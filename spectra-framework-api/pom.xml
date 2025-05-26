@@ -4,9 +4,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.yangxj96</groupId>
-    <artifactId>spectra-framework</artifactId>
+    <artifactId>spectra-framework-api</artifactId>
     <version>${revision}</version>
-    <name>spectra-framework</name>
+    <name>spectra-framework-api</name>
     <packaging>pom</packaging>
 
     <parent>
@@ -17,7 +17,9 @@
     </parent>
 
     <properties>
-        <java.version>21</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 项目版本 -->
         <revision>0.0.1-SNAPSHOT</revision>
 
@@ -29,6 +31,9 @@
 
     <modules>
 
+        <module>spectra-framework-launch</module>
+        <module>spectra-framework-core</module>
+        <module>spectra-framework-security</module>
     </modules>
 
     <dependencyManagement>
@@ -79,11 +84,38 @@
         </dependency>
         <!-- Spring Boot End -->
 
+        <!-- 数据库 Begin -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+        </dependency>
+        <!-- 数据库 End -->
+
         <!-- 通用工具包 Begin -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.6.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>23.1.0</version>
+            <scope>compile</scope>
         </dependency>
         <!-- 通用工具包 End -->
     </dependencies>
