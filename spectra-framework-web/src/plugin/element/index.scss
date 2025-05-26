@@ -1,0 +1,10 @@
+// 这里可以重写element plus的样式表
+@forward "element-plus/theme-chalk/src/common/var.scss" with (
+    $colors: (
+        "primary": (
+            "base": #409eff
+        )
+    )
+);
+
+@use "element-plus/theme-chalk/src/index.scss";

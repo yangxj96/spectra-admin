@@ -1,0 +1,167 @@
+<template>
+    <el-container class="box">
+        <el-header class="box-header">
+            <navbar />
+        </el-header>
+
+        <el-container class="box-container">
+            <el-aside width="200px">
+                <sidebar />
+            </el-aside>
+
+            <el-main class="box-main">
+                <!-- 面包屑横条 -->
+                <el-row class="box-breadcrumb" style="height: 4vh; line-height: 4vh">
+                    <el-col :span="23">
+                        <i class="box-unfold-a" @click="handleMenu">
+                            <icons v-if="appStore.unfold" style="height: 4vh" name="icon-fold-right" />
+                            <icons v-else style="height: 4vh" name="icon-fold-left" />
+                        </i>
+                        <!-- 面包屑 -->
+                        <el-breadcrumb style="display: inline-block" separator-class="el-icon-arrow-right">
+                            <el-breadcrumb-item v-for="(item, idx) in breadcrumb" :key="idx" :to="{ path: item.path }">
+                                {{ item.meta.title }}
+                            </el-breadcrumb-item>
+                        </el-breadcrumb>
+                    </el-col>
+                    <el-col :span="1">
+                        <i class="box-unfold-a" style="float: right" @click="toggle">
+                            <icons name="icon-fullScreen" />
+                        </i>
+                    </el-col>
+                </el-row>
+                <div ref="content" class="box-content loading-box">
+                    <router-view></router-view>
+                </div>
+                <el-footer class="footer">
+                    Copyright © 2018-2023
+                    <strong><a href="//yangxj96.com/" target="_blank">yangxj96</a></strong>
+                    &nbsp;
+                    <strong><a href="//yangxj96.com/" target="_blank">yangxj96.com</a></strong>
+                    All Rights Reserved. 备案号：
+                    <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">滇ICP备2023006063号-1</a>
+                </el-footer>
+            </el-main>
+        </el-container>
+    </el-container>
+</template>
+
+<script lang="ts" setup>
+import Navbar from "@/components/Layout/components/navbar/index.vue";
+import Sidebar from "@/components/Layout/components/sidebar/index.vue";
+import { type RouteLocationMatched, useRouter } from "vue-router";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import useAppStore from "@/plugin/store/modules/useAppStore.ts";
+import { useFullscreen } from "@vueuse/core";
+
+const router = useRouter();
+// 面包屑
+const breadcrumb = ref<RouteLocationMatched[]>([]);
+const appStore = useAppStore();
+const context = useTemplateRef<HTMLElement>("content");
+const { toggle } = useFullscreen(context);
+
+onMounted(() => {
+    handlerRouter();
+
+    watch(
+        () => router.currentRoute.value.matched,
+        value => {
+            handlerRouter([...value]);
+        },
+        {
+            immediate: true,
+            deep: true
+        }
+    );
+});
+
+function handlerRouter(r: RouteLocationMatched[] = []) {
+    if (r.length <= 0) {
+        r = [...router.currentRoute.value.matched];
+    }
+    breadcrumb.value = r;
+}
+
+function handleMenu() {
+    appStore.unfold = !appStore.unfold;
+}
+</script>
+
+<style scoped lang="scss">
+::v-deep(.el-aside) {
+    width: auto;
+}
+
+::v-deep(.el-breadcrumb) {
+    line-height: 4vh;
+}
+
+.box {
+    height: 100vh;
+}
+
+.box-aside {
+    width: 64px;
+}
+
+.box-header {
+    height: auto;
+    border-bottom: solid 1px var(--el-border-color);
+    padding: 0;
+}
+
+.box-container {
+    height: calc(100vh - 66px);
+}
+
+.box-main {
+    padding: 0;
+
+    .box-breadcrumb {
+        padding-left: 2vh;
+        padding-right: 2vh;
+        background-color: #fafafa;
+    }
+
+    .box-content {
+        width: 100%;
+        // 面包屑4vh,头高62px,底部版权20px
+        height: calc(100vh - 4vh - 62px - 20px);
+        overflow: auto;
+    }
+
+    .box-content > div {
+        padding: 10px;
+    }
+
+    .box-content:-webkit-full-screen {
+        background-color: white;
+    }
+
+    .box-content:fullscreen {
+        background-color: white;
+    }
+
+    .box-unfold-a {
+        margin-right: 8px;
+    }
+
+    .footer {
+        text-align: center;
+        width: 100%;
+        height: 20px;
+        font-size: 10px;
+        line-height: 20px;
+        color: var(--el-text-color-regular);
+
+        a {
+            color: var(--el-text-color-primary);
+        }
+    }
+
+    .box-unfold-a:hover {
+        cursor: pointer;
+    }
+}
+</style>

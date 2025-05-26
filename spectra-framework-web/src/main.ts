@@ -1,14 +1,33 @@
-import './assets/main.css'
+import { createApp } from "vue";
+import App from "./App.vue";
+// 加载相关内容
+import loadPlugins from "@/plugin";
+import loadDirective from "@/directive";
+// iconfont
+import "//at.alicdn.com/t/c/font_3119163_uqq7r2jpcnr.js";
+import Icons from "@/components/common/Icons.vue";
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import Mock from "@/mocks/browser.ts";
 
-import App from './App.vue'
-import router from './router'
+// 启动mock模拟请求
+if (import.meta.env.DEV) {
+    await Mock.start({
+        // 未拦截的地址不进行警告
+        onUnhandledRequest: "bypass"
+    });
+}
 
-const app = createApp(App)
+// 判断是否是刷新进来的
+const navigationEntries = globalThis.performance?.getEntriesByType?.("navigation");
+const navigationEntry = navigationEntries?.[0] as PerformanceNavigationTiming | undefined;
 
-app.use(createPinia())
-app.use(router)
+if (navigationEntry?.type === "reload") {
+    sessionStorage.setItem("reloaded", "true");
+}
 
-app.mount('#app')
+// 创建APP
+const app = createApp(App);
+loadPlugins(app);
+loadDirective(app);
+app.component("icons", Icons);
+app.mount("#app");

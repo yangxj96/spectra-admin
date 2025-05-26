@@ -1,39 +1,29 @@
-# spectra-framework-web
+# 通用SAAS平台前端项目
 
-This template should help get you started developing with Vue 3 in Vite.
+# 1 技术架构选型
 
-## Recommended IDE Setup
+技术架构：
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- 🚀️ `vite`
+- 🚀️ `vue`
+- 🚀️ `vue-router`
+- 🚀️ `pinia`
+- 🚀️ `sass`
+- 🚀️ `element-plus`
+- 🚀️ `axios`
+- 🚀️ `typescript`
+- ...
 
-## Type Support for `.vue` Imports in TS
+## 依赖版本管理
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+使用npm-check-updates管理版本
 
-## Customize configuration
+将package.json中的所有依赖更新为最新版本：
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```shell
+    ncu -u
 ```
 
-### Compile and Hot-Reload for Development
+# 使用许可
 
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+[MIT](../LICENSE) © yangxj96
