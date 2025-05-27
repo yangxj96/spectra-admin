@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS db_user.t_account
     id         BIGINT PRIMARY KEY,
 
     username   VARCHAR(20) UNIQUE,
-    password   varbit(128),
+    password   VARCHAR(128),
     enable     BOOLEAN,
 
     created_by BIGINT,

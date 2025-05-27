@@ -87,15 +87,6 @@ export default [
                             path: "swagger",
                             component: "/System/Swagger/index",
                             sort: 0
-                        },
-                        {
-                            id: "1909865049464242177",
-                            pid: "1909865049464242176",
-                            icon: "icon-setting-role",
-                            name: "路由管理",
-                            path: "route",
-                            component: "/System/Route/index",
-                            sort: 0
                         }
                     ]
                 },

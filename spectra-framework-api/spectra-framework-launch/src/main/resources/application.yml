@@ -1,20 +1,26 @@
 # 服务器配置
 server:
   port: 8888
+  servlet:
+    context-path: /api/v1
 # spring 配置
 spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/spectra_saas_db
+    url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
     type: com.zaxxer.hikari.HikariDataSource
+  data:
+    redis:
+      url: redis://localhost:6379/1
+
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.yangxj96.spectra.*.entity.dto
+  type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     local-cache-scope: statement
@@ -45,6 +51,8 @@ springdoc:
 sa-token:
   # token 名称（同时也是 cookie 名称）
   token-name: Authorization
+  # token前缀
+  token-prefix: Bearer
   # token 有效期（单位：秒） 默认30天，-1 代表永久有效
   # timeout: 2592000
   # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
@@ -59,3 +67,4 @@ sa-token:
   is-log: true
   # 是否输出banner
   is-print: false
+

@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "t_authority")
+@TableName(value = "db_user.t_authority")
 public class Authority extends BaseEntity {
     /**
      * 权限名称

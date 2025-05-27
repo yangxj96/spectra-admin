@@ -20,13 +20,11 @@
     </sql>
 
     <select id="getAccountId" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List">
-        </include>
+        SELECT r.*
         FROM db_user.t_role r,
-        db_user.t_account_role_map arm
+             db_user.t_account_role_map arm
         WHERE arm.account_id = #{accountId}
-        AND arm.role_id = r.id
+          AND arm.role_id = r.id
         ORDER BY created_at DESC;
     </select>
 </mapper>

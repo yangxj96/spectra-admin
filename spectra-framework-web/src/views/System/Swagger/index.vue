@@ -4,7 +4,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
-const src = ref("http://localhost:8888/swagger-ui/index.html");
+const src = ref("http://localhost:8888/api/v1/swagger-ui/index.html");
 </script>
 
 <style scoped lang="scss">

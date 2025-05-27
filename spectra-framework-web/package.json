@@ -14,7 +14,7 @@
         "format": "prettier --write . --config ./.prettierrc.json",
         "lint": "eslint  ./src --fix",
         "type-check": "vue-tsc --noEmit --composite false",
-        "prestart": "npm format && npm lint && npm type-check"
+        "prestart": "npm run format && npm run lint && npm run type-check"
     },
     "husky": {
         "hooks": {

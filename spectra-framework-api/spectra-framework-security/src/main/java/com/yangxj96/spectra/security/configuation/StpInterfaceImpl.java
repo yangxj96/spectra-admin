@@ -8,8 +8,8 @@ import com.yangxj96.spectra.security.service.RoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 自定义权限加载接口实现类
@@ -28,14 +28,17 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        List<Role> roles = roleService.getByAccountId((Long) loginId);
-        List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).collect(Collectors.toList()));
-        return authorities.stream().map(Authority::getName).collect(Collectors.toList());
+        List<Role> roles = roleService.getByAccountId(Long.parseLong((String) loginId));
+        if (roles.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).toList());
+        return authorities.stream().map(Authority::getName).toList();
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        List<Role> roles = roleService.getByAccountId((Long) loginId);
-        return roles.stream().map(Role::getName).collect(Collectors.toList());
+        List<Role> roles = roleService.getByAccountId(Long.parseLong((String) loginId));
+        return roles.stream().map(Role::getName).toList();
     }
 }

@@ -1,13 +1,13 @@
 package com.yangxj96.spectra.security.entity.vo;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 登录认证token响应
@@ -17,6 +17,7 @@ import java.io.Serializable;
  */
 @Data
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class TokenVO implements Serializable {
@@ -24,5 +25,16 @@ public class TokenVO implements Serializable {
     @Serial
     @JsonIgnore
     private static final long serialVersionUID = 1L;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long id;
+
+    private String username;
+
+    private String accessToken;
+
+    private List<String> authorities;
+
+    private List<String> roles;
 
 }

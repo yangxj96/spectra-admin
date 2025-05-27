@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "t_account_role_map")
+@TableName(value = "db_user.t_account_role_map")
 public class AccountRoleMap extends BaseEntity {
     /**
      * 账号ID

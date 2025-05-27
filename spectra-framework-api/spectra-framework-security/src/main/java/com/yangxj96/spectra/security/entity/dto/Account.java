@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "t_account")
+@TableName(value = "db_user.t_account")
 public class Account extends BaseEntity {
 
     /**
@@ -32,7 +32,7 @@ public class Account extends BaseEntity {
      * 密码
      */
     @TableField(value = "\"password\"")
-    private byte[] password;
+    private String password;
 
     /**
      * 是否启用
