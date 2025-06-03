@@ -3,12 +3,16 @@ import { hideLoading, showLoading } from "@/plugin/element/loading";
 import { ElMessage } from "element-plus/es";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 
+// 常见内容类型
+// application/x-www-form-urlencoded
+// application/json
+
 const http = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
     timeout: 60 * 1000,
     withCredentials: false,
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/x-www-form-urlencoded"
     }
 });
 
@@ -25,10 +29,7 @@ export function stopAllRequest() {
     }
 }
 
-/**
- * 请求拦截器 配置请求
- * @param config 相关配置
- */
+// 每次发起 HTTP 请求时都会首先触发这个拦截器。
 const requestFulfilled = (config: InternalAxiosRequestConfig) => {
     if (config.headers.loading == undefined || config.headers.loading === true) {
         showLoading();
@@ -36,7 +37,7 @@ const requestFulfilled = (config: InternalAxiosRequestConfig) => {
     }
     const token = useUserStore().token.access_token;
     if (token != undefined || token != "") {
-        config.headers["Authorization"] = token;
+        config.headers["Authorization"] = `Bearer ${token}`;
     }
     config.cancelToken = new axios.CancelToken(function executor(c) {
         clean.push(c);
@@ -44,65 +45,30 @@ const requestFulfilled = (config: InternalAxiosRequestConfig) => {
     return config;
 };
 
-/**
- * 请求失败情况,在请求之前就失败了
- * @param error
- */
+// 当创建请求或配置请求过程中发生错误时触发。例如，在尝试构造请求对象时发生了异常，或者在请求配置阶段遇到了问题。
 const requestRejected = (error: AxiosError) => {
     hideLoading();
     return Promise.reject(error as Error);
 };
 
-/**
- * 请求拦截
- * 在2xx范围内的任何状态代码都会触发此函数，这里主要用于处理响应数据
- * @param response
- */
+// HTTP 状态码在 200 ~ 299 之间
 const responseFulfilled = (response: AxiosResponse<IResult>) => {
     hideLoading();
-    if (response.data.code != 0) {
-        ElMessage.error({
-            type: "error",
-            message: response.data.msg
-        });
-        throw new Error(`请求失败:${response.data.msg}`);
-    }
     return response;
 };
 
-/**
- * 主要用于发送请求就直接出错了,比如网络错误之类的
- * @param error
- */
+// 网络错误、请求未完成,HTTP 状态码为 4xx、5xx
 const responseRejected = (error: AxiosError) => {
     console.log(error);
     hideLoading();
     if (error.name === "CanceledError") {
         return Promise.reject(error);
     }
-    if (error.response) {
-        switch (error.response.status) {
-            case 404: {
-                ElMessage.error({
-                    type: "error",
-                    message: "请求URL错误"
-                });
-                break;
-            }
-            case 500: {
-                ElMessage.error({
-                    type: "error",
-                    message: "服务器异常"
-                });
-                break;
-            }
-            default: {
-                ElMessage.error({
-                    type: "error",
-                    message: "请求失败,请稍后重试"
-                });
-            }
-        }
+    if (error.response?.data as IResult) {
+        ElMessage.error({
+            type: "error",
+            message: (error.response?.data as IResult).msg
+        });
     } else {
         ElMessage.error({
             type: "error",

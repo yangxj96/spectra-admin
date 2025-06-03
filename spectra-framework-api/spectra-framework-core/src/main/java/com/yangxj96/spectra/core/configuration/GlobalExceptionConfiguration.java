@@ -7,8 +7,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.security.auth.login.LoginException;
 
 /**
  * 全局异常处理
@@ -19,6 +22,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionConfiguration {
+
+
+    /**
+     * 登录异常
+     */
+    @ExceptionHandler(LoginException.class)
+    public R<Object> loginException(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.atError().log("登录异常,{}", e.getMessage(), e);
+        return R.failure(e.getMessage());
+    }
 
 
     /**
@@ -49,6 +63,22 @@ public class GlobalExceptionConfiguration {
         response.setStatus(HttpStatus.NO_CONTENT.value());
         log.atError().log("数据不存在异常,{} ", e.getMessage(), e);
         return R.failure(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * 参数验证异常
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
+        log.atError().log("参数验证异常,{} ", e.getMessage(), e);
+        response.setStatus(HttpStatus.BAD_REQUEST.value());
+
+        var errors = e.getBindingResult().getAllErrors();
+        if (!errors.isEmpty()) {
+            return R.failure(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage());
+        } else {
+            return R.failure(HttpStatus.BAD_REQUEST);
+        }
     }
 
     /**

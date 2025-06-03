@@ -1,16 +1,17 @@
 import http from "@/plugin/request";
-import useUserStore from "@/plugin/store/modules/useUserStore";
 
 export default {
     /**
      * 用户登录
      * @param username 用户名
      * @param password 密码
+     * @param code 验证码
      */
-    async login(username: string, password: string) {
+    async login(username: string, password: string, code: string) {
         const response = await http.post<IResult<Token>>("/api/auth/login", {
             username: username,
-            password: password
+            password: password,
+            code: code
         });
         return response.data;
     },
@@ -18,9 +19,7 @@ export default {
      * 退出登录
      */
     async logout() {
-        const resp = await http.post("/api/auth/logout", {
-            token: useUserStore().token.access_token
-        });
+        const resp = await http.post("/api/auth/logout");
         return resp.data;
     }
 };

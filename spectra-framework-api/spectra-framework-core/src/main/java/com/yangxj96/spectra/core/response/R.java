@@ -58,4 +58,15 @@ public class R<T> implements Serializable {
         return R.builder().code(status.value()).msg(status.getReasonPhrase()).build();
     }
 
+    public static R<Object> failure(String msg) {
+        return R.builder()
+                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .msg(msg)
+                .build();
+    }
+
+    public static R<Object> failure(HttpStatus status,String msg) {
+        return R.builder().code(status.value()).msg(msg).build();
+    }
+
 }

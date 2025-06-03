@@ -1,7 +1,9 @@
 import { http, HttpResponse } from "msw";
 
+const prefix = import.meta.env.VITE_API_URL;
+
 export default [
-    http.get("/api/system/menus", () => {
+    http.get(prefix + "/api/system/menus", () => {
         return HttpResponse.json<IResult<Menu[]>>({
             code: 0,
             msg: "success",
@@ -77,15 +79,6 @@ export default [
                             name: "文件存储",
                             path: "storage",
                             component: "/System/Storage/index",
-                            sort: 0
-                        },
-                        {
-                            id: "1909865049464242177",
-                            pid: "1909865049464242176",
-                            icon: "icon-setting-role",
-                            name: "接口测试",
-                            path: "swagger",
-                            component: "/System/Swagger/index",
                             sort: 0
                         }
                     ]

@@ -7,6 +7,7 @@ import com.yangxj96.spectra.security.entity.vo.TokenVO;
 import com.yangxj96.spectra.security.service.AccountService;
 import com.yangxj96.spectra.security.service.AuthService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import javax.security.auth.login.LoginException;
  * @author 杨新杰
  * @since 2025/5/26 19:01
  */
+@Slf4j
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -32,11 +34,8 @@ public class AuthServiceImpl implements AuthService {
         // 验证码查询
         // 账户查询
         Account datum = accountService.getByUsername(params.getUsername());
-        if (null == datum) {
-            throw new LoginException("账号或密码错误");
-        }
-        // 密码匹配失败
-        if (!encoder.matches(params.getPassword(), datum.getPassword())) {
+        // 账号不存在或者密码匹配失败
+        if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
             throw new LoginException("账号或密码错误");
         }
         StpUtil.login(datum.getId());
@@ -52,7 +51,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout() {
         StpUtil.logout();
-
     }
 
 }

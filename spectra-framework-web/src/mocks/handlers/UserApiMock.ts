@@ -1,8 +1,10 @@
 import { http, HttpResponse } from "msw";
 import CommonUtils from "@/utils/CommonUtils.ts";
 
+const prefix = import.meta.env.VITE_API_URL;
+
 export default [
-    http.get("/api/user/page", () => {
+    http.get(prefix + "/api/user/page", () => {
         let records = [] as User[];
         for (let i = 0; i < 15; i++) {
             records.push({

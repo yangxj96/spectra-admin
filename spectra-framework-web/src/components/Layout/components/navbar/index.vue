@@ -59,19 +59,13 @@ function gotoHome() {
 
 function handleUserLogout() {
     stopAllRequest();
-    AuthApi.logout().then(res => {
-        if (res.code == 0) {
-            ElMessage.success({
-                message: "退出成功",
-                onClose: () => {
-                    GlobalUtils.exit();
-                }
-            });
-        } else {
-            ElMessage.error({
-                message: res.msg
-            });
-        }
+    AuthApi.logout().then(() => {
+        ElMessage.success({
+            message: "退出成功",
+            onClose: () => {
+                GlobalUtils.exit();
+            }
+        });
     });
 }
 

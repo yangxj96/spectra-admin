@@ -14,12 +14,15 @@
                 </p>
             </template>
             <div>
-                <el-form ref="loginForm" label-width="60px" :model="user" :rules="rules">
+                <el-form ref="loginForm" label-width="70px" :model="user" :rules="rules">
                     <el-form-item label="账号" prop="username">
                         <el-input v-model="user.username" placeholder="请输入账号" />
                     </el-form-item>
                     <el-form-item label="密码" prop="password">
                         <el-input v-model="user.password" placeholder="请输入密码" show-password />
+                    </el-form-item>
+                    <el-form-item label="验证码" prop="code">
+                        <el-input v-model="user.code" placeholder="请输入验证码" />
                     </el-form-item>
                 </el-form>
             </div>
@@ -46,12 +49,14 @@ const loginForm = ref<FormInstance>();
 
 const user = reactive<User>({
     username: "sysadmin",
-    password: "sysadmin"
+    password: "sysadmin",
+    code: "1234"
 });
 
 const rules = reactive<FormRules<User>>({
     username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-    password: [{ required: true, message: "请输入密码", trigger: "blur" }]
+    password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+    code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
 });
 
 async function handleLogin(formElement: FormInstance | undefined) {
@@ -69,8 +74,8 @@ async function handleLogin(formElement: FormInstance | undefined) {
             return;
         }
 
-        AuthApi.login(user.username, user.password).then(res => {
-            if (res && res.code === 0 && res.data) {
+        AuthApi.login(user.username, user.password, user.code).then(res => {
+            if (res && res.code === 200 && res.data) {
                 ElMessage.success({
                     duration: 500,
                     message: "登录成功",
@@ -87,6 +92,7 @@ async function handleLogin(formElement: FormInstance | undefined) {
 interface User {
     username: string;
     password: string;
+    code: string;
 }
 </script>
 

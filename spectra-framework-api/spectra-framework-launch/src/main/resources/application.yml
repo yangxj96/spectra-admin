@@ -2,7 +2,7 @@
 server:
   port: 8888
   servlet:
-    context-path: /api/v1
+    context-path: /api
 # spring 配置
 spring:
   application:
@@ -22,7 +22,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    # log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -37,16 +38,6 @@ logging:
     spectra: debug
   group:
     spectra: com.yangxj96.spectra
-# OpenAPI配置
-springdoc:
-  webjars:
-    prefix:
-  api-docs:
-    enabled: true
-    path: /v3/api-docs
-  swagger-ui:
-    enabled: true
-    path: /swagger-ui.html
 # Sa-Token 配置
 sa-token:
   # token 名称（同时也是 cookie 名称）
