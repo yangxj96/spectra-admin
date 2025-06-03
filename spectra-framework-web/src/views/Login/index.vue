@@ -22,7 +22,22 @@
                         <el-input v-model="user.password" placeholder="请输入密码" show-password />
                     </el-form-item>
                     <el-form-item label="验证码" prop="code">
-                        <el-input v-model="user.code" placeholder="请输入验证码" />
+                        <el-row style="width: 100%">
+                            <el-col :span="12">
+                                <el-input v-model="user.code" placeholder="请输入验证码" />
+                            </el-col>
+                            <el-col :span="12">
+                                <el-image src="/src/assets/images/vcode.png" class="v-code">
+                                    <template #error>
+                                        <div class="image-slot">
+                                            <el-icon>
+                                                <icon-picture />
+                                            </el-icon>
+                                        </div>
+                                    </template>
+                                </el-image>
+                            </el-col>
+                        </el-row>
                     </el-form-item>
                 </el-form>
             </div>
@@ -40,6 +55,7 @@
 import { reactive, ref } from "vue";
 import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
+import { Picture as IconPicture } from "@element-plus/icons-vue";
 import { useRouter } from "vue-router";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import AuthApi from "@/api/AuthApi.ts";
@@ -113,5 +129,12 @@ interface User {
 
 :deep(.el-dialog__footer) {
     padding-top: 0;
+}
+
+.v-code {
+    height: calc(var(--el-input-height, 32px) - 2px);
+    width: 100%;
+    padding: 4px;
+    border-radius: 10px;
 }
 </style>
