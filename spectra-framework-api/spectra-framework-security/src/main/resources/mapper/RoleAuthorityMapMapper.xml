@@ -3,7 +3,7 @@
 <mapper namespace="com.yangxj96.spectra.security.mapper.RoleAuthorityMapMapper">
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.security.entity.dto.RoleAuthorityMap">
         <!--@mbg.generated-->
-        <!--@Table t_role_authority_map-->
+        <!--@Table db_system.t_role_authority_map-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="role_id" jdbcType="BIGINT" property="roleId"/>
         <result column="authority_id" jdbcType="BIGINT" property="authorityId"/>

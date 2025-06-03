@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_kernel.t_menu")
+@TableName(value = "db_system.t_menu")
 public class Menu extends BaseEntity {
 
     /**

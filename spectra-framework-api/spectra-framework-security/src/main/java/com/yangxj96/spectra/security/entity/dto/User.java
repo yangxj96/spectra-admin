@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_user.t_user")
+@TableName(value = "db_system.t_user")
 public class User extends BaseEntity {
     /**
      * 姓名

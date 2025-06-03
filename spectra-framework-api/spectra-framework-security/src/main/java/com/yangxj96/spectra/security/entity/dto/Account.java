@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_user.t_account")
+@TableName(value = "db_system.t_account")
 public class Account extends BaseEntity {
 
     /**

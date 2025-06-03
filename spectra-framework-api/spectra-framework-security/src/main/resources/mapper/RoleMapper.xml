@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.security.entity.dto.Role">
         <!--@mbg.generated-->
-        <!--@Table db_user.t_role-->
+        <!--@Table db_system.t_role-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
@@ -21,8 +21,8 @@
 
     <select id="getAccountId" resultMap="BaseResultMap">
         SELECT r.*
-        FROM db_user.t_role r,
-             db_user.t_account_role_map arm
+        FROM db_system.t_role r,
+             db_system.t_account_role_map arm
         WHERE arm.account_id = #{accountId}
           AND arm.role_id = r.id
         ORDER BY created_at DESC;

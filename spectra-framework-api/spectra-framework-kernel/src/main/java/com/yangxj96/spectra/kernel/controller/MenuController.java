@@ -8,9 +8,7 @@ import com.yangxj96.spectra.core.response.R;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
 import com.yangxj96.spectra.kernel.service.MenuService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,5 +43,16 @@ public class MenuController {
     @GetMapping("/tree")
     public R<List<Tree<String>>> tree() {
         return R.success(bindService.tree());
+    }
+
+    /**
+     * 修改菜单信息
+     *
+     * @param params 菜单信息
+     * @return 修改结果
+     */
+    @PutMapping("/modify")
+    public R<Object> modify(@RequestBody Menu params) {
+        return R.success();
     }
 }

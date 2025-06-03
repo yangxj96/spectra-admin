@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_user.t_role_authority_map")
+@TableName(value = "db_system.t_role_authority_map")
 public class RoleAuthorityMap extends BaseEntity {
     /**
      * 角色ID

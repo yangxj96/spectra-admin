@@ -3,7 +3,7 @@
 <mapper namespace="com.yangxj96.spectra.security.mapper.UserMapper">
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.security.entity.dto.User">
         <!--@mbg.generated-->
-        <!--@Table t_user-->
+        <!--@Table db_system.t_user-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="name" jdbcType="VARCHAR" property="name"/>
         <result column="tel" jdbcType="VARCHAR" property="tel"/>

@@ -6,7 +6,7 @@
                 <el-input placeholder="请输入菜单名称" clearable />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary" @click="handleCriteriaQuery">查询</el-button>
                 <el-button>重置</el-button>
                 <el-button @click="handleMenuAddDialog">新增</el-button>
             </el-form-item>
@@ -38,7 +38,6 @@
             </el-table-column>
         </el-table>
     </el-row>
-
     <!-- 新增或编辑 -->
     <el-dialog
         v-model="menu.dialog"
@@ -50,9 +49,40 @@
         :title="(menu.modify ? '编辑' : '新增') + '菜单'"
         width="30vw">
         <template #default>
-            <el-form v-loading="menu.loading" label-width="auto" @submit.prevent>
-                <el-form-item label="姓名" prop="username">
-                    <el-input placeholder="请输入姓名" />
+            <el-form
+                v-loading="menu.loading"
+                :rules="menu.rules"
+                :model="menu.form"
+                label-width="auto"
+                style="padding: 20px"
+                @submit.prevent>
+                <el-form-item v-if="menu.modify" label="数据ID" prop="id">
+                    <el-input v-model="menu.form.id" disabled clearable placeholder="请输入菜单名称" />
+                </el-form-item>
+                <el-form-item label="名称" prop="name">
+                    <el-input v-model="menu.form.name" clearable placeholder="请输入菜单名称" />
+                </el-form-item>
+                <el-form-item label="图标" prop="icon">
+                    <el-input v-model="menu.form.icon" clearable placeholder="请选择菜单名称" />
+                </el-form-item>
+                <el-form-item label="路径" prop="path">
+                    <el-input v-model="menu.form.path" clearable placeholder="请输入路径" />
+                </el-form-item>
+                <el-form-item label="组件" prop="component">
+                    <el-input v-model="menu.form.component" clearable placeholder="请输入组件路径" />
+                </el-form-item>
+                <el-form-item label="布局" prop="layout">
+                    <el-select v-model="menu.form.layout" clearable placeholder="请输入布局">
+                        <el-option label="默认布局" value="layout" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="排序" prop="sort">
+                    <el-input-number
+                        :min="0"
+                        :max="999"
+                        v-model="menu.form.sort"
+                        placeholder="请输入排序"
+                        style="width: 100%" />
                 </el-form-item>
             </el-form>
         </template>
@@ -77,17 +107,26 @@ const menu = reactive({
     loading: false,
     form: {} as Menu,
     rules: {
-        username: [{ required: true, message: "请输入用户名", trigger: "blur" }]
+        name: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
+        icon: [{ required: true, message: "请选择菜单图标", trigger: "blur" }],
+        path: [{ required: true, message: "请输入菜单路径", trigger: "blur" }],
+        component: [{ required: true, message: "请输入组件路径", trigger: "blur" }],
+        sort: [{ required: true, message: "请输入排序", trigger: "blur" }]
     } as FormRules
 });
 
 onMounted(() => {
+    handleCriteriaQuery();
+});
+
+// 初始化数据
+function handleCriteriaQuery() {
     MenuApi.tree().then((res: IResult<Menu[]>) => {
         if (res.code === 200 && res.data) {
             table_data.value = res.data;
         }
     });
-});
+}
 
 // 表行修改按钮被单击
 function handleTableItemModify(row: Menu) {

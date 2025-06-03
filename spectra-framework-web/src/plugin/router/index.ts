@@ -3,7 +3,7 @@ import useUserStore from "@/plugin/store/modules/useUserStore";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 import { hideLoading, showLoading } from "@/plugin/element/loading";
 import routes from "@/plugin/router/routes";
-import SystemApi from "@/api/SystemApi.ts";
+import MenuApi from "@/api/MenuApi.ts";
 import { convertMenuToRoutes } from "@/utils/RouteUtils.ts";
 import { ElMessage } from "element-plus";
 
@@ -47,8 +47,8 @@ router.beforeEach(async (to, _, next) => {
         let menus = useAppStore().menus;
         // 判断是否有菜单信息,没有则需要拉去菜单信息
         if (menus.length === 0) {
-            let res = await SystemApi.getMenu();
-            if (res.code == 0 && res.data) {
+            let res = await MenuApi.tree();
+            if (res.code == 200 && res.data) {
                 useAppStore().menus = res.data;
                 menus = res.data;
             } else {
@@ -79,6 +79,7 @@ router.beforeEach(async (to, _, next) => {
     }
     console.debug("[路由守卫 - 前置] - 解析守卫结束");
 });
+
 // 路由后置守卫
 router.afterEach(to => {
     // 切换标题

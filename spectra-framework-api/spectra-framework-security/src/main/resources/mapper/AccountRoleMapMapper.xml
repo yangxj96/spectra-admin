@@ -3,7 +3,7 @@
 <mapper namespace="com.yangxj96.spectra.security.mapper.AccountRoleMapMapper">
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.security.entity.dto.AccountRoleMap">
         <!--@mbg.generated-->
-        <!--@Table t_account_role_map-->
+        <!--@Table db_system.t_account_role_map-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="account_id" jdbcType="BIGINT" property="accountId"/>
         <result column="role_id" jdbcType="BIGINT" property="roleId"/>

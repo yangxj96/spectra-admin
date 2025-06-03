@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_user.t_role")
+@TableName(value = "db_system.t_role")
 public class Role extends BaseEntity {
     /**
      * 角色名称
