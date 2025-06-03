@@ -16,6 +16,13 @@ type UserPageParams = BasePageParams & {
 };
 
 /**
+ * 菜单分页请求参数定义
+ */
+type MenuPageParams = BasePageParams & {
+    name?: string;
+};
+
+/**
  * 路由分页请求参数定义
  */
 type RoutePageParams = BasePageParams & {

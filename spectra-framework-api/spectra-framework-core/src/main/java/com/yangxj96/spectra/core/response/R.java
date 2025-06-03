@@ -47,6 +47,14 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    public static <T> @NotNull R<T> success(T data) {
+        return R.<T>builder()
+                .code(HttpStatus.OK.value())
+                .msg(HttpStatus.OK.getReasonPhrase())
+                .data(data)
+                .build();
+    }
+
     public static R<Object> failure() {
         return R.builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())

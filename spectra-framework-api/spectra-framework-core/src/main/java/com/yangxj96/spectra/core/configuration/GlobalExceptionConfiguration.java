@@ -1,5 +1,6 @@
 package com.yangxj96.spectra.core.configuration;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import com.yangxj96.spectra.core.exception.DataExistException;
 import com.yangxj96.spectra.core.exception.DataNotExistException;
 import com.yangxj96.spectra.core.response.R;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import javax.security.auth.login.LoginException;
 
@@ -25,6 +27,29 @@ public class GlobalExceptionConfiguration {
 
 
     /**
+     * 未找到资源
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.atError().log("未找到资源,{}", e.getMessage(), e);
+        return R.failure("未找到资源");
+    }
+
+    /**
+     * 未登录异常
+     */
+    @ExceptionHandler(NotLoginException.class)
+    public R<Object> notLoginException(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        log.atError().log("未登录异常,{}", e.getMessage(), e);
+        if (e.getMessage().contains("冻结")) {
+            return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
+        }
+        return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
+    /**
      * 登录异常
      */
     @ExceptionHandler(LoginException.class)
@@ -33,7 +58,6 @@ public class GlobalExceptionConfiguration {
         log.atError().log("登录异常,{}", e.getMessage(), e);
         return R.failure(e.getMessage());
     }
-
 
     /**
      * 数据已存在异常

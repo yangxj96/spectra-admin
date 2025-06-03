@@ -2,6 +2,7 @@ import axios, { type AxiosError, type AxiosResponse, type Canceler, type Interna
 import { hideLoading, showLoading } from "@/plugin/element/loading";
 import { ElMessage } from "element-plus/es";
 import useUserStore from "@/plugin/store/modules/useUserStore";
+import GlobalUtils from "@/utils/GlobalUtils.ts";
 
 // 常见内容类型
 // application/x-www-form-urlencoded
@@ -65,10 +66,18 @@ const responseRejected = (error: AxiosError) => {
         return Promise.reject(error);
     }
     if (error.response?.data as IResult) {
-        ElMessage.error({
-            type: "error",
-            message: (error.response?.data as IResult).msg
-        });
+        let result = error.response?.data as IResult;
+        switch (error.response?.status) {
+            case 401:
+                ElMessage.error(result.msg);
+                GlobalUtils.exit();
+                return;
+            case 402:
+                console.log("占位用一下");
+                return;
+            default:
+                ElMessage.error((error.response?.data as IResult).msg);
+        }
     } else {
         ElMessage.error({
             type: "error",

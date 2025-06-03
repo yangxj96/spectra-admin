@@ -18,6 +18,8 @@ export function useTable<T>(
     const table_data = ref<T[]>([]);
 
     onMounted(() => {
+        pagination.value.page = parameters.page_num;
+        pagination.value.size = parameters.page_size;
         handleCurrentChange(pagination.value.page);
     });
 
@@ -55,7 +57,7 @@ export function useTable<T>(
      * @param response 响应内容
      */
     function handleRequestResult(response: IResult<Page<T>>) {
-        if (response.code != 0) {
+        if (response.code != 200) {
             ElMessage.success({
                 message: response.msg
             });

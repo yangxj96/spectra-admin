@@ -34,6 +34,7 @@
         <module>spectra-framework-launch</module>
         <module>spectra-framework-core</module>
         <module>spectra-framework-security</module>
+        <module>spectra-framework-kernel</module>
     </modules>
 
     <dependencyManagement>
@@ -121,6 +122,10 @@
             <artifactId>annotations</artifactId>
             <version>23.1.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
         </dependency>
         <!-- 通用工具包 End -->
     </dependencies>
