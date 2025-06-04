@@ -28,11 +28,10 @@
     <module name="TreeWalker">
 
         <!-- import检查-->
-        <!-- 避免使用* -->
         <module name="AvoidStarImport">
             <property name="excludes" value="java.io,java.net,java.lang.Math"/>
             <!-- 实例；import java.util.*;.-->
-            <property name="allowClassImports" value="false"/>
+            <property name="allowClassImports" value="true"/>
             <!-- 实例 ；import static org.junit.Assert.*;-->
             <property name="allowStaticMemberImports" value="true"/>
         </module>
