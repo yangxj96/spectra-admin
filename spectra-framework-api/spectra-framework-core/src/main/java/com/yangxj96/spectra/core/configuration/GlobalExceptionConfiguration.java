@@ -1,6 +1,7 @@
 package com.yangxj96.spectra.core.configuration;
 
 import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import com.yangxj96.spectra.core.exception.DataExistException;
 import com.yangxj96.spectra.core.exception.DataNotExistException;
 import com.yangxj96.spectra.core.response.R;
@@ -37,6 +38,16 @@ public class GlobalExceptionConfiguration {
     }
 
     /**
+     * 无权限异常
+     */
+    @ExceptionHandler(NotPermissionException.class)
+    public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        log.atError().log("无权限异常,{}", e.getMessage(), e);
+        return R.failure(HttpStatus.FORBIDDEN, "权限不足");
+    }
+
+    /**
      * 未登录异常
      */
     @ExceptionHandler(NotLoginException.class)
@@ -60,7 +71,7 @@ public class GlobalExceptionConfiguration {
     }
 
     /**
-     * 数据已存在异常
+     * 未进行功能实现异常
      */
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
@@ -84,9 +95,9 @@ public class GlobalExceptionConfiguration {
      */
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.NO_CONTENT.value());
+        response.setStatus(HttpStatus.NOT_FOUND.value());
         log.atError().log("数据不存在异常,{} ", e.getMessage(), e);
-        return R.failure(HttpStatus.NO_CONTENT);
+        return R.failure(HttpStatus.NOT_FOUND);
     }
 
     /**

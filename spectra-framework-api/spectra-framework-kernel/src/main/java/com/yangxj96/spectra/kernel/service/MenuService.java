@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yangxj96.spectra.core.entity.from.PageFrom;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
+import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 
 import java.util.List;
 
@@ -17,18 +18,22 @@ import java.util.List;
 public interface MenuService extends IService<Menu> {
 
     /**
-     * 分页查询数据
-     *
-     * @param page 分页信息
-     * @return 分页VO
-     */
-    IPage<Menu> page(PageFrom page);
-
-    /**
      * 生成树形菜单
      *
      * @return 生成的树形菜单
      */
     List<Tree<String>> tree();
 
+    /**
+     * 创建菜单
+     * @param params 菜单信息
+     */
+    void created(MenuSaveFrom params);
+
+    /**
+     * 修改菜单信息
+     *
+     * @param params 修改参数
+     */
+    void modify(MenuSaveFrom params);
 }

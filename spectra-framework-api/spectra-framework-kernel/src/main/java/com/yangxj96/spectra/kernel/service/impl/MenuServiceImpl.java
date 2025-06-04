@@ -8,10 +8,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yangxj96.spectra.core.entity.from.PageFrom;
+import com.yangxj96.spectra.core.exception.DataNotExistException;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
+import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 import com.yangxj96.spectra.kernel.mapper.MenuMapper;
 import com.yangxj96.spectra.kernel.service.MenuService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,12 +27,6 @@ import java.util.List;
  */
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
-
-    @Override
-    public IPage<Menu> page(PageFrom page) {
-        Page<Menu> p = new Page<>(page.getPageNum(), page.getPageSize());
-        return this.page(p, new LambdaQueryWrapper<>());
-    }
 
     @Override
     public List<Tree<String>> tree() {
@@ -46,5 +44,24 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             tree.putExtra("layout", node.getLayout());
             tree.putExtra("sort", node.getSort());
         });
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void created(MenuSaveFrom params) {
+        Menu menu = new Menu();
+        BeanUtils.copyProperties(params, menu);
+        this.save(menu);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void modify(MenuSaveFrom params) {
+        if (null == this.getById(params.getId())) {
+            throw new DataNotExistException("[" + params.getId() + "]不存在");
+        }
+        Menu menu = new Menu();
+        BeanUtils.copyProperties(params, menu);
+        this.updateById(menu);
     }
 }

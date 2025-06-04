@@ -173,7 +173,6 @@ COMMENT ON COLUMN db_system.t_menu.created_at IS '创建时间';
 COMMENT ON COLUMN db_system.t_menu.updated_by IS '最后更新人';
 COMMENT ON COLUMN db_system.t_menu.updated_at IS '最后更新时间';
 COMMENT ON COLUMN db_system.t_menu.deleted IS '是否删除';
-
 COMMENT ON COLUMN db_system.t_menu.pid IS '父级ID';
 COMMENT ON COLUMN db_system.t_menu.icon IS '图标';
 COMMENT ON COLUMN db_system.t_menu.name IS '名称';

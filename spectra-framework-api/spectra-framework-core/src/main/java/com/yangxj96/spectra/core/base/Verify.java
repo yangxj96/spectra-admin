@@ -11,13 +11,13 @@ public class Verify {
     /**
      * 校验新增分组
      */
-    interface Insert {
+    public interface Insert {
     }
 
     /**
      * 校验修改分组
      */
-    interface Update {
+    public interface Update {
     }
 
 }

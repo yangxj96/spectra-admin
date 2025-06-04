@@ -78,9 +78,9 @@
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number
+                        v-model="menu.form.sort"
                         :min="0"
                         :max="999"
-                        v-model="menu.form.sort"
                         placeholder="请输入排序"
                         style="width: 100%" />
                 </el-form-item>
@@ -158,10 +158,12 @@ function handleMenuAddDialog() {
 function handleUserSave() {
     console.log(`保存:`, menu.form);
     menu.loading = true;
-    let i = setInterval(() => {
-        menu.loading = false;
-        clearInterval(i);
-    }, 3000);
+    let request = menu.modify ? MenuApi.modify : MenuApi.created;
+    request(menu.form)
+        .finally(() => (menu.loading = false))
+        .then(res => {
+            console.log(res);
+        });
 }
 </script>
 

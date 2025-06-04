@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.yangxj96</groupId>
         <artifactId>spectra-framework-api</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>spectra-framework-kernel</artifactId>

@@ -39,6 +39,30 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    /**
+     * 资源创建成功
+     *
+     * @return R
+     */
+    public static R<Object> created() {
+        return R.builder()
+                .code(HttpStatus.CREATED.value())
+                .msg(HttpStatus.CREATED.getReasonPhrase())
+                .build();
+    }
+
+    /**
+     * 成功,但是无内容响应
+     *
+     * @return R
+     */
+    public static R<Object> noContent() {
+        return R.builder()
+                .code(HttpStatus.NO_CONTENT.value())
+                .msg(HttpStatus.NO_CONTENT.getReasonPhrase())
+                .build();
+    }
+
     public static <T extends Serializable> @NotNull R<T> success(T data) {
         return R.<T>builder()
                 .code(HttpStatus.OK.value())
@@ -73,7 +97,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
-    public static R<Object> failure(HttpStatus status,String msg) {
+    public static R<Object> failure(HttpStatus status, String msg) {
         return R.builder().code(status.value()).msg(msg).build();
     }
 

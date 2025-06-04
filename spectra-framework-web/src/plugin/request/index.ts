@@ -60,7 +60,6 @@ const responseFulfilled = (response: AxiosResponse<IResult>) => {
 
 // 网络错误、请求未完成,HTTP 状态码为 4xx、5xx
 const responseRejected = (error: AxiosError) => {
-    console.log(error);
     hideLoading();
     if (error.name === "CanceledError") {
         return Promise.reject(error);
@@ -68,15 +67,18 @@ const responseRejected = (error: AxiosError) => {
     if (error.response?.data as IResult) {
         let result = error.response?.data as IResult;
         switch (error.response?.status) {
-            case 401:
+            case 401: {
                 ElMessage.error(result.msg);
                 GlobalUtils.exit();
                 return;
-            case 402:
+            }
+            case 402: {
                 console.log("占位用一下");
                 return;
-            default:
+            }
+            default: {
                 ElMessage.error((error.response?.data as IResult).msg);
+            }
         }
     } else {
         ElMessage.error({
