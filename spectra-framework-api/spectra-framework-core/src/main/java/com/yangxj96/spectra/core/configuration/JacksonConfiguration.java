@@ -68,7 +68,7 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         builder.dateFormat(sdf);
         log.atDebug().log("{} 加载java8新时间序列化", PREFIX);
-        var serializers = new HashMap<Class<?>, JsonSerializer<?>>(3);
+        var serializers = new HashMap<Class<?>, JsonSerializer<?>>();
         serializers.put(LocalDateTime.class,
                 new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(LOCAL_DATE_TIME_FORMAT)));
         serializers.put(LocalDate.class,
@@ -77,7 +77,7 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
                 new LocalTimeSerializer(DateTimeFormatter.ofPattern(LOCAL_TIME_FORMAT)));
         builder.serializersByType(serializers);
         log.atDebug().log("{} 加载java8新时间反序列化", PREFIX);
-        var deserializers = new HashMap<Class<?>, JsonDeserializer<?>>(3);
+        var deserializers = new HashMap<Class<?>, JsonDeserializer<?>>();
         deserializers.put(LocalDateTime.class,
                 new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(LOCAL_DATE_TIME_FORMAT)));
         deserializers.put(LocalDate.class,

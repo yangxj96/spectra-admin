@@ -32,7 +32,7 @@ import java.time.LocalDateTime;
 public class BaseEntity implements Serializable {
 
     /**
-     * 数据id
+     * 数据id.
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     @JsonSerialize(using = ToStringSerializer.class)
@@ -79,5 +79,4 @@ public class BaseEntity implements Serializable {
     @TableField(value = "deleted")
     @Null(message = "非公开字段", groups = {Verify.Insert.class, Verify.Update.class})
     private LocalDateTime deleted;
-
 }

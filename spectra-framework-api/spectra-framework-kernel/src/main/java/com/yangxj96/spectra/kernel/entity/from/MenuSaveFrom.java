@@ -5,7 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.groups.Default;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 菜单保存接口
@@ -35,19 +39,19 @@ public class MenuSaveFrom {
     /**
      * 图标
      */
-    @NotNull(message = "图标不能为空",groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    @NotNull(message = "图标不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String icon;
 
     /**
      * 名称
      */
-    @NotBlank(message = "菜单名称不能为空",groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    @NotBlank(message = "菜单名称不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String name;
 
     /**
      * 请求路径
      */
-    @NotBlank(message = "请求路径不能为空",groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    @NotBlank(message = "请求路径不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String path;
 
     /**
@@ -63,6 +67,6 @@ public class MenuSaveFrom {
     /**
      * 排序
      */
-    @NotNull(message = "排序不能为空",groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    @NotNull(message = "排序不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private Integer sort;
 }

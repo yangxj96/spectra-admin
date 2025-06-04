@@ -165,37 +165,23 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- 打包javadoc包 -->
+            <!-- Checkstyle 检查插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.7.0</version>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
                 <configuration>
-                    <encoding>UTF-8</encoding>
-                    <charset>UTF-8</charset>
-                    <docencoding>UTF-8</docencoding>
-                    <release>17</release>
-                    <additionalOptions>-Xdoclint:none</additionalOptions>
+                    <configLocation>checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <id>checkstyle-validation</id>
+                        <!-- 绑定到 process-sources 阶段，在编译前进行检查 -->
+                        <phase>process-sources</phase>
                         <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <!--配置生成源码包-->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
+                            <goal>check</goal>
                         </goals>
                     </execution>
                 </executions>

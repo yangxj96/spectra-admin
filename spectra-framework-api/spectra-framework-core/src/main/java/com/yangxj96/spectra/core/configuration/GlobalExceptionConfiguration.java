@@ -29,6 +29,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 未找到资源
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
@@ -39,6 +43,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 无权限异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(NotPermissionException.class)
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
@@ -49,6 +57,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 未登录异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(NotLoginException.class)
     public R<Object> notLoginException(Exception e, HttpServletResponse response) {
@@ -62,6 +74,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 登录异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(LoginException.class)
     public R<Object> loginException(Exception e, HttpServletResponse response) {
@@ -72,6 +88,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 未进行功能实现异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
@@ -82,6 +102,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 数据已存在异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
@@ -92,6 +116,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 数据不存在异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
@@ -102,6 +130,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 参数验证异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
@@ -118,6 +150,10 @@ public class GlobalExceptionConfiguration {
 
     /**
      * 兜底异常处理
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {

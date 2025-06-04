@@ -1,9 +1,7 @@
 package com.yangxj96.spectra.kernel.service;
 
 import cn.hutool.core.lang.tree.Tree;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yangxj96.spectra.core.entity.from.PageFrom;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 
@@ -26,6 +24,7 @@ public interface MenuService extends IService<Menu> {
 
     /**
      * 创建菜单
+     *
      * @param params 菜单信息
      */
     void created(MenuSaveFrom params);

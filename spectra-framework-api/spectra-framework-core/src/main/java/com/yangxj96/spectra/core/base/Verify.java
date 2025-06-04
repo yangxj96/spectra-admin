@@ -19,5 +19,4 @@ public class Verify {
      */
     public interface Update {
     }
-
 }

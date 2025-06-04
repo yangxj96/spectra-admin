@@ -55,7 +55,8 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
 
         private final ConcurrentMap<String, String[]> formatted;
 
-        public ParamsModifyHttpServletRequestWrapper(HttpServletRequest request, ConcurrentMap<String, String[]> formatted) {
+        public ParamsModifyHttpServletRequestWrapper(HttpServletRequest request,
+                                                     ConcurrentMap<String, String[]> formatted) {
             super(request);
             this.formatted = formatted;
         }

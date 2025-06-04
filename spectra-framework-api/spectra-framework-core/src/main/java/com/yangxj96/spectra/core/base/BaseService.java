@@ -15,5 +15,4 @@ public interface BaseService<O extends BaseEntity> extends IService<O> {
     Boolean delete(Long id);
 
     void modify(O datum);
-
 }

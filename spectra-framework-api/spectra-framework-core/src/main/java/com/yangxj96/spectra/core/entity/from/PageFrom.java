@@ -1,6 +1,10 @@
 package com.yangxj96.spectra.core.entity.from;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * 分页查询入参

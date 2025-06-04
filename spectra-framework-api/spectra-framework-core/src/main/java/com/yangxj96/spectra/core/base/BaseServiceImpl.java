@@ -52,5 +52,4 @@ public class BaseServiceImpl<M extends BaseMapper<O>, O extends BaseEntity>
             throw new RuntimeException("更新数据失败");
         }
     }
-
 }

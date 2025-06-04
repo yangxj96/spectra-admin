@@ -1,7 +1,11 @@
 package com.yangxj96.spectra.core.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 
@@ -11,6 +15,7 @@ import java.io.Serializable;
 /**
  * 响应
  *
+ * @param <T> 具体类型
  * @author 杨新杰
  * @since 2025/5/26 17:09
  */
