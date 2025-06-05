@@ -180,3 +180,39 @@ COMMENT ON COLUMN db_system.t_menu.path IS '请求路径';
 COMMENT ON COLUMN db_system.t_menu.component IS '组件路径,为空则使用布局组件';
 COMMENT ON COLUMN db_system.t_menu.layout IS '布局';
 COMMENT ON COLUMN db_system.t_menu.sort IS '排序';
+
+-- 操作日志
+CREATE TABLE IF NOT EXISTS db_system.t_operation_log
+(
+    id         BIGINT PRIMARY KEY,
+
+    explain    TEXT,
+    status     int2,
+    ip         VARCHAR(15),
+    method     VARCHAR(255),
+    url        VARCHAR(255),
+    args       JSON,
+    result     json,
+    time_cost  BIGINT,
+
+    created_by BIGINT,
+    created_at TIMESTAMP,
+    updated_by BIGINT,
+    updated_at TIMESTAMP,
+    deleted    TIMESTAMP
+);
+COMMENT ON TABLE db_system.t_operation_log IS '菜单表';
+COMMENT ON COLUMN db_system.t_operation_log.id IS '主键ID';
+COMMENT ON COLUMN db_system.t_operation_log.created_by IS '创建人';
+COMMENT ON COLUMN db_system.t_operation_log.created_at IS '创建时间';
+COMMENT ON COLUMN db_system.t_operation_log.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_system.t_operation_log.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_system.t_operation_log.deleted IS '是否删除';
+COMMENT ON COLUMN db_system.t_operation_log.explain IS '日志说明';
+COMMENT ON COLUMN db_system.t_operation_log.status IS '请求状态';
+COMMENT ON COLUMN db_system.t_operation_log.ip IS '来源IP';
+COMMENT ON COLUMN db_system.t_operation_log.method IS '请求方法';
+COMMENT ON COLUMN db_system.t_operation_log.url IS '请求URL';
+COMMENT ON COLUMN db_system.t_operation_log.args IS '请求参数';
+COMMENT ON COLUMN db_system.t_operation_log.result IS '请求响应';
+COMMENT ON COLUMN db_system.t_operation_log.time_cost IS '耗时';

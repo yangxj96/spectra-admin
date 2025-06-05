@@ -18,7 +18,6 @@
     </properties>
 
     <dependencies>
-
         <dependency>
             <groupId>com.yangxj96</groupId>
             <artifactId>spectra-framework-core</artifactId>

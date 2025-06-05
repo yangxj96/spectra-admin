@@ -2,6 +2,7 @@ package com.yangxj96.spectra.core.configuration;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
+import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.exception.DataExistException;
 import com.yangxj96.spectra.core.exception.DataNotExistException;
 import com.yangxj96.spectra.core.response.R;
@@ -48,6 +49,7 @@ public class GlobalExceptionConfiguration {
      * @param response 响应
      * @return 格式化为正常的响应返回
      */
+    @ULog("无权操作")
     @ExceptionHandler(NotPermissionException.class)
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());

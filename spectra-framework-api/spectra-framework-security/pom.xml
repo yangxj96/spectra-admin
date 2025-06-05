@@ -21,7 +21,8 @@
         <dependency>
             <groupId>com.yangxj96</groupId>
             <artifactId>spectra-framework-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

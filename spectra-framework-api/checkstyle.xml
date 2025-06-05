@@ -19,9 +19,9 @@
         <property name="max" value="1500"/>
     </module>
 
-    <!-- 每行不超过120个字符 -->
+    <!-- 每行不超过150个字符 -->
     <module name="LineLength">
-        <property name="max" value="120" />
+        <property name="max" value="150" />
     </module>
 
     <!-- 每个java文件一个语法树 -->

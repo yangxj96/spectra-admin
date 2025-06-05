@@ -13,7 +13,7 @@ const http = axios.create({
     timeout: 60 * 1000,
     withCredentials: false,
     headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
+        "Content-Type": "application/json"
     }
 });
 

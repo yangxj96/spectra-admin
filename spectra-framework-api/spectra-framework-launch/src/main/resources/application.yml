@@ -8,7 +8,7 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db
+    url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db?stringtype=unspecified
     driver-class-name: org.postgresql.Driver
     username: postgres
     password: postgres
@@ -16,7 +16,7 @@ spring:
   data:
     redis:
       host: localhost
-      database: 0
+      database: 10
       password:
 
 # mybatis plus配置

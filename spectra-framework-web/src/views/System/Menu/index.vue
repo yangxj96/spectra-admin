@@ -50,6 +50,7 @@
         width="30vw">
         <template #default>
             <el-form
+                ref="ruleFormRef"
                 v-loading="menu.loading"
                 :rules="menu.rules"
                 :model="menu.form"
@@ -88,16 +89,17 @@
         </template>
         <template #footer>
             <el-button :disabled="menu.loading" @click="() => (menu.dialog = false)">取消</el-button>
-            <el-button :disabled="menu.loading" type="primary" @click="handleUserSave">确定</el-button>
+            <el-button :disabled="menu.loading" type="primary" @click="handleMenuSave()">确定</el-button>
         </template>
     </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import MenuApi from "@/api/MenuApi.ts";
-import { ElMessage, ElMessageBox, type FormRules } from "element-plus";
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 
+const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
 
 // 新增或编辑
@@ -155,15 +157,20 @@ function handleMenuAddDialog() {
 }
 
 // 新增或编辑
-function handleUserSave() {
-    console.log(`保存:`, menu.form);
-    menu.loading = true;
-    let request = menu.modify ? MenuApi.modify : MenuApi.created;
-    request(menu.form)
-        .finally(() => (menu.loading = false))
-        .then(res => {
-            console.log(res);
-        });
+async function handleMenuSave() {
+    if (!menuForm.value) return;
+    await menuForm.value?.validate((valid, _) => {
+        if (valid) {
+            console.log(`保存:`, menu.form);
+            menu.loading = true;
+            let request = menu.modify ? MenuApi.modify : MenuApi.created;
+            request(menu.form)
+                .finally(() => (menu.loading = false))
+                .then(res => {
+                    console.log(res);
+                });
+        }
+    });
 }
 </script>
 

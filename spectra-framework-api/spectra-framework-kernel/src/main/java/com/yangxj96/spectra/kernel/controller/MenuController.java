@@ -3,17 +3,14 @@ package com.yangxj96.spectra.kernel.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.lang.tree.Tree;
+import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
 import com.yangxj96.spectra.core.response.R;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 import com.yangxj96.spectra.kernel.service.MenuService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,6 +33,7 @@ public class MenuController {
      *
      * @return 构建的树形菜单
      */
+    @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
     public R<List<Tree<String>>> tree() {
         return R.success(bindService.tree());
@@ -47,9 +45,10 @@ public class MenuController {
      * @param params 菜单信息
      * @return 修改结果
      */
+    @ULog("新增菜单")
     @SaCheckPermission("menu::insert")
     @PostMapping("/created")
-    public R<Object> created(@Validated(Verify.Insert.class) MenuSaveFrom params) {
+    public R<Object> created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
         return R.created();
     }
@@ -60,9 +59,10 @@ public class MenuController {
      * @param params 菜单信息
      * @return 修改结果
      */
+    @ULog("修改菜单")
     @SaCheckPermission("menu::modify")
     @PutMapping("/modify")
-    public R<Object> modify(@Validated(Verify.Update.class) MenuSaveFrom params) {
+    public R<Object> modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
         return R.noContent();
     }

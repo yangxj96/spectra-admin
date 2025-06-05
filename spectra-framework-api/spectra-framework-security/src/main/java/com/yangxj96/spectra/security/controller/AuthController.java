@@ -2,6 +2,7 @@ package com.yangxj96.spectra.security.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
+import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.response.R;
 import com.yangxj96.spectra.security.entity.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.security.entity.vo.TokenVO;
@@ -10,6 +11,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,12 +32,14 @@ public class AuthController {
     private AuthService bindService;
 
     @SaIgnore
+    @ULog("登录")
     @PostMapping("/login")
-    public R<TokenVO> login(@Validated UsernamePasswordFrom params) throws LoginException {
+    public R<TokenVO> login(@Validated @RequestBody UsernamePasswordFrom params) throws LoginException {
         return R.success(bindService.login(params));
     }
 
     @SaCheckLogin
+    @ULog("退出登录")
     @PostMapping("/logout")
     public void logout() {
         bindService.logout();
