@@ -54,7 +54,7 @@ public class GlobalExceptionConfiguration {
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         log.atError().log("无权限异常,{}", e.getMessage(), e);
-        return R.failure(HttpStatus.FORBIDDEN, "权限不足");
+        return R.failure(HttpStatus.FORBIDDEN, "无权操作");
     }
 
     /**

@@ -41,7 +41,6 @@
     <!-- 新增或编辑 -->
     <el-dialog
         v-model="menu.dialog"
-        append-to-body
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"

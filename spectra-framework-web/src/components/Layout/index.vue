@@ -30,7 +30,7 @@
                         </i>
                     </el-col>
                 </el-row>
-                <div ref="content" class="box-content loading-box">
+                <div ref="content" class="box-content loading-box dialog-root">
                     <router-view></router-view>
                 </div>
                 <el-footer class="footer">
@@ -121,7 +121,7 @@ function handleMenu() {
     .box-breadcrumb {
         padding-left: 2vh;
         padding-right: 2vh;
-        background-color: #fafafa;
+        background-color: var(--el-bg-color);
     }
 
     .box-content {
@@ -136,11 +136,11 @@ function handleMenu() {
     }
 
     .box-content:-webkit-full-screen {
-        background-color: white;
+        background-color: var(--el-bg-color);
     }
 
     .box-content:fullscreen {
-        background-color: white;
+        background-color: var(--el-bg-color);
     }
 
     .box-unfold-a {

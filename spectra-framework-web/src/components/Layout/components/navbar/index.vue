@@ -1,20 +1,13 @@
 <template>
-    <el-row>
-        <el-col :span="3">
-            <img
-                src="/src/assets/logo-across.png"
-                class="goto-home"
-                alt="logo"
-                style="height: 56px"
-                @click="gotoHome" />
-        </el-col>
+    <el-row style="height: 60px">
+        <el-col :span="3"></el-col>
 
         <el-col :span="20" style="padding-right: 40px"></el-col>
 
         <el-col :span="1">
             <el-dropdown>
                 <img
-                    src="/src/assets/images/default-avatar.jpg"
+                    src="@/assets/images/default-avatar.jpg"
                     alt="default avatar"
                     style="object-fit: cover"
                     class="el-avatar el-avatar--circle el-tooltip__trigger" />
