@@ -40,6 +40,7 @@
     </el-row>
     <!-- 新增或编辑 -->
     <el-dialog
+        v-if="ready"
         v-model="menu.dialog"
         :append-to="'.box-body'"
         :close-on-click-modal="false"
@@ -98,6 +99,7 @@
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import MenuApi from "@/api/MenuApi.ts";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import _ from "lodash";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
@@ -117,8 +119,11 @@ const menu = reactive({
     } as FormRules
 });
 
+const ready = ref(false);
+
 onMounted(() => {
     handleCriteriaQuery();
+    ready.value = true;
 });
 
 // 初始化数据
@@ -133,7 +138,7 @@ function handleCriteriaQuery() {
 // 表行修改按钮被单击
 function handleTableItemModify(row: Menu) {
     menu.modify = true;
-    menu.form = row;
+    menu.form = _.cloneDeep(row);
     menu.dialog = true;
 }
 
@@ -166,8 +171,14 @@ async function handleMenuSave() {
             let request = menu.modify ? MenuApi.modify : MenuApi.created;
             request(menu.form)
                 .finally(() => (menu.loading = false))
-                .then(res => {
-                    console.log(res);
+                .then(() => {
+                    ElMessage.success({
+                        message: menu.modify ? "修改菜单成功" : "新增菜单成功",
+                        onClose() {
+                            menu.dialog = false;
+                            handleCriteriaQuery();
+                        }
+                    });
                 });
         }
     });

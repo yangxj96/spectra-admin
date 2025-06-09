@@ -11,12 +11,9 @@ import java.util.List;
 @Service
 public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Authority> implements AuthorityService {
 
-    protected AuthorityServiceImpl(AuthorityMapper bindMapper) {
-        super(bindMapper);
-    }
 
     @Override
     public List<Authority> getByRoleIds(List<Long> roleIds) {
-        return this.bindMapper.getByRoleIds(roleIds);
+        return this.baseMapper.getByRoleIds(roleIds);
     }
 }

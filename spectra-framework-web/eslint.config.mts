@@ -37,7 +37,9 @@ const sharedRules = {
         }
     ],
     // 变量命名规则
-    "unicorn/prevent-abbreviations": "off"
+    "unicorn/prevent-abbreviations": "off",
+    // 使用structuredClone方法
+    "unicorn/prefer-structured-clone": "off"
 };
 
 export default [

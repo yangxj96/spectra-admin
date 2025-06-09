@@ -43,7 +43,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void created(MenuSaveFrom params) {
         Menu menu = new Menu();
         BeanUtils.copyProperties(params, menu);
@@ -51,7 +51,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void modify(MenuSaveFrom params) {
         if (null == this.getById(params.getId())) {
             throw new DataNotExistException("[" + params.getId() + "]不存在");

@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> implements AccountService {
 
-    protected AccountServiceImpl(AccountMapper bindMapper) {
-        super(bindMapper);
-    }
-
     @Override
     public Account getByUsername(String username) {
         return this.getOne(new LambdaQueryWrapper<Account>()

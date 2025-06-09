@@ -34,8 +34,8 @@ public class AuthController {
     @SaIgnore
     @ULog("登录")
     @PostMapping("/login")
-    public R<TokenVO> login(@Validated @RequestBody UsernamePasswordFrom params) throws LoginException {
-        return R.success(bindService.login(params));
+    public TokenVO login(@Validated @RequestBody UsernamePasswordFrom params) throws LoginException {
+        return bindService.login(params);
     }
 
     @SaCheckLogin

@@ -9,7 +9,4 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
-    protected UserServiceImpl(UserMapper bindMapper) {
-        super(bindMapper);
-    }
 }

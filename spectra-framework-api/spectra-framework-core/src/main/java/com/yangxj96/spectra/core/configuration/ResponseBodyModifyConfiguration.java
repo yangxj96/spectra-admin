@@ -1,0 +1,77 @@
+package com.yangxj96.spectra.core.configuration;
+
+import com.yangxj96.spectra.core.response.R;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.util.regex.Pattern;
+
+/**
+ * 响应结果统一修改
+ *
+ * @author 杨新杰
+ * @since 2025/6/9 23:57
+ */
+@ControllerAdvice
+public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Object> {
+
+    private static final Pattern pattern = Pattern.compile("com\\.yangxj96\\.spectra\\..*\\.controller");
+
+    @Override
+    public boolean supports(@NotNull MethodParameter returnType,
+                            @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+        // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
+        if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
+            return false;
+        }
+
+        Class<?> declaringClass = returnType.getContainingClass();
+        if (declaringClass == null) {
+            return false;
+        }
+        // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
+        return pattern.matcher(declaringClass.getPackageName()).matches();
+    }
+
+    @Override
+    public @NotNull Object beforeBodyWrite(@Nullable Object body,
+                                           @NotNull MethodParameter returnType,
+                                           @NotNull MediaType contentType,
+                                           @NotNull Class<? extends HttpMessageConverter<?>> converterType,
+                                           @NotNull ServerHttpRequest request,
+                                           @NotNull ServerHttpResponse response) {
+        // 跳过 String 和 byte[] 类型（避免 JSON 包装干扰）
+        if (body instanceof String || body instanceof byte[]) {
+            return body;
+        }
+
+        // void 或 null 返回值，返回无 data 的成功响应
+        // 是void或者null通常是创建/更新资源,根据RESTful API规则中,post是新增,put是修改
+        if (body == null) {
+            String httpMethod = request.getMethod().name();
+            if ("POST".equalsIgnoreCase(httpMethod)) {
+                // 可以返回特定格式的创建响应
+                response.setStatusCode(HttpStatus.CREATED);
+                return new R<>(HttpStatus.CREATED);
+            } else if ("PUT".equalsIgnoreCase(httpMethod)) {
+                // 可以返回特定格式的更新响应
+                response.setStatusCode(HttpStatus.NO_CONTENT);
+                return new R<>(HttpStatus.NO_CONTENT);
+            } else {
+                return R.success();
+            }
+        }
+
+        return R.success(body);
+    }
+
+}

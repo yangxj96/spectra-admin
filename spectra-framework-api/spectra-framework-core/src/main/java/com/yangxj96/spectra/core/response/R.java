@@ -1,11 +1,7 @@
 package com.yangxj96.spectra.core.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 
@@ -36,35 +32,20 @@ public class R<T> implements Serializable {
 
     private transient T data;
 
+    /**
+     * 自定义的构建方式
+     *
+     * @param status http状态码
+     */
+    public R(HttpStatus status) {
+        this.code = status.value();
+        this.msg = status.getReasonPhrase();
+    }
 
     public static R<Object> success() {
         return R.builder()
                 .code(HttpStatus.OK.value())
                 .msg(HttpStatus.OK.getReasonPhrase())
-                .build();
-    }
-
-    /**
-     * 资源创建成功
-     *
-     * @return R
-     */
-    public static R<Object> created() {
-        return R.builder()
-                .code(HttpStatus.CREATED.value())
-                .msg(HttpStatus.CREATED.getReasonPhrase())
-                .build();
-    }
-
-    /**
-     * 成功,但是无内容响应
-     *
-     * @return R
-     */
-    public static R<Object> noContent() {
-        return R.builder()
-                .code(HttpStatus.NO_CONTENT.value())
-                .msg(HttpStatus.NO_CONTENT.getReasonPhrase())
                 .build();
     }
 

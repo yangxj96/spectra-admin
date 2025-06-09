@@ -35,8 +35,8 @@ public class MenuController {
      */
     @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
-    public R<List<Tree<String>>> tree() {
-        return R.success(bindService.tree());
+    public List<Tree<String>> tree() {
+        return bindService.tree();
     }
 
     /**
@@ -46,11 +46,9 @@ public class MenuController {
      * @return 修改结果
      */
     @ULog("新增菜单")
-    @SaCheckPermission("menu::insert")
     @PostMapping("/created")
-    public R<Object> created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
+    public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
-        return R.created();
     }
 
     /**
@@ -60,10 +58,8 @@ public class MenuController {
      * @return 修改结果
      */
     @ULog("修改菜单")
-    @SaCheckPermission("menu::modify")
     @PutMapping("/modify")
-    public R<Object> modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
+    public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
-        return R.noContent();
     }
 }

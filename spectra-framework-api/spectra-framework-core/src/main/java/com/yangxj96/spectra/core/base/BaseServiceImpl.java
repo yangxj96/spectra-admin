@@ -17,12 +17,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class BaseServiceImpl<M extends BaseMapper<O>, O extends BaseEntity>
         extends ServiceImpl<M, O> implements BaseService<O> {
 
-    protected M bindMapper;
-
-    protected BaseServiceImpl(M bindMapper) {
-        this.bindMapper = bindMapper;
-    }
-
     @Override
     @ResponseStatus(HttpStatus.CREATED)
     @Transactional(rollbackFor = {Exception.class})
