@@ -8,8 +8,14 @@
             <el-form-item label="电话" prop="telephone">
                 <el-input v-model="condition.telephone" placeholder="请输入电话" clearable />
             </el-form-item>
-            <el-form-item label="状态" prop="status">
-                <el-select v-model="condition.status" placeholder="请输入状态" clearable style="width: 200px">
+            <el-form-item id="form-status" label="状态" prop="status">
+                <el-select
+                    v-if="mountedStatus"
+                    v-model="condition.status"
+                    :append-to="'#form-status'"
+                    placeholder="请输入状态"
+                    clearable
+                    style="width: 200px">
                     <el-option label="激活" :value="true" />
                     <el-option label="冻结" :value="false" />
                 </el-select>
@@ -72,11 +78,11 @@
                 @currentChange="handleCurrentChange" />
         </el-col>
     </el-row>
-
-    <!-- 新增或编辑用户 -->
+    <!-- 新增或编辑 -->
     <el-dialog
+        v-if="mountedStatus"
         v-model="user.dialog"
-        append-to-body
+        :append-to="'.box-body'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
@@ -125,7 +131,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import UserApi from "@/api/UserApi.ts";
 import { ElMessageBox, type FormRules } from "element-plus";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
@@ -142,6 +148,8 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     UserApi.page,
     condition.value
 );
+
+const mountedStatus = ref(false);
 
 const data_tree = ref([
     {
@@ -224,6 +232,10 @@ const user = reactive({
         status: [{ required: true, message: "请选择状态", trigger: "blur" }],
         roles: [{ required: true, message: "请选择角色", trigger: "blur" }]
     } as FormRules
+});
+
+onMounted(() => {
+    mountedStatus.value = true;
 });
 
 // 表行修改按钮被单击

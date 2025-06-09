@@ -45,53 +45,55 @@
     </el-row>
 
     <!-- 新增或编辑路由 -->
-    <el-dialog
-        v-model="operation.dialog"
-        append-to-body
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :destroy-on-close="true"
-        :title="(operation.modify ? '编辑' : '新增') + '路由信息'"
-        width="30vw">
-        <template #default>
-            <el-form
-                ref="form"
-                v-loading="operation.loading"
-                :model="operation.form"
-                :rules="operation.rules"
-                label-width="auto"
-                @submit.prevent>
-                <el-form-item label="路由ID" prop="route_id">
-                    <el-input v-model="operation.form.route_id" placeholder="请输入路由ID" />
-                </el-form-item>
-                <el-form-item label="路由URI" prop="uri">
-                    <el-input v-model="operation.form.uri" placeholder="请输入路由URI" />
-                </el-form-item>
-                <el-form-item label="排序" prop="order">
-                    <el-input-number
-                        v-model="operation.form.order"
-                        :min="0"
-                        :controls="false"
-                        placeholder="请输入排序"
-                        style="width: 100%" />
-                </el-form-item>
-                <el-form-item label="过滤器" prop="filters">
-                    <JsonEdit v-model="operation.form.filters" style="width: 100%" />
-                </el-form-item>
-                <el-form-item label="谓语处理" prop="predicates">
-                    <JsonEdit v-model="operation.form.predicates" style="width: 100%" />
-                </el-form-item>
-                <el-form-item label="元数据" prop="metadata">
-                    <JsonEdit v-model="operation.form.metadata" style="width: 100%" />
-                </el-form-item>
-            </el-form>
-        </template>
-        <template #footer>
-            <el-button :disabled="operation.loading" @click="handleDialogClosed">取消</el-button>
-            <el-button :disabled="operation.loading" type="primary" @click="handleRouteSave">确定</el-button>
-        </template>
-    </el-dialog>
+    <teleport defer to=".el-main">
+        <el-dialog
+            v-model="operation.dialog"
+            append-to-body
+            :close-on-click-modal="false"
+            :close-on-press-escape="false"
+            :show-close="false"
+            :destroy-on-close="true"
+            :title="(operation.modify ? '编辑' : '新增') + '路由信息'"
+            width="30vw">
+            <template #default>
+                <el-form
+                    ref="form"
+                    v-loading="operation.loading"
+                    :model="operation.form"
+                    :rules="operation.rules"
+                    label-width="auto"
+                    @submit.prevent>
+                    <el-form-item label="路由ID" prop="route_id">
+                        <el-input v-model="operation.form.route_id" placeholder="请输入路由ID" />
+                    </el-form-item>
+                    <el-form-item label="路由URI" prop="uri">
+                        <el-input v-model="operation.form.uri" placeholder="请输入路由URI" />
+                    </el-form-item>
+                    <el-form-item label="排序" prop="order">
+                        <el-input-number
+                            v-model="operation.form.order"
+                            :min="0"
+                            :controls="false"
+                            placeholder="请输入排序"
+                            style="width: 100%" />
+                    </el-form-item>
+                    <el-form-item label="过滤器" prop="filters">
+                        <JsonEdit v-model="operation.form.filters" style="width: 100%" />
+                    </el-form-item>
+                    <el-form-item label="谓语处理" prop="predicates">
+                        <JsonEdit v-model="operation.form.predicates" style="width: 100%" />
+                    </el-form-item>
+                    <el-form-item label="元数据" prop="metadata">
+                        <JsonEdit v-model="operation.form.metadata" style="width: 100%" />
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template #footer>
+                <el-button :disabled="operation.loading" @click="handleDialogClosed">取消</el-button>
+                <el-button :disabled="operation.loading" type="primary" @click="handleRouteSave">确定</el-button>
+            </template>
+        </el-dialog>
+    </teleport>
 </template>
 
 <script setup lang="ts">
