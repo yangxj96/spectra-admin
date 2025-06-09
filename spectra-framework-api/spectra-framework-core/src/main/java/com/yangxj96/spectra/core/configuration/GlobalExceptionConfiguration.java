@@ -68,7 +68,7 @@ public class GlobalExceptionConfiguration {
     public R<Object> notLoginException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.atError().log("未登录异常,{}", e.getMessage(), e);
-        if (e.getMessage().contains("冻结")) {
+        if (e.getMessage().contains("token 已被冻结")) {
             return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
         }
         return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
