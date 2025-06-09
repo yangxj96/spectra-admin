@@ -1,5 +1,6 @@
 package com.yangxj96.spectra.core.configuration;
 
+import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import com.yangxj96.spectra.core.annotation.ULog;
@@ -65,10 +66,10 @@ public class GlobalExceptionConfiguration {
      * @return 格式化为正常的响应返回
      */
     @ExceptionHandler(NotLoginException.class)
-    public R<Object> notLoginException(Exception e, HttpServletResponse response) {
+    public R<Object> notLoginException(NotLoginException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.atError().log("未登录异常,{}", e.getMessage(), e);
-        if (e.getMessage().contains("token 已被冻结")) {
+        if (e.getCode() == SaErrorCode.CODE_11016) {
             return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
         }
         return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
