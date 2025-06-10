@@ -65,7 +65,7 @@
                     <el-input v-model="menu.form.name" clearable placeholder="请输入菜单名称" />
                 </el-form-item>
                 <el-form-item label="图标" prop="icon">
-                    <el-input v-model="menu.form.icon" clearable placeholder="请选择菜单名称" />
+                    <icon-picker v-model="menu.form.icon" />
                 </el-form-item>
                 <el-form-item label="路径" prop="path">
                     <el-input v-model="menu.form.path" clearable placeholder="请输入路径" />
@@ -100,6 +100,7 @@ import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import MenuApi from "@/api/MenuApi.ts";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import _ from "lodash";
+import IconPicker from "@/components/IconPicker/index.vue";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
