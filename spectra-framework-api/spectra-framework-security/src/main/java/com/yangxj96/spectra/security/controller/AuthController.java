@@ -3,7 +3,6 @@ package com.yangxj96.spectra.security.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.yangxj96.spectra.core.annotation.ULog;
-import com.yangxj96.spectra.core.response.R;
 import com.yangxj96.spectra.security.entity.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.security.entity.vo.TokenVO;
 import com.yangxj96.spectra.security.service.AuthService;

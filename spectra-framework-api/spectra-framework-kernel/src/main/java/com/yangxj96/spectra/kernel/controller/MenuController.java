@@ -1,11 +1,9 @@
 package com.yangxj96.spectra.kernel.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.hutool.core.lang.tree.Tree;
 import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
-import com.yangxj96.spectra.core.response.R;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 import com.yangxj96.spectra.kernel.service.MenuService;
 import jakarta.annotation.Resource;
@@ -43,7 +41,6 @@ public class MenuController {
      * 新增菜单信息
      *
      * @param params 菜单信息
-     * @return 修改结果
      */
     @ULog("新增菜单")
     @PostMapping("/created")
@@ -55,7 +52,6 @@ public class MenuController {
      * 修改菜单信息
      *
      * @param params 菜单信息
-     * @return 修改结果
      */
     @ULog("修改菜单")
     @PutMapping("/modify")

@@ -24,7 +24,7 @@ import java.util.regex.Pattern;
 @ControllerAdvice
 public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Object> {
 
-    private static final Pattern pattern = Pattern.compile("com\\.yangxj96\\.spectra\\..*\\.controller");
+    private static final Pattern PATTERN = Pattern.compile("com\\.yangxj96\\.spectra\\..*\\.controller");
 
     @Override
     public boolean supports(@NotNull MethodParameter returnType,
@@ -39,7 +39,7 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
             return false;
         }
         // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
-        return pattern.matcher(declaringClass.getPackageName()).matches();
+        return PATTERN.matcher(declaringClass.getPackageName()).matches();
     }
 
     @Override
@@ -54,6 +54,7 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
             return body;
         }
 
+        R<Object> r;
         // void 或 null 返回值，返回无 data 的成功响应
         // 是void或者null通常是创建/更新资源,根据RESTful API规则中,post是新增,put是修改
         if (body == null) {
@@ -61,14 +62,15 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
             if ("POST".equalsIgnoreCase(httpMethod)) {
                 // 可以返回特定格式的创建响应
                 response.setStatusCode(HttpStatus.CREATED);
-                return new R<>(HttpStatus.CREATED);
+                r = new R<>(HttpStatus.CREATED);
             } else if ("PUT".equalsIgnoreCase(httpMethod)) {
                 // 可以返回特定格式的更新响应
                 response.setStatusCode(HttpStatus.NO_CONTENT);
-                return new R<>(HttpStatus.NO_CONTENT);
+                r = new R<>(HttpStatus.NO_CONTENT);
             } else {
-                return R.success();
+                r = R.success();
             }
+            return r;
         }
 
         return R.success(body);

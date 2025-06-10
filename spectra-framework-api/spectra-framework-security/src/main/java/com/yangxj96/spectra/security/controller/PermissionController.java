@@ -24,9 +24,11 @@ public class PermissionController {
 
     /**
      * 创建角色
+     *
+     * @param params 角色实体
      */
     @PostMapping("/createdRole")
-    public void createdRole(@Validated @RequestBody RoleFrom params){
+    public void createdRole(@Validated @RequestBody RoleFrom params) {
         bindService.createdRole(params);
     }
 
