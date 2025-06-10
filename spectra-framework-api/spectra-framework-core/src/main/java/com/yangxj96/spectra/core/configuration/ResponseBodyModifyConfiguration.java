@@ -35,9 +35,6 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
         }
 
         Class<?> declaringClass = returnType.getContainingClass();
-        if (declaringClass == null) {
-            return false;
-        }
         // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
         return PATTERN.matcher(declaringClass.getPackageName()).matches();
     }
