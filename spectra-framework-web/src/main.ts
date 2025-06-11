@@ -4,7 +4,7 @@ import App from "./App.vue";
 import loadPlugins from "@/plugin";
 import loadDirective from "@/directive";
 // iconfont
-import "//at.alicdn.com/t/c/font_3119163_uqq7r2jpcnr.js";
+import "//at.alicdn.com/t/c/font_3119163_j0b2h7gi3v.js";
 import Icons from "@/components/common/Icons.vue";
 
 import Mock from "@/mocks/browser.ts";

@@ -11,26 +11,42 @@
 
             <el-main class="box-main">
                 <!-- 面包屑横条 -->
-                <el-row class="box-breadcrumb" style="height: 4vh; line-height: 4vh">
-                    <el-col :span="23">
+                <el-row class="box-breadcrumb">
+                    <el-col :span="22">
                         <i class="box-unfold-a" @click="handleMenu">
-                            <icons v-if="appStore.unfold" style="height: 4vh" name="icon-fold-right" />
-                            <icons v-else style="height: 4vh" name="icon-fold-left" />
+                            <icons v-if="appStore.unfold" name="icon-fold-left" />
+                            <icons v-else name="icon-fold-right" />
                         </i>
                         <!-- 面包屑 -->
-                        <el-breadcrumb style="display: inline-block" separator-class="el-icon-arrow-right">
+                        <el-breadcrumb style="display: inline-block">
                             <el-breadcrumb-item v-for="(item, idx) in breadcrumb" :key="idx" :to="{ path: item.path }">
                                 {{ item.meta.title }}
                             </el-breadcrumb-item>
                         </el-breadcrumb>
                     </el-col>
-                    <el-col :span="1">
-                        <i class="box-unfold-a" style="float: right" @click="toggle">
-                            <icons name="icon-fullScreen" />
-                        </i>
+                    <el-col :span="2">
+                        <el-form inline>
+                            <el-form-item>
+                                <el-switch v-model="mode" inline-prompt :size="'small'">
+                                    <template #active-action>
+                                        <icons name="icon-github" />
+                                    </template>
+                                    <template #inactive-action>
+                                        <icons name="icon-qq" />
+                                    </template>
+                                </el-switch>
+                            </el-form-item>
+                            <el-form-item>
+                                <icons
+                                    name="icon-fullScreen"
+                                    class="box-unfold-a"
+                                    style="width: 1.4em; height: 1.4em"
+                                    @click="toggle" />
+                            </el-form-item>
+                        </el-form>
                     </el-col>
                 </el-row>
-                <div ref="content" class="box-content loading-box dialog-root">
+                <div ref="content" class="box-content loading-box">
                     <router-view></router-view>
                 </div>
                 <el-footer class="footer">
@@ -60,6 +76,8 @@ const breadcrumb = ref<RouteLocationMatched[]>([]);
 const appStore = useAppStore();
 const context = useTemplateRef<HTMLElement>("content");
 const { toggle } = useFullscreen(context);
+
+const mode = ref(true);
 
 onMounted(() => {
     handlerRouter();
@@ -93,8 +111,8 @@ function handleMenu() {
     width: auto;
 }
 
-::v-deep(.el-breadcrumb) {
-    line-height: 4vh;
+::v-deep(.el-form-item) {
+    margin-bottom: 0;
 }
 
 .box {
@@ -119,6 +137,7 @@ function handleMenu() {
     padding: 0;
 
     .box-breadcrumb {
+        margin-top: 1vh;
         padding-left: 2vh;
         padding-right: 2vh;
         background-color: var(--el-bg-color);
@@ -126,8 +145,8 @@ function handleMenu() {
 
     .box-content {
         width: 100%;
-        // 面包屑4vh,头高62px,底部版权20px
-        height: calc(100vh - 4vh - 62px - 20px);
+        // 面包屑3.6vh,有个地方计算错了,改成5vh,头高62px,底部版权20px
+        height: calc(100vh - 5vh - 62px - 20px);
         overflow: auto;
     }
 

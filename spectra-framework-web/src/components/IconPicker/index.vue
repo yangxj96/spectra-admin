@@ -21,12 +21,11 @@
 import { ref } from "vue";
 import Icons from "@/components/common/Icons.vue";
 
+// "icon-fullScreen",
+//  "icon-fold-right",
+// "icon-fold-left",
 const icons = ref([
-    "icon-fullScreen",
     "icon-setting-role",
-    "icon-fold-right",
-    "icon-fold-left",
-    "icon-del",
     "icon-module",
     "icon-qq",
     "icon-github",
