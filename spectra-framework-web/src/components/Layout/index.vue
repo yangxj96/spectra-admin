@@ -12,7 +12,7 @@
             <el-main class="box-main">
                 <!-- 面包屑横条 -->
                 <el-row class="box-breadcrumb">
-                    <el-col :span="22">
+                    <el-col :span="21">
                         <i class="box-unfold-a" @click="handleMenu">
                             <icons v-if="appStore.unfold" name="icon-fold-left" />
                             <icons v-else name="icon-fold-right" />
@@ -24,19 +24,25 @@
                             </el-breadcrumb-item>
                         </el-breadcrumb>
                     </el-col>
-                    <el-col :span="2">
+                    <el-col :span="3">
                         <el-form inline>
-                            <el-form-item>
-                                <el-switch v-model="mode" inline-prompt :size="'small'">
+                            <el-form-item class="form-item">
+                                <el-switch
+                                    v-model="theme"
+                                    active-text="深色模式"
+                                    inactive-text="浅色模式"
+                                    inline-prompt
+                                    :size="'small'"
+                                    @change="handleDarkSwitch">
                                     <template #active-action>
-                                        <icons name="icon-github" />
+                                        <icons name="icon-moon" />
                                     </template>
                                     <template #inactive-action>
-                                        <icons name="icon-qq" />
+                                        <icons name="icon-sun" />
                                     </template>
                                 </el-switch>
                             </el-form-item>
-                            <el-form-item>
+                            <el-form-item class="form-item">
                                 <icons
                                     name="icon-fullScreen"
                                     class="box-unfold-a"
@@ -68,16 +74,16 @@ import Sidebar from "@/components/Layout/components/sidebar/index.vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
-import { useFullscreen } from "@vueuse/core";
+import { useDark, useFullscreen, useToggle } from "@vueuse/core";
 
+const appStore = useAppStore();
 const router = useRouter();
+const context = useTemplateRef<HTMLElement>("content");
+
 // 面包屑
 const breadcrumb = ref<RouteLocationMatched[]>([]);
-const appStore = useAppStore();
-const context = useTemplateRef<HTMLElement>("content");
 const { toggle } = useFullscreen(context);
-
-const mode = ref(true);
+const theme = ref(useDark());
 
 onMounted(() => {
     handlerRouter();
@@ -93,6 +99,12 @@ onMounted(() => {
         }
     );
 });
+
+// 深色模式切换
+function handleDarkSwitch(val: boolean) {
+    theme.value = val;
+    useToggle(theme);
+}
 
 function handlerRouter(r: RouteLocationMatched[] = []) {
     if (r.length <= 0) {
@@ -111,10 +123,6 @@ function handleMenu() {
     width: auto;
 }
 
-::v-deep(.el-form-item) {
-    margin-bottom: 0;
-}
-
 .box {
     height: 100vh;
 }
@@ -131,6 +139,10 @@ function handleMenu() {
 
 .box-container {
     height: calc(100vh - 66px);
+}
+
+.form-item {
+    margin-bottom: 0;
 }
 
 .box-main {

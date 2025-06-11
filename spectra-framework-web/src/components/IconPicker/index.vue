@@ -21,9 +21,6 @@
 import { ref } from "vue";
 import Icons from "@/components/common/Icons.vue";
 
-// "icon-fullScreen",
-//  "icon-fold-right",
-// "icon-fold-left",
 const icons = ref([
     "icon-setting-role",
     "icon-module",
@@ -48,7 +45,9 @@ const icons = ref([
     "icon-file-config",
     "icon-menu",
     "icon-setting",
-    "icon-flow"
+    "icon-flow",
+    "icon-sun",
+    "icon-moon"
 ]);
 
 const selectedIcon = defineModel();
