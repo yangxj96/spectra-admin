@@ -18,7 +18,7 @@ spring:
       host: localhost
       database: 10
       password:
-
+      timeout: 100
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml

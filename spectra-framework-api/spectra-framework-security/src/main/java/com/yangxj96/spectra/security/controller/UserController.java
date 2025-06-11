@@ -1,8 +1,8 @@
 package com.yangxj96.spectra.security.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.entity.from.PageFrom;
-import com.yangxj96.spectra.security.entity.dto.User;
 import com.yangxj96.spectra.security.entity.from.UserPageFrom;
 import com.yangxj96.spectra.security.entity.vo.UserPageVO;
 import com.yangxj96.spectra.security.service.UserService;
@@ -33,6 +33,7 @@ public class UserController {
      * @param params 查询条件参数
      * @return 分页结果
      */
+    @ULog("分页查询用户列表")
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         return bindService.page(page, params);

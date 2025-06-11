@@ -1,6 +1,7 @@
 package com.yangxj96.spectra.security.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
 import com.yangxj96.spectra.core.entity.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
@@ -29,6 +30,7 @@ public class PermissionController {
      *
      * @return 分页结果
      */
+    @ULog("分页查询角色列表")
     @GetMapping("/pageRole")
     public IPage<Role> pageRole(PageFrom page, RolePageFrom params) {
         return bindService.pageRole(page, params);
@@ -40,16 +42,18 @@ public class PermissionController {
      *
      * @param params 角色实体
      */
+    @ULog("创建角色")
     @PostMapping("/createdRole")
     public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.createdRole(params);
     }
 
     /**
-     * 创建角色
+     * 修改角色信息
      *
      * @param params 角色实体
      */
+    @ULog("修改角色信息")
     @PutMapping("/modifyRole")
     public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         bindService.modifyRole(params);
