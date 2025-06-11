@@ -72,3 +72,18 @@ type Role = BaseEntity & {
      */
     remark: string;
 };
+
+/**
+ * 部门
+ */
+type Dept = BaseEntity & {
+    /**
+     * 部门名称
+     */
+    name: string;
+
+    /**
+     * 子级
+     */
+    children?: Dept[];
+};

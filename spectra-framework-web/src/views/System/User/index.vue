@@ -10,7 +10,7 @@
             </el-form-item>
             <el-form-item id="form-status" label="状态" prop="status">
                 <el-select
-                    v-if="mountedStatus"
+                    v-if="ready"
                     v-model="condition.status"
                     :append-to="'#form-status'"
                     placeholder="请输入状态"
@@ -33,12 +33,16 @@
         <el-col :span="4">
             <el-auto-resizer>
                 <template #default="{ height, width }">
-                    <el-tree-v2
+                    <el-tree
+                        default-expand-all
                         highlight-current
-                        :data="data_tree"
                         empty-text="暂无数据"
+                        node-key="id"
+                        :data="dept_tree"
                         :height="height"
-                        :width="width" />
+                        :width="width"
+                        :props="dept_tree_props"
+                        @node-click="handleDeptTreeClick" />
                 </template>
             </el-auto-resizer>
         </el-col>
@@ -51,7 +55,7 @@
                 <el-table-column align="center" prop="tel" label="电话" />
                 <el-table-column align="center" prop="dept" label="岗位/部门" />
                 <el-table-column align="center" label="状态">
-                    <template v-slot:default="scope">
+                    <template #default="scope">
                         <el-tag v-if="scope.row.state" type="success">激活</el-tag>
                         <el-tag v-else type="danger">冻结</el-tag>
                     </template>
@@ -83,7 +87,7 @@
     </el-row>
     <!-- 新增或编辑 -->
     <el-dialog
-        v-if="mountedStatus"
+        v-if="ready"
         v-model="user.dialog"
         :append-to="'.box-body'"
         :close-on-click-modal="false"
@@ -95,34 +99,84 @@
         <template #default>
             <el-form v-loading="user.loading" :model="user.form" :rules="user.rules" label-width="auto" @submit.prevent>
                 <el-form-item label="姓名" prop="username">
-                    <el-input v-model="user.form.username" placeholder="请输入姓名" />
-                </el-form-item>
-                <el-form-item label="账号" prop="account">
-                    <el-input v-model="user.form.account" placeholder="请输入账号" />
+                    <el-input v-model="user.form.username" placeholder="请输入姓名" style="width: 90%" />
+                    <el-popover
+                        placement="right"
+                        title="用户名规则"
+                        width="200"
+                        trigger="hover"
+                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
+                        <template #reference>
+                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                        </template>
+                    </el-popover>
                 </el-form-item>
                 <el-form-item label="手机号码" prop="telephone">
-                    <el-input v-model="user.form.telephone" placeholder="请输入手机号码" />
+                    <el-input v-model="user.form.telephone" placeholder="请输入手机号码" style="width: 90%" />
+                    <el-popover
+                        placement="right"
+                        title="用户名规则"
+                        width="200"
+                        trigger="hover"
+                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
+                        <template #reference>
+                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                        </template>
+                    </el-popover>
                 </el-form-item>
                 <el-form-item label="部门" prop="dept">
                     <el-tree-select
                         v-model="user.form.dept"
-                        :data="data_dept_tree"
+                        :data="dept_tree"
                         placeholder="请选择部门"
                         check-strictly
+                        default-expand-all
+                        node-key="id"
+                        :props="dept_tree_props"
                         :render-after-expand="false"
-                        style="width: 100%" />
+                        style="width: 90%" />
+                    <el-popover
+                        placement="right"
+                        title="用户名规则"
+                        width="200"
+                        trigger="hover"
+                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
+                        <template #reference>
+                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                        </template>
+                    </el-popover>
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
-                    <el-radio-group v-model="user.form.status">
-                        <el-radio :value="true">激活</el-radio>
-                        <el-radio :value="false">冻结</el-radio>
-                    </el-radio-group>
+                    <el-select v-model="user.form.status" placeholder="请选择状态" clearable style="width: 90%">
+                        <el-option label="激活" :value="true" />
+                        <el-option label="冻结" :value="false" />
+                    </el-select>
+                    <el-popover
+                        placement="right"
+                        title="用户名规则"
+                        width="200"
+                        trigger="hover"
+                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
+                        <template #reference>
+                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                        </template>
+                    </el-popover>
                 </el-form-item>
                 <el-form-item label="角色" prop="roles">
-                    <el-select v-model="user.form.role" placeholder="请选择角色" clearable style="width: 100%">
+                    <el-select v-model="user.form.role" placeholder="请选择角色" clearable style="width: 90%">
                         <el-option label="系统管理员" value="sysadmin" />
                         <el-option label="管理员" value="admin" />
                     </el-select>
+                    <el-popover
+                        placement="right"
+                        title="用户名规则"
+                        width="200"
+                        trigger="hover"
+                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
+                        <template #reference>
+                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                        </template>
+                    </el-popover>
                 </el-form-item>
             </el-form>
         </template>
@@ -140,6 +194,10 @@ import { ElMessageBox, type FormRules } from "element-plus";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UseTable from "@/hooks/UseTable.ts";
 
+const dept_tree_props = {
+    label: "name"
+};
+
 // 查询条件
 const condition = ref<UserPageParams>({
     page_num: 1,
@@ -152,67 +210,30 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     condition.value
 );
 
-const mountedStatus = ref(false);
+const ready = ref(false);
 
-const data_tree = ref([
+const dept_tree = ref<Dept[]>([
     {
-        id: "1",
-        label: "树型1",
+        id: "1111",
+        name: "部门1",
         children: [
             {
-                id: "1-1",
-                label: "树型1-1"
-            },
-            {
-                id: "1-2",
-                label: "树型1-2"
-            },
-            {
-                id: "1-3",
-                label: "树型1-3"
-            },
-            {
-                id: "1-4",
-                label: "树型1-4"
+                id: "1111-2222",
+                name: "部门1-1"
             }
         ]
     },
     {
-        id: "2",
-        label: "树型2"
-    },
-    {
-        id: "3",
-        label: "树型3"
-    },
-    {
-        id: "4",
-        label: "树型4"
-    }
-]);
-
-const data_dept_tree = ref([
-    {
-        value: "1",
-        label: "部门1",
+        id: "12311111",
+        name: "部门2",
         children: [
             {
-                value: "1-1",
-                label: "部门1-1"
-            }
-        ]
-    },
-    {
-        value: "2",
-        label: "部门2",
-        children: [
-            {
-                value: "2-1",
-                label: "部门2-1"
+                id: "2222-11111",
+                name: "部门2-1"
             },
             {
-                value: "2-2",
-                label: "部门2-2"
+                id: "2222-2222",
+                name: "部门2-2"
             }
         ]
     }
@@ -238,8 +259,13 @@ const user = reactive({
 });
 
 onMounted(() => {
-    mountedStatus.value = true;
+    ready.value = true;
 });
+
+// 部门树被单机
+function handleDeptTreeClick(node: unknown) {
+    console.log(`节点被单机`, node);
+}
 
 // 表行修改按钮被单击
 function handleTableItemModify(row: User) {
@@ -259,6 +285,7 @@ function handleTableItemDelete(row: User) {
     });
 }
 
+// 用户新增被单机
 function handleUserAddDialog() {
     user.modify = false;
     user.form = {} as User;
