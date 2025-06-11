@@ -25,12 +25,12 @@
                         </el-breadcrumb>
                     </el-col>
                     <el-col :span="3">
-                        <el-form inline>
+                        <el-form inline style="float: right">
                             <el-form-item class="form-item">
                                 <el-switch
                                     v-model="theme"
-                                    active-text="深色模式"
-                                    inactive-text="浅色模式"
+                                    active-text="浅色"
+                                    inactive-text="深色"
                                     inline-prompt
                                     :size="'small'"
                                     @change="handleDarkSwitch">
@@ -42,7 +42,7 @@
                                     </template>
                                 </el-switch>
                             </el-form-item>
-                            <el-form-item class="form-item">
+                            <el-form-item class="form-item form-item-end">
                                 <icons
                                     name="icon-fullScreen"
                                     class="box-unfold-a"
@@ -141,18 +141,23 @@ function handleMenu() {
     height: calc(100vh - 66px);
 }
 
-.form-item {
-    margin-bottom: 0;
-}
-
 .box-main {
     padding: 0;
 
     .box-breadcrumb {
-        margin-top: 1vh;
+        margin-top: 0.5vh;
+        margin-bottom: 0.5vh;
         padding-left: 2vh;
         padding-right: 2vh;
         background-color: var(--el-bg-color);
+
+        .form-item {
+            margin-bottom: 0;
+        }
+
+        .form-item-end {
+            margin-right: 0;
+        }
     }
 
     .box-content {
