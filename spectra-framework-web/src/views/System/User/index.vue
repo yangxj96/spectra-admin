@@ -29,6 +29,7 @@
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
+        <!-- 部门树 -->
         <el-col :span="4">
             <el-auto-resizer>
                 <template #default="{ height, width }">
@@ -41,16 +42,17 @@
                 </template>
             </el-auto-resizer>
         </el-col>
+        <!-- 列表 -->
         <el-col :span="20">
             <el-table :data="table_data" height="90%" stripe>
                 <el-table-column align="center" type="index" />
-                <el-table-column align="center" prop="username" label="姓名" />
-                <el-table-column align="center" prop="account" label="账号" />
-                <el-table-column align="center" prop="telephone" label="电话" />
+                <el-table-column align="center" prop="name" label="姓名" />
+                <el-table-column align="center" prop="email" label="邮箱" />
+                <el-table-column align="center" prop="tel" label="电话" />
                 <el-table-column align="center" prop="dept" label="岗位/部门" />
                 <el-table-column align="center" label="状态">
                     <template v-slot:default="scope">
-                        <el-tag v-if="scope.row.status" type="success">激活</el-tag>
+                        <el-tag v-if="scope.row.state" type="success">激活</el-tag>
                         <el-tag v-else type="danger">冻结</el-tag>
                     </template>
                 </el-table-column>
@@ -66,6 +68,7 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <!-- 分页 -->
             <el-pagination
                 background
                 hide-on-single-page
