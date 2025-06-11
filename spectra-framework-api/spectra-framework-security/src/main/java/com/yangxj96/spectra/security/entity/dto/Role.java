@@ -21,9 +21,28 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @TableName(value = "db_system.t_role")
 public class Role extends BaseEntity {
+
     /**
-     * 角色名称
+     * 名称
      */
     @TableField(value = "\"name\"")
     private String name;
+
+    /**
+     * 状态
+     */
+    @TableField(value = "\"state\"")
+    private Boolean state;
+
+    /**
+     * 范围
+     */
+    @TableField(value = "\"scope\"")
+    private Short scope;
+
+    /**
+     * 备注
+     */
+    @TableField(value = "remark")
+    private String remark;
 }

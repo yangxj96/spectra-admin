@@ -1,13 +1,15 @@
 package com.yangxj96.spectra.security.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yangxj96.spectra.core.base.Verify;
+import com.yangxj96.spectra.core.entity.from.PageFrom;
+import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
+import com.yangxj96.spectra.security.entity.from.RolePageFrom;
 import com.yangxj96.spectra.security.service.PermissionService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 权限操作相关
@@ -23,13 +25,34 @@ public class PermissionController {
     private PermissionService bindService;
 
     /**
+     * 分页查询角色信息
+     *
+     * @return 分页结果
+     */
+    @GetMapping("/pageRole")
+    public IPage<Role> pageRole(PageFrom page, RolePageFrom params) {
+        return bindService.pageRole(page, params);
+    }
+
+
+    /**
      * 创建角色
      *
      * @param params 角色实体
      */
     @PostMapping("/createdRole")
-    public void createdRole(@Validated @RequestBody RoleFrom params) {
+    public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.createdRole(params);
+    }
+
+    /**
+     * 创建角色
+     *
+     * @param params 角色实体
+     */
+    @PutMapping("/modifyRole")
+    public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        bindService.modifyRole(params);
     }
 
 }

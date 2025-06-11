@@ -47,3 +47,28 @@ type Menu = BaseEntity & {
      */
     children?: Menu[];
 };
+
+/**
+ * 角色
+ */
+type Role = BaseEntity & {
+    /**
+     * 角色名称
+     */
+    name: string;
+
+    /**
+     * 角色状态
+     */
+    state: boolean;
+
+    /**
+     * 角色范围
+     */
+    scope: number;
+
+    /**
+     * 角色备注
+     */
+    remark: string;
+};

@@ -7,6 +7,9 @@
         <!--@Table db_system.t_role-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
+        <result column="state"      jdbcType="BOOLEAN"   property="state"/>
+        <result column="scope"      jdbcType="SMALLINT"  property="scope"/>
+        <result column="remark"     jdbcType="VARCHAR"   property="remark"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
@@ -16,7 +19,16 @@
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, "name", created_by, created_at, updated_by, updated_at, deleted
+        id,
+        "name",
+        "state",
+        "scope",
+        remark,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted
     </sql>
 
     <select id="getAccountId" resultMap="BaseResultMap">

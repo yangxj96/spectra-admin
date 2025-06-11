@@ -31,6 +31,18 @@ type RoutePageParams = BasePageParams & {
 };
 
 /**
+ * 角色分页请求参数定义
+ */
+type RolePageParams = BasePageParams & {
+    /** 角色名称 **/
+    name?: string;
+    /**
+     * 角色状态
+     */
+    state?: boolean;
+};
+
+/**
  * 分页实体
  */
 type Page<T = never> = {

@@ -56,11 +56,15 @@ COMMENT ON COLUMN db_system.t_user.email IS '邮箱';
 COMMENT ON COLUMN db_system.t_user.avatar IS '头像';
 
 -- 角色表
+DROP TABLE IF EXISTS db_system.t_role;
 CREATE TABLE IF NOT EXISTS db_system.t_role
 (
     id         BIGINT PRIMARY KEY,
 
     name       VARCHAR(100),
+    state      BOOLEAN DEFAULT TRUE,
+    scope      int2,
+    remark     varchar(255),
 
     created_by BIGINT,
     created_at TIMESTAMP,
@@ -75,7 +79,10 @@ COMMENT ON COLUMN db_system.t_role.created_at IS '创建时间';
 COMMENT ON COLUMN db_system.t_role.updated_by IS '最后更新人';
 COMMENT ON COLUMN db_system.t_role.updated_at IS '最后更新时间';
 COMMENT ON COLUMN db_system.t_role.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_role.name IS '角色名称';
+COMMENT ON COLUMN db_system.t_role.name IS '名称';
+COMMENT ON COLUMN db_system.t_role.state IS '状态';
+COMMENT ON COLUMN db_system.t_role.scope IS '范围';
+COMMENT ON COLUMN db_system.t_role.remark IS '备注';
 
 -- 角色表<->账户
 CREATE TABLE IF NOT EXISTS db_system.t_account_role_map

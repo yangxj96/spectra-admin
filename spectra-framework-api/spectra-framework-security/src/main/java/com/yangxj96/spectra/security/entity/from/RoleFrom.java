@@ -1,9 +1,7 @@
 package com.yangxj96.spectra.security.entity.from;
 
 import com.yangxj96.spectra.core.base.Verify;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 /**
@@ -32,5 +30,21 @@ public class RoleFrom {
     @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
 
+    /**
+     * 状态
+     */
+    private Boolean state;
+
+    /**
+     * 范围
+     */
+    @Min(value = 0, message = "范围值不正确", groups = {Verify.Insert.class, Verify.Update.class})
+    @Max(value = 2, message = "范围值不正确", groups = {Verify.Insert.class, Verify.Update.class})
+    private Short scope;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

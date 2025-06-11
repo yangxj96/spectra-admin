@@ -148,7 +148,7 @@ function handleTableItemDelete(row: Menu) {
     ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
-        type: "error"
+        type: "warning"
     }).then(() => {
         console.log(`确定删除`);
         ElMessage.success("执行删除了");
