@@ -9,12 +9,12 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import useAppStore from "@/plugin/store/modules/useAppStore";
-import type { MessageConfigContext } from "element-plus";
 
 const locale = ref(useAppStore().lang);
-const message = reactive<MessageConfigContext>({
+const message = reactive({
     max: 3,
-    duration: 500
+    duration: 500,
+    plain: true
 });
 </script>
 

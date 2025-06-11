@@ -16,7 +16,7 @@
                     </el-form-item>
                     <el-form-item>
                         <el-button type="primary">查询</el-button>
-                        <el-button>新增</el-button>
+                        <el-button @click="handleRoleAddDialog">新增</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
@@ -36,9 +36,13 @@
                 </el-table-column>
                 <el-table-column align="center" prop="details" label="备注" show-overflow-tooltip />
                 <el-table-column align="center" label="编辑" width="120">
-                    <template #default>
-                        <el-button link type="primary" size="small">编辑</el-button>
-                        <el-button link type="primary" size="small">删除</el-button>
+                    <template #default="scope">
+                        <el-button link type="primary" size="small" @click="handleRoleEditDialog(scope.row)">
+                            编辑
+                        </el-button>
+                        <el-button link type="primary" size="small" @click="handleRoleDelete(scope.row)">
+                            删除
+                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -53,13 +57,25 @@
         <el-col :span="4" style="padding: 10px">
             <el-text type="primary">角色权限</el-text>
             <el-divider />
-            <el-tree :data="tree_data" :props="tree_props" default-expand-all empty-text="暂无权限" show-checkbox />
+            <el-tree
+                ref="powerRef"
+                :data="tree_data"
+                :props="tree_props"
+                default-expand-all
+                empty-text="暂无权限"
+                show-checkbox />
         </el-col>
         <!-- 菜单 -->
         <el-col :span="4" style="padding: 10px">
             <el-text type="primary">角色菜单</el-text>
             <el-divider />
-            <el-tree :data="tree_data" :props="tree_props" default-expand-all empty-text="暂无菜单" show-checkbox />
+            <el-tree
+                ref="menuRef"
+                :data="tree_data"
+                :props="tree_props"
+                default-expand-all
+                empty-text="暂无菜单"
+                show-checkbox />
         </el-col>
     </el-row>
 
@@ -103,15 +119,19 @@
             </el-form>
         </template>
         <template #footer>
-            <el-button>关闭</el-button>
-            <el-button>提交</el-button>
+            <el-button @click="() => (edit.dialog = false)">关闭</el-button>
+            <el-button @click="handleRoleSave">提交</el-button>
         </template>
     </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import MenuApi from "@/api/MenuApi.ts";
+import { ElMessage, ElMessageBox, ElTree, type FormRules } from "element-plus";
+
+const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
+const menuRef = useTemplateRef<InstanceType<typeof ElTree>>("menuRef");
 
 const tree_props = {
     label: "name"
@@ -147,14 +167,44 @@ const table_data = reactive([
 const tree_data = ref<Menu[]>();
 
 const edit = reactive({
-    dialog: false
+    dialog: false,
+    modify: false,
+    loading: false,
+    form: {} as Menu,
+    rules: {} as FormRules
 });
 
 onMounted(() => {
     MenuApi.tree().then(res => (tree_data.value = res.data));
 });
 
-function handleRoleEditDialog() {
+function handleRoleAddDialog() {
+    console.log(`角色新增`);
+    edit.modify = false;
+    edit.form = {} as Menu;
     edit.dialog = true;
+}
+
+function handleRoleEditDialog(row: Menu) {
+    console.log(`角色编辑`);
+    edit.modify = true;
+    edit.form = row;
+    edit.dialog = true;
+}
+
+function handleRoleDelete(row: Menu) {
+    console.log(`角色删除:`, row);
+    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+    }).then(() => {
+        console.log(`确定删除`);
+        ElMessage.success("执行删除了");
+    });
+}
+
+function handleRoleSave() {
+    console.log(`角色保存:`);
 }
 </script>

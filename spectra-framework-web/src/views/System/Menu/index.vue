@@ -27,7 +27,7 @@
             <el-table-column align="center" prop="layout" label="布局" />
             <el-table-column align="center" prop="sort" label="排序" />
             <el-table-column align="center" label="操作">
-                <template v-slot:default="scope">
+                <template #default="scope">
                     <el-button link type="primary" size="small" @click="handleTableItemModify(scope.row)">
                         编辑
                     </el-button>
