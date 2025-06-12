@@ -3,7 +3,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.yangxj96.spectra.core.mapper.OperationLogMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.entity.dto.OperationLog">
+    <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.javabean.dto.OperationLog">
         <!--@mbg.generated-->
         <!--@Table db_system.t_operation_log-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>

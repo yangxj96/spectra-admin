@@ -1,10 +1,11 @@
 package com.yangxj96.spectra.security.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yangxj96.spectra.core.entity.from.PageFrom;
+import com.yangxj96.spectra.core.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
+import com.yangxj96.spectra.security.entity.vo.RoleVO;
 
 /**
  * 权限操作业务层
@@ -32,5 +33,5 @@ public interface PermissionService {
      * @param params 查询参数
      * @return 分页结果
      */
-    IPage<Role> pageRole(PageFrom page, RolePageFrom params);
+    IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params);
 }

@@ -1,6 +1,7 @@
 package com.yangxj96.spectra.security.entity.from;
 
 import com.yangxj96.spectra.core.base.Verify;
+import com.yangxj96.spectra.core.enums.PowerScope;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -31,16 +32,14 @@ public class RoleFrom {
     private String name;
 
     /**
+     * 范围
+     */
+    private PowerScope scope;
+
+    /**
      * 状态
      */
     private Boolean state;
-
-    /**
-     * 范围
-     */
-    @Min(value = 0, message = "范围值不正确", groups = {Verify.Insert.class, Verify.Update.class})
-    @Max(value = 2, message = "范围值不正确", groups = {Verify.Insert.class, Verify.Update.class})
-    private Short scope;
 
     /**
      * 备注

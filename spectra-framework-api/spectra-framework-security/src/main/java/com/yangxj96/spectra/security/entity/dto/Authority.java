@@ -7,18 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
  * 权限表
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "db_system.t_authority")
 public class Authority extends BaseEntity {
     /**

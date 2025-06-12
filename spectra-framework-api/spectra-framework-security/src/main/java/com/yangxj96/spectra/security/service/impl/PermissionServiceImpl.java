@@ -3,10 +3,12 @@ package com.yangxj96.spectra.security.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yangxj96.spectra.core.entity.from.PageFrom;
+import com.yangxj96.spectra.core.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
+import com.yangxj96.spectra.security.entity.vo.RoleVO;
+import com.yangxj96.spectra.security.entity.mapstruct.RoleMapstruct;
 import com.yangxj96.spectra.security.service.PermissionService;
 import com.yangxj96.spectra.security.service.RoleService;
 import jakarta.annotation.Resource;
@@ -27,6 +29,9 @@ public class PermissionServiceImpl implements PermissionService {
     @Resource
     private RoleService roleService;
 
+    @Resource
+    private RoleMapstruct roleMapstruct;
+
     @Override
     @Transactional
     public void createdRole(RoleFrom params) {
@@ -44,12 +49,16 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public IPage<Role> pageRole(PageFrom page, RolePageFrom params) {
+    public IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params) {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper
                 .like(StringUtils.isNotBlank(params.getName()), Role::getName, params.getName())
                 .eq(null != params.getState(), Role::getState, params.getState())
                 .orderByAsc(Role::getCreatedAt);
-        return roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
+        Page<Role> db = roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
+        Page<RoleVO> result = new Page<>();
+        BeanUtils.copyProperties(db,result);
+        result.setRecords(roleMapstruct.toVOs(db.getRecords()));
+        return result;
     }
 }

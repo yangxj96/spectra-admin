@@ -3,10 +3,11 @@ package com.yangxj96.spectra.security.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
-import com.yangxj96.spectra.core.entity.from.PageFrom;
+import com.yangxj96.spectra.core.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
+import com.yangxj96.spectra.security.entity.vo.RoleVO;
 import com.yangxj96.spectra.security.service.PermissionService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
@@ -34,7 +35,7 @@ public class PermissionController {
      */
     @ULog("分页查询角色列表")
     @GetMapping("/pageRole")
-    public IPage<Role> pageRole(PageFrom page, RolePageFrom params) {
+    public IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params) {
         return bindService.pageRole(page, params);
     }
 

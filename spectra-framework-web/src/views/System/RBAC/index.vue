@@ -40,10 +40,7 @@
                 <el-table-column align="center" prop="name" width="220" label="名称" />
                 <el-table-column align="center" width="220" label="范围">
                     <template #default="scope">
-                        <el-tag v-if="scope.row.scope === 0" type="primary">本级及其下级</el-tag>
-                        <el-tag v-else-if="scope.row.scope === 1" type="primary">本级</el-tag>
-                        <el-tag v-else-if="scope.row.scope === 2" type="primary">全局</el-tag>
-                        <el-tag v-else type="danger">未匹配</el-tag>
+                        <el-tag type="primary">{{ scope.row.scope }}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" width="220" label="状态">
@@ -120,9 +117,9 @@
                 </el-form-item>
                 <el-form-item label="角色范围" prop="scope">
                     <el-select v-model="edit.form.scope" clearable>
-                        <el-option :value="0" label="本级及其下级" />
-                        <el-option :value="1" label="本级" />
-                        <el-option :value="2" label="全局" />
+                        <el-option value="本级包含下级" label="本级包含下级" />
+                        <el-option value="本级" label="本级" />
+                        <el-option value="全局" label="全局" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否启用" prop="state">
@@ -149,6 +146,7 @@ import MenuApi from "@/api/MenuApi.ts";
 import { ElMessage, ElMessageBox, ElTree, type FormInstance, type FormRules } from "element-plus";
 import PermissionApi from "@/api/PermissionApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
+import _ from "lodash";
 
 const formRef = useTemplateRef<FormInstance>("formRef");
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
@@ -203,7 +201,7 @@ function handleRoleAddDialog() {
 function handleRoleEditDialog(row: Role) {
     console.log(`角色编辑`);
     edit.modify = true;
-    edit.form = row;
+    edit.form = _.cloneDeep(row);
     edit.dialog = true;
 }
 

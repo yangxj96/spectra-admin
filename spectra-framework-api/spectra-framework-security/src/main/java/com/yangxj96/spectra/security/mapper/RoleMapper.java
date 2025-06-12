@@ -9,6 +9,7 @@ import java.util.List;
 
 @Mapper
 public interface RoleMapper extends BaseMapper<Role> {
+
     /**
      * 根据账号ID获取所拥有的角色
      *
@@ -16,4 +17,5 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return 角色列表
      */
     List<Role> getAccountId(@Param("accountId") Long accountId);
+
 }

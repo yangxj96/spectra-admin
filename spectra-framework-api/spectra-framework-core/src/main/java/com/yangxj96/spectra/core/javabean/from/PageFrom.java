@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.entity.from;
+package com.yangxj96.spectra.core.javabean.from;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

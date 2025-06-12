@@ -7,18 +7,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
 import lombok.experimental.SuperBuilder;
 
 /**
  * 角色表<->账户
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "db_system.t_account_role_map")
 public class AccountRoleMap extends BaseEntity {
     /**

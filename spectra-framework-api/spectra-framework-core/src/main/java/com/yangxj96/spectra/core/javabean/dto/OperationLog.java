@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.entity.dto;
+package com.yangxj96.spectra.core.javabean.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
