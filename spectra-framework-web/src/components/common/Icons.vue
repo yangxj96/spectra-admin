@@ -41,4 +41,12 @@ const svgClass = computed(() => {
     width: 1em;
     height: 1em;
 }
+
+// 透明边框
+.svg-icon:focus {
+    /* 使用透明边框或其他颜色 */
+    outline: 2px solid transparent;
+    /* 可选：设置轮廓线与对象之间的空间 */
+    outline-offset: 2px;
+}
 </style>

@@ -17,7 +17,7 @@
         <el-row style="width: 100%; height: 100%">
             <el-col :span="20" :push="2">
                 <img
-                    src="/src/assets/images/default-avatar.jpg"
+                    src="@/assets/images/avatar.png"
                     alt="default avatar"
                     style="object-fit: cover; margin-left: 80px; margin-bottom: 10px"
                     class="el-avatar el-avatar--circle el-tooltip__trigger" />

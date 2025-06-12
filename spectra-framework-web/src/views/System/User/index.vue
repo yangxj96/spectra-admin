@@ -50,17 +50,18 @@
         <el-col :span="20">
             <el-table :data="table_data" height="90%" stripe>
                 <el-table-column align="center" type="index" />
-                <el-table-column align="center" prop="name" label="姓名" />
-                <el-table-column align="center" prop="email" label="邮箱" />
-                <el-table-column align="center" prop="tel" label="电话" />
-                <el-table-column align="center" prop="dept" label="岗位/部门" />
-                <el-table-column align="center" label="状态">
+                <el-table-column align="center" label="姓名" prop="name" />
+                <el-table-column align="center" label="邮箱" prop="email" />
+                <el-table-column align="center" label="手机" prop="tel" />
+                <el-table-column align="center" label="部门" prop="dept" />
+                <el-table-column align="center" label="岗位" prop="dept" />
+                <el-table-column align="center" label="状态" prop="state">
                     <template #default="scope">
-                        <el-tag v-if="scope.row.state" type="success">激活</el-tag>
+                        <el-tag v-if="scope.row.state" type="success">正常</el-tag>
                         <el-tag v-else type="danger">冻结</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" prop="role" label="角色" />
+                <el-table-column align="center" label="角色" prop="role" />
                 <el-table-column align="center" label="操作">
                     <template v-slot:default="scope">
                         <el-button link type="primary" size="small" @click="handleTableItemModify(scope.row)">
@@ -88,101 +89,59 @@
     <!-- 新增或编辑 -->
     <el-dialog
         v-if="ready"
-        v-model="user.dialog"
+        v-model="edit.dialog"
         :append-to="'.box-content'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
         :destroy-on-close="true"
-        :title="(user.modify ? '编辑' : '新增') + '用户'"
+        :title="(edit.modify ? '编辑' : '新增') + '用户'"
         width="30vw">
         <template #default>
-            <el-form v-loading="user.loading" :model="user.form" :rules="user.rules" label-width="auto" @submit.prevent>
+            <el-form v-loading="edit.loading" :model="edit.form" :rules="edit.rules" label-width="auto" @submit.prevent>
                 <el-form-item label="姓名" prop="username">
-                    <el-input v-model="user.form.username" placeholder="请输入姓名" style="width: 90%" />
-                    <el-popover
-                        placement="right"
-                        title="用户名规则"
-                        width="200"
-                        trigger="hover"
-                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
-                        <template #reference>
-                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                        </template>
-                    </el-popover>
+                    <el-input v-model="edit.form.username" placeholder="请输入姓名" />
                 </el-form-item>
-                <el-form-item label="手机号码" prop="telephone">
-                    <el-input v-model="user.form.telephone" placeholder="请输入手机号码" style="width: 90%" />
-                    <el-popover
-                        placement="right"
-                        title="用户名规则"
-                        width="200"
-                        trigger="hover"
-                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
-                        <template #reference>
-                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                <el-form-item label="手机" prop="tel">
+                    <el-input v-model="edit.form.tel" placeholder="请输入手机号码" />
+                </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="edit.form.email" placeholder="请输入邮箱">
+                        <template #suffix>
+                            <el-tooltip effect="dark" content="同时也作为登录账号" placement="right">
+                                <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                            </el-tooltip>
                         </template>
-                    </el-popover>
+                    </el-input>
                 </el-form-item>
                 <el-form-item label="部门" prop="dept">
                     <el-tree-select
-                        v-model="user.form.dept"
+                        v-model="edit.form.dept"
                         :data="dept_tree"
                         placeholder="请选择部门"
                         check-strictly
                         default-expand-all
                         node-key="id"
                         :props="dept_tree_props"
-                        :render-after-expand="false"
-                        style="width: 90%" />
-                    <el-popover
-                        placement="right"
-                        title="用户名规则"
-                        width="200"
-                        trigger="hover"
-                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
-                        <template #reference>
-                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                        </template>
-                    </el-popover>
+                        :render-after-expand="false" />
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
-                    <el-select v-model="user.form.status" placeholder="请选择状态" clearable style="width: 90%">
+                    <el-select v-model="edit.form.status" placeholder="请选择状态" clearable>
                         <el-option label="激活" :value="true" />
                         <el-option label="冻结" :value="false" />
                     </el-select>
-                    <el-popover
-                        placement="right"
-                        title="用户名规则"
-                        width="200"
-                        trigger="hover"
-                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
-                        <template #reference>
-                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                        </template>
-                    </el-popover>
                 </el-form-item>
-                <el-form-item label="角色" prop="roles">
-                    <el-select v-model="user.form.role" placeholder="请选择角色" clearable style="width: 90%">
+                <el-form-item label="角色" prop="role">
+                    <el-select v-model="edit.form.role" placeholder="请选择角色" clearable>
                         <el-option label="系统管理员" value="sysadmin" />
                         <el-option label="管理员" value="admin" />
                     </el-select>
-                    <el-popover
-                        placement="right"
-                        title="用户名规则"
-                        width="200"
-                        trigger="hover"
-                        content="用户名必须为3-20个字符，支持字母数字和下划线。">
-                        <template #reference>
-                            <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                        </template>
-                    </el-popover>
                 </el-form-item>
             </el-form>
         </template>
         <template #footer>
-            <el-button :disabled="user.loading" @click="() => (user.dialog = false)">取消</el-button>
-            <el-button :disabled="user.loading" type="primary" @click="handleUserSave">确定</el-button>
+            <el-button :disabled="edit.loading" @click="() => (edit.dialog = false)">取消</el-button>
+            <el-button :disabled="edit.loading" type="primary" @click="handleUserSave">确定</el-button>
         </template>
     </el-dialog>
 </template>
@@ -191,8 +150,8 @@
 import { onMounted, reactive, ref } from "vue";
 import UserApi from "@/api/UserApi.ts";
 import { ElMessageBox, type FormRules } from "element-plus";
-import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UseTable from "@/hooks/UseTable.ts";
+import * as VerifyRules from "@/utils/VerifyRules.ts";
 
 const dept_tree_props = {
     label: "name"
@@ -240,21 +199,24 @@ const dept_tree = ref<Dept[]>([
 ]);
 
 // 新增或编辑
-const user = reactive({
+const edit = reactive({
     dialog: false,
     modify: false,
     loading: false,
     form: {} as User,
     rules: {
         username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        account: [{ required: true, message: "请输入账号", trigger: "blur" }],
-        telephone: [
+        tel: [
             { required: true, message: "请输入手机号码", trigger: "blur" },
             { validator: VerifyRules.mobile, message: "请输入正确的手机号码", trigger: "blur" }
         ],
+        email: [
+            { required: true, message: "请输入邮箱", trigger: "blur" },
+            { validator: VerifyRules.email, message: "请输入正确的邮箱", trigger: "blur" }
+        ],
         dept: [{ required: true, message: "请选择部门", trigger: "blur" }],
         status: [{ required: true, message: "请选择状态", trigger: "blur" }],
-        roles: [{ required: true, message: "请选择角色", trigger: "blur" }]
+        role: [{ required: true, message: "请选择角色", trigger: "blur" }]
     } as FormRules
 });
 
@@ -269,9 +231,9 @@ function handleDeptTreeClick(node: unknown) {
 
 // 表行修改按钮被单击
 function handleTableItemModify(row: User) {
-    user.modify = true;
-    user.form = row;
-    user.dialog = true;
+    edit.modify = true;
+    edit.form = row;
+    edit.dialog = true;
 }
 
 // 表行删除按钮被单击
@@ -287,17 +249,17 @@ function handleTableItemDelete(row: User) {
 
 // 用户新增被单机
 function handleUserAddDialog() {
-    user.modify = false;
-    user.form = {} as User;
-    user.dialog = true;
+    edit.modify = false;
+    edit.form = {} as User;
+    edit.dialog = true;
 }
 
 // 新增或编辑用户
 function handleUserSave() {
-    console.log(`保存:`, user.form);
-    user.loading = true;
+    console.log(`保存:`, edit.form);
+    edit.loading = true;
     let i = setInterval(() => {
-        user.loading = false;
+        edit.loading = false;
         clearInterval(i);
     }, 3000);
 }

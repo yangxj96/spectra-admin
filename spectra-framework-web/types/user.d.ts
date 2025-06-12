@@ -11,11 +11,11 @@ type Token = {
     roles: string[];
 };
 
-type User = {
-    id: string;
+// 用户
+type User = BaseEntity & {
     username: string;
-    account: string;
-    telephone: string;
+    tel: string;
+    email: string;
     dept: string;
     status: boolean;
     role: string;

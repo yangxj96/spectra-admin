@@ -1,13 +1,15 @@
 <template>
     <el-row style="height: 60px">
-        <el-col :span="3"></el-col>
+        <el-col :span="3">
+            <el-image :src="logo" />
+        </el-col>
 
         <el-col :span="20" style="padding-right: 40px"></el-col>
 
         <el-col :span="1">
             <el-dropdown>
                 <img
-                    src="@/assets/images/default-avatar.jpg"
+                    src="@/assets/images/avatar.png"
                     alt="default avatar"
                     style="object-fit: cover"
                     class="el-avatar el-avatar--circle el-tooltip__trigger" />
@@ -43,6 +45,7 @@ import { useRouter } from "vue-router";
 import { ElMessage } from "element-plus/es";
 import useStore from "@/plugin/store";
 import { stopAllRequest } from "@/plugin/request";
+import logo from "@/assets/images/logo.svg";
 
 const router = useRouter();
 
