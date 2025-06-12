@@ -49,8 +49,7 @@ public class PermissionServiceImpl implements PermissionService {
         wrapper
                 .like(StringUtils.isNotBlank(params.getName()), Role::getName, params.getName())
                 .eq(null != params.getState(), Role::getState, params.getState())
-                .orderByAsc(Role::getCreatedAt)
-        ;
+                .orderByAsc(Role::getCreatedAt);
         return roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
     }
 }

@@ -42,7 +42,7 @@
     <el-dialog
         v-if="ready"
         v-model="menu.dialog"
-        :append-to="'.box-body'"
+        :append-to="'.box-content'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
         :show-close="false"
@@ -60,6 +60,17 @@
                 @submit.prevent>
                 <el-form-item v-if="menu.modify" label="数据ID" prop="id">
                     <el-input v-model="menu.form.id" disabled clearable placeholder="请输入菜单名称" />
+                </el-form-item>
+                <el-form-item label="上级菜单" prop="pid">
+                    <el-tree-select
+                        v-model="menu.form.pid"
+                        :data="table_data"
+                        placeholder="请选择菜单父级"
+                        check-strictly
+                        default-expand-all
+                        node-key="id"
+                        :props="{ label: 'name' }"
+                        :render-after-expand="false" />
                 </el-form-item>
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="menu.form.name" clearable placeholder="请输入菜单名称" />
@@ -138,6 +149,7 @@ function handleCriteriaQuery() {
 
 // 表行修改按钮被单击
 function handleTableItemModify(row: Menu) {
+    console.log(`菜单`, row);
     menu.modify = true;
     menu.form = _.cloneDeep(row);
     menu.dialog = true;

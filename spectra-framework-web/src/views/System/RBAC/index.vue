@@ -107,7 +107,7 @@
         v-if="ready"
         v-model="edit.dialog"
         :title="`${edit.modify ? '编辑' : '新增'}角色`"
-        append-to-body
+        :append-to="'.box-content'"
         width="30%"
         :show-close="false"
         :destroy-on-close="true"

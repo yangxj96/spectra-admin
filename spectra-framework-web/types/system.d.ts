@@ -78,9 +78,29 @@ type Role = BaseEntity & {
  */
 type Dept = BaseEntity & {
     /**
-     * 部门名称
+     * 名称
      */
     name: string;
+
+    /**
+     * 类型
+     */
+    type: string;
+
+    /**
+     * 代码
+     */
+    code: string;
+
+    /**
+     * 排序
+     */
+    sort: number;
+
+    /**
+     * 备注
+     */
+    remark?: string;
 
     /**
      * 子级

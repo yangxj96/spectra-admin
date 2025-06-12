@@ -11,7 +11,6 @@ import com.yangxj96.spectra.security.entity.from.UserPageFrom;
 import com.yangxj96.spectra.security.entity.vo.UserPageVO;
 import com.yangxj96.spectra.security.mapper.UserMapper;
 import com.yangxj96.spectra.security.service.AccountService;
-import com.yangxj96.spectra.security.service.RoleService;
 import com.yangxj96.spectra.security.service.UserService;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
@@ -32,8 +31,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper
                 .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
-                .orderByAsc(User::getCreatedAt)
-        ;
+                .orderByAsc(User::getCreatedAt);
         Page<User> users = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         IPage<UserPageVO> result = new Page<>();
         BeanUtils.copyProperties(users, result);

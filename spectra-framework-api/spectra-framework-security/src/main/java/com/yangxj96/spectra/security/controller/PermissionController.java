@@ -28,6 +28,8 @@ public class PermissionController {
     /**
      * 分页查询角色信息
      *
+     * @param page   分页信息,页码和每页数量
+     * @param params 角色分页入参
      * @return 分页结果
      */
     @ULog("分页查询角色列表")
