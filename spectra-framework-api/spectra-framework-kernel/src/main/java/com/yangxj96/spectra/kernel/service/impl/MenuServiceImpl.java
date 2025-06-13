@@ -1,14 +1,16 @@
 package com.yangxj96.spectra.kernel.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yangxj96.spectra.core.constant.Common;
 import com.yangxj96.spectra.core.exception.DataNotExistException;
-import com.yangxj96.spectra.core.utils.TreeBuildConfig;
-import com.yangxj96.spectra.core.utils.TreeNode;
-import com.yangxj96.spectra.core.utils.TreeUtils;
+import com.yangxj96.spectra.core.utils.TreeBuilder;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
+import com.yangxj96.spectra.kernel.entity.mapstruct.MenuMapstruct;
+import com.yangxj96.spectra.kernel.entity.vo.MenuTreeVO;
 import com.yangxj96.spectra.kernel.mapper.MenuMapper;
 import com.yangxj96.spectra.kernel.service.MenuService;
+import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,25 +26,15 @@ import java.util.List;
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
+    @Resource
+    private MenuMapstruct mapstruct;
+
     @Override
-    public List<TreeNode> tree() {
+    public List<MenuTreeVO> tree() {
         List<Menu> menus = this.list();
-        // 构建树配置
-        TreeBuildConfig<Menu> config = TreeBuildConfig.<Menu>builder()
-                .idFunc(menu -> menu.getId() == null ? null : menu.getId().toString())
-                .parentIdFunc(menu -> menu.getPid() == null ? null : menu.getPid().toString())
-                .nodeMapper((menu, treeNode) -> {
-                    treeNode.setName(menu.getName());
-                    treeNode.getExtra().put("icon", menu.getIcon());
-                    treeNode.getExtra().put("path", menu.getPath());
-                    treeNode.getExtra().put("component", menu.getComponent());
-                    treeNode.getExtra().put("layout", menu.getLayout());
-                    treeNode.getExtra().put("sort", menu.getSort());
-                })
-                .comparator(TreeBuildConfig.defaultComparator())
-                .skipIfParentNotExists(false)
-                .build();
-        return TreeUtils.buildTree(menus, "0", config);
+        // 先转树形VO
+        List<MenuTreeVO> vos = mapstruct.toTreeVOS(menus);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override

@@ -27,7 +27,7 @@
         <!-- 统一依赖版本管理 -->
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <sa-token.version>1.43.0</sa-token.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
 
         <apache.commons.lang3.version>3.17.0</apache.commons.lang3.version>
         <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
@@ -35,7 +35,6 @@
     </properties>
 
     <modules>
-
         <module>spectra-framework-launch</module>
         <module>spectra-framework-core</module>
         <module>spectra-framework-security</module>

@@ -1,9 +1,9 @@
 package com.yangxj96.spectra.kernel.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.yangxj96.spectra.core.utils.TreeNode;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
+import com.yangxj96.spectra.kernel.entity.vo.MenuTreeVO;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ public interface MenuService extends IService<Menu> {
      *
      * @return 生成的树形菜单
      */
-    List<TreeNode> tree();
+    List<MenuTreeVO> tree();
 
     /**
      * 创建菜单

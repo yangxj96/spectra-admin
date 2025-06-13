@@ -20,33 +20,35 @@
  * SOFTWARE.
  */
 
-package com.yangxj96.spectra.core.utils;
+package com.yangxj96.spectra.core.base.javabean.from;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+/**
+ * 分页查询入参
+ *
+ * @author 杨新杰
+ * @since 2025/6/3 23:21
+ */
 @Data
-@NoArgsConstructor
+@ToString
+@Builder
 @AllArgsConstructor
-public class TreeNode {
+@NoArgsConstructor
+public class PageFrom {
 
-    private String id;
+    /**
+     * 页码
+     */
+    private Long pageSize;
 
-    private String parentId;
+    /**
+     * 每页数量
+     */
+    private Long pageNum;
 
-    private String name;
-
-    private List<TreeNode> children = new ArrayList<>();
-
-    private Map<String, Object> extra = new HashMap<>();
-
-    public void putExtra(String key, Object value) {
-        this.extra.put(key, value);
-    }
 }

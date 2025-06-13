@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yangxj96.spectra.core.base.BaseServiceImpl;
-import com.yangxj96.spectra.core.javabean.from.PageFrom;
+import com.yangxj96.spectra.core.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Account;
 import com.yangxj96.spectra.security.entity.dto.User;
 import com.yangxj96.spectra.security.entity.from.UserPageFrom;

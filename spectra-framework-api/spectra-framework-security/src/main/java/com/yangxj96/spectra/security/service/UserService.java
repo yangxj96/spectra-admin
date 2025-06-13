@@ -2,7 +2,7 @@ package com.yangxj96.spectra.security.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.core.base.BaseService;
-import com.yangxj96.spectra.core.javabean.from.PageFrom;
+import com.yangxj96.spectra.core.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.User;
 import com.yangxj96.spectra.security.entity.from.UserPageFrom;
 import com.yangxj96.spectra.security.entity.vo.UserPageVO;

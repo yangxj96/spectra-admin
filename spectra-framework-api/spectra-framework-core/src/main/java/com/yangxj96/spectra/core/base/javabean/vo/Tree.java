@@ -20,32 +20,24 @@
  * SOFTWARE.
  */
 
-package com.yangxj96.spectra.core.utils;
+package com.yangxj96.spectra.core.base.javabean.vo;
 
-import lombok.Builder;
-import lombok.Getter;
-import java.util.Comparator;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
+import java.util.List;
 
-@Getter
-@Builder
-public class TreeBuildConfig<T> {
-    private final Function<T, String> idFunc;
+/**
+ * 所有树形结构 VO 的通用接口
+ */
+public interface Tree<T> {
 
-    private final Function<T, String> parentIdFunc;
+    Long getId();
 
-    private final BiConsumer<T, TreeNode> nodeMapper;
+    void setId(Long id);
 
-    private final Comparator<TreeNode> comparator;
+    Long getPid();
 
-    private final boolean skipIfParentNotExists; // 是否跳过找不到父节点的数据
+    void setPid(Long pid);
 
-    // 默认比较器：按 "sort" 字段排序
-    public static <T> Comparator<TreeNode> defaultComparator() {
-        return Comparator.comparingInt(o -> {
-            Object sortObj = o.getExtra().get("sort");
-            return sortObj instanceof Number number ? number.intValue() : 0;
-        });
-    }
+    List<T> getChildren();
+
+    void setChildren(List<T> children);
 }

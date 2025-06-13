@@ -3,7 +3,7 @@ package com.yangxj96.spectra.security.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.yangxj96.spectra.core.javabean.from.PageFrom;
+import com.yangxj96.spectra.core.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
