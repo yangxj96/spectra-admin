@@ -1,6 +1,6 @@
 package com.yangxj96.spectra.core.configuration;
 
-import com.yangxj96.spectra.core.response.R;
+import com.yangxj96.spectra.common.response.R;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.core.MethodParameter;
@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 /**
  * 响应结果统一修改
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/6/9 23:57
  */
 @ControllerAdvice

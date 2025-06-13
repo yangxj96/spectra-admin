@@ -3,7 +3,7 @@ package com.yangxj96.spectra.core.aspectj;
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yangxj96.spectra.core.annotation.ULog;
-import com.yangxj96.spectra.core.javabean.dto.OperationLog;
+import com.yangxj96.spectra.core.javabean.entity.OperationLog;
 import com.yangxj96.spectra.core.service.OperationLogService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * ULog注解AOP切面
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/6/5 10:46
  */
 @Slf4j

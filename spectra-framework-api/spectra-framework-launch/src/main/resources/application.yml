@@ -5,6 +5,8 @@ server:
     context-path: /api
 # spring 配置
 spring:
+  main:
+    banner-mode: off
   application:
     name: spectra-framework-launch
   datasource:

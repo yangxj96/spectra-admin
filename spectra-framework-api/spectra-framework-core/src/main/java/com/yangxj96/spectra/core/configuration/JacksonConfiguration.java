@@ -27,7 +27,7 @@ import java.util.TimeZone;
 /**
  * JackJSON配置
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/5/26 16:38
  */
 @Slf4j

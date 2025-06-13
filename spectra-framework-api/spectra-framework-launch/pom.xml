@@ -22,17 +22,12 @@
         <!-- 自己的模块 -->
         <dependency>
             <groupId>com.yangxj96</groupId>
+            <artifactId>spectra-framework-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yangxj96</groupId>
             <artifactId>spectra-framework-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yangxj96</groupId>
-            <artifactId>spectra-framework-security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.yangxj96</groupId>
-            <artifactId>spectra-framework-kernel</artifactId>
             <version>${project.version}</version>
         </dependency>
 

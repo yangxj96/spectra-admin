@@ -12,14 +12,16 @@ import org.springframework.context.annotation.Configuration;
 /**
  * MyBatisPlus配置
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/6/5 10:58
  */
 @Slf4j
 @Configuration
 public class MyBatisPlusConfiguration {
 
-    /** 最大查询分页数量 **/
+    /**
+     * 最大查询分页数量
+     **/
     private static final Long MAX_LIMIT = 500L;
 
     @Bean

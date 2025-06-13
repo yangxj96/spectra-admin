@@ -3,10 +3,10 @@ package com.yangxj96.spectra.core.configuration;
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
+import com.yangxj96.spectra.common.exception.DataExistException;
+import com.yangxj96.spectra.common.exception.DataNotExistException;
+import com.yangxj96.spectra.common.response.R;
 import com.yangxj96.spectra.core.annotation.ULog;
-import com.yangxj96.spectra.core.exception.DataExistException;
-import com.yangxj96.spectra.core.exception.DataNotExistException;
-import com.yangxj96.spectra.core.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
@@ -21,7 +21,7 @@ import javax.security.auth.login.LoginException;
 /**
  * 全局异常处理
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/5/26 17:07
  */
 @Slf4j

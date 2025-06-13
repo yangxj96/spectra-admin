@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentMap;
 /**
  * Get请求参数下滑先转驼峰命名
  *
- * @author 杨新杰
+ * @author Jack Young
  * @since 2025/6/3 23:32
  */
 @Slf4j

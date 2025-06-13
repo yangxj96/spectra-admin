@@ -6,8 +6,9 @@
 
     <groupId>com.yangxj96</groupId>
     <artifactId>spectra-framework-api</artifactId>
-    <version>${revision}</version>
     <name>spectra-framework-api</name>
+    <version>${revision}</version>
+
     <packaging>pom</packaging>
 
     <parent>
@@ -35,10 +36,9 @@
     </properties>
 
     <modules>
-        <module>spectra-framework-launch</module>
+        <module>spectra-framework-common</module>
         <module>spectra-framework-core</module>
-        <module>spectra-framework-security</module>
-        <module>spectra-framework-kernel</module>
+        <module>spectra-framework-launch</module>
     </modules>
 
     <dependencyManagement>
@@ -51,22 +51,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- SaToken -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-aop</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -76,10 +60,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
+        <!-- aop模块 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!-- redis模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+        </dependency>
+        <!-- 测试模块 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -103,6 +98,28 @@
             <artifactId>mybatis-plus-jsqlparser</artifactId>
         </dependency>
         <!-- 数据库 End -->
+
+        <!-- SaToken Begin -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot3-starter</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-aop</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
+        <!-- SaToken End -->
 
         <!-- 通用工具包 Begin -->
         <!-- commons-lang3 -->

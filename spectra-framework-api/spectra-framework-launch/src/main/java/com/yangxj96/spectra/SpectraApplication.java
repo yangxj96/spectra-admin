@@ -6,6 +6,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
+/**
+ * 项目启动类
+ *
+ * @author Jack Young
+ * @since 2025/5/5 10:09
+ */
 @SpringBootApplication
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 @MapperScan("com.yangxj96.spectra.*.mapper")
