@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @param <M> 子类对应的mapper
  * @param <O> 子类对应的实体
  * @author Jack Young
+ * @version 1.0
+ * @since 2025-6-14
  */
 public class BaseServiceImpl<M extends BaseMapper<O>, O extends BaseEntity>
         extends ServiceImpl<M, O> implements BaseService<O> {

@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.RollbackOn;
  * 项目启动类
  *
  * @author Jack Young
- * @since 2025/5/5 10:09
+ * @version 1.0
+ * @since 2025-6-14
  */
 @SpringBootApplication
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)

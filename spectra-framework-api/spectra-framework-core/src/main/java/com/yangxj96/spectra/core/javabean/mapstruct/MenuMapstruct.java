@@ -11,7 +11,8 @@ import java.util.List;
  * 菜单相关mapstruct
  *
  * @author Jack Young
- * @since 2025/6/13 15:16
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Mapper(componentModel = "spring")
 public interface MenuMapstruct {

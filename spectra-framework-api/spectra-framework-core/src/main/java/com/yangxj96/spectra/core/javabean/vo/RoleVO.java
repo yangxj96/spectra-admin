@@ -13,7 +13,8 @@ import lombok.NoArgsConstructor;
  * 角色响应VO
  *
  * @author Jack Young
- * @since 2025/6/12 17:29
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Data
 @Builder

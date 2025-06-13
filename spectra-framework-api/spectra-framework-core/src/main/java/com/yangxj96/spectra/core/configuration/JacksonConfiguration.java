@@ -28,7 +28,8 @@ import java.util.TimeZone;
  * JackJSON配置
  *
  * @author Jack Young
- * @since 2025/5/26 16:38
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @Configuration

@@ -8,7 +8,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * SaToken相关配置
  *
  * @author Jack Young
- * @since 2025/5/26 17:45
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Configuration
 public class SaTokenConfiguration {

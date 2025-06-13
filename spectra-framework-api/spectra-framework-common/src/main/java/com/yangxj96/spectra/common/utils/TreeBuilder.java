@@ -10,7 +10,8 @@ import java.util.*;
  *
  * @param <T> 实现了{@link Tree}的子类
  * @author Jack Young
- * @since 2025/6/5 10:09
+ * @version 1.0
+ * @since 2025-6-14
  */
 public class TreeBuilder<T extends Tree<T>> {
 

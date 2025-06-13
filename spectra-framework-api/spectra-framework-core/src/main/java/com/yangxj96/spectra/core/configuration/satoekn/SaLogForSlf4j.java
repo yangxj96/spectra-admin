@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
  * 重写日志输出
  *
  * @author Jack Young
- * @since 2025/5/26 18:07
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @Component

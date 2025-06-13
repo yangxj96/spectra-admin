@@ -6,7 +6,8 @@ import lombok.*;
  * 分页查询入参
  *
  * @author Jack Young
- * @since 2025/6/3 23:21
+ * @version 1.0
+ * @since 2025/6/3
  */
 @Data
 @ToString

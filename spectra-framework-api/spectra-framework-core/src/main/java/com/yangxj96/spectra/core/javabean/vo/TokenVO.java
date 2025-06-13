@@ -13,7 +13,8 @@ import java.util.List;
  * 登录认证token响应
  *
  * @author Jack Young
- * @since 2025/5/26 19:02
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Data
 @ToString

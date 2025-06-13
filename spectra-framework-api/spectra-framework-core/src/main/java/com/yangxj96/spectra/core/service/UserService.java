@@ -11,7 +11,8 @@ import com.yangxj96.spectra.core.javabean.vo.UserPageVO;
  * 用户service层
  *
  * @author Jack Young
- * @since 2025/6/3 23:18
+ * @version 1.0
+ * @since 2025-6-14
  */
 public interface UserService extends BaseService<User> {
 

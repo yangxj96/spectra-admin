@@ -8,10 +8,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * 用户认证接口测试
+ * 用户认证接口单元测试
  *
  * @author Jack Young
- * @since 2025/6/3 23:44
+ * @version 1.0
+ * @since 2025-6-14
  */
 @SpringBootTest
 class AuthControllerTest {

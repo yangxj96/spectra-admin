@@ -24,7 +24,8 @@ import java.util.Map;
  * ULog注解AOP切面
  *
  * @author Jack Young
- * @since 2025/6/5 10:46
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @Aspect

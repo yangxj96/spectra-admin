@@ -22,7 +22,8 @@ import javax.security.auth.login.LoginException;
  * 全局异常处理
  *
  * @author Jack Young
- * @since 2025/5/26 17:07
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @RestControllerAdvice

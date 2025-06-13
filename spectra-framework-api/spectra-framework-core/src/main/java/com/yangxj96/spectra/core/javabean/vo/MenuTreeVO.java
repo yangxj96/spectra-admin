@@ -14,7 +14,8 @@ import java.util.List;
  * 菜单树形VO
  *
  * @author Jack Young
- * @since 2025/6/13 15:14
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Data
 @NoArgsConstructor

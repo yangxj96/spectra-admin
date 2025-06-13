@@ -16,7 +16,8 @@ import java.util.List;
  * 菜单控制器
  *
  * @author Jack Young
- * @since 2025/6/3 23:18
+ * @version 1.0
+ * @since 2025-6-14
  */
 @SaCheckLogin
 @RestController

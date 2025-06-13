@@ -10,7 +10,8 @@ import org.springframework.stereotype.Service;
  * 操作日志service层-实现
  *
  * @author Jack Young
- * @since 2025/6/3 23:18
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Service
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {

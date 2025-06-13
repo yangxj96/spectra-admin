@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Configuration;
  * MyBatisPlus配置
  *
  * @author Jack Young
- * @since 2025/6/5 10:58
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @Configuration

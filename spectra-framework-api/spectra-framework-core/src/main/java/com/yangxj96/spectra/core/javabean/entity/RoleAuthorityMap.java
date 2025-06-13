@@ -13,7 +13,8 @@ import lombok.experimental.SuperBuilder;
  * 权限表<->角色
  *
  * @author Jack Young
- * @since 2025/6/3 23:32
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Data
 @SuperBuilder

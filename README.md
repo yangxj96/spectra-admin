@@ -57,4 +57,4 @@
 
 # 使用许可
 
-[MIT](LICENSE) © Jack Young (杨新杰)
+[MIT](LICENSE) © Jack Young

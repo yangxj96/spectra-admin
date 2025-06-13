@@ -7,7 +7,8 @@ import java.util.Enumeration;
  * 集合工具包扩展
  *
  * @author Jack Young
- * @since 2025/6/5 10:09
+ * @version 1.0
+ * @since 2025-6-14
  */
 public final class CollUtils {
 

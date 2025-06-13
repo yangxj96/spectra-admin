@@ -23,7 +23,8 @@ import java.util.concurrent.ConcurrentMap;
  * Get请求参数下滑先转驼峰命名
  *
  * @author Jack Young
- * @since 2025/6/3 23:32
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @Component

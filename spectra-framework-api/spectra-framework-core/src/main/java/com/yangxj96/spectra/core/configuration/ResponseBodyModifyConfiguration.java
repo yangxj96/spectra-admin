@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
  * 响应结果统一修改
  *
  * @author Jack Young
- * @since 2025/6/9 23:57
+ * @version 1.0
+ * @since 2025-6-14
  */
 @ControllerAdvice
 public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Object> {

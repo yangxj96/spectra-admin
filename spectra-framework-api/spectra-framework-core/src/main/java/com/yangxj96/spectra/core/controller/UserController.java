@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
  * 用户控制器
  *
  * @author Jack Young
- * @since 2025/6/11 14:52
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @RestController

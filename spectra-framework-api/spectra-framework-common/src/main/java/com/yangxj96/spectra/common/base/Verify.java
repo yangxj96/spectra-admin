@@ -4,7 +4,8 @@ package com.yangxj96.spectra.common.base;
  * 验证分组
  *
  * @author Jack Young
- * @since 2025/5/26 17:04
+ * @version 1.0
+ * @since 2025-6-14
  */
 public class Verify {
 

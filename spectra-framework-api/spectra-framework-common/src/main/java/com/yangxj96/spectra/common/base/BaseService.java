@@ -7,6 +7,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  *
  * @param <O> 子类对应的实体
  * @author Jack Young
+ * @version 1.0
+ * @since 2025-6-14
  */
 public interface BaseService<O extends BaseEntity> extends IService<O> {
 

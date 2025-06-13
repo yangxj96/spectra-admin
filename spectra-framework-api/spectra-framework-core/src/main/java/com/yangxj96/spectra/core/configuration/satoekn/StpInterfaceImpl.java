@@ -15,7 +15,8 @@ import java.util.List;
  * 自定义权限加载接口实现类
  *
  * @author Jack Young
- * @since 2025/5/26 19:07
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Component
 public class StpInterfaceImpl implements StpInterface {

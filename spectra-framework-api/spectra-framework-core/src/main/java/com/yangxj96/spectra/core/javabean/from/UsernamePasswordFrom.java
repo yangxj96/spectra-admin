@@ -10,7 +10,8 @@ import lombok.ToString;
  * 用户名密码登录入参
  *
  * @author Jack Young
- * @since 2025/5/26 18:58
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Data
 @ToString

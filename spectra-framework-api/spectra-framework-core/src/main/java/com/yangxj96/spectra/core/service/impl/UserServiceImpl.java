@@ -24,7 +24,8 @@ import java.util.List;
  * 用户service层-实现
  *
  * @author Jack Young
- * @since 2025/6/3 23:18
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Service
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {

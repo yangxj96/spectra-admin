@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
  * 元数据填充实现
  *
  * @author Jack Young
- * @since 2025/6/5 11:02
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {

@@ -20,7 +20,8 @@ import javax.security.auth.login.LoginException;
  * 认证控制器
  *
  * @author Jack Young
- * @since 2025/5/26 16:56
+ * @version 1.0
+ * @since 2025-6-14
  */
 @Slf4j
 @RestController
