@@ -1,9 +1,9 @@
 package com.yangxj96.spectra.kernel.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.hutool.core.lang.tree.Tree;
 import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
+import com.yangxj96.spectra.core.utils.TreeNode;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 import com.yangxj96.spectra.kernel.service.MenuService;
 import jakarta.annotation.Resource;
@@ -33,7 +33,7 @@ public class MenuController {
      */
     @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
-    public List<Tree<String>> tree() {
+    public List<TreeNode> tree() {
         return bindService.tree();
     }
 

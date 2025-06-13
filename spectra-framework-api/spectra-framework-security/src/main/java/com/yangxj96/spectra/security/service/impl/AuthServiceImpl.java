@@ -2,8 +2,6 @@ package com.yangxj96.spectra.security.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import cn.hutool.http.useragent.UserAgent;
-import cn.hutool.http.useragent.UserAgentUtil;
 import com.yangxj96.spectra.core.utils.CollUtils;
 import com.yangxj96.spectra.security.entity.dto.Account;
 import com.yangxj96.spectra.security.entity.from.UsernamePasswordFrom;
@@ -50,11 +48,10 @@ public class AuthServiceImpl implements AuthService {
         if (!CollUtils.contains(request.getHeaderNames(), "user-agent")) {
             throw new AuthException("认证错误");
         }
-        UserAgent agent = UserAgentUtil.parse(request.getHeader("user-agent"));
         StpUtil.login(
                 datum.getId(),
                 new SaLoginParameter()
-                        .setDeviceType(agent.isMobile() ? "Android" : "PC")
+                        .setDeviceType("PC")
                         .setIsLastingCookie(false)
                         .setIsWriteHeader(false)
         );

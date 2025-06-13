@@ -1,10 +1,10 @@
 package com.yangxj96.spectra.kernel.service.impl;
 
-import cn.hutool.core.lang.tree.Tree;
-import cn.hutool.core.lang.tree.TreeNodeConfig;
-import cn.hutool.core.lang.tree.TreeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yangxj96.spectra.core.exception.DataNotExistException;
+import com.yangxj96.spectra.core.utils.TreeBuildConfig;
+import com.yangxj96.spectra.core.utils.TreeNode;
+import com.yangxj96.spectra.core.utils.TreeUtils;
 import com.yangxj96.spectra.kernel.entity.dto.Menu;
 import com.yangxj96.spectra.kernel.entity.from.MenuSaveFrom;
 import com.yangxj96.spectra.kernel.mapper.MenuMapper;
@@ -25,21 +25,24 @@ import java.util.List;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
     @Override
-    public List<Tree<String>> tree() {
+    public List<TreeNode> tree() {
         List<Menu> menus = this.list();
-        TreeNodeConfig config = new TreeNodeConfig();
-        config.setWeightKey("sort");
-        config.setParentIdKey("pid");
-        return TreeUtil.build(menus, "0", config, (node, tree) -> {
-            tree.setId(node.getId().toString());
-            tree.setParentId(node.getPid().toString());
-            tree.setName(node.getName());
-            tree.putExtra("icon", node.getIcon());
-            tree.putExtra("path", node.getPath());
-            tree.putExtra("component", node.getComponent());
-            tree.putExtra("layout", node.getLayout());
-            tree.putExtra("sort", node.getSort());
-        });
+        // 构建树配置
+        TreeBuildConfig<Menu> config = TreeBuildConfig.<Menu>builder()
+                .idFunc(menu -> menu.getId() == null ? null : menu.getId().toString())
+                .parentIdFunc(menu -> menu.getPid() == null ? null : menu.getPid().toString())
+                .nodeMapper((menu, treeNode) -> {
+                    treeNode.setName(menu.getName());
+                    treeNode.getExtra().put("icon", menu.getIcon());
+                    treeNode.getExtra().put("path", menu.getPath());
+                    treeNode.getExtra().put("component", menu.getComponent());
+                    treeNode.getExtra().put("layout", menu.getLayout());
+                    treeNode.getExtra().put("sort", menu.getSort());
+                })
+                .comparator(TreeBuildConfig.defaultComparator())
+                .skipIfParentNotExists(false)
+                .build();
+        return TreeUtils.buildTree(menus, "0", config);
     }
 
     @Override

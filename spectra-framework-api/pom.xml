@@ -26,8 +26,12 @@
 
         <!-- 统一依赖版本管理 -->
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
-        <hutool.version>5.8.38</hutool.version>
         <sa-token.version>1.43.0</sa-token.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
+
+        <apache.commons.lang3.version>3.17.0</apache.commons.lang3.version>
+        <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
+        <apache.commons.text.version>1.13.1</apache.commons.text.version>
     </properties>
 
     <modules>
@@ -47,12 +51,6 @@
                 <version>${mybatis-plus.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <!-- hutool工具包 -->
-            <dependency>
-                <groupId>cn.hutool</groupId>
-                <artifactId>hutool-all</artifactId>
-                <version>${hutool.version}</version>
             </dependency>
             <!-- SaToken -->
             <dependency>
@@ -112,34 +110,42 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.17.0</version>
+            <version>${apache.commons.lang3.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${apache.commons.coll.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>${apache.commons.text.version}</version>
+        </dependency>
+        <!-- jetbrains注解包,用来检测允许空值等 -->
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>23.1.0</version>
             <scope>compile</scope>
         </dependency>
+        <!-- lombok -->
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
         </dependency>
         <!-- MapStruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${mapstruct.version}</version>
         </dependency>
         <!-- MapStruct 注解处理器（编译时用） -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>1.5.5.Final</version>
+            <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- 通用工具包 End -->

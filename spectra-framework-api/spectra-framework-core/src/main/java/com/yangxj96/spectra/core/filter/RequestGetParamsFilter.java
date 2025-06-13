@@ -1,12 +1,12 @@
 package com.yangxj96.spectra.core.filter;
 
-import cn.hutool.core.text.CharSequenceUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.CaseUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -42,7 +42,9 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
         for (String param : request.getParameterMap().keySet()) {
             var k = "";
             if (param.contains("_")) {
-                k = CharSequenceUtil.toCamelCase(param);
+                // 原先的hutool,决定不在使用了
+                // k = CharSequenceUtil.toCamelCase(param)
+                k = CaseUtils.toCamelCase(param, false, '_');
             } else {
                 k = param;
             }

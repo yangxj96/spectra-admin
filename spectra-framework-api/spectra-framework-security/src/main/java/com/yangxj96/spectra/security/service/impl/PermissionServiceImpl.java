@@ -7,8 +7,8 @@ import com.yangxj96.spectra.core.javabean.from.PageFrom;
 import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
-import com.yangxj96.spectra.security.entity.vo.RoleVO;
 import com.yangxj96.spectra.security.entity.mapstruct.RoleMapstruct;
+import com.yangxj96.spectra.security.entity.vo.RoleVO;
 import com.yangxj96.spectra.security.service.PermissionService;
 import com.yangxj96.spectra.security.service.RoleService;
 import jakarta.annotation.Resource;
@@ -57,7 +57,7 @@ public class PermissionServiceImpl implements PermissionService {
                 .orderByAsc(Role::getCreatedAt);
         Page<Role> db = roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         Page<RoleVO> result = new Page<>();
-        BeanUtils.copyProperties(db,result);
+        BeanUtils.copyProperties(db, result);
         result.setRecords(roleMapstruct.toVOs(db.getRecords()));
         return result;
     }

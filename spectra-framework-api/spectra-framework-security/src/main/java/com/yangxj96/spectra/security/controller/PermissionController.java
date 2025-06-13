@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.base.Verify;
 import com.yangxj96.spectra.core.javabean.from.PageFrom;
-import com.yangxj96.spectra.security.entity.dto.Role;
 import com.yangxj96.spectra.security.entity.from.RoleFrom;
 import com.yangxj96.spectra.security.entity.from.RolePageFrom;
 import com.yangxj96.spectra.security.entity.vo.RoleVO;
