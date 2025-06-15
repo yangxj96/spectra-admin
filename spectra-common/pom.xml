@@ -10,7 +10,7 @@
         <version>${revision}</version>
     </parent>
 
-    <artifactId>spectra-framework-common</artifactId>
+    <artifactId>spectra-common</artifactId>
     <description>公用模块</description>
 
     <properties>
