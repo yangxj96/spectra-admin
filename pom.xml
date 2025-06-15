@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.yangxj96</groupId>
-    <artifactId>spectra-framework-api</artifactId>
-    <name>spectra-framework-api</name>
+    <groupId>com.yangxj96.spectra</groupId>
+    <artifactId>spectra-api</artifactId>
+    <name>spectra-api</name>
     <version>${revision}</version>
 
     <packaging>pom</packaging>
@@ -36,9 +36,9 @@
     </properties>
 
     <modules>
-        <module>spectra-framework-common</module>
-        <module>spectra-framework-core</module>
-        <module>spectra-framework-launch</module>
+        <module>spectra-common</module>
+        <module>spectra-core</module>
+        <module>spectra-launch</module>
     </modules>
 
     <dependencyManagement>

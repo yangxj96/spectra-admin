@@ -5,13 +5,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.yangxj96</groupId>
-        <artifactId>spectra-framework-api</artifactId>
+        <groupId>com.yangxj96.spectra</groupId>
+        <artifactId>spectra-api</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>spectra-framework-core</artifactId>
-    <description>平台核心模块</description>
+    <artifactId>spectra-framework-launch</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
@@ -22,21 +21,41 @@
     <dependencies>
         <!-- 自己的模块 -->
         <dependency>
-            <groupId>com.yangxj96</groupId>
-            <artifactId>spectra-framework-common</artifactId>
+            <groupId>com.yangxj96.spectra</groupId>
+            <artifactId>spectra-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yangxj96.spectra</groupId>
+            <artifactId>spectra-core</artifactId>
             <version>${project.version}</version>
         </dependency>
 
+        <!-- spring boot -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven 插件 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.yangxj96.spectra.SpectraApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
