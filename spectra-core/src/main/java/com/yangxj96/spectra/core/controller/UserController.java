@@ -1,7 +1,6 @@
 package com.yangxj96.spectra.core.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.core.annotation.ULog;
@@ -37,7 +36,7 @@ public class UserController {
      * @return 分页结果
      */
     @ULog("分页查询用户列表")
-    @SaCheckPermission(value = "ROLE:RELEVANCE_ROLES",orRole = "DEV_ADMIN")
+    @SaCheckPermission(value = "ROLE:RELEVANCE_ROLES", orRole = "DEV_ADMIN")
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         return bindService.page(page, params);

@@ -2,7 +2,6 @@ package com.yangxj96.spectra.core.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yangxj96.spectra.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
