@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.configuration;
+package com.yangxj96.spectra.core.configuration.mvc;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

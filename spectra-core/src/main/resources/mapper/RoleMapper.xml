@@ -7,6 +7,7 @@
         <!--@Table db_system.t_role-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
+        <result column="code"       jdbcType="BOOLEAN"   property="code"/>
         <result column="state"      jdbcType="BOOLEAN"   property="state"/>
         <result column="scope"      jdbcType="SMALLINT"  property="scope"/>
         <result column="remark"     jdbcType="VARCHAR"   property="remark"/>
@@ -21,6 +22,7 @@
         <!--@mbg.generated-->
         id,
         "name",
+        code,
         "state",
         "scope",
         remark,
@@ -31,12 +33,14 @@
         deleted
     </sql>
 
-    <select id="getAccountId" resultMap="BaseResultMap">
+    <select id="getByUserId" resultMap="BaseResultMap">
         SELECT r.*
         FROM db_system.t_role r,
-        db_system.t_account_role_map arm
-        WHERE arm.account_id = #{accountId}
-        AND arm.role_id = r.id
+             db_system.t_user_role_map arm
+        WHERE arm.user_id = #{userId}
+          AND arm.role_id = r.id
+          AND r.deleted IS NULL
+          AND arm.deleted IS NULL
         ORDER BY created_at DESC;
     </select>
 </mapper>

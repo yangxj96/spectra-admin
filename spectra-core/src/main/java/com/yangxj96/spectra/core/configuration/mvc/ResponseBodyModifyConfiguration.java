@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.configuration;
+package com.yangxj96.spectra.core.configuration.mvc;
 
 import com.yangxj96.spectra.common.response.R;
 import org.jetbrains.annotations.NotNull;

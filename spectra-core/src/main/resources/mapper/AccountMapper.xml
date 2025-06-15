@@ -8,7 +8,8 @@
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="username"   jdbcType="VARCHAR"   property="username"/>
         <result column="password"   jdbcType="VARCHAR"   property="password"/>
-        <result column="enable"     jdbcType="BOOLEAN"   property="enable"/>
+        <result column="user_id"    jdbcType="BOOLEAN"   property="userId"/>
+        <result column="type"       jdbcType="BOOLEAN"   property="type"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
@@ -21,7 +22,8 @@
         id,
         username,
         "password",
-        "enable",
+        user_id,
+        "type",
         created_by,
         created_at,
         updated_by,

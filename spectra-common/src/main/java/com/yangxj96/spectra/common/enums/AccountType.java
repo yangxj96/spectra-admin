@@ -1,33 +1,35 @@
 package com.yangxj96.spectra.common.enums;
 
+
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 用户状态
+ * <p>
+ * 账号类型
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/15
  */
 @Getter
 @AllArgsConstructor
-public enum UserState implements IEnum<Short> {
-
+public enum AccountType implements IEnum<Short> {
     /**
-     * 正常
+     * 默认登录,也就是平台账号登录,默认注册的平台登录用邮箱作为登录账号
      */
-    NORMAL((short) 0, "正常"),
+    DEFAULT((short) 0, "邮箱登录"),
     /**
-     * 冻结
+     * 手机号码登录,预留
      */
-    FREEZE((short) -1, "冻结"),
+    PHONE((short) 1, "手机号码"),
     /**
-     * 封禁
+     * 微信登录,预留
      */
-    BANNED((short) -2, "冻结");
+    WECHAT((short) 2, "微信登录");
 
     private final short value;
 

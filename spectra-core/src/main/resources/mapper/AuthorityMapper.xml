@@ -7,6 +7,7 @@
         <!--@Table db_system.t_authority-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
+        <result column="code"       jdbcType="VARCHAR"   property="code"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
@@ -16,17 +17,26 @@
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, "name", created_by, created_at, updated_by, updated_at, deleted
+        id,
+        "name",
+        code,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted
     </sql>
 
     <select id="getByRoleIds" resultMap="BaseResultMap">
         SELECT a.*
         FROM db_system.t_authority a,
-        db_system.t_role_authority_map ram
+             db_system.t_role_authority_map ram
         WHERE ram.role_id IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}
         </foreach>
         AND ram.authority_id = a.id
+        AND a.deleted IS NULL
+        AND ram.deleted IS NULL
     </select>
 </mapper>

@@ -10,6 +10,9 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 角色表
  *
@@ -23,13 +26,22 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "db_system.t_role")
-public class Role extends BaseEntity {
+public class Role extends BaseEntity implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 名称
      */
     @TableField(value = "\"name\"")
     private String name;
+
+    /**
+     * 编码
+     */
+    @TableField(value = "code")
+    private String code;
 
     /**
      * 状态

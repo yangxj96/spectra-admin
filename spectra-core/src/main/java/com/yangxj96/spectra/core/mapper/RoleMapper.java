@@ -16,11 +16,11 @@ import java.util.List;
 public interface RoleMapper extends BaseMapper<Role> {
 
     /**
-     * 根据账号ID获取所拥有的角色
+     * 根据用户ID获取用户角色列表
      *
-     * @param accountId 账号 ID
+     * @param userId 用户ID
      * @return 角色列表
      */
-    List<Role> getAccountId(@Param("accountId") Long accountId);
+    List<Role> getByUserId(@Param("userId") Long userId);
 
 }

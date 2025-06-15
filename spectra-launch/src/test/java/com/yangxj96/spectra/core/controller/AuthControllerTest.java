@@ -1,11 +1,16 @@
 package com.yangxj96.spectra.core.controller;
 
+import com.yangxj96.spectra.common.enums.AccountType;
+import com.yangxj96.spectra.common.enums.UserState;
 import com.yangxj96.spectra.core.javabean.entity.Account;
+import com.yangxj96.spectra.core.javabean.entity.User;
 import com.yangxj96.spectra.core.service.AccountService;
+import com.yangxj96.spectra.core.service.UserService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.util.Assert;
 
 /**
  * 用户认证接口单元测试
@@ -23,14 +28,31 @@ class AuthControllerTest {
     @Resource
     private AccountService accountService;
 
+    @Resource
+    private UserService userService;
 
     @Test
     void addSysadmin() {
-        accountService.save(Account.builder()
-                .username("sysadmin")
+        var datum = Account.builder()
+                .username("sysadmin@pt.com")
                 .password(encoder.encode("sysadmin"))
-                .enable(true)
-                .build());
+                .type(AccountType.DEFAULT)
+                .userId(0L)
+                .build();
+        boolean save = accountService.save(datum);
+        Assert.isTrue(save, "保存失败");
+    }
+
+    @Test
+    void addUser() {
+        var datum = User.builder()
+                .name("平台管理员")
+                .email("sysadmin@pt.com")
+                .avatar(null)
+                .state(UserState.NORMAL)
+                .build();
+        boolean save = userService.save(datum);
+        Assert.isTrue(save, "保存失败");
     }
 
 }

@@ -19,7 +19,7 @@ import java.util.List;
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 
     @Override
-    public List<Role> getByAccountId(Long accountId) {
-        return this.baseMapper.getAccountId(accountId);
+    public List<Role> getByUserId(Long uid) {
+        return this.baseMapper.getByUserId(uid);
     }
 }

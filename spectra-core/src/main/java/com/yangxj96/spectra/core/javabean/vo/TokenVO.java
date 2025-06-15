@@ -24,7 +24,6 @@ import java.util.List;
 public class TokenVO implements Serializable {
 
     @Serial
-    @JsonIgnore
     private static final long serialVersionUID = 1L;
 
     @JsonSerialize(using = ToStringSerializer.class)

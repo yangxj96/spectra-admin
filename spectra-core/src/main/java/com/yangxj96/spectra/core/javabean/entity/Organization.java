@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yangxj96.spectra.common.base.BaseEntity;
-import com.yangxj96.spectra.common.enums.AccountType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,44 +14,51 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 账号信息
+ * 组织机构业务层-实现
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025-6-15
  */
 @Data
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_system.t_account")
-public class Account extends BaseEntity implements Serializable {
+@TableName(value = "db_system.t_organization")
+public class Organization extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 用户名
+     * 上级ID
      */
-    @TableField(value = "username")
-    private String username;
+    @TableField(value = "pid")
+    private Long pid;
 
     /**
-     * 密码
+     * 名称
      */
-    @TableField(value = "\"password\"")
-    private String password;
+    @TableField(value = "\"name\"")
+    private String name;
 
     /**
-     * 密码
+     * 编码
      */
-    @TableField(value = "user_id")
-    private Long userId;
+    @TableField(value = "code")
+    private String code;
 
     /**
-     * 登录方式
+     * 类型
      */
     @TableField(value = "\"type\"")
-    private AccountType type;
+    private Short type;
+
+    /**
+     * 备注
+     */
+    @TableField(value = "remark")
+    private String remark;
 }
+

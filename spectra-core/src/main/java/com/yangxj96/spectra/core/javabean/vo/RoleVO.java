@@ -9,6 +9,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 角色响应VO
  *
@@ -20,7 +23,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleVO {
+public class RoleVO implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;

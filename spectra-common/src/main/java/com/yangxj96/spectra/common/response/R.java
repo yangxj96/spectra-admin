@@ -24,7 +24,6 @@ import java.io.Serializable;
 public class R<T> implements Serializable {
 
     @Serial
-    @JsonIgnore
     private static final long serialVersionUID = 1L;
 
     private Integer code;

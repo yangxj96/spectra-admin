@@ -14,12 +14,11 @@ import java.util.List;
  */
 public interface RoleService extends BaseService<Role> {
 
-
     /**
      * 根据账号ID获取所拥有的角色
      *
-     * @param accountId 账号 ID
+     * @param uid 账号ID
      * @return 角色列表
      */
-    List<Role> getByAccountId(Long accountId);
+    List<Role> getByUserId(Long uid);
 }

@@ -55,6 +55,7 @@ public class AuthServiceImpl implements AuthService {
                         .setDeviceType("PC")
                         .setIsLastingCookie(false)
                         .setIsWriteHeader(false)
+                        .setTerminalExtra("user_id",datum.getUserId())
         );
 
         return TokenVO.builder()

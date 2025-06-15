@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.configuration;
+package com.yangxj96.spectra.core.configuration.mvc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.JsonDeserializer;

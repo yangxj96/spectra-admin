@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.configuration;
+package com.yangxj96.spectra.core.configuration.mvc;
 
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
