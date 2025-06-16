@@ -1,8 +1,9 @@
-package com.yangxj96.spectra;
+package com.yangxj96.spectra.launch;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.RollbackOn;
 @SpringBootApplication
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 @MapperScan("com.yangxj96.spectra.*.mapper")
+@ComponentScan("com.yangxj96.spectra")
 public class SpectraApplication {
 
     public static void main(String[] args) {

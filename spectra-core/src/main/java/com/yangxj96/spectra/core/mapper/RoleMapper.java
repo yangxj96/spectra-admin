@@ -23,4 +23,21 @@ public interface RoleMapper extends BaseMapper<Role> {
      */
     List<Role> getByUserId(@Param("userId") Long userId);
 
+    /**
+     * 删除关联的角色列表
+     *
+     * @param uid 用户ID
+     * @return 删除的条目数
+     */
+    int removeRelevanceRoles(@Param("userId") Long uid);
+
+    /**
+     * 新增关联的角色列表
+     *
+     * @param id     主键ID
+     * @param uid    用户ID
+     * @param roleId 角色ID
+     * @return 收影响的行数
+     */
+    int insertRelevanceRole(@Param("id") Long id, @Param("uid") Long uid, @Param("rid") Long roleId);
 }

@@ -7,4 +7,5 @@
 <suppressions>
     <!-- 屏蔽启动类的 FinalClass 检查 -->
     <suppress checks="FinalClass" files="SpectraApplication\.java"/>
+    <suppress checks="HideUtilityClassConstructor" files="SpectraApplication\.java"/>
 </suppressions>

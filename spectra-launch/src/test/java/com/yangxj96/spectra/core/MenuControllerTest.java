@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.controller;
+package com.yangxj96.spectra.core;
 
 import com.yangxj96.spectra.core.javabean.entity.Menu;
 import com.yangxj96.spectra.core.service.MenuService;

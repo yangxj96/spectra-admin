@@ -152,19 +152,22 @@
             <version>23.1.0</version>
             <scope>compile</scope>
         </dependency>
+        <!--
+        MapStruct
+        这三个的顺序不能调整,不然生成的mapstruct实现类会出问题
+        -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- MapStruct -->
-        <dependency>
-            <groupId>org.mapstruct</groupId>
-            <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
-        </dependency>
-        <!-- MapStruct 注解处理器（编译时用） -->
+        <!-- MapStruct 注解处理器（编译时用）-->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>

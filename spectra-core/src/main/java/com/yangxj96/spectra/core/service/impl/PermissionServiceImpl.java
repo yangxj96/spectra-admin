@@ -17,6 +17,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * 权限service层-实现
  *
@@ -61,5 +63,10 @@ public class PermissionServiceImpl implements PermissionService {
         BeanUtils.copyProperties(db, result);
         result.setRecords(roleMapstruct.toVOs(db.getRecords()));
         return result;
+    }
+
+    @Override
+    public List<RoleVO> listRole() {
+        return roleMapstruct.toVOs(roleService.list());
     }
 }

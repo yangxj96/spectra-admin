@@ -1,4 +1,4 @@
-package com.yangxj96.spectra;
+package com.yangxj96.spectra.launch;
 
 import org.springframework.boot.test.context.SpringBootTest;
 

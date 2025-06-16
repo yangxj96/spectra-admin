@@ -1,6 +1,5 @@
 package com.yangxj96.spectra.common.response;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;

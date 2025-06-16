@@ -30,15 +30,4 @@
         updated_at,
         deleted
     </sql>
-
-    <insert id="insertRelevanceRoles">
-        INSERT INTO db_system.t_user_role_map(id, user_id, role_id, created_by, created_at, updated_by, updated_at, deleted)
-        VALUES (#{id}, #{userId}, #{roleId}, #{current}, NOW(), #{current}, NOW(), NULL)
-    </insert>
-
-    <update id="removeRelevanceRoles">
-        UPDATE db_system.t_user_role_map
-        SET deleted = NOW()
-        WHERE user_id = #{userId}
-    </update>
 </mapper>

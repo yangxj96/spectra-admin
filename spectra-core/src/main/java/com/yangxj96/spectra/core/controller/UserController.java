@@ -2,10 +2,12 @@ package com.yangxj96.spectra.core.controller;
 
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.core.annotation.ULog;
 import com.yangxj96.spectra.core.javabean.from.UserPageFrom;
 import com.yangxj96.spectra.core.javabean.from.UserRelevanceRolesFrom;
+import com.yangxj96.spectra.core.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.core.javabean.vo.UserPageVO;
 import com.yangxj96.spectra.core.service.UserService;
 import jakarta.annotation.Resource;
@@ -42,10 +44,42 @@ public class UserController {
         return bindService.page(page, params);
     }
 
-
+    /**
+     * 关联用户到角色
+     *
+     * @param params 请求参数
+     */
     @PutMapping("/relevanceRoles")
     public void relevanceRoles(@Validated @RequestBody UserRelevanceRolesFrom params) {
         bindService.relevanceRoles(params);
     }
 
+    /**
+     * 创建用户
+     *
+     * @param params 请求参数
+     */
+    @PostMapping
+    public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
+        bindService.create(params);
+    }
+
+    /**
+     * 根据ID更新用户
+     *
+     * @param params 请求参数
+     */
+    @PutMapping
+    public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
+        bindService.updateById(params);
+    }
+
+    /**
+     * 根据用户ID删除用户信息
+     * @param uid 用户ID
+     */
+    @DeleteMapping("/{uid}")
+    public void deleteById(@PathVariable String uid){
+        bindService.deleteById(uid);
+    }
 }

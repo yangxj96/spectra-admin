@@ -53,7 +53,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.yangxj96.spectra.SpectraApplication</mainClass>
+                    <mainClass>com.yangxj96.spectra.launch.SpectraApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>

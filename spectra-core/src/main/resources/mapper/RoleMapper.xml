@@ -43,4 +43,15 @@
           AND arm.deleted IS NULL
         ORDER BY created_at DESC;
     </select>
+
+    <update id="removeRelevanceRoles">
+        UPDATE db_system.t_user_role_map
+        SET deleted = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <insert id="insertRelevanceRole">
+        INSERT INTO db_system.t_user_role_map(id, user_id, role_id, created_by, created_at, updated_by, updated_at)
+        VALUES (#{id}, #{uid}, #{rid}, 0, NOW(), 0, NOW())
+    </insert>
 </mapper>

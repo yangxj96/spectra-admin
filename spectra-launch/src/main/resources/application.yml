@@ -53,3 +53,7 @@ sa-token:
   is-log: true
   is-print: false
 
+spectra:
+  user:
+    default-password: "123456"
+

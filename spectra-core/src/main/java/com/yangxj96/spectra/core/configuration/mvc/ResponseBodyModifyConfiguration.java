@@ -1,6 +1,7 @@
 package com.yangxj96.spectra.core.configuration.mvc;
 
 import com.yangxj96.spectra.common.response.R;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.core.MethodParameter;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
  * @version 1.0
  * @since 2025-6-14
  */
+@Slf4j
 @ControllerAdvice
 public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Object> {
 
@@ -30,6 +32,7 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
     @Override
     public boolean supports(@NotNull MethodParameter returnType,
                             @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+        log.atDebug().log("响应修改处理");
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
             return false;

@@ -12,6 +12,8 @@ import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 权限操作相关
  *
@@ -39,6 +41,15 @@ public class PermissionController {
         return bindService.pageRole(page, params);
     }
 
+    /**
+     * 查询角色列表
+     * @return 角色列表
+     */
+    @ULog("查询角色列表")
+    @GetMapping("/listRole")
+    public List<RoleVO> listRole() {
+        return bindService.listRole();
+    }
 
     /**
      * 创建角色

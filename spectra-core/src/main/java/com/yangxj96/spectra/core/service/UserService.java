@@ -6,6 +6,7 @@ import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.core.javabean.entity.User;
 import com.yangxj96.spectra.core.javabean.from.UserPageFrom;
 import com.yangxj96.spectra.core.javabean.from.UserRelevanceRolesFrom;
+import com.yangxj96.spectra.core.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.core.javabean.vo.UserPageVO;
 
 /**
@@ -32,4 +33,24 @@ public interface UserService extends BaseService<User> {
      * @param params 请求参数
      */
     void relevanceRoles(UserRelevanceRolesFrom params);
+
+    /**
+     * 创建用户
+     *
+     * @param params 请求参数
+     */
+    void create(UserSaveFrom params);
+
+    /**
+     * 根据用户ID更新用户
+     *
+     * @param params 请求参数
+     */
+    void updateById(UserSaveFrom params);
+
+    /**
+     * 根据用户ID删除用户信息
+     * @param uid 用户ID
+     */
+    void deleteById(String uid);
 }

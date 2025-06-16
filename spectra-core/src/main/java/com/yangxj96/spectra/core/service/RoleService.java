@@ -21,4 +21,21 @@ public interface RoleService extends BaseService<Role> {
      * @return 角色列表
      */
     List<Role> getByUserId(Long uid);
+
+    /**
+     * 删除关联的角色列表
+     *
+     * @param uid 用户ID
+     * @return 删除的条目数
+     */
+    int removeRelevanceRoles(Long uid);
+
+    /**
+     * 新增关联角色列表
+     *
+     * @param uid     用户ID
+     * @param roleIds 角色ID
+     * @return 新增的条目数
+     */
+    int insertRelevanceRoles(Long uid, List<Long> roleIds);
 }

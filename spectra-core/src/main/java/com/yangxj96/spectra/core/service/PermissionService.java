@@ -6,6 +6,8 @@ import com.yangxj96.spectra.core.javabean.from.RoleFrom;
 import com.yangxj96.spectra.core.javabean.from.RolePageFrom;
 import com.yangxj96.spectra.core.javabean.vo.RoleVO;
 
+import java.util.List;
+
 
 /**
  * 权限service层
@@ -38,4 +40,11 @@ public interface PermissionService {
      * @return 分页结果
      */
     IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params);
+
+    /**
+     * 获取角色列表
+     * @return 角色列表
+     */
+    List<RoleVO> listRole();
+
 }
