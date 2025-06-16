@@ -49,6 +49,7 @@ public class UserController {
      *
      * @param params 请求参数
      */
+    @ULog("关联用户到角色")
     @PutMapping("/relevanceRoles")
     public void relevanceRoles(@Validated @RequestBody UserRelevanceRolesFrom params) {
         bindService.relevanceRoles(params);
@@ -59,6 +60,7 @@ public class UserController {
      *
      * @param params 请求参数
      */
+    @ULog("创建用户")
     @PostMapping
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
@@ -69,6 +71,7 @@ public class UserController {
      *
      * @param params 请求参数
      */
+    @ULog("根据ID更新用户信息")
     @PutMapping
     public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.updateById(params);
@@ -78,6 +81,7 @@ public class UserController {
      * 根据用户ID删除用户信息
      * @param uid 用户ID
      */
+    @ULog("根据ID删除用户")
     @DeleteMapping("/{uid}")
     public void deleteById(@PathVariable String uid){
         bindService.deleteById(uid);
