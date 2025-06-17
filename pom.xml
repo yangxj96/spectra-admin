@@ -33,6 +33,7 @@
         <apache.commons.lang3.version>3.17.0</apache.commons.lang3.version>
         <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
         <apache.commons.text.version>1.13.1</apache.commons.text.version>
+        <apache.commons.pool2.version>2.12.1</apache.commons.pool2.version>
     </properties>
 
     <modules>
@@ -122,6 +123,12 @@
             <artifactId>sa-token-redis-jackson</artifactId>
             <version>${sa-token.version}</version>
         </dependency>
+        <!-- Sa-Token插件：权限缓存与业务缓存分离 -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-alone-redis</artifactId>
+            <version>${sa-token.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
@@ -144,6 +151,11 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
             <version>${apache.commons.text.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>${apache.commons.pool2.version}</version>
         </dependency>
         <!-- jetbrains注解包,用来检测允许空值等 -->
         <dependency>
