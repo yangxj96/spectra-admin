@@ -79,11 +79,12 @@ public class UserController {
 
     /**
      * 根据用户ID删除用户信息
+     *
      * @param uid 用户ID
      */
     @ULog("根据ID删除用户")
     @DeleteMapping("/{uid}")
-    public void deleteById(@PathVariable String uid){
+    public void deleteById(@PathVariable String uid) {
         bindService.deleteById(uid);
     }
 }

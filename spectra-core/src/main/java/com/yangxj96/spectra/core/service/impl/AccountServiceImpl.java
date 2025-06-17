@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.common.enums.AccountType;
 import com.yangxj96.spectra.core.javabean.entity.Account;
-import com.yangxj96.spectra.core.javabean.entity.User;
 import com.yangxj96.spectra.core.mapper.AccountMapper;
 import com.yangxj96.spectra.core.service.AccountService;
 import org.springframework.stereotype.Service;

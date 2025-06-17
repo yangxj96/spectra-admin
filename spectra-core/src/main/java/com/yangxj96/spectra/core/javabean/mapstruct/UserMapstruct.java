@@ -26,6 +26,7 @@ public interface UserMapstruct {
      * @param user 实体
      * @return 分页实体
      */
+    @Mapping(target = "roles", ignore = true)
     UserPageVO toVO(User user);
 
     /**
@@ -43,5 +44,11 @@ public interface UserMapstruct {
      * @param vo 入参vo
      * @return 实体
      */
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
     User toEntity(UserSaveFrom vo);
 }
