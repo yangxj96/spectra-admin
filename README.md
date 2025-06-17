@@ -67,6 +67,3 @@
 - [x] 深色模式切换
 - [x] 内容部分全屏
 
-# 使用许可
-
-[MIT](LICENSE) © Jack Young
