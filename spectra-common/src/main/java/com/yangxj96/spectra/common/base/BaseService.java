@@ -29,9 +29,4 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface BaseService<O extends BaseEntity> extends IService<O> {
 
-    void create(O datum);
-
-    Boolean delete(Long id);
-
-    void modify(O datum);
 }
