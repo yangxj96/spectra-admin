@@ -20,8 +20,6 @@ package com.yangxj96.spectra.core.javabean.from;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 
 /**
  * 角色分页查询
@@ -31,8 +29,6 @@ import lombok.experimental.SuperBuilder;
  * @since 2025-6-14
  */
 @Data
-@ToString
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class RolePageFrom {

@@ -15,32 +15,36 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.from;
+package com.yangxj96.spectra.common.enums;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.baomidou.mybatisplus.annotation.IEnum;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
- * 用户名密码登录入参
+ * <p>
+ * 字典类型
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/18
  */
-@Data
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class UsernamePasswordFrom {
+public enum DictType implements IEnum<Short> {
 
-    @NotEmpty(message = "用户名不能为空")
-    private String username;
+    DICT((short) 0, "字典"),
+    DICT_ITEM((short) 1, "字典项目");
 
-    @NotEmpty(message = "密码不能为空")
-    private String password;
+    private final short value;
 
-    @NotEmpty(message = "验证码不能为空")
-    private String code;
+    @JsonValue
+    private final String desc;
 
+    @Override
+    public Short getValue() {
+        return this.value;
+    }
 }

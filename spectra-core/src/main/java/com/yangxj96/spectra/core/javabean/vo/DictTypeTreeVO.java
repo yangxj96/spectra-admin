@@ -15,55 +15,71 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.from;
+package com.yangxj96.spectra.core.javabean.vo;
 
-import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.common.enums.PowerScope;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.yangxj96.spectra.common.base.javabean.vo.Tree;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * 角色操作入参
+ * <p>
+ * 字典类型树VO
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/18
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RoleFrom {
+@AllArgsConstructor
+public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
-     * 角色ID
+     * 数据id.
      */
-    @Null(message = "新增不能指定角色ID", groups = Verify.Insert.class)
-    @NotNull(message = "角色ID不能为空", groups = Verify.Update.class)
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
-     * 角色名称
+     * 父级ID
      */
-    @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private Long pid;
+
+    /**
+     * 字典名称
+     */
     private String name;
 
     /**
-     * 范围
+     * 字典编码
      */
-    private PowerScope scope;
+    private String code;
 
     /**
-     * 状态
+     * 字典状态
      */
-    private Boolean state;
+    private Short state;
 
     /**
      * 备注
      */
     private String remark;
+
+    /**
+     * 子级
+     */
+    private List<DictTypeTreeVO> children = new ArrayList<>();
 
 }

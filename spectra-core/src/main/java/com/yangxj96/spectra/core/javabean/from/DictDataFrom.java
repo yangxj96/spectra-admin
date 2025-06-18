@@ -18,8 +18,7 @@
 package com.yangxj96.spectra.core.javabean.from;
 
 import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.common.enums.PowerScope;
-import jakarta.validation.constraints.NotEmpty;
+import com.yangxj96.spectra.common.enums.CommonState;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -27,39 +26,54 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 角色操作入参
+ * <p>
+ * 字典数据入参
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/18
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class RoleFrom {
+@AllArgsConstructor
+public class DictDataFrom {
 
     /**
-     * 角色ID
+     * 主键ID
      */
-    @Null(message = "新增不能指定角色ID", groups = Verify.Insert.class)
-    @NotNull(message = "角色ID不能为空", groups = Verify.Update.class)
+    @NotNull(message = "ID不能为空", groups = Verify.Update.class)
+    @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private Long id;
 
     /**
-     * 角色名称
+     * 字典类型ID
      */
-    @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String name;
+    @NotNull(message = "字典类型不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private Long dictTypeId;
 
     /**
-     * 范围
+     * 标签
      */
-    private PowerScope scope;
+    @NotNull(message = "标签不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private String label;
+
+    /**
+     * 值
+     */
+    @NotNull(message = "字典值不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private String value;
+
+    /**
+     * 排序
+     */
+    private Short sort;
 
     /**
      * 状态
      */
-    private Boolean state;
+    @NotNull(message = "字典状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private CommonState state;
 
     /**
      * 备注

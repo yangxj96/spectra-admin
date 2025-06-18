@@ -15,32 +15,43 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.from;
+package com.yangxj96.spectra.common.enums;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.baomidou.mybatisplus.annotation.IEnum;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 /**
- * 用户名密码登录入参
+ * <p>
+ * 通用状态
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/18
  */
-@Data
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
-public class UsernamePasswordFrom {
+public enum CommonState implements IEnum<Short> {
 
-    @NotEmpty(message = "用户名不能为空")
-    private String username;
+    /**
+     * 启用
+     */
+    ENABLE((short) 0, "启用"),
 
-    @NotEmpty(message = "密码不能为空")
-    private String password;
+    /**
+     * 禁用
+     */
+    DISABLE((short) 1, "禁用");
 
-    @NotEmpty(message = "验证码不能为空")
-    private String code;
+    private final short value;
 
+    @JsonValue
+    private final String desc;
+
+    @Override
+    public Short getValue() {
+        return this.value;
+    }
 }

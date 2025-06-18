@@ -17,7 +17,9 @@
 
 package com.yangxj96.spectra.core.javabean.from;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 用户分页查询入参
@@ -27,8 +29,6 @@ import lombok.*;
  * @since 2025-6-14
  */
 @Data
-@ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPageFrom {

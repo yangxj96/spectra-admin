@@ -15,32 +15,59 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.from;
+package com.yangxj96.spectra.core.javabean.vo;
 
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 用户名密码登录入参
+ * <p>
+ * 字典数据VO
+ * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/6/18
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UsernamePasswordFrom {
+@AllArgsConstructor
+public class DictDataVo {
 
-    @NotEmpty(message = "用户名不能为空")
-    private String username;
+    /**
+     * 数据id.
+     */
+    private Long id;
 
-    @NotEmpty(message = "密码不能为空")
-    private String password;
+    /**
+     * 字典类型ID
+     */
+    private Long dictTypeId;
 
-    @NotEmpty(message = "验证码不能为空")
-    private String code;
+    /**
+     * 标签
+     */
+    private String label;
+
+    /**
+     * 值
+     */
+    private String value;
+
+    /**
+     * 排序
+     */
+    private Short sort;
+
+    /**
+     * 状态
+     */
+    private Short state;
+
+    /**
+     * 备注
+     */
+    private String remark;
 
 }

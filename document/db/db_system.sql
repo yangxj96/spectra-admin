@@ -269,4 +269,66 @@ COMMENT ON COLUMN db_system.t_organization.type IS '类型';
 COMMENT ON COLUMN db_system.t_organization.remark IS '备注';
 
 
+-- 数据字典(字典类型)
+DROP TABLE IF EXISTS db_system.t_dict_type;
+CREATE TABLE IF NOT EXISTS db_system.t_dict_type
+(
+    id         BIGINT PRIMARY KEY,
 
+    pid        BIGINT       NOT NULL DEFAULT 0,
+    name       VARCHAR(100) NOT NULL,
+    code       VARCHAR(100) NOT NULL,
+    state      int2         NOT NULL,
+    remark     VARCHAR(255) NOT NULL,
+
+    created_by BIGINT,
+    created_at TIMESTAMP,
+    updated_by BIGINT,
+    updated_at TIMESTAMP,
+    deleted    TIMESTAMP
+);
+COMMENT ON TABLE db_system.t_dict_type IS '数据字典(字典类型)';
+COMMENT ON COLUMN db_system.t_dict_type.id IS '主键ID';
+COMMENT ON COLUMN db_system.t_dict_type.created_by IS '创建人';
+COMMENT ON COLUMN db_system.t_dict_type.created_at IS '创建时间';
+COMMENT ON COLUMN db_system.t_dict_type.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_system.t_dict_type.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_system.t_dict_type.deleted IS '是否删除';
+COMMENT ON COLUMN db_system.t_dict_type.pid IS '父级ID';
+COMMENT ON COLUMN db_system.t_dict_type.name IS '字典名称';
+COMMENT ON COLUMN db_system.t_dict_type.code IS '字典编码';
+COMMENT ON COLUMN db_system.t_dict_type.state IS '字典状态';
+COMMENT ON COLUMN db_system.t_dict_type.remark IS '备注';
+
+-- 数据字典(字典值)
+DROP TABLE IF EXISTS db_system.t_dict_data;
+CREATE TABLE IF NOT EXISTS db_system.t_dict_data
+(
+    id           BIGINT PRIMARY KEY,
+
+    dict_type_id BIGINT       NOT NULL,
+    label        VARCHAR(100) NOT NULL,
+    value        VARCHAR(100) NOT NULL,
+    sort         int2         NOT NULL DEFAULT 0,
+    state        int2         NOT NULL,
+    remark       VARCHAR(255),
+
+    created_by   BIGINT,
+    created_at   TIMESTAMP,
+    updated_by   BIGINT,
+    updated_at   TIMESTAMP,
+    deleted      TIMESTAMP
+);
+COMMENT ON TABLE db_system.t_dict_data IS '数据字典(字典值)';
+COMMENT ON COLUMN db_system.t_dict_data.id IS '主键ID';
+COMMENT ON COLUMN db_system.t_dict_data.created_by IS '创建人';
+COMMENT ON COLUMN db_system.t_dict_data.created_at IS '创建时间';
+COMMENT ON COLUMN db_system.t_dict_data.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_system.t_dict_data.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_system.t_dict_data.deleted IS '是否删除';
+COMMENT ON COLUMN db_system.t_dict_data.dict_type_id IS '字典类型ID';
+COMMENT ON COLUMN db_system.t_dict_data.label IS '标签';
+COMMENT ON COLUMN db_system.t_dict_data.value IS '值';
+COMMENT ON COLUMN db_system.t_dict_data.sort IS '排序';
+COMMENT ON COLUMN db_system.t_dict_data.state IS '状态';
+COMMENT ON COLUMN db_system.t_dict_data.remark IS '备注';

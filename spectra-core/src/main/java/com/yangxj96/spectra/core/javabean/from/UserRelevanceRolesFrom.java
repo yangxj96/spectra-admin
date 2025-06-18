@@ -18,7 +18,9 @@
 package com.yangxj96.spectra.core.javabean.from;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -32,8 +34,6 @@ import java.util.List;
  * @since 2025/6/15
  */
 @Data
-@ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRelevanceRolesFrom {

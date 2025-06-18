@@ -20,7 +20,9 @@ package com.yangxj96.spectra.core.javabean.from;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.enums.UserState;
 import jakarta.validation.constraints.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -34,8 +36,6 @@ import java.util.List;
  * @since 2025/6/16
  */
 @Data
-@ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserSaveFrom {

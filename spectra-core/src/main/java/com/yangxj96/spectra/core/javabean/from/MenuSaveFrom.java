@@ -22,7 +22,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.groups.Default;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 菜单保存接口
@@ -32,8 +34,6 @@ import lombok.*;
  * @since 2025-6-14
  */
 @Data
-@ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuSaveFrom {
