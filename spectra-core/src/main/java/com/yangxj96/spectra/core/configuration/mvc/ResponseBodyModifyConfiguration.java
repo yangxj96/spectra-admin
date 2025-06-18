@@ -28,6 +28,7 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -72,26 +73,41 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
             return body;
         }
 
-        R<Object> r;
-        // void 或 null 返回值，返回无 data 的成功响应
-        // 是void或者null通常是创建/更新资源,根据RESTful API规则中,post是新增,put是修改
+        // 如果是空且能转换成ServletServerHttpResponse则直接读取响应码后退出
         if (body == null) {
-            String httpMethod = request.getMethod().name();
-            if ("POST".equalsIgnoreCase(httpMethod)) {
-                // 可以返回特定格式的创建响应
-                response.setStatusCode(HttpStatus.CREATED);
-                r = new R<>(HttpStatus.CREATED);
-            } else if ("PUT".equalsIgnoreCase(httpMethod)) {
-                // 可以返回特定格式的更新响应
-                response.setStatusCode(HttpStatus.NO_CONTENT);
-                r = new R<>(HttpStatus.NO_CONTENT);
-            } else {
-                r = R.success();
-            }
-            return r;
+            return handleNullBody(request, response);
         }
 
         return R.success(body);
     }
+
+    /**
+     * 空body处理
+     *
+     * @param request  请求
+     * @param response 响应
+     * @return 结果
+     */
+    private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
+        // 如果能获取到响应则直接狗响应
+        if (response instanceof ServletServerHttpResponse resp) {
+            int status = resp.getServletResponse().getStatus();
+            return new R<>(HttpStatus.resolve(status));
+        }
+        // 否则根据方法的RESTFull API设计规范进行响应
+        String httpMethod = request.getMethod().name();
+        if ("POST".equalsIgnoreCase(httpMethod)) {
+            // 可以返回特定格式的创建响应
+            response.setStatusCode(HttpStatus.CREATED);
+            return new R<>(HttpStatus.CREATED);
+        } else if ("PUT".equalsIgnoreCase(httpMethod)) {
+            // 可以返回特定格式的更新响应
+            response.setStatusCode(HttpStatus.NO_CONTENT);
+            return new R<>(HttpStatus.NO_CONTENT);
+        } else {
+            return R.success();
+        }
+    }
+
 
 }

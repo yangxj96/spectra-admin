@@ -25,11 +25,9 @@ import com.yangxj96.spectra.core.javabean.vo.TokenVO;
 import com.yangxj96.spectra.core.service.AuthService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
 
@@ -58,6 +56,7 @@ public class AuthController {
     @SaCheckLogin
     @ULog("退出登录")
     @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.OK)
     public void logout() {
         bindService.logout();
     }

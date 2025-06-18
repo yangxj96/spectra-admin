@@ -17,12 +17,16 @@
 
 package com.yangxj96.spectra.launch;
 
+import io.github.cdimascio.dotenv.Dotenv;
+import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
+
+import java.util.Properties;
 
 /**
  * 项目启动类
@@ -31,6 +35,7 @@ import org.springframework.transaction.annotation.RollbackOn;
  * @version 1.0
  * @since 2025-6-14
  */
+@Slf4j
 @SpringBootApplication
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 @MapperScan("com.yangxj96.spectra.*.mapper")
@@ -38,7 +43,14 @@ import org.springframework.transaction.annotation.RollbackOn;
 public class SpectraApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SpectraApplication.class, args);
+        // 从.env文件中读取环境变量
+        SpringApplication app = new SpringApplication(SpectraApplication.class);
+        Dotenv dotenv = Dotenv.configure().load();
+        String jasyptPassword = dotenv.get("JASYPT_ENCRYPTOR_PASSWORD");
+        Properties defaultProperties = new Properties();
+        defaultProperties.put("jasypt.encryptor.password", jasyptPassword);
+        app.setDefaultProperties(defaultProperties);
+        app.run(args);
     }
 
 }

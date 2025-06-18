@@ -13,7 +13,7 @@ spring:
     url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db?stringtype=unspecified
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: postgres
+    password: ENC(n1BUyCGo/Xt4HemeFS6BcAGNN+LAnp4MAXAI13ES+LZW9ah856rDm6GHxKZ+MrI5)
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
@@ -59,8 +59,6 @@ sa-token:
     port: 6379
     password:
     timeout: 10s
-
 spectra:
   user:
-    default-password: "123456"
-
+    default-password: ENC(xhyePaPkX7s1niOK06ACFUMbg9GRXVELQ26LfOXId14jAJBXvUG1BPPe76fB5hRo)
