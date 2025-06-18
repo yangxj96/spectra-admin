@@ -89,24 +89,27 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
      * @return 结果
      */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
+        R<Object> r;
         // 如果能获取到响应则直接狗响应
         if (response instanceof ServletServerHttpResponse resp) {
             int status = resp.getServletResponse().getStatus();
-            return new R<>(HttpStatus.resolve(status));
-        }
-        // 否则根据方法的RESTFull API设计规范进行响应
-        String httpMethod = request.getMethod().name();
-        if ("POST".equalsIgnoreCase(httpMethod)) {
-            // 可以返回特定格式的创建响应
-            response.setStatusCode(HttpStatus.CREATED);
-            return new R<>(HttpStatus.CREATED);
-        } else if ("PUT".equalsIgnoreCase(httpMethod)) {
-            // 可以返回特定格式的更新响应
-            response.setStatusCode(HttpStatus.NO_CONTENT);
-            return new R<>(HttpStatus.NO_CONTENT);
+            r = new R<>(HttpStatus.resolve(status));
         } else {
-            return R.success();
+            // 否则根据方法的RESTFull API设计规范进行响应
+            String httpMethod = request.getMethod().name();
+            if ("POST".equalsIgnoreCase(httpMethod)) {
+                // 可以返回特定格式的创建响应
+                response.setStatusCode(HttpStatus.CREATED);
+                r = new R<>(HttpStatus.CREATED);
+            } else if ("PUT".equalsIgnoreCase(httpMethod)) {
+                // 可以返回特定格式的更新响应
+                response.setStatusCode(HttpStatus.NO_CONTENT);
+                r = new R<>(HttpStatus.NO_CONTENT);
+            } else {
+                r = R.success();
+            }
         }
+        return r;
     }
 
 

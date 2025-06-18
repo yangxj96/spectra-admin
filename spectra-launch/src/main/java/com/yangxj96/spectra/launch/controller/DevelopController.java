@@ -47,6 +47,7 @@ public class DevelopController {
     /**
      * jasypt加密
      *
+     * @param str 需要加密的密码
      * @return 加密结果
      */
     @GetMapping("/jasypt/encrypt/{str}")
