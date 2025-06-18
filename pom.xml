@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -27,7 +26,7 @@
 
         <!-- 统一依赖版本管理 -->
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
-        <sa-token.version>1.43.0</sa-token.version>
+        <sa-token.version>1.44.0</sa-token.version>
         <mapstruct.version>1.6.3</mapstruct.version>
 
         <apache.commons.lang3.version>3.17.0</apache.commons.lang3.version>
@@ -112,6 +111,12 @@
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-spring-boot3-starter</artifactId>
             <version>${sa-token.version}</version>
+        </dependency>
+        <!-- CVE-2025-48988依赖问题修复 -->
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+            <version>10.1.42</version>
         </dependency>
         <dependency>
             <groupId>cn.dev33</groupId>
