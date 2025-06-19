@@ -59,6 +59,7 @@ sa-token:
     port: 6379
     password:
     timeout: 10s
+# 健康检查
 management:
   endpoints:
     web:
@@ -67,12 +68,13 @@ management:
   endpoint:
     health:
       show-details: always
+# 自己项目的配置
 spectra:
   user:
     default-password: ENC(xhyePaPkX7s1niOK06ACFUMbg9GRXVELQ26LfOXId14jAJBXvUG1BPPe76fB5hRo)
   file:
-    base-dir: /spectra-files/
-    upload-dir: /uploads/
+    base-dir: spectra-files
+    upload-dir: uploads
     upload:
       allowed-types:
         - jpeg

@@ -19,9 +19,13 @@ package com.yangxj96.spectra.common.fileupload.strategy.impl;
 
 import com.yangxj96.spectra.common.fileupload.FileType;
 import com.yangxj96.spectra.common.fileupload.strategy.FileTypeValidationStrategy;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
@@ -38,14 +42,62 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
             return false;
         }
 
-        byte[] fileHeader = FileType.readHeader(file);
+        byte[] fileHeader = readHeader(file);
 
         for (FileType type : allowedTypes) {
             byte[] magic = type.getMagicNumber();
-            if (FileType.matches(fileHeader, magic)) {
+            if (matches(fileHeader, magic)) {
                 return true;
             }
         }
         return false;
     }
+
+
+    /**
+     * 判断两个字节数组前 n 字节是否相等
+     *
+     * @param fileHeader 文件头字节
+     * @param magic      文件类型的魔数字节
+     * @return 是否相等
+     */
+    public static boolean matches(byte[] fileHeader, byte[] magic) {
+        if (fileHeader == null || magic == null || fileHeader.length < magic.length) {
+            return false;
+        }
+        for (int i = 0; i < magic.length; i++) {
+            if (fileHeader[i] != magic[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    /**
+     * 从 MultipartFile 读取指定长度的文件头
+     *
+     * @param file 需要读取的文件
+     * @return 读取到的头部长度
+     */
+    public static byte @NotNull [] readHeader(MultipartFile file) throws IOException {
+        var length = Arrays.stream(FileType.values())
+                .mapToInt(t -> t.getMagicNumber().length)
+                .max()
+                .orElse(0);
+
+        if (length <= 0) {
+            throw new RuntimeException("不允许的文件类型");
+        }
+
+        try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
+            byte[] header = new byte[length];
+            int bytesRead = is.read(header);
+            if (bytesRead < 1) {
+                throw new IOException("空文件");
+            }
+            return header;
+        }
+    }
+
 }

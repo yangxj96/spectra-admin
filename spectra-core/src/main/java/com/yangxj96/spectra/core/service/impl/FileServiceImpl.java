@@ -25,8 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * <p>
@@ -57,21 +59,15 @@ public class FileServiceImpl implements FileService {
         if (!validator.validate(file)) {
             throw new RuntimeException("此类文件不允许上传");
         }
-        // 获取上传位置前缀
-        String prefix = properties.getBaseDir() + properties.getUploadDir();
+        // 创建目录（如果不存在）
+        Path uploadDirPath = Paths.get(properties.getUploadDir());
+        if (!Files.exists(uploadDirPath)) {
+            Files.createDirectories(uploadDirPath);
+        }
+        // 构建目标文件路径
+        Path targetLocation = uploadDirPath.resolve(file.getOriginalFilename());
+        file.transferTo(targetLocation); // Spring 提供的方法直接保存
 
-        // 3. 打印文件基本信息（实际应用中可替换为保存逻辑）
-        log.info("文件名: " + file.getOriginalFilename());
-        log.info("文件大小: " + file.getSize() + " bytes");
-        log.info("MIME 类型: " + file.getContentType());
-
-        // 4. 实际保存文件（示例：保存到临时目录）
-        String targetPath = prefix + File.separator + file.getOriginalFilename();
-        File dest = new File(targetPath);
-        // 防止重名覆盖，可加 UUID 前缀
-        // FileUtils.writeBytesToFile(file.getBytes(), dest); // 可用 Apache Commons IO
-        file.transferTo(dest); // Spring 提供的方法直接保存
-
-        log.info("文件已保存至: " + targetPath);
+        log.info("文件已保存至: " + targetLocation);
     }
 }

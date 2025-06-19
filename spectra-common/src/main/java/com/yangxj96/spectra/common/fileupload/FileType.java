@@ -19,14 +19,6 @@ package com.yangxj96.spectra.common.fileupload;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * <p>
@@ -66,64 +58,5 @@ public enum FileType {
      * 文件魔数
      */
     private final byte[] magicNumber;
-
-    /**
-     * 判断两个字节数组前 n 字节是否相等
-     *
-     * @param fileHeader 文件头字节
-     * @param magic      文件类型的魔数字节
-     * @return 是否相等
-     */
-    public static boolean matches(byte[] fileHeader, byte[] magic) {
-        if (fileHeader == null || magic == null || fileHeader.length < magic.length) {
-            return false;
-        }
-        for (int i = 0; i < magic.length; i++) {
-            if (fileHeader[i] != magic[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * 从 MultipartFile 读取指定长度的文件头
-     *
-     * @param file 需要读取的文件
-     * @return 读取到的头部长度
-     */
-    public static byte[] readHeader(MultipartFile file) throws IOException {
-        var length = Arrays.stream(values())
-                .mapToInt(t -> t.getMagicNumber().length)
-                .max()
-                .orElse(0);
-
-        if (length <= 0) {
-            throw new RuntimeException("不允许的文件类型");
-        }
-
-        try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
-            byte[] header = new byte[length];
-            int bytesRead = is.read(header);
-            if (bytesRead < 1) {
-                throw new IOException("空文件");
-            }
-            return header;
-        }
-    }
-
-    /**
-     * 获取可上传的文件的mimes列表
-     *
-     * @param allowedTypes 允许上传的列表
-     * @return mime列表
-     */
-    public static List<String> mimes(List<FileType> allowedTypes) {
-        List<String> m = new ArrayList<>();
-        for (FileType allowedType : allowedTypes) {
-            m.add(allowedType.getMime());
-        }
-        return m;
-    }
 
 }

@@ -28,11 +28,10 @@ public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
     private final List<String> allowedMimes;
 
-    private final Tika tika;
+    private final Tika tika = new Tika();
 
-    public TikaValidationStrategy(List<String> allowedMimes, Tika tika) {
+    public TikaValidationStrategy(List<String> allowedMimes) {
         this.allowedMimes = allowedMimes;
-        this.tika = tika;
     }
 
     @Override

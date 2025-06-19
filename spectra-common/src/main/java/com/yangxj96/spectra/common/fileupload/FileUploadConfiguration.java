@@ -24,7 +24,6 @@ import com.yangxj96.spectra.common.fileupload.strategy.impl.MimeValidationStrate
 import com.yangxj96.spectra.common.fileupload.strategy.impl.TikaValidationStrategy;
 import com.yangxj96.spectra.common.properties.FileUploadProperties;
 import jakarta.annotation.Resource;
-import org.apache.tika.Tika;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,18 +43,7 @@ import java.util.List;
 public class FileUploadConfiguration {
 
     @Resource
-    private FileUploadProperties fileUploadProperties;
-
-
-    /**
-     * tika
-     *
-     * @return {@link Tika}
-     */
-    @Bean
-    public Tika tika() {
-        return new Tika();
-    }
+    private FileUploadProperties properties;
 
     /**
      * 文件类型验证策略管理器
@@ -66,24 +54,38 @@ public class FileUploadConfiguration {
     public FileTypeValidator fileTypeValidator() {
         List<FileTypeValidationStrategy> strategies = new ArrayList<>();
 
-        List<FileType> allowedTypes = fileUploadProperties.getAllowedTypes();
+        List<FileType> allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器
-        for (var strategy : fileUploadProperties.getStrategies()) {
-            if (strategy.getSimpleName().equals(MimeValidationStrategy.class.getSimpleName())) {
-                strategies.add(new MimeValidationStrategy(FileType.mimes(allowedTypes)));
+        for (var strategy : properties.getStrategies()) {
+            if (strategy.isAssignableFrom(MimeValidationStrategy.class)) {
+                strategies.add(new MimeValidationStrategy(mimes(allowedTypes)));
             }
-            if (strategy.getSimpleName().equals(ExtensionValidationStrategy.class.getSimpleName())) {
+            if (strategy.isAssignableFrom(ExtensionValidationStrategy.class)) {
                 strategies.add(new ExtensionValidationStrategy(allowedTypes));
             }
-            if (strategy.getSimpleName().equals(MagicNumberValidationStrategy.class.getSimpleName())) {
+            if (strategy.isAssignableFrom(MagicNumberValidationStrategy.class)) {
                 strategies.add(new MagicNumberValidationStrategy(allowedTypes));
             }
-            if (strategy.getSimpleName().equals(TikaValidationStrategy.class.getSimpleName())) {
-                strategies.add(new TikaValidationStrategy(FileType.mimes(allowedTypes), tika()));
+            if (strategy.isAssignableFrom(TikaValidationStrategy.class)) {
+                strategies.add(new TikaValidationStrategy(mimes(allowedTypes)));
             }
         }
         return new FileTypeValidator(strategies);
     }
 
+
+    /**
+     * 获取可上传的文件的mimes列表
+     *
+     * @param allowedTypes 允许上传的列表
+     * @return mime列表
+     */
+    private List<String> mimes(List<FileType> allowedTypes) {
+        List<String> m = new ArrayList<>();
+        for (FileType allowedType : allowedTypes) {
+            m.add(allowedType.getMime());
+        }
+        return m;
+    }
 
 }
