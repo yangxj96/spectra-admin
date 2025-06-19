@@ -25,8 +25,6 @@
 - 🚀️  `PostgreSQL 15`
 - 🚀️  `spring-boot  3.5.0`
 - 🚀️  `mybatis-plus 3.5.12`
-- 🚀️  `vue 3.5.14`
-- 🚀️  `element-plus 2.9.10`
 - ...
 
 # 2 IDEA环境`JVM`参数配置
@@ -69,6 +67,6 @@
 
 # 4 env文件说明
 
-| 环境变量                      | 说明          |
-|---------------------------|-------------|
-| JASYPT_ENCRYPTOR_PASSWORD | jasypt加密秘密啊 |
+| 环境变量                      | 说明         |
+|---------------------------|------------|
+| JASYPT_ENCRYPTOR_PASSWORD | jasypt加密密码 |
