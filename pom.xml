@@ -33,6 +33,8 @@
         <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
         <apache.commons.text.version>1.13.1</apache.commons.text.version>
         <apache.commons.pool2.version>2.12.1</apache.commons.pool2.version>
+        <apache.commons.fileupload.version>1.6.0</apache.commons.fileupload.version>
+        <apache.tika.version>3.2.0</apache.tika.version>
     </properties>
 
     <modules>
@@ -161,6 +163,16 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
             <version>${apache.commons.pool2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-fileupload</groupId>
+            <artifactId>commons-fileupload</artifactId>
+            <version>${apache.commons.fileupload.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${apache.tika.version}</version>
         </dependency>
         <!-- jetbrains注解包,用来检测允许空值等 -->
         <dependency>

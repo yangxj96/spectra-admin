@@ -15,60 +15,28 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.vo;
+package com.yangxj96.spectra.core.service;
 
-import com.yangxj96.spectra.common.enums.CommonState;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * <p>
- * 字典数据VO
+ * 文件业务层
  * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/18
+ * @since 2025/6/19
  */
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DictDataVo {
+public interface FileService {
 
     /**
-     * 数据id.
+     * 文件上传
+     *
+     * @param file 文件信息
      */
-    private Long id;
-
-    /**
-     * 字典类型ID
-     */
-    private Long dictTypeId;
-
-    /**
-     * 标签
-     */
-    private String label;
-
-    /**
-     * 值
-     */
-    private String value;
-
-    /**
-     * 排序
-     */
-    private Short sort;
-
-    /**
-     * 状态
-     */
-    private CommonState state;
-
-    /**
-     * 备注
-     */
-    private String remark;
+    void upload(MultipartFile file) throws IOException;
 
 }

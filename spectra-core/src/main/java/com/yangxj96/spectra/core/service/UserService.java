@@ -67,6 +67,7 @@ public interface UserService extends BaseService<User> {
 
     /**
      * 根据用户ID删除用户信息
+     *
      * @param uid 用户ID
      */
     void deleteById(String uid);

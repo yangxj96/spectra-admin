@@ -20,15 +20,12 @@ package com.yangxj96.spectra.core.controller;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.core.javabean.entity.DictData;
 import com.yangxj96.spectra.core.javabean.from.DictDataFrom;
 import com.yangxj96.spectra.core.javabean.from.DictTypeFrom;
 import com.yangxj96.spectra.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.core.javabean.vo.DictTypeTreeVO;
-import com.yangxj96.spectra.core.javabean.vo.MenuTreeVO;
 import com.yangxj96.spectra.core.service.DictService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -54,6 +51,8 @@ public class DictController {
 
     /**
      * 获取所有字典类型的树形列表
+     *
+     * @return 字典类型树
      */
     @GetMapping("/type/tree")
     public List<DictTypeTreeVO> getTypesGroupTree() {
@@ -64,6 +63,7 @@ public class DictController {
      * 根据类型编码获取字典数据
      *
      * @param code 对应数据类型的code
+     * @return 字典数据列表
      */
     @GetMapping("/data/{code}")
     public List<DictDataVo> getDataByTypeCode(@PathVariable String code) {
@@ -72,20 +72,24 @@ public class DictController {
 
     /**
      * 创建字典类型
+     *
+     * @param params 请求参数
      */
     @PostMapping("/createType")
     @ResponseStatus(HttpStatus.CREATED)
-    @SaCheckPermission(value = "DICT:INSERT",orRole = "DEV_SYSADMIN")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")
     public void createType(@Validated(Verify.Insert.class) @RequestBody DictTypeFrom params) {
         bindService.createType(params);
     }
 
     /**
      * 创建字典类型
+     *
+     * @param params 请求参数
      */
     @PostMapping("/createData")
     @ResponseStatus(HttpStatus.CREATED)
-    @SaCheckPermission(value = "DICT:INSERT",orRole = "DEV_SYSADMIN")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }

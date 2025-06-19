@@ -15,60 +15,37 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.vo;
+package com.yangxj96.spectra.common.properties;
 
-import com.yangxj96.spectra.common.enums.CommonState;
-import lombok.AllArgsConstructor;
+import com.yangxj96.spectra.common.fileupload.FileType;
+import com.yangxj96.spectra.common.fileupload.strategy.FileTypeValidationStrategy;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * <p>
- * 字典数据VO
+ * 文件上传参数
  * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/18
+ * @since 2025/6/19
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DictDataVo {
+@Component
+@ConfigurationProperties(prefix = "spectra.file.upload")
+public class FileUploadProperties {
 
     /**
-     * 数据id.
+     * 允许的类型
      */
-    private Long id;
+    private List<FileType> allowedTypes;
 
     /**
-     * 字典类型ID
+     * 文件类型验证策略
      */
-    private Long dictTypeId;
-
-    /**
-     * 标签
-     */
-    private String label;
-
-    /**
-     * 值
-     */
-    private String value;
-
-    /**
-     * 排序
-     */
-    private Short sort;
-
-    /**
-     * 状态
-     */
-    private CommonState state;
-
-    /**
-     * 备注
-     */
-    private String remark;
-
+    private List<Class<? extends FileTypeValidationStrategy>> strategies;
 }

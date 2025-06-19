@@ -15,29 +15,23 @@
  *
  */
 
-package com.yangxj96.spectra.core.properties;
+package com.yangxj96.spectra.common.fileupload.strategy;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 /**
  * <p>
- * 用户配置相关
+ * 文件类型验证策略
  * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/16
+ * @since 2025/6/19
  */
-@Data
-@Component
-@ConfigurationProperties(prefix = "spectra.user")
-public class UserProperties {
+public interface FileTypeValidationStrategy {
 
-    /**
-     * 默认密码
-     */
-    private String defaultPassword;
+    boolean isValid(MultipartFile file) throws IOException;
 
 }

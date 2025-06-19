@@ -170,6 +170,20 @@ public class GlobalExceptionConfiguration {
     }
 
     /**
+     * 运行时异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
+     */
+    @ExceptionHandler(RuntimeException.class)
+    public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.atError().log("运行时异常,{}", e.getMessage(), e);
+        return R.failure(e.getMessage());
+    }
+
+    /**
      * 兜底异常处理
      *
      * @param e        错误信息

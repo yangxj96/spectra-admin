@@ -53,11 +53,11 @@
     <select id="getByUserId" resultMap="BaseResultMap">
         SELECT r.*
         FROM db_system.t_role r,
-             db_system.t_user_role_map arm
+        db_system.t_user_role_map arm
         WHERE arm.user_id = #{userId}
-          AND arm.role_id = r.id
-          AND r.deleted IS NULL
-          AND arm.deleted IS NULL
+        AND arm.role_id = r.id
+        AND r.deleted IS NULL
+        AND arm.deleted IS NULL
         ORDER BY created_at DESC;
     </select>
 

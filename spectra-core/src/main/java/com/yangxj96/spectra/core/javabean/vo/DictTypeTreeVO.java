@@ -20,6 +20,7 @@ package com.yangxj96.spectra.core.javabean.vo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yangxj96.spectra.common.base.javabean.vo.Tree;
+import com.yangxj96.spectra.common.enums.CommonState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -70,7 +71,7 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     /**
      * 字典状态
      */
-    private Short state;
+    private CommonState state;
 
     /**
      * 备注

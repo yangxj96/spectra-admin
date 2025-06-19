@@ -15,60 +15,39 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.vo;
+package com.yangxj96.spectra.common.properties;
 
-import com.yangxj96.spectra.common.enums.CommonState;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
- * 字典数据VO
+ * 文件相关配置
  * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/18
+ * @since 2025/6/19
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DictDataVo {
+@Component
+@ConfigurationProperties(prefix = "spectra.file")
+public class FileProperties {
 
     /**
-     * 数据id.
+     * 基础文件位置,所有文件都会在这个目录下面进行存放
      */
-    private Long id;
+    private String baseDir = "/spectra-files";
 
     /**
-     * 字典类型ID
+     * 上传的文件夹位置
      */
-    private Long dictTypeId;
+    private String uploadDir = "/uploads";
 
     /**
-     * 标签
+     * 日志文件夹位置
      */
-    private String label;
-
-    /**
-     * 值
-     */
-    private String value;
-
-    /**
-     * 排序
-     */
-    private Short sort;
-
-    /**
-     * 状态
-     */
-    private CommonState state;
-
-    /**
-     * 备注
-     */
-    private String remark;
+    private String logsDir = "/logs";
 
 }

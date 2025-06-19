@@ -25,6 +25,7 @@ import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.common.enums.AccountType;
 import com.yangxj96.spectra.common.exception.DataNotExistException;
+import com.yangxj96.spectra.common.properties.UserProperties;
 import com.yangxj96.spectra.core.javabean.entity.Account;
 import com.yangxj96.spectra.core.javabean.entity.Role;
 import com.yangxj96.spectra.core.javabean.entity.User;
@@ -36,7 +37,6 @@ import com.yangxj96.spectra.core.javabean.mapstruct.UserMapstruct;
 import com.yangxj96.spectra.core.javabean.vo.RoleVO;
 import com.yangxj96.spectra.core.javabean.vo.UserPageVO;
 import com.yangxj96.spectra.core.mapper.UserMapper;
-import com.yangxj96.spectra.core.properties.UserProperties;
 import com.yangxj96.spectra.core.service.AccountService;
 import com.yangxj96.spectra.core.service.RoleService;
 import com.yangxj96.spectra.core.service.UserService;
@@ -60,6 +60,9 @@ import java.util.List;
  */
 @Service
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
+
+    @Resource
+    private UserService self;
 
     @Resource
     private UserMapstruct mapstruct;
@@ -146,7 +149,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         User entity = mapstruct.toEntity(params);
-        if (!this.updateById(entity)) {
+        if (!self.updateById(entity)) {
             throw new RuntimeException("更新用户发生错误");
         }
         // 如果邮箱有过修改,则应该同时修改账号

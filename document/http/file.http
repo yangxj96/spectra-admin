@@ -1,0 +1,10 @@
+# @name 文件上传
+POST {{host}}/file/upload
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="file"; filename="test.xlsx"
+Content-Type: text/plain
+
+< test.xlsx
+--WebAppBoundary--

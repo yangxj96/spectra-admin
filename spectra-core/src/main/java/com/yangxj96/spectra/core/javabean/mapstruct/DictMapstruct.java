@@ -24,6 +24,7 @@ import com.yangxj96.spectra.core.javabean.from.DictTypeFrom;
 import com.yangxj96.spectra.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.core.javabean.vo.DictTypeTreeVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -45,6 +46,11 @@ public interface DictMapstruct {
      * @param from 字典类型入参
      * @return 转换后的实体
      */
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     DictType typeFromToEntity(DictTypeFrom from);
 
     /**
@@ -53,6 +59,11 @@ public interface DictMapstruct {
      * @param from 字典数据入参
      * @return 转换后的实体
      */
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     DictData dataFromToEntity(DictDataFrom from);
 
     /**
@@ -61,6 +72,7 @@ public interface DictMapstruct {
      * @param datum 字典类型
      * @return 字典类型
      */
+    @Mapping(target = "children", ignore = true)
     DictTypeTreeVO typeToTreeVO(DictType datum);
 
     /**

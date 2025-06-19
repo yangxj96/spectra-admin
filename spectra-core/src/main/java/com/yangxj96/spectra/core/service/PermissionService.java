@@ -60,6 +60,7 @@ public interface PermissionService {
 
     /**
      * 获取角色列表
+     *
      * @return 角色列表
      */
     List<RoleVO> listRole();

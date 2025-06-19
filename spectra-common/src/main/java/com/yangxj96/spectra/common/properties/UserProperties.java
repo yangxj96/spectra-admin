@@ -15,60 +15,29 @@
  *
  */
 
-package com.yangxj96.spectra.core.javabean.vo;
+package com.yangxj96.spectra.common.properties;
 
-import com.yangxj96.spectra.common.enums.CommonState;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
- * 字典数据VO
+ * 用户配置相关
  * </p>
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/18
+ * @since 2025/6/16
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class DictDataVo {
+@Component
+@ConfigurationProperties(prefix = "spectra.user")
+public class UserProperties {
 
     /**
-     * 数据id.
+     * 默认密码
      */
-    private Long id;
-
-    /**
-     * 字典类型ID
-     */
-    private Long dictTypeId;
-
-    /**
-     * 标签
-     */
-    private String label;
-
-    /**
-     * 值
-     */
-    private String value;
-
-    /**
-     * 排序
-     */
-    private Short sort;
-
-    /**
-     * 状态
-     */
-    private CommonState state;
-
-    /**
-     * 备注
-     */
-    private String remark;
+    private String defaultPassword;
 
 }
