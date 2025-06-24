@@ -280,6 +280,9 @@ CREATE TABLE IF NOT EXISTS db_system.t_dict_type
     code       VARCHAR(100) NOT NULL,
     state      int2         NOT NULL,
     remark     VARCHAR(255) NOT NULL,
+    builtin    BOOLEAN      NOT NULL DEFAULT FALSE,
+    hide       BOOLEAN      NOT NULL DEFAULT FALSE,
+
 
     created_by BIGINT,
     created_at TIMESTAMP,
@@ -299,6 +302,8 @@ COMMENT ON COLUMN db_system.t_dict_type.name IS '字典名称';
 COMMENT ON COLUMN db_system.t_dict_type.code IS '字典编码';
 COMMENT ON COLUMN db_system.t_dict_type.state IS '字典状态';
 COMMENT ON COLUMN db_system.t_dict_type.remark IS '备注';
+COMMENT ON COLUMN db_system.t_dict_type.builtin IS '是否内置字段,为true则不允许他进行修改删除操作';
+COMMENT ON COLUMN db_system.t_dict_type.hide IS '是否隐藏,为true则前端不可直接进行修改删除等操作';
 
 -- 数据字典(字典值)
 DROP TABLE IF EXISTS db_system.t_dict_data;

@@ -5,7 +5,7 @@ POST {{host}}/auth/login
 Content-Type: application/json
 
 {
-  "username": "yangxj96@gmail.com",
+  "username": "sysadmin",
   "password": "sysadmin",
   "code": "1234"
 }

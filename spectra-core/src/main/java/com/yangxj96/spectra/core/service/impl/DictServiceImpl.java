@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.core.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.constant.Common;
 import com.yangxj96.spectra.common.exception.DataNotExistException;
 import com.yangxj96.spectra.common.utils.TreeBuilder;
@@ -78,7 +79,11 @@ public class DictServiceImpl implements DictService {
 
     @Override
     public List<DictTypeTreeVO> getTypesWrapTree() {
-        List<DictType> menus = typeService.list();
+        // 不能是内置字段,也不能是隐藏字段
+        LambdaQueryWrapper<DictType> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DictType::getBuiltin, Boolean.FALSE)
+                .eq(DictType::getHide, Boolean.FALSE);
+        List<DictType> menus = typeService.list(wrapper);
         List<DictTypeTreeVO> vos = mapstruct.typeToTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }

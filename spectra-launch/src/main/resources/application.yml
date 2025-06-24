@@ -17,7 +17,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
-      host: localhost
+      host: 127.0.0.1
       port: 6379
       database: 10
       password:
@@ -55,7 +55,7 @@ sa-token:
   is-print: false
   alone-redis:
     database: 11
-    host: localhost
+    host: 127.0.0.1
     port: 6379
     password:
     timeout: 10s

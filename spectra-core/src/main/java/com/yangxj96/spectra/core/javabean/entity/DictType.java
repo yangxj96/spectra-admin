@@ -60,4 +60,16 @@ public class DictType extends BaseEntity implements Serializable {
      */
     @TableField(value = "remark")
     private String remark;
+
+    /**
+     * 是否内置字段,为true则不允许他进行修改删除操作
+     */
+    @TableField(value = "builtin")
+    private Boolean builtin;
+
+    /**
+     * 是否隐藏,为true则前端不可直接进行修改删除等操作
+     */
+    @TableField(value = "hide")
+    private Boolean hide;
 }

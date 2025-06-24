@@ -11,6 +11,8 @@
         <result column="code"       jdbcType="VARCHAR"   property="code"/>
         <result column="state"      jdbcType="SMALLINT"  property="state"/>
         <result column="remark"     jdbcType="VARCHAR"   property="remark"/>
+        <result column="builtin"    jdbcType="VARCHAR"   property="builtin"/>
+        <result column="hide"       jdbcType="VARCHAR"   property="hide"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
@@ -26,6 +28,8 @@
         code,
         "state",
         remark,
+        builtin,
+        hide,
         created_by,
         created_at,
         updated_by,
