@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.filter;
+package com.yangxj96.spectra.common.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

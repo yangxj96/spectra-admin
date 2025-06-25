@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS db_system.t_user
     id         BIGINT PRIMARY KEY,
 
     name       VARCHAR(100),
-    email      VARCHAR(100),
+    email      VARCHAR(100) UNIQUE,
     avatar     VARCHAR(100),
     state      int2,
 
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS db_system.t_role
     id         BIGINT PRIMARY KEY,
 
     name       VARCHAR(100),
-    code       VARCHAR(100),
+    code       VARCHAR(100) UNIQUE,
     state      BOOLEAN DEFAULT TRUE,
     scope      int2,
     remark     VARCHAR(255),
@@ -171,9 +171,9 @@ CREATE TABLE IF NOT EXISTS db_system.t_menu
 (
     id         BIGINT PRIMARY KEY,
 
+    name       VARCHAR(100) NOT NULL,
     pid        BIGINT,
     icon       VARCHAR(100),
-    name       VARCHAR(100) NOT NULL,
     path       VARCHAR(255) NOT NULL,
     component  VARCHAR(100) NOT NULL,
     layout     VARCHAR(100),
@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS db_system.t_organization
 (
     id         BIGINT PRIMARY KEY,
 
-    pid        BIGINT       NOT NULL DEFAULT 0,
+    pid        BIGINT,
     name       VARCHAR(100) NOT NULL,
     code       VARCHAR(100) NOT NULL,
     type       int2         NOT NULL,
@@ -268,6 +268,39 @@ COMMENT ON COLUMN db_system.t_organization.code IS '编码';
 COMMENT ON COLUMN db_system.t_organization.type IS '类型';
 COMMENT ON COLUMN db_system.t_organization.remark IS '备注';
 
+-- 部门
+DROP TABLE IF EXISTS db_system.t_department;
+CREATE TABLE IF NOT EXISTS db_system.t_department
+(
+    id         BIGINT PRIMARY KEY,
+
+    name       VARCHAR(100) NOT NULL,
+    code       VARCHAR(100) NOT NULL,
+    pid        BIGINT,
+    org_id     BIGINT       NOT NULL,
+    manager_id BIGINT       NOT NULL,
+    remark     VARCHAR(255) NOT NULL,
+
+    created_by BIGINT,
+    created_at TIMESTAMP,
+    updated_by BIGINT,
+    updated_at TIMESTAMP,
+    deleted    TIMESTAMP
+);
+COMMENT ON TABLE db_system.t_department IS '部门';
+COMMENT ON COLUMN db_system.t_department.id IS '主键ID';
+COMMENT ON COLUMN db_system.t_department.created_by IS '创建人';
+COMMENT ON COLUMN db_system.t_department.created_at IS '创建时间';
+COMMENT ON COLUMN db_system.t_department.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_system.t_department.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_system.t_department.deleted IS '是否删除';
+COMMENT ON COLUMN db_system.t_department.name IS '名称';
+COMMENT ON COLUMN db_system.t_department.code IS '编码';
+COMMENT ON COLUMN db_system.t_department.pid IS '上级ID';
+COMMENT ON COLUMN db_system.t_department.org_id IS '组织机构ID';
+COMMENT ON COLUMN db_system.t_department.manager_id IS '部门负责人ID';
+COMMENT ON COLUMN db_system.t_department.remark IS '备注';
+
 
 -- 数据字典(字典类型)
 DROP TABLE IF EXISTS db_system.t_dict_type;
@@ -275,7 +308,7 @@ CREATE TABLE IF NOT EXISTS db_system.t_dict_type
 (
     id         BIGINT PRIMARY KEY,
 
-    pid        BIGINT       NOT NULL DEFAULT 0,
+    pid        BIGINT,
     name       VARCHAR(100) NOT NULL,
     code       VARCHAR(100) NOT NULL,
     state      int2         NOT NULL,

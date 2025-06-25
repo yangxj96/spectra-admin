@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.configuration.mvc;
+package com.yangxj96.spectra.common.configuration.mvc;
 
 import com.yangxj96.spectra.common.response.R;
 import lombok.extern.slf4j.Slf4j;

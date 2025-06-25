@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.configuration.mvc;
+package com.yangxj96.spectra.common.configuration.mvc;
 
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
@@ -23,7 +23,7 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import com.yangxj96.spectra.common.exception.DataExistException;
 import com.yangxj96.spectra.common.exception.DataNotExistException;
 import com.yangxj96.spectra.common.response.R;
-import com.yangxj96.spectra.core.annotation.ULog;
+import com.yangxj96.spectra.common.annotation.ULog;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;

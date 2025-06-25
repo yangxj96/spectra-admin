@@ -21,7 +21,7 @@ import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
-import com.yangxj96.spectra.core.annotation.ULog;
+import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.core.javabean.from.UserPageFrom;
 import com.yangxj96.spectra.core.javabean.from.UserRelevanceRolesFrom;
 import com.yangxj96.spectra.core.javabean.from.UserSaveFrom;

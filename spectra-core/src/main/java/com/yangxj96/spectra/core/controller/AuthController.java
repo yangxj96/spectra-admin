@@ -19,7 +19,7 @@ package com.yangxj96.spectra.core.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.yangxj96.spectra.core.annotation.ULog;
+import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.core.javabean.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.core.javabean.vo.TokenVO;
 import com.yangxj96.spectra.core.service.AuthService;

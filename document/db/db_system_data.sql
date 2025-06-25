@@ -1,12 +1,18 @@
 -- 用户
 INSERT INTO db_system.t_user (id, name, email, avatar, state, created_by, created_at, updated_by, updated_at, deleted) VALUES (1934276682383138817, '平台管理员', 'yangxj96@gmail.com', null, 0, 0, '2025-06-15 23:47:52.864290', 1927290201865945090, '2025-06-24 11:37:14.216352', null);
 INSERT INTO db_system.t_user (id, name, email, avatar, state, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937354420709711873, '超级管理员', 'sysadmin@1.com', null, 0, 1927290201865945090, '2025-06-24 11:37:42.866695', 1927290201865945090, '2025-06-24 11:41:34.424012', null);
+INSERT INTO db_system.t_user (id, name, email, avatar, state, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937706586813169665, '测试用户', 'ceshi@1.com', null, 0, 1927290201865945090, '2025-06-25 10:57:05.810342', 1927290201865945090, '2025-06-25 10:57:05.811358', null);
+
 -- 账号
 INSERT INTO db_system.t_account (id, username, password, user_id, type, created_by, created_at, updated_by, updated_at, deleted) VALUES (1927290201865945090, 'yangxj96@gmail.com', '$2a$10$ALzuYNgOSYLlJg/XsxUY7O4BKeqECHf5J7bY8eGPaQK.3VSlkFTaO', 1934276682383138817, 0, null, null, 1927290201865945090, '2025-06-24 11:37:14.243354', null);
 INSERT INTO db_system.t_account (id, username, password, user_id, type, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937354421099782146, 'sysadmin@1.com', '$2a$10$zQSrfeQHvHw022UFUOoJwe5oHdOAWcaZr8d2owbbCwAgWqOSjVFVa', 1937354420709711873, 0, 1927290201865945090, '2025-06-24 11:37:42.957695', 1927290201865945090, '2025-06-24 11:37:42.957695', null);
+INSERT INTO db_system.t_account (id, username, password, user_id, type, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937706587203239938, 'ceshi@1.com', '$2a$10$UhexxdMYdvPFokOuBO2va.hG4mxzjvXRGufSmnLtRYJrirY8Bw4km', 1937706586813169665, 0, 1927290201865945090, '2025-06-25 10:57:05.907345', 1927290201865945090, '2025-06-25 10:57:05.911344', null);
+
 -- 用户到角色
 INSERT INTO db_system.t_user_role_map (id, user_id, role_id, created_by, created_at, updated_by, updated_at, deleted) VALUES (1934292480493473793, 1934276682383138817, 1932682189593350146, 1927290201865945090, '2025-06-16 00:50:39.420317', 1927290201865945090, '2025-06-16 00:50:39.420317', null);
 INSERT INTO db_system.t_user_role_map (id, user_id, role_id, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937354421099782147, 1937354420709711873, 1932685785802162178, 0, '2025-06-24 11:37:42.867752', 0, '2025-06-24 11:37:42.867752', null);
+INSERT INTO db_system.t_user_role_map (id, user_id, role_id, created_by, created_at, updated_by, updated_at, deleted) VALUES (1937706587291320321, 1937706586813169665, 1932687324356775938, 0, '2025-06-25 10:57:05.812216', 0, '2025-06-25 10:57:05.812216', null);
+
 -- 角色
 INSERT INTO db_system.t_role (id, name, code, state, scope, remark, created_by, created_at, updated_by, updated_at, deleted) VALUES (1932682189593350146, '运维管理员', 'DEV_ADMIN', true, 2, '运维人员使用,全局范围,拥有所有权限', 1927290201865945090, '2025-06-11 14:11:56.208812', 1927290201865945090, '2025-06-11 14:33:59.593709', null);
 INSERT INTO db_system.t_role (id, name, code, state, scope, remark, created_by, created_at, updated_by, updated_at, deleted) VALUES (1932687324356775938, '小组长', 'GROUP_LEADER', false, 1, '测试禁用状态', 1927290201865945090, '2025-06-11 14:32:20.385948', 1927290201865945090, '2025-06-12 17:15:18.034439', null);

@@ -20,7 +20,7 @@ package com.yangxj96.spectra.core.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
-import com.yangxj96.spectra.core.annotation.ULog;
+import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.core.javabean.from.RoleFrom;
 import com.yangxj96.spectra.core.javabean.from.RolePageFrom;
 import com.yangxj96.spectra.core.javabean.vo.RoleVO;

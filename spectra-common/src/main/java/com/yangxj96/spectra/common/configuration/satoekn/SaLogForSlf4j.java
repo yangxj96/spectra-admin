@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.configuration.satoekn;
+package com.yangxj96.spectra.common.configuration.satoekn;
 
 import cn.dev33.satoken.log.SaLog;
 import lombok.extern.slf4j.Slf4j;

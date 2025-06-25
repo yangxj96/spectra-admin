@@ -15,11 +15,12 @@
  *
  */
 
-package com.yangxj96.spectra.core.configuration.mybatis;
+package com.yangxj96.spectra.common.configuration.mybatis;
 
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import com.yangxj96.spectra.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -90,7 +91,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
             return StpUtil.getLoginIdAsLong();
         } catch (Exception e) {
             log.atError().log("获取ID出错,默认ID为0");
-            return 0L;
+            return Common.PID;
         }
     }
 }

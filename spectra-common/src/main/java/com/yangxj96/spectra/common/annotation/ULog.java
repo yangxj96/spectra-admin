@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.annotation;
+package com.yangxj96.spectra.common.annotation;
 
 import java.lang.annotation.*;
 

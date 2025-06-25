@@ -19,7 +19,7 @@ package com.yangxj96.spectra.core.aspectj;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yangxj96.spectra.core.annotation.ULog;
+import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.core.javabean.entity.OperationLog;
 import com.yangxj96.spectra.core.service.OperationLogService;
 import jakarta.annotation.Resource;

@@ -14,8 +14,7 @@
  *  limitations under the License.
  *
  */
-
-package com.yangxj96.spectra.core.configuration.satoekn;
+package com.yangxj96.spectra.core.service.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;

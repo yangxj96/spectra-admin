@@ -61,6 +61,9 @@ sa-token:
     timeout: 10s
 # 健康检查
 management:
+  health:
+    redis:
+      enabled: false
   endpoints:
     web:
       exposure:

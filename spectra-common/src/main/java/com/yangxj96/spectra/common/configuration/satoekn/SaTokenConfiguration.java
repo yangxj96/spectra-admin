@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.core.configuration.satoekn;
+package com.yangxj96.spectra.common.configuration.satoekn;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

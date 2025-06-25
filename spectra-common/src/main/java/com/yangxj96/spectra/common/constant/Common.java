@@ -29,6 +29,9 @@ public final class Common {
     private Common() {
     }
 
-    public static final Long PID = 0L;
+    /**
+     * 默认的PID
+     */
+    public static final Long PID = null;
 
 }
