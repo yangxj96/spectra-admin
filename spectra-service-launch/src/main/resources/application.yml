@@ -84,4 +84,4 @@ spectra:
         - png
         - pdf
       strategies:
-        - com.yangxj96.spectra.common.fileupload.strategy.impl.TikaValidationStrategy
+        - com.yangxj96.spectra.starter.fileupload.strategy.impl.TikaValidationStrategy

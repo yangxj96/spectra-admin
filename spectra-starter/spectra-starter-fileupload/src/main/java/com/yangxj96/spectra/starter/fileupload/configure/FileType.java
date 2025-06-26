@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.common.fileupload;
+package com.yangxj96.spectra.starter.fileupload.configure;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

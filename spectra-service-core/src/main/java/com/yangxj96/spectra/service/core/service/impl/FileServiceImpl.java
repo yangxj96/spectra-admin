@@ -17,9 +17,9 @@
 
 package com.yangxj96.spectra.service.core.service.impl;
 
-import com.yangxj96.spectra.common.fileupload.FileTypeValidator;
 import com.yangxj96.spectra.common.properties.FileProperties;
 import com.yangxj96.spectra.service.core.service.FileService;
+import com.yangxj96.spectra.starter.fileupload.configure.FileTypeValidator;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -1,13 +1,13 @@
 package com.yangxj96.spectra.starter.fileupload.autoconfigure;
 
-import com.yangxj96.spectra.common.fileupload.FileType;
-import com.yangxj96.spectra.common.fileupload.FileTypeValidator;
+import com.yangxj96.spectra.starter.fileupload.configure.FileType;
+import com.yangxj96.spectra.starter.fileupload.configure.FileTypeValidator;
 import com.yangxj96.spectra.starter.fileupload.properties.FileUploadProperties;
-import com.yangxj96.spectra.common.fileupload.strategy.FileTypeValidationStrategy;
-import com.yangxj96.spectra.common.fileupload.strategy.impl.ExtensionValidationStrategy;
-import com.yangxj96.spectra.common.fileupload.strategy.impl.MagicNumberValidationStrategy;
-import com.yangxj96.spectra.common.fileupload.strategy.impl.MimeValidationStrategy;
-import com.yangxj96.spectra.common.fileupload.strategy.impl.TikaValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.FileTypeValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.impl.ExtensionValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.impl.MagicNumberValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.impl.MimeValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.impl.TikaValidationStrategy;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 

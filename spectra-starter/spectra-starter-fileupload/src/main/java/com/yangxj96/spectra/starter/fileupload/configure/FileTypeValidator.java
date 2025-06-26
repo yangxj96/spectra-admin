@@ -15,9 +15,9 @@
  *
  */
 
-package com.yangxj96.spectra.common.fileupload;
+package com.yangxj96.spectra.starter.fileupload.configure;
 
-import com.yangxj96.spectra.common.fileupload.strategy.FileTypeValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.strategy.FileTypeValidationStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 

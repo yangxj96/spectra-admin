@@ -17,8 +17,8 @@
 
 package com.yangxj96.spectra.starter.fileupload.properties;
 
-import com.yangxj96.spectra.common.fileupload.FileType;
-import com.yangxj96.spectra.common.fileupload.strategy.FileTypeValidationStrategy;
+import com.yangxj96.spectra.starter.fileupload.configure.FileType;
+import com.yangxj96.spectra.starter.fileupload.strategy.FileTypeValidationStrategy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

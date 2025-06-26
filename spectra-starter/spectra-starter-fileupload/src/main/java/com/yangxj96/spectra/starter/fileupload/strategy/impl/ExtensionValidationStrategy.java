@@ -17,7 +17,7 @@
 
 package com.yangxj96.spectra.starter.fileupload.strategy.impl;
 
-import com.yangxj96.spectra.common.fileupload.FileType;
+import com.yangxj96.spectra.starter.fileupload.configure.FileType;
 import com.yangxj96.spectra.starter.fileupload.strategy.FileTypeValidationStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
