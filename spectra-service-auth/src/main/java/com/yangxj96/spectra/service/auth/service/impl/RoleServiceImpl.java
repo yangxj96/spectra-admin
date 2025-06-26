@@ -18,10 +18,10 @@
 package com.yangxj96.spectra.service.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.mapper.RoleMapper;
 import com.yangxj96.spectra.service.auth.service.RoleService;
-import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

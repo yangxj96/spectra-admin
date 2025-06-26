@@ -22,7 +22,7 @@ public class FileUploadAutoConfiguration {
 
     private final FileUploadProperties properties;
 
-    public FileUploadAutoConfiguration(FileUploadProperties properties){
+    public FileUploadAutoConfiguration(FileUploadProperties properties) {
         this.properties = properties;
     }
 

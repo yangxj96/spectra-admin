@@ -18,10 +18,10 @@
 package com.yangxj96.spectra.service.auth.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RoleFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RolePageFrom;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
-import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 
 import java.util.List;
 

@@ -17,10 +17,10 @@
 
 package com.yangxj96.spectra.service.auth.service.impl;
 
+import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.service.auth.javabean.entity.Authority;
 import com.yangxj96.spectra.service.auth.mapper.AuthorityMapper;
 import com.yangxj96.spectra.service.auth.service.AuthorityService;
-import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

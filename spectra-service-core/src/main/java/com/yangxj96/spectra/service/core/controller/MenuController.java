@@ -18,11 +18,11 @@
 package com.yangxj96.spectra.service.core.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.annotation.ULog;
-import com.yangxj96.spectra.service.core.service.MenuService;
+import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.service.core.javabean.from.MenuSaveFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.MenuTreeVO;
+import com.yangxj96.spectra.service.core.service.MenuService;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

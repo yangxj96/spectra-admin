@@ -19,6 +19,7 @@ package com.yangxj96.spectra.service.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.yangxj96.spectra.common.constant.Common;
+import com.yangxj96.spectra.common.utils.TreeBuilder;
 import com.yangxj96.spectra.service.core.javabean.entity.Menu;
 import com.yangxj96.spectra.service.core.javabean.from.MenuSaveFrom;
 import com.yangxj96.spectra.service.core.javabean.mapstruct.MenuMapstruct;
@@ -26,7 +27,6 @@ import com.yangxj96.spectra.service.core.javabean.vo.MenuTreeVO;
 import com.yangxj96.spectra.service.core.mapper.MenuMapper;
 import com.yangxj96.spectra.service.core.service.MenuService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
-import com.yangxj96.spectra.common.utils.TreeBuilder;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;

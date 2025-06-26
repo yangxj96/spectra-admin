@@ -1,11 +1,11 @@
 package com.yangxj96.spectra.service.core;
 
+import com.yangxj96.spectra.common.enums.AccountType;
+import com.yangxj96.spectra.common.enums.UserState;
 import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;
 import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.UserService;
-import com.yangxj96.spectra.common.enums.AccountType;
-import com.yangxj96.spectra.common.enums.UserState;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

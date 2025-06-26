@@ -51,6 +51,8 @@ public interface DictMapstruct {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "builtin", ignore = true)
+    @Mapping(target = "hide", ignore = true)
     DictType typeFromToEntity(DictTypeFrom from);
 
     /**

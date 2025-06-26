@@ -17,8 +17,8 @@
 
 package com.yangxj96.spectra.service.auth.service;
 
-import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.common.base.BaseService;
+import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 
 import java.util.List;
 
