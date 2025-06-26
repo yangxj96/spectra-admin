@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.yangxj96.spectra.auth.mapper.AccountMapper">
+<mapper namespace="com.yangxj96.spectra.service.auth.mapper.AccountMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="com.yangxj96.spectra.auth.javabean.entity.Account">
+    <resultMap id="BaseResultMap" type="com.yangxj96.spectra.service.auth.javabean.entity.Account">
         <!--@mbg.generated-->
         <!--@Table db_system.t_account-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
