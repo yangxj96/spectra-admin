@@ -1,0 +1,4 @@
+com.yangxj96.spectra.autoconfigure.MvcAutoConfiguration
+com.yangxj96.spectra.autoconfigure.JacksonAutoConfiguration
+com.yangxj96.spectra.autoconfigure.GlobalExceptionConfiguration
+com.yangxj96.spectra.autoconfigure.ResponseBodyModifyConfiguration
