@@ -15,6 +15,7 @@ spectra-files
 
 ### IntelliJ IDEA ###
 .idea
+.idea/httpRequests/*.http
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
