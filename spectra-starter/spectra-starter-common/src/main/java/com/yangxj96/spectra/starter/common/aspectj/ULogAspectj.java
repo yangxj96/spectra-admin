@@ -15,14 +15,12 @@
  *
  */
 
-package com.yangxj96.spectra.service.core.aspectj;
+package com.yangxj96.spectra.starter.common.aspectj;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.yangxj96.spectra.common.annotation.ULog;
-import com.yangxj96.spectra.service.core.javabean.entity.OperationLog;
-import com.yangxj96.spectra.service.core.service.OperationLogService;
-import jakarta.annotation.Resource;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
+import com.yangxj96.spectra.starter.common.entity.ULogEntity;
+import com.yangxj96.spectra.starter.common.service.ULogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +28,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -46,14 +43,18 @@ import java.util.Map;
  */
 @Slf4j
 @Aspect
-@Component
 public class ULogAspectj {
 
-    @Resource
-    private OperationLogService operationLogService;
+    private static final String PREFIX = "[ULogAspectj]:";
 
-    @Resource
-    private ObjectMapper om;
+    private final ULogService service;
+
+    private final ObjectMapper om;
+
+    public ULogAspectj(ULogService service, ObjectMapper om) {
+        this.service = service;
+        this.om = om;
+    }
 
     /**
      * 对使用了ULog注解的方法进行切面拦截处理
@@ -64,16 +65,14 @@ public class ULogAspectj {
      */
     @Around("@annotation(annotation)")
     public Object handle(ProceedingJoinPoint joinPoint, ULog annotation) throws Throwable {
-        log.atDebug().log("操作日志-开始记录");
+        log.atDebug().log(PREFIX + "操作日志-开始记录");
         // 获取注解中的树形
         long startTime = System.currentTimeMillis();
         // 获取请求上下文
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();
         // 初始化记录实体
-        OperationLog datum = new OperationLog();
-        datum.setCreatedBy(StpUtil.isLogin() ? StpUtil.getLoginIdAsLong() : null);
-        datum.setUpdatedBy(StpUtil.isLogin() ? StpUtil.getLoginIdAsLong() : null);
+        ULogEntity datum = new ULogEntity();
         datum.setExplain(annotation.value());
         datum.setArgs(safeWriteValueAsString(getArgs(joinPoint)));
         datum.setIp(getClientIP(request));
@@ -86,22 +85,17 @@ public class ULogAspectj {
             result = joinPoint.proceed();
             return result;
         } catch (Throwable e) {
-            log.atError().log("操作日志-AOP切面异常", e);
+            log.atError().log(PREFIX + "操作日志-AOP切面异常", e);
             throw e;
         } finally {
             HttpServletResponse response = attributes.getResponse();
 
-            // 也有可能在执行后才能获取到UID,所以执行完成后在尝试获取用户ID
-            if (datum.getCreatedBy() == null || datum.getUpdatedBy() == null) {
-                datum.setCreatedBy(StpUtil.isLogin() ? StpUtil.getLoginIdAsLong() : null);
-                datum.setUpdatedBy(StpUtil.isLogin() ? StpUtil.getLoginIdAsLong() : null);
-            }
             datum.setStatus((short) response.getStatus());
             datum.setResult(safeWriteValueAsString(result));
             datum.setTimeCost(System.currentTimeMillis() - startTime);
-            operationLogService.save(datum);
-
-            log.atDebug().log("操作日志-记录结束");
+            boolean flag = service.save(datum);
+            log.atDebug().log(PREFIX + "日志保存结果:" + flag);
+            log.atDebug().log(PREFIX + "操作日志-记录结束");
         }
     }
 

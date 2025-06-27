@@ -18,7 +18,7 @@
 package com.yangxj96.spectra.service.core.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import com.yangxj96.spectra.common.annotation.ULog;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.service.core.javabean.from.MenuSaveFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.MenuTreeVO;

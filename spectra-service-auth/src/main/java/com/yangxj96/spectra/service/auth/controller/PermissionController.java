@@ -18,7 +18,7 @@
 package com.yangxj96.spectra.service.auth.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.yangxj96.spectra.common.annotation.ULog;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RoleFrom;

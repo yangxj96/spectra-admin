@@ -20,7 +20,7 @@ package com.yangxj96.spectra.starter.common.autoconfigure;
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import com.yangxj96.spectra.common.annotation.ULog;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.common.response.R;
 import com.yangxj96.spectra.starter.common.exception.DataExistException;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
