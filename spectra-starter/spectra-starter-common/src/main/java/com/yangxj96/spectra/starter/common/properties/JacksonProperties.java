@@ -11,11 +11,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class JacksonProperties {
 
     /**
-     * 是否开启自动配置.
-     */
-    private Boolean enable = true;
-
-    /**
      * LocalDateTime类序列化方式.
      */
     private String localDateTimeFormat = "yyyy-MM-dd HH:mm:ss";

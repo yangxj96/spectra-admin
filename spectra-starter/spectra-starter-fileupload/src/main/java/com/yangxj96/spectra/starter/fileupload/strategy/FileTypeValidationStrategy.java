@@ -32,6 +32,12 @@ import java.io.IOException;
  */
 public interface FileTypeValidationStrategy {
 
+    /**
+     * 验证文件类型
+     *
+     * @param file 文件
+     * @return 是否验证通过
+     */
     boolean isValid(MultipartFile file) throws IOException;
 
 }

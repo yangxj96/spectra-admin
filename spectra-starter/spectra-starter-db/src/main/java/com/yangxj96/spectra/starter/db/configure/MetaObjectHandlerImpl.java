@@ -59,7 +59,6 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        log.atDebug().log("[MyBatisPlus] 新增填充字段");
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
             setFieldValByName(CREATED_BY, getCurrentUserId(), metaObject);
         }
@@ -76,7 +75,6 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.atDebug().log("[MyBatisPlus] 修改填充字段");
         setFieldValByName(UPDATED_BY, getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
     }

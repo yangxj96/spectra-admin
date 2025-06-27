@@ -18,6 +18,7 @@
 package com.yangxj96.spectra.service.core.controller;
 
 import com.yangxj96.spectra.service.core.service.FileService;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,7 @@ public class FileController {
      *
      * @param file 需要上传的文件
      */
+    @ULog("文件上传")
     @PostMapping("/upload")
     public void upload(MultipartFile file) throws IOException {
         bindService.upload(file);

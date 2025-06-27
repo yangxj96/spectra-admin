@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.common.filter;
+package com.yangxj96.spectra.starter.common.configure;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -47,12 +47,15 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class RequestGetParamsFilter extends OncePerRequestFilter {
 
+    private static final String PREFIX = "[Get请求参数下滑先转驼峰命名]:";
+
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request,
                                     @NotNull HttpServletResponse response,
                                     @NotNull FilterChain filterChain) throws ServletException, IOException {
-        log.atDebug().log("开始处理请求参数下划线转小驼峰命名");
+        log.atDebug().log(PREFIX + "开始处理请求参数下划线转小驼峰命名");
         if (!request.getMethod().toUpperCase(Locale.getDefault()).equals("GET")) {
+            log.atDebug().log(PREFIX + "非GET方法,跳过");
             filterChain.doFilter(request, response);
             return;
         }
@@ -60,14 +63,13 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
         for (String param : request.getParameterMap().keySet()) {
             var k = "";
             if (param.contains("_")) {
-                // 原先的hutool,决定不在使用了
-                // k = CharSequenceUtil.toCamelCase(param)
                 k = CaseUtils.toCamelCase(param, false, '_');
             } else {
                 k = param;
             }
             formatted.put(k, request.getParameterValues(param));
         }
+        log.atDebug().log(PREFIX + "转换成功,继续往下执行");
         filterChain.doFilter(new ParamsModifyHttpServletRequestWrapper(request, formatted), response);
     }
 

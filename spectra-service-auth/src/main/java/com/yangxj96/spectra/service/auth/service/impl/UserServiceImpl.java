@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.common.enums.AccountType;
-import com.yangxj96.spectra.common.properties.UserProperties;
+import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;

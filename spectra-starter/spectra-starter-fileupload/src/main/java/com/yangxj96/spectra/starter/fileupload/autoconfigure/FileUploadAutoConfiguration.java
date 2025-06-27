@@ -8,6 +8,7 @@ import com.yangxj96.spectra.starter.fileupload.strategy.impl.ExtensionValidation
 import com.yangxj96.spectra.starter.fileupload.strategy.impl.MagicNumberValidationStrategy;
 import com.yangxj96.spectra.starter.fileupload.strategy.impl.MimeValidationStrategy;
 import com.yangxj96.spectra.starter.fileupload.strategy.impl.TikaValidationStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -15,17 +16,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 文件上传需要的相关配置
+ * 文件上传类型验证需要的相关配置
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-06-27
  */
+@Slf4j
 @EnableConfigurationProperties(FileUploadProperties.class)
 public class FileUploadAutoConfiguration {
+
+    private static final String PREFIX = "[FileUpload]:";
 
     private final FileUploadProperties properties;
 
     public FileUploadAutoConfiguration(FileUploadProperties properties) {
         this.properties = properties;
     }
-
 
     /**
      * 文件类型验证策略管理器
@@ -34,8 +41,8 @@ public class FileUploadAutoConfiguration {
      */
     @Bean
     public FileTypeValidator fileTypeValidator() {
+        log.atDebug().log(PREFIX + "载入文件类型验证策略管理器");
         List<FileTypeValidationStrategy> strategies = new ArrayList<>();
-
         List<FileType> allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器
         for (var strategy : properties.getStrategies()) {

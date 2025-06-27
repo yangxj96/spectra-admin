@@ -19,10 +19,10 @@ package com.yangxj96.spectra.service.auth.controller;
 
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.service.auth.javabean.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.service.auth.javabean.vo.TokenVO;
 import com.yangxj96.spectra.service.auth.service.AuthService;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

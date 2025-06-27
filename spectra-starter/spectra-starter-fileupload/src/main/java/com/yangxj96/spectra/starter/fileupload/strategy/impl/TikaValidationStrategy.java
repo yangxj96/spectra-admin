@@ -24,6 +24,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * 文件类型验证策略-使用apache的Tika包进行验证
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-06-19
+ */
 public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
     private final List<String> allowedMimes;

@@ -27,7 +27,6 @@ import com.yangxj96.spectra.starter.db.configure.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * MyBatisPlus配置
@@ -37,18 +36,20 @@ import org.springframework.context.annotation.Configuration;
  * @since 2025-6-14
  */
 @Slf4j
-@Configuration
 public class MyBatisPlusAutoConfiguration {
+
+    private static final String PREFIX = "[MyBatisPlus]:";
 
     @Bean
     @ConditionalOnClass(StpUtil.class)
-    MetaObjectHandler metaObjectHandler() {
+    public MetaObjectHandler metaObjectHandler() {
+        log.atDebug().log(PREFIX + "载入元数据处理器");
         return new MetaObjectHandlerImpl();
     }
 
     @Bean
-    MybatisPlusInterceptor mybatisPlusInterceptor() {
-        log.debug("载入MybatisPlusInterceptor");
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+        log.atDebug().log(PREFIX + "载入MybatisPlusInterceptor");
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);

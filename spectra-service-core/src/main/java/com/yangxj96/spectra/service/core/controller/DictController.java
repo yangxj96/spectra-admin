@@ -25,6 +25,7 @@ import com.yangxj96.spectra.service.core.javabean.from.DictTypeFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 import com.yangxj96.spectra.service.core.service.DictService;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -54,6 +55,7 @@ public class DictController {
      *
      * @return 字典类型树
      */
+    @ULog("获取所有字典类型的树形列表")
     @GetMapping("/type/tree")
     public List<DictTypeTreeVO> getTypesGroupTree() {
         return bindService.getTypesWrapTree();
@@ -65,6 +67,7 @@ public class DictController {
      * @param code 对应数据类型的code
      * @return 字典数据列表
      */
+    @ULog("根据类型编码获取字典数据")
     @GetMapping("/data/{code}")
     public List<DictDataVo> getDataByTypeCode(@PathVariable String code) {
         return bindService.getDataByTypeCode(code);
@@ -75,6 +78,7 @@ public class DictController {
      *
      * @param params 请求参数
      */
+    @ULog("创建字典类型")
     @PostMapping("/createType")
     @ResponseStatus(HttpStatus.CREATED)
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")
@@ -83,10 +87,11 @@ public class DictController {
     }
 
     /**
-     * 创建字典类型
+     * 创建字典数据
      *
      * @param params 请求参数
      */
+    @ULog("创建字典数据")
     @PostMapping("/createData")
     @ResponseStatus(HttpStatus.CREATED)
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")

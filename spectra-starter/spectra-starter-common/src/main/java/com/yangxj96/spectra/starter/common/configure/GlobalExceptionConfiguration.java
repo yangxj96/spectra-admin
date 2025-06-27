@@ -15,13 +15,13 @@
  *
  */
 
-package com.yangxj96.spectra.starter.common.autoconfigure;
+package com.yangxj96.spectra.starter.common.configure;
 
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.common.response.R;
+import com.yangxj96.spectra.starter.common.annotation.ULog;
 import com.yangxj96.spectra.starter.common.exception.DataExistException;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,6 +46,8 @@ import javax.security.auth.login.LoginException;
 @RestControllerAdvice
 public class GlobalExceptionConfiguration {
 
+    private static final String PREFIX = "[GlobalException]:";
+
 
     /**
      * 未找到资源
@@ -57,8 +59,8 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log("未找到资源,{}", e.getMessage(), e);
-        return R.failure("未找到资源");
+        log.atError().log(PREFIX + "未找到资源,{}", e.getMessage(), e);
+        return R.failure(PREFIX + "未找到资源");
     }
 
     /**
@@ -72,7 +74,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(NotPermissionException.class)
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        log.atError().log("无权限异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "无权限异常,{}", e.getMessage(), e);
         return R.failure(HttpStatus.FORBIDDEN, "无权操作");
     }
 
@@ -86,7 +88,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(NotLoginException.class)
     public R<Object> notLoginException(NotLoginException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        log.atError().log("未登录异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "未登录异常,{}", e.getMessage(), e);
         if (e.getCode() == SaErrorCode.CODE_11016) {
             return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
         }
@@ -103,7 +105,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(LoginException.class)
     public R<Object> loginException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log("登录异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "登录异常,{}", e.getMessage(), e);
         return R.failure(e.getMessage());
     }
 
@@ -117,7 +119,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log("未进行功能实现异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "未进行功能实现异常,{}", e.getMessage(), e);
         return R.failure();
     }
 
@@ -131,7 +133,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.CONFLICT.value());
-        log.atError().log("数据已存在异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "数据已存在异常,{}", e.getMessage(), e);
         return R.failure(HttpStatus.CONFLICT);
     }
 
@@ -145,7 +147,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.NOT_FOUND.value());
-        log.atError().log("数据不存在异常,{} ", e.getMessage(), e);
+        log.atError().log(PREFIX + "数据不存在异常,{} ", e.getMessage(), e);
         return R.failure(HttpStatus.NOT_FOUND);
     }
 
@@ -158,7 +160,7 @@ public class GlobalExceptionConfiguration {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
-        log.atError().log("参数验证异常,{} ", e.getMessage(), e);
+        log.atError().log(PREFIX + "参数验证异常,{} ", e.getMessage(), e);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
 
         var errors = e.getBindingResult().getAllErrors();
@@ -179,7 +181,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log("运行时异常,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "运行时异常,{}", e.getMessage(), e);
         return R.failure(e.getMessage());
     }
 
@@ -193,7 +195,7 @@ public class GlobalExceptionConfiguration {
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log("兜底异常处理,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "兜底异常处理,{}", e.getMessage(), e);
         return R.failure();
     }
 

@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * <p>
- * mime方式验证
+ * 文件类型验证策略-根据文件mime方式验证
  * </p>
  *
  * @author Jack Young

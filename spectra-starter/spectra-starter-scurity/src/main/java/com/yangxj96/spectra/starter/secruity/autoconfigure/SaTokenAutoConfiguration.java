@@ -19,8 +19,10 @@ package com.yangxj96.spectra.starter.secruity.autoconfigure;
 
 import cn.dev33.satoken.log.SaLog;
 import com.yangxj96.spectra.starter.secruity.configure.SaLogForSlf4j;
+import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
@@ -30,11 +32,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  * @version 1.0
  * @since 2025-6-14
  */
-@Configuration
+@Slf4j
+@EnableConfigurationProperties(UserProperties.class)
 public class SaTokenAutoConfiguration {
 
+    private static final String PREFIX = "[SaToken]:";
+
+    /**
+     * 日志转接到Spring
+     *
+     * @return {@link SaLog}
+     */
     @Bean
     public SaLog saLog() {
+        log.atDebug().log(PREFIX + "载入SaToken日志转接到Spring");
         return new SaLogForSlf4j();
     }
 
@@ -45,6 +56,7 @@ public class SaTokenAutoConfiguration {
      */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
+        log.atDebug().log(PREFIX + "加载密码加解密工具");
         return new BCryptPasswordEncoder();
     }
 

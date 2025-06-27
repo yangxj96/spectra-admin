@@ -17,7 +17,6 @@
 
 package com.yangxj96.spectra.starter.common.exception;
 
-
 /**
  * 数据不存在异常
  *

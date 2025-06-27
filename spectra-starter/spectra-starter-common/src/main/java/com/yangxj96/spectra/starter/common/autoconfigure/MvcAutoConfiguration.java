@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.starter.common.autoconfigure;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -28,11 +29,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @version 1.0
  * @since 2025-6-14
  */
-@Configuration
+@Slf4j
 public class MvcAutoConfiguration implements WebMvcConfigurer {
+
+    private static final String PREFIX = "[MVC]:";
+
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        log.atDebug().log(PREFIX + "载入Cors");
         registry
                 // 匹配所有路径
                 .addMapping("/**")

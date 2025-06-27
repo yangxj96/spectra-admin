@@ -28,6 +28,13 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 文件类型验证策略-根据文件魔数验证
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-06-19
+ */
 public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
 
     private final List<FileType> allowedTypes;

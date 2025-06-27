@@ -15,7 +15,7 @@
  *
  */
 
-package com.yangxj96.spectra.starter.common.autoconfigure;
+package com.yangxj96.spectra.starter.common.configure;
 
 import com.yangxj96.spectra.common.response.R;
 import lombok.extern.slf4j.Slf4j;
@@ -45,12 +45,14 @@ import java.util.regex.Pattern;
 @ControllerAdvice
 public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Object> {
 
+    private static final String PREFIX = "[响应结果统一修改]:";
+
     private static final Pattern PATTERN = Pattern.compile("com\\.yangxj96\\.spectra\\..*\\.controller");
 
     @Override
     public boolean supports(@NotNull MethodParameter returnType,
                             @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
-        log.atDebug().log("响应修改处理");
+        log.atDebug().log(PREFIX + "进入修改");
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
             return false;
@@ -70,14 +72,17 @@ public class ResponseBodyModifyConfiguration implements ResponseBodyAdvice<Objec
                                            @NotNull ServerHttpResponse response) {
         // 跳过 String 和 byte[] 类型（避免 JSON 包装干扰）
         if (body instanceof String || body instanceof byte[]) {
+            log.atDebug().log(PREFIX + "跳过 String 和 byte[] 类型(避免 JSON 包装干扰)");
             return body;
         }
 
         // 如果是空且能转换成ServletServerHttpResponse则直接读取响应码后退出
         if (body == null) {
+            log.atDebug().log(PREFIX + "body为null的情况处理");
             return handleNullBody(request, response);
         }
 
+        log.atDebug().log(PREFIX + "包装后返回");
         return R.success(body);
     }
 
