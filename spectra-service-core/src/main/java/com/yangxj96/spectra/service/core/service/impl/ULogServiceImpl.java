@@ -6,6 +6,7 @@ import com.yangxj96.spectra.starter.common.entity.ULogEntity;
 import com.yangxj96.spectra.starter.common.service.ULogService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -22,9 +23,10 @@ public class ULogServiceImpl implements ULogService {
     private OperationLogService operationLogService;
 
     @Override
-    public boolean save(ULogEntity entity) {
+    @Async("uLogTaskExecutor")
+    public void save(ULogEntity entity) {
         OperationLog log = new OperationLog();
         BeanUtils.copyProperties(entity, log);
-        return operationLogService.save(log);
+        operationLogService.save(log);
     }
 }

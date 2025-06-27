@@ -43,7 +43,7 @@ import java.util.Map;
  */
 @Slf4j
 @Aspect
-public class ULogAspectj {
+public class ULogAspect {
 
     private static final String PREFIX = "[ULogAspectj]:";
 
@@ -51,7 +51,7 @@ public class ULogAspectj {
 
     private final ObjectMapper om;
 
-    public ULogAspectj(ULogService service, ObjectMapper om) {
+    public ULogAspect(ULogService service, ObjectMapper om) {
         this.service = service;
         this.om = om;
     }
@@ -93,8 +93,7 @@ public class ULogAspectj {
             datum.setStatus((short) response.getStatus());
             datum.setResult(safeWriteValueAsString(result));
             datum.setTimeCost(System.currentTimeMillis() - startTime);
-            boolean flag = service.save(datum);
-            log.atDebug().log(PREFIX + "日志保存结果:" + flag);
+            service.save(datum);
             log.atDebug().log(PREFIX + "操作日志-记录结束");
         }
     }
@@ -112,7 +111,7 @@ public class ULogAspectj {
         try {
             return om.writeValueAsString(obj);
         } catch (Exception e) {
-            log.atError().log("JSON 序列化失败: {}", obj.getClass());
+            log.atError().log(PREFIX + "JSON 序列化失败: {}", obj.getClass());
             return null;
         }
     }

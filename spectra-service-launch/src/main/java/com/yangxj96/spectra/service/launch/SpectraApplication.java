@@ -23,6 +23,7 @@ import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
@@ -36,6 +37,7 @@ import java.util.Properties;
  * @since 2025-6-14
  */
 @Slf4j
+@EnableAsync
 @SpringBootApplication
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 @MapperScan("com.yangxj96.spectra.service.*.mapper")

@@ -11,5 +11,5 @@ public interface ULogService {
      * @param entity 日志信息实体
      * @return 是否保存成功
      */
-    boolean save(ULogEntity entity);
+    void save(ULogEntity entity);
 }
