@@ -81,7 +81,7 @@ public class DictController {
     @ULog("创建字典类型")
     @PostMapping("/createType")
     @ResponseStatus(HttpStatus.CREATED)
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createType(@Validated(Verify.Insert.class) @RequestBody DictTypeFrom params) {
         bindService.createType(params);
     }
@@ -94,7 +94,7 @@ public class DictController {
     @ULog("创建字典数据")
     @PostMapping("/createData")
     @ResponseStatus(HttpStatus.CREATED)
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_SYSADMIN")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }

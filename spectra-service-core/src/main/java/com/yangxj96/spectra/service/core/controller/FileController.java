@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.service.core.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yangxj96.spectra.service.core.service.FileService;
 import com.yangxj96.spectra.starter.common.annotation.ULog;
 import jakarta.annotation.Resource;
@@ -36,6 +37,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/6/19
  */
+@SaCheckLogin
 @RestController
 @RequestMapping("/file")
 public class FileController {

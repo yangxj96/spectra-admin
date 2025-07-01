@@ -84,6 +84,8 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public List<RoleVO> listRole() {
-        return roleMapstruct.toVOs(roleService.list());
+        var wrapper = new LambdaQueryWrapper<Role>();
+        wrapper.eq(Role::getState,Boolean.TRUE);
+        return roleMapstruct.toVOs(roleService.list(wrapper));
     }
 }
