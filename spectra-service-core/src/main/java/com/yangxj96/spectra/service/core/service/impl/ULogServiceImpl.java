@@ -31,6 +31,7 @@ public class ULogServiceImpl implements ULogService {
         try {
             id = Long.parseLong(StpUtil.getLoginIdByToken(token).toString());
         } catch (Exception ignored) {
+            // 有可能出错导致转换失败,但是id已经设置了默认值,所以不用处理异常
         }
         OperationLog log = new OperationLog();
         BeanUtils.copyProperties(entity, log);
