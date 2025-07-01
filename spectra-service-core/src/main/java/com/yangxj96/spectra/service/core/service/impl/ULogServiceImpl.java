@@ -1,5 +1,7 @@
 package com.yangxj96.spectra.service.core.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
+import com.yangxj96.spectra.common.constant.Common;
 import com.yangxj96.spectra.service.core.javabean.entity.OperationLog;
 import com.yangxj96.spectra.service.core.service.OperationLogService;
 import com.yangxj96.spectra.starter.common.entity.ULogEntity;
@@ -24,9 +26,16 @@ public class ULogServiceImpl implements ULogService {
 
     @Override
     @Async("uLogTaskExecutor")
-    public void save(ULogEntity entity) {
+    public void save(ULogEntity entity, String token) {
+        var id = Common.PID;
+        try {
+            id = Long.parseLong(StpUtil.getLoginIdByToken(token).toString());
+        } catch (Exception ignored) {
+        }
         OperationLog log = new OperationLog();
         BeanUtils.copyProperties(entity, log);
+        log.setCreatedBy(id);
+        log.setUpdatedBy(id);
         operationLogService.save(log);
     }
 }

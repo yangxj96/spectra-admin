@@ -19,6 +19,7 @@ package com.yangxj96.spectra.service.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.constant.Common;
+import com.yangxj96.spectra.common.enums.CommonState;
 import com.yangxj96.spectra.common.utils.TreeBuilder;
 import com.yangxj96.spectra.service.core.javabean.entity.DictData;
 import com.yangxj96.spectra.service.core.javabean.entity.DictType;
@@ -81,7 +82,9 @@ public class DictServiceImpl implements DictService {
     public List<DictTypeTreeVO> getTypesWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
         LambdaQueryWrapper<DictType> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(DictType::getBuiltin, Boolean.FALSE)
+        wrapper
+                .eq(DictType::getState, CommonState.ENABLE)
+                .eq(DictType::getBuiltin, Boolean.FALSE)
                 .eq(DictType::getHide, Boolean.FALSE);
         List<DictType> menus = typeService.list(wrapper);
         List<DictTypeTreeVO> vos = mapstruct.typeToTreeVOS(menus);

@@ -17,5 +17,5 @@ public interface ULogService {
      *
      * @param entity 日志信息实体
      */
-    void save(ULogEntity entity);
+    void save(ULogEntity entity,String token);
 }

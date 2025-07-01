@@ -27,7 +27,6 @@ import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 import com.yangxj96.spectra.service.core.service.DictService;
 import com.yangxj96.spectra.starter.common.annotation.ULog;
 import jakarta.annotation.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -80,7 +79,6 @@ public class DictController {
      */
     @ULog("创建字典类型")
     @PostMapping("/createType")
-    @ResponseStatus(HttpStatus.CREATED)
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createType(@Validated(Verify.Insert.class) @RequestBody DictTypeFrom params) {
         bindService.createType(params);
@@ -93,11 +91,9 @@ public class DictController {
      */
     @ULog("创建字典数据")
     @PostMapping("/createData")
-    @ResponseStatus(HttpStatus.CREATED)
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }
-
 
 }
