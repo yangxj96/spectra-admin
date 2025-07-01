@@ -28,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -50,6 +51,20 @@ public class GlobalExceptionConfiguration {
 
 
     /**
+     * SQL语法错误
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
+     */
+    @ExceptionHandler(BadSqlGrammarException.class)
+    public R<Object> badSqlGrammarException(Exception e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.atError().log(PREFIX + "SQL语法错误,{}", e.getMessage(), e);
+        return R.failure();
+    }
+
+    /**
      * 未找到资源
      *
      * @param e        错误信息
@@ -60,7 +75,7 @@ public class GlobalExceptionConfiguration {
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.atError().log(PREFIX + "未找到资源,{}", e.getMessage(), e);
-        return R.failure(PREFIX + "未找到资源");
+        return R.failure("未找到资源");
     }
 
     /**

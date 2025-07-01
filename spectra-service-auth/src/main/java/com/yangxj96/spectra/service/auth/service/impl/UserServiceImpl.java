@@ -24,7 +24,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.common.enums.AccountType;
-import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;
@@ -40,6 +39,7 @@ import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import com.yangxj96.spectra.service.auth.service.UserService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
+import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -90,7 +90,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>()
                 .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName());
-        Page<User> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
+        Page<User> db = this.page(page.toPage(), wrapper);
         BeanUtils.copyProperties(db, result);
         result.setRecords(mapstruct.toVOs(db.getRecords()));
         // vo扩展字段补充

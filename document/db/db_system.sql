@@ -1,8 +1,9 @@
+CREATE SCHEMA IF NOT EXISTS db_auth;
 CREATE SCHEMA IF NOT EXISTS db_system;
 
 -- 账号信息
-DROP TABLE IF EXISTS db_system.t_account;
-CREATE TABLE IF NOT EXISTS db_system.t_account
+DROP TABLE IF EXISTS db_auth.t_account;
+CREATE TABLE IF NOT EXISTS db_auth.t_account
 (
     id         BIGINT PRIMARY KEY,
 
@@ -17,21 +18,21 @@ CREATE TABLE IF NOT EXISTS db_system.t_account
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_account IS '账号信息';
-COMMENT ON COLUMN db_system.t_account.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_account.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_account.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_account.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_account.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_account.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_account.username IS '用户名';
-COMMENT ON COLUMN db_system.t_account.password IS '密码';
-COMMENT ON COLUMN db_system.t_account.user_id IS '用户ID';
-COMMENT ON COLUMN db_system.t_account.type IS '账号类型 0-账号密码';
+COMMENT ON TABLE db_auth.t_account IS '账号信息';
+COMMENT ON COLUMN db_auth.t_account.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_account.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_account.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_account.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_account.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_account.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_account.username IS '用户名';
+COMMENT ON COLUMN db_auth.t_account.password IS '密码';
+COMMENT ON COLUMN db_auth.t_account.user_id IS '用户ID';
+COMMENT ON COLUMN db_auth.t_account.type IS '账号类型 0-账号密码';
 
 -- 用户信息
-DROP TABLE IF EXISTS db_system.t_user;
-CREATE TABLE IF NOT EXISTS db_system.t_user
+DROP TABLE IF EXISTS db_auth.t_user;
+CREATE TABLE IF NOT EXISTS db_auth.t_user
 (
     id         BIGINT PRIMARY KEY,
 
@@ -46,22 +47,22 @@ CREATE TABLE IF NOT EXISTS db_system.t_user
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_user IS '用户信息';
-COMMENT ON COLUMN db_system.t_user.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_user.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_user.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_user.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_user.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_user.deleted IS '是否删除';
+COMMENT ON TABLE db_auth.t_user IS '用户信息';
+COMMENT ON COLUMN db_auth.t_user.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_user.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_user.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_user.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_user.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_user.deleted IS '是否删除';
 
-COMMENT ON COLUMN db_system.t_user.name IS '姓名';
-COMMENT ON COLUMN db_system.t_user.email IS '邮箱';
-COMMENT ON COLUMN db_system.t_user.avatar IS '头像';
-COMMENT ON COLUMN db_system.t_user.state IS '状态';
+COMMENT ON COLUMN db_auth.t_user.name IS '姓名';
+COMMENT ON COLUMN db_auth.t_user.email IS '邮箱';
+COMMENT ON COLUMN db_auth.t_user.avatar IS '头像';
+COMMENT ON COLUMN db_auth.t_user.state IS '状态';
 
 -- 角色表
-DROP TABLE IF EXISTS db_system.t_role;
-CREATE TABLE IF NOT EXISTS db_system.t_role
+DROP TABLE IF EXISTS db_auth.t_role;
+CREATE TABLE IF NOT EXISTS db_auth.t_role
 (
     id         BIGINT PRIMARY KEY,
 
@@ -77,22 +78,22 @@ CREATE TABLE IF NOT EXISTS db_system.t_role
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_role IS '角色表';
-COMMENT ON COLUMN db_system.t_role.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_role.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_role.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_role.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_role.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_role.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_role.name IS '名称';
-COMMENT ON COLUMN db_system.t_role.code IS '编码';
-COMMENT ON COLUMN db_system.t_role.state IS '状态';
-COMMENT ON COLUMN db_system.t_role.scope IS '范围';
-COMMENT ON COLUMN db_system.t_role.remark IS '备注';
+COMMENT ON TABLE db_auth.t_role IS '角色表';
+COMMENT ON COLUMN db_auth.t_role.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_role.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_role.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_role.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_role.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_role.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_role.name IS '名称';
+COMMENT ON COLUMN db_auth.t_role.code IS '编码';
+COMMENT ON COLUMN db_auth.t_role.state IS '状态';
+COMMENT ON COLUMN db_auth.t_role.scope IS '范围';
+COMMENT ON COLUMN db_auth.t_role.remark IS '备注';
 
 -- 角色表<->用户
-DROP TABLE IF EXISTS db_system.t_user_role_map;
-CREATE TABLE IF NOT EXISTS db_system.t_user_role_map
+DROP TABLE IF EXISTS db_auth.t_user_role_map;
+CREATE TABLE IF NOT EXISTS db_auth.t_user_role_map
 (
     id         BIGINT PRIMARY KEY,
 
@@ -105,19 +106,19 @@ CREATE TABLE IF NOT EXISTS db_system.t_user_role_map
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_user_role_map IS '角色表<->账户';
-COMMENT ON COLUMN db_system.t_user_role_map.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_user_role_map.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_user_role_map.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_user_role_map.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_user_role_map.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_user_role_map.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_user_role_map.user_id IS '用户ID';
-COMMENT ON COLUMN db_system.t_user_role_map.role_id IS '角色ID';
+COMMENT ON TABLE db_auth.t_user_role_map IS '角色表<->账户';
+COMMENT ON COLUMN db_auth.t_user_role_map.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_user_role_map.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_user_role_map.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_user_role_map.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_user_role_map.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_user_role_map.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_user_role_map.user_id IS '用户ID';
+COMMENT ON COLUMN db_auth.t_user_role_map.role_id IS '角色ID';
 
 -- 权限表
-DROP TABLE IF EXISTS db_system.t_authority;
-CREATE TABLE IF NOT EXISTS db_system.t_authority
+DROP TABLE IF EXISTS db_auth.t_authority;
+CREATE TABLE IF NOT EXISTS db_auth.t_authority
 (
     id         BIGINT PRIMARY KEY,
 
@@ -130,19 +131,19 @@ CREATE TABLE IF NOT EXISTS db_system.t_authority
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_authority IS '权限表';
-COMMENT ON COLUMN db_system.t_authority.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_authority.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_authority.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_authority.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_authority.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_authority.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_authority.name IS '权限名称';
-COMMENT ON COLUMN db_system.t_authority.code IS '权限编码';
+COMMENT ON TABLE db_auth.t_authority IS '权限表';
+COMMENT ON COLUMN db_auth.t_authority.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_authority.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_authority.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_authority.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_authority.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_authority.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_authority.name IS '权限名称';
+COMMENT ON COLUMN db_auth.t_authority.code IS '权限编码';
 
 -- 权限表<->角色
-DROP TABLE IF EXISTS db_system.t_role_authority_map;
-CREATE TABLE IF NOT EXISTS db_system.t_role_authority_map
+DROP TABLE IF EXISTS db_auth.t_role_authority_map;
+CREATE TABLE IF NOT EXISTS db_auth.t_role_authority_map
 (
     id           BIGINT PRIMARY KEY,
 
@@ -155,15 +156,15 @@ CREATE TABLE IF NOT EXISTS db_system.t_role_authority_map
     updated_at   TIMESTAMP,
     deleted      TIMESTAMP
 );
-COMMENT ON TABLE db_system.t_role_authority_map IS '权限表<->角色';
-COMMENT ON COLUMN db_system.t_role_authority_map.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_role_authority_map.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_role_authority_map.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_role_authority_map.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_role_authority_map.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_role_authority_map.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_role_authority_map.role_id IS '角色ID';
-COMMENT ON COLUMN db_system.t_role_authority_map.authority_id IS '权限ID';
+COMMENT ON TABLE db_auth.t_role_authority_map IS '权限表<->角色';
+COMMENT ON COLUMN db_auth.t_role_authority_map.id IS '主键ID';
+COMMENT ON COLUMN db_auth.t_role_authority_map.created_by IS '创建人';
+COMMENT ON COLUMN db_auth.t_role_authority_map.created_at IS '创建时间';
+COMMENT ON COLUMN db_auth.t_role_authority_map.updated_by IS '最后更新人';
+COMMENT ON COLUMN db_auth.t_role_authority_map.updated_at IS '最后更新时间';
+COMMENT ON COLUMN db_auth.t_role_authority_map.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_role_authority_map.role_id IS '角色ID';
+COMMENT ON COLUMN db_auth.t_role_authority_map.authority_id IS '权限ID';
 
 -- 菜单表
 DROP TABLE IF EXISTS db_system.t_menu;

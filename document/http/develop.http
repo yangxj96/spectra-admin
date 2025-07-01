@@ -1,4 +1,0 @@
-// @no-log
-
-# @name jasypt加密
-GET {{host}}/develop/jasypt/encrypt/123456

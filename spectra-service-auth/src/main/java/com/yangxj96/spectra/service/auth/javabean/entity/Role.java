@@ -42,7 +42,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_system.t_role")
+@TableName(value = "db_auth.t_role")
 public class Role extends BaseEntity implements Serializable {
 
     @Serial

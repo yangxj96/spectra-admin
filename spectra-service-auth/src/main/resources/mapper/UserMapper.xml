@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.service.auth.javabean.entity.User">
         <!--@mbg.generated-->
-        <!--@Table db_system.t_user-->
+        <!--@Table db_auth.t_user-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="email"      jdbcType="VARCHAR"   property="email"/>

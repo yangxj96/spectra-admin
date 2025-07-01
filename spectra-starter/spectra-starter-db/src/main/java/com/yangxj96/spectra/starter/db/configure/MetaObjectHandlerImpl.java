@@ -86,6 +86,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
      */
     private Long getCurrentUserId() {
         try {
+            // TODO 发现这里获取不到SaToken的上下文,导致无法获取到用户数据
             return StpUtil.getLoginIdAsLong();
         } catch (Exception e) {
             log.atError().log("获取ID出错,默认ID为{}", Common.PID);

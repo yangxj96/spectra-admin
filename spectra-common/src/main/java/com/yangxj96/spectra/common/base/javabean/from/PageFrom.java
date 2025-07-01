@@ -17,7 +17,12 @@
 
 package com.yangxj96.spectra.common.base.javabean.from;
 
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.*;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
 
 /**
  * 分页查询入参
@@ -43,4 +48,16 @@ public class PageFrom {
      */
     private Long pageNum;
 
+    /**
+     * 排序字段,前端
+     */
+    private List<OrderItem> orders;
+
+    public <T> Page<T> toPage() {
+        Page<T> page = new Page<>(this.pageNum, this.pageSize);
+        if (CollectionUtils.isNotEmpty(orders)) {
+            page.setOrders(this.orders);
+        }
+        return page;
+    }
 }
