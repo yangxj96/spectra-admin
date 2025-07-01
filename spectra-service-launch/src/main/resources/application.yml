@@ -86,3 +86,5 @@ spectra:
       strategies:
         - com.yangxj96.spectra.starter.fileupload.strategy.impl.TikaValidationStrategy
         - com.yangxj96.spectra.starter.fileupload.strategy.impl.MimeValidationStrategy
+        - com.yangxj96.spectra.starter.fileupload.strategy.impl.ExtensionValidationStrategy
+        - com.yangxj96.spectra.starter.fileupload.strategy.impl.MagicNumberValidationStrategy
