@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.Properties;
 
+
 /**
  * 项目启动类
  *
@@ -39,9 +40,9 @@ import java.util.Properties;
 @Slf4j
 @EnableAsync
 @SpringBootApplication
-@EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
-@MapperScan("com.yangxj96.spectra.service.*.mapper")
 @ComponentScan("com.yangxj96.spectra")
+@MapperScan("com.yangxj96.spectra.service.*.mapper")
+@EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class SpectraApplication {
 
     public static void main(String[] args) {

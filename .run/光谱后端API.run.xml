@@ -1,0 +1,10 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="光谱后端API" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="spectra-service-launch" />
+    <option name="PROGRAM_PARAMETERS" value="-Xms256m -Xmx256m -Xmn100m" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.yangxj96.spectra.service.launch.SpectraApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
