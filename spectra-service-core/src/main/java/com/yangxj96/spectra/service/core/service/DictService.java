@@ -36,11 +36,17 @@ import java.util.List;
 public interface DictService {
 
     /**
-     * 创建字典类型
+     * 创建字典组
      *
      * @param params 入参from
      */
     void createGroup(DictGroupFrom params);
+
+    /**
+     * 修改字典组
+     * @param params 入参from
+     */
+    void modifyGroup(DictGroupFrom params);
 
     /**
      * 创建字典数据
@@ -48,6 +54,13 @@ public interface DictService {
      * @param params 入参from
      */
     void createData(DictDataFrom params);
+
+    /**
+     * 修改字典数据
+     *
+     * @param params 入参from
+     */
+    void modifyData(DictDataFrom params);
 
     /**
      * 获取字典类型列表且转换为树
@@ -63,4 +76,5 @@ public interface DictService {
      * @return 字典数据列表
      */
     List<DictDataVo> listDictDataByGroupCode(String code);
+
 }

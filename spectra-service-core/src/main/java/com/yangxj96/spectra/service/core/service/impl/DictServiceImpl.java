@@ -65,17 +65,29 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void createGroup(DictGroupFrom params) {
-        // 先转换为实体
         DictGroup entity = mapstruct.groupFromToEntity(params);
         typeService.save(entity);
     }
 
     @Override
     @Transactional
+    public void modifyGroup(DictGroupFrom params) {
+        DictGroup entity = mapstruct.groupFromToEntity(params);
+        typeService.updateById(entity);
+    }
+
+    @Override
+    @Transactional
     public void createData(DictDataFrom params) {
-        // 先转换为实体
         DictData entity = mapstruct.dataFromToEntity(params);
         dataService.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void modifyData(DictDataFrom params) {
+        DictData entity = mapstruct.dataFromToEntity(params);
+        dataService.updateById(entity);
     }
 
     @Override

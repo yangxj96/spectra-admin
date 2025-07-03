@@ -63,6 +63,17 @@ public class DictController {
     }
 
     /**
+     * 修改字典组信息
+     * @param params 请求参数
+     */
+    @ULog("修改字典数据")
+    @PutMapping("/group/modify")
+    @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
+    public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params){
+        bindService.modifyGroup(params);
+    }
+
+    /**
      * 创建字典数据
      *
      * @param params 请求参数
@@ -72,6 +83,17 @@ public class DictController {
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
+    }
+
+    /**
+     * 修改字典数据
+     * @param params 请求参数
+     */
+    @ULog("修改字典数据")
+    @PutMapping("/data/modify")
+    @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
+    public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params){
+        bindService.modifyData(params);
     }
 
     /**
