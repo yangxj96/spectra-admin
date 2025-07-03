@@ -22,9 +22,9 @@ import com.yangxj96.spectra.common.constant.Common;
 import com.yangxj96.spectra.common.enums.CommonState;
 import com.yangxj96.spectra.common.utils.TreeBuilder;
 import com.yangxj96.spectra.service.core.javabean.entity.DictData;
-import com.yangxj96.spectra.service.core.javabean.entity.DictType;
+import com.yangxj96.spectra.service.core.javabean.entity.DictGroup;
 import com.yangxj96.spectra.service.core.javabean.from.DictDataFrom;
-import com.yangxj96.spectra.service.core.javabean.from.DictTypeFrom;
+import com.yangxj96.spectra.service.core.javabean.from.DictGroupFrom;
 import com.yangxj96.spectra.service.core.javabean.mapstruct.DictMapstruct;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
@@ -64,9 +64,9 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void createType(DictTypeFrom params) {
+    public void createGroup(DictGroupFrom params) {
         // 先转换为实体
-        DictType entity = mapstruct.typeFromToEntity(params);
+        DictGroup entity = mapstruct.groupFromToEntity(params);
         typeService.save(entity);
     }
 
@@ -79,21 +79,21 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<DictTypeTreeVO> getTypesWrapTree() {
+    public List<DictTypeTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
-        LambdaQueryWrapper<DictType> wrapper = new LambdaQueryWrapper<>();
+        LambdaQueryWrapper<DictGroup> wrapper = new LambdaQueryWrapper<>();
         wrapper
-                .eq(DictType::getState, CommonState.ENABLE)
-                .eq(DictType::getBuiltin, Boolean.FALSE)
-                .eq(DictType::getHide, Boolean.FALSE);
-        List<DictType> menus = typeService.list(wrapper);
+                .eq(DictGroup::getState, CommonState.ENABLE)
+                .eq(DictGroup::getBuiltin, Boolean.FALSE)
+                .eq(DictGroup::getHide, Boolean.FALSE);
+        List<DictGroup> menus = typeService.list(wrapper);
         List<DictTypeTreeVO> vos = mapstruct.typeToTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
-    public List<DictDataVo> getDataByTypeCode(String code) {
-        DictType type = typeService.getByCode(code);
+    public List<DictDataVo> listDictDataByGroupCode(String code) {
+        DictGroup type = typeService.getByCode(code);
         if (null == type) {
             throw new DataNotExistException("字典类型不存在");
         }

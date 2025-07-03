@@ -21,7 +21,7 @@ import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.service.core.javabean.from.DictDataFrom;
-import com.yangxj96.spectra.service.core.javabean.from.DictTypeFrom;
+import com.yangxj96.spectra.service.core.javabean.from.DictGroupFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 import com.yangxj96.spectra.service.core.service.DictService;
@@ -49,15 +49,40 @@ public class DictController {
     @Resource
     private DictService bindService;
 
+
+    /**
+     * 创建字典类型
+     *
+     * @param params 请求参数
+     */
+    @ULog("创建字典类型")
+    @PostMapping("/group/create")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
+    public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
+        bindService.createGroup(params);
+    }
+
+    /**
+     * 创建字典数据
+     *
+     * @param params 请求参数
+     */
+    @ULog("创建字典数据")
+    @PostMapping("/data/create")
+    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
+    public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
+        bindService.createData(params);
+    }
+
     /**
      * 获取所有字典类型的树形列表
      *
      * @return 字典类型树
      */
     @ULog("获取所有字典类型的树形列表")
-    @GetMapping("/type/tree")
-    public List<DictTypeTreeVO> getTypesGroupTree() {
-        return bindService.getTypesWrapTree();
+    @GetMapping("/group/tree")
+    public List<DictTypeTreeVO> listDictGroupWrapTree() {
+        return bindService.listDictGroupWrapTree();
     }
 
     /**
@@ -68,32 +93,7 @@ public class DictController {
      */
     @ULog("根据类型编码获取字典数据")
     @GetMapping("/data/{code}")
-    public List<DictDataVo> getDataByTypeCode(@PathVariable String code) {
-        return bindService.getDataByTypeCode(code);
+    public List<DictDataVo> listDictDataByGroupCode(@PathVariable String code) {
+        return bindService.listDictDataByGroupCode(code);
     }
-
-    /**
-     * 创建字典类型
-     *
-     * @param params 请求参数
-     */
-    @ULog("创建字典类型")
-    @PostMapping("/createType")
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
-    public void createType(@Validated(Verify.Insert.class) @RequestBody DictTypeFrom params) {
-        bindService.createType(params);
-    }
-
-    /**
-     * 创建字典数据
-     *
-     * @param params 请求参数
-     */
-    @ULog("创建字典数据")
-    @PostMapping("/createData")
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
-    public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
-        bindService.createData(params);
-    }
-
 }

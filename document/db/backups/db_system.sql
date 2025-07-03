@@ -127,7 +127,7 @@ COMMENT ON TABLE "db_system"."t_dict_data" IS '数据字典(字典值)';
 -- ----------------------------
 -- Table structure for t_dict_type
 -- ----------------------------
-DROP TABLE IF EXISTS "db_system"."t_dict_type";
+DROP TABLE IF EXISTS "db_system".t_dict_group;
 CREATE TABLE "db_system"."t_dict_type"
 (
     "id"         int8                                        NOT NULL,
@@ -145,20 +145,20 @@ CREATE TABLE "db_system"."t_dict_type"
     "deleted"    TIMESTAMP(6)
 )
 ;
-COMMENT ON COLUMN "db_system"."t_dict_type"."id" IS '主键ID';
-COMMENT ON COLUMN "db_system"."t_dict_type"."pid" IS '父级ID';
-COMMENT ON COLUMN "db_system"."t_dict_type"."name" IS '字典名称';
-COMMENT ON COLUMN "db_system"."t_dict_type"."code" IS '字典编码';
-COMMENT ON COLUMN "db_system"."t_dict_type"."state" IS '字典状态';
-COMMENT ON COLUMN "db_system"."t_dict_type"."remark" IS '备注';
-COMMENT ON COLUMN "db_system"."t_dict_type"."builtin" IS '是否内置字段,为true则不允许他进行修改删除操作';
-COMMENT ON COLUMN "db_system"."t_dict_type"."hide" IS '是否隐藏,为true则前端不可直接进行修改删除等操作';
-COMMENT ON COLUMN "db_system"."t_dict_type"."created_by" IS '创建人';
-COMMENT ON COLUMN "db_system"."t_dict_type"."created_at" IS '创建时间';
-COMMENT ON COLUMN "db_system"."t_dict_type"."updated_by" IS '最后更新人';
-COMMENT ON COLUMN "db_system"."t_dict_type"."updated_at" IS '最后更新时间';
-COMMENT ON COLUMN "db_system"."t_dict_type"."deleted" IS '是否删除';
-COMMENT ON TABLE "db_system"."t_dict_type" IS '数据字典(字典类型)';
+COMMENT ON COLUMN "db_system".t_dict_group."id" IS '主键ID';
+COMMENT ON COLUMN "db_system".t_dict_group."pid" IS '父级ID';
+COMMENT ON COLUMN "db_system".t_dict_group."name" IS '字典名称';
+COMMENT ON COLUMN "db_system".t_dict_group."code" IS '字典编码';
+COMMENT ON COLUMN "db_system".t_dict_group."state" IS '字典状态';
+COMMENT ON COLUMN "db_system".t_dict_group."remark" IS '备注';
+COMMENT ON COLUMN "db_system".t_dict_group."builtin" IS '是否内置字段,为true则不允许他进行修改删除操作';
+COMMENT ON COLUMN "db_system".t_dict_group."hide" IS '是否隐藏,为true则前端不可直接进行修改删除等操作';
+COMMENT ON COLUMN "db_system".t_dict_group."created_by" IS '创建人';
+COMMENT ON COLUMN "db_system".t_dict_group."created_at" IS '创建时间';
+COMMENT ON COLUMN "db_system".t_dict_group."updated_by" IS '最后更新人';
+COMMENT ON COLUMN "db_system".t_dict_group."updated_at" IS '最后更新时间';
+COMMENT ON COLUMN "db_system".t_dict_group."deleted" IS '是否删除';
+COMMENT ON TABLE "db_system".t_dict_group IS '数据字典(字典类型)';
 
 -- ----------------------------
 -- Records of t_dict_type
@@ -2848,7 +2848,7 @@ ALTER TABLE "db_system"."t_dict_data"
 -- ----------------------------
 -- Primary Key structure for table t_dict_type
 -- ----------------------------
-ALTER TABLE "db_system"."t_dict_type"
+ALTER TABLE "db_system".t_dict_group
     ADD CONSTRAINT "t_dict_type_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------

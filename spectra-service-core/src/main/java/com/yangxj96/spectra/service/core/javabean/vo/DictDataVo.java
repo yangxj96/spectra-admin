@@ -17,10 +17,15 @@
 
 package com.yangxj96.spectra.service.core.javabean.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.yangxj96.spectra.common.enums.CommonState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * <p>
@@ -34,16 +39,21 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DictDataVo {
+public class DictDataVo implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 数据id.
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     /**
      * 字典类型ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long dictTypeId;
 
     /**

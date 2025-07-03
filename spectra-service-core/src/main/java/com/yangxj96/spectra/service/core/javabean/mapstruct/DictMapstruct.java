@@ -18,9 +18,9 @@
 package com.yangxj96.spectra.service.core.javabean.mapstruct;
 
 import com.yangxj96.spectra.service.core.javabean.entity.DictData;
-import com.yangxj96.spectra.service.core.javabean.entity.DictType;
+import com.yangxj96.spectra.service.core.javabean.entity.DictGroup;
 import com.yangxj96.spectra.service.core.javabean.from.DictDataFrom;
-import com.yangxj96.spectra.service.core.javabean.from.DictTypeFrom;
+import com.yangxj96.spectra.service.core.javabean.from.DictGroupFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 import org.mapstruct.Mapper;
@@ -53,7 +53,7 @@ public interface DictMapstruct {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "builtin", ignore = true)
     @Mapping(target = "hide", ignore = true)
-    DictType typeFromToEntity(DictTypeFrom from);
+    DictGroup groupFromToEntity(DictGroupFrom from);
 
     /**
      * 字典数据入参转实体
@@ -75,7 +75,7 @@ public interface DictMapstruct {
      * @return 字典类型
      */
     @Mapping(target = "children", ignore = true)
-    DictTypeTreeVO typeToTreeVO(DictType datum);
+    DictTypeTreeVO typeToTreeVO(DictGroup datum);
 
     /**
      * 字典类型列表转字典类型树列表
@@ -83,7 +83,7 @@ public interface DictMapstruct {
      * @param datum 字典类型列表
      * @return 字典类型树列表
      */
-    List<DictTypeTreeVO> typeToTreeVOS(List<DictType> datum);
+    List<DictTypeTreeVO> typeToTreeVOS(List<DictGroup> datum);
 
     /**
      * 字典数据转字典数据VO

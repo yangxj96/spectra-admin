@@ -2,7 +2,7 @@ package com.yangxj96.spectra.service.core.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
-import com.yangxj96.spectra.service.core.javabean.entity.DictType;
+import com.yangxj96.spectra.service.core.javabean.entity.DictGroup;
 import com.yangxj96.spectra.service.core.mapper.DictTypeMapper;
 import com.yangxj96.spectra.service.core.service.DictTypeService;
 import org.springframework.stereotype.Service;
@@ -15,13 +15,13 @@ import org.springframework.stereotype.Service;
  * @since 2025-6-18
  */
 @Service
-public class DictTypeServiceImpl extends BaseServiceImpl<DictTypeMapper, DictType> implements DictTypeService {
+public class DictTypeServiceImpl extends BaseServiceImpl<DictTypeMapper, DictGroup> implements DictTypeService {
 
     @Override
-    public DictType getByCode(String code) {
+    public DictGroup getByCode(String code) {
         return this.getOne(
-                new LambdaQueryWrapper<DictType>()
-                        .eq(DictType::getCode, code)
+                new LambdaQueryWrapper<DictGroup>()
+                        .eq(DictGroup::getCode, code)
                         .last("LIMIT 1")
         );
     }

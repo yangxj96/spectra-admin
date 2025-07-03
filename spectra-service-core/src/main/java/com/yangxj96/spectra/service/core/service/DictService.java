@@ -18,7 +18,7 @@
 package com.yangxj96.spectra.service.core.service;
 
 import com.yangxj96.spectra.service.core.javabean.from.DictDataFrom;
-import com.yangxj96.spectra.service.core.javabean.from.DictTypeFrom;
+import com.yangxj96.spectra.service.core.javabean.from.DictGroupFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 
@@ -40,7 +40,7 @@ public interface DictService {
      *
      * @param params 入参from
      */
-    void createType(DictTypeFrom params);
+    void createGroup(DictGroupFrom params);
 
     /**
      * 创建字典数据
@@ -54,7 +54,7 @@ public interface DictService {
      *
      * @return 字典类型树
      */
-    List<DictTypeTreeVO> getTypesWrapTree();
+    List<DictTypeTreeVO> listDictGroupWrapTree();
 
     /**
      * 根据字典类型编码获取字典数据列表
@@ -62,5 +62,5 @@ public interface DictService {
      * @param code 字典类型编码
      * @return 字典数据列表
      */
-    List<DictDataVo> getDataByTypeCode(String code);
+    List<DictDataVo> listDictDataByGroupCode(String code);
 }

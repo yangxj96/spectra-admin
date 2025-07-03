@@ -25,8 +25,8 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_system.t_dict_type")
-public class DictType extends BaseEntity implements Serializable {
+@TableName(value = "db_system.t_dict_group")
+public class DictGroup extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
