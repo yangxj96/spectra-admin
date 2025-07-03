@@ -20,8 +20,8 @@ package com.yangxj96.spectra.starter.common.aspectj;
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yangxj96.spectra.starter.common.annotation.ULog;
+import com.yangxj96.spectra.starter.common.configure.ULogEventPublisher;
 import com.yangxj96.spectra.starter.common.entity.ULogEntity;
-import com.yangxj96.spectra.starter.common.service.ULogService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -48,12 +48,12 @@ public class ULogAspect {
 
     private static final String PREFIX = "[ULogAspectj]:";
 
-    private final ULogService service;
+    private final ULogEventPublisher publisher;
 
     private final ObjectMapper om;
 
-    public ULogAspect(ULogService service, ObjectMapper om) {
-        this.service = service;
+    public ULogAspect(ULogEventPublisher publisher, ObjectMapper om) {
+        this.publisher = publisher;
         this.om = om;
     }
 
@@ -94,9 +94,9 @@ public class ULogAspect {
             datum.setStatus((short) response.getStatus());
             datum.setResult(safeWriteValueAsString(result));
             datum.setTimeCost(System.currentTimeMillis() - startTime);
+            datum.setToken(StpUtil.getTokenValue());
 
-            // save方法为异步方法,传递TOKEN到内部,不然无法获取到身份信息
-            service.save(datum, StpUtil.getTokenValue());
+            publisher.save(datum);
             log.atDebug().log(PREFIX + "操作日志-记录结束");
         }
     }
