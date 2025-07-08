@@ -55,21 +55,35 @@ public class DictController {
      *
      * @param params 请求参数
      */
-    @ULog("创建字典类型")
-    @PostMapping("/group/create")
+    @ULog("创建字典组")
+    @PostMapping("/group")
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
         bindService.createGroup(params);
     }
 
     /**
+     * 删除字典组
+     *
+     * @param id 字典组ID
+     */
+    @ULog("删除字典组")
+    @DeleteMapping("/group/{id}")
+    @SaCheckPermission(value = "DICT:DELETE", orRole = "DEV_ADMIN")
+    public void deleteGroup(@PathVariable String id) {
+        bindService.deleteGroup(Long.parseLong(id));
+    }
+
+
+    /**
      * 修改字典组信息
+     *
      * @param params 请求参数
      */
-    @ULog("修改字典数据")
-    @PutMapping("/group/modify")
+    @ULog("修改字典组")
+    @PutMapping("/group")
     @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
-    public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params){
+    public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params) {
         bindService.modifyGroup(params);
     }
 
@@ -79,20 +93,33 @@ public class DictController {
      * @param params 请求参数
      */
     @ULog("创建字典数据")
-    @PostMapping("/data/create")
+    @PostMapping("/data")
     @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }
 
     /**
+     * 删除字典项
+     *
+     * @param id 字典项ID
+     */
+    @ULog("删除字典项")
+    @DeleteMapping("/data/{id}")
+    @SaCheckPermission(value = "DICT:DELETE", orRole = "DEV_ADMIN")
+    public void deleteData(@PathVariable String id) {
+        bindService.deleteData(Long.parseLong(id));
+    }
+
+    /**
      * 修改字典数据
+     *
      * @param params 请求参数
      */
     @ULog("修改字典数据")
-    @PutMapping("/data/modify")
+    @PutMapping("/data")
     @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
-    public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params){
+    public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params) {
         bindService.modifyData(params);
     }
 

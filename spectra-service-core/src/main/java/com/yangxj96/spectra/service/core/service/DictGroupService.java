@@ -10,7 +10,7 @@ import com.yangxj96.spectra.service.core.javabean.entity.DictGroup;
  * @version 1.0
  * @since 2025-6-18
  */
-public interface DictTypeService extends BaseService<DictGroup> {
+public interface DictGroupService extends BaseService<DictGroup> {
 
     /**
      * 根据字典类型编码获取字典类型

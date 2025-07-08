@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.service.core.javabean.entity.DictGroup;
 import com.yangxj96.spectra.service.core.mapper.DictTypeMapper;
-import com.yangxj96.spectra.service.core.service.DictTypeService;
+import com.yangxj96.spectra.service.core.service.DictGroupService;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
  * @since 2025-6-18
  */
 @Service
-public class DictTypeServiceImpl extends BaseServiceImpl<DictTypeMapper, DictGroup> implements DictTypeService {
+public class DictGroupServiceImpl extends BaseServiceImpl<DictTypeMapper, DictGroup> implements DictGroupService {
 
     @Override
     public DictGroup getByCode(String code) {

@@ -28,8 +28,8 @@ import com.yangxj96.spectra.service.core.javabean.mapstruct.DictMapstruct;
 import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.javabean.vo.DictTypeTreeVO;
 import com.yangxj96.spectra.service.core.service.DictDataService;
+import com.yangxj96.spectra.service.core.service.DictGroupService;
 import com.yangxj96.spectra.service.core.service.DictService;
-import com.yangxj96.spectra.service.core.service.DictTypeService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +55,7 @@ public class DictServiceImpl implements DictService {
     private DictMapstruct mapstruct;
 
     @Resource
-    private DictTypeService typeService;
+    private DictGroupService groupService;
 
     @Resource
     private DictDataService dataService;
@@ -65,14 +65,35 @@ public class DictServiceImpl implements DictService {
     @Transactional
     public void createGroup(DictGroupFrom params) {
         DictGroup entity = mapstruct.groupFromToEntity(params);
-        typeService.save(entity);
+        groupService.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void deleteGroup(Long id) {
+        DictGroup group = groupService.getById(id);
+        if (null == group) {
+            throw new DataNotExistException("字典组不存在");
+        }
+        if (Boolean.TRUE.equals(group.getBuiltin())) {
+            throw new RuntimeException("内置字典,无法删除");
+        }
+        // 获取他的字典数据
+        List<DictData> dictData = dataService.listByGid(id);
+        dataService.removeBatchByIds(dictData.stream().map(DictData::getId).toList());
+        // 删除字典组
+        groupService.removeById(id);
     }
 
     @Override
     @Transactional
     public void modifyGroup(DictGroupFrom params) {
+        DictGroup group = groupService.getById(params.getId());
+        if (Boolean.TRUE.equals(group.getBuiltin())) {
+            throw new RuntimeException("内置字典,无法修改");
+        }
         DictGroup entity = mapstruct.groupFromToEntity(params);
-        typeService.updateById(entity);
+        groupService.updateById(entity);
     }
 
     @Override
@@ -84,7 +105,25 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
+    public void deleteData(Long id) {
+        DictData dictData = dataService.getById(id);
+        if (null == dictData) {
+            throw new DataNotExistException("字典项不存在");
+        }
+        DictGroup group = groupService.getById(dictData.getGid());
+        if (Boolean.TRUE.equals(group.getBuiltin())) {
+            throw new RuntimeException("内置字典,无法删除");
+        }
+        dataService.removeById(id);
+    }
+
+    @Override
+    @Transactional
     public void modifyData(DictDataFrom params) {
+        DictGroup group = groupService.getById(params.getGid());
+        if (Boolean.TRUE.equals(group.getBuiltin())) {
+            throw new RuntimeException("内置字典,无法修改");
+        }
         DictData entity = mapstruct.dataFromToEntity(params);
         dataService.updateById(entity);
     }
@@ -96,17 +135,18 @@ public class DictServiceImpl implements DictService {
         wrapper
                 .eq(DictGroup::getState, 0)
                 .eq(DictGroup::getHide, Boolean.FALSE);
-        List<DictGroup> menus = typeService.list(wrapper);
+        List<DictGroup> menus = groupService.list(wrapper);
         List<DictTypeTreeVO> vos = mapstruct.typeToTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
     public List<DictDataVo> listDictDataByGroupCode(String code) {
-        DictGroup type = typeService.getByCode(code);
-        if (null == type) {
+        DictGroup group = groupService.getByCode(code);
+        if (null == group) {
             throw new DataNotExistException("字典类型不存在");
         }
-        return dataService.listByDictGid(type.getId());
+        List<DictData> dictData = dataService.listByGid(group.getId());
+        return mapstruct.dataToVos(dictData);
     }
 }

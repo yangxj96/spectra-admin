@@ -2,7 +2,6 @@ package com.yangxj96.spectra.service.core.service;
 
 import com.yangxj96.spectra.common.base.BaseService;
 import com.yangxj96.spectra.service.core.javabean.entity.DictData;
-import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 
 import java.util.List;
 
@@ -16,10 +15,10 @@ import java.util.List;
 public interface DictDataService extends BaseService<DictData> {
 
     /**
-     * 根据字典类型ID获取字典数据列表
+     * 根据字典组ID查询字典数据列表
      *
-     * @param id 字典类型ID
+     * @param gid 字典组ID
      * @return 字典数据列表
      */
-    List<DictDataVo> listByDictGid(Long id);
+    List<DictData> listByGid(Long gid);
 }

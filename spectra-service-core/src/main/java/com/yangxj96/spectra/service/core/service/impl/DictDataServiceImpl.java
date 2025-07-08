@@ -3,11 +3,8 @@ package com.yangxj96.spectra.service.core.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.yangxj96.spectra.common.base.BaseServiceImpl;
 import com.yangxj96.spectra.service.core.javabean.entity.DictData;
-import com.yangxj96.spectra.service.core.javabean.mapstruct.DictMapstruct;
-import com.yangxj96.spectra.service.core.javabean.vo.DictDataVo;
 import com.yangxj96.spectra.service.core.mapper.DictDataMapper;
 import com.yangxj96.spectra.service.core.service.DictDataService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,15 +19,10 @@ import java.util.List;
 @Service
 public class DictDataServiceImpl extends BaseServiceImpl<DictDataMapper, DictData> implements DictDataService {
 
-    @Resource
-    private DictMapstruct mapstruct;
-
-
     @Override
-    public List<DictDataVo> listByDictGid(Long id) {
+    public List<DictData> listByGid(Long gid) {
         var wrapper = new LambdaQueryWrapper<DictData>()
-                .eq(DictData::getGid, id);
-        List<DictData> list = this.list(wrapper);
-        return mapstruct.dataToVos(list);
+                .eq(DictData::getGid, gid);
+        return this.list(wrapper);
     }
 }

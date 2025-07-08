@@ -43,7 +43,15 @@ public interface DictService {
     void createGroup(DictGroupFrom params);
 
     /**
+     * 根据ID删除字典组
+     *
+     * @param id 字典组主键ID
+     */
+    void deleteGroup(Long id);
+
+    /**
      * 修改字典组
+     *
      * @param params 入参from
      */
     void modifyGroup(DictGroupFrom params);
@@ -54,6 +62,13 @@ public interface DictService {
      * @param params 入参from
      */
     void createData(DictDataFrom params);
+
+    /**
+     * 根据ID删除字典数据
+     *
+     * @param id 字典数据ID
+     */
+    void deleteData(Long id);
 
     /**
      * 修改字典数据

@@ -67,7 +67,7 @@ public class DictGroup extends BaseEntity implements Serializable {
     private Boolean builtin;
 
     /**
-     * 是否隐藏,为true则前端不可直接进行修改删除等操作
+     * 是否隐藏,为true则前端不可见
      */
     @TableField(value = "hide")
     private Boolean hide;
