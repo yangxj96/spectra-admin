@@ -9,7 +9,7 @@
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="email"      jdbcType="VARCHAR"   property="email"/>
         <result column="avatar"     jdbcType="VARCHAR"   property="avatar"/>
-        <result column="state"      jdbcType="VARCHAR"   property="state"/>
+        <result column="state"      jdbcType="SMALLINT"  property="state"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>

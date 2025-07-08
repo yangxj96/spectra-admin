@@ -18,7 +18,6 @@
 package com.yangxj96.spectra.service.auth.javabean.from;
 
 import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.common.enums.UserState;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -64,7 +63,7 @@ public class UserSaveFrom {
      * 用户状态
      */
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private UserState state;
+    private Short state;
 
     /**
      * 角色ID列表

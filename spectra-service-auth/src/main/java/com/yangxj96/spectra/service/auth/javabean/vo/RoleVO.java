@@ -20,7 +20,6 @@ package com.yangxj96.spectra.service.auth.javabean.vo;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.yangxj96.spectra.common.enums.PowerScope;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -64,7 +63,7 @@ public class RoleVO implements Serializable {
      * 范围
      */
     @TableField(value = "\"scope\"")
-    private PowerScope scope;
+    private Short scope;
 
     /**
      * 备注

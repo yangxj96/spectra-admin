@@ -19,7 +19,6 @@ package com.yangxj96.spectra.service.auth.javabean.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.yangxj96.spectra.common.enums.UserState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -69,7 +68,7 @@ public class UserPageVO implements Serializable {
     /**
      * 用户状态
      */
-    private UserState state;
+    private Short state;
 
     /**
      * 角色列表

@@ -18,7 +18,6 @@
 package com.yangxj96.spectra.service.auth.javabean.from;
 
 import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.common.enums.PowerScope;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -54,7 +53,7 @@ public class RoleFrom {
     /**
      * 范围
      */
-    private PowerScope scope;
+    private Short scope;
 
     /**
      * 状态

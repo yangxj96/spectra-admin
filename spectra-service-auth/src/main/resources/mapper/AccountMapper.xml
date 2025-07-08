@@ -9,7 +9,7 @@
         <result column="username"   jdbcType="VARCHAR"   property="username"/>
         <result column="password"   jdbcType="VARCHAR"   property="password"/>
         <result column="user_id"    jdbcType="BOOLEAN"   property="userId"/>
-        <result column="type"       jdbcType="BOOLEAN"   property="type"/>
+        <result column="type"       jdbcType="SMALLINT"  property="type"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
         <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>

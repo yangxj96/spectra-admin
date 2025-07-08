@@ -20,7 +20,6 @@ package com.yangxj96.spectra.service.auth.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yangxj96.spectra.common.base.BaseEntity;
-import com.yangxj96.spectra.common.enums.UserState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -70,5 +69,5 @@ public class User extends BaseEntity implements Serializable {
      * 用户状态
      */
     @TableField(value = "state")
-    private UserState state;
+    private Short state;
 }

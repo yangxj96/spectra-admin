@@ -18,7 +18,6 @@
 package com.yangxj96.spectra.service.core.javabean.from;
 
 import com.yangxj96.spectra.common.base.Verify;
-import com.yangxj96.spectra.common.enums.CommonState;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
@@ -67,7 +66,7 @@ public class DictGroupFrom {
      * 字典状态
      */
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private CommonState state;
+    private Short state;
 
     /**
      * 备注

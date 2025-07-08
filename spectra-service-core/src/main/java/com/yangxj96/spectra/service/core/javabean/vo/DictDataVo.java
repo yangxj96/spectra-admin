@@ -19,7 +19,6 @@ package com.yangxj96.spectra.service.core.javabean.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.yangxj96.spectra.common.enums.CommonState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -74,7 +73,7 @@ public class DictDataVo implements Serializable {
     /**
      * 状态
      */
-    private CommonState state;
+    private Short state;
 
     /**
      * 备注

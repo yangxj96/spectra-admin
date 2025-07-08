@@ -3,7 +3,6 @@ package com.yangxj96.spectra.service.core.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.yangxj96.spectra.common.base.BaseEntity;
-import com.yangxj96.spectra.common.enums.CommonState;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -53,7 +52,7 @@ public class DictGroup extends BaseEntity implements Serializable {
      * 字典状态
      */
     @TableField(value = "\"state\"")
-    private CommonState state;
+    private Short state;
 
     /**
      * 备注

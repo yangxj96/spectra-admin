@@ -1,7 +1,6 @@
 package com.yangxj96.spectra.service.core;
 
 import com.yangxj96.spectra.common.enums.AccountType;
-import com.yangxj96.spectra.common.enums.UserState;
 import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;
 import com.yangxj96.spectra.service.auth.service.AccountService;
@@ -49,7 +48,7 @@ class AuthControllerTest {
                 .name("平台管理员")
                 .email("sysadmin@pt.com")
                 .avatar(null)
-                .state(UserState.NORMAL)
+                .state((short) 0)
                 .build();
         boolean save = userService.save(datum);
         Assert.isTrue(save, "保存失败");
