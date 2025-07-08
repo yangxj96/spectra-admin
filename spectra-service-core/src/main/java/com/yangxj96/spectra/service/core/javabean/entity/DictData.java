@@ -33,8 +33,8 @@ public class DictData extends BaseEntity implements Serializable {
     /**
      * 字典类型ID
      */
-    @TableField(value = "dict_type_id")
-    private Long dictTypeId;
+    @TableField(value = "gid")
+    private Long gid;
 
     /**
      * 标签

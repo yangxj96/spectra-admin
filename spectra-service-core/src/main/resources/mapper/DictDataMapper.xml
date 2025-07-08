@@ -6,7 +6,7 @@
         <!--@mbg.generated-->
         <!--@Table db_system.t_dict_data-->
         <id     column="id"           jdbcType="BIGINT"    property="id"/>
-        <result column="dict_type_id" jdbcType="BIGINT"    property="dictTypeId"/>
+        <result column="gid"          jdbcType="BIGINT"    property="gid"/>
         <result column="label"        jdbcType="VARCHAR"   property="label"/>
         <result column="value"        jdbcType="VARCHAR"   property="value"/>
         <result column="sort"         jdbcType="SMALLINT"  property="sort"/>
@@ -22,7 +22,7 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
-        dict_type_id,
+        gid,
         "label",
         "value",
         sort,

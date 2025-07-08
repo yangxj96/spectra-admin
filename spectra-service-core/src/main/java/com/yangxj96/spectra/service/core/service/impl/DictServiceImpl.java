@@ -107,6 +107,6 @@ public class DictServiceImpl implements DictService {
         if (null == type) {
             throw new DataNotExistException("字典类型不存在");
         }
-        return dataService.listByDictTypeId(type.getId());
+        return dataService.listByDictGid(type.getId());
     }
 }

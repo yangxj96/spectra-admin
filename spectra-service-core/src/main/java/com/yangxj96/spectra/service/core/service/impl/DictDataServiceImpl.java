@@ -27,9 +27,9 @@ public class DictDataServiceImpl extends BaseServiceImpl<DictDataMapper, DictDat
 
 
     @Override
-    public List<DictDataVo> listByDictTypeId(Long id) {
+    public List<DictDataVo> listByDictGid(Long id) {
         var wrapper = new LambdaQueryWrapper<DictData>()
-                .eq(DictData::getDictTypeId, id);
+                .eq(DictData::getGid, id);
         List<DictData> list = this.list(wrapper);
         return mapstruct.dataToVos(list);
     }

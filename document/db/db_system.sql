@@ -343,20 +343,20 @@ COMMENT ON COLUMN db_system.t_dict_group.hide IS '是否隐藏,为true则前端�
 DROP TABLE IF EXISTS db_system.t_dict_data;
 CREATE TABLE IF NOT EXISTS db_system.t_dict_data
 (
-    id           BIGINT PRIMARY KEY,
+    id         BIGINT PRIMARY KEY,
 
-    dict_type_id BIGINT       NOT NULL,
-    label        VARCHAR(100) NOT NULL,
-    value        VARCHAR(100) NOT NULL,
-    sort         int2         NOT NULL DEFAULT 0,
-    state        int2         NOT NULL,
-    remark       VARCHAR(255),
+    gid        BIGINT       NOT NULL,
+    label      VARCHAR(100) NOT NULL,
+    value      VARCHAR(100) NOT NULL,
+    sort       int2         NOT NULL DEFAULT 0,
+    state      int2         NOT NULL,
+    remark     VARCHAR(255),
 
-    created_by   BIGINT,
-    created_at   TIMESTAMP,
-    updated_by   BIGINT,
-    updated_at   TIMESTAMP,
-    deleted      TIMESTAMP
+    created_by BIGINT,
+    created_at TIMESTAMP,
+    updated_by BIGINT,
+    updated_at TIMESTAMP,
+    deleted    TIMESTAMP
 );
 COMMENT ON TABLE db_system.t_dict_data IS '数据字典(字典值)';
 COMMENT ON COLUMN db_system.t_dict_data.id IS '主键ID';
@@ -365,7 +365,7 @@ COMMENT ON COLUMN db_system.t_dict_data.created_at IS '创建时间';
 COMMENT ON COLUMN db_system.t_dict_data.updated_by IS '最后更新人';
 COMMENT ON COLUMN db_system.t_dict_data.updated_at IS '最后更新时间';
 COMMENT ON COLUMN db_system.t_dict_data.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_dict_data.dict_type_id IS '字典类型ID';
+COMMENT ON COLUMN db_system.t_dict_data.gid IS '字典类型ID';
 COMMENT ON COLUMN db_system.t_dict_data.label IS '标签';
 COMMENT ON COLUMN db_system.t_dict_data.value IS '值';
 COMMENT ON COLUMN db_system.t_dict_data.sort IS '排序';

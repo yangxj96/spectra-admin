@@ -21,5 +21,5 @@ public interface DictDataService extends BaseService<DictData> {
      * @param id 字典类型ID
      * @return 字典数据列表
      */
-    List<DictDataVo> listByDictTypeId(Long id);
+    List<DictDataVo> listByDictGid(Long id);
 }

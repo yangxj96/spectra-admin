@@ -53,7 +53,7 @@ public class DictDataVo implements Serializable {
      * 字典类型ID
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long dictTypeId;
+    private Long gid;
 
     /**
      * 标签
