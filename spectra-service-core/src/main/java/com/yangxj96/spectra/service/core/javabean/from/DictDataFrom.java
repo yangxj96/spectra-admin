@@ -49,7 +49,7 @@ public class DictDataFrom {
      * 字典类型ID
      */
     @NotNull(message = "字典类型不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Long dictTypeId;
+    private Long gid;
 
     /**
      * 标签

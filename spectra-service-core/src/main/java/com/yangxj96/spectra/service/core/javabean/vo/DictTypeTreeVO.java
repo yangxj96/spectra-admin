@@ -55,6 +55,7 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     /**
      * 父级ID
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
     /**
