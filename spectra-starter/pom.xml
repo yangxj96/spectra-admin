@@ -14,7 +14,7 @@
     <modules>
         <module>spectra-starter-common</module>
         <module>spectra-starter-db</module>
-        <module>spectra-starter-scurity</module>
+        <module>spectra-starter-security</module>
         <module>spectra-starter-fileupload</module>
     </modules>
 

@@ -32,7 +32,7 @@
         </dependency>
         <dependency>
             <groupId>com.yangxj96.spectra</groupId>
-            <artifactId>spectra-starter-scurity</artifactId>
+            <artifactId>spectra-starter-security</artifactId>
             <version>${project.version}</version>
         </dependency>
 
