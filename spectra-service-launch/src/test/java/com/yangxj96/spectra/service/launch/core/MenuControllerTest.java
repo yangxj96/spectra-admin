@@ -1,11 +1,15 @@
-package com.yangxj96.spectra.service.core;
+package com.yangxj96.spectra.service.launch.core;
 
 import com.yangxj96.spectra.service.core.javabean.entity.Menu;
 import com.yangxj96.spectra.service.core.service.MenuService;
+import com.yangxj96.spectra.service.launch.SpectraApplication;
+import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import java.util.Arrays;
 
@@ -16,11 +20,18 @@ import java.util.Arrays;
  * @version 1.0
  * @since 2025-6-14
  */
-@SpringBootTest
+@SpringBootTest(classes = SpectraApplication.class)
 class MenuControllerTest {
 
     @Resource
     private MenuService menuService;
+
+    @DynamicPropertySource
+    static void jasyptProperties(DynamicPropertyRegistry registry) {
+        Dotenv dotenv = Dotenv.configure().directory("../.env").load();
+        String jasyptPassword = dotenv.get("JASYPT_ENCRYPTOR_PASSWORD");
+        registry.add("jasypt.encryptor.password", () -> jasyptPassword);
+    }
 
     // 插入父级
     @Test

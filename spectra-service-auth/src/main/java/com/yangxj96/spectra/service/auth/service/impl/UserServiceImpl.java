@@ -30,7 +30,7 @@ import com.yangxj96.spectra.service.auth.javabean.entity.User;
 import com.yangxj96.spectra.service.auth.javabean.from.UserPageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserRelevanceRolesFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserSaveFrom;
-import com.yangxj96.spectra.service.auth.javabean.mapstruct.RoleMapstruct;
+import com.yangxj96.spectra.service.auth.javabean.mapstruct.PermissionMapstruct;
 import com.yangxj96.spectra.service.auth.javabean.mapstruct.UserMapstruct;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.UserPageVO;
@@ -73,7 +73,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private RoleService roleService;
 
     @Resource
-    private RoleMapstruct roleMapstruct;
+    private PermissionMapstruct permissionMapstruct;
 
     @Resource
     private AccountService accountService;
@@ -97,7 +97,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.getRecords().forEach(vo -> {
             var roles = roleService.getByUserId(vo.getId());
             if (null != roles && !roles.isEmpty()) {
-                vo.setRoles((ArrayList<RoleVO>) roleMapstruct.toVOs(roles));
+                vo.setRoles((ArrayList<RoleVO>) permissionMapstruct.roleToVOs(roles));
             }
         });
         // 响应

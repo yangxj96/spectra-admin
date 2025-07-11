@@ -18,7 +18,9 @@
 package com.yangxj96.spectra.service.auth.javabean.mapstruct;
 
 
+import com.yangxj96.spectra.service.auth.javabean.entity.Authority;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
+import com.yangxj96.spectra.service.auth.javabean.vo.AuthorityTreeVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 import org.mapstruct.Mapper;
 
@@ -32,9 +34,37 @@ import java.util.List;
  * @since 2025-6-14
  */
 @Mapper(componentModel = "spring")
-public interface RoleMapstruct {
+public interface PermissionMapstruct {
 
-    RoleVO toVO(Role role);
+    /**
+     * 角色实体到VO
+     *
+     * @param role 角色实体
+     * @return 角色VO
+     */
+    RoleVO roleToVO(Role role);
 
-    List<RoleVO> toVOs(List<Role> roles);
+    /**
+     * 角色实体列表到VO列表
+     *
+     * @param roles 角色实体列表
+     * @return 角色VO列表
+     */
+    List<RoleVO> roleToVOs(List<Role> roles);
+
+    /**
+     * 权限实体到权限树形VO
+     *
+     * @param authority 权限实体
+     * @return 权限树形VO
+     */
+    AuthorityTreeVO authorityToTreeVo(Authority authority);
+
+    /**
+     * 权限实体列表到权限树形VO列表
+     *
+     * @param authority 权限实体列表
+     * @return 权限树形VO列表
+     */
+    List<AuthorityTreeVO> authorityToTreeVos(List<Authority> authority);
 }

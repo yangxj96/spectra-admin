@@ -17,11 +17,13 @@
 
 package com.yangxj96.spectra.service.auth.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RoleFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RolePageFrom;
+import com.yangxj96.spectra.service.auth.javabean.vo.AuthorityTreeVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 import com.yangxj96.spectra.service.auth.service.PermissionService;
 import com.yangxj96.spectra.starter.common.annotation.ULog;
@@ -38,6 +40,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-14
  */
+@SaCheckLogin
 @RestController
 @RequestMapping("/permission")
 public class PermissionController {
@@ -53,7 +56,7 @@ public class PermissionController {
      * @return 分页结果
      */
     @ULog("分页查询角色列表")
-    @GetMapping("/pageRole")
+    @GetMapping("/role/page")
     public IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params) {
         return bindService.pageRole(page, params);
     }
@@ -64,7 +67,7 @@ public class PermissionController {
      * @return 角色列表
      */
     @ULog("查询角色列表")
-    @GetMapping("/listRole")
+    @GetMapping("/role/list")
     public List<RoleVO> listRole() {
         return bindService.listRole();
     }
@@ -75,7 +78,7 @@ public class PermissionController {
      * @param params 角色实体
      */
     @ULog("创建角色")
-    @PostMapping("/createdRole")
+    @PostMapping("/role")
     public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.createdRole(params);
     }
@@ -86,9 +89,19 @@ public class PermissionController {
      * @param params 角色实体
      */
     @ULog("修改角色信息")
-    @PutMapping("/modifyRole")
+    @PutMapping("/role")
     public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         bindService.modifyRole(params);
     }
 
+    /**
+     * 获取权限树
+     *
+     * @return 权限树列表
+     */
+    @ULog("获取权限树列表")
+    @GetMapping("/authority/tree")
+    public List<AuthorityTreeVO> authorityTree() {
+        return bindService.authorityTree();
+    }
 }

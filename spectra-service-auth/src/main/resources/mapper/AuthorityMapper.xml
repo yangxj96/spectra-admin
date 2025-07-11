@@ -6,6 +6,7 @@
         <!--@mbg.generated-->
         <!--@Table db_auth.t_authority-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
+        <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="code"       jdbcType="VARCHAR"   property="code"/>
         <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
@@ -18,6 +19,7 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
+        pid,
         "name",
         code,
         created_by,

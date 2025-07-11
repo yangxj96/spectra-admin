@@ -122,6 +122,7 @@ CREATE TABLE IF NOT EXISTS db_auth.t_authority
 (
     id         BIGINT PRIMARY KEY,
 
+    pid        BIGINT,
     name       VARCHAR(100),
     code       VARCHAR(100),
 
@@ -138,6 +139,7 @@ COMMENT ON COLUMN db_auth.t_authority.created_at IS '创建时间';
 COMMENT ON COLUMN db_auth.t_authority.updated_by IS '最后更新人';
 COMMENT ON COLUMN db_auth.t_authority.updated_at IS '最后更新时间';
 COMMENT ON COLUMN db_auth.t_authority.deleted IS '是否删除';
+COMMENT ON COLUMN db_auth.t_authority.pid IS '父级ID,用于构建树形结构';
 COMMENT ON COLUMN db_auth.t_authority.name IS '权限名称';
 COMMENT ON COLUMN db_auth.t_authority.code IS '权限编码';
 

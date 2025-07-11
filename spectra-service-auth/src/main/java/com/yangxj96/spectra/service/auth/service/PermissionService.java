@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RoleFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RolePageFrom;
+import com.yangxj96.spectra.service.auth.javabean.vo.AuthorityTreeVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 
 import java.util.List;
@@ -64,5 +65,12 @@ public interface PermissionService {
      * @return 角色列表
      */
     List<RoleVO> listRole();
+
+    /**
+     * 获取权限树
+     *
+     * @return 权限树列表
+     */
+    List<AuthorityTreeVO> authorityTree();
 
 }

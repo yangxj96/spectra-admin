@@ -21,11 +21,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import com.yangxj96.spectra.common.constant.Common;
+import com.yangxj96.spectra.common.utils.TreeBuilder;
+import com.yangxj96.spectra.service.auth.javabean.entity.Authority;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.javabean.from.RoleFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.RolePageFrom;
-import com.yangxj96.spectra.service.auth.javabean.mapstruct.RoleMapstruct;
+import com.yangxj96.spectra.service.auth.javabean.mapstruct.PermissionMapstruct;
+import com.yangxj96.spectra.service.auth.javabean.vo.AuthorityTreeVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
+import com.yangxj96.spectra.service.auth.service.AuthorityService;
 import com.yangxj96.spectra.service.auth.service.PermissionService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import jakarta.annotation.Resource;
@@ -50,7 +55,10 @@ public class PermissionServiceImpl implements PermissionService {
     private RoleService roleService;
 
     @Resource
-    private RoleMapstruct roleMapstruct;
+    private AuthorityService authorityService;
+
+    @Resource
+    private PermissionMapstruct mapstruct;
 
     @Override
     @Transactional
@@ -78,14 +86,21 @@ public class PermissionServiceImpl implements PermissionService {
         Page<Role> db = roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         Page<RoleVO> result = new Page<>();
         BeanUtils.copyProperties(db, result);
-        result.setRecords(roleMapstruct.toVOs(db.getRecords()));
+        result.setRecords(mapstruct.roleToVOs(db.getRecords()));
         return result;
     }
 
     @Override
     public List<RoleVO> listRole() {
         var wrapper = new LambdaQueryWrapper<Role>();
-        wrapper.eq(Role::getState,Boolean.TRUE);
-        return roleMapstruct.toVOs(roleService.list(wrapper));
+        wrapper.eq(Role::getState, Boolean.TRUE);
+        return mapstruct.roleToVOs(roleService.list(wrapper));
+    }
+
+    @Override
+    public List<AuthorityTreeVO> authorityTree() {
+        List<Authority> authorities = authorityService.list();
+        List<AuthorityTreeVO> vos = mapstruct.authorityToTreeVos(authorities);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 }
