@@ -23,6 +23,7 @@ import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.javabean.vo.AuthorityTreeVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -58,6 +59,7 @@ public interface PermissionMapstruct {
      * @param authority 权限实体
      * @return 权限树形VO
      */
+    @Mapping(target = "children", ignore = true)
     AuthorityTreeVO authorityToTreeVo(Authority authority);
 
     /**
