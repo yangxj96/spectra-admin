@@ -7,9 +7,14 @@ import com.yangxj96.spectra.starter.common.configure.RequestGetParamsFilter;
 import com.yangxj96.spectra.starter.common.configure.ResponseBodyModifyConfiguration;
 import com.yangxj96.spectra.starter.common.configure.ULogEventPublisher;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.support.TaskExecutorAdapter;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * 通用的一些自动配置
@@ -53,23 +58,22 @@ public class CommonAutoConfiguration {
         return new ULogAspect(publisher, om);
     }
 
-    ///**
-    // * 配置一个用于日志保存的异步线程池
-    // *
-    // * @return {@link Executor}
-    // */
-    //@Bean
-    //@ConditionalOnBean(ULogAspect.class)
-    //public Executor uLogTaskExecutor() {
-    //    log.atDebug().log(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
-    //    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-    //    executor.setCorePoolSize(5);
-    //    executor.setMaxPoolSize(10);
-    //    executor.setQueueCapacity(100);
-    //    executor.setThreadNamePrefix("ULog-Async-");
-    //    executor.setWaitForTasksToCompleteOnShutdown(true);
-    //    executor.initialize();
-    //    return executor;
-    //}
+
+    /**
+     * 配置一个用于日志保存的异步线程池
+     *
+     * @return {@link Executor}
+     */
+    @Bean
+    @ConditionalOnBean(ULogAspect.class)
+    public Executor uLogTaskExecutor() {
+        log.atDebug().log(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
+        return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(
+                Thread
+                        .ofVirtual()
+                        .name("ULog-Async-", 0)
+                        .factory()
+        ));
+    }
 
 }
