@@ -19,6 +19,10 @@ package com.yangxj96.spectra.service.core.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.yangxj96.spectra.service.core.javabean.entity.Organization;
+import com.yangxj96.spectra.service.core.javabean.from.OrganizationFrom;
+import com.yangxj96.spectra.service.core.javabean.vo.OrganizationTreeVo;
+
+import java.util.List;
 
 /**
  * 组织机构业务层
@@ -29,5 +33,24 @@ import com.yangxj96.spectra.service.core.javabean.entity.Organization;
  */
 public interface OrganizationService extends IService<Organization> {
 
+    /**
+     * 组织机构树形结构
+     *
+     * @return 组织机构树形结构数组
+     */
+    List<OrganizationTreeVo> tree();
 
+    /**
+     * 新增组织机构
+     *
+     * @param from 请求入参
+     */
+    void created(OrganizationFrom from);
+
+    /**
+     * 编辑组织机构
+     *
+     * @param from 请求入参
+     */
+    void modify(OrganizationFrom from);
 }

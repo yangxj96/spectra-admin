@@ -30,7 +30,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 组织机构业务层-实现
+ * 组织机构
  *
  * @author Jack Young
  * @version 1.0
@@ -66,10 +66,22 @@ public class Organization extends BaseEntity implements Serializable {
     private String code;
 
     /**
-     * 类型
+     * 组织机构类型
      */
     @TableField(value = "\"type\"")
     private Short type;
+
+    /**
+     * 组织机构所在地址
+     */
+    @TableField(value = "address")
+    private String address;
+
+    /**
+     * 负责人ID
+     */
+    @TableField(value = "manager_id")
+    private Long managerId;
 
     /**
      * 备注

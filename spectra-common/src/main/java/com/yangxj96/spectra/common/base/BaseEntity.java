@@ -58,7 +58,7 @@ public class BaseEntity implements Serializable {
     /**
      * 创建时间
      */
-    @OrderBy
+    @OrderBy(asc = true)
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

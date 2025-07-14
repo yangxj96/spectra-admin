@@ -249,8 +249,10 @@ CREATE TABLE IF NOT EXISTS db_system.t_organization
     pid        BIGINT,
     name       VARCHAR(100) NOT NULL,
     code       VARCHAR(100) NOT NULL,
-    type       int2         NOT NULL,
-    remark     VARCHAR(255) NOT NULL,
+    type       int2,
+    address    VARCHAR(255) NOT NULL,
+    manager_id BIGINT,
+    remark     VARCHAR(255),
 
     created_by BIGINT,
     created_at TIMESTAMP,
@@ -258,6 +260,9 @@ CREATE TABLE IF NOT EXISTS db_system.t_organization
     updated_at TIMESTAMP,
     deleted    TIMESTAMP
 );
+-- 索引
+CREATE UNIQUE INDEX IF NOT EXISTS idx_t_organization_name_unique ON db_system.t_organization (name);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_t_organization_code_unique ON db_system.t_organization (code);
 COMMENT ON TABLE db_system.t_organization IS '组织机构';
 COMMENT ON COLUMN db_system.t_organization.id IS '主键ID';
 COMMENT ON COLUMN db_system.t_organization.created_by IS '创建人';
@@ -268,41 +273,10 @@ COMMENT ON COLUMN db_system.t_organization.deleted IS '是否删除';
 COMMENT ON COLUMN db_system.t_organization.pid IS '上级ID';
 COMMENT ON COLUMN db_system.t_organization.name IS '名称';
 COMMENT ON COLUMN db_system.t_organization.code IS '编码';
-COMMENT ON COLUMN db_system.t_organization.type IS '类型';
+COMMENT ON COLUMN db_system.t_organization.type IS '公司类型';
+COMMENT ON COLUMN db_system.t_organization.address IS '注册地址';
+COMMENT ON COLUMN db_system.t_organization.manager_id IS '负责人ID';
 COMMENT ON COLUMN db_system.t_organization.remark IS '备注';
-
--- 部门
-DROP TABLE IF EXISTS db_system.t_department;
-CREATE TABLE IF NOT EXISTS db_system.t_department
-(
-    id         BIGINT PRIMARY KEY,
-
-    name       VARCHAR(100) NOT NULL,
-    code       VARCHAR(100) NOT NULL,
-    pid        BIGINT,
-    org_id     BIGINT       NOT NULL,
-    manager_id BIGINT       NOT NULL,
-    remark     VARCHAR(255) NOT NULL,
-
-    created_by BIGINT,
-    created_at TIMESTAMP,
-    updated_by BIGINT,
-    updated_at TIMESTAMP,
-    deleted    TIMESTAMP
-);
-COMMENT ON TABLE db_system.t_department IS '部门';
-COMMENT ON COLUMN db_system.t_department.id IS '主键ID';
-COMMENT ON COLUMN db_system.t_department.created_by IS '创建人';
-COMMENT ON COLUMN db_system.t_department.created_at IS '创建时间';
-COMMENT ON COLUMN db_system.t_department.updated_by IS '最后更新人';
-COMMENT ON COLUMN db_system.t_department.updated_at IS '最后更新时间';
-COMMENT ON COLUMN db_system.t_department.deleted IS '是否删除';
-COMMENT ON COLUMN db_system.t_department.name IS '名称';
-COMMENT ON COLUMN db_system.t_department.code IS '编码';
-COMMENT ON COLUMN db_system.t_department.pid IS '上级ID';
-COMMENT ON COLUMN db_system.t_department.org_id IS '组织机构ID';
-COMMENT ON COLUMN db_system.t_department.manager_id IS '部门负责人ID';
-COMMENT ON COLUMN db_system.t_department.remark IS '备注';
 
 
 -- 数据字典(字典组)

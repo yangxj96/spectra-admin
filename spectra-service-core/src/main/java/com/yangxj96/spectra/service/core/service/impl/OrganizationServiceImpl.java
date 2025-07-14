@@ -18,10 +18,20 @@
 package com.yangxj96.spectra.service.core.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.yangxj96.spectra.common.constant.Common;
+import com.yangxj96.spectra.common.utils.TreeBuilder;
 import com.yangxj96.spectra.service.core.javabean.entity.Organization;
+import com.yangxj96.spectra.service.core.javabean.from.OrganizationFrom;
+import com.yangxj96.spectra.service.core.javabean.mapstruct.OrganizationMapstruct;
+import com.yangxj96.spectra.service.core.javabean.vo.OrganizationTreeVo;
 import com.yangxj96.spectra.service.core.mapper.OrganizationMapper;
 import com.yangxj96.spectra.service.core.service.OrganizationService;
+import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
+import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * 组织机构业务层-实现
@@ -32,5 +42,33 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
+
+    @Resource
+    private OrganizationMapstruct mapstruct;
+
+    @Override
+    public List<OrganizationTreeVo> tree() {
+        var list = this.list();
+        var vos = mapstruct.toTreeVOS(list);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
+    }
+
+    @Override
+    @Transactional
+    public void created(OrganizationFrom from) {
+        Organization entity = mapstruct.toEntity(from);
+        this.save(entity);
+    }
+
+    @Override
+    @Transactional
+    public void modify(OrganizationFrom from) {
+        Organization organization = this.getById(from.getId());
+        if (null == organization) {
+            throw new DataNotExistException("没找到组织机构信息");
+        }
+        Organization entity = mapstruct.toEntity(from);
+        this.updateById(entity);
+    }
 
 }

@@ -27,6 +27,7 @@ import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -35,6 +36,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import javax.security.auth.login.LoginException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 全局异常处理
@@ -49,6 +52,30 @@ public class GlobalExceptionConfiguration {
 
     private static final String PREFIX = "[GlobalException]:";
 
+
+    /**
+     * SQL语法错误
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常的响应返回
+     */
+    @ExceptionHandler(DuplicateKeyException.class)
+    public R<Object> duplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        String message = e.getMessage();
+        Pattern pattern = Pattern.compile("键值\"\\(name\\)=\\((?<value>[^)]+)\\)\" 已经存在");
+        Matcher matcher = pattern.matcher(message);
+        String errorMessage = "数据重复，请检查输入内容";
+        if (matcher.find()) {
+            String value = matcher.group("value");
+
+            return R.failure("\"%s\"已存在,请更换名称".formatted(value));
+        }
+        // 记录日志（这里假设你有 log 对象）
+        log.atError().log(PREFIX + errorMessage + ", detail: {}", message, e);
+        return R.failure(errorMessage);
+    }
 
     /**
      * SQL语法错误
