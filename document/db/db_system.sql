@@ -34,18 +34,19 @@ COMMENT ON COLUMN db_auth.t_account.type IS '账号类型 0-账号密码';
 DROP TABLE IF EXISTS db_auth.t_user;
 CREATE TABLE IF NOT EXISTS db_auth.t_user
 (
-    id         BIGINT PRIMARY KEY,
+    id              BIGINT PRIMARY KEY,
 
-    name       VARCHAR(100),
-    email      VARCHAR(100) UNIQUE,
-    avatar     VARCHAR(100),
-    state      int2,
+    name            VARCHAR(100),
+    email           VARCHAR(100) UNIQUE,
+    organization_id BIGINT,
+    avatar          VARCHAR(100),
+    state           int2,
 
-    created_by BIGINT,
-    created_at TIMESTAMP,
-    updated_by BIGINT,
-    updated_at TIMESTAMP,
-    deleted    TIMESTAMP
+    created_by      BIGINT,
+    created_at      TIMESTAMP,
+    updated_by      BIGINT,
+    updated_at      TIMESTAMP,
+    deleted         TIMESTAMP
 );
 COMMENT ON TABLE db_auth.t_user IS '用户信息';
 COMMENT ON COLUMN db_auth.t_user.id IS '主键ID';
@@ -57,6 +58,7 @@ COMMENT ON COLUMN db_auth.t_user.deleted IS '是否删除';
 
 COMMENT ON COLUMN db_auth.t_user.name IS '姓名';
 COMMENT ON COLUMN db_auth.t_user.email IS '邮箱';
+COMMENT ON COLUMN db_auth.t_user.organization_id IS '所属组织机构ID';
 COMMENT ON COLUMN db_auth.t_user.avatar IS '头像';
 COMMENT ON COLUMN db_auth.t_user.state IS '状态';
 

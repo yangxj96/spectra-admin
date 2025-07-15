@@ -60,6 +60,12 @@ public class UserSaveFrom {
     private String email;
 
     /**
+     * 所属组织机构ID
+     */
+    @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private Long organizationId;
+
+    /**
      * 用户状态
      */
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})

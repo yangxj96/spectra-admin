@@ -74,4 +74,15 @@ public class UserPageVO implements Serializable {
      * 角色列表
      */
     private ArrayList<RoleVO> roles;
+
+    /**
+     * 组织机构ID
+     */
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long organizationId;
+
+    /**
+     * 组织机构名称
+     */
+    private String organizationName;
 }

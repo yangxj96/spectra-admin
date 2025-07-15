@@ -66,6 +66,12 @@ public class User extends BaseEntity implements Serializable {
     private String avatar;
 
     /**
+     * 所属组织机构ID
+     */
+    @TableField(value = "organization_id")
+    private Long organizationId;
+
+    /**
      * 用户状态
      */
     @TableField(value = "state")
