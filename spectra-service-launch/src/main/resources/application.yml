@@ -16,7 +16,7 @@ spring:
     url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db?stringtype=unspecified
     driver-class-name: org.postgresql.Driver
     username: postgres
-    password: ENC(n1BUyCGo/Xt4HemeFS6BcAGNN+LAnp4MAXAI13ES+LZW9ah856rDm6GHxKZ+MrI5)
+    password: ENC(2Lnmg8Bfa3rlYoZn0BAV1GSTQznHwRLOCZDfth3BC/cRdhnkecEMTJ+iABMdF0LP)
     type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
