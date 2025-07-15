@@ -44,5 +44,4 @@ public interface AuthService {
      * 用户退出
      */
     void logout();
-
 }

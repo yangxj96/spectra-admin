@@ -60,4 +60,11 @@ public class AuthController {
     public void logout() {
         bindService.logout();
     }
+
+    @SaCheckLogin
+    @ULog("token检查")
+    @PostMapping("/check")
+    public void check() {
+        // 能进入方法,就说明是正常的token了,无需多余的逻辑进行检查
+    }
 }

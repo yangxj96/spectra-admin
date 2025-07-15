@@ -88,5 +88,4 @@ public class AuthServiceImpl implements AuthService {
     public void logout() {
         StpUtil.logout();
     }
-
 }
