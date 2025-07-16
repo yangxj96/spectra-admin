@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganizationShareDTO {
+public class ShareOrganizationDTO {
 
     /**
      * 主键ID

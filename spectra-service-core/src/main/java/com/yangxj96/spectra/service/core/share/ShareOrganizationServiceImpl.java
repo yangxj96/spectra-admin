@@ -3,7 +3,7 @@ package com.yangxj96.spectra.service.core.share;
 import com.yangxj96.spectra.service.core.javabean.entity.Organization;
 import com.yangxj96.spectra.service.core.javabean.mapstruct.OrganizationMapstruct;
 import com.yangxj96.spectra.service.core.service.OrganizationService;
-import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
+import com.yangxj96.spectra.share.javabean.ShareOrganizationDTO;
 import com.yangxj96.spectra.share.service.ShareOrganizationService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ public class ShareOrganizationServiceImpl implements ShareOrganizationService {
     private OrganizationMapstruct organizationMapstruct;
 
     @Override
-    public List<OrganizationShareDTO> all() {
+    public List<ShareOrganizationDTO> all() {
         List<Organization> organizations = organizationService.list();
         return organizationMapstruct.toShareDTOs(organizations);
     }

@@ -36,7 +36,7 @@ import com.yangxj96.spectra.service.auth.mapper.UserMapper;
 import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import com.yangxj96.spectra.service.auth.service.UserService;
-import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
+import com.yangxj96.spectra.share.javabean.ShareOrganizationDTO;
 import com.yangxj96.spectra.share.service.ShareOrganizationService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
@@ -106,7 +106,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 .map(ShareOrganizationService::all)
                 .orElse(Collections.emptyList())
                 .stream()
-                .collect(Collectors.toMap(OrganizationShareDTO::getId, OrganizationShareDTO::getName));
+                .collect(Collectors.toMap(ShareOrganizationDTO::getId, ShareOrganizationDTO::getName));
 
         // vo扩展字段补充
         result.getRecords().forEach(vo -> {

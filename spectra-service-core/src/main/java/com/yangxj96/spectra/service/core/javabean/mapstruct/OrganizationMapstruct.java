@@ -3,7 +3,7 @@ package com.yangxj96.spectra.service.core.javabean.mapstruct;
 import com.yangxj96.spectra.service.core.javabean.entity.Organization;
 import com.yangxj96.spectra.service.core.javabean.from.OrganizationFrom;
 import com.yangxj96.spectra.service.core.javabean.vo.OrganizationTreeVo;
-import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
+import com.yangxj96.spectra.share.javabean.ShareOrganizationDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -51,7 +51,7 @@ public interface OrganizationMapstruct {
      * @param entity 组织机构entity
      * @return 共享DTO对象
      */
-    OrganizationShareDTO toShareDTO(Organization entity);
+    ShareOrganizationDTO toShareDTO(Organization entity);
 
     /**
      * 转换成组织机构共享DTO对象列表
@@ -59,7 +59,7 @@ public interface OrganizationMapstruct {
      * @param entities 组织机构entity列表
      * @return 共享DTO对象列表
      */
-    List<OrganizationShareDTO> toShareDTOs(List<Organization> entities);
+    List<ShareOrganizationDTO> toShareDTOs(List<Organization> entities);
 
 }
 
