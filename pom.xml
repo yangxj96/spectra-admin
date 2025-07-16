@@ -30,7 +30,7 @@
         <sa-token.version>1.44.0</sa-token.version>
         <mapstruct.version>1.6.3</mapstruct.version>
 
-        <apache.commons.lang3.version>3.17.0</apache.commons.lang3.version>
+        <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
         <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
         <apache.commons.text.version>1.13.1</apache.commons.text.version>
         <apache.commons.pool2.version>2.12.1</apache.commons.pool2.version>
@@ -42,6 +42,7 @@
         <module>spectra-common</module>
         <module>spectra-starter</module>
         <module>spectra-service</module>
+        <module>spectra-share</module>
     </modules>
 
     <dependencyManagement>

@@ -22,6 +22,11 @@
         <!-- 自己封装的starter -->
         <dependency>
             <groupId>com.yangxj96.spectra</groupId>
+            <artifactId>spectra-share</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yangxj96.spectra</groupId>
             <artifactId>spectra-starter-common</artifactId>
             <version>${project.version}</version>
         </dependency>

@@ -38,19 +38,21 @@ import com.yangxj96.spectra.service.auth.mapper.UserMapper;
 import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import com.yangxj96.spectra.service.auth.service.UserService;
+import com.yangxj96.spectra.share.OrganizationShareService;
+import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import jakarta.annotation.Resource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户service层-实现
@@ -84,6 +86,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private PasswordEncoder passwordEncoder;
 
+    @Resource
+    private ObjectProvider<OrganizationShareService> organizationShareService;
+
+
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         var result = new Page<UserPageVO>();
@@ -93,12 +99,21 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         Page<User> db = this.page(page.toPage(), wrapper);
         BeanUtils.copyProperties(db, result);
         result.setRecords(mapstruct.toVOs(db.getRecords()));
+
+        // 获取所需内容
+        Map<Long, String> organizationNameMap = Optional.ofNullable(organizationShareService.getIfAvailable())
+                .map(OrganizationShareService::all)
+                .orElse(Collections.emptyList())
+                .stream()
+                .collect(Collectors.toMap(OrganizationShareDTO::getId, OrganizationShareDTO::getName));
+
         // vo扩展字段补充
         result.getRecords().forEach(vo -> {
             var roles = roleService.getByUserId(vo.getId());
             if (null != roles && !roles.isEmpty()) {
                 vo.setRoles((ArrayList<RoleVO>) permissionMapstruct.roleToVOs(roles));
             }
+            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), null));
         });
         // 响应
         return result;
