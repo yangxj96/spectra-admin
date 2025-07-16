@@ -37,7 +37,7 @@ import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import com.yangxj96.spectra.service.auth.service.UserService;
 import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
-import com.yangxj96.spectra.share.service.OrganizationService;
+import com.yangxj96.spectra.share.service.ShareOrganizationService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import jakarta.annotation.Resource;
@@ -88,7 +88,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private PasswordEncoder passwordEncoder;
 
     @Resource
-    private ObjectProvider<OrganizationService> organizationServices;
+    private ObjectProvider<ShareOrganizationService> shareOrganizationServices;
 
 
     @Override
@@ -102,8 +102,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.setRecords(mapstruct.toVOs(db.getRecords()));
 
         // 获取所需内容
-        Map<Long, String> organizationNameMap = Optional.ofNullable(organizationServices.getIfAvailable())
-                .map(OrganizationService::all)
+        Map<Long, String> organizationNameMap = Optional.ofNullable(shareOrganizationServices.getIfAvailable())
+                .map(ShareOrganizationService::all)
                 .orElse(Collections.emptyList())
                 .stream()
                 .collect(Collectors.toMap(OrganizationShareDTO::getId, OrganizationShareDTO::getName));

@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/7/16
  */
-public interface OrganizationService {
+public interface ShareOrganizationService {
 
     /**
      * 获取所有有权用的组织机构
