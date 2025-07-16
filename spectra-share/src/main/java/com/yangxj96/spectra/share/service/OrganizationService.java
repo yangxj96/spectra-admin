@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.share;
+package com.yangxj96.spectra.share.service;
 
 import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
 
@@ -11,7 +11,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/7/16
  */
-public interface OrganizationShareService {
+public interface OrganizationService {
 
     /**
      * 获取所有有权用的组织机构

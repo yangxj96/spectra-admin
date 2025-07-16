@@ -2,9 +2,8 @@ package com.yangxj96.spectra.service.core.share;
 
 import com.yangxj96.spectra.service.core.javabean.entity.Organization;
 import com.yangxj96.spectra.service.core.javabean.mapstruct.OrganizationMapstruct;
-import com.yangxj96.spectra.service.core.service.OrganizationService;
-import com.yangxj96.spectra.share.OrganizationShareService;
 import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
+import com.yangxj96.spectra.share.service.OrganizationService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -18,10 +17,10 @@ import java.util.List;
  * @since 2025/7/16
  */
 @Service
-public class OrganizationShareServiceImpl implements OrganizationShareService {
+public class OrganizationServiceImpl implements OrganizationService {
 
     @Resource
-    private OrganizationService organizationService;
+    private com.yangxj96.spectra.service.core.service.OrganizationService organizationService;
 
     @Resource
     private OrganizationMapstruct organizationMapstruct;

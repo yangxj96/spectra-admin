@@ -22,7 +22,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserPageFrom;
-import com.yangxj96.spectra.service.auth.javabean.from.UserRelevanceRolesFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.service.auth.javabean.vo.UserPageVO;
 import com.yangxj96.spectra.service.auth.service.UserService;
@@ -59,17 +58,6 @@ public class UserController {
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         return bindService.page(page, params);
-    }
-
-    /**
-     * 关联用户到角色
-     *
-     * @param params 请求参数
-     */
-    @ULog("关联用户到角色")
-    @PutMapping("/relevanceRoles")
-    public void relevanceRoles(@Validated @RequestBody UserRelevanceRolesFrom params) {
-        bindService.relevanceRoles(params);
     }
 
     /**

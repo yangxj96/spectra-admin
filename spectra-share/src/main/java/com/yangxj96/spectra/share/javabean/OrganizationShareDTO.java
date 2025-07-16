@@ -16,6 +16,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrganizationShareDTO {
 
+    /**
+     * 主键ID
+     */
     private Long id;
 
     /**

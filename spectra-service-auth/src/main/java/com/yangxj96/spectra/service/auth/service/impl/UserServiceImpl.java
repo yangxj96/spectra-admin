@@ -28,18 +28,16 @@ import com.yangxj96.spectra.service.auth.javabean.entity.Account;
 import com.yangxj96.spectra.service.auth.javabean.entity.Role;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;
 import com.yangxj96.spectra.service.auth.javabean.from.UserPageFrom;
-import com.yangxj96.spectra.service.auth.javabean.from.UserRelevanceRolesFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.service.auth.javabean.mapstruct.PermissionMapstruct;
 import com.yangxj96.spectra.service.auth.javabean.mapstruct.UserMapstruct;
-import com.yangxj96.spectra.service.auth.javabean.vo.RoleVO;
 import com.yangxj96.spectra.service.auth.javabean.vo.UserPageVO;
 import com.yangxj96.spectra.service.auth.mapper.UserMapper;
 import com.yangxj96.spectra.service.auth.service.AccountService;
 import com.yangxj96.spectra.service.auth.service.RoleService;
 import com.yangxj96.spectra.service.auth.service.UserService;
-import com.yangxj96.spectra.share.OrganizationShareService;
 import com.yangxj96.spectra.share.javabean.OrganizationShareDTO;
+import com.yangxj96.spectra.share.service.OrganizationService;
 import com.yangxj96.spectra.starter.common.exception.DataNotExistException;
 import com.yangxj96.spectra.starter.secruity.properties.UserProperties;
 import jakarta.annotation.Resource;
@@ -51,7 +49,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -87,7 +88,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private PasswordEncoder passwordEncoder;
 
     @Resource
-    private ObjectProvider<OrganizationShareService> organizationShareService;
+    private ObjectProvider<OrganizationService> organizationServices;
 
 
     @Override
@@ -101,8 +102,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.setRecords(mapstruct.toVOs(db.getRecords()));
 
         // 获取所需内容
-        Map<Long, String> organizationNameMap = Optional.ofNullable(organizationShareService.getIfAvailable())
-                .map(OrganizationShareService::all)
+        Map<Long, String> organizationNameMap = Optional.ofNullable(organizationServices.getIfAvailable())
+                .map(OrganizationService::all)
                 .orElse(Collections.emptyList())
                 .stream()
                 .collect(Collectors.toMap(OrganizationShareDTO::getId, OrganizationShareDTO::getName));
@@ -111,30 +112,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.getRecords().forEach(vo -> {
             var roles = roleService.getByUserId(vo.getId());
             if (null != roles && !roles.isEmpty()) {
-                vo.setRoles((ArrayList<RoleVO>) permissionMapstruct.roleToVOs(roles));
+                vo.setRoles(permissionMapstruct.roleToVOs(roles));
             }
             vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), null));
         });
         // 响应
         return result;
-    }
-
-    @Override
-    @Transactional
-    public void relevanceRoles(UserRelevanceRolesFrom params) {
-        var user = this.getById(params.getUserId());
-        if (null == user) {
-            throw new DataNotExistException("用户不存在");
-        }
-        var roles = roleService.listByIds(params.getRoleIds());
-        if (roles.isEmpty() || roles.size() != params.getRoleIds().size()) {
-            throw new DataNotExistException("角色列表不正确");
-        }
-        // 移除之前的关联
-        roleService.removeRelevanceRoles(params.getUserId());
-        if (roleService.insertRelevanceRoles(params.getUserId(), params.getRoleIds()) != params.getRoleIds().size()) {
-            throw new RuntimeException("关联角色异常");
-        }
     }
 
     @Override

@@ -22,7 +22,6 @@ import com.yangxj96.spectra.common.base.BaseService;
 import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.service.auth.javabean.entity.User;
 import com.yangxj96.spectra.service.auth.javabean.from.UserPageFrom;
-import com.yangxj96.spectra.service.auth.javabean.from.UserRelevanceRolesFrom;
 import com.yangxj96.spectra.service.auth.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.service.auth.javabean.vo.UserPageVO;
 
@@ -43,13 +42,6 @@ public interface UserService extends BaseService<User> {
      * @return 分页结果
      */
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params);
-
-    /**
-     * 用户关联角色列表
-     *
-     * @param params 请求参数
-     */
-    void relevanceRoles(UserRelevanceRolesFrom params);
 
     /**
      * 创建用户

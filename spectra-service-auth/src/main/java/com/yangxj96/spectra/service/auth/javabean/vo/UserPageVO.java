@@ -27,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -73,7 +73,7 @@ public class UserPageVO implements Serializable {
     /**
      * 角色列表
      */
-    private ArrayList<RoleVO> roles;
+    private List<RoleVO> roles;
 
     /**
      * 组织机构ID
