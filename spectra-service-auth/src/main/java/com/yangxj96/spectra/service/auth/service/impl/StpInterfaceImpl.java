@@ -18,11 +18,12 @@ package com.yangxj96.spectra.service.auth.service.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
-import com.yangxj96.spectra.service.auth.javabean.entity.Authority;
-import com.yangxj96.spectra.service.auth.javabean.entity.Role;
-import com.yangxj96.spectra.service.auth.service.AuthorityService;
-import com.yangxj96.spectra.service.auth.service.RoleService;
+import com.yangxj96.spectra.share.javabean.ShareAuthority;
+import com.yangxj96.spectra.share.javabean.ShareRole;
+import com.yangxj96.spectra.share.service.ShareAuthorityService;
+import com.yangxj96.spectra.share.service.ShareRoleService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -39,21 +40,26 @@ import java.util.List;
 public class StpInterfaceImpl implements StpInterface {
 
     @Resource
-    private RoleService roleService;
+    private ObjectProvider<ShareRoleService> roleService;
 
     @Resource
-    private AuthorityService authorityService;
+    private ObjectProvider<ShareAuthorityService> authorityService;
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
         Object userId = StpUtil.getTerminalInfo().getExtra("user_id");
+        var rService = roleService.getIfUnique();
+        var aService = authorityService.getIfUnique();
+        if (rService == null || aService == null) {
+            return Collections.emptyList();
+        }
         if (userId instanceof Long uid) {
-            List<Role> roles = roleService.getByUserId(uid);
+            List<ShareRole> roles = rService.getByUserId(uid);
             if (roles.isEmpty()) {
                 return Collections.emptyList();
             }
-            List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).toList());
-            return authorities.stream().map(Authority::getCode).toList();
+            List<ShareAuthority> authorities = aService.getByRoleIds(roles.stream().map(ShareRole::getId).toList());
+            return authorities.stream().map(ShareAuthority::getCode).toList();
         } else {
             return Collections.emptyList();
         }
@@ -62,9 +68,14 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
         Object userId = StpUtil.getTerminalInfo().getExtra("user_id");
+        var rService = roleService.getIfUnique();
+        if (rService == null) {
+            return Collections.emptyList();
+        }
+
         if (userId instanceof Long uid) {
-            List<Role> roles = roleService.getByUserId(uid);
-            return roles.stream().map(Role::getCode).toList();
+            List<ShareRole> roles = rService.getByUserId(uid);
+            return roles.stream().map(ShareRole::getCode).toList();
         } else {
             return Collections.emptyList();
         }

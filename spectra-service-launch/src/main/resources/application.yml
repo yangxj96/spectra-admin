@@ -56,12 +56,6 @@ sa-token:
   token-style: uuid
   is-log: true
   is-print: false
-  alone-redis:
-    database: 11
-    host: 127.0.0.1
-    port: 6379
-    password:
-    timeout: 10s
 # 健康检查
 management:
   health:

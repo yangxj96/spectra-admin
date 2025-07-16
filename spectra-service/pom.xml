@@ -35,11 +35,6 @@
             <artifactId>spectra-starter-db</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.yangxj96.spectra</groupId>
-            <artifactId>spectra-starter-security</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- spring boot -->
         <dependency>

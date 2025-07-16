@@ -22,6 +22,11 @@
         <!-- service模块 -->
         <dependency>
             <groupId>com.yangxj96.spectra</groupId>
+            <artifactId>spectra-service-user</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.yangxj96.spectra</groupId>
             <artifactId>spectra-service-auth</artifactId>
             <version>${project.version}</version>
         </dependency>
