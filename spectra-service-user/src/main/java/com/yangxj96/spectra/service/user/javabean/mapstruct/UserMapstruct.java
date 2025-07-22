@@ -44,6 +44,7 @@ public interface UserMapstruct {
      * @return 分页实体
      */
     @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "organizationName", ignore = true)
     UserPageVO toVO(User user);
 
     /**
