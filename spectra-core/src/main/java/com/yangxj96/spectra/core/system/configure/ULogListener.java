@@ -37,8 +37,10 @@ public class ULogListener {
         if (StringUtils.isNotBlank(entity.getToken())) {
             try {
                 Object loginId = StpUtil.getLoginIdByToken(entity.getToken());
-                datum.setCreatedBy(Long.parseLong(loginId.toString()));
-                datum.setUpdatedBy(Long.parseLong(loginId.toString()));
+                if (loginId != null) {
+                    datum.setCreatedBy(Long.parseLong(loginId.toString()));
+                    datum.setUpdatedBy(Long.parseLong(loginId.toString()));
+                }
             } catch (Exception e) {
                 log.atError().log("获取登录用户ID失败", e);
             }
