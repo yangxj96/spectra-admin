@@ -20,17 +20,18 @@
 -- Table structure for t_account
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_account";
-CREATE TABLE "db_auth"."t_account" (
-  "id" int8 NOT NULL,
-  "username" varchar(20) COLLATE "pg_catalog"."default",
-  "password" varchar(128) COLLATE "pg_catalog"."default",
-  "user_id" int8,
-  "type" int2,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_account"
+(
+    "id"         int8 NOT NULL,
+    "username"   VARCHAR(20) COLLATE "pg_catalog"."default",
+    "password"   VARCHAR(128) COLLATE "pg_catalog"."default",
+    "user_id"    int8,
+    "type"       int2,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_account"."id" IS '主键ID';
@@ -48,23 +49,30 @@ COMMENT ON TABLE "db_auth"."t_account" IS '账号信息';
 -- ----------------------------
 -- Records of t_account
 -- ----------------------------
-INSERT INTO "db_auth"."t_account" VALUES (1927290201865945090, 'yangxj96@gmail.com', '$2a$10$ALzuYNgOSYLlJg/XsxUY7O4BKeqECHf5J7bY8eGPaQK.3VSlkFTaO', 1934276682383138817, 0, NULL, NULL, 1927290201865945090, '2025-06-24 11:37:14.243354', NULL);
-INSERT INTO "db_auth"."t_account" VALUES (1937354421099782146, 'sysadmin@1.com', '$2a$10$zQSrfeQHvHw022UFUOoJwe5oHdOAWcaZr8d2owbbCwAgWqOSjVFVa', 1937354420709711873, 0, 1927290201865945090, '2025-06-24 11:37:42.957695', 1927290201865945090, '2025-06-24 11:37:42.957695', NULL);
-INSERT INTO "db_auth"."t_account" VALUES (1937706587203239938, 'ceshi@1.com', '$2a$10$UhexxdMYdvPFokOuBO2va.hG4mxzjvXRGufSmnLtRYJrirY8Bw4km', 1937706586813169665, 0, 1927290201865945090, '2025-06-25 10:57:05.907345', 1927290201865945090, '2025-06-25 10:57:05.911344', NULL);
+INSERT INTO "db_auth"."t_account"
+VALUES (1927290201865945090, 'yangxj96@gmail.com', '$2a$10$ALzuYNgOSYLlJg/XsxUY7O4BKeqECHf5J7bY8eGPaQK.3VSlkFTaO', 1934276682383138817, 0, NULL, NULL,
+        1927290201865945090, '2025-06-24 11:37:14.243354', NULL);
+INSERT INTO "db_auth"."t_account"
+VALUES (1937354421099782146, 'sysadmin@1.com', '$2a$10$zQSrfeQHvHw022UFUOoJwe5oHdOAWcaZr8d2owbbCwAgWqOSjVFVa', 1937354420709711873, 0,
+        1927290201865945090, '2025-06-24 11:37:42.957695', 1927290201865945090, '2025-06-24 11:37:42.957695', NULL);
+INSERT INTO "db_auth"."t_account"
+VALUES (1937706587203239938, 'ceshi@1.com', '$2a$10$UhexxdMYdvPFokOuBO2va.hG4mxzjvXRGufSmnLtRYJrirY8Bw4km', 1937706586813169665, 0,
+        1927290201865945090, '2025-06-25 10:57:05.907345', 1927290201865945090, '2025-06-25 10:57:05.911344', NULL);
 
 -- ----------------------------
 -- Table structure for t_authority
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_authority";
-CREATE TABLE "db_auth"."t_authority" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default",
-  "code" varchar(100) COLLATE "pg_catalog"."default",
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_authority"
+(
+    "id"         int8 NOT NULL,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "code"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_authority"."id" IS '主键ID';
@@ -85,18 +93,19 @@ COMMENT ON TABLE "db_auth"."t_authority" IS '权限表';
 -- Table structure for t_role
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_role";
-CREATE TABLE "db_auth"."t_role" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default",
-  "code" varchar(100) COLLATE "pg_catalog"."default",
-  "state" bool DEFAULT true,
-  "scope" int2,
-  "remark" varchar(255) COLLATE "pg_catalog"."default",
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_role"
+(
+    "id"         int8 NOT NULL,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "code"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "state"      bool DEFAULT TRUE,
+    "scope"      int2,
+    "remark"     VARCHAR(255) COLLATE "pg_catalog"."default",
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_role"."id" IS '主键ID';
@@ -115,23 +124,30 @@ COMMENT ON TABLE "db_auth"."t_role" IS '角色表';
 -- ----------------------------
 -- Records of t_role
 -- ----------------------------
-INSERT INTO "db_auth"."t_role" VALUES (1932682189593350146, '运维管理员', 'DEV_ADMIN', 't', 2, '运维人员使用,全局范围,拥有所有权限', 1927290201865945090, '2025-06-11 14:11:56.208812', 1927290201865945090, '2025-06-11 14:33:59.593709', NULL);
-INSERT INTO "db_auth"."t_role" VALUES (1932687324356775938, '小组长', 'GROUP_LEADER', 'f', 1, '测试禁用状态', 1927290201865945090, '2025-06-11 14:32:20.385948', 1927290201865945090, '2025-06-12 17:15:18.034439', NULL);
-INSERT INTO "db_auth"."t_role" VALUES (1932685785802162178, '系统管理员', 'SYS_ADMIN', 't', 0, '系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容', 1927290201865945090, '2025-06-11 14:26:13.572692', 1927290201865945090, '2025-06-11 14:26:13.572692', NULL);
+INSERT INTO "db_auth"."t_role"
+VALUES (1932682189593350146, '运维管理员', 'DEV_ADMIN', 't', 2, '运维人员使用,全局范围,拥有所有权限', 1927290201865945090,
+        '2025-06-11 14:11:56.208812', 1927290201865945090, '2025-06-11 14:33:59.593709', NULL);
+INSERT INTO "db_auth"."t_role"
+VALUES (1932687324356775938, '小组长', 'GROUP_LEADER', 'f', 1, '测试禁用状态', 1927290201865945090, '2025-06-11 14:32:20.385948', 1927290201865945090,
+        '2025-06-12 17:15:18.034439', NULL);
+INSERT INTO "db_auth"."t_role"
+VALUES (1932685785802162178, '系统管理员', 'SYS_ADMIN', 't', 0, '系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容', 1927290201865945090,
+        '2025-06-11 14:26:13.572692', 1927290201865945090, '2025-06-11 14:26:13.572692', NULL);
 
 -- ----------------------------
 -- Table structure for t_role_authority_map
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_role_authority_map";
-CREATE TABLE "db_auth"."t_role_authority_map" (
-  "id" int8 NOT NULL,
-  "role_id" int8 NOT NULL,
-  "authority_id" int8 NOT NULL,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_role_authority_map"
+(
+    "id"           int8 NOT NULL,
+    "role_id"      int8 NOT NULL,
+    "authority_id" int8 NOT NULL,
+    "created_by"   int8,
+    "created_at"   TIMESTAMP(6),
+    "updated_by"   int8,
+    "updated_at"   TIMESTAMP(6),
+    "deleted"      TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_role_authority_map"."id" IS '主键ID';
@@ -152,17 +168,18 @@ COMMENT ON TABLE "db_auth"."t_role_authority_map" IS '权限表<->角色';
 -- Table structure for t_user
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_user";
-CREATE TABLE "db_auth"."t_user" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default",
-  "email" varchar(100) COLLATE "pg_catalog"."default",
-  "avatar" varchar(100) COLLATE "pg_catalog"."default",
-  "state" int2,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_user"
+(
+    "id"         int8 NOT NULL,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "email"      VARCHAR(100) COLLATE "pg_catalog"."default",
+    "avatar"     VARCHAR(100) COLLATE "pg_catalog"."default",
+    "state"      int2,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_user"."id" IS '主键ID';
@@ -180,23 +197,30 @@ COMMENT ON TABLE "db_auth"."t_user" IS '用户信息';
 -- ----------------------------
 -- Records of t_user
 -- ----------------------------
-INSERT INTO "db_auth"."t_user" VALUES (1937354420709711873, '超级管理员', 'sysadmin@1.com', NULL, 0, 1927290201865945090, '2025-06-24 11:37:42.866695', 1927290201865945090, '2025-06-24 11:41:34.424012', NULL);
-INSERT INTO "db_auth"."t_user" VALUES (1937706586813169665, '测试用户', 'ceshi@1.com', NULL, 0, 1927290201865945090, '2025-06-25 10:57:05.810342', 1927290201865945090, '2025-06-25 10:57:05.811358', NULL);
-INSERT INTO "db_auth"."t_user" VALUES (1934276682383138817, '平台管理员', 'yangxj96@gmail.com', NULL, 0, NULL, '2025-06-15 23:47:52.86429', 1927290201865945090, '2025-06-24 11:37:14.216352', NULL);
+INSERT INTO "db_auth"."t_user"
+VALUES (1937354420709711873, '超级管理员', 'sysadmin@1.com', NULL, 0, 1927290201865945090, '2025-06-24 11:37:42.866695', 1927290201865945090,
+        '2025-06-24 11:41:34.424012', NULL);
+INSERT INTO "db_auth"."t_user"
+VALUES (1937706586813169665, '测试用户', 'ceshi@1.com', NULL, 0, 1927290201865945090, '2025-06-25 10:57:05.810342', 1927290201865945090,
+        '2025-06-25 10:57:05.811358', NULL);
+INSERT INTO "db_auth"."t_user"
+VALUES (1934276682383138817, '平台管理员', 'yangxj96@gmail.com', NULL, 0, NULL, '2025-06-15 23:47:52.86429', 1927290201865945090,
+        '2025-06-24 11:37:14.216352', NULL);
 
 -- ----------------------------
 -- Table structure for t_user_role_map
 -- ----------------------------
 DROP TABLE IF EXISTS "db_auth"."t_user_role_map";
-CREATE TABLE "db_auth"."t_user_role_map" (
-  "id" int8 NOT NULL,
-  "user_id" int8 NOT NULL,
-  "role_id" int8 NOT NULL,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_auth"."t_user_role_map"
+(
+    "id"         int8 NOT NULL,
+    "user_id"    int8 NOT NULL,
+    "role_id"    int8 NOT NULL,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_auth"."t_user_role_map"."id" IS '主键ID';
@@ -212,51 +236,63 @@ COMMENT ON TABLE "db_auth"."t_user_role_map" IS '角色表<->账户';
 -- ----------------------------
 -- Records of t_user_role_map
 -- ----------------------------
-INSERT INTO "db_auth"."t_user_role_map" VALUES (1934292480493473793, 1934276682383138817, 1932682189593350146, NULL, '2025-06-16 00:50:39.420317', NULL, '2025-06-16 00:50:39.420317', NULL);
-INSERT INTO "db_auth"."t_user_role_map" VALUES (1937706587291320321, 1937706586813169665, 1932687324356775938, NULL, '2025-06-25 10:57:05.812216', NULL, '2025-06-25 10:57:05.812216', NULL);
-INSERT INTO "db_auth"."t_user_role_map" VALUES (1937354421099782147, 1937354420709711873, 1932685785802162178, NULL, '2025-06-24 11:37:42.867752', NULL, '2025-06-24 11:37:42.867752', NULL);
+INSERT INTO "db_auth"."t_user_role_map"
+VALUES (1934292480493473793, 1934276682383138817, 1932682189593350146, NULL, '2025-06-16 00:50:39.420317', NULL, '2025-06-16 00:50:39.420317', NULL);
+INSERT INTO "db_auth"."t_user_role_map"
+VALUES (1937706587291320321, 1937706586813169665, 1932687324356775938, NULL, '2025-06-25 10:57:05.812216', NULL, '2025-06-25 10:57:05.812216', NULL);
+INSERT INTO "db_auth"."t_user_role_map"
+VALUES (1937354421099782147, 1937354420709711873, 1932685785802162178, NULL, '2025-06-24 11:37:42.867752', NULL, '2025-06-24 11:37:42.867752', NULL);
 
 -- ----------------------------
 -- Uniques structure for table t_account
 -- ----------------------------
-ALTER TABLE "db_auth"."t_account" ADD CONSTRAINT "t_account_username_key" UNIQUE ("username");
+ALTER TABLE "db_auth"."t_account"
+    ADD CONSTRAINT "t_account_username_key" UNIQUE ("username");
 
 -- ----------------------------
 -- Primary Key structure for table t_account
 -- ----------------------------
-ALTER TABLE "db_auth"."t_account" ADD CONSTRAINT "t_account_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_account"
+    ADD CONSTRAINT "t_account_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_authority
 -- ----------------------------
-ALTER TABLE "db_auth"."t_authority" ADD CONSTRAINT "t_authority_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_authority"
+    ADD CONSTRAINT "t_authority_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Uniques structure for table t_role
 -- ----------------------------
-ALTER TABLE "db_auth"."t_role" ADD CONSTRAINT "t_role_code_key" UNIQUE ("code");
+ALTER TABLE "db_auth"."t_role"
+    ADD CONSTRAINT "t_role_code_key" UNIQUE ("code");
 
 -- ----------------------------
 -- Primary Key structure for table t_role
 -- ----------------------------
-ALTER TABLE "db_auth"."t_role" ADD CONSTRAINT "t_role_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_role"
+    ADD CONSTRAINT "t_role_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_role_authority_map
 -- ----------------------------
-ALTER TABLE "db_auth"."t_role_authority_map" ADD CONSTRAINT "t_role_authority_map_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_role_authority_map"
+    ADD CONSTRAINT "t_role_authority_map_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Uniques structure for table t_user
 -- ----------------------------
-ALTER TABLE "db_auth"."t_user" ADD CONSTRAINT "t_user_email_key" UNIQUE ("email");
+ALTER TABLE "db_auth"."t_user"
+    ADD CONSTRAINT "t_user_email_key" UNIQUE ("email");
 
 -- ----------------------------
 -- Primary Key structure for table t_user
 -- ----------------------------
-ALTER TABLE "db_auth"."t_user" ADD CONSTRAINT "t_user_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_user"
+    ADD CONSTRAINT "t_user_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_user_role_map
 -- ----------------------------
-ALTER TABLE "db_auth"."t_user_role_map" ADD CONSTRAINT "t_user_role_map_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_auth"."t_user_role_map"
+    ADD CONSTRAINT "t_user_role_map_pkey" PRIMARY KEY ("id");

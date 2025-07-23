@@ -20,19 +20,20 @@
 -- Table structure for t_department
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_department";
-CREATE TABLE "db_system"."t_department" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "code" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "pid" int8,
-  "org_id" int8 NOT NULL,
-  "manager_id" int8 NOT NULL,
-  "remark" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_department"
+(
+    "id"         int8                                        NOT NULL,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "code"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "pid"        int8,
+    "org_id"     int8                                        NOT NULL,
+    "manager_id" int8                                        NOT NULL,
+    "remark"     VARCHAR(255) COLLATE "pg_catalog"."default" NOT NULL,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_department"."id" IS '主键ID';
@@ -57,19 +58,20 @@ COMMENT ON TABLE "db_system"."t_department" IS '部门';
 -- Table structure for t_dict_data
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_dict_data";
-CREATE TABLE "db_system"."t_dict_data" (
-  "id" int8 NOT NULL,
-  "gid" int8 NOT NULL,
-  "label" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "value" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "sort" int2 NOT NULL DEFAULT 0,
-  "state" int2 NOT NULL,
-  "remark" varchar(255) COLLATE "pg_catalog"."default",
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_dict_data"
+(
+    "id"         int8                                        NOT NULL,
+    "gid"        int8                                        NOT NULL,
+    "label"      VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "value"      VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "sort"       int2                                        NOT NULL DEFAULT 0,
+    "state"      int2                                        NOT NULL,
+    "remark"     VARCHAR(255) COLLATE "pg_catalog"."default",
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_dict_data"."id" IS '主键ID';
@@ -89,36 +91,59 @@ COMMENT ON TABLE "db_system"."t_dict_data" IS '数据字典(字典值)';
 -- ----------------------------
 -- Records of t_dict_data
 -- ----------------------------
-INSERT INTO "db_system"."t_dict_data" VALUES (1942142254075305986, 1942142182856024066, '全局', '0', 999, 0, '全局范围可查询', 1927290201865945090, '2025-07-07 16:42:51.29908', 1927290201865945090, '2025-07-07 16:42:51.29908', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942142354801516546, 1942142182856024066, '本级', '1', 999, 0, '可以查询当前所属的组织机构+部门本级别的内容', 1927290201865945090, '2025-07-07 16:43:15.314449', 1927290201865945090, '2025-07-07 16:43:15.314449', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942142489367371777, 1942142182856024066, '本级包含下级', '2', 999, 0, '可以查询当前组织机构+部门,包含子级组织机构+部门的数据', 1927290201865945090, '2025-07-07 16:43:47.386874', 1927290201865945090, '2025-07-07 16:43:47.386874', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942143228055609345, 1942142790749085698, '正常', '0', 999, 0, '正常', 1927290201865945090, '2025-07-07 16:46:43.508788', 1927290201865945090, '2025-07-07 16:46:43.509787', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942143271655399425, 1942142790749085698, '冻结', '1', 999, 0, '冻结', 1927290201865945090, '2025-07-07 16:46:53.905348', 1927290201865945090, '2025-07-07 16:46:53.906348', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942143325908721665, 1942142790749085698, '封禁', '2', 999, 0, '封禁', 1927290201865945090, '2025-07-07 16:47:06.841538', 1927290201865945090, '2025-07-07 16:47:06.842538', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942143694822924289, 1942143605777850369, '禁用', '1', 999, 0, '禁用', 1927290201865945090, '2025-07-07 16:48:34.796278', 1927290201865945090, '2025-07-07 16:48:34.796278', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942151875150163969, 1942151722745933825, '邮箱登录', '0', 999, 0, '邮箱登录', 1927290201865945090, '2025-07-07 17:21:05.137799', 1927290201865945090, '2025-07-07 17:21:05.137799', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942151904090861570, 1942151722745933825, '手机号码', '1', 999, 0, '手机号码', 1927290201865945090, '2025-07-07 17:21:12.03659', 1927290201865945090, '2025-07-07 17:21:12.03659', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942151942581989377, 1942151722745933825, '微信登录', '2', 999, 0, '微信登录', 1927290201865945090, '2025-07-07 17:21:21.209022', 1927290201865945090, '2025-07-07 17:21:21.21002', NULL);
-INSERT INTO "db_system"."t_dict_data" VALUES (1942143658663829506, 1942143605777850369, '启用', '0', 999, 0, '启用', 1927290201865945090, '2025-07-07 16:48:26.176609', 1927290201865945090, '2025-07-07 16:48:26.176609', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942142254075305986, 1942142182856024066, '全局', '0', 999, 0, '全局范围可查询', 1927290201865945090, '2025-07-07 16:42:51.29908',
+        1927290201865945090, '2025-07-07 16:42:51.29908', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942142354801516546, 1942142182856024066, '本级', '1', 999, 0, '可以查询当前所属的组织机构+部门本级别的内容', 1927290201865945090,
+        '2025-07-07 16:43:15.314449', 1927290201865945090, '2025-07-07 16:43:15.314449', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942142489367371777, 1942142182856024066, '本级包含下级', '2', 999, 0, '可以查询当前组织机构+部门,包含子级组织机构+部门的数据',
+        1927290201865945090, '2025-07-07 16:43:47.386874', 1927290201865945090, '2025-07-07 16:43:47.386874', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942143228055609345, 1942142790749085698, '正常', '0', 999, 0, '正常', 1927290201865945090, '2025-07-07 16:46:43.508788', 1927290201865945090,
+        '2025-07-07 16:46:43.509787', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942143271655399425, 1942142790749085698, '冻结', '1', 999, 0, '冻结', 1927290201865945090, '2025-07-07 16:46:53.905348', 1927290201865945090,
+        '2025-07-07 16:46:53.906348', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942143325908721665, 1942142790749085698, '封禁', '2', 999, 0, '封禁', 1927290201865945090, '2025-07-07 16:47:06.841538', 1927290201865945090,
+        '2025-07-07 16:47:06.842538', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942143694822924289, 1942143605777850369, '禁用', '1', 999, 0, '禁用', 1927290201865945090, '2025-07-07 16:48:34.796278', 1927290201865945090,
+        '2025-07-07 16:48:34.796278', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942151875150163969, 1942151722745933825, '邮箱登录', '0', 999, 0, '邮箱登录', 1927290201865945090, '2025-07-07 17:21:05.137799',
+        1927290201865945090, '2025-07-07 17:21:05.137799', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942151904090861570, 1942151722745933825, '手机号码', '1', 999, 0, '手机号码', 1927290201865945090, '2025-07-07 17:21:12.03659',
+        1927290201865945090, '2025-07-07 17:21:12.03659', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942151942581989377, 1942151722745933825, '微信登录', '2', 999, 0, '微信登录', 1927290201865945090, '2025-07-07 17:21:21.209022',
+        1927290201865945090, '2025-07-07 17:21:21.21002', NULL);
+INSERT INTO "db_system"."t_dict_data"
+VALUES (1942143658663829506, 1942143605777850369, '启用', '0', 999, 0, '启用', 1927290201865945090, '2025-07-07 16:48:26.176609', 1927290201865945090,
+        '2025-07-07 16:48:26.176609', NULL);
 
 -- ----------------------------
 -- Table structure for t_dict_group
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_dict_group";
-CREATE TABLE "db_system"."t_dict_group" (
-  "id" int8 NOT NULL,
-  "pid" int8,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "code" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "state" int2 NOT NULL,
-  "remark" varchar(255) COLLATE "pg_catalog"."default",
-  "builtin" bool NOT NULL DEFAULT false,
-  "hide" bool NOT NULL DEFAULT false,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_dict_group"
+(
+    "id"         int8                                        NOT NULL,
+    "pid"        int8,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "code"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "state"      int2                                        NOT NULL,
+    "remark"     VARCHAR(255) COLLATE "pg_catalog"."default",
+    "builtin"    bool                                        NOT NULL DEFAULT FALSE,
+    "hide"       bool                                        NOT NULL DEFAULT FALSE,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_dict_group"."id" IS '主键ID';
@@ -139,31 +164,44 @@ COMMENT ON TABLE "db_system"."t_dict_group" IS '数据字典(字典类型)';
 -- ----------------------------
 -- Records of t_dict_group
 -- ----------------------------
-INSERT INTO "db_system"."t_dict_group" VALUES (1942142790749085698, 1942142921347129346, '用户状态', 'sys_user_state', 0, '用户状态', 't', 'f', 1927290201865945090, '2025-07-07 16:44:59.241607', 1927290201865945090, '2025-07-07 16:44:59.242608', NULL);
-INSERT INTO "db_system"."t_dict_group" VALUES (1942143605777850369, 1942142921347129346, '通用状态', 'sys_common_state', 0, '通用状态', 't', 'f', 1927290201865945090, '2025-07-07 16:48:13.563688', 1927290201865945090, '2025-07-07 16:48:13.563688', NULL);
-INSERT INTO "db_system"."t_dict_group" VALUES (1942142182856024066, 1942142921347129346, '权限范围', 'sys_power_scop', 0, '系统权限范围', 't', 'f', 1927290201865945090, '2025-07-07 16:42:34.314302', 1927290201865945090, '2025-07-07 16:42:34.314302', NULL);
-INSERT INTO "db_system"."t_dict_group" VALUES (1942142921347129346, NULL, '系统配置', 'sys', 0, '系统配置相关的字典组.基本为内置不可修改的字典组', 't', 'f', 1927290201865945090, '2025-07-07 16:45:30.388337', 1927290201865945090, '2025-07-07 16:45:30.389337', NULL);
-INSERT INTO "db_system"."t_dict_group" VALUES (1942150470595194881, NULL, '业务配置', 'business', 0, '业务部分需要的配置', 'f', 'f', 1927290201865945090, '2025-07-07 17:15:30.261611', 1927290201865945090, '2025-07-07 17:15:30.262611', NULL);
-INSERT INTO "db_system"."t_dict_group" VALUES (1942151722745933825, 1942142921347129346, '账号类型', 'sys_account_type', 0, '账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式', 't', 'f', 1927290201865945090, '2025-07-07 17:20:28.804878', 1927290201865945090, '2025-07-07 17:20:28.804878', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942142790749085698, 1942142921347129346, '用户状态', 'sys_user_state', 0, '用户状态', 't', 'f', 1927290201865945090,
+        '2025-07-07 16:44:59.241607', 1927290201865945090, '2025-07-07 16:44:59.242608', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942143605777850369, 1942142921347129346, '通用状态', 'sys_common_state', 0, '通用状态', 't', 'f', 1927290201865945090,
+        '2025-07-07 16:48:13.563688', 1927290201865945090, '2025-07-07 16:48:13.563688', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942142182856024066, 1942142921347129346, '权限范围', 'sys_power_scop', 0, '系统权限范围', 't', 'f', 1927290201865945090,
+        '2025-07-07 16:42:34.314302', 1927290201865945090, '2025-07-07 16:42:34.314302', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942142921347129346, NULL, '系统配置', 'sys', 0, '系统配置相关的字典组.基本为内置不可修改的字典组', 't', 'f', 1927290201865945090,
+        '2025-07-07 16:45:30.388337', 1927290201865945090, '2025-07-07 16:45:30.389337', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942150470595194881, NULL, '业务配置', 'business', 0, '业务部分需要的配置', 'f', 'f', 1927290201865945090, '2025-07-07 17:15:30.261611',
+        1927290201865945090, '2025-07-07 17:15:30.262611', NULL);
+INSERT INTO "db_system"."t_dict_group"
+VALUES (1942151722745933825, 1942142921347129346, '账号类型', 'sys_account_type', 0, '账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式',
+        't', 'f', 1927290201865945090, '2025-07-07 17:20:28.804878', 1927290201865945090, '2025-07-07 17:20:28.804878', NULL);
 
 -- ----------------------------
 -- Table structure for t_menu
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_menu";
-CREATE TABLE "db_system"."t_menu" (
-  "id" int8 NOT NULL,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "pid" int8,
-  "icon" varchar(100) COLLATE "pg_catalog"."default",
-  "path" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "component" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "layout" varchar(100) COLLATE "pg_catalog"."default",
-  "sort" int4 DEFAULT 0,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_menu"
+(
+    "id"         int8                                        NOT NULL,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "pid"        int8,
+    "icon"       VARCHAR(100) COLLATE "pg_catalog"."default",
+    "path"       VARCHAR(255) COLLATE "pg_catalog"."default" NOT NULL,
+    "component"  VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "layout"     VARCHAR(100) COLLATE "pg_catalog"."default",
+    "sort"       int4 DEFAULT 0,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_menu"."id" IS '主键ID';
@@ -184,38 +222,63 @@ COMMENT ON TABLE "db_system"."t_menu" IS '菜单表';
 -- ----------------------------
 -- Records of t_menu
 -- ----------------------------
-INSERT INTO "db_system"."t_menu" VALUES (1929929620816441347, '列表示例', 1929928379667386370, 'icon-module', 'table', '/Example/Table/index', NULL, 1, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:10.002749', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620816441348, '表单示例', 1929928379667386370, 'icon-module', 'form', '/Example/Form/index', NULL, 2, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:13.831965', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620816441346, '图表示例', 1929928379667386370, 'icon-module', 'echarts', '/Example/Echarts/index', NULL, 3, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:18.286463', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620753526785, '访问控制', 1929928379575111682, 'icon-module', 'RBAC', '/System/RBAC/index', NULL, 2, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:38.885015', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620753526789, '菜单管理', 1929928379575111682, 'icon-module', 'menu', '/System/Menu/index', NULL, 3, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:42.708315', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620753526787, '字典管理', 1929928379575111682, 'icon-module', 'dict', '/System/Dict/index', NULL, 4, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:45.588571', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620753526790, '文件存储', 1929928379575111682, 'icon-module', 'storage', '/System/Storage/index', NULL, 5, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:48.846378', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620753526788, '定时任务', 1929928379575111682, 'icon-module', 'task', '/System/Task/index', NULL, 6, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:52.30893', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1932983846772363266, '部门管理', 1929928379575111682, 'icon-module', 'dept', '/System/Dept/index', NULL, 1, 1927290201865945090, '2025-06-12 10:10:36.840451', 1927290201865945090, '2025-06-12 10:10:36.840451', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929929620715778049, '用户管理', 1929928379575111682, 'icon-module', 'user', '/System/User/index', NULL, 0, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-13 15:32:51.681846', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929928379667386370, '组件示例', NULL, 'icon-setting', '/example', 'layout', 'layout', 1, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-05 11:37:45.582763', NULL);
-INSERT INTO "db_system"."t_menu" VALUES (1929928379575111682, '系统管理', NULL, 'icon-setting', '/system', 'layout', 'layout', 0, 1927290201865945090, '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-05 11:37:45.582763', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620816441347, '列表示例', 1929928379667386370, 'icon-module', 'table', '/Example/Table/index', NULL, 1, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:10.002749', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620816441348, '表单示例', 1929928379667386370, 'icon-module', 'form', '/Example/Form/index', NULL, 2, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:13.831965', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620816441346, '图表示例', 1929928379667386370, 'icon-module', 'echarts', '/Example/Echarts/index', NULL, 3, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-11 09:47:18.286463', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620753526785, '访问控制', 1929928379575111682, 'icon-module', 'RBAC', '/System/RBAC/index', NULL, 2, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:38.885015', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620753526789, '菜单管理', 1929928379575111682, 'icon-module', 'menu', '/System/Menu/index', NULL, 3, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:42.708315', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620753526787, '字典管理', 1929928379575111682, 'icon-module', 'dict', '/System/Dict/index', NULL, 4, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:45.588571', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620753526790, '文件存储', 1929928379575111682, 'icon-module', 'storage', '/System/Storage/index', NULL, 5, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:48.846378', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620753526788, '定时任务', 1929928379575111682, 'icon-module', 'task', '/System/Task/index', NULL, 6, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-12 10:03:52.30893', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1932983846772363266, '部门管理', 1929928379575111682, 'icon-module', 'dept', '/System/Dept/index', NULL, 1, 1927290201865945090,
+        '2025-06-12 10:10:36.840451', 1927290201865945090, '2025-06-12 10:10:36.840451', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929929620715778049, '用户管理', 1929928379575111682, 'icon-module', 'user', '/System/User/index', NULL, 0, 1927290201865945090,
+        '2025-06-05 11:37:45.58176', 1927290201865945090, '2025-06-13 15:32:51.681846', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929928379667386370, '组件示例', NULL, 'icon-setting', '/example', 'layout', 'layout', 1, 1927290201865945090, '2025-06-05 11:37:45.58176',
+        1927290201865945090, '2025-06-05 11:37:45.582763', NULL);
+INSERT INTO "db_system"."t_menu"
+VALUES (1929928379575111682, '系统管理', NULL, 'icon-setting', '/system', 'layout', 'layout', 0, 1927290201865945090, '2025-06-05 11:37:45.58176',
+        1927290201865945090, '2025-06-05 11:37:45.582763', NULL);
 
 -- ----------------------------
 -- Table structure for t_operation_log
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_operation_log";
-CREATE TABLE "db_system"."t_operation_log" (
-  "id" int8 NOT NULL,
-  "explain" text COLLATE "pg_catalog"."default",
-  "status" int2,
-  "ip" varchar(15) COLLATE "pg_catalog"."default",
-  "method" varchar(255) COLLATE "pg_catalog"."default",
-  "url" varchar(255) COLLATE "pg_catalog"."default",
-  "args" json,
-  "result" json,
-  "time_cost" int8,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_operation_log"
+(
+    "id"         int8 NOT NULL,
+    "explain"    TEXT COLLATE "pg_catalog"."default",
+    "status"     int2,
+    "ip"         VARCHAR(15) COLLATE "pg_catalog"."default",
+    "method"     VARCHAR(255) COLLATE "pg_catalog"."default",
+    "url"        VARCHAR(255) COLLATE "pg_catalog"."default",
+    "args"       json,
+    "result"     json,
+    "time_cost"  int8,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_operation_log"."id" IS '主键ID';
@@ -237,521 +300,19431 @@ COMMENT ON TABLE "db_system"."t_operation_log" IS '操作日志表';
 -- ----------------------------
 -- Records of t_operation_log
 -- ----------------------------
-INSERT INTO "db_system"."t_operation_log" VALUES (1940659711249399809, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":"正常","roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":"本级","remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":"正常","roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":"正常","roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 117, 1927290201865945090, '2025-07-03 14:31:45.534856', 1927290201865945090, '2025-07-03 14:31:45.534856', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940661644718731265, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":"正常","roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":"本级","remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":"正常","roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":"正常","roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 115, 1927290201865945090, '2025-07-03 14:39:26.508195', 1927290201865945090, '2025-07-03 14:39:26.508195', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940661651496726530, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":"正常","roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":"本级","remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":"正常","roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":"正常","roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 8, 1927290201865945090, '2025-07-03 14:39:28.124464', 1927290201865945090, '2025-07-03 14:39:28.125466', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664530278248449, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 13, 1927290201865945090, '2025-07-03 14:50:54.488211', 1927290201865945090, '2025-07-03 14:50:54.488211', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664534363500546, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 5, 1927290201865945090, '2025-07-03 14:50:55.456189', 1927290201865945090, '2025-07-03 14:50:55.457191', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664538998206466, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 6, 1927290201865945090, '2025-07-03 14:50:56.562611', 1927290201865945090, '2025-07-03 14:50:56.562611', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664558153592834, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:51:01.132984', 1927290201865945090, '2025-07-03 14:51:01.132984', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664570342240258, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:51:04.039488', 1927290201865945090, '2025-07-03 14:51:04.039488', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670034249428994, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{"code":"ZD_CODE1"}', '[]', 6, 1927290201865945090, '2025-07-03 15:12:46.733607', 1927290201865945090, '2025-07-03 15:12:46.733607', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670035763572738, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{"code":"TEST_TYPE2"}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:47.094835', 1927290201865945090, '2025-07-03 15:12:47.094835', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670037680369665, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{"code":"C_123"}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:47.549353', 1927290201865945090, '2025-07-03 15:12:47.549353', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664705134587906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:51:36.18132', 1927290201865945090, '2025-07-03 14:51:36.18132', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664719655268353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 3, 1927290201865945090, '2025-07-03 14:51:39.629523', 1927290201865945090, '2025-07-03 14:51:39.629523', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664723916681218, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 6, 1927290201865945090, '2025-07-03 14:51:40.654734', 1927290201865945090, '2025-07-03 14:51:40.654734', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664733257396225, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 21, 1927290201865945090, '2025-07-03 14:51:42.877601', 1927290201865945090, '2025-07-03 14:51:42.877601', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664740630982658, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:51:44.635656', 1927290201865945090, '2025-07-03 14:51:44.635656', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664805592363010, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:52:00.122931', 1927290201865945090, '2025-07-03 14:52:00.122931', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664832461074433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 14:52:06.52412', 1927290201865945090, '2025-07-03 14:52:06.52412', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664844972683266, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 3, 1927290201865945090, '2025-07-03 14:52:09.509516', 1927290201865945090, '2025-07-03 14:52:09.509516', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664847866753025, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 2, 1927290201865945090, '2025-07-03 14:52:10.207405', 1927290201865945090, '2025-07-03 14:52:10.207405', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670039450365953, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_4', '{"code":"C_4"}', '[]', 5, 1927290201865945090, '2025-07-03 15:12:47.973649', 1927290201865945090, '2025-07-03 15:12:47.973649', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670041346191362, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:48.423974', 1927290201865945090, '2025-07-03 15:12:48.423974', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670042910666754, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:48.807948', 1927290201865945090, '2025-07-03 15:12:48.807948', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670044173152258, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:49.10045', 1927290201865945090, '2025-07-03 15:12:49.10045', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940664861510823938, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 14:52:13.457161', 1927290201865945090, '2025-07-03 14:52:13.457161', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666583977209858, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 95, 1927290201865945090, '2025-07-03 14:59:04.11868', 1927290201865945090, '2025-07-03 14:59:04.11868', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666612804661249, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:59:11.002383', 1927290201865945090, '2025-07-03 14:59:11.002383', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666612930490369, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:59:11.035383', 1927290201865945090, '2025-07-03 14:59:11.035383', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666675064909826, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 14:59:25.842375', 1927290201865945090, '2025-07-03 14:59:25.842375', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666765779316737, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 14:59:47.471241', 1927290201865945090, '2025-07-03 14:59:47.471241', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670045670518785, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:12:49.450824', 1927290201865945090, '2025-07-03 15:12:49.450824', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940666957601615874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 6, 1927290201865945090, '2025-07-03 15:00:33.207138', 1927290201865945090, '2025-07-03 15:00:33.207138', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667007991984130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:00:45.221827', 1927290201865945090, '2025-07-03 15:00:45.221827', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667034424487938, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:00:51.519417', 1927290201865945090, '2025-07-03 15:00:51.519417', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667133011603458, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:01:15.033885', 1927290201865945090, '2025-07-03 15:01:15.033885', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667160039698433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:01:21.462929', 1927290201865945090, '2025-07-03 15:01:21.462929', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667232236253185, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:01:38.680729', 1927290201865945090, '2025-07-03 15:01:38.680729', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672813508493313, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:49.354801', 1927290201865945090, '2025-07-03 15:23:49.354801', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672815802777602, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:49.903288', 1927290201865945090, '2025-07-03 15:23:49.903288', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672815802777603, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:49.91105', 1927290201865945090, '2025-07-03 15:23:49.91105', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667247075700737, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:01:42.223886', 1927290201865945090, '2025-07-03 15:01:42.223886', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667284287565825, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:01:51.096336', 1927290201865945090, '2025-07-03 15:01:51.096336', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667333595803650, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 63, 1927290201865945090, '2025-07-03 15:02:02.851759', 1927290201865945090, '2025-07-03 15:02:02.851759', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667335961391106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 10, 1927290201865945090, '2025-07-03 15:02:03.415631', 1927290201865945090, '2025-07-03 15:02:03.415631', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667509194534914, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:02:44.709582', 1927290201865945090, '2025-07-03 15:02:44.709582', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667525636206593, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:02:48.638668', 1927290201865945090, '2025-07-03 15:02:48.638668', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667675905536001, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 6, 1927290201865945090, '2025-07-03 15:03:24.462852', 1927290201865945090, '2025-07-03 15:03:24.462852', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667678413729793, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 4, 1927290201865945090, '2025-07-03 15:03:25.061261', 1927290201865945090, '2025-07-03 15:03:25.061261', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667682582867970, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 3, 1927290201865945090, '2025-07-03 15:03:26.061811', 1927290201865945090, '2025-07-03 15:03:26.061811', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667684612911106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 6, 1927290201865945090, '2025-07-03 15:03:26.530924', 1927290201865945090, '2025-07-03 15:03:26.530924', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667695203528705, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:03:29.067685', 1927290201865945090, '2025-07-03 15:03:29.067685', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667761272205314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:03:44.810021', 1927290201865945090, '2025-07-03 15:03:44.810021', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667770193489921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:03:46.942004', 1927290201865945090, '2025-07-03 15:03:46.942004', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667784105996290, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 6, 1927290201865945090, '2025-07-03 15:03:50.256692', 1927290201865945090, '2025-07-03 15:03:50.256692', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667933125423105, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:04:25.786725', 1927290201865945090, '2025-07-03 15:04:25.786725', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667937739157505, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:04:26.891442', 1927290201865945090, '2025-07-03 15:04:26.891442', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667943007203329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 4, 1927290201865945090, '2025-07-03 15:04:28.146188', 1927290201865945090, '2025-07-03 15:04:28.146188', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667951479697410, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 7, 1927290201865945090, '2025-07-03 15:04:30.165418', 1927290201865945090, '2025-07-03 15:04:30.165418', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940667959658590209, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:04:32.110033', 1927290201865945090, '2025-07-03 15:04:32.110033', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940668065078226945, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:04:57.253504', 1927290201865945090, '2025-07-03 15:04:57.253504', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940668073810767874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:04:59.330022', 1927290201865945090, '2025-07-03 15:04:59.330022', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940668373703503873, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:06:10.831145', 1927290201865945090, '2025-07-03 15:06:10.831145', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940668398223405058, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 5, 1927290201865945090, '2025-07-03 15:06:16.671163', 1927290201865945090, '2025-07-03 15:06:16.671163', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940668408100990978, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:06:19.035893', 1927290201865945090, '2025-07-03 15:06:19.035893', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669633840197634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:11:11.26415', 1927290201865945090, '2025-07-03 15:11:11.26415', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669639653502978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:11:12.652651', 1927290201865945090, '2025-07-03 15:11:12.652651', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669650248314881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:11:15.178393', 1927290201865945090, '2025-07-03 15:11:15.178393', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669715171946497, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:11:30.658165', 1927290201865945090, '2025-07-03 15:11:30.658165', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669724814651394, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:11:32.954562', 1927290201865945090, '2025-07-03 15:11:32.954562', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669734050508801, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:11:35.160574', 1927290201865945090, '2025-07-03 15:11:35.160574', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669747317092353, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:11:38.33458', 1927290201865945090, '2025-07-03 15:11:38.33458', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672817941872642, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 2, 1927290201865945090, '2025-07-03 15:23:50.419889', 1927290201865945090, '2025-07-03 15:23:50.419889', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669788563877889, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:11:48.154564', 1927290201865945090, '2025-07-03 15:11:48.154564', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669924492881921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:12:20.559985', 1927290201865945090, '2025-07-03 15:12:20.559985', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669955996299265, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:12:28.085604', 1927290201865945090, '2025-07-03 15:12:28.085604', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669992457383937, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:36.769338', 1927290201865945090, '2025-07-03 15:12:36.770338', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940669995015909377, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 5, 1927290201865945090, '2025-07-03 15:12:37.377715', 1927290201865945090, '2025-07-03 15:12:37.377715', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670005036101633, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:12:39.764058', 1927290201865945090, '2025-07-03 15:12:39.764058', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670021414858754, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:12:43.681762', 1927290201865945090, '2025-07-03 15:12:43.681762', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670024032104450, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 5, 1927290201865945090, '2025-07-03 15:12:44.299351', 1927290201865945090, '2025-07-03 15:12:44.299351', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670025995038722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:44.759309', 1927290201865945090, '2025-07-03 15:12:44.759309', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670027236552705, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{"code":"顶顶顶顶顶"}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:45.063679', 1927290201865945090, '2025-07-03 15:12:45.063679', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670028616478722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{"code":"顶顶顶顶顶"}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:45.398008', 1927290201865945090, '2025-07-03 15:12:45.398008', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670030055124994, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{"code":"C_123"}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:45.742768', 1927290201865945090, '2025-07-03 15:12:45.742768', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670031363747842, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{"code":"TEST_TYPE2"}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:46.047728', 1927290201865945090, '2025-07-03 15:12:46.047728', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670078897795073, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 7, 1927290201865945090, '2025-07-03 15:12:57.373332', 1927290201865945090, '2025-07-03 15:12:57.373332', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670085352828929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_2","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 5, 1927290201865945090, '2025-07-03 15:12:58.917506', 1927290201865945090, '2025-07-03 15:12:58.917506', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670092759969794, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:13:00.691582', 1927290201865945090, '2025-07-03 15:13:00.691582', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670539449212930, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940608046697762817,"dict_type_id":1940606153753841665,"label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"}}', NULL, 115, 1927290201865945090, '2025-07-03 15:14:47.177406', 1927290201865945090, '2025-07-03 15:14:47.177406', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670543962284033, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 29, 1927290201865945090, '2025-07-03 15:14:48.257615', 1927290201865945090, '2025-07-03 15:14:48.257615', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670645997117442, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:15:12.587555', 1927290201865945090, '2025-07-03 15:15:12.587555', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670666410795009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:15:17.452944', 1927290201865945090, '2025-07-03 15:15:17.452944', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672818008981506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 2, 1927290201865945090, '2025-07-03 15:23:50.428936', 1927290201865945090, '2025-07-03 15:23:50.428936', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143699273080835, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 6, 1927290201865945090, '2025-07-07 16:48:35.848738', 1927290201865945090, '2025-07-07 16:48:35.848738', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670794601308161, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:15:48.019328', 1927290201865945090, '2025-07-03 15:15:48.019328', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670844018597889, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:15:59.804675', 1927290201865945090, '2025-07-03 15:15:59.804675', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670874729291777, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 6, 1927290201865945090, '2025-07-03 15:16:07.11502', 1927290201865945090, '2025-07-03 15:16:07.11502', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670918442328066, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:16:17.545452', 1927290201865945090, '2025-07-03 15:16:17.545452', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940670998373179393, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:16:36.593795', 1927290201865945090, '2025-07-03 15:16:36.593795', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671088613629954, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:16:58.119547', 1927290201865945090, '2025-07-03 15:16:58.119547', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673888823181315, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:28:05.730252', 1927290201865945090, '2025-07-03 15:28:05.730252', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144713875218433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090, '2025-07-07 16:52:37.762718', 1927290201865945090, '2025-07-07 16:52:37.762718', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671132775456769, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:17:08.641826', 1927290201865945090, '2025-07-03 15:17:08.641826', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671254959726594, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:17:37.773806', 1927290201865945090, '2025-07-03 15:17:37.773806', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671525370626050, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_1","value":"9999","sort":999,"state":"启用"}]', 106, 1927290201865945090, '2025-07-03 15:18:42.238737', 1927290201865945090, '2025-07-03 15:18:42.238737', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671533989920769, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940608046697762817,"dict_type_id":1940606153753841665,"label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"}}', NULL, 85, 1927290201865945090, '2025-07-03 15:18:44.303499', 1927290201865945090, '2025-07-03 15:18:44.303499', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671538414911490, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 10, 1927290201865945090, '2025-07-03 15:18:45.351637', 1927290201865945090, '2025-07-03 15:18:45.351637', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671546795130881, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940608046697762817,"dict_type_id":1940606153753841665,"label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"}}', NULL, 10, 1927290201865945090, '2025-07-03 15:18:47.35031', 1927290201865945090, '2025-07-03 15:18:47.35031', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671551094292482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 6, 1927290201865945090, '2025-07-03 15:18:48.384577', 1927290201865945090, '2025-07-03 15:18:48.384577', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671612628926465, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940606284905533441,"dict_type_id":1940606153753841665,"label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}}', NULL, 6, 1927290201865945090, '2025-07-03 15:19:03.044281', 1927290201865945090, '2025-07-03 15:19:03.044281', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671616999391233, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:19:04.088089', 1927290201865945090, '2025-07-03 15:19:04.088089', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671628609224706, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940608046697762817,"dict_type_id":1940606153753841665,"label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"}}', NULL, 7, 1927290201865945090, '2025-07-03 15:19:06.866402', 1927290201865945090, '2025-07-03 15:19:06.866402', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671632946135042, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:19:07.899186', 1927290201865945090, '2025-07-03 15:19:07.899186', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671638889463810, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 6, 1927290201865945090, '2025-07-03 15:19:09.303015', 1927290201865945090, '2025-07-03 15:19:09.303015', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671640802066434, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 5, 1927290201865945090, '2025-07-03 15:19:09.767419', 1927290201865945090, '2025-07-03 15:19:09.767419', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671785681715201, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:19:44.31729', 1927290201865945090, '2025-07-03 15:19:44.31729', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671829981954049, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:19:54.864959', 1927290201865945090, '2025-07-03 15:19:54.864959', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671863276339202, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:20:02.80588', 1927290201865945090, '2025-07-03 15:20:02.80588', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671890757419009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:20:09.357045', 1927290201865945090, '2025-07-03 15:20:09.357045', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674175235424258, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:29:14.017768', 1927290201865945090, '2025-07-03 15:29:14.017768', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143616297164802, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[]', 2, 1927290201865945090, '2025-07-07 16:48:16.075411', 1927290201865945090, '2025-07-07 16:48:16.075411', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146708455501825, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 14, 1927290201865945090, '2025-07-07 17:00:33.304911', 1927290201865945090, '2025-07-07 17:00:33.304911', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940671959334289409, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:20:25.713452', 1927290201865945090, '2025-07-03 15:20:25.713452', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672085083717634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:20:55.690295', 1927290201865945090, '2025-07-03 15:20:55.690295', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672115127517186, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:21:02.857335', 1927290201865945090, '2025-07-03 15:21:02.857335', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672135268564994, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:21:07.651291', 1927290201865945090, '2025-07-03 15:21:07.651291', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672567688724482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:22:50.756033', 1927290201865945090, '2025-07-03 15:22:50.756033', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672641118404609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:23:08.257163', 1927290201865945090, '2025-07-03 15:23:08.257163', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674188434898945, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940606284905533441,"dict_type_id":1940606153753841665,"label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用","remark":"参数"}}', NULL, 5, 1927290201865945090, '2025-07-03 15:29:17.177755', 1927290201865945090, '2025-07-03 15:29:17.177755', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143658663829507, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942143605777850369,"label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}}', NULL, 5, 1927290201865945090, '2025-07-07 16:48:26.18161', 1927290201865945090, '2025-07-07 16:48:26.18161', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672655219654657, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:23:11.627768', 1927290201865945090, '2025-07-03 15:23:11.627768', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672672206585857, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:23:15.672609', 1927290201865945090, '2025-07-03 15:23:15.672609', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672696932007937, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:23:21.573789', 1927290201865945090, '2025-07-03 15:23:21.573789', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672750682013697, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:23:34.379561', 1927290201865945090, '2025-07-03 15:23:34.379561', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672762417676289, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:23:37.186553', 1927290201865945090, '2025-07-03 15:23:37.186553', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672777953378305, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:23:40.890635', 1927290201865945090, '2025-07-03 15:23:40.890635', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672810853498881, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:48.723719', 1927290201865945090, '2025-07-03 15:23:48.723719', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672810853498882, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:48.73372', 1927290201865945090, '2025-07-03 15:23:48.73372', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672813445578754, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:49.346802', 1927290201865945090, '2025-07-03 15:23:49.346802', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672826154319874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:23:52.377233', 1927290201865945090, '2025-07-03 15:23:52.377233', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672835679584258, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:23:54.64584', 1927290201865945090, '2025-07-03 15:23:54.64584', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672838791757826, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{"code":"ZD_CODE1"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.38901', 1927290201865945090, '2025-07-03 15:23:55.38901', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672838791757827, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{"code":"ZD_CODE1"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.398017', 1927290201865945090, '2025-07-03 15:23:55.398017', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672840821800961, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{"code":"TEST_TYPE2"}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:55.880882', 1927290201865945090, '2025-07-03 15:23:55.880882', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672840888909825, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{"code":"TEST_TYPE2"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.890881', 1927290201865945090, '2025-07-03 15:23:55.890881', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672846161149954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:57.14451', 1927290201865945090, '2025-07-03 15:23:57.14451', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672846224064513, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:57.155509', 1927290201865945090, '2025-07-03 15:23:57.155509', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672848207970305, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 5, 1927290201865945090, '2025-07-03 15:23:57.639244', 1927290201865945090, '2025-07-03 15:23:57.639244', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672848291856385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:57.648277', 1927290201865945090, '2025-07-03 15:23:57.648277', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672917653061634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:24:14.186922', 1927290201865945090, '2025-07-03 15:24:14.186922', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672923302789121, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{"code":"顶顶顶顶顶"}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:15.534202', 1927290201865945090, '2025-07-03 15:24:15.535202', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672925265723393, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 5, 1927290201865945090, '2025-07-03 15:24:16.002644', 1927290201865945090, '2025-07-03 15:24:16.002644', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672927165743105, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:16.453182', 1927290201865945090, '2025-07-03 15:24:16.453182', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672929720074241, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:24:17.075866', 1927290201865945090, '2025-07-03 15:24:17.075866', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672936296742913, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:18.630614', 1927290201865945090, '2025-07-03 15:24:18.630614', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940672938611998721, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 4, 1927290201865945090, '2025-07-03 15:24:19.183128', 1927290201865945090, '2025-07-03 15:24:19.183128', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674192872472578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用","remark":"参数"}]', 5, 1927290201865945090, '2025-07-03 15:29:18.230489', 1927290201865945090, '2025-07-03 15:29:18.230489', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143663042682882, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 5, 1927290201865945090, '2025-07-07 16:48:27.216693', 1927290201865945090, '2025-07-07 16:48:27.216693', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148900184862722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 4, 1927290201865945090, '2025-07-07 17:09:15.849473', 1927290201865945090, '2025-07-07 17:09:15.849473', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673280871399425, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:25:40.788714', 1927290201865945090, '2025-07-03 15:25:40.788714', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673302258155521, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:25:45.890485', 1927290201865945090, '2025-07-03 15:25:45.890485', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673327222652929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{"code":"顶顶顶顶顶"}', '[]', 5, 1927290201865945090, '2025-07-03 15:25:51.841462', 1927290201865945090, '2025-07-03 15:25:51.841462', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673329646960641, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 2, 1927290201865945090, '2025-07-03 15:25:52.415575', 1927290201865945090, '2025-07-03 15:25:52.415575', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673332935294978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 3, 1927290201865945090, '2025-07-03 15:25:53.208844', 1927290201865945090, '2025-07-03 15:25:53.208844', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673335464460289, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 5, 1927290201865945090, '2025-07-03 15:25:53.799695', 1927290201865945090, '2025-07-03 15:25:53.799695', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673338371112962, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 3, 1927290201865945090, '2025-07-03 15:25:54.499096', 1927290201865945090, '2025-07-03 15:25:54.499096', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673339943976962, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 4, 1927290201865945090, '2025-07-03 15:25:54.876706', 1927290201865945090, '2025-07-03 15:25:54.876706', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673342355701761, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 4, 1927290201865945090, '2025-07-03 15:25:55.444565', 1927290201865945090, '2025-07-03 15:25:55.444565', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673347325952002, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 4, 1927290201865945090, '2025-07-03 15:25:56.640379', 1927290201865945090, '2025-07-03 15:25:56.640379', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673354343022594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 6, 1927290201865945090, '2025-07-03 15:25:58.306901', 1927290201865945090, '2025-07-03 15:25:58.306901', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673357174177794, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:25:58.983127', 1927290201865945090, '2025-07-03 15:25:58.983127', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673394310545409, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:26:07.82825', 1927290201865945090, '2025-07-03 15:26:07.82825', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673567866650625, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 1, 1927290201865945090, '2025-07-03 15:26:49.208748', 1927290201865945090, '2025-07-03 15:26:49.208748', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673690625540098, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 1, 1927290201865945090, '2025-07-03 15:27:18.480059', 1927290201865945090, '2025-07-03 15:27:18.480059', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673745780637697, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:27:31.62827', 1927290201865945090, '2025-07-03 15:27:31.62827', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673780996014082, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:27:40.028437', 1927290201865945090, '2025-07-03 15:27:40.028437', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673822528012290, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:27:49.925638', 1927290201865945090, '2025-07-03 15:27:49.925638', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673832548204546, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_3","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 2, 1927290201865945090, '2025-07-03 15:27:52.313677', 1927290201865945090, '2025-07-03 15:27:52.313677', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673858720661505, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940608046697762817,"dict_type_id":1940606153753841665,"label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"}}', NULL, 6, 1927290201865945090, '2025-07-03 15:27:58.566414', 1927290201865945090, '2025-07-03 15:27:58.566414', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673863095320577, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:27:59.609075', 1927290201865945090, '2025-07-03 15:27:59.609075', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673863095320578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_4","value":"9999","sort":999,"state":"启用"}]', 3, 1927290201865945090, '2025-07-03 15:27:59.609075', 1927290201865945090, '2025-07-03 15:27:59.609075', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673884414967809, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{"params":{"id":1940606284905533441,"dict_type_id":1940606153753841665,"label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用"}}', NULL, 8, 1927290201865945090, '2025-07-03 15:28:04.685809', 1927290201865945090, '2025-07-03 15:28:04.685809', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673888823181314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:28:05.729252', 1927290201865945090, '2025-07-03 15:28:05.729252', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940673969219600386, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 3, 1927290201865945090, '2025-07-03 15:28:24.903691', 1927290201865945090, '2025-07-03 15:28:24.903691', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674077113876482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:28:50.636254', 1927290201865945090, '2025-07-03 15:28:50.636254', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674096835493890, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:28:55.326916', 1927290201865945090, '2025-07-03 15:28:55.326916', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674104112611329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 2, 1927290201865945090, '2025-07-03 15:28:57.070784', 1927290201865945090, '2025-07-03 15:28:57.070784', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674105895190530, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 4, 1927290201865945090, '2025-07-03 15:28:57.484579', 1927290201865945090, '2025-07-03 15:28:57.484579', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674107669381121, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 3, 1927290201865945090, '2025-07-03 15:28:57.918517', 1927290201865945090, '2025-07-03 15:28:57.918517', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674109309353986, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用"}]', 7, 1927290201865945090, '2025-07-03 15:28:58.304539', 1927290201865945090, '2025-07-03 15:28:58.304539', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674155962597378, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"pid":1939957440345735169,"name":"参数6","code":"CS5","state":"启用","remark":""}}', NULL, 18, 1927290201865945090, '2025-07-03 15:29:09.420709', 1927290201865945090, '2025-07-03 15:29:09.420709', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674160295313410, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[{"id":"1940674155836768258","pid":1939957440345735169,"name":"参数6","code":"CS5","state":"启用","remark":"","children":[]}]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 4, 1927290201865945090, '2025-07-03 15:29:10.468265', 1927290201865945090, '2025-07-03 15:29:10.468265', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674166070870017, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 4, 1927290201865945090, '2025-07-03 15:29:11.830367', 1927290201865945090, '2025-07-03 15:29:11.830367', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674168641978370, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 4, 1927290201865945090, '2025-07-03 15:29:12.443284', 1927290201865945090, '2025-07-03 15:29:12.443284', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674192872472577, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[{"id":"1940674155836768258","pid":1939957440345735169,"name":"参数6","code":"CS5","state":"启用","remark":"","children":[]}]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 5, 1927290201865945090, '2025-07-03 15:29:18.230489', 1927290201865945090, '2025-07-03 15:29:18.230489', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674865840160769, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 3, 1927290201865945090, '2025-07-03 15:31:58.683634', 1927290201865945090, '2025-07-03 15:31:58.683634', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674878725062657, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:01.752115', 1927290201865945090, '2025-07-03 15:32:01.752115', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674882860646402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 9, 1927290201865945090, '2025-07-03 15:32:02.740717', 1927290201865945090, '2025-07-03 15:32:02.740717', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674889525395458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{"code":"C6"}', '[]', 5, 1927290201865945090, '2025-07-03 15:32:04.329079', 1927290201865945090, '2025-07-03 15:32:04.329079', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674894130741249, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:05.427132', 1927290201865945090, '2025-07-03 15:32:05.427132', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674904549392385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_4', '{"code":"C_4"}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:07.898565', 1927290201865945090, '2025-07-03 15:32:07.898565', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674311743242242, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[{"id":"1940674155836768258","pid":1939957440345735169,"name":"参数6","code":"CS5","state":"启用","remark":"","children":[]}]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 2, 1927290201865945090, '2025-07-03 15:29:46.571636', 1927290201865945090, '2025-07-03 15:29:46.571636', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674867941507074, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 4, 1927290201865945090, '2025-07-03 15:31:59.169655', 1927290201865945090, '2025-07-03 15:31:59.169655', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674869799583745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用","remark":"参数"}]', 3, 1927290201865945090, '2025-07-03 15:31:59.614473', 1927290201865945090, '2025-07-03 15:31:59.614473', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674880759300098, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用","remark":"参数"}]', 2, 1927290201865945090, '2025-07-03 15:32:02.23818', 1927290201865945090, '2025-07-03 15:32:02.23818', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674884378984449, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{"code":"CSZD_3"}', '[{"id":"1940608046697762817","dict_type_id":"1940606153753841665","label":"测试字典值标签_5","value":"888","sort":999,"state":"启用","remark":"备注测试2"},{"id":"1940606284905533441","dict_type_id":"1940606153753841665","label":"测试字典值标签_6","value":"9999","sort":999,"state":"启用","remark":"参数"}]', 8, 1927290201865945090, '2025-07-03 15:32:03.113129', 1927290201865945090, '2025-07-03 15:32:03.113129', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674886954287106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 4, 1927290201865945090, '2025-07-03 15:32:03.711554', 1927290201865945090, '2025-07-03 15:32:03.711554', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674892029394946, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{"code":"CS5"}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:04.913824', 1927290201865945090, '2025-07-03 15:32:04.913824', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674897192583169, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{"code":"顶顶顶顶顶"}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:06.1467', 1927290201865945090, '2025-07-03 15:32:06.1467', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940674900485111810, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{"code":"C_123"}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:06.941443', 1927290201865945090, '2025-07-03 15:32:06.941443', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1940676269900201985, '退出登录', 200, '127.0.0.1', 'POST', '/api/auth/logout', '{}', NULL, 13, NULL, '2025-07-03 15:37:33.427928', NULL, '2025-07-03 15:37:33.427928', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141648531054593, '登录', 200, '127.0.0.1', 'POST', '/api/auth/login', '{"params":{"username":"yangxj96@gmail.com","password":"sysadmin","code":"1234"}}', '{"id":"1927290201865945090","username":"yangxj96@gmail.com","access_token":"49da64d2-ae49-43c9-9d15-4db59e8c7232","authorities":[],"roles":["DEV_ADMIN"]}', 636, 1927290201865945090, '2025-07-07 16:40:26.914646', 1927290201865945090, '2025-07-07 16:40:26.914646', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141650783395841, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 8, 1927290201865945090, '2025-07-07 16:40:27.453264', 1927290201865945090, '2025-07-07 16:40:27.453264', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141709319102466, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1940606153753841665","name":"测试字典3","code":"CSZD_3","state":"启用","remark":"测试字典","children":[{"id":"1940614715133612033","pid":1940606153753841665,"name":"测试测试下级字典1","code":"XJ_11","state":"启用","children":[]}]},{"id":"1939957440345735169","name":"测试6","code":"C6","state":"启用","remark":"C5","children":[{"id":"1940674155836768258","pid":1939957440345735169,"name":"参数6","code":"CS5","state":"启用","remark":"","children":[]}]},{"id":"1939957150334779393","name":"测试5","code":"CS5","state":"启用","remark":"测试5","children":[]},{"id":"1939953089195737090","name":"测试12","code":"顶顶顶顶顶","state":"启用","remark":"测试","children":[{"id":"1939953759621677058","pid":1939953089195737090,"name":"测试3","code":"C_123","state":"启用","remark":"","children":[{"id":"1939953883236204545","pid":1939953759621677058,"name":"测试4","code":"C_4","state":"启用","remark":"","children":[]}]}]},{"id":"1939950809859948546","name":"测试字典2","code":"TEST_TYPE2","state":"启用","remark":"","children":[]},{"id":"1939946948415913986","name":"测试字典1","code":"ZD_CODE1","state":"启用","remark":"","children":[]}]', 14, 1927290201865945090, '2025-07-07 16:40:41.420632', 1927290201865945090, '2025-07-07 16:40:41.420632', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141713630846978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{"code":"XJ_11"}', '[]', 6, 1927290201865945090, '2025-07-07 16:40:42.444579', 1927290201865945090, '2025-07-07 16:40:42.444579', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141824565993473, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]', 9, 1927290201865945090, '2025-07-07 16:41:08.887407', 1927290201865945090, '2025-07-07 16:41:08.887407', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143012237697025, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]', 3, 1927290201865945090, '2025-07-07 16:45:52.059162', 1927290201865945090, '2025-07-07 16:45:52.059162', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141825098670081, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":"正常","roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":"本级","remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":"正常","roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":"正常","roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 97, 1927290201865945090, '2025-07-07 16:41:09.010226', 1927290201865945090, '2025-07-07 16:41:09.010226', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942141829553020929, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 3, 1927290201865945090, '2025-07-07 16:41:10.081215', 1927290201865945090, '2025-07-07 16:41:10.081215', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142182856024067, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围"}}', NULL, 14, 1927290201865945090, '2025-07-07 16:42:34.320305', 1927290201865945090, '2025-07-07 16:42:34.320305', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142187239071746, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 3, 1927290201865945090, '2025-07-07 16:42:35.371309', 1927290201865945090, '2025-07-07 16:42:35.371309', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142191752142850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[]', 3, 1927290201865945090, '2025-07-07 16:42:36.44002', 1927290201865945090, '2025-07-07 16:42:36.44002', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142254142414849, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142182856024066,"label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}}', NULL, 7, 1927290201865945090, '2025-07-07 16:42:51.305855', 1927290201865945090, '2025-07-07 16:42:51.305855', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142258542239746, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 2, 1927290201865945090, '2025-07-07 16:42:52.351762', 1927290201865945090, '2025-07-07 16:42:52.351762', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142258542239747, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 11, 1927290201865945090, '2025-07-07 16:42:52.357762', 1927290201865945090, '2025-07-07 16:42:52.357762', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142354801516547, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142182856024066,"label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"}}', NULL, 3, 1927290201865945090, '2025-07-07 16:43:15.317448', 1927290201865945090, '2025-07-07 16:43:15.317448', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142359180369921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 3, 1927290201865945090, '2025-07-07 16:43:16.350671', 1927290201865945090, '2025-07-07 16:43:16.350671', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142359180369922, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 6, 1927290201865945090, '2025-07-07 16:43:16.35167', 1927290201865945090, '2025-07-07 16:43:16.35167', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142489367371778, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142182856024066,"label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"}}', NULL, 6, 1927290201865945090, '2025-07-07 16:43:47.392874', 1927290201865945090, '2025-07-07 16:43:47.392874', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142493687504898, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 4, 1927290201865945090, '2025-07-07 16:43:48.427753', 1927290201865945090, '2025-07-07 16:43:48.427753', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142493750419457, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 7, 1927290201865945090, '2025-07-07 16:43:48.430752', 1927290201865945090, '2025-07-07 16:43:48.431754', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142500515831809, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 7, 1927290201865945090, '2025-07-07 16:43:50.047903', 1927290201865945090, '2025-07-07 16:43:50.048904', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142790749085699, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态"}}', NULL, 4, 1927290201865945090, '2025-07-07 16:44:59.246607', 1927290201865945090, '2025-07-07 16:44:59.246607', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142795056635906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142790749085698","name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 4, 1927290201865945090, '2025-07-07 16:45:00.276693', 1927290201865945090, '2025-07-07 16:45:00.276693', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142921410043906, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组"}}', NULL, 5, 1927290201865945090, '2025-07-07 16:45:30.392337', 1927290201865945090, '2025-07-07 16:45:30.392337', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142925725982722, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[]},{"id":"1942142790749085698","name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]', 4, 1927290201865945090, '2025-07-07 16:45:31.422811', 1927290201865945090, '2025-07-07 16:45:31.422811', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942142928406142978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[]', 5, 1927290201865945090, '2025-07-07 16:45:32.065768', 1927290201865945090, '2025-07-07 16:45:32.065768', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143012367720450, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":"正常","roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":"本级","remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":"正常","roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":"全局","remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":"正常","roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":"本级包含下级","remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 12, 1927290201865945090, '2025-07-07 16:45:52.080162', 1927290201865945090, '2025-07-07 16:45:52.080162', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143018554318849, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[]', 4, 1927290201865945090, '2025-07-07 16:45:53.554502', 1927290201865945090, '2025-07-07 16:45:53.554502', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143020504670209, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 16:45:54.032063', 1927290201865945090, '2025-07-07 16:45:54.032063', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143033062416385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 6, 1927290201865945090, '2025-07-07 16:45:57.01779', 1927290201865945090, '2025-07-07 16:45:57.01779', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143172439138305, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 16:46:30.246119', 1927290201865945090, '2025-07-07 16:46:30.246119', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143184967524353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[]', 2, 1927290201865945090, '2025-07-07 16:46:33.24382', 1927290201865945090, '2025-07-07 16:46:33.24382', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143235223674882, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 16:46:45.215155', 1927290201865945090, '2025-07-07 16:46:45.215155', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143271718313986, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142790749085698,"label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"}}', NULL, 4, 1927290201865945090, '2025-07-07 16:46:53.911349', 1927290201865945090, '2025-07-07 16:46:53.911349', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143311987826689, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 16:47:03.517628', 1927290201865945090, '2025-07-07 16:47:03.517628', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143330354683906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 16:47:07.893776', 1927290201865945090, '2025-07-07 16:47:07.893776', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143370909409282, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 9, 1927290201865945090, '2025-07-07 16:47:17.571812', 1927290201865945090, '2025-07-07 16:47:17.571812', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143375212765185, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 5, 1927290201865945090, '2025-07-07 16:47:18.598952', 1927290201865945090, '2025-07-07 16:47:18.598952', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143015177904130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 6, 1927290201865945090, '2025-07-07 16:45:52.749847', 1927290201865945090, '2025-07-07 16:45:52.749847', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143023834947585, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[]', 3, 1927290201865945090, '2025-07-07 16:45:54.814799', 1927290201865945090, '2025-07-07 16:45:54.814799', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143035616747522, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[]', 3, 1927290201865945090, '2025-07-07 16:45:57.625382', 1927290201865945090, '2025-07-07 16:45:57.625382', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143228055609346, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142790749085698,"label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}}', NULL, 1, 1927290201865945090, '2025-07-07 16:46:43.511789', 1927290201865945090, '2025-07-07 16:46:43.511789', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143235223674883, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 5, 1927290201865945090, '2025-07-07 16:46:45.217158', 1927290201865945090, '2025-07-07 16:46:45.217158', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143277061857282, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 16:46:55.201142', 1927290201865945090, '2025-07-07 16:46:55.201142', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143277128966146, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 7, 1927290201865945090, '2025-07-07 16:46:55.204143', 1927290201865945090, '2025-07-07 16:46:55.204143', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143325971636226, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942142790749085698,"label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"}}', NULL, 2, 1927290201865945090, '2025-07-07 16:47:06.848539', 1927290201865945090, '2025-07-07 16:47:06.848539', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143330354683905, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 5, 1927290201865945090, '2025-07-07 16:47:07.893776', 1927290201865945090, '2025-07-07 16:47:07.893776', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143366991929345, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 16:47:16.62845', 1927290201865945090, '2025-07-07 16:47:16.62845', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143373648289793, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 16:47:18.227796', 1927290201865945090, '2025-07-07 16:47:18.227796', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143442791391234, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 5, 1927290201865945090, '2025-07-07 16:47:34.702869', 1927290201865945090, '2025-07-07 16:47:34.702869', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143513473802241, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 16:47:51.555484', 1927290201865945090, '2025-07-07 16:47:51.555484', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143529563152385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 5, 1927290201865945090, '2025-07-07 16:47:55.396721', 1927290201865945090, '2025-07-07 16:47:55.396721', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143605777850370, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态"}}', NULL, 2, 1927290201865945090, '2025-07-07 16:48:13.567688', 1927290201865945090, '2025-07-07 16:48:13.567688', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143610110566401, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:48:14.598542', 1927290201865945090, '2025-07-07 16:48:14.598542', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143613952548865, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 16:48:15.52381', 1927290201865945090, '2025-07-07 16:48:15.52381', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143663042682881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:48:27.215693', 1927290201865945090, '2025-07-07 16:48:27.215693', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143694822924290, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942143605777850369,"label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"}}', NULL, 4, 1927290201865945090, '2025-07-07 16:48:34.798276', 1927290201865945090, '2025-07-07 16:48:34.798276', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143699273080834, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:48:35.848738', 1927290201865945090, '2025-07-07 16:48:35.848738', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143705933635586, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 4, 1927290201865945090, '2025-07-07 16:48:37.443959', 1927290201865945090, '2025-07-07 16:48:37.443959', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143708932562945, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 16:48:38.157587', 1927290201865945090, '2025-07-07 16:48:38.157587', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143711935684610, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 4, 1927290201865945090, '2025-07-07 16:48:38.870745', 1927290201865945090, '2025-07-07 16:48:38.870745', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143713177198594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 16:48:39.164731', 1927290201865945090, '2025-07-07 16:48:39.164731', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143789152821250, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 16:48:57.279109', 1927290201865945090, '2025-07-07 16:48:57.279109', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143792244023298, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 16:48:58.023096', 1927290201865945090, '2025-07-07 16:48:58.023096', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143795561717761, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 16:48:58.808189', 1927290201865945090, '2025-07-07 16:48:58.808189', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143800070594562, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 7, 1927290201865945090, '2025-07-07 16:48:59.884014', 1927290201865945090, '2025-07-07 16:48:59.884014', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144589073702914, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:52:07.996002', 1927290201865945090, '2025-07-07 16:52:07.996002', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144590894030849, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090, '2025-07-07 16:52:08.439414', 1927290201865945090, '2025-07-07 16:52:08.439414', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144675472171009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090, '2025-07-07 16:52:28.607107', 1927290201865945090, '2025-07-07 16:52:28.607107', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144684095660034, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090, '2025-07-07 16:52:30.660253', 1927290201865945090, '2025-07-07 16:52:30.660253', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143707510693890, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 16:48:37.813848', 1927290201865945090, '2025-07-07 16:48:37.813848', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143710354432002, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 3, 1927290201865945090, '2025-07-07 16:48:38.500632', 1927290201865945090, '2025-07-07 16:48:38.500632', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143714229968897, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 16:48:39.42804', 1927290201865945090, '2025-07-07 16:48:39.42804', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143790914428930, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 5, 1927290201865945090, '2025-07-07 16:48:57.706933', 1927290201865945090, '2025-07-07 16:48:57.706933', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942143797952471042, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 3, 1927290201865945090, '2025-07-07 16:48:59.377334', 1927290201865945090, '2025-07-07 16:48:59.377334', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144182125551618, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090, '2025-07-07 16:50:30.979947', 1927290201865945090, '2025-07-07 16:50:30.979947', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144655595364353, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090, '2025-07-07 16:52:23.857786', 1927290201865945090, '2025-07-07 16:52:23.857786', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144681931399169, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 2, 1927290201865945090, '2025-07-07 16:52:30.140598', 1927290201865945090, '2025-07-07 16:52:30.140598', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144966112305154, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 92, 1927290201865945090, '2025-07-07 16:53:37.887019', 1927290201865945090, '2025-07-07 16:53:37.887019', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942144970491158530, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 12, 1927290201865945090, '2025-07-07 16:53:38.936659', 1927290201865945090, '2025-07-07 16:53:38.936659', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145136652705793, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:54:18.547487', 1927290201865945090, '2025-07-07 16:54:18.547487', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145215815999490, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 6, 1927290201865945090, '2025-07-07 16:54:37.424002', 1927290201865945090, '2025-07-07 16:54:37.424002', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145218240307202, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 16:54:38.009532', 1927290201865945090, '2025-07-07 16:54:38.009532', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145219871891458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 16:54:38.388177', 1927290201865945090, '2025-07-07 16:54:38.388177', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145221499281410, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 7, 1927290201865945090, '2025-07-07 16:54:38.782061', 1927290201865945090, '2025-07-07 16:54:38.782061', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145222807904257, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 8, 1927290201865945090, '2025-07-07 16:54:39.089193', 1927290201865945090, '2025-07-07 16:54:39.089193', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145246363115521, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:54:44.70742', 1927290201865945090, '2025-07-07 16:54:44.70742', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145477632770049, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","remark":"系统权限范围","children":[]}]}]', 98, 1927290201865945090, '2025-07-07 16:55:39.843582', 1927290201865945090, '2025-07-07 16:55:39.843582', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942145944525942785, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 118, 1927290201865945090, '2025-07-07 16:57:31.159338', 1927290201865945090, '2025-07-07 16:57:31.159338', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146237435162626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 16:58:41.007976', 1927290201865945090, '2025-07-07 16:58:41.007976', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146518201872385, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 16:59:47.93754', 1927290201865945090, '2025-07-07 16:59:47.93754', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146595540643841, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:00:06.384988', 1927290201865945090, '2025-07-07 17:00:06.384988', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146639232708609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:00:16.801031', 1927290201865945090, '2025-07-07 17:00:16.801031', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146704290557954, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:00:32.302892', 1927290201865945090, '2025-07-07 17:00:32.302892', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146717875908609, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 9, 1927290201865945090, '2025-07-07 17:00:35.541749', 1927290201865945090, '2025-07-07 17:00:35.541749', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146719306166273, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:00:35.884598', 1927290201865945090, '2025-07-07 17:00:35.884598', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146726574895105, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 7, 1927290201865945090, '2025-07-07 17:00:37.625052', 1927290201865945090, '2025-07-07 17:00:37.625052', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146728818847746, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 6, 1927290201865945090, '2025-07-07 17:00:38.149306', 1927290201865945090, '2025-07-07 17:00:38.149306', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146873279066113, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:01:12.592526', 1927290201865945090, '2025-07-07 17:01:12.592526', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942146933320527874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:01:26.919693', 1927290201865945090, '2025-07-07 17:01:26.919693', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147024949293057, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:01:48.761944', 1927290201865945090, '2025-07-07 17:01:48.762943', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147103164674050, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:02:07.400729', 1927290201865945090, '2025-07-07 17:02:07.400729', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147253777936386, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:02:43.317673', 1927290201865945090, '2025-07-07 17:02:43.317673', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147359868661761, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:03:08.614354', 1927290201865945090, '2025-07-07 17:03:08.614354', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147370358616065, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 6, 1927290201865945090, '2025-07-07 17:03:11.104877', 1927290201865945090, '2025-07-07 17:03:11.104877', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147445776396289, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:03:29.087187', 1927290201865945090, '2025-07-07 17:03:29.087187', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147451333849089, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 6, 1927290201865945090, '2025-07-07 17:03:30.42239', 1927290201865945090, '2025-07-07 17:03:30.42239', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147483571269634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:03:38.102045', 1927290201865945090, '2025-07-07 17:03:38.102045', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147485601312770, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:03:38.592629', 1927290201865945090, '2025-07-07 17:03:38.592629', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147510922326017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 1, 1927290201865945090, '2025-07-07 17:03:44.622494', 1927290201865945090, '2025-07-07 17:03:44.622494', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147515028549633, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:03:45.603408', 1927290201865945090, '2025-07-07 17:03:45.603408', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147619449942017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:04:10.504301', 1927290201865945090, '2025-07-07 17:04:10.504301', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147647023296514, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:04:17.07458', 1927290201865945090, '2025-07-07 17:04:17.07458', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147754766577665, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:04:42.76505', 1927290201865945090, '2025-07-07 17:04:42.76505', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147760890261506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:04:44.213703', 1927290201865945090, '2025-07-07 17:04:44.213703', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147922316439554, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:05:22.714164', 1927290201865945090, '2025-07-07 17:05:22.714164', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147926363942914, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:05:23.679435', 1927290201865945090, '2025-07-07 17:05:23.679435', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942147982315958274, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 1, 1927290201865945090, '2025-07-07 17:05:37.016527', 1927290201865945090, '2025-07-07 17:05:37.016527', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148033071230977, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:05:49.107231', 1927290201865945090, '2025-07-07 17:05:49.107231', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148037722714113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 7, 1927290201865945090, '2025-07-07 17:05:50.229409', 1927290201865945090, '2025-07-07 17:05:50.229409', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148078214524929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:05:59.872661', 1927290201865945090, '2025-07-07 17:05:59.872661', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148128118353921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:06:11.768327', 1927290201865945090, '2025-07-07 17:06:11.768327', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148131268276225, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:06:12.520806', 1927290201865945090, '2025-07-07 17:06:12.520806', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148133155713026, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:06:12.969236', 1927290201865945090, '2025-07-07 17:06:12.969236', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149313197977602, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:10:54.327755', 1927290201865945090, '2025-07-07 17:10:54.327755', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148157558173698, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:06:18.790575', 1927290201865945090, '2025-07-07 17:06:18.790575', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148160951365633, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:06:19.601953', 1927290201865945090, '2025-07-07 17:06:19.601953', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148164130648066, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:06:20.365044', 1927290201865945090, '2025-07-07 17:06:20.365044', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148166949220353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 2, 1927290201865945090, '2025-07-07 17:06:21.031394', 1927290201865945090, '2025-07-07 17:06:21.031394', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148182619140098, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:06:24.769639', 1927290201865945090, '2025-07-07 17:06:24.769639', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148196397428738, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:06:28.047912', 1927290201865945090, '2025-07-07 17:06:28.047912', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148202160402434, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:06:29.422823', 1927290201865945090, '2025-07-07 17:06:29.422823', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148883856437249, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:09:11.961063', 1927290201865945090, '2025-07-07 17:09:11.961063', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148887778111490, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:09:12.899084', 1927290201865945090, '2025-07-07 17:09:12.899084', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148892941299713, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 6, 1927290201865945090, '2025-07-07 17:09:14.121339', 1927290201865945090, '2025-07-07 17:09:14.121339', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148894652575745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:09:14.52329', 1927290201865945090, '2025-07-07 17:09:14.52329', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148953532215297, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:09:28.572827', 1927290201865945090, '2025-07-07 17:09:28.572827', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148956937990145, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:09:29.376419', 1927290201865945090, '2025-07-07 17:09:29.376419', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148958628294658, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 6, 1927290201865945090, '2025-07-07 17:09:29.78766', 1927290201865945090, '2025-07-07 17:09:29.78766', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148984716865537, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:09:36.000983', 1927290201865945090, '2025-07-07 17:09:36.000983', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148986881126402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 5, 1927290201865945090, '2025-07-07 17:09:36.524278', 1927290201865945090, '2025-07-07 17:09:36.524278', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148988323966977, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:09:36.863216', 1927290201865945090, '2025-07-07 17:09:36.863216', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148993625567233, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 5, 1927290201865945090, '2025-07-07 17:09:38.121165', 1927290201865945090, '2025-07-07 17:09:38.121165', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942148994720280578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 6, 1927290201865945090, '2025-07-07 17:09:38.387861', 1927290201865945090, '2025-07-07 17:09:38.387861', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149122403282945, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:10:08.830265', 1927290201865945090, '2025-07-07 17:10:08.830265', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149124085198850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:10:09.231556', 1927290201865945090, '2025-07-07 17:10:09.231556', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149307829268482, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:10:53.034214', 1927290201865945090, '2025-07-07 17:10:53.034214', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149309125308418, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 5, 1927290201865945090, '2025-07-07 17:10:53.344697', 1927290201865945090, '2025-07-07 17:10:53.344697', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149314959585282, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:10:54.74273', 1927290201865945090, '2025-07-07 17:10:54.74273', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149316461146113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 3, 1927290201865945090, '2025-07-07 17:10:55.094573', 1927290201865945090, '2025-07-07 17:10:55.094573', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149318424080385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 5, 1927290201865945090, '2025-07-07 17:10:55.572789', 1927290201865945090, '2025-07-07 17:10:55.572789', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149425848594434, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:11:21.171218', 1927290201865945090, '2025-07-07 17:11:21.171218', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149434463694850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 2, 1927290201865945090, '2025-07-07 17:11:23.226738', 1927290201865945090, '2025-07-07 17:11:23.226738', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149522376306690, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 2, 1927290201865945090, '2025-07-07 17:11:44.198442', 1927290201865945090, '2025-07-07 17:11:44.198442', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149526692245505, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:11:45.225095', 1927290201865945090, '2025-07-07 17:11:45.225095', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149528458047489, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 2, 1927290201865945090, '2025-07-07 17:11:45.638685', 1927290201865945090, '2025-07-07 17:11:45.638685', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149535911325697, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 1, 1927290201865945090, '2025-07-07 17:11:47.412238', 1927290201865945090, '2025-07-07 17:11:47.412238', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149551983898626, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 4, 1927290201865945090, '2025-07-07 17:11:51.251757', 1927290201865945090, '2025-07-07 17:11:51.251757', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149643583303682, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:12:13.085546', 1927290201865945090, '2025-07-07 17:12:13.085546', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149646317989890, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:12:13.737282', 1927290201865945090, '2025-07-07 17:12:13.737282', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149648540971009, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:12:14.264238', 1927290201865945090, '2025-07-07 17:12:14.264238', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149650822672385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 3, 1927290201865945090, '2025-07-07 17:12:14.822279', 1927290201865945090, '2025-07-07 17:12:14.822279', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149665343352834, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 4, 1927290201865945090, '2025-07-07 17:12:18.278156', 1927290201865945090, '2025-07-07 17:12:18.278156', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149697949872130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 1, 1927290201865945090, '2025-07-07 17:12:26.052012', 1927290201865945090, '2025-07-07 17:12:26.052012', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149700705529858, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:12:26.715853', 1927290201865945090, '2025-07-07 17:12:26.715853', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149703909978113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:12:27.468201', 1927290201865945090, '2025-07-07 17:12:27.468201', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149710838968322, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:12:29.120906', 1927290201865945090, '2025-07-07 17:12:29.120906', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149715947630594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:12:30.347395', 1927290201865945090, '2025-07-07 17:12:30.347395', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149718422269954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-07 17:12:30.940051', 1927290201865945090, '2025-07-07 17:12:30.940051', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942149728224358402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 6, 1927290201865945090, '2025-07-07 17:12:33.273886', 1927290201865945090, '2025-07-07 17:12:33.273886', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942150470595194882, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"name":"业务配置","code":"business","state":"启用","remark":"业务部分需要的配置"}}', NULL, 16, 1927290201865945090, '2025-07-07 17:15:30.268612', 1927290201865945090, '2025-07-07 17:15:30.268612', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942150475007602690, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:15:31.311579', 1927290201865945090, '2025-07-07 17:15:31.311579', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151590688272385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{"code":"sys"}', '[]', 4, 1927290201865945090, '2025-07-07 17:19:57.310561', 1927290201865945090, '2025-07-07 17:19:57.310561', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151722745933826, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{"params":{"pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式"}}', NULL, 3, 1927290201865945090, '2025-07-07 17:20:28.80888', 1927290201865945090, '2025-07-07 17:20:28.80888', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151727124787201, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","builtin":false,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:20:29.849831', 1927290201865945090, '2025-07-07 17:20:29.849831', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151733198139394, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:20:31.296855', 1927290201865945090, '2025-07-07 17:20:31.296855', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151735618252802, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[]', 5, 1927290201865945090, '2025-07-07 17:20:31.865978', 1927290201865945090, '2025-07-07 17:20:31.865978', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151805189173250, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 1, 1927290201865945090, '2025-07-07 17:20:48.458845', 1927290201865945090, '2025-07-07 17:20:48.458845', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151810155229185, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[]', 3, 1927290201865945090, '2025-07-07 17:20:49.644518', 1927290201865945090, '2025-07-07 17:20:49.644518', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151812525010946, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 4, 1927290201865945090, '2025-07-07 17:20:50.206538', 1927290201865945090, '2025-07-07 17:20:50.206538', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151815783985153, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 2, 1927290201865945090, '2025-07-07 17:20:50.98801', 1927290201865945090, '2025-07-07 17:20:50.98801', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151817553981442, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 2, 1927290201865945090, '2025-07-07 17:20:51.404728', 1927290201865945090, '2025-07-07 17:20:51.404728', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151819986677762, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[]', 2, 1927290201865945090, '2025-07-07 17:20:51.981835', 1927290201865945090, '2025-07-07 17:20:51.981835', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151875150163970, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942151722745933825,"label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}}', NULL, 8, 1927290201865945090, '2025-07-07 17:21:05.1438', 1927290201865945090, '2025-07-07 17:21:05.1438', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151879709372417, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}]', 7, 1927290201865945090, '2025-07-07 17:21:06.219514', 1927290201865945090, '2025-07-07 17:21:06.219514', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151879709372418, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 8, 1927290201865945090, '2025-07-07 17:21:06.219514', 1927290201865945090, '2025-07-07 17:21:06.219514', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151904090861571, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942151722745933825,"label":"手机号码","value":"1","sort":999,"state":"启用","remark":"手机号码"}}', NULL, 6, 1927290201865945090, '2025-07-07 17:21:12.043592', 1927290201865945090, '2025-07-07 17:21:12.043592', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151908549406723, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":"启用","remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}]', 3, 1927290201865945090, '2025-07-07 17:21:13.092229', 1927290201865945090, '2025-07-07 17:21:13.092229', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151942581989378, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{"params":{"dict_type_id":1942151722745933825,"label":"微信登录","value":"2","sort":999,"state":"启用","remark":"微信登录"}}', NULL, 6, 1927290201865945090, '2025-07-07 17:21:21.21502', 1927290201865945090, '2025-07-07 17:21:21.21502', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151947027951618, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151942581989377","dict_type_id":"1942151722745933825","label":"微信登录","value":"2","sort":999,"state":"启用","remark":"微信登录"},{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":"启用","remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}]', 3, 1927290201865945090, '2025-07-07 17:21:22.273191', 1927290201865945090, '2025-07-07 17:21:22.273191', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151956796485634, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 3, 1927290201865945090, '2025-07-07 17:21:24.609052', 1927290201865945090, '2025-07-07 17:21:24.609052', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151959275319297, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:21:25.190315', 1927290201865945090, '2025-07-07 17:21:25.190315', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151963192799234, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":"启用","remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":"启用","remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":"启用","remark":"正常"}]', 4, 1927290201865945090, '2025-07-07 17:21:26.128341', 1927290201865945090, '2025-07-07 17:21:26.128341', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151965931679745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151942581989377","dict_type_id":"1942151722745933825","label":"微信登录","value":"2","sort":999,"state":"启用","remark":"微信登录"},{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":"启用","remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}]', 3, 1927290201865945090, '2025-07-07 17:21:26.773044', 1927290201865945090, '2025-07-07 17:21:26.773044', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151908549406722, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:21:13.092229', 1927290201865945090, '2025-07-07 17:21:13.092229', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151947027951617, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":"启用","builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":"启用","builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":"启用","builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":"启用","builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":"启用","builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":"启用","builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:21:22.270216', 1927290201865945090, '2025-07-07 17:21:22.270216', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151953151635458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151942581989377","dict_type_id":"1942151722745933825","label":"微信登录","value":"2","sort":999,"state":"启用","remark":"微信登录"},{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":"启用","remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":"启用","remark":"邮箱登录"}]', 3, 1927290201865945090, '2025-07-07 17:21:23.739925', 1927290201865945090, '2025-07-07 17:21:23.739925', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151961183727617, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":"启用","remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":"启用","remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":"启用","remark":"全局范围可查询"}]', 5, 1927290201865945090, '2025-07-07 17:21:25.641406', 1927290201865945090, '2025-07-07 17:21:25.641406', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942151964375592961, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":"启用","remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":"启用","remark":"启用"}]', 2, 1927290201865945090, '2025-07-07 17:21:26.409066', 1927290201865945090, '2025-07-07 17:21:26.409066', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154031148240897, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 90, 1927290201865945090, '2025-07-07 17:29:39.160622', 1927290201865945090, '2025-07-07 17:29:39.160622', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154034302357506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151942581989377","dict_type_id":"1942151722745933825","label":"微信登录","value":"2","sort":999,"state":0,"remark":"微信登录"},{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":0,"remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":0,"remark":"邮箱登录"}]', 14, 1927290201865945090, '2025-07-07 17:29:39.92638', 1927290201865945090, '2025-07-07 17:29:39.92738', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154076610301954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/business', '{"code":"business"}', '[]', 5, 1927290201865945090, '2025-07-07 17:29:50.003471', 1927290201865945090, '2025-07-07 17:29:50.003471', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154079894441986, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 9, 1927290201865945090, '2025-07-07 17:29:50.784689', 1927290201865945090, '2025-07-07 17:29:50.784689', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154081056264194, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 200, 1927290201865945090, '2025-07-07 17:29:51.069769', 1927290201865945090, '2025-07-07 17:29:51.069769', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154101990035458, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 12, 1927290201865945090, '2025-07-07 17:29:56.064005', 1927290201865945090, '2025-07-07 17:29:56.064005', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154101990035459, '分页查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/pageRole', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"},{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}],"total":3,"size":100,"current":1,"pages":1}', 19, 1927290201865945090, '2025-07-07 17:29:56.066006', 1927290201865945090, '2025-07-07 17:29:56.066006', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154117567680513, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:29:59.764584', 1927290201865945090, '2025-07-07 17:29:59.764584', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154117567680514, '分页查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/pageRole', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"},{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}],"total":3,"size":100,"current":1,"pages":1}', 22, 1927290201865945090, '2025-07-07 17:29:59.777582', 1927290201865945090, '2025-07-07 17:29:59.777582', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154147535982594, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 7, 1927290201865945090, '2025-07-07 17:30:06.910743', 1927290201865945090, '2025-07-07 17:30:06.910743', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154152535592962, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:30:08.112411', 1927290201865945090, '2025-07-07 17:30:08.112411', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942154240574033921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:30:29.103046', 1927290201865945090, '2025-07-07 17:30:29.103046', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942155242010251265, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:34:27.860177', 1927290201865945090, '2025-07-07 17:34:27.860177', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408011770204162, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 4, 1927290201865945090, '2025-07-08 10:18:52.859866', 1927290201865945090, '2025-07-08 10:18:52.860866', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942155379549868034, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:35:00.650156', 1927290201865945090, '2025-07-07 17:35:00.650156', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942155689605402626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-07 17:36:14.570247', 1927290201865945090, '2025-07-07 17:36:14.570247', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160252576141314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:54:22.474831', 1927290201865945090, '2025-07-07 17:54:22.474831', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160257974210562, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:54:23.751762', 1927290201865945090, '2025-07-07 17:54:23.751762', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160267600138241, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 5, 1927290201865945090, '2025-07-07 17:54:26.053166', 1927290201865945090, '2025-07-07 17:54:26.053166', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160276865355778, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 6, 1927290201865945090, '2025-07-07 17:54:28.25537', 1927290201865945090, '2025-07-07 17:54:28.25537', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160290337460225, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-07 17:54:31.481298', 1927290201865945090, '2025-07-07 17:54:31.481298', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160303637598209, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 17:54:34.647486', 1927290201865945090, '2025-07-07 17:54:34.647486', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160676737716226, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-07 17:56:03.6016', 1927290201865945090, '2025-07-07 17:56:03.6016', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160823739682818, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 17:56:38.645304', 1927290201865945090, '2025-07-07 17:56:38.645304', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942160340685885442, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:54:43.478495', 1927290201865945090, '2025-07-07 17:54:43.478495', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942161631264837633, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 6, 1927290201865945090, '2025-07-07 17:59:51.179674', 1927290201865945090, '2025-07-07 17:59:51.180673', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942161660666908673, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 17:59:58.189541', 1927290201865945090, '2025-07-07 17:59:58.189541', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942161672247382017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 18:00:00.949164', 1927290201865945090, '2025-07-07 18:00:00.949164', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942161680937979906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 1, 1927290201865945090, '2025-07-07 18:00:03.020571', 1927290201865945090, '2025-07-07 18:00:03.020571', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942161752195010562, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 18:00:20.009688', 1927290201865945090, '2025-07-07 18:00:20.009688', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942414379134701569, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","gid":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","gid":"1942143605777850369","label":"启用","value":"0","sort":999,"state":0,"remark":"启用"}]', 19, 1927290201865945090, '2025-07-08 10:44:10.965908', 1927290201865945090, '2025-07-08 10:44:10.965908', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942162255725400065, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-07 18:02:20.057457', 1927290201865945090, '2025-07-07 18:02:20.057457', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942162271936385026, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 18:02:23.930085', 1927290201865945090, '2025-07-07 18:02:23.930085', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942162439649824770, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-07 18:03:03.913101', 1927290201865945090, '2025-07-07 18:03:03.913101', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942162452396314626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-07 18:03:06.955588', 1927290201865945090, '2025-07-07 18:03:06.955588', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942406343573868545, '登录', 200, '127.0.0.1', 'POST', '/api/auth/login', '{"params":{"username":"yangxj96@gmail.com","password":"sysadmin","code":"1234"}}', '{"id":"1927290201865945090","username":"yangxj96@gmail.com","access_token":"ea91a498-f8cd-4fc9-925c-0544d4b3fc2b","authorities":[],"roles":["DEV_ADMIN"]}', 876, 1927290201865945090, '2025-07-08 10:12:15.130786', 1927290201865945090, '2025-07-08 10:12:15.130786', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942406345830404097, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[{"id":"1929928379575111682","icon":"icon-setting","name":"系统管理","path":"/system","component":"layout","layout":"layout","sort":0,"children":[{"id":"1929929620715778049","pid":"1929928379575111682","icon":"icon-module","name":"用户管理","path":"user","component":"/System/User/index","sort":0,"children":[]},{"id":"1932983846772363266","pid":"1929928379575111682","icon":"icon-module","name":"部门管理","path":"dept","component":"/System/Dept/index","sort":1,"children":[]},{"id":"1929929620753526785","pid":"1929928379575111682","icon":"icon-module","name":"访问控制","path":"RBAC","component":"/System/RBAC/index","sort":2,"children":[]},{"id":"1929929620753526789","pid":"1929928379575111682","icon":"icon-module","name":"菜单管理","path":"menu","component":"/System/Menu/index","sort":3,"children":[]},{"id":"1929929620753526787","pid":"1929928379575111682","icon":"icon-module","name":"字典管理","path":"dict","component":"/System/Dict/index","sort":4,"children":[]},{"id":"1929929620753526790","pid":"1929928379575111682","icon":"icon-module","name":"文件存储","path":"storage","component":"/System/Storage/index","sort":5,"children":[]},{"id":"1929929620753526788","pid":"1929928379575111682","icon":"icon-module","name":"定时任务","path":"task","component":"/System/Task/index","sort":6,"children":[]}]},{"id":"1929928379667386370","icon":"icon-setting","name":"组件示例","path":"/example","component":"layout","layout":"layout","sort":1,"children":[{"id":"1929929620816441347","pid":"1929928379667386370","icon":"icon-module","name":"列表示例","path":"table","component":"/Example/Table/index","sort":1,"children":[]},{"id":"1929929620816441348","pid":"1929928379667386370","icon":"icon-module","name":"表单示例","path":"form","component":"/Example/Form/index","sort":2,"children":[]},{"id":"1929929620816441346","pid":"1929928379667386370","icon":"icon-module","name":"图表示例","path":"echarts","component":"/Example/Echarts/index","sort":3,"children":[]}]}]', 13, 1927290201865945090, '2025-07-08 10:12:15.671883', 1927290201865945090, '2025-07-08 10:12:15.671883', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942406518342127617, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 7, 1927290201865945090, '2025-07-08 10:12:56.80008', 1927290201865945090, '2025-07-08 10:12:56.80008', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942406653012840450, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-08 10:13:28.909145', 1927290201865945090, '2025-07-08 10:13:28.909145', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407030823161857, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-08 10:14:58.987793', 1927290201865945090, '2025-07-08 10:14:58.987793', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407042638516226, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 17, 1927290201865945090, '2025-07-08 10:15:01.802575', 1927290201865945090, '2025-07-08 10:15:01.802575', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407431211421698, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 5, 1927290201865945090, '2025-07-08 10:16:34.443304', 1927290201865945090, '2025-07-08 10:16:34.443304', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407462115053570, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 4, 1927290201865945090, '2025-07-08 10:16:41.822953', 1927290201865945090, '2025-07-08 10:16:41.822953', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407490082672641, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 5, 1927290201865945090, '2025-07-08 10:16:48.480186', 1927290201865945090, '2025-07-08 10:16:48.480186', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407508537610241, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-08 10:16:52.878826', 1927290201865945090, '2025-07-08 10:16:52.878826', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407618260602881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-08 10:17:19.04504', 1927290201865945090, '2025-07-08 10:17:19.04504', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407669481443329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 4, 1927290201865945090, '2025-07-08 10:17:31.252985', 1927290201865945090, '2025-07-08 10:17:31.252985', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942407967176364033, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 6, 1927290201865945090, '2025-07-08 10:18:42.239538', 1927290201865945090, '2025-07-08 10:18:42.239538', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408078212173826, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:19:08.709085', 1927290201865945090, '2025-07-08 10:19:08.709085', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408086827274242, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 3, 1927290201865945090, '2025-07-08 10:19:10.76865', 1927290201865945090, '2025-07-08 10:19:10.76865', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408184806215682, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:19:34.133735', 1927290201865945090, '2025-07-08 10:19:34.133735', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408192704090113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 6, 1927290201865945090, '2025-07-08 10:19:35.996213', 1927290201865945090, '2025-07-08 10:19:35.996213', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408269094948866, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-08 10:19:54.209407', 1927290201865945090, '2025-07-08 10:19:54.209407', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408277038960641, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 8, 1927290201865945090, '2025-07-08 10:19:56.111098', 1927290201865945090, '2025-07-08 10:19:56.111098', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408277810712578, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 155, 1927290201865945090, '2025-07-08 10:19:56.292727', 1927290201865945090, '2025-07-08 10:19:56.292727', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408286790717441, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 4, 1927290201865945090, '2025-07-08 10:19:58.431745', 1927290201865945090, '2025-07-08 10:19:58.431745', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408286912352258, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 16, 1927290201865945090, '2025-07-08 10:19:58.463745', 1927290201865945090, '2025-07-08 10:19:58.464745', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408410862424065, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 2, 1927290201865945090, '2025-07-08 10:20:28.013837', 1927290201865945090, '2025-07-08 10:20:28.014827', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408410996641794, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 17, 1927290201865945090, '2025-07-08 10:20:28.044246', 1927290201865945090, '2025-07-08 10:20:28.044246', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408427442507777, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 3, 1927290201865945090, '2025-07-08 10:20:31.971882', 1927290201865945090, '2025-07-08 10:20:31.971882', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408427627057154, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 25, 1927290201865945090, '2025-07-08 10:20:32.014927', 1927290201865945090, '2025-07-08 10:20:32.014927', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408477732212738, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 3, 1927290201865945090, '2025-07-08 10:20:43.96014', 1927290201865945090, '2025-07-08 10:20:43.96014', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408477862236161, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 14, 1927290201865945090, '2025-07-08 10:20:43.985965', 1927290201865945090, '2025-07-08 10:20:43.985965', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408494236798978, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"},{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]', 3, 1927290201865945090, '2025-07-08 10:20:47.8951', 1927290201865945090, '2025-07-08 10:20:47.8951', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408494303907842, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{"page":{"page_size":100,"page_num":1},"params":{}}', '{"records":[{"id":"1937706586813169665","name":"测试用户","email":"ceshi@1.com","state":0,"roles":[{"id":"1932687324356775938","name":"小组长","state":false,"scope":1,"remark":"测试禁用状态"}]},{"id":"1937354420709711873","name":"超级管理员","email":"sysadmin@1.com","state":0,"roles":[{"id":"1932685785802162178","name":"系统管理员","state":true,"scope":0,"remark":"系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"}]},{"id":"1934276682383138817","name":"平台管理员","email":"yangxj96@gmail.com","state":0,"roles":[{"id":"1932682189593350146","name":"运维管理员","state":true,"scope":2,"remark":"运维人员使用,全局范围,拥有所有权限"}]}],"total":3,"size":100,"current":1,"pages":1}', 13, 1927290201865945090, '2025-07-08 10:20:47.917103', 1927290201865945090, '2025-07-08 10:20:47.917103', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408507444662274, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 5, 1927290201865945090, '2025-07-08 10:20:51.042215', 1927290201865945090, '2025-07-08 10:20:51.042215', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408836315844609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-08 10:22:09.450387', 1927290201865945090, '2025-07-08 10:22:09.450387', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942408989189836802, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:22:45.895083', 1927290201865945090, '2025-07-08 10:22:45.895083', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409029320937474, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:22:55.465739', 1927290201865945090, '2025-07-08 10:22:55.465739', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409035171991554, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 5, 1927290201865945090, '2025-07-08 10:22:56.861146', 1927290201865945090, '2025-07-08 10:22:56.861146', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409090729742337, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:23:10.112498', 1927290201865945090, '2025-07-08 10:23:10.112498', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409099600695298, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 3, 1927290201865945090, '2025-07-08 10:23:12.227034', 1927290201865945090, '2025-07-08 10:23:12.227034', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409182467559425, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-08 10:23:31.987896', 1927290201865945090, '2025-07-08 10:23:31.987896', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409199882309634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:23:36.143754', 1927290201865945090, '2025-07-08 10:23:36.143754', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409212486193153, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 3, 1927290201865945090, '2025-07-08 10:23:39.142326', 1927290201865945090, '2025-07-08 10:23:39.142326', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409345177194497, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 2, 1927290201865945090, '2025-07-08 10:24:10.778417', 1927290201865945090, '2025-07-08 10:24:10.778417', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409355646177282, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 3, 1927290201865945090, '2025-07-08 10:24:13.263666', 1927290201865945090, '2025-07-08 10:24:13.263666', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409362818437122, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"1","sort":999,"state":0,"remark":"启用"}]', 3, 1927290201865945090, '2025-07-08 10:24:14.980235', 1927290201865945090, '2025-07-08 10:24:14.980235', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409524492079105, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 2, 1927290201865945090, '2025-07-08 10:24:53.531579', 1927290201865945090, '2025-07-08 10:24:53.531579', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409532977156097, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"0","sort":999,"state":0,"remark":"启用"}]', 3, 1927290201865945090, '2025-07-08 10:24:55.555996', 1927290201865945090, '2025-07-08 10:24:55.555996', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409568880398337, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{"code":"sys_account_type"}', '[{"id":"1942151942581989377","dict_type_id":"1942151722745933825","label":"微信登录","value":"2","sort":999,"state":0,"remark":"微信登录"},{"id":"1942151904090861570","dict_type_id":"1942151722745933825","label":"手机号码","value":"1","sort":999,"state":0,"remark":"手机号码"},{"id":"1942151875150163969","dict_type_id":"1942151722745933825","label":"邮箱登录","value":"0","sort":999,"state":0,"remark":"邮箱登录"}]', 3, 1927290201865945090, '2025-07-08 10:25:04.115806', 1927290201865945090, '2025-07-08 10:25:04.115806', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409580683169794, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":0,"remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":0,"remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":0,"remark":"正常"}]', 5, 1927290201865945090, '2025-07-08 10:25:06.929715', 1927290201865945090, '2025-07-08 10:25:06.929715', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409583229112322, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{"code":"sys_common_state"}', '[{"id":"1942143694822924289","dict_type_id":"1942143605777850369","label":"禁用","value":"1","sort":999,"state":0,"remark":"禁用"},{"id":"1942143658663829506","dict_type_id":"1942143605777850369","label":"启用","value":"0","sort":999,"state":0,"remark":"启用"}]', 5, 1927290201865945090, '2025-07-08 10:25:07.526515', 1927290201865945090, '2025-07-08 10:25:07.526515', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409585720528897, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{"code":"sys_user_state"}', '[{"id":"1942143325908721665","dict_type_id":"1942142790749085698","label":"封禁","value":"2","sort":999,"state":0,"remark":"封禁"},{"id":"1942143271655399425","dict_type_id":"1942142790749085698","label":"冻结","value":"1","sort":999,"state":0,"remark":"冻结"},{"id":"1942143228055609345","dict_type_id":"1942142790749085698","label":"正常","value":"0","sort":999,"state":0,"remark":"正常"}]', 6, 1927290201865945090, '2025-07-08 10:25:08.128021', 1927290201865945090, '2025-07-08 10:25:08.128021', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409587444387841, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{"code":"sys_power_scop"}', '[{"id":"1942142489367371777","dict_type_id":"1942142182856024066","label":"本级包含下级","value":"2","sort":999,"state":0,"remark":"可以查询当前组织机构+部门,包含子级组织机构+部门的数据"},{"id":"1942142354801516546","dict_type_id":"1942142182856024066","label":"本级","value":"1","sort":999,"state":0,"remark":"可以查询当前所属的组织机构+部门本级别的内容"},{"id":"1942142254075305986","dict_type_id":"1942142182856024066","label":"全局","value":"0","sort":999,"state":0,"remark":"全局范围可查询"}]', 3, 1927290201865945090, '2025-07-08 10:25:08.535147', 1927290201865945090, '2025-07-08 10:25:08.535147', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942409592615964674, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/business', '{"code":"business"}', '[]', 2, 1927290201865945090, '2025-07-08 10:25:09.764645', 1927290201865945090, '2025-07-08 10:25:09.764645', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942414376316129281, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 147, 1927290201865945090, '2025-07-08 10:44:10.285887', 1927290201865945090, '2025-07-08 10:44:10.285887', NULL);
-INSERT INTO "db_system"."t_operation_log" VALUES (1942414950151442433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[{"id":"1942150470595194881","name":"业务配置","code":"business","state":0,"builtin":false,"remark":"业务部分需要的配置","children":[]},{"id":"1942142921347129346","name":"系统配置","code":"sys","state":0,"builtin":true,"remark":"系统配置相关的字典组.基本为内置不可修改的字典组","children":[{"id":"1942151722745933825","pid":1942142921347129346,"name":"账号类型","code":"sys_account_type","state":0,"builtin":true,"remark":"账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式","children":[]},{"id":"1942143605777850369","pid":1942142921347129346,"name":"通用状态","code":"sys_common_state","state":0,"builtin":true,"remark":"通用状态","children":[]},{"id":"1942142790749085698","pid":1942142921347129346,"name":"用户状态","code":"sys_user_state","state":0,"builtin":true,"remark":"用户状态","children":[]},{"id":"1942142182856024066","pid":1942142921347129346,"name":"权限范围","code":"sys_power_scop","state":0,"builtin":true,"remark":"系统权限范围","children":[]}]}]', 4, 1927290201865945090, '2025-07-08 10:46:27.109209', 1927290201865945090, '2025-07-08 10:46:27.109209', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940659711249399809, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": "本级",
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": "全局",
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": "本级包含下级",
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 117, 1927290201865945090, '2025-07-03 14:31:45.534856', 1927290201865945090, '2025-07-03 14:31:45.534856', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940661644718731265, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": "本级",
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": "全局",
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": "本级包含下级",
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 115, 1927290201865945090, '2025-07-03 14:39:26.508195', 1927290201865945090, '2025-07-03 14:39:26.508195', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940661651496726530, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": "本级",
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": "全局",
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": "本级包含下级",
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 8, 1927290201865945090, '2025-07-03 14:39:28.124464', 1927290201865945090, '2025-07-03 14:39:28.125466', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664530278248449, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 13, 1927290201865945090, '2025-07-03 14:50:54.488211', 1927290201865945090, '2025-07-03 14:50:54.488211', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664534363500546, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 5, 1927290201865945090, '2025-07-03 14:50:55.456189', 1927290201865945090, '2025-07-03 14:50:55.457191', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664538998206466, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-03 14:50:56.562611', 1927290201865945090, '2025-07-03 14:50:56.562611', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664558153592834, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:51:01.132984', 1927290201865945090, '2025-07-03 14:51:01.132984', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664570342240258, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:51:04.039488', 1927290201865945090, '2025-07-03 14:51:04.039488', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670034249428994, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{
+  "code": "ZD_CODE1"
+}', '[]', 6, 1927290201865945090, '2025-07-03 15:12:46.733607', 1927290201865945090, '2025-07-03 15:12:46.733607', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670035763572738, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{
+  "code": "TEST_TYPE2"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:47.094835', 1927290201865945090, '2025-07-03 15:12:47.094835', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670037680369665, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{
+  "code": "C_123"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:47.549353', 1927290201865945090, '2025-07-03 15:12:47.549353', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664705134587906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:51:36.18132', 1927290201865945090, '2025-07-03 14:51:36.18132', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664719655268353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 3, 1927290201865945090, '2025-07-03 14:51:39.629523', 1927290201865945090, '2025-07-03 14:51:39.629523', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664723916681218, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-03 14:51:40.654734', 1927290201865945090, '2025-07-03 14:51:40.654734', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664733257396225, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 21, 1927290201865945090, '2025-07-03 14:51:42.877601', 1927290201865945090, '2025-07-03 14:51:42.877601', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664740630982658, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:51:44.635656', 1927290201865945090, '2025-07-03 14:51:44.635656', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664805592363010, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:52:00.122931', 1927290201865945090, '2025-07-03 14:52:00.122931', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664832461074433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 14:52:06.52412', 1927290201865945090, '2025-07-03 14:52:06.52412', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664844972683266, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 3, 1927290201865945090, '2025-07-03 14:52:09.509516', 1927290201865945090, '2025-07-03 14:52:09.509516', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664847866753025, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 2, 1927290201865945090, '2025-07-03 14:52:10.207405', 1927290201865945090, '2025-07-03 14:52:10.207405', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670039450365953, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_4', '{
+  "code": "C_4"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:12:47.973649', 1927290201865945090, '2025-07-03 15:12:47.973649', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670041346191362, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:48.423974', 1927290201865945090, '2025-07-03 15:12:48.423974', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670042910666754, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:48.807948', 1927290201865945090, '2025-07-03 15:12:48.807948', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670044173152258, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:49.10045', 1927290201865945090, '2025-07-03 15:12:49.10045', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940664861510823938, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 14:52:13.457161', 1927290201865945090, '2025-07-03 14:52:13.457161', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666583977209858, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 95, 1927290201865945090, '2025-07-03 14:59:04.11868', 1927290201865945090, '2025-07-03 14:59:04.11868', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666612804661249, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:59:11.002383', 1927290201865945090, '2025-07-03 14:59:11.002383', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666612930490369, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:59:11.035383', 1927290201865945090, '2025-07-03 14:59:11.035383', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666675064909826, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 14:59:25.842375', 1927290201865945090, '2025-07-03 14:59:25.842375', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666765779316737, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 14:59:47.471241', 1927290201865945090, '2025-07-03 14:59:47.471241', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670045670518785, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:12:49.450824', 1927290201865945090, '2025-07-03 15:12:49.450824', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940666957601615874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:00:33.207138', 1927290201865945090, '2025-07-03 15:00:33.207138', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667007991984130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:00:45.221827', 1927290201865945090, '2025-07-03 15:00:45.221827', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667034424487938, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:00:51.519417', 1927290201865945090, '2025-07-03 15:00:51.519417', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667133011603458, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:01:15.033885', 1927290201865945090, '2025-07-03 15:01:15.033885', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667160039698433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:01:21.462929', 1927290201865945090, '2025-07-03 15:01:21.462929', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667232236253185, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:01:38.680729', 1927290201865945090, '2025-07-03 15:01:38.680729', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672813508493313, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:49.354801', 1927290201865945090, '2025-07-03 15:23:49.354801', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672815802777602, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:49.903288', 1927290201865945090, '2025-07-03 15:23:49.903288', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672815802777603, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:49.91105', 1927290201865945090, '2025-07-03 15:23:49.91105', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667247075700737, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:01:42.223886', 1927290201865945090, '2025-07-03 15:01:42.223886', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667284287565825, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:01:51.096336', 1927290201865945090, '2025-07-03 15:01:51.096336', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667333595803650, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 63, 1927290201865945090, '2025-07-03 15:02:02.851759', 1927290201865945090, '2025-07-03 15:02:02.851759', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667335961391106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 10, 1927290201865945090, '2025-07-03 15:02:03.415631', 1927290201865945090, '2025-07-03 15:02:03.415631', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667509194534914, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:02:44.709582', 1927290201865945090, '2025-07-03 15:02:44.709582', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667525636206593, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:02:48.638668', 1927290201865945090, '2025-07-03 15:02:48.638668', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667675905536001, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:03:24.462852', 1927290201865945090, '2025-07-03 15:03:24.462852', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667678413729793, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:03:25.061261', 1927290201865945090, '2025-07-03 15:03:25.061261', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667682582867970, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:03:26.061811', 1927290201865945090, '2025-07-03 15:03:26.061811', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667684612911106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:03:26.530924', 1927290201865945090, '2025-07-03 15:03:26.530924', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667695203528705, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:03:29.067685', 1927290201865945090, '2025-07-03 15:03:29.067685', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667761272205314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:03:44.810021', 1927290201865945090, '2025-07-03 15:03:44.810021', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667770193489921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:03:46.942004', 1927290201865945090, '2025-07-03 15:03:46.942004', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667784105996290, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:03:50.256692', 1927290201865945090, '2025-07-03 15:03:50.256692', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667933125423105, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:04:25.786725', 1927290201865945090, '2025-07-03 15:04:25.786725', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667937739157505, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:04:26.891442', 1927290201865945090, '2025-07-03 15:04:26.891442', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667943007203329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:04:28.146188', 1927290201865945090, '2025-07-03 15:04:28.146188', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667951479697410, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 7, 1927290201865945090, '2025-07-03 15:04:30.165418', 1927290201865945090, '2025-07-03 15:04:30.165418', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940667959658590209, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:04:32.110033', 1927290201865945090, '2025-07-03 15:04:32.110033', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940668065078226945, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:04:57.253504', 1927290201865945090, '2025-07-03 15:04:57.253504', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940668073810767874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:04:59.330022', 1927290201865945090, '2025-07-03 15:04:59.330022', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940668373703503873, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:06:10.831145', 1927290201865945090, '2025-07-03 15:06:10.831145', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940668398223405058, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:06:16.671163', 1927290201865945090, '2025-07-03 15:06:16.671163', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940668408100990978, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:06:19.035893', 1927290201865945090, '2025-07-03 15:06:19.035893', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669633840197634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:11:11.26415', 1927290201865945090, '2025-07-03 15:11:11.26415', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669639653502978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:11:12.652651', 1927290201865945090, '2025-07-03 15:11:12.652651', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669650248314881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:11:15.178393', 1927290201865945090, '2025-07-03 15:11:15.178393', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669715171946497, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:11:30.658165', 1927290201865945090, '2025-07-03 15:11:30.658165', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669724814651394, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:11:32.954562', 1927290201865945090, '2025-07-03 15:11:32.954562', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669734050508801, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:11:35.160574', 1927290201865945090, '2025-07-03 15:11:35.160574', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669747317092353, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:11:38.33458', 1927290201865945090, '2025-07-03 15:11:38.33458', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672817941872642, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:23:50.419889', 1927290201865945090, '2025-07-03 15:23:50.419889', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669788563877889, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:11:48.154564', 1927290201865945090, '2025-07-03 15:11:48.154564', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669924492881921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:12:20.559985', 1927290201865945090, '2025-07-03 15:12:20.559985', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669955996299265, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:12:28.085604', 1927290201865945090, '2025-07-03 15:12:28.085604', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669992457383937, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:36.769338', 1927290201865945090, '2025-07-03 15:12:36.770338', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940669995015909377, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:12:37.377715', 1927290201865945090, '2025-07-03 15:12:37.377715', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670005036101633, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:12:39.764058', 1927290201865945090, '2025-07-03 15:12:39.764058', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670021414858754, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:12:43.681762', 1927290201865945090, '2025-07-03 15:12:43.681762', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670024032104450, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:12:44.299351', 1927290201865945090, '2025-07-03 15:12:44.299351', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670025995038722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:44.759309', 1927290201865945090, '2025-07-03 15:12:44.759309', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670027236552705, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{
+  "code": "顶顶顶顶顶"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:12:45.063679', 1927290201865945090, '2025-07-03 15:12:45.063679', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670028616478722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{
+  "code": "顶顶顶顶顶"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:45.398008', 1927290201865945090, '2025-07-03 15:12:45.398008', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670030055124994, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{
+  "code": "C_123"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:12:45.742768', 1927290201865945090, '2025-07-03 15:12:45.742768', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670031363747842, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{
+  "code": "TEST_TYPE2"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:12:46.047728', 1927290201865945090, '2025-07-03 15:12:46.047728', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670078897795073, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 7, 1927290201865945090, '2025-07-03 15:12:57.373332', 1927290201865945090, '2025-07-03 15:12:57.373332', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670085352828929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_2",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:12:58.917506', 1927290201865945090, '2025-07-03 15:12:58.917506', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670092759969794, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:13:00.691582', 1927290201865945090, '2025-07-03 15:13:00.691582', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670539449212930, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940608046697762817,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  }
+}', NULL, 115, 1927290201865945090, '2025-07-03 15:14:47.177406', 1927290201865945090, '2025-07-03 15:14:47.177406', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670543962284033, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 29, 1927290201865945090, '2025-07-03 15:14:48.257615', 1927290201865945090, '2025-07-03 15:14:48.257615', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670645997117442, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:15:12.587555', 1927290201865945090, '2025-07-03 15:15:12.587555', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670666410795009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:15:17.452944', 1927290201865945090, '2025-07-03 15:15:17.452944', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672818008981506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:23:50.428936', 1927290201865945090, '2025-07-03 15:23:50.428936', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143699273080835, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-07 16:48:35.848738', 1927290201865945090, '2025-07-07 16:48:35.848738', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670794601308161, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:15:48.019328', 1927290201865945090, '2025-07-03 15:15:48.019328', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670844018597889, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:15:59.804675', 1927290201865945090, '2025-07-03 15:15:59.804675', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670874729291777, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:16:07.11502', 1927290201865945090, '2025-07-03 15:16:07.11502', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670918442328066, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:16:17.545452', 1927290201865945090, '2025-07-03 15:16:17.545452', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940670998373179393, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:16:36.593795', 1927290201865945090, '2025-07-03 15:16:36.593795', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671088613629954, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:16:58.119547', 1927290201865945090, '2025-07-03 15:16:58.119547', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673888823181315, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:28:05.730252', 1927290201865945090, '2025-07-03 15:28:05.730252', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144713875218433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090,
+        '2025-07-07 16:52:37.762718', 1927290201865945090, '2025-07-07 16:52:37.762718', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671132775456769, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:17:08.641826', 1927290201865945090, '2025-07-03 15:17:08.641826', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671254959726594, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:17:37.773806', 1927290201865945090, '2025-07-03 15:17:37.773806', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671525370626050, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_1",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 106, 1927290201865945090, '2025-07-03 15:18:42.238737', 1927290201865945090, '2025-07-03 15:18:42.238737', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671533989920769, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940608046697762817,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  }
+}', NULL, 85, 1927290201865945090, '2025-07-03 15:18:44.303499', 1927290201865945090, '2025-07-03 15:18:44.303499', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671538414911490, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 10, 1927290201865945090, '2025-07-03 15:18:45.351637', 1927290201865945090, '2025-07-03 15:18:45.351637', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671546795130881, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940608046697762817,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  }
+}', NULL, 10, 1927290201865945090, '2025-07-03 15:18:47.35031', 1927290201865945090, '2025-07-03 15:18:47.35031', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671551094292482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:18:48.384577', 1927290201865945090, '2025-07-03 15:18:48.384577', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671612628926465, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940606284905533441,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+}', NULL, 6, 1927290201865945090, '2025-07-03 15:19:03.044281', 1927290201865945090, '2025-07-03 15:19:03.044281', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671616999391233, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:19:04.088089', 1927290201865945090, '2025-07-03 15:19:04.088089', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671628609224706, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940608046697762817,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  }
+}', NULL, 7, 1927290201865945090, '2025-07-03 15:19:06.866402', 1927290201865945090, '2025-07-03 15:19:06.866402', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671632946135042, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:19:07.899186', 1927290201865945090, '2025-07-03 15:19:07.899186', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671638889463810, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-03 15:19:09.303015', 1927290201865945090, '2025-07-03 15:19:09.303015', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671640802066434, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:19:09.767419', 1927290201865945090, '2025-07-03 15:19:09.767419', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671785681715201, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:19:44.31729', 1927290201865945090, '2025-07-03 15:19:44.31729', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671829981954049, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:19:54.864959', 1927290201865945090, '2025-07-03 15:19:54.864959', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671863276339202, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:20:02.80588', 1927290201865945090, '2025-07-03 15:20:02.80588', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671890757419009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:20:09.357045', 1927290201865945090, '2025-07-03 15:20:09.357045', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674175235424258, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:29:14.017768', 1927290201865945090, '2025-07-03 15:29:14.017768', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143616297164802, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[]', 2, 1927290201865945090, '2025-07-07 16:48:16.075411', 1927290201865945090, '2025-07-07 16:48:16.075411', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146708455501825, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 14, 1927290201865945090, '2025-07-07 17:00:33.304911', 1927290201865945090, '2025-07-07 17:00:33.304911', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940671959334289409, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:20:25.713452', 1927290201865945090, '2025-07-03 15:20:25.713452', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672085083717634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:20:55.690295', 1927290201865945090, '2025-07-03 15:20:55.690295', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672115127517186, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:21:02.857335', 1927290201865945090, '2025-07-03 15:21:02.857335', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672135268564994, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:21:07.651291', 1927290201865945090, '2025-07-03 15:21:07.651291', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672567688724482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:22:50.756033', 1927290201865945090, '2025-07-03 15:22:50.756033', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672641118404609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:23:08.257163', 1927290201865945090, '2025-07-03 15:23:08.257163', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674188434898945, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940606284905533441,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用",
+    "remark": "参数"
+  }
+}', NULL, 5, 1927290201865945090, '2025-07-03 15:29:17.177755', 1927290201865945090, '2025-07-03 15:29:17.177755', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143658663829507, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942143605777850369,
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+}', NULL, 5, 1927290201865945090, '2025-07-07 16:48:26.18161', 1927290201865945090, '2025-07-07 16:48:26.18161', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672655219654657, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:23:11.627768', 1927290201865945090, '2025-07-03 15:23:11.627768', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672672206585857, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:23:15.672609', 1927290201865945090, '2025-07-03 15:23:15.672609', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672696932007937, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:23:21.573789', 1927290201865945090, '2025-07-03 15:23:21.573789', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672750682013697, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:23:34.379561', 1927290201865945090, '2025-07-03 15:23:34.379561', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672762417676289, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:23:37.186553', 1927290201865945090, '2025-07-03 15:23:37.186553', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672777953378305, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:23:40.890635', 1927290201865945090, '2025-07-03 15:23:40.890635', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672810853498881, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:48.723719', 1927290201865945090, '2025-07-03 15:23:48.723719', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672810853498882, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:48.73372', 1927290201865945090, '2025-07-03 15:23:48.73372', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672813445578754, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:49.346802', 1927290201865945090, '2025-07-03 15:23:49.346802', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672826154319874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:23:52.377233', 1927290201865945090, '2025-07-03 15:23:52.377233', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672835679584258, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:23:54.64584', 1927290201865945090, '2025-07-03 15:23:54.64584', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672838791757826, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{
+  "code": "ZD_CODE1"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.38901', 1927290201865945090, '2025-07-03 15:23:55.38901', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672838791757827, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/ZD_CODE1', '{
+  "code": "ZD_CODE1"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.398017', 1927290201865945090, '2025-07-03 15:23:55.398017', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672840821800961, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{
+  "code": "TEST_TYPE2"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:23:55.880882', 1927290201865945090, '2025-07-03 15:23:55.880882', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672840888909825, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/TEST_TYPE2', '{
+  "code": "TEST_TYPE2"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:55.890881', 1927290201865945090, '2025-07-03 15:23:55.890881', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672846161149954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:57.14451', 1927290201865945090, '2025-07-03 15:23:57.14451', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672846224064513, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:23:57.155509', 1927290201865945090, '2025-07-03 15:23:57.155509', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672848207970305, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:23:57.639244', 1927290201865945090, '2025-07-03 15:23:57.639244', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672848291856385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:23:57.648277', 1927290201865945090, '2025-07-03 15:23:57.648277', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672917653061634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:24:14.186922', 1927290201865945090, '2025-07-03 15:24:14.186922', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672923302789121, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{
+  "code": "顶顶顶顶顶"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:15.534202', 1927290201865945090, '2025-07-03 15:24:15.535202', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672925265723393, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:24:16.002644', 1927290201865945090, '2025-07-03 15:24:16.002644', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672927165743105, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:16.453182', 1927290201865945090, '2025-07-03 15:24:16.453182', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672929720074241, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:24:17.075866', 1927290201865945090, '2025-07-03 15:24:17.075866', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672936296742913, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:24:18.630614', 1927290201865945090, '2025-07-03 15:24:18.630614', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940672938611998721, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:24:19.183128', 1927290201865945090, '2025-07-03 15:24:19.183128', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674192872472578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用",
+    "remark": "参数"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:29:18.230489', 1927290201865945090, '2025-07-03 15:29:18.230489', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143663042682882, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:48:27.216693', 1927290201865945090, '2025-07-07 16:48:27.216693', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148900184862722, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 4, 1927290201865945090, '2025-07-07 17:09:15.849473', 1927290201865945090, '2025-07-07 17:09:15.849473', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673280871399425, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:25:40.788714', 1927290201865945090, '2025-07-03 15:25:40.788714', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673302258155521, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:25:45.890485', 1927290201865945090, '2025-07-03 15:25:45.890485', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673327222652929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{
+  "code": "顶顶顶顶顶"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:25:51.841462', 1927290201865945090, '2025-07-03 15:25:51.841462', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673329646960641, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:25:52.415575', 1927290201865945090, '2025-07-03 15:25:52.415575', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673332935294978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:25:53.208844', 1927290201865945090, '2025-07-03 15:25:53.208844', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673335464460289, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:25:53.799695', 1927290201865945090, '2025-07-03 15:25:53.799695', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673338371112962, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:25:54.499096', 1927290201865945090, '2025-07-03 15:25:54.499096', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673339943976962, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:25:54.876706', 1927290201865945090, '2025-07-03 15:25:54.876706', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673342355701761, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:25:55.444565', 1927290201865945090, '2025-07-03 15:25:55.444565', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673347325952002, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:25:56.640379', 1927290201865945090, '2025-07-03 15:25:56.640379', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673354343022594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 6, 1927290201865945090, '2025-07-03 15:25:58.306901', 1927290201865945090, '2025-07-03 15:25:58.306901', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673357174177794, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:25:58.983127', 1927290201865945090, '2025-07-03 15:25:58.983127', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673394310545409, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:26:07.82825', 1927290201865945090, '2025-07-03 15:26:07.82825', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673567866650625, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 1, 1927290201865945090, '2025-07-03 15:26:49.208748', 1927290201865945090, '2025-07-03 15:26:49.208748', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673690625540098, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 1, 1927290201865945090, '2025-07-03 15:27:18.480059', 1927290201865945090, '2025-07-03 15:27:18.480059', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673745780637697, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:27:31.62827', 1927290201865945090, '2025-07-03 15:27:31.62827', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673780996014082, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:27:40.028437', 1927290201865945090, '2025-07-03 15:27:40.028437', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673822528012290, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:27:49.925638', 1927290201865945090, '2025-07-03 15:27:49.925638', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673832548204546, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_3",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:27:52.313677', 1927290201865945090, '2025-07-03 15:27:52.313677', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673858720661505, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940608046697762817,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  }
+}', NULL, 6, 1927290201865945090, '2025-07-03 15:27:58.566414', 1927290201865945090, '2025-07-03 15:27:58.566414', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673863095320577, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:27:59.609075', 1927290201865945090, '2025-07-03 15:27:59.609075', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673863095320578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_4",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:27:59.609075', 1927290201865945090, '2025-07-03 15:27:59.609075', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673884414967809, '修改字典数据', 200, '127.0.0.1', 'PUT', '/api/dict/data/modify', '{
+  "params": {
+    "id": 1940606284905533441,
+    "dict_type_id": 1940606153753841665,
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+}', NULL, 8, 1927290201865945090, '2025-07-03 15:28:04.685809', 1927290201865945090, '2025-07-03 15:28:04.685809', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673888823181314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:28:05.729252', 1927290201865945090, '2025-07-03 15:28:05.729252', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940673969219600386, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:28:24.903691', 1927290201865945090, '2025-07-03 15:28:24.903691', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674077113876482, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:28:50.636254', 1927290201865945090, '2025-07-03 15:28:50.636254', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674096835493890, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": []
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:28:55.326916', 1927290201865945090, '2025-07-03 15:28:55.326916', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674104112611329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:28:57.070784', 1927290201865945090, '2025-07-03 15:28:57.070784', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674105895190530, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:28:57.484579', 1927290201865945090, '2025-07-03 15:28:57.484579', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674107669381121, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:28:57.918517', 1927290201865945090, '2025-07-03 15:28:57.918517', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674109309353986, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用"
+  }
+]', 7, 1927290201865945090, '2025-07-03 15:28:58.304539', 1927290201865945090, '2025-07-03 15:28:58.304539', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674155962597378, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "pid": 1939957440345735169,
+    "name": "参数6",
+    "code": "CS5",
+    "state": "启用",
+    "remark": ""
+  }
+}', NULL, 18, 1927290201865945090, '2025-07-03 15:29:09.420709', 1927290201865945090, '2025-07-03 15:29:09.420709', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674160295313410, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": [
+      {
+        "id": "1940674155836768258",
+        "pid": 1939957440345735169,
+        "name": "参数6",
+        "code": "CS5",
+        "state": "启用",
+        "remark": "",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-03 15:29:10.468265', 1927290201865945090, '2025-07-03 15:29:10.468265', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674166070870017, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:29:11.830367', 1927290201865945090, '2025-07-03 15:29:11.830367', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674168641978370, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:29:12.443284', 1927290201865945090, '2025-07-03 15:29:12.443284', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674192872472577, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": [
+      {
+        "id": "1940674155836768258",
+        "pid": 1939957440345735169,
+        "name": "参数6",
+        "code": "CS5",
+        "state": "启用",
+        "remark": "",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 5, 1927290201865945090, '2025-07-03 15:29:18.230489', 1927290201865945090, '2025-07-03 15:29:18.230489', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674865840160769, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:31:58.683634', 1927290201865945090, '2025-07-03 15:31:58.683634', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674878725062657, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:01.752115', 1927290201865945090, '2025-07-03 15:32:01.752115', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674882860646402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 9, 1927290201865945090, '2025-07-03 15:32:02.740717', 1927290201865945090, '2025-07-03 15:32:02.740717', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674889525395458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C6', '{
+  "code": "C6"
+}', '[]', 5, 1927290201865945090, '2025-07-03 15:32:04.329079', 1927290201865945090, '2025-07-03 15:32:04.329079', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674894130741249, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:05.427132', 1927290201865945090, '2025-07-03 15:32:05.427132', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674904549392385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_4', '{
+  "code": "C_4"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:07.898565', 1927290201865945090, '2025-07-03 15:32:07.898565', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674311743242242, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": [
+      {
+        "id": "1940674155836768258",
+        "pid": 1939957440345735169,
+        "name": "参数6",
+        "code": "CS5",
+        "state": "启用",
+        "remark": "",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:29:46.571636', 1927290201865945090, '2025-07-03 15:29:46.571636', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674867941507074, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:31:59.169655', 1927290201865945090, '2025-07-03 15:31:59.169655', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674869799583745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用",
+    "remark": "参数"
+  }
+]', 3, 1927290201865945090, '2025-07-03 15:31:59.614473', 1927290201865945090, '2025-07-03 15:31:59.614473', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674880759300098, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用",
+    "remark": "参数"
+  }
+]', 2, 1927290201865945090, '2025-07-03 15:32:02.23818', 1927290201865945090, '2025-07-03 15:32:02.23818', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674884378984449, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CSZD_3', '{
+  "code": "CSZD_3"
+}', '[
+  {
+    "id": "1940608046697762817",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_5",
+    "value": "888",
+    "sort": 999,
+    "state": "启用",
+    "remark": "备注测试2"
+  },
+  {
+    "id": "1940606284905533441",
+    "dict_type_id": "1940606153753841665",
+    "label": "测试字典值标签_6",
+    "value": "9999",
+    "sort": 999,
+    "state": "启用",
+    "remark": "参数"
+  }
+]', 8, 1927290201865945090, '2025-07-03 15:32:03.113129', 1927290201865945090, '2025-07-03 15:32:03.113129', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674886954287106, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 4, 1927290201865945090, '2025-07-03 15:32:03.711554', 1927290201865945090, '2025-07-03 15:32:03.711554', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674892029394946, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/CS5', '{
+  "code": "CS5"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:04.913824', 1927290201865945090, '2025-07-03 15:32:04.913824', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674897192583169, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6%E9%A1%B6', '{
+  "code": "顶顶顶顶顶"
+}', '[]', 2, 1927290201865945090, '2025-07-03 15:32:06.1467', 1927290201865945090, '2025-07-03 15:32:06.1467', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940674900485111810, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/C_123', '{
+  "code": "C_123"
+}', '[]', 3, 1927290201865945090, '2025-07-03 15:32:06.941443', 1927290201865945090, '2025-07-03 15:32:06.941443', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1940676269900201985, '退出登录', 200, '127.0.0.1', 'POST', '/api/auth/logout', '{}', NULL, 13, NULL, '2025-07-03 15:37:33.427928', NULL,
+        '2025-07-03 15:37:33.427928', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141648531054593, '登录', 200, '127.0.0.1', 'POST', '/api/auth/login', '{
+  "params": {
+    "username": "yangxj96@gmail.com",
+    "password": "sysadmin",
+    "code": "1234"
+  }
+}', '{
+  "id": "1927290201865945090",
+  "username": "yangxj96@gmail.com",
+  "access_token": "49da64d2-ae49-43c9-9d15-4db59e8c7232",
+  "authorities": [],
+  "roles": [
+    "DEV_ADMIN"
+  ]
+}', 636, 1927290201865945090, '2025-07-07 16:40:26.914646', 1927290201865945090, '2025-07-07 16:40:26.914646', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141650783395841, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 8, 1927290201865945090, '2025-07-07 16:40:27.453264', 1927290201865945090, '2025-07-07 16:40:27.453264', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141709319102466, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1940606153753841665",
+    "name": "测试字典3",
+    "code": "CSZD_3",
+    "state": "启用",
+    "remark": "测试字典",
+    "children": [
+      {
+        "id": "1940614715133612033",
+        "pid": 1940606153753841665,
+        "name": "测试测试下级字典1",
+        "code": "XJ_11",
+        "state": "启用",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957440345735169",
+    "name": "测试6",
+    "code": "C6",
+    "state": "启用",
+    "remark": "C5",
+    "children": [
+      {
+        "id": "1940674155836768258",
+        "pid": 1939957440345735169,
+        "name": "参数6",
+        "code": "CS5",
+        "state": "启用",
+        "remark": "",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1939957150334779393",
+    "name": "测试5",
+    "code": "CS5",
+    "state": "启用",
+    "remark": "测试5",
+    "children": []
+  },
+  {
+    "id": "1939953089195737090",
+    "name": "测试12",
+    "code": "顶顶顶顶顶",
+    "state": "启用",
+    "remark": "测试",
+    "children": [
+      {
+        "id": "1939953759621677058",
+        "pid": 1939953089195737090,
+        "name": "测试3",
+        "code": "C_123",
+        "state": "启用",
+        "remark": "",
+        "children": [
+          {
+            "id": "1939953883236204545",
+            "pid": 1939953759621677058,
+            "name": "测试4",
+            "code": "C_4",
+            "state": "启用",
+            "remark": "",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "1939950809859948546",
+    "name": "测试字典2",
+    "code": "TEST_TYPE2",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  },
+  {
+    "id": "1939946948415913986",
+    "name": "测试字典1",
+    "code": "ZD_CODE1",
+    "state": "启用",
+    "remark": "",
+    "children": []
+  }
+]', 14, 1927290201865945090, '2025-07-07 16:40:41.420632', 1927290201865945090, '2025-07-07 16:40:41.420632', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141713630846978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/XJ_11', '{
+  "code": "XJ_11"
+}', '[]', 6, 1927290201865945090, '2025-07-07 16:40:42.444579', 1927290201865945090, '2025-07-07 16:40:42.444579', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141824565993473, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": "全局",
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": "本级包含下级",
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 9, 1927290201865945090, '2025-07-07 16:41:08.887407', 1927290201865945090, '2025-07-07 16:41:08.887407', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143012237697025, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": "全局",
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": "本级包含下级",
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:45:52.059162', 1927290201865945090, '2025-07-07 16:45:52.059162', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141825098670081, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": "本级",
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": "全局",
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": "本级包含下级",
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 97, 1927290201865945090, '2025-07-07 16:41:09.010226', 1927290201865945090, '2025-07-07 16:41:09.010226', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942141829553020929, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 3, 1927290201865945090,
+        '2025-07-07 16:41:10.081215', 1927290201865945090, '2025-07-07 16:41:10.081215', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142182856024067, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围"
+  }
+}', NULL, 14, 1927290201865945090, '2025-07-07 16:42:34.320305', 1927290201865945090, '2025-07-07 16:42:34.320305', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142187239071746, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:42:35.371309', 1927290201865945090, '2025-07-07 16:42:35.371309', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142191752142850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[]', 3, 1927290201865945090, '2025-07-07 16:42:36.44002', 1927290201865945090, '2025-07-07 16:42:36.44002', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142254142414849, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142182856024066,
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+}', NULL, 7, 1927290201865945090, '2025-07-07 16:42:51.305855', 1927290201865945090, '2025-07-07 16:42:51.305855', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142258542239746, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:42:52.351762', 1927290201865945090, '2025-07-07 16:42:52.351762', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142258542239747, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 11, 1927290201865945090, '2025-07-07 16:42:52.357762', 1927290201865945090, '2025-07-07 16:42:52.357762', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142354801516547, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142182856024066,
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  }
+}', NULL, 3, 1927290201865945090, '2025-07-07 16:43:15.317448', 1927290201865945090, '2025-07-07 16:43:15.317448', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142359180369921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:43:16.350671', 1927290201865945090, '2025-07-07 16:43:16.350671', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142359180369922, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 6, 1927290201865945090, '2025-07-07 16:43:16.35167', 1927290201865945090, '2025-07-07 16:43:16.35167', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142489367371778, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142182856024066,
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  }
+}', NULL, 6, 1927290201865945090, '2025-07-07 16:43:47.392874', 1927290201865945090, '2025-07-07 16:43:47.392874', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142493687504898, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:43:48.427753', 1927290201865945090, '2025-07-07 16:43:48.427753', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142493750419457, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 7, 1927290201865945090, '2025-07-07 16:43:48.430752', 1927290201865945090, '2025-07-07 16:43:48.431754', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142500515831809, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 7, 1927290201865945090, '2025-07-07 16:43:50.047903', 1927290201865945090, '2025-07-07 16:43:50.048904', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142790749085699, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "name": "用户状态",
+    "code": "sys_user_state",
+    "state": "启用",
+    "remark": "用户状态"
+  }
+}', NULL, 4, 1927290201865945090, '2025-07-07 16:44:59.246607', 1927290201865945090, '2025-07-07 16:44:59.246607', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142795056635906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142790749085698",
+    "name": "用户状态",
+    "code": "sys_user_state",
+    "state": "启用",
+    "remark": "用户状态",
+    "children": []
+  },
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:45:00.276693', 1927290201865945090, '2025-07-07 16:45:00.276693', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142921410043906, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组"
+  }
+}', NULL, 5, 1927290201865945090, '2025-07-07 16:45:30.392337', 1927290201865945090, '2025-07-07 16:45:30.392337', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142925725982722, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": []
+  },
+  {
+    "id": "1942142790749085698",
+    "name": "用户状态",
+    "code": "sys_user_state",
+    "state": "启用",
+    "remark": "用户状态",
+    "children": []
+  },
+  {
+    "id": "1942142182856024066",
+    "name": "权限范围",
+    "code": "sys_power_scop",
+    "state": "启用",
+    "remark": "系统权限范围",
+    "children": []
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:45:31.422811', 1927290201865945090, '2025-07-07 16:45:31.422811', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942142928406142978, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[]', 5, 1927290201865945090, '2025-07-07 16:45:32.065768', 1927290201865945090, '2025-07-07 16:45:32.065768', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143012367720450, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": "本级",
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": "全局",
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": "正常",
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": "本级包含下级",
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 12, 1927290201865945090, '2025-07-07 16:45:52.080162', 1927290201865945090, '2025-07-07 16:45:52.080162', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143018554318849, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[]', 4, 1927290201865945090, '2025-07-07 16:45:53.554502', 1927290201865945090, '2025-07-07 16:45:53.554502', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143020504670209, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:45:54.032063', 1927290201865945090, '2025-07-07 16:45:54.032063', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143033062416385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 6, 1927290201865945090, '2025-07-07 16:45:57.01779', 1927290201865945090, '2025-07-07 16:45:57.01779', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143172439138305, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:46:30.246119', 1927290201865945090, '2025-07-07 16:46:30.246119', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143184967524353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[]', 2, 1927290201865945090, '2025-07-07 16:46:33.24382', 1927290201865945090, '2025-07-07 16:46:33.24382', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143235223674882, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:46:45.215155', 1927290201865945090, '2025-07-07 16:46:45.215155', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143271718313986, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142790749085698,
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  }
+}', NULL, 4, 1927290201865945090, '2025-07-07 16:46:53.911349', 1927290201865945090, '2025-07-07 16:46:53.911349', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143311987826689, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:47:03.517628', 1927290201865945090, '2025-07-07 16:47:03.517628', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143330354683906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:47:07.893776', 1927290201865945090, '2025-07-07 16:47:07.893776', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143370909409282, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 9, 1927290201865945090, '2025-07-07 16:47:17.571812', 1927290201865945090, '2025-07-07 16:47:17.571812', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143375212765185, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:47:18.598952', 1927290201865945090, '2025-07-07 16:47:18.598952', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143015177904130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 6, 1927290201865945090, '2025-07-07 16:45:52.749847', 1927290201865945090, '2025-07-07 16:45:52.749847', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143023834947585, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[]', 3, 1927290201865945090, '2025-07-07 16:45:54.814799', 1927290201865945090, '2025-07-07 16:45:54.814799', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143035616747522, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[]', 3, 1927290201865945090, '2025-07-07 16:45:57.625382', 1927290201865945090, '2025-07-07 16:45:57.625382', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143228055609346, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142790749085698,
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+}', NULL, 1, 1927290201865945090, '2025-07-07 16:46:43.511789', 1927290201865945090, '2025-07-07 16:46:43.511789', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143235223674883, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:46:45.217158', 1927290201865945090, '2025-07-07 16:46:45.217158', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143277061857282, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:46:55.201142', 1927290201865945090, '2025-07-07 16:46:55.201142', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143277128966146, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 7, 1927290201865945090, '2025-07-07 16:46:55.204143', 1927290201865945090, '2025-07-07 16:46:55.204143', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143325971636226, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942142790749085698,
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  }
+}', NULL, 2, 1927290201865945090, '2025-07-07 16:47:06.848539', 1927290201865945090, '2025-07-07 16:47:06.848539', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143330354683905, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:47:07.893776', 1927290201865945090, '2025-07-07 16:47:07.893776', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143366991929345, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:47:16.62845', 1927290201865945090, '2025-07-07 16:47:16.62845', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143373648289793, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:47:18.227796', 1927290201865945090, '2025-07-07 16:47:18.227796', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143442791391234, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 5, 1927290201865945090, '2025-07-07 16:47:34.702869', 1927290201865945090, '2025-07-07 16:47:34.702869', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143513473802241, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:47:51.555484', 1927290201865945090, '2025-07-07 16:47:51.555484', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143529563152385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 5, 1927290201865945090, '2025-07-07 16:47:55.396721', 1927290201865945090, '2025-07-07 16:47:55.396721', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143605777850370, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "pid": 1942142921347129346,
+    "name": "通用状态",
+    "code": "sys_common_state",
+    "state": "启用",
+    "remark": "通用状态"
+  }
+}', NULL, 2, 1927290201865945090, '2025-07-07 16:48:13.567688', 1927290201865945090, '2025-07-07 16:48:13.567688', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143610110566401, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:14.598542', 1927290201865945090, '2025-07-07 16:48:14.598542', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143613952548865, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:15.52381', 1927290201865945090, '2025-07-07 16:48:15.52381', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143663042682881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:27.215693', 1927290201865945090, '2025-07-07 16:48:27.215693', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143694822924290, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942143605777850369,
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  }
+}', NULL, 4, 1927290201865945090, '2025-07-07 16:48:34.798276', 1927290201865945090, '2025-07-07 16:48:34.798276', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143699273080834, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:35.848738', 1927290201865945090, '2025-07-07 16:48:35.848738', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143705933635586, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:37.443959', 1927290201865945090, '2025-07-07 16:48:37.443959', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143708932562945, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:48:38.157587', 1927290201865945090, '2025-07-07 16:48:38.157587', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143711935684610, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:38.870745', 1927290201865945090, '2025-07-07 16:48:38.870745', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143713177198594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:48:39.164731', 1927290201865945090, '2025-07-07 16:48:39.164731', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143789152821250, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:57.279109', 1927290201865945090, '2025-07-07 16:48:57.279109', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143792244023298, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:48:58.023096', 1927290201865945090, '2025-07-07 16:48:58.023096', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143795561717761, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:58.808189', 1927290201865945090, '2025-07-07 16:48:58.808189', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143800070594562, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 7, 1927290201865945090, '2025-07-07 16:48:59.884014', 1927290201865945090, '2025-07-07 16:48:59.884014', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144589073702914, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:52:07.996002', 1927290201865945090, '2025-07-07 16:52:07.996002', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144590894030849, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090,
+        '2025-07-07 16:52:08.439414', 1927290201865945090, '2025-07-07 16:52:08.439414', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144675472171009, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090,
+        '2025-07-07 16:52:28.607107', 1927290201865945090, '2025-07-07 16:52:28.607107', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144684095660034, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090,
+        '2025-07-07 16:52:30.660253', 1927290201865945090, '2025-07-07 16:52:30.660253', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143707510693890, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:48:37.813848', 1927290201865945090, '2025-07-07 16:48:37.813848', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143710354432002, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:48:38.500632', 1927290201865945090, '2025-07-07 16:48:38.500632', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143714229968897, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:48:39.42804', 1927290201865945090, '2025-07-07 16:48:39.42804', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143790914428930, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-07 16:48:57.706933', 1927290201865945090, '2025-07-07 16:48:57.706933', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942143797952471042, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:48:59.377334', 1927290201865945090, '2025-07-07 16:48:59.377334', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144182125551618, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 1, 1927290201865945090,
+        '2025-07-07 16:50:30.979947', 1927290201865945090, '2025-07-07 16:50:30.979947', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144655595364353, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[]', 2, 1927290201865945090,
+        '2025-07-07 16:52:23.857786', 1927290201865945090, '2025-07-07 16:52:23.857786', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144681931399169, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 16:52:30.140598', 1927290201865945090, '2025-07-07 16:52:30.140598', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144966112305154, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 92, 1927290201865945090, '2025-07-07 16:53:37.887019', 1927290201865945090, '2025-07-07 16:53:37.887019', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942144970491158530, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 12, 1927290201865945090, '2025-07-07 16:53:38.936659', 1927290201865945090, '2025-07-07 16:53:38.936659', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145136652705793, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:54:18.547487', 1927290201865945090, '2025-07-07 16:54:18.547487', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145215815999490, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-07 16:54:37.424002', 1927290201865945090, '2025-07-07 16:54:37.424002', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145218240307202, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:54:38.009532', 1927290201865945090, '2025-07-07 16:54:38.009532', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145219871891458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:54:38.388177', 1927290201865945090, '2025-07-07 16:54:38.388177', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145221499281410, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 7, 1927290201865945090, '2025-07-07 16:54:38.782061', 1927290201865945090, '2025-07-07 16:54:38.782061', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145222807904257, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 8, 1927290201865945090, '2025-07-07 16:54:39.089193', 1927290201865945090, '2025-07-07 16:54:39.089193', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145246363115521, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:54:44.70742', 1927290201865945090, '2025-07-07 16:54:44.70742', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145477632770049, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 98, 1927290201865945090, '2025-07-07 16:55:39.843582', 1927290201865945090, '2025-07-07 16:55:39.843582', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942145944525942785, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 118, 1927290201865945090, '2025-07-07 16:57:31.159338', 1927290201865945090, '2025-07-07 16:57:31.159338', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146237435162626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 16:58:41.007976', 1927290201865945090, '2025-07-07 16:58:41.007976', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146518201872385, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 16:59:47.93754', 1927290201865945090, '2025-07-07 16:59:47.93754', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146595540643841, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:00:06.384988', 1927290201865945090, '2025-07-07 17:00:06.384988', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146639232708609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:00:16.801031', 1927290201865945090, '2025-07-07 17:00:16.801031', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146704290557954, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:00:32.302892', 1927290201865945090, '2025-07-07 17:00:32.302892', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146717875908609, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 9, 1927290201865945090, '2025-07-07 17:00:35.541749', 1927290201865945090, '2025-07-07 17:00:35.541749', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146719306166273, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:00:35.884598', 1927290201865945090, '2025-07-07 17:00:35.884598', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146726574895105, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 7, 1927290201865945090, '2025-07-07 17:00:37.625052', 1927290201865945090, '2025-07-07 17:00:37.625052', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146728818847746, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:00:38.149306', 1927290201865945090, '2025-07-07 17:00:38.149306', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146873279066113, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:01:12.592526', 1927290201865945090, '2025-07-07 17:01:12.592526', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942146933320527874, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:01:26.919693', 1927290201865945090, '2025-07-07 17:01:26.919693', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147024949293057, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:01:48.761944', 1927290201865945090, '2025-07-07 17:01:48.762943', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147103164674050, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:02:07.400729', 1927290201865945090, '2025-07-07 17:02:07.400729', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147253777936386, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:02:43.317673', 1927290201865945090, '2025-07-07 17:02:43.317673', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147359868661761, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:03:08.614354', 1927290201865945090, '2025-07-07 17:03:08.614354', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147370358616065, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 6, 1927290201865945090, '2025-07-07 17:03:11.104877', 1927290201865945090, '2025-07-07 17:03:11.104877', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147445776396289, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:03:29.087187', 1927290201865945090, '2025-07-07 17:03:29.087187', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147451333849089, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:03:30.42239', 1927290201865945090, '2025-07-07 17:03:30.42239', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147483571269634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:03:38.102045', 1927290201865945090, '2025-07-07 17:03:38.102045', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147485601312770, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:03:38.592629', 1927290201865945090, '2025-07-07 17:03:38.592629', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147510922326017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 1, 1927290201865945090, '2025-07-07 17:03:44.622494', 1927290201865945090, '2025-07-07 17:03:44.622494', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147515028549633, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:03:45.603408', 1927290201865945090, '2025-07-07 17:03:45.603408', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147619449942017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:04:10.504301', 1927290201865945090, '2025-07-07 17:04:10.504301', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147647023296514, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:04:17.07458', 1927290201865945090, '2025-07-07 17:04:17.07458', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147754766577665, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:04:42.76505', 1927290201865945090, '2025-07-07 17:04:42.76505', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147760890261506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:04:44.213703', 1927290201865945090, '2025-07-07 17:04:44.213703', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147922316439554, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:05:22.714164', 1927290201865945090, '2025-07-07 17:05:22.714164', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147926363942914, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:05:23.679435', 1927290201865945090, '2025-07-07 17:05:23.679435', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942147982315958274, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 1, 1927290201865945090, '2025-07-07 17:05:37.016527', 1927290201865945090, '2025-07-07 17:05:37.016527', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148033071230977, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:05:49.107231', 1927290201865945090, '2025-07-07 17:05:49.107231', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148037722714113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 7, 1927290201865945090, '2025-07-07 17:05:50.229409', 1927290201865945090, '2025-07-07 17:05:50.229409', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148078214524929, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:05:59.872661', 1927290201865945090, '2025-07-07 17:05:59.872661', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148128118353921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:06:11.768327', 1927290201865945090, '2025-07-07 17:06:11.768327', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148131268276225, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:06:12.520806', 1927290201865945090, '2025-07-07 17:06:12.520806', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148133155713026, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:06:12.969236', 1927290201865945090, '2025-07-07 17:06:12.969236', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149313197977602, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:10:54.327755', 1927290201865945090, '2025-07-07 17:10:54.327755', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148157558173698, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:06:18.790575', 1927290201865945090, '2025-07-07 17:06:18.790575', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148160951365633, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:06:19.601953', 1927290201865945090, '2025-07-07 17:06:19.601953', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148164130648066, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:06:20.365044', 1927290201865945090, '2025-07-07 17:06:20.365044', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148166949220353, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:06:21.031394', 1927290201865945090, '2025-07-07 17:06:21.031394', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148182619140098, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:06:24.769639', 1927290201865945090, '2025-07-07 17:06:24.769639', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148196397428738, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:06:28.047912', 1927290201865945090, '2025-07-07 17:06:28.047912', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148202160402434, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:06:29.422823', 1927290201865945090, '2025-07-07 17:06:29.422823', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148883856437249, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:09:11.961063', 1927290201865945090, '2025-07-07 17:09:11.961063', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148887778111490, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:09:12.899084', 1927290201865945090, '2025-07-07 17:09:12.899084', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148892941299713, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:09:14.121339', 1927290201865945090, '2025-07-07 17:09:14.121339', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148894652575745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:09:14.52329', 1927290201865945090, '2025-07-07 17:09:14.52329', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148953532215297, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:09:28.572827', 1927290201865945090, '2025-07-07 17:09:28.572827', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148956937990145, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:09:29.376419', 1927290201865945090, '2025-07-07 17:09:29.376419', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148958628294658, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:09:29.78766', 1927290201865945090, '2025-07-07 17:09:29.78766', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148984716865537, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:09:36.000983', 1927290201865945090, '2025-07-07 17:09:36.000983', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148986881126402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:09:36.524278', 1927290201865945090, '2025-07-07 17:09:36.524278', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148988323966977, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:09:36.863216', 1927290201865945090, '2025-07-07 17:09:36.863216', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148993625567233, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:09:38.121165', 1927290201865945090, '2025-07-07 17:09:38.121165', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942148994720280578, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:09:38.387861', 1927290201865945090, '2025-07-07 17:09:38.387861', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149122403282945, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:10:08.830265', 1927290201865945090, '2025-07-07 17:10:08.830265', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149124085198850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:10:09.231556', 1927290201865945090, '2025-07-07 17:10:09.231556', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149307829268482, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:10:53.034214', 1927290201865945090, '2025-07-07 17:10:53.034214', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149309125308418, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:10:53.344697', 1927290201865945090, '2025-07-07 17:10:53.344697', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149314959585282, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:10:54.74273', 1927290201865945090, '2025-07-07 17:10:54.74273', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149316461146113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:10:55.094573', 1927290201865945090, '2025-07-07 17:10:55.094573', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149318424080385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:10:55.572789', 1927290201865945090, '2025-07-07 17:10:55.572789', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149425848594434, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:11:21.171218', 1927290201865945090, '2025-07-07 17:11:21.171218', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149434463694850, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:11:23.226738', 1927290201865945090, '2025-07-07 17:11:23.226738', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149522376306690, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:11:44.198442', 1927290201865945090, '2025-07-07 17:11:44.198442', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149526692245505, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:11:45.225095', 1927290201865945090, '2025-07-07 17:11:45.225095', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149528458047489, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:11:45.638685', 1927290201865945090, '2025-07-07 17:11:45.638685', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149535911325697, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 1, 1927290201865945090, '2025-07-07 17:11:47.412238', 1927290201865945090, '2025-07-07 17:11:47.412238', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149551983898626, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:11:51.251757', 1927290201865945090, '2025-07-07 17:11:51.251757', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149643583303682, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:12:13.085546', 1927290201865945090, '2025-07-07 17:12:13.085546', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149646317989890, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:12:13.737282', 1927290201865945090, '2025-07-07 17:12:13.737282', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149648540971009, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:12:14.264238', 1927290201865945090, '2025-07-07 17:12:14.264238', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149650822672385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:12:14.822279', 1927290201865945090, '2025-07-07 17:12:14.822279', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149665343352834, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:12:18.278156', 1927290201865945090, '2025-07-07 17:12:18.278156', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149697949872130, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 1, 1927290201865945090, '2025-07-07 17:12:26.052012', 1927290201865945090, '2025-07-07 17:12:26.052012', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149700705529858, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:12:26.715853', 1927290201865945090, '2025-07-07 17:12:26.715853', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149703909978113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:12:27.468201', 1927290201865945090, '2025-07-07 17:12:27.468201', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149710838968322, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:12:29.120906', 1927290201865945090, '2025-07-07 17:12:29.120906', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149715947630594, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:12:30.347395', 1927290201865945090, '2025-07-07 17:12:30.347395', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149718422269954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:12:30.940051', 1927290201865945090, '2025-07-07 17:12:30.940051', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942149728224358402, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 6, 1927290201865945090, '2025-07-07 17:12:33.273886', 1927290201865945090, '2025-07-07 17:12:33.273886', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942150470595194882, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "remark": "业务部分需要的配置"
+  }
+}', NULL, 16, 1927290201865945090, '2025-07-07 17:15:30.268612', 1927290201865945090, '2025-07-07 17:15:30.268612', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942150475007602690, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:15:31.311579', 1927290201865945090, '2025-07-07 17:15:31.311579', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151590688272385, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys', '{
+  "code": "sys"
+}', '[]', 4, 1927290201865945090, '2025-07-07 17:19:57.310561', 1927290201865945090, '2025-07-07 17:19:57.310561', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151722745933826, '创建字典类型', 200, '127.0.0.1', 'POST', '/api/dict/group/create', '{
+  "params": {
+    "pid": 1942142921347129346,
+    "name": "账号类型",
+    "code": "sys_account_type",
+    "state": "启用",
+    "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式"
+  }
+}', NULL, 3, 1927290201865945090, '2025-07-07 17:20:28.80888', 1927290201865945090, '2025-07-07 17:20:28.80888', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151727124787201, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": "启用",
+        "builtin": false,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:20:29.849831', 1927290201865945090, '2025-07-07 17:20:29.849831', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151733198139394, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:20:31.296855', 1927290201865945090, '2025-07-07 17:20:31.296855', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151735618252802, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[]', 5, 1927290201865945090, '2025-07-07 17:20:31.865978', 1927290201865945090, '2025-07-07 17:20:31.865978', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151805189173250, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": "启用",
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 1, 1927290201865945090, '2025-07-07 17:20:48.458845', 1927290201865945090, '2025-07-07 17:20:48.458845', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151810155229185, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[]', 3, 1927290201865945090, '2025-07-07 17:20:49.644518', 1927290201865945090, '2025-07-07 17:20:49.644518', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151812525010946, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:20:50.206538', 1927290201865945090, '2025-07-07 17:20:50.206538', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151815783985153, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:20:50.98801', 1927290201865945090, '2025-07-07 17:20:50.98801', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151817553981442, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:20:51.404728', 1927290201865945090, '2025-07-07 17:20:51.404728', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151819986677762, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[]', 2, 1927290201865945090, '2025-07-07 17:20:51.981835', 1927290201865945090, '2025-07-07 17:20:51.981835', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151875150163970, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942151722745933825,
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+}', NULL, 8, 1927290201865945090, '2025-07-07 17:21:05.1438', 1927290201865945090, '2025-07-07 17:21:05.1438', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151879709372417, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+]', 7, 1927290201865945090, '2025-07-07 17:21:06.219514', 1927290201865945090, '2025-07-07 17:21:06.219514', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151879709372418, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": "启用",
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 8, 1927290201865945090, '2025-07-07 17:21:06.219514', 1927290201865945090, '2025-07-07 17:21:06.219514', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151904090861571, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942151722745933825,
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "手机号码"
+  }
+}', NULL, 6, 1927290201865945090, '2025-07-07 17:21:12.043592', 1927290201865945090, '2025-07-07 17:21:12.043592', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151908549406723, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:21:13.092229', 1927290201865945090, '2025-07-07 17:21:13.092229', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151942581989378, '创建字典数据', 200, '127.0.0.1', 'POST', '/api/dict/data/create', '{
+  "params": {
+    "dict_type_id": 1942151722745933825,
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "微信登录"
+  }
+}', NULL, 6, 1927290201865945090, '2025-07-07 17:21:21.21502', 1927290201865945090, '2025-07-07 17:21:21.21502', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151947027951618, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151942581989377",
+    "dict_type_id": "1942151722745933825",
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "微信登录"
+  },
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:21:22.273191', 1927290201865945090, '2025-07-07 17:21:22.273191', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151956796485634, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:21:24.609052', 1927290201865945090, '2025-07-07 17:21:24.609052', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151959275319297, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:21:25.190315', 1927290201865945090, '2025-07-07 17:21:25.190315', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151963192799234, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "正常"
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:21:26.128341', 1927290201865945090, '2025-07-07 17:21:26.128341', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151965931679745, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151942581989377",
+    "dict_type_id": "1942151722745933825",
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "微信登录"
+  },
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:21:26.773044', 1927290201865945090, '2025-07-07 17:21:26.773044', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151908549406722, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": "启用",
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:21:13.092229', 1927290201865945090, '2025-07-07 17:21:13.092229', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151947027951617, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": "启用",
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": "启用",
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": "启用",
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": "启用",
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": "启用",
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:21:22.270216', 1927290201865945090, '2025-07-07 17:21:22.270216', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151953151635458, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151942581989377",
+    "dict_type_id": "1942151722745933825",
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "微信登录"
+  },
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "邮箱登录"
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:21:23.739925', 1927290201865945090, '2025-07-07 17:21:23.739925', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151961183727617, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": "启用",
+    "remark": "全局范围可查询"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:21:25.641406', 1927290201865945090, '2025-07-07 17:21:25.641406', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942151964375592961, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": "启用",
+    "remark": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:21:26.409066', 1927290201865945090, '2025-07-07 17:21:26.409066', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154031148240897, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 90, 1927290201865945090, '2025-07-07 17:29:39.160622', 1927290201865945090, '2025-07-07 17:29:39.160622', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154034302357506, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151942581989377",
+    "dict_type_id": "1942151722745933825",
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": 0,
+    "remark": "微信登录"
+  },
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "邮箱登录"
+  }
+]', 14, 1927290201865945090, '2025-07-07 17:29:39.92638', 1927290201865945090, '2025-07-07 17:29:39.92738', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154076610301954, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/business', '{
+  "code": "business"
+}', '[]', 5, 1927290201865945090, '2025-07-07 17:29:50.003471', 1927290201865945090, '2025-07-07 17:29:50.003471', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154079894441986, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 9, 1927290201865945090, '2025-07-07 17:29:50.784689', 1927290201865945090, '2025-07-07 17:29:50.784689', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154081056264194, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 200, 1927290201865945090, '2025-07-07 17:29:51.069769', 1927290201865945090, '2025-07-07 17:29:51.069769', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154101990035458, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 12, 1927290201865945090, '2025-07-07 17:29:56.064005', 1927290201865945090, '2025-07-07 17:29:56.064005', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154101990035459, '分页查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/pageRole', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1932682189593350146",
+      "name": "运维管理员",
+      "state": true,
+      "scope": 2,
+      "remark": "运维人员使用,全局范围,拥有所有权限"
+    },
+    {
+      "id": "1932685785802162178",
+      "name": "系统管理员",
+      "state": true,
+      "scope": 0,
+      "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+    },
+    {
+      "id": "1932687324356775938",
+      "name": "小组长",
+      "state": false,
+      "scope": 1,
+      "remark": "测试禁用状态"
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 19, 1927290201865945090, '2025-07-07 17:29:56.066006', 1927290201865945090, '2025-07-07 17:29:56.066006', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154117567680513, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:29:59.764584', 1927290201865945090, '2025-07-07 17:29:59.764584', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154117567680514, '分页查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/pageRole', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1932682189593350146",
+      "name": "运维管理员",
+      "state": true,
+      "scope": 2,
+      "remark": "运维人员使用,全局范围,拥有所有权限"
+    },
+    {
+      "id": "1932685785802162178",
+      "name": "系统管理员",
+      "state": true,
+      "scope": 0,
+      "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+    },
+    {
+      "id": "1932687324356775938",
+      "name": "小组长",
+      "state": false,
+      "scope": 1,
+      "remark": "测试禁用状态"
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 22, 1927290201865945090, '2025-07-07 17:29:59.777582', 1927290201865945090, '2025-07-07 17:29:59.777582', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154147535982594, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 7, 1927290201865945090, '2025-07-07 17:30:06.910743', 1927290201865945090, '2025-07-07 17:30:06.910743', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154152535592962, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:30:08.112411', 1927290201865945090, '2025-07-07 17:30:08.112411', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942154240574033921, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:30:29.103046', 1927290201865945090, '2025-07-07 17:30:29.103046', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942155242010251265, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:34:27.860177', 1927290201865945090, '2025-07-07 17:34:27.860177', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408011770204162, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:18:52.859866', 1927290201865945090, '2025-07-08 10:18:52.860866', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942155379549868034, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:35:00.650156', 1927290201865945090, '2025-07-07 17:35:00.650156', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942155689605402626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:36:14.570247', 1927290201865945090, '2025-07-07 17:36:14.570247', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160252576141314, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:54:22.474831', 1927290201865945090, '2025-07-07 17:54:22.474831', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160257974210562, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:54:23.751762', 1927290201865945090, '2025-07-07 17:54:23.751762', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160267600138241, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:54:26.053166', 1927290201865945090, '2025-07-07 17:54:26.053166', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160276865355778, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:54:28.25537', 1927290201865945090, '2025-07-07 17:54:28.25537', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160290337460225, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:54:31.481298', 1927290201865945090, '2025-07-07 17:54:31.481298', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160303637598209, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 17:54:34.647486', 1927290201865945090, '2025-07-07 17:54:34.647486', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160676737716226, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-07 17:56:03.6016', 1927290201865945090, '2025-07-07 17:56:03.6016', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160823739682818, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 17:56:38.645304', 1927290201865945090, '2025-07-07 17:56:38.645304', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942160340685885442, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:54:43.478495', 1927290201865945090, '2025-07-07 17:54:43.478495', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942161631264837633, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 6, 1927290201865945090, '2025-07-07 17:59:51.179674', 1927290201865945090, '2025-07-07 17:59:51.180673', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942161660666908673, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 17:59:58.189541', 1927290201865945090, '2025-07-07 17:59:58.189541', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942161672247382017, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 18:00:00.949164', 1927290201865945090, '2025-07-07 18:00:00.949164', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942161680937979906, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 1, 1927290201865945090, '2025-07-07 18:00:03.020571', 1927290201865945090, '2025-07-07 18:00:03.020571', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942161752195010562, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 18:00:20.009688', 1927290201865945090, '2025-07-07 18:00:20.009688', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942414379134701569, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "gid": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "gid": "1942143605777850369",
+    "label": "启用",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 19, 1927290201865945090, '2025-07-08 10:44:10.965908', 1927290201865945090, '2025-07-08 10:44:10.965908', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942162255725400065, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-07 18:02:20.057457', 1927290201865945090, '2025-07-07 18:02:20.057457', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942162271936385026, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 18:02:23.930085', 1927290201865945090, '2025-07-07 18:02:23.930085', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942162439649824770, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-07 18:03:03.913101', 1927290201865945090, '2025-07-07 18:03:03.913101', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942162452396314626, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-07 18:03:06.955588', 1927290201865945090, '2025-07-07 18:03:06.955588', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942406343573868545, '登录', 200, '127.0.0.1', 'POST', '/api/auth/login', '{
+  "params": {
+    "username": "yangxj96@gmail.com",
+    "password": "sysadmin",
+    "code": "1234"
+  }
+}', '{
+  "id": "1927290201865945090",
+  "username": "yangxj96@gmail.com",
+  "access_token": "ea91a498-f8cd-4fc9-925c-0544d4b3fc2b",
+  "authorities": [],
+  "roles": [
+    "DEV_ADMIN"
+  ]
+}', 876, 1927290201865945090, '2025-07-08 10:12:15.130786', 1927290201865945090, '2025-07-08 10:12:15.130786', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942406345830404097, '获取树形菜单', 200, '127.0.0.1', 'GET', '/api/menu/tree', '{}', '[
+  {
+    "id": "1929928379575111682",
+    "icon": "icon-setting",
+    "name": "系统管理",
+    "path": "/system",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 0,
+    "children": [
+      {
+        "id": "1929929620715778049",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "用户管理",
+        "path": "user",
+        "component": "/System/User/index",
+        "sort": 0,
+        "children": []
+      },
+      {
+        "id": "1932983846772363266",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "部门管理",
+        "path": "dept",
+        "component": "/System/Dept/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620753526785",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "访问控制",
+        "path": "RBAC",
+        "component": "/System/RBAC/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620753526789",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "菜单管理",
+        "path": "menu",
+        "component": "/System/Menu/index",
+        "sort": 3,
+        "children": []
+      },
+      {
+        "id": "1929929620753526787",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "字典管理",
+        "path": "dict",
+        "component": "/System/Dict/index",
+        "sort": 4,
+        "children": []
+      },
+      {
+        "id": "1929929620753526790",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "文件存储",
+        "path": "storage",
+        "component": "/System/Storage/index",
+        "sort": 5,
+        "children": []
+      },
+      {
+        "id": "1929929620753526788",
+        "pid": "1929928379575111682",
+        "icon": "icon-module",
+        "name": "定时任务",
+        "path": "task",
+        "component": "/System/Task/index",
+        "sort": 6,
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1929928379667386370",
+    "icon": "icon-setting",
+    "name": "组件示例",
+    "path": "/example",
+    "component": "layout",
+    "layout": "layout",
+    "sort": 1,
+    "children": [
+      {
+        "id": "1929929620816441347",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "列表示例",
+        "path": "table",
+        "component": "/Example/Table/index",
+        "sort": 1,
+        "children": []
+      },
+      {
+        "id": "1929929620816441348",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "表单示例",
+        "path": "form",
+        "component": "/Example/Form/index",
+        "sort": 2,
+        "children": []
+      },
+      {
+        "id": "1929929620816441346",
+        "pid": "1929928379667386370",
+        "icon": "icon-module",
+        "name": "图表示例",
+        "path": "echarts",
+        "component": "/Example/Echarts/index",
+        "sort": 3,
+        "children": []
+      }
+    ]
+  }
+]', 13, 1927290201865945090, '2025-07-08 10:12:15.671883', 1927290201865945090, '2025-07-08 10:12:15.671883', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942406518342127617, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 7, 1927290201865945090, '2025-07-08 10:12:56.80008', 1927290201865945090, '2025-07-08 10:12:56.80008', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942406653012840450, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:13:28.909145', 1927290201865945090, '2025-07-08 10:13:28.909145', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407030823161857, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:14:58.987793', 1927290201865945090, '2025-07-08 10:14:58.987793', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407042638516226, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 17, 1927290201865945090, '2025-07-08 10:15:01.802575', 1927290201865945090, '2025-07-08 10:15:01.802575', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407431211421698, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:16:34.443304', 1927290201865945090, '2025-07-08 10:16:34.443304', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407462115053570, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:16:41.822953', 1927290201865945090, '2025-07-08 10:16:41.822953', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407490082672641, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:16:48.480186', 1927290201865945090, '2025-07-08 10:16:48.480186', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407508537610241, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:16:52.878826', 1927290201865945090, '2025-07-08 10:16:52.878826', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407618260602881, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:17:19.04504', 1927290201865945090, '2025-07-08 10:17:19.04504', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407669481443329, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:17:31.252985', 1927290201865945090, '2025-07-08 10:17:31.252985', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942407967176364033, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-08 10:18:42.239538', 1927290201865945090, '2025-07-08 10:18:42.239538', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408078212173826, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:19:08.709085', 1927290201865945090, '2025-07-08 10:19:08.709085', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408086827274242, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:19:10.76865', 1927290201865945090, '2025-07-08 10:19:10.76865', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408184806215682, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:19:34.133735', 1927290201865945090, '2025-07-08 10:19:34.133735', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408192704090113, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 6, 1927290201865945090, '2025-07-08 10:19:35.996213', 1927290201865945090, '2025-07-08 10:19:35.996213', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408269094948866, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:19:54.209407', 1927290201865945090, '2025-07-08 10:19:54.209407', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408277038960641, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 8, 1927290201865945090, '2025-07-08 10:19:56.111098', 1927290201865945090, '2025-07-08 10:19:56.111098', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408277810712578, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 155, 1927290201865945090, '2025-07-08 10:19:56.292727', 1927290201865945090, '2025-07-08 10:19:56.292727', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408286790717441, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:19:58.431745', 1927290201865945090, '2025-07-08 10:19:58.431745', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408286912352258, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 16, 1927290201865945090, '2025-07-08 10:19:58.463745', 1927290201865945090, '2025-07-08 10:19:58.464745', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408410862424065, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 2, 1927290201865945090, '2025-07-08 10:20:28.013837', 1927290201865945090, '2025-07-08 10:20:28.014827', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408410996641794, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 17, 1927290201865945090, '2025-07-08 10:20:28.044246', 1927290201865945090, '2025-07-08 10:20:28.044246', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408427442507777, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:20:31.971882', 1927290201865945090, '2025-07-08 10:20:31.971882', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408427627057154, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 25, 1927290201865945090, '2025-07-08 10:20:32.014927', 1927290201865945090, '2025-07-08 10:20:32.014927', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408477732212738, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:20:43.96014', 1927290201865945090, '2025-07-08 10:20:43.96014', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408477862236161, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 14, 1927290201865945090, '2025-07-08 10:20:43.985965', 1927290201865945090, '2025-07-08 10:20:43.985965', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408494236798978, '查询角色列表', 200, '127.0.0.1', 'GET', '/api/permission/listRole', '{}', '[
+  {
+    "id": "1932685785802162178",
+    "name": "系统管理员",
+    "state": true,
+    "scope": 0,
+    "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+  },
+  {
+    "id": "1932682189593350146",
+    "name": "运维管理员",
+    "state": true,
+    "scope": 2,
+    "remark": "运维人员使用,全局范围,拥有所有权限"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:20:47.8951', 1927290201865945090, '2025-07-08 10:20:47.8951', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408494303907842, '分页查询用户列表', 200, '127.0.0.1', 'GET', '/api/user/page', '{
+  "page": {
+    "page_size": 100,
+    "page_num": 1
+  },
+  "params": {}
+}', '{
+  "records": [
+    {
+      "id": "1937706586813169665",
+      "name": "测试用户",
+      "email": "ceshi@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932687324356775938",
+          "name": "小组长",
+          "state": false,
+          "scope": 1,
+          "remark": "测试禁用状态"
+        }
+      ]
+    },
+    {
+      "id": "1937354420709711873",
+      "name": "超级管理员",
+      "email": "sysadmin@1.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932685785802162178",
+          "name": "系统管理员",
+          "state": true,
+          "scope": 0,
+          "remark": "系统管理员,管理整个系统的,但是看不到系统运维相关的一些内容"
+        }
+      ]
+    },
+    {
+      "id": "1934276682383138817",
+      "name": "平台管理员",
+      "email": "yangxj96@gmail.com",
+      "state": 0,
+      "roles": [
+        {
+          "id": "1932682189593350146",
+          "name": "运维管理员",
+          "state": true,
+          "scope": 2,
+          "remark": "运维人员使用,全局范围,拥有所有权限"
+        }
+      ]
+    }
+  ],
+  "total": 3,
+  "size": 100,
+  "current": 1,
+  "pages": 1
+}', 13, 1927290201865945090, '2025-07-08 10:20:47.917103', 1927290201865945090, '2025-07-08 10:20:47.917103', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408507444662274, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:20:51.042215', 1927290201865945090, '2025-07-08 10:20:51.042215', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408836315844609, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:22:09.450387', 1927290201865945090, '2025-07-08 10:22:09.450387', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942408989189836802, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:22:45.895083', 1927290201865945090, '2025-07-08 10:22:45.895083', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409029320937474, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:22:55.465739', 1927290201865945090, '2025-07-08 10:22:55.465739', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409035171991554, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:22:56.861146', 1927290201865945090, '2025-07-08 10:22:56.861146', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409090729742337, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:23:10.112498', 1927290201865945090, '2025-07-08 10:23:10.112498', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409099600695298, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:23:12.227034', 1927290201865945090, '2025-07-08 10:23:12.227034', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409182467559425, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-08 10:23:31.987896', 1927290201865945090, '2025-07-08 10:23:31.987896', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409199882309634, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:23:36.143754', 1927290201865945090, '2025-07-08 10:23:36.143754', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409212486193153, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:23:39.142326', 1927290201865945090, '2025-07-08 10:23:39.142326', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409345177194497, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 2, 1927290201865945090, '2025-07-08 10:24:10.778417', 1927290201865945090, '2025-07-08 10:24:10.778417', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409355646177282, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:24:13.263666', 1927290201865945090, '2025-07-08 10:24:13.263666', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409362818437122, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:24:14.980235', 1927290201865945090, '2025-07-08 10:24:14.980235', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409524492079105, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 2, 1927290201865945090, '2025-07-08 10:24:53.531579', 1927290201865945090, '2025-07-08 10:24:53.531579', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409532977156097, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:24:55.555996', 1927290201865945090, '2025-07-08 10:24:55.555996', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409568880398337, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_account_type', '{
+  "code": "sys_account_type"
+}', '[
+  {
+    "id": "1942151942581989377",
+    "dict_type_id": "1942151722745933825",
+    "label": "微信登录",
+    "value": "2",
+    "sort": 999,
+    "state": 0,
+    "remark": "微信登录"
+  },
+  {
+    "id": "1942151904090861570",
+    "dict_type_id": "1942151722745933825",
+    "label": "手机号码",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "手机号码"
+  },
+  {
+    "id": "1942151875150163969",
+    "dict_type_id": "1942151722745933825",
+    "label": "邮箱登录",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "邮箱登录"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:25:04.115806', 1927290201865945090, '2025-07-08 10:25:04.115806', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409580683169794, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": 0,
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "正常"
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:25:06.929715', 1927290201865945090, '2025-07-08 10:25:06.929715', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409583229112322, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_common_state', '{
+  "code": "sys_common_state"
+}', '[
+  {
+    "id": "1942143694822924289",
+    "dict_type_id": "1942143605777850369",
+    "label": "禁用",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "禁用"
+  },
+  {
+    "id": "1942143658663829506",
+    "dict_type_id": "1942143605777850369",
+    "label": "启用",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "启用"
+  }
+]', 5, 1927290201865945090, '2025-07-08 10:25:07.526515', 1927290201865945090, '2025-07-08 10:25:07.526515', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409585720528897, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_user_state', '{
+  "code": "sys_user_state"
+}', '[
+  {
+    "id": "1942143325908721665",
+    "dict_type_id": "1942142790749085698",
+    "label": "封禁",
+    "value": "2",
+    "sort": 999,
+    "state": 0,
+    "remark": "封禁"
+  },
+  {
+    "id": "1942143271655399425",
+    "dict_type_id": "1942142790749085698",
+    "label": "冻结",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "冻结"
+  },
+  {
+    "id": "1942143228055609345",
+    "dict_type_id": "1942142790749085698",
+    "label": "正常",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "正常"
+  }
+]', 6, 1927290201865945090, '2025-07-08 10:25:08.128021', 1927290201865945090, '2025-07-08 10:25:08.128021', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409587444387841, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/sys_power_scop', '{
+  "code": "sys_power_scop"
+}', '[
+  {
+    "id": "1942142489367371777",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级包含下级",
+    "value": "2",
+    "sort": 999,
+    "state": 0,
+    "remark": "可以查询当前组织机构+部门,包含子级组织机构+部门的数据"
+  },
+  {
+    "id": "1942142354801516546",
+    "dict_type_id": "1942142182856024066",
+    "label": "本级",
+    "value": "1",
+    "sort": 999,
+    "state": 0,
+    "remark": "可以查询当前所属的组织机构+部门本级别的内容"
+  },
+  {
+    "id": "1942142254075305986",
+    "dict_type_id": "1942142182856024066",
+    "label": "全局",
+    "value": "0",
+    "sort": 999,
+    "state": 0,
+    "remark": "全局范围可查询"
+  }
+]', 3, 1927290201865945090, '2025-07-08 10:25:08.535147', 1927290201865945090, '2025-07-08 10:25:08.535147', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942409592615964674, '根据类型编码获取字典数据', 200, '127.0.0.1', 'GET', '/api/dict/data/business', '{
+  "code": "business"
+}', '[]', 2, 1927290201865945090, '2025-07-08 10:25:09.764645', 1927290201865945090, '2025-07-08 10:25:09.764645', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942414376316129281, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 147, 1927290201865945090, '2025-07-08 10:44:10.285887', 1927290201865945090, '2025-07-08 10:44:10.285887', NULL);
+INSERT INTO "db_system"."t_operation_log"
+VALUES (1942414950151442433, '获取所有字典类型的树形列表', 200, '127.0.0.1', 'GET', '/api/dict/group/tree', '{}', '[
+  {
+    "id": "1942150470595194881",
+    "name": "业务配置",
+    "code": "business",
+    "state": 0,
+    "builtin": false,
+    "remark": "业务部分需要的配置",
+    "children": []
+  },
+  {
+    "id": "1942142921347129346",
+    "name": "系统配置",
+    "code": "sys",
+    "state": 0,
+    "builtin": true,
+    "remark": "系统配置相关的字典组.基本为内置不可修改的字典组",
+    "children": [
+      {
+        "id": "1942151722745933825",
+        "pid": 1942142921347129346,
+        "name": "账号类型",
+        "code": "sys_account_type",
+        "state": 0,
+        "builtin": true,
+        "remark": "账号类型，一个用户可以有多个不同账号类型的账号，对应不同登录方式",
+        "children": []
+      },
+      {
+        "id": "1942143605777850369",
+        "pid": 1942142921347129346,
+        "name": "通用状态",
+        "code": "sys_common_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "通用状态",
+        "children": []
+      },
+      {
+        "id": "1942142790749085698",
+        "pid": 1942142921347129346,
+        "name": "用户状态",
+        "code": "sys_user_state",
+        "state": 0,
+        "builtin": true,
+        "remark": "用户状态",
+        "children": []
+      },
+      {
+        "id": "1942142182856024066",
+        "pid": 1942142921347129346,
+        "name": "权限范围",
+        "code": "sys_power_scop",
+        "state": 0,
+        "builtin": true,
+        "remark": "系统权限范围",
+        "children": []
+      }
+    ]
+  }
+]', 4, 1927290201865945090, '2025-07-08 10:46:27.109209', 1927290201865945090, '2025-07-08 10:46:27.109209', NULL);
 
 -- ----------------------------
 -- Table structure for t_organization
 -- ----------------------------
 DROP TABLE IF EXISTS "db_system"."t_organization";
-CREATE TABLE "db_system"."t_organization" (
-  "id" int8 NOT NULL,
-  "pid" int8,
-  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "code" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "type" int2 NOT NULL,
-  "remark" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
-  "created_by" int8,
-  "created_at" timestamp(6),
-  "updated_by" int8,
-  "updated_at" timestamp(6),
-  "deleted" timestamp(6)
+CREATE TABLE "db_system"."t_organization"
+(
+    "id"         int8                                        NOT NULL,
+    "pid"        int8,
+    "name"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "code"       VARCHAR(100) COLLATE "pg_catalog"."default" NOT NULL,
+    "type"       int2                                        NOT NULL,
+    "remark"     VARCHAR(255) COLLATE "pg_catalog"."default" NOT NULL,
+    "created_by" int8,
+    "created_at" TIMESTAMP(6),
+    "updated_by" int8,
+    "updated_at" TIMESTAMP(6),
+    "deleted"    TIMESTAMP(6)
 )
 ;
 COMMENT ON COLUMN "db_system"."t_organization"."id" IS '主键ID';
@@ -774,29 +19747,35 @@ COMMENT ON TABLE "db_system"."t_organization" IS '组织机构';
 -- ----------------------------
 -- Primary Key structure for table t_department
 -- ----------------------------
-ALTER TABLE "db_system"."t_department" ADD CONSTRAINT "t_department_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_department"
+    ADD CONSTRAINT "t_department_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_dict_data
 -- ----------------------------
-ALTER TABLE "db_system"."t_dict_data" ADD CONSTRAINT "t_dict_data_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_dict_data"
+    ADD CONSTRAINT "t_dict_data_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_dict_group
 -- ----------------------------
-ALTER TABLE "db_system"."t_dict_group" ADD CONSTRAINT "t_dict_type_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_dict_group"
+    ADD CONSTRAINT "t_dict_type_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_menu
 -- ----------------------------
-ALTER TABLE "db_system"."t_menu" ADD CONSTRAINT "t_menu_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_menu"
+    ADD CONSTRAINT "t_menu_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_operation_log
 -- ----------------------------
-ALTER TABLE "db_system"."t_operation_log" ADD CONSTRAINT "t_operation_log_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_operation_log"
+    ADD CONSTRAINT "t_operation_log_pkey" PRIMARY KEY ("id");
 
 -- ----------------------------
 -- Primary Key structure for table t_organization
 -- ----------------------------
-ALTER TABLE "db_system"."t_organization" ADD CONSTRAINT "t_organization_pkey" PRIMARY KEY ("id");
+ALTER TABLE "db_system"."t_organization"
+    ADD CONSTRAINT "t_organization_pkey" PRIMARY KEY ("id");

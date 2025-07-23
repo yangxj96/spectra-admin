@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yangxj96.spectra.core.user.mapper.RoleMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Role">
+        <!--@mbg.generated-->
+        <!--@Table db_auth.t_role-->
+        <id column="id"             jdbcType="BIGINT"    property="id"/>
+        <result column="name"       jdbcType="VARCHAR"   property="name"/>
+        <result column="code"       jdbcType="BOOLEAN"   property="code"/>
+        <result column="state"      jdbcType="BOOLEAN"   property="state"/>
+        <result column="scope"      jdbcType="SMALLINT"  property="scope"/>
+        <result column="remark"     jdbcType="VARCHAR"   property="remark"/>
+        <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
+        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="deleted"    jdbcType="TIMESTAMP" property="deleted"/>
+    </resultMap>
+    <!-- @formatter:on -->
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        id,
+        "name",
+        code,
+        "state",
+        "scope",
+        remark,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted
+    </sql>
+
+    <select id="getByUserId" resultMap="BaseResultMap">
+        SELECT r.*
+        FROM db_auth.t_role r,
+        db_auth.t_user_role_map arm
+        WHERE arm.user_id = #{userId}
+        AND arm.role_id = r.id
+        AND r.deleted IS NULL
+        AND arm.deleted IS NULL
+        ORDER BY created_at DESC;
+    </select>
+
+    <update id="removeRelevanceRoles">
+        UPDATE db_auth.t_user_role_map
+        SET deleted = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <insert id="insertRelevanceRole">
+        INSERT INTO db_auth.t_user_role_map(id, user_id, role_id, created_by, created_at, updated_by, updated_at)
+        VALUES (#{id}, #{uid}, #{rid}, 0, NOW(), 0, NOW())
+    </insert>
+</mapper>

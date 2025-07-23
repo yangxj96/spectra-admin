@@ -40,9 +40,9 @@
 
     <modules>
         <module>spectra-common</module>
-        <module>spectra-starter</module>
-        <module>spectra-service</module>
-        <module>spectra-share</module>
+        <module>spectra-framework</module>
+        <module>spectra-launch</module>
+        <module>spectra-core</module>
     </modules>
 
     <dependencyManagement>
@@ -70,12 +70,6 @@
             <dependency>
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <!-- Sa-Token插件：权限缓存与业务缓存分离 -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-alone-redis</artifactId>
                 <version>${sa-token.version}</version>
             </dependency>
 
@@ -110,6 +104,16 @@
                 <artifactId>tika-core</artifactId>
                 <version>${apache.tika.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct-processor</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -117,18 +121,29 @@
         <!-- Spring Boot Begin -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <!-- 测试模块 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
         <!-- Spring Boot End -->
 
-        <!--
-        MapStruct
-        这三个的顺序不能调整,不然生成的mapstruct实现类会出问题
-        -->
+        <!-- MapStruct -->
+        <!-- 这三个的顺序不能调整,不然生成的mapstruct实现类会出问题 -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>${mapstruct.version}</version>
         </dependency>
         <!-- lombok -->
         <dependency>
@@ -140,10 +155,8 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>${mapstruct.version}</version>
             <scope>provided</scope>
         </dependency>
-        <!-- 通用工具包 End -->
     </dependencies>
 
     <build>

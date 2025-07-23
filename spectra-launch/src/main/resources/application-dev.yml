@@ -1,0 +1,89 @@
+# 自己项目的配置
+spectra:
+  user:
+    default-password: ENC(xhyePaPkX7s1niOK06ACFUMbg9GRXVELQ26LfOXId14jAJBXvUG1BPPe76fB5hRo)
+  file:
+    base-dir: spectra-files
+    upload-dir: uploads
+    upload:
+      allowed-types:
+        - jpeg
+        - png
+        - pdf
+      strategies:
+        - com.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
+        - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
+        - com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
+        - com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
+
+# 服务器配置
+server:
+  port: 8888
+  servlet:
+    context-path: /api
+# spring 配置
+spring:
+  threads:
+    virtual:
+      enabled: true
+  main:
+    banner-mode: off
+  application:
+    name: spectra-framework-launch
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db?stringtype=unspecified
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: ENC(2Lnmg8Bfa3rlYoZn0BAV1GSTQznHwRLOCZDfth3BC/cRdhnkecEMTJ+iABMdF0LP)
+    type: com.zaxxer.hikari.HikariDataSource
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 10
+      password:
+      timeout: 10s
+# mybatis plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.yangxj96.spectra.**.entity.dto
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    local-cache-scope: statement
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-not-delete-value: "null"
+      logic-delete-value: "now()"
+# 日志配置
+logging:
+  level:
+    spectra: debug
+    root: info
+  group:
+    spectra: com.yangxj96.spectra
+# Sa-Token 配置
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  active-timeout: 3000
+  is-concurrent: false
+  is-share: false
+  token-style: uuid
+  is-log: true
+  is-print: false
+# 健康检查
+management:
+  health:
+    # windows下安装的redis非官方版本,存在一定问题,所以关闭检查
+    redis:
+      enabled: false
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
