@@ -15,28 +15,46 @@
  *
  */
 
-package com.yangxj96.spectra.core.system.service;
+package com.yangxj96.spectra.core.common.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.yangxj96.spectra.common.annotation.ULog;
+import com.yangxj96.spectra.core.common.service.FileService;
+import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 /**
  * <p>
- * 文件业务层
+ * 文件操作相关控制器
  * </p>
  *
  * @author Jack Young
  * @version 1.0
  * @since 2025/6/19
  */
-public interface FileService {
+@SaCheckLogin
+@RestController
+@RequestMapping("/file")
+public class FileController {
+
+    @Resource
+    private FileService bindService;
 
     /**
      * 文件上传
      *
-     * @param file 文件信息
+     * @param file 需要上传的文件
      */
-    void upload(MultipartFile file) throws IOException;
+    @ULog("文件上传")
+    @PostMapping("/upload")
+    public void upload(MultipartFile file) throws IOException {
+        bindService.upload(file);
+    }
+
 
 }

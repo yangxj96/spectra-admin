@@ -21,6 +21,13 @@
 
     <dependencies>
 
+        <!-- Spring Boot Begin -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <!-- Spring Boot End -->
+
         <!-- 通用工具包 Begin -->
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -52,6 +59,17 @@
             <artifactId>annotations</artifactId>
             <version>23.1.0</version>
             <scope>compile</scope>
+        </dependency>
+        <!-- 验证码 -->
+        <dependency>
+            <groupId>pro.fessional</groupId>
+            <artifactId>kaptcha</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- 通用工具包 End -->
 

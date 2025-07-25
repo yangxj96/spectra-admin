@@ -25,9 +25,12 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.yangxj96.spectra.framework.mybatis.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.RollbackOn;
 
 /**
  * MyBatisPlus配置
@@ -38,6 +41,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Slf4j
 @Configuration
+@MapperScan("com.yangxj96.spectra.**.mapper")
+@EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 
     private static final String PREFIX = "[MyBatisPlus]:";

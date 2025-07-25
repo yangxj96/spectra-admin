@@ -2,13 +2,9 @@ package com.yangxj96.spectra.launch;
 
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.extern.slf4j.Slf4j;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.Properties;
 
@@ -20,11 +16,8 @@ import java.util.Properties;
  * @since 2025/7/23
  */
 @Slf4j
-@EnableAsync
 @SpringBootApplication
 @ComponentScan("com.yangxj96.spectra")
-@MapperScan("com.yangxj96.spectra.**.mapper")
-@EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class LaunchApplication {
 
     public static void main(String[] args) {

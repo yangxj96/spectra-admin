@@ -15,6 +15,8 @@ spectra:
         - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
+  kaptcha:
+    type: math
 
 # 服务器配置
 server:
@@ -86,6 +88,8 @@ spring:
       database: 0
       password:
       timeout: 10s
+  cache:
+    type: redis
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml

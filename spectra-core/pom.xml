@@ -23,6 +23,7 @@
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+
     </dependencies>
 
 </project>

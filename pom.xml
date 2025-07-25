@@ -36,6 +36,8 @@
         <apache.commons.pool2.version>2.12.1</apache.commons.pool2.version>
         <apache.commons.fileupload.version>1.6.0</apache.commons.fileupload.version>
         <apache.tika.version>3.2.0</apache.tika.version>
+        <!-- 验证码 -->
+        <kaptcha.version>2.3.3</kaptcha.version>
     </properties>
 
     <modules>
@@ -119,6 +121,12 @@
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct-processor</artifactId>
                 <version>${mapstruct.version}</version>
+            </dependency>
+            <!-- 验证码 -->
+            <dependency>
+                <groupId>pro.fessional</groupId>
+                <artifactId>kaptcha</artifactId>
+                <version>${kaptcha.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -15,11 +15,11 @@
  *
  */
 
-package com.yangxj96.spectra.core.system.service.impl;
+package com.yangxj96.spectra.core.common.service.impl;
 
 import com.yangxj96.spectra.common.properties.FileProperties;
 import com.yangxj96.spectra.common.verify.FileTypeValidator;
-import com.yangxj96.spectra.core.system.service.FileService;
+import com.yangxj96.spectra.core.common.service.FileService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

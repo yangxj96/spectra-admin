@@ -8,6 +8,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.support.TaskExecutorAdapter;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -20,6 +21,7 @@ import java.util.concurrent.Executors;
  * @since 2025/6/27
  */
 @Slf4j
+@EnableAsync
 @Configuration
 public class CommonConfiguration {
 
