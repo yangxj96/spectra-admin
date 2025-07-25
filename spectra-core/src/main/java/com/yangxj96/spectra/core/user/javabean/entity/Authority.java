@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_auth.t_authority")
+@TableName(value = "t_authority")
 public class Authority extends BaseEntity implements Serializable {
 
     @Serial
@@ -56,7 +56,7 @@ public class Authority extends BaseEntity implements Serializable {
     /**
      * 权限名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "name")
     private String name;
 
     /**

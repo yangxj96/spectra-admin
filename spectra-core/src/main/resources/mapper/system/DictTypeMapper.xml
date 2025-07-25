@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.DictGroup">
         <!--@mbg.generated-->
-        <!--@Table db_system.t_dict_group-->
+        <!--@Table t_dict_group-->
         <id     column="id"         jdbcType="BIGINT"    property="id"/>
         <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
@@ -24,9 +24,9 @@
         <!--@mbg.generated-->
         id,
         pid,
-        "name",
+        name,
         code,
-        "state",
+        state,
         remark,
         builtin,
         hide,

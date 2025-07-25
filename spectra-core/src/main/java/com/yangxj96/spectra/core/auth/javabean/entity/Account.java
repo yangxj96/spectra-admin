@@ -42,7 +42,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_auth.t_account")
+@TableName(value = "t_account")
 public class Account extends BaseEntity implements Serializable {
 
     @Serial
@@ -57,7 +57,7 @@ public class Account extends BaseEntity implements Serializable {
     /**
      * 密码
      */
-    @TableField(value = "\"password\"")
+    @TableField(value = "password")
     private String password;
 
     /**
@@ -69,6 +69,6 @@ public class Account extends BaseEntity implements Serializable {
     /**
      * 登录方式
      */
-    @TableField(value = "\"type\"")
+    @TableField(value = "type")
     private AccountType type;
 }

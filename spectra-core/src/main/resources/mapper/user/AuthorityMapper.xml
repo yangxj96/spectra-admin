@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table db_auth.t_authority-->
+        <!--@Table t_authority-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
@@ -20,7 +20,7 @@
         <!--@mbg.generated-->
         id,
         pid,
-        "name",
+        name,
         code,
         created_by,
         created_at,
@@ -31,8 +31,8 @@
 
     <select id="getByRoleIds" resultMap="BaseResultMap">
         SELECT a.*
-        FROM db_auth.t_authority a,
-        db_auth.t_role_authority_map ram
+        FROM t_authority a,
+        t_role_authority_map ram
         WHERE ram.role_id IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}

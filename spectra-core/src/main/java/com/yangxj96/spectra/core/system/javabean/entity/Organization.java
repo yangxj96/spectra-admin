@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_system.t_organization")
+@TableName(value = "t_organization")
 public class Organization extends BaseEntity implements Serializable {
 
     @Serial
@@ -56,7 +56,7 @@ public class Organization extends BaseEntity implements Serializable {
     /**
      * 名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "name")
     private String name;
 
     /**
@@ -68,7 +68,7 @@ public class Organization extends BaseEntity implements Serializable {
     /**
      * 组织机构类型
      */
-    @TableField(value = "\"type\"")
+    @TableField(value = "type")
     private Short type;
 
     /**

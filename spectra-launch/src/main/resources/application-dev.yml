@@ -31,10 +31,10 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: jdbc:postgresql://127.0.0.1:5432/spectra_framework_db?stringtype=unspecified
-    driver-class-name: org.postgresql.Driver
-    username: postgres
-    password: ENC(2Lnmg8Bfa3rlYoZn0BAV1GSTQznHwRLOCZDfth3BC/cRdhnkecEMTJ+iABMdF0LP)
+    url: jdbc:mysql://127.0.0.1:3306/spectra_framework_db
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       # 初始化连接池大小
@@ -83,7 +83,7 @@ spring:
     redis:
       host: 127.0.0.1
       port: 6379
-      database: 10
+      database: 0
       password:
       timeout: 10s
 # mybatis plus配置

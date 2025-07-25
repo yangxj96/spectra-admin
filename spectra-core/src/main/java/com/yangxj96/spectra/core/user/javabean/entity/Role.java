@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "db_auth.t_role")
+@TableName(value = "t_role")
 public class Role extends BaseEntity implements Serializable {
 
     @Serial
@@ -62,13 +62,13 @@ public class Role extends BaseEntity implements Serializable {
     /**
      * 状态
      */
-    @TableField(value = "\"state\"")
+    @TableField(value = "state")
     private Boolean state;
 
     /**
      * 范围
      */
-    @TableField(value = "\"scope\"")
+    @TableField(value = "scope")
     private Short scope;
 
     /**

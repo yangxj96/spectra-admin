@@ -24,7 +24,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_system.t_dict_data")
+@TableName(value = "t_dict_data")
 public class DictData extends BaseEntity implements Serializable {
 
     @Serial
@@ -39,13 +39,13 @@ public class DictData extends BaseEntity implements Serializable {
     /**
      * 标签
      */
-    @TableField(value = "\"label\"")
+    @TableField(value = "label")
     private String label;
 
     /**
      * 值
      */
-    @TableField(value = "\"value\"")
+    @TableField(value = "value")
     private String value;
 
     /**
@@ -57,7 +57,7 @@ public class DictData extends BaseEntity implements Serializable {
     /**
      * 状态
      */
-    @TableField(value = "\"state\"")
+    @TableField(value = "state")
     private Short state;
 
     /**

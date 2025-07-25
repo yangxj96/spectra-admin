@@ -56,7 +56,7 @@ public class MyBatisPlusConfiguration {
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);
         pageInterceptor.setMaxLimit(500L);
-        pageInterceptor.setDbType(DbType.POSTGRE_SQL);
+        pageInterceptor.setDbType(DbType.MYSQL);
         var interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(pageInterceptor);
         // 针对 update 和 delete 语句 作用: 阻止恶意的全表更新删除

@@ -45,7 +45,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_system.t_menu")
+@TableName(value = "t_menu")
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial
@@ -68,13 +68,13 @@ public class Menu extends BaseEntity implements Serializable {
     /**
      * 名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "name")
     private String name;
 
     /**
      * 请求路径
      */
-    @TableField(value = "\"path\"")
+    @TableField(value = "path")
     private String path;
 
     /**

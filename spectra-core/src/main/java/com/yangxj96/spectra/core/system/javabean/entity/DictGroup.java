@@ -24,7 +24,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "db_system.t_dict_group")
+@TableName(value = "t_dict_group")
 public class DictGroup extends BaseEntity implements Serializable {
 
     @Serial
@@ -39,7 +39,7 @@ public class DictGroup extends BaseEntity implements Serializable {
     /**
      * 字典名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "name")
     private String name;
 
     /**
@@ -51,7 +51,7 @@ public class DictGroup extends BaseEntity implements Serializable {
     /**
      * 字典状态
      */
-    @TableField(value = "\"state\"")
+    @TableField(value = "state")
     private Short state;
 
     /**
