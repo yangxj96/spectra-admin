@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -23,6 +24,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/7/25
  */
+@Slf4j
 @Service
 @CacheConfig(cacheNames = "CommonService", keyGenerator = "keyGenerator")
 public class CommonServiceImpl implements CommonService {
@@ -35,7 +37,8 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public void generateKaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
+        String sessionId = request.getSession().getId();
+        log.atDebug().log("SessionId:{}", sessionId);
         response.setDateHeader("Expires", 0);
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
         response.addHeader("Cache-Control", "post-check=0, pre-check=0");

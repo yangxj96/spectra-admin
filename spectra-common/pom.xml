@@ -117,6 +117,10 @@
         </dependency>
         <dependency>
             <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-el</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cn.dev33</groupId>
             <artifactId>sa-token-redis-jackson</artifactId>
         </dependency>
         <dependency>

@@ -80,6 +80,12 @@
                 <artifactId>sa-token-redis-jackson</artifactId>
                 <version>${sa-token.version}</version>
             </dependency>
+            <!-- Sa-Token 注解鉴权使用 EL 表达式 -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-el</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
 
             <!-- 工具包 -->
             <dependency>

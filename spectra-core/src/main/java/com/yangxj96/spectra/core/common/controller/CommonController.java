@@ -35,7 +35,7 @@ public class CommonController {
     }
 
     @GetMapping("/cache/{v}")
-    public String cache(@PathVariable String v){
+    public String cache(@PathVariable String v) {
         return bindService.cache(v);
     }
 
