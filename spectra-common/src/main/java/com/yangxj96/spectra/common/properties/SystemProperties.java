@@ -40,4 +40,17 @@ public class SystemProperties {
      */
     private String baseDir = "files";
 
+    /**
+     * 指定包前缀,一部分地方在使用的时候不得不固定写死代码,<br/>
+     * 导致如果克隆代码后需要修改包名为自己公司或者自己使用的时候,<br/>
+     * 可以直接修改这个配置,在需要写死的地方会直接使用这里.<br/>
+     * 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表;
+     * 以下为没法直接使用这个属性进行修改的位置:<br/>
+     * <ul>
+     *     <li>com.yangxj96.spectra.framework.configure.MyBatisPlusConfiguration</li>
+     *     <li>com.yangxj96.spectra.framework.advice.ResponseBodyModifyAdvice</li>
+     *     <li>com.yangxj96.spectra.launch.LaunchApplication</li>
+     * </ul>
+     */
+    private String packagePrefix = "com.yangxj96.spectra";
 }

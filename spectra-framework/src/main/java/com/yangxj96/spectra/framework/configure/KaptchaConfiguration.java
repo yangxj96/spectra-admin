@@ -4,6 +4,8 @@ import com.google.code.kaptcha.Producer;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import com.yangxj96.spectra.common.properties.KaptchaProperties;
+import com.yangxj96.spectra.common.properties.SystemProperties;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -27,6 +29,9 @@ import static com.google.code.kaptcha.Constants.*;
 public class KaptchaConfiguration {
 
     private static final String PREFIX = "[验证码配置]:";
+
+    @Resource
+    private SystemProperties systemProperties;
 
     /**
      * 图片验证码
@@ -91,7 +96,7 @@ public class KaptchaConfiguration {
         // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCodeMath");
         // 验证码文本生成器
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, "com.yangxj96.spectra.framework.kaptcha.KaptchaTextCreator");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, systemProperties.getPackagePrefix() + ".framework.kaptcha.KaptchaTextCreator");
         // 验证码文本字符间距 默认为2
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_SPACE, "3");
         // 验证码文本字符长度 默认为5

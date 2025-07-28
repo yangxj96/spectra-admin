@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         if (kaptchaService.isCheck() == Boolean.TRUE) {
             String code = kaptchaService.getKaptchaCode();
             if (!params.getCode().equals(code)) {
-                throw new KaptchaNotMatchException();
+                throw new KaptchaNotMatchException("验证码错误");
             }
         }
 

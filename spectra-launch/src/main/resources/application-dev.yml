@@ -22,13 +22,19 @@ spectra:
   # 验证码相关
   kaptcha:
     type: math
-    verify: false
+    verify: true
 
 # 服务器配置
 server:
   port: 8888
   servlet:
     context-path: /api
+    session:
+      cookie:
+        path: /
+        same-site: none
+        # 如果你用的是 HTTP，否则设为 true
+        secure: true
 # spring 配置
 spring:
   threads:

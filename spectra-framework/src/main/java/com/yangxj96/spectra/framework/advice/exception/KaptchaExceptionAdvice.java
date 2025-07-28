@@ -32,7 +32,7 @@ public class KaptchaExceptionAdvice {
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log(PREFIX + "验证码过期,{}", e.getMessage(), e);
+        log.atError().log(PREFIX + "验证码不匹配,{}", e.getMessage(), e);
         return R.failure("验证码不匹配");
     }
 

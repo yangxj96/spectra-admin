@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
  * @version 1.0
  * @since 2025/7/28
  */
-public class HashUtils {
+public final class HashUtils {
 
     private HashUtils() {
     }

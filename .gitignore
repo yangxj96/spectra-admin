@@ -14,6 +14,10 @@ document/jar
 files
 spectra-files
 
+## autoimport
+auto-imports.d.ts
+components.d.ts
+
 ### IntelliJ IDEA ###
 .idea
 .idea/httpRequests/*.http
@@ -52,3 +56,31 @@ out/
 
 ### Mac OS ###
 .DS_Store
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+node_modules
+dist
+dist-ssr
+coverage
+*.local
+
+/cypress/videos/
+/cypress/screenshots/
+
+# Editor directories and files
+spectra-framework-web/.vscode/settings.json
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo

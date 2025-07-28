@@ -7,5 +7,14 @@ package com.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025/7/28
  */
-public class KaptchaExpiresException extends RuntimeException{
+public class KaptchaExpiresException extends RuntimeException {
+
+    public KaptchaExpiresException() {
+        super();
+    }
+
+    public KaptchaExpiresException(String message) {
+        super(message);
+    }
+
 }

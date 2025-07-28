@@ -10,7 +10,7 @@ import org.apache.commons.lang3.StringUtils;
  * @version 1.0
  * @since 2025/7/23
  */
-public class IpUtils {
+public final class IpUtils {
 
     private IpUtils() {
     }

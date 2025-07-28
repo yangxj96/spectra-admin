@@ -95,7 +95,7 @@ public class KaptchaServiceImpl implements KaptchaService {
         var key = RedisKey.KAPTCHA + request.getSession().getId();
         var val = redisTemplate.opsForValue().get(key);
         if (val == null) {
-            throw new KaptchaExpiresException();
+            throw new KaptchaExpiresException("验证码过期");
         }
         // 这里逻辑上确实是有可能为null的
         return val.toString();
