@@ -11,6 +11,7 @@ target
 document/jar
 .env
 .env.*
+files
 spectra-files
 
 ### IntelliJ IDEA ###

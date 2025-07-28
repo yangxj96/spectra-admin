@@ -15,18 +15,15 @@
  *
  */
 
-package com.yangxj96.spectra.framework.properties;
+package com.yangxj96.spectra.common.properties;
 
-import com.yangxj96.spectra.common.enums.FileType;
-import com.yangxj96.spectra.common.strategy.FileTypeValidationStrategy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  * <p>
- * 文件上传参数
+ * 文件相关配置
  * </p>
  *
  * @author Jack Young
@@ -34,16 +31,13 @@ import java.util.List;
  * @since 2025/6/19
  */
 @Data
-@ConfigurationProperties(prefix = "spectra.file.upload")
-public class FileUploadProperties {
+@Component
+@ConfigurationProperties(prefix = "spectra.system")
+public class SystemProperties {
 
     /**
-     * 允许的类型
+     * 基础文件位置,所有文件都会在这个目录下面进行存放
      */
-    private List<FileType> allowedTypes;
+    private String baseDir = "files";
 
-    /**
-     * 文件类型验证策略
-     */
-    private List<Class<? extends FileTypeValidationStrategy>> strategies;
 }

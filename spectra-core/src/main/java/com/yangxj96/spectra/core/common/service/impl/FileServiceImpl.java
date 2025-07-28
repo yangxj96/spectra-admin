@@ -17,7 +17,7 @@
 
 package com.yangxj96.spectra.core.common.service.impl;
 
-import com.yangxj96.spectra.common.properties.FileProperties;
+import com.yangxj96.spectra.common.properties.FileUploadProperties;
 import com.yangxj96.spectra.common.verify.FileTypeValidator;
 import com.yangxj96.spectra.core.common.service.FileService;
 import jakarta.annotation.Resource;
@@ -44,7 +44,7 @@ import java.nio.file.Paths;
 public class FileServiceImpl implements FileService {
 
     @Resource
-    private FileProperties properties;
+    private FileUploadProperties properties;
 
     @Resource
     private FileTypeValidator validator;
@@ -67,7 +67,6 @@ public class FileServiceImpl implements FileService {
         // 构建目标文件路径
         Path targetLocation = uploadDirPath.resolve(file.getOriginalFilename());
         file.transferTo(targetLocation); // Spring 提供的方法直接保存
-
         log.info("文件已保存至: " + targetLocation);
     }
 }

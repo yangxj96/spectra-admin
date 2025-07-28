@@ -36,6 +36,8 @@ import java.time.LocalDateTime;
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
+    private static final String PREFIX = "[MyBatisPlus数据填充]:";
+
     /**
      * 创建人
      */
@@ -88,7 +90,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         try {
             return StpUtil.getLoginIdAsLong();
         } catch (Exception e) {
-            log.atError().log("获取ID出错,默认ID为{}", Common.PID);
+            log.atError().log(PREFIX + "获取ID出错,默认ID为{}", Common.PID);
             return Common.PID;
         }
     }

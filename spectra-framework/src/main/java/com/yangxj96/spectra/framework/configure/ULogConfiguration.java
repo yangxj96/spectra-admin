@@ -14,7 +14,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 /**
- * 通用的一些自动配置
+ * 操作日志相关配置
  *
  * @author Jack Young
  * @version 1.0
@@ -23,9 +23,9 @@ import java.util.concurrent.Executors;
 @Slf4j
 @EnableAsync
 @Configuration
-public class CommonConfiguration {
+public class ULogConfiguration {
 
-    private static final String PREFIX = "[CommonAutoConfiguration]:";
+    private static final String PREFIX = "[操作日志配置]:";
 
     /**
      * 日志消息订阅发布者

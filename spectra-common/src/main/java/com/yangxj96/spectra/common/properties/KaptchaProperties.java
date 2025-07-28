@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.framework.properties;
+package com.yangxj96.spectra.common.properties;
 
 import com.yangxj96.spectra.common.enums.KaptchaType;
 import lombok.Data;
@@ -23,6 +23,6 @@ public class KaptchaProperties {
     /**
      * 是什么类型的验证码
      */
-    private KaptchaType type = KaptchaType.CHAT;
+    private KaptchaType type = KaptchaType.MATH;
 
 }

@@ -24,7 +24,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "t_dict_group")
+@TableName(value = "sys_dict_group")
 public class DictGroup extends BaseEntity implements Serializable {
 
     @Serial

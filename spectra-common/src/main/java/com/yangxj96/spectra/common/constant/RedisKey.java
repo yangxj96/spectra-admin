@@ -15,6 +15,6 @@ public class RedisKey {
     /**
      * 验证码
      */
-    private static final String KAPTCHA = "kaptcha:";
+    public static final String KAPTCHA = "kaptcha:";
 
 }

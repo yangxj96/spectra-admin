@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.framework.properties;
+package com.yangxj96.spectra.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,6 +24,5 @@ public class JacksonProperties {
      * LocalTime类序列化方式.
      */
     private String localTimeFormat = "HH:mm:ss";
-
 
 }

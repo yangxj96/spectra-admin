@@ -3,7 +3,7 @@ package com.yangxj96.spectra.framework.configure;
 import com.google.code.kaptcha.Producer;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
-import com.yangxj96.spectra.framework.properties.KaptchaProperties;
+import com.yangxj96.spectra.common.properties.KaptchaProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -26,6 +26,8 @@ import static com.google.code.kaptcha.Constants.*;
 @EnableConfigurationProperties(KaptchaProperties.class)
 public class KaptchaConfiguration {
 
+    private static final String PREFIX = "[验证码配置]:";
+
     /**
      * 图片验证码
      *
@@ -34,6 +36,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "char")
     public Producer kaptchaProducer() {
+        log.atDebug().log(PREFIX + "开始配置图片验证码,字符模式");
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no
@@ -70,6 +73,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() {
+        log.atDebug().log(PREFIX + "开始配置图片验证码,算术模式");
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
         Properties properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no

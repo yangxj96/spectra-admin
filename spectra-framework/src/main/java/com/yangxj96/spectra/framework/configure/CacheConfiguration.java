@@ -1,5 +1,6 @@
 package com.yangxj96.spectra.framework.configure;
 
+import com.yangxj96.spectra.common.utils.HashUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -13,10 +14,6 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
 /**
@@ -31,7 +28,7 @@ import java.util.Arrays;
 @Configuration
 public class CacheConfiguration {
 
-    private static final String PREFIX = "[CommonAutoConfiguration]:";
+    private static final String PREFIX = "[缓存配置]:";
 
     /**
      * Redis缓存管理器
@@ -76,28 +73,12 @@ public class CacheConfiguration {
             sb.append(method.getName());
             sb.append(":");
 
+            // 把参数转换为字符串链接
             String paramKey = Arrays.toString(params);
-            String hash = md5Hash(paramKey);
+            sb.append(paramKey);
 
-            sb.append(hash);
-            return sb.toString();
+            return HashUtils.md5(sb.toString());
         };
-    }
-
-    // MD5 哈希方法
-    private String md5Hash(String input) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes(StandardCharsets.UTF_8));
-            BigInteger no = new BigInteger(1, messageDigest);
-            StringBuilder hashText = new StringBuilder(no.toString(16));
-            while (hashText.length() < 32) {
-                hashText.insert(0, "0");
-            }
-            return hashText.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating MD5 hash", e);
-        }
     }
 
 }

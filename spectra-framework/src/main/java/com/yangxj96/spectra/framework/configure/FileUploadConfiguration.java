@@ -1,13 +1,13 @@
 package com.yangxj96.spectra.framework.configure;
 
 import com.yangxj96.spectra.common.enums.FileType;
+import com.yangxj96.spectra.common.properties.FileUploadProperties;
 import com.yangxj96.spectra.common.strategy.FileTypeValidationStrategy;
 import com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy;
 import com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy;
 import com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy;
 import com.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy;
 import com.yangxj96.spectra.common.verify.FileTypeValidator;
-import com.yangxj96.spectra.framework.properties.FileUploadProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +28,7 @@ import java.util.List;
 @EnableConfigurationProperties(FileUploadProperties.class)
 public class FileUploadConfiguration {
 
-    private static final String PREFIX = "[FileUpload]:";
+    private static final String PREFIX = "[文件上传配置]:";
 
     private final FileUploadProperties properties;
 

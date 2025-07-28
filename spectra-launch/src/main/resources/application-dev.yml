@@ -1,22 +1,28 @@
 # 自己项目的配置
 spectra:
+  # 用户相关
   user:
     default-password: ENC(xhyePaPkX7s1niOK06ACFUMbg9GRXVELQ26LfOXId14jAJBXvUG1BPPe76fB5hRo)
+  # 系统配置线管
+  system:
+    base-dir: files
+  # 文件相关
   file:
-    base-dir: spectra-files
-    upload-dir: uploads
     upload:
+      upload-dir: ${spectra.system.base-dir}/uploads
       allowed-types:
         - jpeg
         - png
         - pdf
       strategies:
         - com.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
-        - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
+        # - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
+  # 验证码相关
   kaptcha:
     type: math
+    verify: false
 
 # 服务器配置
 server:

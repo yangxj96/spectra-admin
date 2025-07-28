@@ -45,7 +45,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "t_menu")
+@TableName(value = "sys_menu")
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial

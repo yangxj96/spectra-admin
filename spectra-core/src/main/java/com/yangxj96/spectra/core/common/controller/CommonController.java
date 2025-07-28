@@ -1,11 +1,9 @@
 package com.yangxj96.spectra.core.common.controller;
 
-import com.yangxj96.spectra.core.common.service.CommonService;
+import cn.dev33.satoken.annotation.SaIgnore;
+import com.yangxj96.spectra.core.common.service.KaptchaService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,25 +16,24 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/7/25
  */
+@SaIgnore
 @RestController
 @RequestMapping("/common")
 public class CommonController {
 
     @Resource
-    private CommonService bindService;
-
+    private KaptchaService kaptchaService;
 
     /**
      * 获取验证码
      */
     @GetMapping("/kaptcha")
-    public void kaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        bindService.generateKaptcha(request, response);
+    public void kaptcha() throws IOException {
+        kaptchaService.generate();
     }
 
-    @GetMapping("/cache/{v}")
-    public String cache(@PathVariable String v) {
-        return bindService.cache(v);
+    @GetMapping("/check")
+    public String check() {
+        return "OK";
     }
-
 }

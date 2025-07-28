@@ -1,42 +1,51 @@
 package com.yangxj96.spectra.core.common.service.impl;
 
 import com.google.code.kaptcha.Producer;
-import com.yangxj96.spectra.common.enums.KaptchaType;
-import com.yangxj96.spectra.core.common.service.CommonService;
+import com.yangxj96.spectra.common.constant.RedisKey;
+import com.yangxj96.spectra.common.exception.KaptchaExpiresException;
+import com.yangxj96.spectra.common.properties.KaptchaProperties;
+import com.yangxj96.spectra.core.common.service.KaptchaService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 /**
- * 通用接口的业务层实现
+ * 验证码服务默认实现
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/7/25
+ * @since 2025/7/28
  */
 @Slf4j
 @Service
-@CacheConfig(cacheNames = "CommonService", keyGenerator = "keyGenerator")
-public class CommonServiceImpl implements CommonService {
+public class KaptchaServiceImpl implements KaptchaService {
 
     @Resource
     private Producer kaptchaProducer;
 
-    @Value("${spectra.kaptcha.type}")
-    private KaptchaType kaptchaType;
+    @Resource
+    private KaptchaProperties properties;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private HttpServletRequest request;
+
+    @Resource
+    private HttpServletResponse response;
 
     @Override
-    public void generateKaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void generate() throws IOException {
         String sessionId = request.getSession().getId();
         log.atDebug().log("SessionId:{}", sessionId);
         response.setDateHeader("Expires", 0);
@@ -45,18 +54,14 @@ public class CommonServiceImpl implements CommonService {
         response.setHeader("Pragma", "no-cache");
         response.setContentType("image/jpeg");
 
-        // 保存验证码信息
-        //String uuid = IdUtils.simpleUUID();
-        //String verifyKey = CacheConstants.CAPTCHA_CODE_KEY + uuid;
-
         // 验证码文本
         String capStr;
         // 算数方式下的结果
-        String code = null;
+        String code;
         // 生成的图片
         BufferedImage image;
 
-        switch (kaptchaType) {
+        switch (properties.getType()) {
             case MATH -> {
                 String capText = kaptchaProducer.createText();
                 capStr = capText.substring(0, capText.lastIndexOf("@"));
@@ -70,6 +75,9 @@ public class CommonServiceImpl implements CommonService {
             default -> throw new RuntimeException("为获取到验证码生成方式");
         }
 
+        // 存储到缓存中
+        redisTemplate.opsForValue().set(RedisKey.KAPTCHA + request.getSession().getId(), code, 5, TimeUnit.MINUTES);
+
         ServletOutputStream out = response.getOutputStream();
         try (out) {
             ImageIO.write(image, "jpg", out);
@@ -78,8 +86,19 @@ public class CommonServiceImpl implements CommonService {
     }
 
     @Override
-    @Cacheable
-    public String cache(String v) {
-        return v;
+    public Boolean isCheck() {
+        return properties.getVerify() == Boolean.TRUE;
     }
+
+    @Override
+    public String getKaptchaCode() {
+        var key = RedisKey.KAPTCHA + request.getSession().getId();
+        var val = redisTemplate.opsForValue().get(key);
+        if (val == null) {
+            throw new KaptchaExpiresException();
+        }
+        // 这里逻辑上确实是有可能为null的
+        return val.toString();
+    }
+
 }

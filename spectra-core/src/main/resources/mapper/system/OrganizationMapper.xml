@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.Organization">
         <!--@mbg.generated-->
-        <!--@Table t_organization-->
+        <!--@Table sys_organization-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>

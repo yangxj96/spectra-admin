@@ -56,5 +56,4 @@ public class FileController {
         bindService.upload(file);
     }
 
-
 }

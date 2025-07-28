@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Role">
         <!--@mbg.generated-->
-        <!--@Table t_role-->
+        <!--@Table sys_role-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="code"       jdbcType="BOOLEAN"   property="code"/>
@@ -35,8 +35,8 @@
 
     <select id="getByUserId" resultMap="BaseResultMap">
         SELECT r.*
-        FROM t_role r,
-             t_user_role_map arm
+        FROM sys_role r,
+             sys_user_role_map arm
         WHERE arm.user_id = #{userId}
           AND arm.role_id = r.id
           AND r.deleted IS NULL
@@ -45,13 +45,13 @@
     </select>
 
     <update id="removeRelevanceRoles">
-        UPDATE db_auth.t_user_role_map
+        UPDATE sys_user_role_map
         SET deleted = NOW()
         WHERE user_id = #{userId}
     </update>
 
     <insert id="insertRelevanceRole">
-        INSERT INTO db_auth.t_user_role_map(id, user_id, role_id, created_by, created_at, updated_by, updated_at)
+        INSERT INTO sys_user_role_map(id, user_id, role_id, created_by, created_at, updated_by, updated_at)
         VALUES (#{id}, #{uid}, #{rid}, 0, NOW(), 0, NOW())
     </insert>
 </mapper>

@@ -47,7 +47,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 public class ULogAspect {
 
-    private static final String PREFIX = "[ULogAspectj]:";
+    private static final String PREFIX = "[操作日志切面]:";
 
     @Resource
     private ULogEventPublisher publisher;

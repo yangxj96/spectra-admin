@@ -35,7 +35,6 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     private static final String PREFIX = "[MVC]:";
 
-
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.atDebug().log(PREFIX + "载入Cors");
