@@ -6,7 +6,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.4-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.17-green)
 ![MySQL](https://img.shields.io/badge/MySQL-8.4.4-blue)
-![License](https://img.shields.io/github/license/yangxj96/spectra-api)
+![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
 ---
 
@@ -112,7 +112,7 @@
 
 1. 克隆项目：
    ```bash
-   git clone https://github.com/yangxj96/spectra-api.git
+   git clone https://github.com/yangxj96/spectra-admin.git
    ```
 
 2. 创建 `.env` 文件并配置环境变量（前后端分别配置）

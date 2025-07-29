@@ -4,8 +4,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.yangxj96.spectra</groupId>
-    <artifactId>spectra-api</artifactId>
-    <name>spectra-api</name>
+    <artifactId>spectra-admin</artifactId>
+    <name>spectra-admin</name>
     <version>${revision}</version>
 
     <packaging>pom</packaging>

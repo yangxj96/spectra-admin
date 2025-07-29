@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.yangxj96.spectra</groupId>
-        <artifactId>spectra-api</artifactId>
+        <artifactId>spectra-admin</artifactId>
         <version>${revision}</version>
     </parent>
 
