@@ -39,6 +39,7 @@
              sys_user_role_map arm
         WHERE arm.user_id = #{userId}
           AND arm.role_id = r.id
+          AND r.state = TRUE
           AND r.deleted IS NULL
           AND arm.deleted IS NULL
         ORDER BY created_at DESC;
