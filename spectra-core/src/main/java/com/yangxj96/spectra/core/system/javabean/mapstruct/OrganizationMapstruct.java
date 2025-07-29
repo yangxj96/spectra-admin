@@ -41,6 +41,11 @@ public interface OrganizationMapstruct {
      * @param from 入参
      * @return 实体
      */
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     Organization toEntity(OrganizationFrom from);
 
 }

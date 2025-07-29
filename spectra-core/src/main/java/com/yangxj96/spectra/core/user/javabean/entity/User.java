@@ -50,7 +50,7 @@ public class User extends BaseEntity implements Serializable {
     /**
      * 姓名
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "name")
     private String name;
 
     /**

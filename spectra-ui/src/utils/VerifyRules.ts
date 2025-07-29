@@ -1,5 +1,5 @@
 // 手机号码验证规则
-import type {FormItemRule} from "element-plus";
+import type { FormItemRule } from "element-plus";
 
 export const mobile: FormItemRule["validator"] = (rule, value, callback) => {
     if (!value) {
