@@ -57,7 +57,7 @@ export default class CommonUtils {
             });
         }
         //sunrise = 日出 sunset = 日落
-        const {sunrise, sunset} = SunCalc.getTimes(now, lat, lon);
+        const { sunrise, sunset } = SunCalc.getTimes(now, lat, lon);
         // 日出前 或 日落后，开启深色模式
         return now < sunrise || now >= sunset;
     }

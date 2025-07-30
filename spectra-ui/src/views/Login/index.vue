@@ -5,21 +5,25 @@ import { ElForm, ElMessage, type FormRules } from "element-plus";
 
 const router = useRouter();
 const loginRef = useTemplateRef<InstanceType<typeof ElForm>>("loginForm");
-const kaptchaUrl = ref(import.meta.env.VITE_API_URL + "api/common/kaptcha?t=" + Date.now());
+const kaptchaUrl = ref(import.meta.env.VITE_API_URL + "api/common/kaptcha?_t=" + Date.now());
 
-// 表单
-const user = reactive<LongParams>({
-    username: "yangxj96@gmail.com",
-    password: "sysadmin",
-    code: "1234"
+const login = reactive({
+    form: {
+        username: "yangxj96@gmail.com",
+        password: "sysadmin",
+        code: "1234"
+    },
+    rules: {
+        username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
+    } as FormRules,
 });
 
-// 路由
-const rules = reactive<FormRules<LongParams>>({
-    username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-    password: [{ required: true, message: "请输入密码", trigger: "blur" }],
-    code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
-});
+// 刷新验证码
+function refreshKaptcha() {
+    kaptchaUrl.value = import.meta.env.VITE_API_URL + "api/common/kaptcha?_t=" + Date.now();
+}
 
 // 登录
 async function handleLogin() {
@@ -36,28 +40,26 @@ async function handleLogin() {
             console.log("错误字段为:", fields);
             return;
         }
-
-        AuthApi.login(user.username, user.password, user.code).then(res => {
-            if (res && res.code === 200 && res.data) {
-                ElMessage.success({
-                    duration: 500,
-                    message: "登录成功",
-                    onClose() {
-                        useUserStore().token = res.data!;
-                        router.push({ path: "/" });
-                    }
-                });
-            }
-        });
+        AuthApi.login(login.form.username, login.form.password, login.form.code)
+            // 出现错误就刷新下验证码
+            .catch(() => {
+                refreshKaptcha();
+            })
+            .then(res => {
+                if (res && res.code === 200 && res.data) {
+                    ElMessage.success({
+                        duration: 500,
+                        message: "登录成功",
+                        onClose() {
+                            useUserStore().token = res.data!;
+                            router.push({ path: "/" });
+                        }
+                    });
+                }
+            });
     });
 }
 
-// 登录参数
-interface LongParams {
-    username: string;
-    password: string;
-    code: string;
-}
 </script>
 
 <template>
@@ -76,20 +78,20 @@ interface LongParams {
                 </p>
             </template>
             <div>
-                <el-form ref="loginForm" label-width="70px" :model="user" :rules="rules">
+                <el-form ref="loginForm" label-width="70px" :model="login.form" :rules="login.rules">
                     <el-form-item label="账号" prop="username">
-                        <el-input v-model="user.username" placeholder="请输入账号" />
+                        <el-input v-model="login.form.username" placeholder="请输入账号" />
                     </el-form-item>
                     <el-form-item label="密码" prop="password">
-                        <el-input v-model="user.password" placeholder="请输入密码" show-password />
+                        <el-input v-model="login.form.password" placeholder="请输入密码" show-password />
                     </el-form-item>
                     <el-form-item label="验证码" prop="code">
                         <el-row style="width: 100%">
                             <el-col :span="12">
-                                <el-input v-model="user.code" placeholder="请输入验证码" />
+                                <el-input v-model="login.form.code" placeholder="请输入验证码" />
                             </el-col>
                             <el-col :span="12">
-                                <el-image :src="kaptchaUrl" class="v-code" />
+                                <el-image :src="kaptchaUrl" class="v-code" @click="refreshKaptcha" />
                             </el-col>
                         </el-row>
                     </el-form-item>
@@ -129,5 +131,12 @@ interface LongParams {
     width: 100%;
     padding: 4px;
     border-radius: 10px;
+    cursor: pointer;
+}
+
+.v-code:hover {
+    opacity: 0.8;
+    transform: scale(1.02);
+    transition: all 0.2s ease;
 }
 </style>

@@ -29,4 +29,10 @@ public interface KaptchaService {
      * @return 验证码
      */
     String getKaptchaCode();
+
+    /**
+     * 根据SessionID删除验证码
+     */
+    void deleteBySessionId();
+
 }

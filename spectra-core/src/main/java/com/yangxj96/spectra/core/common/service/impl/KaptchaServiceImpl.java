@@ -101,4 +101,9 @@ public class KaptchaServiceImpl implements KaptchaService {
         return val.toString();
     }
 
+    @Override
+    public void deleteBySessionId() {
+        var key = RedisKey.KAPTCHA + request.getSession().getId();
+        redisTemplate.delete(key);
+    }
 }

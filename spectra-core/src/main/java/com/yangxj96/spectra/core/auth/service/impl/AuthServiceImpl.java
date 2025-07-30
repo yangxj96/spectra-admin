@@ -61,39 +61,46 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public TokenVO login(UsernamePasswordFrom params) throws LoginException {
-        // 验证码验证
-        if (kaptchaService.isCheck() == Boolean.TRUE) {
-            String code = kaptchaService.getKaptchaCode();
-            if (!params.getCode().equals(code)) {
-                throw new KaptchaNotMatchException("验证码错误");
+
+        try {
+
+            // 验证码验证
+            if (kaptchaService.isCheck() == Boolean.TRUE) {
+                String code = kaptchaService.getKaptchaCode();
+                if (!params.getCode().equals(code)) {
+                    throw new KaptchaNotMatchException("验证码错误");
+                }
             }
+
+            // 账户查询
+            Account datum = accountService.getByUsername(params.getUsername());
+            // 账号不存在或者密码匹配失败
+            if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
+                throw new LoginException("账号或密码错误");
+            }
+            if (!CollUtils.contains(request.getHeaderNames(), "user-agent")) {
+                throw new AuthException("认证错误");
+            }
+            StpUtil.login(
+                    datum.getId(),
+                    new SaLoginParameter()
+                            .setDeviceType("PC")
+                            .setIsLastingCookie(false)
+                            .setIsWriteHeader(false)
+                            .setTerminalExtra("user_id", datum.getUserId())
+            );
+
+            return TokenVO.builder()
+                    .id(datum.getId())
+                    .username(datum.getUsername())
+                    .accessToken(StpUtil.getTokenValue())
+                    .authorities(StpUtil.getPermissionList())
+                    .roles(StpUtil.getRoleList())
+                    .build();
+        } finally {
+            kaptchaService.deleteBySessionId();
         }
 
-        // 账户查询
-        Account datum = accountService.getByUsername(params.getUsername());
-        // 账号不存在或者密码匹配失败
-        if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
-            throw new LoginException("账号或密码错误");
-        }
-        if (!CollUtils.contains(request.getHeaderNames(), "user-agent")) {
-            throw new AuthException("认证错误");
-        }
-        StpUtil.login(
-                datum.getId(),
-                new SaLoginParameter()
-                        .setDeviceType("PC")
-                        .setIsLastingCookie(false)
-                        .setIsWriteHeader(false)
-                        .setTerminalExtra("user_id", datum.getUserId())
-        );
-
-        return TokenVO.builder()
-                .id(datum.getId())
-                .username(datum.getUsername())
-                .accessToken(StpUtil.getTokenValue())
-                .authorities(StpUtil.getPermissionList())
-                .roles(StpUtil.getRoleList())
-                .build();
     }
 
     @Override
