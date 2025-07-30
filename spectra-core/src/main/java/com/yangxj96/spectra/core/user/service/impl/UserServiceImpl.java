@@ -40,6 +40,7 @@ import com.yangxj96.spectra.core.user.mapper.UserMapper;
 import com.yangxj96.spectra.core.user.service.RoleService;
 import com.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.annotation.Lazy;
@@ -83,7 +84,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var result = new Page<UserPageVO>();
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>()
-                .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName());
+                .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
+                .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
+                .eq(params.getStatus() != null, User::getState, params.getStatus());
+
         var db = this.page(page.toPage(), wrapper);
         BeanUtils.copyProperties(db, result);
         result.setRecords(mapstruct.toVOs(db.getRecords()));
@@ -99,7 +103,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             if (null != roles && !roles.isEmpty()) {
                 vo.setRoles(permissionMapstruct.roleToVOs(roles));
             }
-            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), null));
+            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
         });
         // 响应
         return result;
@@ -144,20 +148,22 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             account.setUsername(entity.getEmail());
             accountServices.updateById(account);
         }
-        // 判断角色是否修改过
-        var roleIds = roleService.getByUserId(entity.getId())
-                .stream()
-                .map(Role::getId)
-                .sorted()
-                .toList();
-        Collections.sort(params.getRoleIds());
-        // 角色列表变化了
-        if (!roleIds.equals(params.getRoleIds())) {
-            if (roleService.removeRelevanceRoles(entity.getId()) < 0) {
-                throw new RuntimeException("移除过期的角色关联错误");
-            }
-            if (roleService.insertRelevanceRoles(entity.getId(), params.getRoleIds()) <= 0) {
-                throw new RuntimeException("新增角色列表错误");
+        // 判断角色是否修改过,有角色就要判断下角色是否修改过了
+        if (CollectionUtils.isNotEmpty(params.getRoleIds())) {
+            var roleIds = roleService.getByUserId(entity.getId())
+                    .stream()
+                    .map(Role::getId)
+                    .sorted()
+                    .toList();
+            Collections.sort(params.getRoleIds());
+            // 角色列表变化了
+            if (!roleIds.equals(params.getRoleIds())) {
+                if (roleService.removeRelevanceRoles(entity.getId()) < 0) {
+                    throw new RuntimeException("移除过期的角色关联错误");
+                }
+                if (roleService.insertRelevanceRoles(entity.getId(), params.getRoleIds()) <= 0) {
+                    throw new RuntimeException("新增角色列表错误");
+                }
             }
         }
     }

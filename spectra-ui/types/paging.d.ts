@@ -37,8 +37,8 @@ type OrderItem = {
 // 用户分页请求参数定义
 type UserPageParams = BasePageParams & {
     username?: string;
-    telephone?: string;
-    status?: string;
+    email?: string;
+    status?: boolean;
 };
 
 // 角色分页请求参数定义

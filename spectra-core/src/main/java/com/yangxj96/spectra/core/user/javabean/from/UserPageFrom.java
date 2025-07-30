@@ -38,4 +38,13 @@ public class UserPageFrom {
      */
     private String name;
 
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 状态
+     */
+    private Boolean status;
 }

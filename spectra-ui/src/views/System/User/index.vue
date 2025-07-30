@@ -7,6 +7,7 @@ import * as VerifyRules from "@/utils/VerifyRules.ts";
 import _ from "lodash";
 import PermissionApi from "@/api/PermissionApi.ts";
 import OrganizationApi from "@/api/OrganizationApi.ts";
+import CommonUtils from "@/utils/CommonUtils.ts";
 
 // 树形props配置
 const treeProps = {children: "children", label: "name", value: "id"};
@@ -41,7 +42,8 @@ const edit = reactive({
       {validator: VerifyRules.email, message: "请输入正确的邮箱", trigger: "blur"}
     ],
     state: [{required: true, message: "请选择状态", trigger: "blur"}],
-    role_ids: [{required: true, message: "请选择角色", trigger: "blur"}]
+    // role_ids: [{required: true, message: "请选择角色", trigger: "blur"}]
+    organization_id: [{required: true, message: "请选择所属组织", trigger: "blur"}]
   } as FormRules
 });
 
@@ -71,7 +73,7 @@ function initData() {
 // 表行修改按钮被单击
 function handleTableItemModify(row: User) {
   let datum = _.cloneDeep(row);
-  if (datum.roles.length > 0) {
+  if (datum.roles && datum.roles.length > 0) {
     if (!datum.role_ids) {
       datum.role_ids = [] as string[];
     }
@@ -109,22 +111,44 @@ function handleUserAddDialog() {
 // 新增或编辑用户
 async function handleUserSave() {
   if (!formRef.value) return;
-  await formRef.value?.validate(valid => {
-    if (valid) {
-      let request = edit.modify ? UserApi.modify : UserApi.created;
-      request(edit.form)
-          .finally(() => (edit.loading = false))
-          .then(() => {
-            ElMessage.success({
-              message: edit.modify ? "修改用户成功" : "新增用户成功",
-              onClose() {
-                edit.dialog = false;
-                handlerConditionQuery();
-              }
-            });
-          });
-    }
-  });
+
+  try {
+    await formRef.value?.validate();
+
+    const request = edit.modify ? UserApi.modify : UserApi.created;
+
+    // 开启 loading
+    edit.loading = true;
+
+    // 记录开始时间
+    const startTime = Date.now();
+    const minLoadingTime = 500; // 最小 loading 显示时间（毫秒）
+
+    // 发送请求
+    await request(edit.form);
+
+    // 计算是否需要补足最小 loading 时间
+    const elapsed = Date.now() - startTime;
+    const remaining = Math.max(0, minLoadingTime - elapsed);
+
+    // 使用 lodash delay 或原生 setTimeout 补足时间
+    // await delay(remaining); // 来自 lodash-es
+    await CommonUtils.delay(remaining);
+
+    // 成功提示
+    ElMessage.success({
+      message: edit.modify ? '修改用户成功' : '新增用户成功',
+      onClose: () => {
+        edit.dialog = false;
+        handlerConditionQuery();
+      }
+    });
+  } catch (error) {
+    // 输出到控制台就好了,不需要进行提示
+    console.error(error);
+  } finally {
+    edit.loading = false;
+  }
 }
 
 // 排序字段改变
@@ -145,8 +169,8 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
       <el-form-item label="姓名" prop="username">
         <el-input v-model="condition.username" placeholder="请输入姓名" clearable/>
       </el-form-item>
-      <el-form-item label="电话" prop="telephone">
-        <el-input v-model="condition.telephone" placeholder="请输入电话" clearable/>
+      <el-form-item label="邮箱" prop="email">
+        <el-input v-model="condition.email" placeholder="请输入电话" clearable/>
       </el-form-item>
       <el-form-item id="form-status" label="状态" prop="status">
         <el-select
@@ -249,7 +273,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             <el-option v-for="item in edit.roles" :key="item.id" :label="item.name" :value="item.id"/>
           </el-select>
         </el-form-item>
-        <el-form-item label="所属组织" prop="role_ids">
+        <el-form-item label="所属组织" prop="organization_id">
           <el-tree-select v-model="edit.form.organization_id" :data="orgTree" node-key="id"
                           clearable
                           check-strictly

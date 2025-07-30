@@ -57,8 +57,17 @@ export default class CommonUtils {
             });
         }
         //sunrise = 日出 sunset = 日落
-        const { sunrise, sunset } = SunCalc.getTimes(now, lat, lon);
+        const {sunrise, sunset} = SunCalc.getTimes(now, lat, lon);
         // 日出前 或 日落后，开启深色模式
         return now < sunrise || now >= sunset;
+    }
+
+    /**
+     * delay 函数定义
+     * 主要用于解决请求太快,导致loading框一闪即逝的问题
+     * @param ms 需要缓冲的时间
+     */
+    public static delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
