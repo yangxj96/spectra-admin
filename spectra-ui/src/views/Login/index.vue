@@ -17,7 +17,7 @@ const login = reactive({
         username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
         code: [{ required: true, message: "请输入验证码", trigger: "blur" }]
-    } as FormRules,
+    } as FormRules
 });
 
 // 刷新验证码
@@ -59,7 +59,6 @@ async function handleLogin() {
             });
     });
 }
-
 </script>
 
 <template>

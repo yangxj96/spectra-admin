@@ -22,6 +22,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ULogListener {
 
+    private final static String PREFIX = "[日志消息监听器]: ";
+
     private final OperationLogService logService;
 
     public ULogListener(OperationLogService logService) {
@@ -31,7 +33,7 @@ public class ULogListener {
     @Async("uLogTaskExecutor")
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
-        log.atDebug().log("日志消息监听器,开始记录");
+        log.atDebug().log(PREFIX + "开始记录");
         OperationLog datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
         if (StringUtils.isNotBlank(entity.getToken())) {

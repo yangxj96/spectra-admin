@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.common.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -29,4 +30,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface BaseService<O extends BaseEntity> extends IService<O> {
 
+    LambdaQueryWrapper<O> getWrapper();
 }

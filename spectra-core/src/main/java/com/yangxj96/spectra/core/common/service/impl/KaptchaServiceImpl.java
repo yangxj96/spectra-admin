@@ -46,8 +46,6 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     @Override
     public void generate() throws IOException {
-        String sessionId = request.getSession().getId();
-        log.atDebug().log("SessionId:{}", sessionId);
         response.setDateHeader("Expires", 0);
         response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
         response.addHeader("Cache-Control", "post-check=0, pre-check=0");

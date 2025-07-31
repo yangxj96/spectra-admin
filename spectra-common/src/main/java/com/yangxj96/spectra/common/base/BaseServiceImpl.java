@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.common.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -31,5 +32,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
  */
 public class BaseServiceImpl<M extends BaseMapper<O>, O extends BaseEntity>
         extends ServiceImpl<M, O> implements BaseService<O> {
+
+    @Override
+    public LambdaQueryWrapper<O> getWrapper() {
+        return new LambdaQueryWrapper<>();
+    }
 
 }

@@ -20,7 +20,6 @@ package com.yangxj96.spectra.core.auth.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import com.yangxj96.spectra.common.exception.KaptchaNotMatchException;
-import com.yangxj96.spectra.common.utils.CollUtils;
 import com.yangxj96.spectra.core.auth.javabean.entity.Account;
 import com.yangxj96.spectra.core.auth.javabean.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.core.auth.javabean.vo.TokenVO;
@@ -28,8 +27,6 @@ import com.yangxj96.spectra.core.auth.service.AccountService;
 import com.yangxj96.spectra.core.auth.service.AuthService;
 import com.yangxj96.spectra.core.common.service.KaptchaService;
 import jakarta.annotation.Resource;
-import jakarta.security.auth.message.AuthException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -54,16 +51,11 @@ public class AuthServiceImpl implements AuthService {
     private BCryptPasswordEncoder encoder;
 
     @Resource
-    private HttpServletRequest request;
-
-    @Resource
     private KaptchaService kaptchaService;
 
     @Override
     public TokenVO login(UsernamePasswordFrom params) throws LoginException {
-
         try {
-
             // 验证码验证
             if (kaptchaService.isCheck() == Boolean.TRUE) {
                 String code = kaptchaService.getKaptchaCode();
@@ -71,25 +63,20 @@ public class AuthServiceImpl implements AuthService {
                     throw new KaptchaNotMatchException("验证码错误");
                 }
             }
-
             // 账户查询
             Account datum = accountService.getByUsername(params.getUsername());
             // 账号不存在或者密码匹配失败
             if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
                 throw new LoginException("账号或密码错误");
             }
-            if (!CollUtils.contains(request.getHeaderNames(), "user-agent")) {
-                throw new AuthException("认证错误");
-            }
-            StpUtil.login(
-                    datum.getId(),
-                    new SaLoginParameter()
-                            .setDeviceType("PC")
-                            .setIsLastingCookie(false)
-                            .setIsWriteHeader(false)
-                            .setTerminalExtra("user_id", datum.getUserId())
+            // 登录
+            StpUtil.login(datum.getId(), new SaLoginParameter()
+                    .setDeviceType("PC")
+                    .setIsLastingCookie(false)
+                    .setIsWriteHeader(false)
+                    .setTerminalExtra("user_id", datum.getUserId())
             );
-
+            // 组件token
             return TokenVO.builder()
                     .id(datum.getId())
                     .username(datum.getUsername())
