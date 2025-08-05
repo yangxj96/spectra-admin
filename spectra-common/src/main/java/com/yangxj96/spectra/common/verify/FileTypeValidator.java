@@ -17,13 +17,7 @@ import java.util.List;
  * @since 2025/6/19
  */
 @Slf4j
-public class FileTypeValidator {
-
-    private final List<FileTypeValidationStrategy> strategies;
-
-    public FileTypeValidator(List<FileTypeValidationStrategy> strategies) {
-        this.strategies = strategies;
-    }
+public record FileTypeValidator(List<FileTypeValidationStrategy> strategies) {
 
     /**
      * 执行所有注册的验证策略

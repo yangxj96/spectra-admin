@@ -1,4 +1,4 @@
-package com.yangxj96.spectra.core.runner;
+package com.yangxj96.spectra.framework.runner;
 
 import com.yangxj96.spectra.common.properties.SystemProperties;
 import jakarta.annotation.Resource;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 
 /**
- * 文件夹检测
+ * 文件夹检查
  *
  * @author Jack Young
  * @version 1.0
@@ -18,13 +18,13 @@ import java.io.File;
  */
 @Slf4j
 @Component
-public class FileApplicationRunner implements ApplicationRunner {
+public class FolderCheckRunner implements ApplicationRunner {
 
     @Resource
     private SystemProperties properties;
 
     @Override
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
         File folder = new File(properties.getBaseDir());
         if (!folder.exists()) {
             boolean created = folder.mkdirs();

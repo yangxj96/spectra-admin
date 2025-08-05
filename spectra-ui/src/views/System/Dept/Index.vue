@@ -98,7 +98,7 @@ async function handleOrganizationSave() {
     <el-row class="box-body">
         <el-table :data="table_data" height="100%" stripe default-expand-all row-key="id">
             <el-table-column align="center" type="index" />
-            <el-table-column align="center" prop="name" label="名称" />
+            <el-table-column header-align="center" align="left" prop="name" label="名称" />
             <el-table-column align="center" prop="code" label="代码" />
             <el-table-column align="center" prop="type" label="类型">
                 <template #default="scope">

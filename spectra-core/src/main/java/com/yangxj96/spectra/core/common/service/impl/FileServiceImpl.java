@@ -67,6 +67,6 @@ public class FileServiceImpl implements FileService {
         // 构建目标文件路径
         Path targetLocation = uploadDirPath.resolve(file.getOriginalFilename());
         file.transferTo(targetLocation); // Spring 提供的方法直接保存
-        log.info("文件已保存至: " + targetLocation);
+        log.atDebug().log("文件已保存至: {}", targetLocation);
     }
 }

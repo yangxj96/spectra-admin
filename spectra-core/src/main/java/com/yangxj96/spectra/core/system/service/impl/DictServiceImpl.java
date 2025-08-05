@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -147,6 +148,8 @@ public class DictServiceImpl implements DictService {
             throw new DataNotExistException("字典类型不存在");
         }
         List<DictData> dictData = dataService.listByGid(group.getId());
+        // 根据sort字段进行一个排序
+        dictData.sort(Comparator.comparing(DictData::getSort));
         return mapstruct.dataToVos(dictData);
     }
 }

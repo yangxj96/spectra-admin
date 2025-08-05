@@ -49,9 +49,8 @@ public class DictController {
     @Resource
     private DictService bindService;
 
-
     /**
-     * 创建字典类型
+     * 创建字典组
      *
      * @param params 请求参数
      */
@@ -74,9 +73,8 @@ public class DictController {
         bindService.deleteGroup(Long.parseLong(id));
     }
 
-
     /**
-     * 修改字典组信息
+     * 修改字典组
      *
      * @param params 请求参数
      */
@@ -88,7 +86,7 @@ public class DictController {
     }
 
     /**
-     * 创建字典数据
+     * 创建字典项
      *
      * @param params 请求参数
      */
@@ -112,7 +110,7 @@ public class DictController {
     }
 
     /**
-     * 修改字典数据
+     * 修改字典项
      *
      * @param params 请求参数
      */
@@ -124,9 +122,9 @@ public class DictController {
     }
 
     /**
-     * 获取所有字典类型的树形列表
+     * 获取所有字典组的树形列表
      *
-     * @return 字典类型树
+     * @return 字典组树
      */
     @ULog("获取所有字典类型的树形列表")
     @GetMapping("/group/tree")
@@ -135,10 +133,10 @@ public class DictController {
     }
 
     /**
-     * 根据类型编码获取字典数据
+     * 根据类型编码获取字典项
      *
      * @param code 对应数据类型的code
-     * @return 字典数据列表
+     * @return 字典项列表
      */
     @ULog("根据类型编码获取字典数据")
     @GetMapping("/data/{code}")

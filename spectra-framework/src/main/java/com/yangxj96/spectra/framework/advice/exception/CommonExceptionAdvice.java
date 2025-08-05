@@ -23,6 +23,7 @@ import com.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  * @since 2025-6-14
  */
 @Slf4j
+@Order
 @RestControllerAdvice
 public class CommonExceptionAdvice {
 
@@ -126,6 +128,7 @@ public class CommonExceptionAdvice {
      * @param response 响应
      * @return 格式化为正常响应返回
      */
+    @Order(Integer.MAX_VALUE - 1)
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -140,6 +143,7 @@ public class CommonExceptionAdvice {
      * @param response 响应
      * @return 格式化为正常响应返回
      */
+    @Order(Integer.MAX_VALUE)
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

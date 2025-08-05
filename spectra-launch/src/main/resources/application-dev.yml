@@ -2,7 +2,7 @@
 spectra:
   # 用户相关
   user:
-    default-password: ENC(xhyePaPkX7s1niOK06ACFUMbg9GRXVELQ26LfOXId14jAJBXvUG1BPPe76fB5hRo)
+    default-password: admin123
   # 系统配置线管
   system:
     base-dir: files

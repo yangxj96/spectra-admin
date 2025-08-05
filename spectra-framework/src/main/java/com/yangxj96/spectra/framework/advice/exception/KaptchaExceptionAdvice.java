@@ -5,6 +5,7 @@ import com.yangxj96.spectra.common.exception.KaptchaNotMatchException;
 import com.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * @since 2025/7/28
  */
 @Slf4j
+@Order(Integer.MIN_VALUE)
 @RestControllerAdvice
 public class KaptchaExceptionAdvice {
 
