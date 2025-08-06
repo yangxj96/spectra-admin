@@ -62,6 +62,13 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 
     @Override
     @Transactional
+    public void deleteById(String id) {
+        // TODO 现在的删除并不完善,还需要修改
+        this.removeById(Long.parseLong(id));
+    }
+
+    @Override
+    @Transactional
     public void modify(OrganizationFrom from) {
         Organization organization = this.getById(from.getId());
         if (null == organization) {

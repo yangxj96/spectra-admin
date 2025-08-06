@@ -50,6 +50,17 @@ public class OrganizationController {
     }
 
     /**
+     * 删除组织机构
+     *
+     * @param id 组织机构ID
+     */
+    @ULog("新增组织机构")
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable String id) {
+        bindService.deleteById(id);
+    }
+
+    /**
      * 编辑组织机构
      *
      * @param from 请求入参

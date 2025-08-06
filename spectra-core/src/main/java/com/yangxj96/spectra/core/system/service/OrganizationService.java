@@ -48,9 +48,17 @@ public interface OrganizationService extends IService<Organization> {
     void created(OrganizationFrom from);
 
     /**
+     * 根据ID删除组织机构
+     *
+     * @param id ID
+     */
+    void deleteById(String id);
+
+    /**
      * 编辑组织机构
      *
      * @param from 请求入参
      */
     void modify(OrganizationFrom from);
+
 }

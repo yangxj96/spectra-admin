@@ -11,7 +11,7 @@ const login = reactive({
     form: {
         username: "yangxj96@gmail.com",
         password: "sysadmin",
-        code: "1234"
+        code: undefined
     },
     rules: {
         username: [{ required: true, message: "请输入用户名", trigger: "blur" }],

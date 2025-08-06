@@ -95,7 +95,7 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
      */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
         R<Object> r;
-        // 如果能获取到响应则直接狗响应
+        // 如果能获取到响应则直接响应
         if (response instanceof ServletServerHttpResponse resp) {
             int status = resp.getServletResponse().getStatus();
             r = new R<>(HttpStatus.resolve(status));

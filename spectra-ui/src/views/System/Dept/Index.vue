@@ -39,13 +39,13 @@ function handleCriteriaQuery() {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Organization) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-    }).then(() => {
-        console.log(`确定删除`);
-        ElMessage.success("执行删除了");
+    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning" }).then(async () => {
+        try {
+            let { code, msg } = await OrganizationApi.deleteById(row.id);
+            ElMessage.success(code === 200 ? "删除成功" : msg);
+        } finally {
+            handleCriteriaQuery();
+        }
     });
 }
 

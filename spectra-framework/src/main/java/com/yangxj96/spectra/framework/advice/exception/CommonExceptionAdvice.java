@@ -128,7 +128,6 @@ public class CommonExceptionAdvice {
      * @param response 响应
      * @return 格式化为正常响应返回
      */
-    @Order(Integer.MAX_VALUE - 1)
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -143,12 +142,11 @@ public class CommonExceptionAdvice {
      * @param response 响应
      * @return 格式化为正常响应返回
      */
-    @Order(Integer.MAX_VALUE)
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.atError().log(PREFIX + "兜底异常处理,{}", e.getMessage(), e);
-        return R.failure();
+        return R.failure("系统内部错误,请联系管理员");
     }
 
 }
