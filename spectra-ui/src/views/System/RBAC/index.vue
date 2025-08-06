@@ -29,7 +29,6 @@ const authority_tree = ref<AuthorityTree[]>();
 const edit = reactive({
     dialog: false,
     modify: false,
-    loading: false,
     form: {} as Role,
     rules: {} as FormRules
 });
@@ -55,7 +54,6 @@ function handleInitData() {
 
 // 角色新增打开
 function handleRoleAddDialog() {
-    console.log(`角色新增`);
     edit.modify = false;
     edit.form = {} as Role;
     edit.dialog = true;
@@ -63,7 +61,6 @@ function handleRoleAddDialog() {
 
 // 角色编辑框打开
 function handleRoleEditDialog(row: Role) {
-    console.log(`角色编辑`);
     edit.modify = true;
     edit.form = _.cloneDeep(row);
     edit.dialog = true;
@@ -71,36 +68,26 @@ function handleRoleEditDialog(row: Role) {
 
 // 角色删除
 function handleRoleDelete(row: Role) {
-    console.log(`角色删除:`, row);
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-    }).then(() => {
-        console.log(`确定删除`);
+    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning" }).then(() => {
         ElMessage.success("执行删除了");
     });
 }
 
 // 角色保存
 async function handleRoleSave() {
-    console.log(`角色保存:`);
     if (!formRef.value) return;
     await formRef.value?.validate((valid, _) => {
         if (valid) {
-            edit.loading = true;
             let request = edit.modify ? PermissionApi.modifyRole : PermissionApi.createdRole;
-            request(edit.form)
-                .finally(() => (edit.loading = false))
-                .then(() => {
-                    ElMessage.success({
-                        message: edit.modify ? "修改角色成功" : "新增角色成功",
-                        onClose() {
-                            edit.dialog = false;
-                            handlerConditionQuery();
-                        }
-                    });
+            request(edit.form).then(() => {
+                ElMessage.success({
+                    message: edit.modify ? "修改角色成功" : "新增角色成功",
+                    onClose() {
+                        edit.dialog = false;
+                        handlerConditionQuery();
+                    }
                 });
+            });
         }
     });
 }
@@ -150,6 +137,7 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
                 highlight-current-row
                 height="88%"
                 style="width: 100%"
+                class="loading-box"
                 @row-dblclick="handleRoleTableRowClick">
                 <el-table-column align="center" label="序号" width="60" type="index" />
                 <el-table-column align="center" prop="name" width="220" label="名称" />
@@ -221,12 +209,13 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
         :title="`${edit.modify ? '编辑' : '新增'}角色`"
         :append-to="'.box-content'"
         width="30%"
+        class="loading-box"
         :show-close="false"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false">
         <template #default>
-            <el-form ref="formRef" v-loading="edit.loading" :model="edit.form" :rules="edit.rules" label-width="auto">
+            <el-form ref="formRef" :model="edit.form" :rules="edit.rules" label-width="auto">
                 <el-form-item label="角色名称" prop="name">
                     <el-input v-model="edit.form.name" clearable />
                 </el-form-item>
@@ -249,8 +238,8 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
             </el-form>
         </template>
         <template #footer>
-            <el-button :disabled="edit.loading" @click="() => (edit.dialog = false)">关闭</el-button>
-            <el-button :disabled="edit.loading" @click="handleRoleSave">提交</el-button>
+            <el-button @click="() => (edit.dialog = false)">关闭</el-button>
+            <el-button @click="handleRoleSave">提交</el-button>
         </template>
     </el-dialog>
 </template>

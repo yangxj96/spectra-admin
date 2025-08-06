@@ -14,7 +14,6 @@ const table_data = ref<OrganizationTree[]>();
 const edit = reactive({
     dialog: false,
     modify: false,
-    loading: false,
     form: {} as Organization,
     rules: {
         name: [{ required: true, message: "请输入部门名称", trigger: "blur" }],
@@ -122,6 +121,7 @@ async function handleOrganizationSave() {
     <el-dialog
         v-if="ready"
         v-model="edit.dialog"
+        class="loading-box"
         :append-to="'.box-content'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -132,7 +132,6 @@ async function handleOrganizationSave() {
         <template #default>
             <el-form
                 ref="formRef"
-                v-loading="edit.loading"
                 :rules="edit.rules"
                 :model="edit.form"
                 label-width="auto"
@@ -179,8 +178,8 @@ async function handleOrganizationSave() {
             </el-form>
         </template>
         <template #footer>
-            <el-button :disabled="edit.loading" @click="() => (edit.dialog = false)">取消</el-button>
-            <el-button :disabled="edit.loading" type="primary" @click="handleOrganizationSave()">确定</el-button>
+            <el-button @click="() => (edit.dialog = false)">取消</el-button>
+            <el-button type="primary" @click="handleOrganizationSave()">确定</el-button>
         </template>
     </el-dialog>
 </template>

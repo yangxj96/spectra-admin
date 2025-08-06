@@ -12,7 +12,6 @@ const table_data = ref<Menu[]>([]);
 const menu = reactive({
     dialog: false,
     modify: false,
-    loading: false,
     form: {} as Menu,
     rules: {
         name: [{ required: true, message: "请输入菜单名称", trigger: "blur" }],
@@ -71,20 +70,16 @@ async function handleMenuSave() {
     if (!menuForm.value) return;
     await menuForm.value?.validate((valid, _) => {
         if (valid) {
-            console.log(`保存:`, menu.form);
-            menu.loading = true;
             let request = menu.modify ? MenuApi.modify : MenuApi.created;
-            request(menu.form)
-                .finally(() => (menu.loading = false))
-                .then(() => {
-                    ElMessage.success({
-                        message: menu.modify ? "修改菜单成功" : "新增菜单成功",
-                        onClose() {
-                            menu.dialog = false;
-                            handleCriteriaQuery();
-                        }
-                    });
+            request(menu.form).then(() => {
+                ElMessage.success({
+                    message: menu.modify ? "修改菜单成功" : "新增菜单成功",
+                    onClose() {
+                        menu.dialog = false;
+                        handleCriteriaQuery();
+                    }
                 });
+            });
         }
     });
 }
@@ -106,7 +101,14 @@ async function handleMenuSave() {
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <el-table v-if="table_data.length > 0" :data="table_data" height="100%" stripe default-expand-all row-key="id">
+        <el-table
+            v-if="table_data.length > 0"
+            :data="table_data"
+            height="100%"
+            stripe
+            default-expand-all
+            row-key="id"
+            class="loading-box">
             <el-table-column align="center" type="index" />
             <el-table-column align="center" prop="name" label="名称" />
             <el-table-column align="center" prop="icon" label="图标">
@@ -134,6 +136,7 @@ async function handleMenuSave() {
     <el-dialog
         v-if="ready"
         v-model="menu.dialog"
+        class="loading-box"
         :append-to="'.box-content'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -144,7 +147,6 @@ async function handleMenuSave() {
         <template #default>
             <el-form
                 ref="ruleFormRef"
-                v-loading="menu.loading"
                 :rules="menu.rules"
                 :model="menu.form"
                 label-width="auto"
@@ -192,8 +194,8 @@ async function handleMenuSave() {
             </el-form>
         </template>
         <template #footer>
-            <el-button :disabled="menu.loading" @click="() => (menu.dialog = false)">取消</el-button>
-            <el-button :disabled="menu.loading" type="primary" @click="handleMenuSave()">确定</el-button>
+            <el-button @click="() => (menu.dialog = false)">取消</el-button>
+            <el-button type="primary" @click="handleMenuSave()">确定</el-button>
         </template>
     </el-dialog>
 </template>

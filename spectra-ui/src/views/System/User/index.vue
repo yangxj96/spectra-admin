@@ -7,7 +7,6 @@ import * as VerifyRules from "@/utils/VerifyRules.ts";
 import _ from "lodash";
 import PermissionApi from "@/api/PermissionApi.ts";
 import OrganizationApi from "@/api/OrganizationApi.ts";
-import CommonUtils from "@/utils/CommonUtils.ts";
 
 // 树形props配置
 const treeProps = { children: "children", label: "name", value: "id" };
@@ -32,7 +31,6 @@ const ready = ref(false);
 const edit = reactive({
     dialog: false,
     modify: false,
-    loading: false,
     roles: [] as Role[],
     form: {} as User,
     rules: {
@@ -50,14 +48,12 @@ const edit = reactive({
 // 挂载后执行
 onMounted(() => {
     ready.value = true;
-
     initData();
 });
 
 // 初始化获取必备数据
 function initData() {
     let request = [PermissionApi.listRole(), OrganizationApi.tree()];
-
     Promise.all(request).then(([role, org]) => {
         edit.roles = role.data as Role[];
         orgTree.value = org.data as OrganizationTree[];
@@ -105,31 +101,10 @@ function handleUserAddDialog() {
 // 新增或编辑用户
 async function handleUserSave() {
     if (!formRef.value) return;
-
     try {
         await formRef.value?.validate();
-
         const request = edit.modify ? UserApi.modify : UserApi.created;
-
-        // 开启 loading
-        edit.loading = true;
-
-        // 记录开始时间
-        const startTime = Date.now();
-        const minLoadingTime = 500; // 最小 loading 显示时间（毫秒）
-
-        // 发送请求
         await request(edit.form);
-
-        // 计算是否需要补足最小 loading 时间
-        const elapsed = Date.now() - startTime;
-        const remaining = Math.max(0, minLoadingTime - elapsed);
-
-        // 使用 lodash delay 或原生 setTimeout 补足时间
-        // await delay(remaining); // 来自 lodash-es
-        await CommonUtils.delay(remaining);
-
-        // 成功提示
         ElMessage.success({
             message: edit.modify ? "修改用户成功" : "新增用户成功",
             onClose: () => {
@@ -140,8 +115,6 @@ async function handleUserSave() {
     } catch (error) {
         // 输出到控制台就好了,不需要进行提示
         console.error(error);
-    } finally {
-        edit.loading = false;
     }
 }
 
@@ -232,6 +205,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
     <el-dialog
         v-if="ready"
         v-model="edit.dialog"
+        class="loading-box"
         :append-to="'.box-content'"
         :close-on-click-modal="false"
         :close-on-press-escape="false"
@@ -240,13 +214,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
         :title="(edit.modify ? '编辑' : '新增') + '用户'"
         width="30vw">
         <template #default>
-            <el-form
-                ref="formRef"
-                v-loading="edit.loading"
-                :model="edit.form"
-                :rules="edit.rules"
-                label-width="auto"
-                @submit.prevent>
+            <el-form ref="formRef" :model="edit.form" :rules="edit.rules" label-width="auto" @submit.prevent>
                 <el-form-item label="姓名" prop="name">
                     <el-input v-model="edit.form.name" placeholder="请输入姓名" />
                 </el-form-item>
@@ -280,8 +248,8 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             </el-form>
         </template>
         <template #footer>
-            <el-button :disabled="edit.loading" @click="() => (edit.dialog = false)">取消</el-button>
-            <el-button :disabled="edit.loading" type="primary" @click="handleUserSave">确定</el-button>
+            <el-button @click="() => (edit.dialog = false)">取消</el-button>
+            <el-button type="primary" @click="handleUserSave">确定</el-button>
         </template>
     </el-dialog>
 </template>

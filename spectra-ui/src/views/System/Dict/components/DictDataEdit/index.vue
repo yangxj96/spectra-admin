@@ -23,15 +23,10 @@ const gropus = ref<DictGroup[]>([]);
 // 编辑标识,是否为编辑数据
 const has_edit = props.row?.id && props.row.id !== "";
 
-// 弹出框配置
-const dialog = ref({
-    visible: true,
-    loading: false,
-    title: (has_edit ? "编辑" : "新增") + "字典数据"
-});
-
 // 定义字典组编辑对话框的状态和表单数据
 const edit = reactive({
+    visible: true,
+    title: (has_edit ? "编辑" : "新增") + "字典数据",
     rules: {
         gid: [{ required: true, message: "请选择所属字典组", trigger: "blur" }],
         label: [
@@ -79,38 +74,28 @@ function handleSaveDictGroup() {
             ElMessage.error("请检查必填内容");
             return;
         }
-        dialog.value.loading = true;
         let request = has_edit ? DictApi.modifyData : DictApi.createData;
-        request(edit.form)
-            .finally(() => {
-                dialog.value.loading = false;
-            })
-            .then((res: IResult) => {
-                if (res.code === 200) {
-                    ElMessage.success({
-                        message: "保存成功",
-                        duration: 1000,
-                        onClose() {
-                            emit("close");
-                        }
-                    });
-                } else {
-                    ElMessage.error(res.msg || "保存失败");
-                }
-            });
+        request(edit.form).then((res: IResult) => {
+            if (res.code === 200) {
+                ElMessage.success({
+                    message: "保存成功",
+                    duration: 1000,
+                    onClose() {
+                        emit("close");
+                    }
+                });
+            } else {
+                ElMessage.error(res.msg || "保存失败");
+            }
+        });
     });
 }
 </script>
 
 <template>
-    <el-dialog v-model="dialog.visible" :title="dialog.title" width="500">
+    <el-dialog v-model="edit.visible" :title="edit.title" width="500" class="loading-box">
         <template #default>
-            <el-form
-                ref="editForm"
-                v-loading="dialog.loading"
-                :model="edit.form"
-                :rules="edit.rules"
-                label-width="auto">
+            <el-form ref="editForm" :model="edit.form" :rules="edit.rules" label-width="auto">
                 <el-form-item v-if="has_edit" label="主键ID">
                     <p>{{ edit.form.id }}</p>
                 </el-form-item>
@@ -147,8 +132,8 @@ function handleSaveDictGroup() {
         </template>
         <template #footer>
             <div class="dialog-footer">
-                <el-button :loading="dialog.loading" @click="$emit('close')">取消</el-button>
-                <el-button :loading="dialog.loading" type="primary" @click="handleSaveDictGroup">确认</el-button>
+                <el-button @click="$emit('close')">取消</el-button>
+                <el-button type="primary" @click="handleSaveDictGroup">确认</el-button>
             </div>
         </template>
     </el-dialog>
