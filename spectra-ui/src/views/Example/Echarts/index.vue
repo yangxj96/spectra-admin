@@ -20,5 +20,12 @@ const option = ref({
 </script>
 
 <template>
-    <v-chart :option="option" style="width: 100%; height: 100%" />
+    <v-chart :option="option" autoresize class="chart" />
 </template>
+
+<style lang="scss" scoped>
+.chart {
+    width: 100%;
+    height: 100%;
+}
+</style>

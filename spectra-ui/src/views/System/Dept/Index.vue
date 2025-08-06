@@ -62,19 +62,16 @@ async function handleOrganizationSave() {
         if (!valid) {
             return;
         }
-        edit.loading = true;
         let request = edit.modify ? OrganizationApi.modify : OrganizationApi.created;
-        request(edit.form)
-            .finally(() => (edit.loading = false))
-            .then(() => {
-                ElMessage.success({
-                    message: edit.modify ? "修改组织机构成功" : "新增组织机构成功",
-                    onClose() {
-                        edit.dialog = false;
-                        handleCriteriaQuery();
-                    }
-                });
+        request(edit.form).then(() => {
+            ElMessage.success({
+                message: edit.modify ? "修改组织机构成功" : "新增组织机构成功",
+                onClose() {
+                    edit.dialog = false;
+                    handleCriteriaQuery();
+                }
             });
+        });
     });
 }
 </script>
