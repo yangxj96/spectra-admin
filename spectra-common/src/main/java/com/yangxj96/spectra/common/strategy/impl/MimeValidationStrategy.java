@@ -31,13 +31,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/19
  */
-public class MimeValidationStrategy implements FileTypeValidationStrategy {
-
-    private final List<String> allowedMimes;
-
-    public MimeValidationStrategy(List<String> allowedMimes) {
-        this.allowedMimes = allowedMimes;
-    }
+public record MimeValidationStrategy(List<String> allowedMimes) implements FileTypeValidationStrategy {
 
     @Override
     public boolean isValid(MultipartFile file) {

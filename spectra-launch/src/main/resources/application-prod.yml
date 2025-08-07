@@ -12,7 +12,7 @@ spectra:
         - pdf
       strategies:
         - com.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
-        # - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
+        - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
         - com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
   kaptcha:

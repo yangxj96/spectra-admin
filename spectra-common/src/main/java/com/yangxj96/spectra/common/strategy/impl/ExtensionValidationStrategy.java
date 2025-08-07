@@ -31,15 +31,9 @@ import java.util.List;
  * @version 1.0
  * @since 2025-06-19
  */
-public class ExtensionValidationStrategy implements FileTypeValidationStrategy {
+public record ExtensionValidationStrategy(List<FileType> allowed) implements FileTypeValidationStrategy {
 
     private static final Integer MIN = -1;
-
-    private final List<FileType> allowed;
-
-    public ExtensionValidationStrategy(List<FileType> allowed) {
-        this.allowed = allowed;
-    }
 
     @Override
     public boolean isValid(MultipartFile file) {

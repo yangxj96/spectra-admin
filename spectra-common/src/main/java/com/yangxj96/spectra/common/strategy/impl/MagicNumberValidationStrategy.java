@@ -35,13 +35,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025-06-19
  */
-public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
-
-    private final List<FileType> allowedTypes;
-
-    public MagicNumberValidationStrategy(List<FileType> allowedTypes) {
-        this.allowedTypes = allowedTypes;
-    }
+public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
 
     @Override
     public boolean isValid(MultipartFile file) throws IOException {

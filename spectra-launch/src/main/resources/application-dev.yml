@@ -3,7 +3,7 @@ spectra:
   # 用户相关
   user:
     default-password: admin123
-  # 系统配置线管
+  # 系统配置
   system:
     base-dir: files
   # 文件相关
