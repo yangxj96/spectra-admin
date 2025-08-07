@@ -40,6 +40,19 @@
             <artifactId>dotenv-java</artifactId>
             <version>3.2.0</version>
         </dependency>
+
+        <!-- XSS攻击防范 -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-xss</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-core</artifactId>
+            <version>3.5.4</version>
+        </dependency>
+
     </dependencies>
 
 </project>

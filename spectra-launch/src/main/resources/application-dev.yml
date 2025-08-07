@@ -22,8 +22,7 @@ spectra:
   # 验证码相关
   kaptcha:
     type: math
-    verify: true
-
+    verify: false
 # 服务器配置
 server:
   port: 8888
@@ -95,13 +94,22 @@ spring:
             multi-statement-allow: true
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      database: 0
-      password:
+      # 格式 redis://user:password@example.com:6379/8
+      # 格式 redis://:[password]@[host]:[port]
+      # 密码为可选
+      url: redis://127.0.0.1:6379/0
       timeout: 10s
   cache:
     type: redis
+# XSS防范
+mica:
+  xss:
+    # 是否开启
+    enabled: true
+    # 拦截的
+    path-patterns: /**
+    # 放行的
+    path-exclude-patterns:
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
