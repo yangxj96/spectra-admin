@@ -3,6 +3,10 @@
 interface ImportMetaEnvironment {
     /** api请求地址 **/
     readonly VITE_API_URL: string;
+    /**
+     * 网站名称
+     */
+    readonly VITE_WEB_TITLE: string;
 }
 
 interface ImportMeta {

@@ -85,7 +85,7 @@ router.afterEach(to => {
     // 切换标题
     if (to.meta.title) {
         // 强制转换成了string,后续优化
-        document.title = String(to.meta.title);
+        document.title = import.meta.env.VITE_WEB_TITLE + ' - ' + String(to.meta.title);
     }
     hideLoading();
 });
