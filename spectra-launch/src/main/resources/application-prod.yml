@@ -111,3 +111,11 @@ management:
   endpoints:
     access:
       default: none
+    web:
+      exposure:
+        include: ""
+        exclude: "*"
+  endpoint:
+    health:
+      access: none
+      show-details: never

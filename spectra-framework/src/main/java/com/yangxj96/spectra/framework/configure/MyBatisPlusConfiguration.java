@@ -22,10 +22,12 @@ import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.yangxj96.spectra.framework.mybatis.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -47,6 +49,15 @@ public class MyBatisPlusConfiguration {
 
     private static final String PREFIX = "[MyBatisPlus]:";
 
+    /**
+     * 使用 ObjectProvider 自动收集所有 InnerInterceptor 类型的 Bean
+     */
+    private final ObjectProvider<InnerInterceptor> innerInterceptors;
+
+    public MyBatisPlusConfiguration(ObjectProvider<InnerInterceptor> innerInterceptors) {
+        this.innerInterceptors = innerInterceptors;
+    }
+
     @Bean
     @ConditionalOnClass(StpUtil.class)
     public MetaObjectHandler metaObjectHandler() {
@@ -66,6 +77,8 @@ public class MyBatisPlusConfiguration {
         interceptor.addInnerInterceptor(pageInterceptor);
         // 针对 update 和 delete 语句 作用: 阻止恶意的全表更新删除
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+        // 收集的bean进行注册
+        innerInterceptors.orderedStream().forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }
 

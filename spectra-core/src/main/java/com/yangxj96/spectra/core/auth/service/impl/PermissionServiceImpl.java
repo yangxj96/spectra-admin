@@ -1,7 +1,7 @@
 package com.yangxj96.spectra.core.auth.service.impl;
 
 import com.yangxj96.spectra.core.auth.service.PermissionService;
-import org.apache.commons.lang3.NotImplementedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -11,11 +11,8 @@ import org.springframework.stereotype.Service;
  * @version 1.0
  * @since 2025/7/28
  */
+@Slf4j
 @Service("ss")
 public class PermissionServiceImpl implements PermissionService {
 
-    @Override
-    public void check() {
-        throw new NotImplementedException("权限未实现");
-    }
 }

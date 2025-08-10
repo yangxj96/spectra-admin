@@ -9,6 +9,5 @@ package com.yangxj96.spectra.core.auth.service;
  */
 public interface PermissionService {
 
-    void check();
 
 }
