@@ -106,6 +106,7 @@ function handleSaveDictGroup() {
                         check-strictly
                         :data="gropus"
                         node-key="id"
+                        append-to=".box-content"
                         :props="treeProps" />
                 </el-form-item>
                 <el-form-item label="字典标签" prop="label">

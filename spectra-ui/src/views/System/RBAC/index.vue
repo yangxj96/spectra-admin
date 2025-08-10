@@ -220,14 +220,14 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
                     <el-input v-model="edit.form.name" clearable />
                 </el-form-item>
                 <el-form-item label="角色范围" prop="scope">
-                    <el-select v-model="edit.form.scope" clearable>
+                    <el-select v-model="edit.form.scope" clearable append-to=".box-content">
                         <el-option value="本级包含下级" label="本级包含下级" />
                         <el-option value="本级" label="本级" />
                         <el-option value="全局" label="全局" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否启用" prop="state">
-                    <el-select v-model="edit.form.state" clearable>
+                    <el-select v-model="edit.form.state" clearable append-to=".box-content">
                         <el-option :value="true" label="是" />
                         <el-option :value="false" label="否" />
                     </el-select>

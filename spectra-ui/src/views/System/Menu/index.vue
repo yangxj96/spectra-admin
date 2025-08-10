@@ -163,6 +163,7 @@ async function handleMenuSave() {
                         check-strictly
                         default-expand-all
                         node-key="id"
+                        append-to=".box-content"
                         :props="{ label: 'name' }"
                         :render-after-expand="false" />
                 </el-form-item>
@@ -179,7 +180,7 @@ async function handleMenuSave() {
                     <el-input v-model="menu.form.component" clearable placeholder="请输入组件路径" />
                 </el-form-item>
                 <el-form-item label="布局" prop="layout">
-                    <el-select v-model="menu.form.layout" clearable placeholder="请输入布局">
+                    <el-select v-model="menu.form.layout" clearable placeholder="请输入布局" append-to=".box-content">
                         <el-option label="默认布局" value="layout" />
                     </el-select>
                 </el-form-item>
