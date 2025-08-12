@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.User">
         <!--@mbg.generated-->
-        <!--@Table sys_user-->
+        <!--@Table DB_AUTH."sys_user"-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
         <result column="email"      jdbcType="VARCHAR"   property="email"/>
@@ -19,16 +19,16 @@
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
-        name,
-        email,
-        avatar,
-        state,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted,
-        organization_id
+        "id",
+        "name",
+        "email",
+        "avatar",
+        "state",
+        "organization_id",
+        "created_by",
+        "created_at",
+        "updated_by",
+        "updated_at",
+        "deleted"
     </sql>
 </mapper>

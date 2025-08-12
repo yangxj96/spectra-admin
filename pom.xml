@@ -25,11 +25,13 @@
         <!-- 项目版本 -->
         <revision>0.0.1-SNAPSHOT</revision>
 
-        <!-- 统一依赖版本管理 -->
+        <!-- 数据库 -->
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <dm.version>8.1.4.125</dm.version>
+        <!-- 身份认证 -->
         <sa-token.version>1.44.0</sa-token.version>
+        <!-- 工具包 -->
         <mapstruct.version>1.6.3</mapstruct.version>
-
         <apache.commons.lang3.version>3.18.0</apache.commons.lang3.version>
         <apache.commons.coll.version>4.5.0</apache.commons.coll.version>
         <apache.commons.text.version>1.13.1</apache.commons.text.version>

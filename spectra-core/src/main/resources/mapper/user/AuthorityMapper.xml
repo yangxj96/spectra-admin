@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table sys_authority-->
+        <!--@Table DB_AUTH."sys_authority"-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
@@ -18,27 +18,27 @@
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
-        pid,
-        name,
-        code,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted
+        "id",
+        "pid",
+        "name",
+        "code",
+        "created_by",
+        "created_at",
+        "updated_by",
+        "updated_at",
+        "deleted"
     </sql>
 
     <select id="getByRoleIds" resultMap="BaseResultMap">
-        SELECT a.*
-        FROM sys_authority a,
-        sys_role_authority_map ram
-        WHERE ram.role_id IN
+        SELECT "a".*
+        FROM DB_AUTH."sys_authority" AS "a",
+        DB_AUTH."sys_role_authority_map" AS "ram"
+        WHERE "ram"."role_id" IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}
         </foreach>
-        AND ram.authority_id = a.id
-        AND a.deleted IS NULL
-        AND ram.deleted IS NULL
+        AND "ram"."authority_id" = "a"."id"
+        AND "a"."deleted" IS NULL
+        AND "ram"."deleted" IS NULL
     </select>
 </mapper>

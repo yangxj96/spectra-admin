@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_user")
+@TableName(value = "\"sys_user\"", schema = "DB_AUTH")
 public class User extends BaseEntity implements Serializable {
 
     @Serial
@@ -50,30 +50,30 @@ public class User extends BaseEntity implements Serializable {
     /**
      * 姓名
      */
-    @TableField(value = "name")
+    @TableField(value = "\"name\"")
     private String name;
 
     /**
      * 邮箱
      */
-    @TableField(value = "email")
+    @TableField(value = "\"email\"")
     private String email;
 
     /**
      * 头像
      */
-    @TableField(value = "avatar")
+    @TableField(value = "\"avatar\"")
     private String avatar;
 
     /**
      * 所属组织机构ID
      */
-    @TableField(value = "organization_id")
+    @TableField(value = "\"organization_id\"")
     private Long organizationId;
 
     /**
      * 用户状态
      */
-    @TableField(value = "state")
+    @TableField(value = "\"state\"")
     private Short state;
 }

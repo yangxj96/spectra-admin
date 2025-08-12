@@ -43,7 +43,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_operation_log")
+@TableName(value = "\"sys_operation_log\"", schema = "DB_SYS")
 public class OperationLog extends BaseEntity implements Serializable {
 
     @Serial
@@ -52,48 +52,48 @@ public class OperationLog extends BaseEntity implements Serializable {
     /**
      * 日志说明
      */
-    @TableField(value = "`explain`")
+    @TableField(value = "\"explain\"")
     private String explain;
 
     /**
      * 请求状态
      */
-    @TableField(value = "status")
+    @TableField(value = "\"status\"")
     private Short status;
 
     /**
      * 来源IP
      */
-    @TableField(value = "ip")
+    @TableField(value = "\"ip\"")
     private String ip;
 
     /**
      * 请求方法
      */
-    @TableField(value = "method")
+    @TableField(value = "\"method\"")
     private String method;
 
     /**
      * 请求URL
      */
-    @TableField(value = "url")
+    @TableField(value = "\"url\"")
     private String url;
 
     /**
      * 请求参数
      */
-    @TableField(value = "args")
+    @TableField(value = "\"args\"")
     private String args;
 
     /**
      * 请求响应
      */
-    @TableField(value = "result")
+    @TableField(value = "\"result\"")
     private String result;
 
     /**
      * 耗时
      */
-    @TableField(value = "time_cost")
+    @TableField(value = "\"time_cost\"")
     private Long timeCost;
 }

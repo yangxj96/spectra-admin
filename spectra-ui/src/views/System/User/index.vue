@@ -231,7 +231,13 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
                     <dict-select v-model="edit.form.state" dict_code="sys_user_state" placeholder="请选择状态" />
                 </el-form-item>
                 <el-form-item label="角色" prop="role_ids">
-                    <el-select v-model="edit.form.role_ids" append-to=".box-content" value-key="id" multiple placeholder="请选择角色" clearable>
+                    <el-select
+                        v-model="edit.form.role_ids"
+                        append-to=".box-content"
+                        value-key="id"
+                        multiple
+                        placeholder="请选择角色"
+                        clearable>
                         <el-option v-for="item in edit.roles" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>

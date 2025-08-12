@@ -10,5 +10,5 @@ import com.yangxj96.spectra.core.system.javabean.entity.DictGroup;
  * @version 1.0
  * @since 2025-6-18
  */
-public interface DictTypeMapper extends BaseMapper<DictGroup> {
+public interface DictGroupMapper extends BaseMapper<DictGroup> {
 }

@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.Organization">
         <!--@mbg.generated-->
-        <!--@Table sys_organization-->
+        <!--@Table DB_SYS."sys_organization"-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="pid"        jdbcType="BIGINT"    property="pid"/>
         <result column="name"       jdbcType="VARCHAR"   property="name"/>
@@ -22,18 +22,18 @@
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
-        pid,
-        name,
-        code,
-        type,
-        address,
-        manager_id,
-        remark,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted
+        "id",
+        "pid",
+        "name",
+        "code",
+        "type",
+        "address",
+        "manager_id",
+        "remark",
+        "created_by",
+        "created_at",
+        "updated_by",
+        "updated_at",
+        "deleted"
     </sql>
 </mapper>
