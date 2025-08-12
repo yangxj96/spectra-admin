@@ -30,7 +30,15 @@
     </sql>
 
     <select id="getByRoleIds" resultMap="BaseResultMap">
-        SELECT "a".*
+        SELECT "a"."id",
+               "a"."pid",
+               "a"."name",
+               "a"."code",
+               "a"."created_by",
+               "a"."created_at",
+               "a"."updated_by",
+               "a"."updated_at",
+               "a"."deleted"
         FROM DB_AUTH."sys_authority" AS "a",
         DB_AUTH."sys_role_authority_map" AS "ram"
         WHERE "ram"."role_id" IN

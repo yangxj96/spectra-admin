@@ -44,7 +44,7 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: jdbc:dm://127.0.0.1:5237
+    url: jdbc:dm://127.0.0.1:5237?compatible_mode=oracle
     driver-class-name: dm.jdbc.driver.DmDriver
     username: SYSDBA
     password: QuVsKppcWvwwX2Vv
