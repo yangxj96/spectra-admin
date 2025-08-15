@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.OperationLog">
         <!--@mbg.generated-->
-        <!--@Table DB_SYS."sys_operation_log"-->
+        <!--@Table "t_sys_operation_log"-->
         <id column="id"             jdbcType="BIGINT"    property="id"/>
         <result column="explain"    jdbcType="VARCHAR"   property="explain"/>
         <result column="status"     jdbcType="SMALLINT"  property="status"/>

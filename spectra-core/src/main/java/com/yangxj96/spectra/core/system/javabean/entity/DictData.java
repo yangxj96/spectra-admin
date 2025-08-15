@@ -24,7 +24,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "\"sys_dict_data\"", schema = "DB_SYS")
+@TableName(value = "\"t_sys_dict_data\"")
 public class DictData extends BaseEntity implements Serializable {
 
     @Serial

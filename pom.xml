@@ -49,6 +49,7 @@
         <module>spectra-framework</module>
         <module>spectra-launch</module>
         <module>spectra-core</module>
+        <module>spectra-workflow</module>
     </modules>
 
     <dependencyManagement>

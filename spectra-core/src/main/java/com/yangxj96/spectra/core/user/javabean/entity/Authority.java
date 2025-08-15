@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "\"sys_authority\"", schema = "DB_AUTH")
+@TableName(value = "\"t_sys_authority\"")
 public class Authority extends BaseEntity implements Serializable {
 
     @Serial

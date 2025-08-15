@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "\"sys_organization\"", schema = "DB_SYS")
+@TableName(value = "\"t_sys_organization\"")
 public class Organization extends BaseEntity implements Serializable {
 
     @Serial

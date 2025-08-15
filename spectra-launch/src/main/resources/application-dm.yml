@@ -46,7 +46,7 @@ spring:
   datasource:
     url: jdbc:dm://127.0.0.1:5237?compatible_mode=oracle
     driver-class-name: dm.jdbc.driver.DmDriver
-    username: SYSDBA
+    username: SPECTRA
     password: QuVsKppcWvwwX2Vv
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
@@ -124,6 +124,7 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-not-delete-value: "null"
       logic-delete-value: "now()"
+      schema: '"SPECTRA"'
 # 日志配置
 logging:
   level:
@@ -141,6 +142,25 @@ sa-token:
   token-style: uuid
   is-log: true
   is-print: false
+# 工作流配置
+flowable:
+  database-schema: SPECTRA_WORKFLOW
+  database-schema-update: true
+  jpa-enabled: false
+  # 异步任务
+  async-executor-activate: true
+  history-level: full
+  # 身份管理引擎
+  idm:
+    enabled: false
+  # 决策模型引擎
+  dmn:
+    enabled: false
+  # 案例管理引擎
+  cmmn:
+    enabled: false
+
+
 # 健康检查
 management:
   health:

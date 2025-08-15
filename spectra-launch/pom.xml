@@ -23,14 +23,22 @@
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 核心配置 不可移除 -->
         <dependency>
             <groupId>com.yangxj96.spectra</groupId>
             <artifactId>spectra-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 核心 不可移除 -->
         <dependency>
             <groupId>com.yangxj96.spectra</groupId>
             <artifactId>spectra-core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 工作流 -->
+        <dependency>
+            <groupId>com.yangxj96.spectra</groupId>
+            <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
 

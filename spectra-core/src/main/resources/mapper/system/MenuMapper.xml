@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
   <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.Menu">
     <!--@mbg.generated-->
-    <!--@Table DB_SYS."sys_menu"-->
+    <!--@Table "t_sys_menu"-->
     <id column="id"             jdbcType="BIGINT"    property="id" />
     <result column="pid"        jdbcType="BIGINT"    property="pid" />
     <result column="icon"       jdbcType="VARCHAR"   property="icon" />

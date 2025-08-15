@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL
+                                 http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             targetNamespace="http://flowable.org/bpmn">
+
+    <!-- 流程定义：id 是流程的唯一标识，name 是可读名称 -->
+    <process id="holidayRequest" name="请假流程" isExecutable="true">
+
+        <!-- 1. 开始事件 -->
+        <startEvent id="startEvent"/>
+
+        <!-- 2. 任务：员工提交请假申请 -->
+        <userTask id="submitRequest" name="Submit Holiday Request" flowable:assignee="employee">
+            <extensionElements>
+                <flowable:formProperty id="holidayType" name="Holiday Type" type="string" required="true"/>
+                <flowable:formProperty id="days" name="Number of Days" type="long" required="true"/>
+                <flowable:formProperty id="startDate" name="Start Date" type="date" datePattern="yyyy-MM-dd" required="true"/>
+            </extensionElements>
+        </userTask>
+
+        <!-- 3. 任务：经理审批 -->
+        <userTask id="approveRequest" name="Approve Holiday" flowable:assignee="manager">
+            <extensionElements>
+                <flowable:formProperty id="approved" name="Approved" type="boolean"/>
+                <flowable:formProperty id="rejectReason" name="Reject Reason" type="string"/>
+            </extensionElements>
+        </userTask>
+
+        <!-- 4. 结束事件 -->
+        <endEvent id="endEvent"/>
+
+        <!-- 5. 流转连线 -->
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="submitRequest"/>
+        <sequenceFlow id="flow2" sourceRef="submitRequest" targetRef="approveRequest"/>
+        <sequenceFlow id="flow3" sourceRef="approveRequest" targetRef="endEvent"/>
+
+    </process>
+
+</definitions>
