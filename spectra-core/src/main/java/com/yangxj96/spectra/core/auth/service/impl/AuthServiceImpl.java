@@ -26,7 +26,6 @@ import com.yangxj96.spectra.core.auth.javabean.vo.TokenVO;
 import com.yangxj96.spectra.core.auth.service.AccountService;
 import com.yangxj96.spectra.core.auth.service.AuthService;
 import com.yangxj96.spectra.core.common.service.KaptchaService;
-import com.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -47,9 +46,6 @@ public class AuthServiceImpl implements AuthService {
 
     @Resource
     private AccountService accountService;
-
-    @Resource
-    private UserService userService;
 
     @Resource
     private BCryptPasswordEncoder encoder;

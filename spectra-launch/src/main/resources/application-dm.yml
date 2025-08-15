@@ -5,7 +5,7 @@ spectra:
     default-password: admin123
   # 系统配置
   system:
-    base-dir: files
+    base-dir: spectra-files
   # 文件相关
   file:
     upload:
@@ -124,7 +124,7 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-not-delete-value: "null"
       logic-delete-value: "now()"
-      schema: '"SPECTRA"'
+      schema: SPECTRA
 # 日志配置
 logging:
   level:
@@ -159,8 +159,6 @@ flowable:
   # 案例管理引擎
   cmmn:
     enabled: false
-
-
 # 健康检查
 management:
   health:

@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "\"t_sys_organization\"")
+@TableName(value = "T_SYS_ORGANIZATION")
 public class Organization extends BaseEntity implements Serializable {
 
     @Serial
@@ -50,43 +50,43 @@ public class Organization extends BaseEntity implements Serializable {
     /**
      * 上级ID
      */
-    @TableField(value = "\"pid\"")
+    @TableField(value = "PID")
     private Long pid;
 
     /**
      * 名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "NAME")
     private String name;
 
     /**
      * 编码
      */
-    @TableField(value = "\"code\"")
+    @TableField(value = "CODE")
     private String code;
 
     /**
      * 组织机构类型
      */
-    @TableField(value = "\"type\"")
+    @TableField(value = "TYPE")
     private Short type;
 
     /**
      * 组织机构所在地址
      */
-    @TableField(value = "\"address\"")
+    @TableField(value = "ADDRESS")
     private String address;
 
     /**
      * 负责人ID
      */
-    @TableField(value = "\"manager_id\"")
+    @TableField(value = "MANAGER_ID")
     private Long managerId;
 
     /**
      * 备注
      */
-    @TableField(value = "\"remark\"")
+    @TableField(value = "REMARK")
     private String remark;
 }
 

@@ -24,7 +24,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "\"t_sys_dict_group\"")
+@TableName(value = "T_SYS_DICT_GROUP")
 public class DictGroup extends BaseEntity implements Serializable {
 
     @Serial
@@ -33,42 +33,42 @@ public class DictGroup extends BaseEntity implements Serializable {
     /**
      * 父级ID
      */
-    @TableField(value = "\"pid\"")
+    @TableField(value = "PID")
     private Long pid;
 
     /**
      * 字典名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "NAME")
     private String name;
 
     /**
      * 字典编码
      */
-    @TableField(value = "\"code\"")
+    @TableField(value = "CODE")
     private String code;
 
     /**
      * 字典状态
      */
-    @TableField(value = "\"state\"")
+    @TableField(value = "STATE")
     private Short state;
 
     /**
      * 备注
      */
-    @TableField(value = "\"remark\"")
+    @TableField(value = "REMARK")
     private String remark;
 
     /**
      * 是否内置字段,为true则不允许他进行修改删除操作
      */
-    @TableField(value = "\"builtin\"")
+    @TableField(value = "BUILTIN")
     private Boolean builtin;
 
     /**
      * 是否隐藏,为true则前端不可见
      */
-    @TableField(value = "\"hide\"")
+    @TableField(value = "HIDE")
     private Boolean hide;
 }

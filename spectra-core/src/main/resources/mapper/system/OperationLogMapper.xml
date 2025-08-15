@@ -4,39 +4,39 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.OperationLog">
         <!--@mbg.generated-->
-        <!--@Table "t_sys_operation_log"-->
-        <id column="id"             jdbcType="BIGINT"    property="id"/>
-        <result column="explain"    jdbcType="VARCHAR"   property="explain"/>
-        <result column="status"     jdbcType="SMALLINT"  property="status"/>
-        <result column="ip"         jdbcType="VARCHAR"   property="ip"/>
-        <result column="method"     jdbcType="VARCHAR"   property="method"/>
-        <result column="url"        jdbcType="VARCHAR"   property="url"/>
-        <result column="args"       jdbcType="VARCHAR"   property="args"/>
-        <result column="result"     jdbcType="VARCHAR"   property="result"/>
-        <result column="time_cost"  jdbcType="BIGINT"    property="timeCost"/>
-        <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="deleted"    jdbcType="TIMESTAMP" property="deleted"/>
+        <!--@Table "T_SYS_OPERATION_LOG"-->
+        <id column="ID"             jdbcType="BIGINT"    property="id"/>
+        <result column="EXPLAIN"    jdbcType="VARCHAR"   property="explain"/>
+        <result column="STATUS"     jdbcType="SMALLINT"  property="status"/>
+        <result column="IP"         jdbcType="VARCHAR"   property="ip"/>
+        <result column="METHOD"     jdbcType="VARCHAR"   property="method"/>
+        <result column="URL"        jdbcType="VARCHAR"   property="url"/>
+        <result column="ARGS"       jdbcType="VARCHAR"   property="args"/>
+        <result column="RESULT"     jdbcType="VARCHAR"   property="result"/>
+        <result column="TIME_COST"  jdbcType="BIGINT"    property="timeCost"/>
+        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        "id",
-        "explain",
-        "status",
-        "ip",
-        "method",
-        "url",
-        "args",
-        "result",
-        "time_cost",
-        "created_by",
-        "created_at",
-        "updated_by",
-        "updated_at",
-        "deleted"
+        ID,
+        EXPLAIN,
+        STATUS,
+        IP,
+        METHOD,
+        URL,
+        ARGS,
+        RESULT,
+        TIME_COST,
+        CREATED_BY,
+        CREATED_AT,
+        UPDATED_BY,
+        UPDATED_AT,
+        DELETED
     </sql>
 </mapper>

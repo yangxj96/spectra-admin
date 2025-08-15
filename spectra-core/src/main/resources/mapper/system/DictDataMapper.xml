@@ -4,34 +4,34 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.DictData">
         <!--@mbg.generated-->
-        <!--@Table "t_sys_dict_data"-->
-        <id     column="id"           jdbcType="BIGINT"    property="id"/>
-        <result column="gid"          jdbcType="BIGINT"    property="gid"/>
-        <result column="label"        jdbcType="VARCHAR"   property="label"/>
-        <result column="value"        jdbcType="VARCHAR"   property="value"/>
-        <result column="sort"         jdbcType="SMALLINT"  property="sort"/>
-        <result column="state"        jdbcType="SMALLINT"  property="state"/>
-        <result column="remark"       jdbcType="VARCHAR"   property="remark"/>
-        <result column="created_by"   jdbcType="BIGINT"    property="createdBy"/>
-        <result column="created_at"   jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="updated_by"   jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="updated_at"   jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="deleted"      jdbcType="TIMESTAMP" property="deleted"/>
+        <!--@Table "T_SYS_DICT_DATA"-->
+        <id     column="ID"           jdbcType="BIGINT"    property="id"/>
+        <result column="GID"          jdbcType="BIGINT"    property="gid"/>
+        <result column="LABEL"        jdbcType="VARCHAR"   property="label"/>
+        <result column="VALUE"        jdbcType="VARCHAR"   property="value"/>
+        <result column="SORT"         jdbcType="SMALLINT"  property="sort"/>
+        <result column="STATE"        jdbcType="SMALLINT"  property="state"/>
+        <result column="REMARK"       jdbcType="VARCHAR"   property="remark"/>
+        <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT"   jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT"   jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"      jdbcType="TIMESTAMP" property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        "id",
-        "gid",
-        "label",
-        "value",
-        "sort",
-        "state",
-        "remark",
-        "created_by",
-        "created_at",
-        "updated_by",
-        "updated_at",
-        "deleted"
+        ID,
+        GID,
+        LABEL,
+        VALUE,
+        SORT,
+        STATE,
+        REMARK,
+        CREATED_BY,
+        CREATED_AT,
+        UPDATED_BY,
+        UPDATED_AT,
+        DELETED
     </sql>
 </mapper>

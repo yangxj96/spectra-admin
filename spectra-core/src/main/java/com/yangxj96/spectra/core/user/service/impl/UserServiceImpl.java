@@ -44,7 +44,9 @@ import jakarta.annotation.Resource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -80,6 +82,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private OrganizationService organizationService;
 
+    @Resource
+    private BCryptPasswordEncoder passwordEncoder;
+
+    @Value("${spectra.user.default-password}")
+    private String defaultPassword;
+
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         var result = new Page<UserPageVO>();
@@ -114,15 +122,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
-
         var entity = mapstruct.toEntity(params);
         if (!this.save(entity)) {
             throw new RuntimeException("保存用户信息异常");
         }
         // 构建默认的账号信息
-        // 密码在账号管理那边会进行填充
         var account = Account.builder()
                 .username(entity.getEmail())
+                .password(passwordEncoder.encode(defaultPassword))
                 .userId(entity.getId())
                 .type(AccountType.DEFAULT)
                 .build();

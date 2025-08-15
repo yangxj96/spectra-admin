@@ -4,30 +4,30 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.auth.javabean.entity.Account">
         <!--@mbg.generated-->
-        <!--@Table "t_sys_account"-->
-        <id column="id"             jdbcType="BIGINT"    property="id"/>
-        <result column="username"   jdbcType="VARCHAR"   property="username"/>
-        <result column="password"   jdbcType="VARCHAR"   property="password"/>
-        <result column="user_id"    jdbcType="BOOLEAN"   property="userId"/>
-        <result column="type"       jdbcType="SMALLINT"  property="type"/>
-        <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="deleted"    jdbcType="TIMESTAMP" property="deleted"/>
+        <!--@Table "T_SYS_ACCOUNT"-->
+        <id column="ID"             jdbcType="BIGINT"    property="id"/>
+        <result column="USERNAME"   jdbcType="VARCHAR"   property="username"/>
+        <result column="PASSWORD"   jdbcType="VARCHAR"   property="password"/>
+        <result column="USER_ID"    jdbcType="BOOLEAN"   property="userId"/>
+        <result column="TYPE"       jdbcType="SMALLINT"  property="type"/>
+        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        "id",
-        "username",
-        "password",
-        "user_id",
-        "type",
-        "created_by",
-        "created_at",
-        "updated_by",
-        "updated_at",
-        "deleted"
+        ID,
+        USERNAME,
+        PASSWORD,
+        USER_ID,
+        TYPE,
+        CREATED_BY,
+        CREATED_AT,
+        UPDATED_BY,
+        UPDATED_AT,
+        DELETED
     </sql>
 </mapper>

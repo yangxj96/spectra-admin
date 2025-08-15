@@ -4,49 +4,49 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table "t_sys_authority"-->
-        <id column="id"             jdbcType="BIGINT"    property="id"/>
-        <result column="pid"        jdbcType="BIGINT"    property="pid"/>
-        <result column="name"       jdbcType="VARCHAR"   property="name"/>
-        <result column="code"       jdbcType="VARCHAR"   property="code"/>
-        <result column="created_by" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="created_at" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="updated_by" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="updated_at" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="deleted"    jdbcType="TIMESTAMP" property="deleted"/>
+        <!--@Table "T_SYS_AUTHORITY"-->
+        <id column="ID"             jdbcType="BIGINT"    property="id"/>
+        <result column="PID"        jdbcType="BIGINT"    property="pid"/>
+        <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
+        <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
+        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        "id",
-        "pid",
-        "name",
-        "code",
-        "created_by",
-        "created_at",
-        "updated_by",
-        "updated_at",
-        "deleted"
+        ID,
+        PID,
+        NAME,
+        CODE,
+        CREATED_BY,
+        CREATED_AT,
+        UPDATED_BY,
+        UPDATED_AT,
+        DELETED
     </sql>
 
     <select id="getByRoleIds" resultMap="BaseResultMap">
-        SELECT "a"."id",
-               "a"."pid",
-               "a"."name",
-               "a"."code",
-               "a"."created_by",
-               "a"."created_at",
-               "a"."updated_by",
-               "a"."updated_at",
-               "a"."deleted"
-        FROM "SPECTRA"."t_sys_authority" "a",
-             "SPECTRA"."t_sys_role_authority_map" "ram"
-        WHERE "ram"."role_id" IN
+        SELECT A.ID,
+               A.PID,
+               A.NAME,
+               A.CODE,
+               A.CREATED_BY,
+               A.CREATED_AT,
+               A.UPDATED_BY,
+               A.UPDATED_AT,
+               A.DELETED
+        FROM SPECTRA.T_SYS_AUTHORITY A,
+             SPECTRA.T_SYS_ROLE_AUTHORITY_MAP RAM
+        WHERE RAM.ROLE_ID IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}
         </foreach>
-        AND "ram"."authority_id" = "a"."id"
-        AND "a"."deleted" IS NULL
-        AND "ram"."deleted" IS NULL
+        AND RAM.AUTHORITY_ID = A.ID
+        AND A.DELETED IS NULL
+        AND RAM.DELETED IS NULL
     </select>
 </mapper>

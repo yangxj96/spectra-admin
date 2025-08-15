@@ -45,7 +45,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "\"t_sys_menu\"")
+@TableName(value = "T_SYS_MENU")
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial
@@ -56,42 +56,42 @@ public class Menu extends BaseEntity implements Serializable {
      * 父级ID
      */
     @JsonSerialize(using = ToStringSerializer.class)
-    @TableField(value = "\"pid\"")
+    @TableField(value = "PID")
     private Long pid;
 
     /**
      * 图标
      */
-    @TableField(value = "\"icon\"")
+    @TableField(value = "ICON")
     private String icon;
 
     /**
      * 名称
      */
-    @TableField(value = "\"name\"")
+    @TableField(value = "NAME")
     private String name;
 
     /**
      * 请求路径
      */
-    @TableField(value = "\"path\"")
+    @TableField(value = "PATH")
     private String path;
 
     /**
      * 组件路径,为空则使用布局组件
      */
-    @TableField(value = "\"component\"")
+    @TableField(value = "COMPONENT")
     private String component;
 
     /**
      * 布局
      */
-    @TableField(value = "\"layout\"")
+    @TableField(value = "LAYOUT")
     private String layout;
 
     /**
      * 排序
      */
-    @TableField(value = "\"sort\"")
+    @TableField(value = "SORT")
     private Integer sort;
 }

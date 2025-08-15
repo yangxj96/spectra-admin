@@ -46,37 +46,37 @@ public class BaseEntity implements Serializable {
     /**
      * 数据id.
      */
-    @TableId(value = "\"id\"", type = IdType.ASSIGN_ID)
+    @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * 创建人
      */
-    @TableField(value = "\"created_by\"", fill = FieldFill.INSERT)
+    @TableField(value = "CREATED_BY", fill = FieldFill.INSERT)
     private Long createdBy;
 
     /**
      * 创建时间
      */
     @OrderBy(asc = true)
-    @TableField(value = "\"created_at\"", fill = FieldFill.INSERT)
+    @TableField(value = "CREATED_AT", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     /**
      * 更新人
      */
-    @TableField(value = "\"updated_by\"", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "UPDATED_BY", fill = FieldFill.INSERT_UPDATE)
     private Long updatedBy;
 
     /**
      * 更新时间
      */
-    @TableField(value = "\"updated_at\"", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "UPDATED_AT", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 
     /**
      * 删除标识
      */
-    @TableField(value = "\"deleted\"")
+    @TableField(value = "DELETED")
     private LocalDateTime deleted;
 }
