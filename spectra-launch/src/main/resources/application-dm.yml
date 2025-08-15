@@ -146,6 +146,7 @@ sa-token:
 flowable:
   database-schema: SPECTRA_WORKFLOW
   database-schema-update: true
+  process-definition-location-prefix: classpath*:/processes/
   jpa-enabled: false
   # 异步任务
   async-executor-activate: true
