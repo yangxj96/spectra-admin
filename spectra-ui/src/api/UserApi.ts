@@ -16,5 +16,9 @@ export default {
     // 修改用户
     async deleteById(id: string) {
         return http.delete<IResult>(`/api/user/${id}`).then(res => res.data);
+    },
+    // 重置用户密码
+    async passwordResetById(id: string) {
+        return http.put<IResult>(`/api/user/password/reset/${id}`).then(res => res.data);
     }
 };

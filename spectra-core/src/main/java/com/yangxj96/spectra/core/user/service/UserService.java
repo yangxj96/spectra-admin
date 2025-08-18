@@ -63,4 +63,11 @@ public interface UserService extends BaseService<User> {
      * @param uid 用户ID
      */
     void deleteById(String uid);
+
+    /**
+     * 重置用户密码
+     *
+     * @param uid 用户ID
+     */
+    void passwordResetById(String uid);
 }

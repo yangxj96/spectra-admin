@@ -27,6 +27,7 @@ import com.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import com.yangxj96.spectra.common.enums.AccountType;
 import com.yangxj96.spectra.common.exception.DataNotExistException;
 import com.yangxj96.spectra.core.auth.javabean.entity.Account;
+import com.yangxj96.spectra.core.auth.properties.UserProperties;
 import com.yangxj96.spectra.core.auth.service.AccountService;
 import com.yangxj96.spectra.core.system.javabean.entity.Organization;
 import com.yangxj96.spectra.core.system.service.OrganizationService;
@@ -85,8 +86,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private BCryptPasswordEncoder passwordEncoder;
 
-    @Value("${spectra.user.default-password}")
-    private String defaultPassword;
+    @Resource
+    private UserProperties properties;
 
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
@@ -129,7 +130,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 构建默认的账号信息
         var account = Account.builder()
                 .username(entity.getEmail())
-                .password(passwordEncoder.encode(defaultPassword))
+                .password(passwordEncoder.encode(properties.getDefaultPassword()))
                 .userId(entity.getId())
                 .type(AccountType.DEFAULT)
                 .build();
@@ -192,5 +193,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         accountServices.removeByUserId(user.getId());
         // 删除用户信息
         this.removeById(user);
+    }
+
+    @Override
+    public void passwordResetById(String uid) {
+        // TODO 用户和账号的关系打算重建,所以也打算重写
     }
 }

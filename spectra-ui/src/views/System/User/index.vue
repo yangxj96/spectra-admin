@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef } from "vue";
+import { ref } from "vue";
 import UserApi from "@/api/UserApi.ts";
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import { ElMessage, ElMessageBox } from "element-plus";
 import UseTable from "@/hooks/UseTable.ts";
-import * as VerifyRules from "@/utils/VerifyRules.ts";
+import UserEdit from "./components/Edit/index.vue";
 import _ from "lodash";
-import PermissionApi from "@/api/PermissionApi.ts";
-import OrganizationApi from "@/api/OrganizationApi.ts";
 
-// 树形props配置
-const treeProps = { children: "children", label: "name", value: "id" };
-const formRef = useTemplateRef<FormInstance>("formRef");
-const orgTree = ref<OrganizationTree[]>();
+// 编辑组件
+const dialog_edit = ref({
+    form: {} as User | undefined,
+    open: false
+});
 
 // 查询条件
 const condition = ref<UserPageParams>({
@@ -25,56 +24,26 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     condition.value
 );
 
-const ready = ref(false);
-
-// 新增或编辑
-const edit = reactive({
-    dialog: false,
-    modify: false,
-    roles: [] as Role[],
-    form: {} as User,
-    rules: {
-        name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        email: [
-            { required: true, message: "请输入邮箱", trigger: "blur" },
-            { validator: VerifyRules.email, message: "请输入正确的邮箱", trigger: "blur" }
-        ],
-        state: [{ required: true, message: "请选择状态", trigger: "blur" }],
-        // role_ids: [{required: true, message: "请选择角色", trigger: "blur"}]
-        organization_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
-    } as FormRules
-});
-
-// 挂载后执行
-onMounted(() => {
-    ready.value = true;
-    initData();
-});
-
-// 初始化获取必备数据
-function initData() {
-    let request = [PermissionApi.listRole(), OrganizationApi.tree()];
-    Promise.all(request).then(([role, org]) => {
-        edit.roles = role.data as Role[];
-        orgTree.value = org.data as OrganizationTree[];
-    });
-}
-
-// 表行修改按钮被单击
-function handleTableItemModify(row: User) {
-    let datum = _.cloneDeep(row);
-    if (datum.roles && datum.roles.length > 0) {
-        if (!datum.role_ids) {
-            datum.role_ids = [] as string[];
+// 用户新增或编辑dialog配置
+function handleUserEditDialog(row?: User | undefined) {
+    let form;
+    if (row != undefined) {
+        let datum = _.cloneDeep(row);
+        if (datum.roles && datum.roles.length > 0) {
+            if (!datum.role_ids) {
+                datum.role_ids = [] as string[];
+            }
+            for (let role of datum.roles) {
+                datum.role_ids.push(role.id);
+            }
+            datum.roles = [];
         }
-        for (let role of datum.roles) {
-            datum.role_ids.push(role.id);
-        }
-        datum.roles = [];
+        form = datum;
     }
-    edit.modify = true;
-    edit.form = datum;
-    edit.dialog = true;
+    dialog_edit.value = {
+        form: form,
+        open: true
+    };
 }
 
 // 表行删除按钮被单击
@@ -91,31 +60,19 @@ function handleTableItemDelete(row: User) {
     });
 }
 
-// 用户新增被单机
-function handleUserAddDialog() {
-    edit.modify = false;
-    edit.form = { state: 0 } as User;
-    edit.dialog = true;
-}
-
-// 新增或编辑用户
-async function handleUserSave() {
-    if (!formRef.value) return;
-    try {
-        await formRef.value?.validate();
-        const request = edit.modify ? UserApi.modify : UserApi.created;
-        await request(edit.form);
-        ElMessage.success({
-            message: edit.modify ? "修改用户成功" : "新增用户成功",
-            onClose: () => {
-                edit.dialog = false;
-                handlerConditionQuery();
-            }
+// 用户重置密码
+function handleTableItemResetPassword(row: User) {
+    console.log(`重置密码:${JSON.stringify(row)}`);
+    ElMessageBox.confirm(`是否要重置[${row.name}]的密码`, "提示", { type: "warning" }).then(() => {
+        UserApi.passwordResetById(row.id).then(() => {
+            ElMessage.success({
+                message: "重置成功",
+                onClose() {
+                    handlerConditionQuery();
+                }
+            });
         });
-    } catch (error) {
-        // 输出到控制台就好了,不需要进行提示
-        console.error(error);
-    }
+    });
 }
 
 // 排序字段改变
@@ -125,6 +82,18 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
         asc: data.order === "ascending"
     };
     condition.value.orders = [order];
+    handlerConditionQuery();
+}
+
+// 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
+function handleDialogClose() {
+    if (dialog_edit.value.open) {
+        dialog_edit.value = {
+            open: false,
+            form: {} as User
+        };
+    }
+    // 最后重新获取下列表数据
     handlerConditionQuery();
 }
 </script>
@@ -139,14 +108,8 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             <el-form-item label="邮箱" prop="email">
                 <el-input v-model="condition.email" placeholder="请输入电话" clearable />
             </el-form-item>
-            <el-form-item id="form-status" label="状态" prop="status">
-                <el-select
-                    v-if="ready"
-                    v-model="condition.status"
-                    :append-to="'#form-status'"
-                    placeholder="请输入状态"
-                    clearable
-                    style="width: 200px">
+            <el-form-item label="状态" prop="status">
+                <el-select v-model="condition.status" placeholder="请输入状态" clearable style="width: 200px">
                     <el-option label="激活" :value="true" />
                     <el-option label="冻结" :value="false" />
                 </el-select>
@@ -154,7 +117,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleUserAddDialog">新增用户</el-button>
+                <el-button @click="handleUserEditDialog()">新增用户</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -180,7 +143,10 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             </el-table-column>
             <el-table-column align="center" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="handleTableItemModify(scope.row)">
+                    <el-button link type="primary" size="small" @click="handleTableItemResetPassword(scope.row)">
+                        重置密码
+                    </el-button>
+                    <el-button link type="primary" size="small" @click="handleUserEditDialog(scope.row)">
                         编辑
                     </el-button>
                     <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
@@ -201,64 +167,8 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </el-row>
-    <!-- 新增或编辑 -->
-    <el-dialog
-        v-if="ready"
-        v-model="edit.dialog"
-        class="loading-box"
-        :append-to="'.box-content'"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :destroy-on-close="true"
-        :title="(edit.modify ? '编辑' : '新增') + '用户'"
-        width="30vw">
-        <template #default>
-            <el-form ref="formRef" :model="edit.form" :rules="edit.rules" label-width="auto" @submit.prevent>
-                <el-form-item label="姓名" prop="name">
-                    <el-input v-model="edit.form.name" placeholder="请输入姓名" />
-                </el-form-item>
-                <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="edit.form.email" placeholder="请输入邮箱">
-                        <template #suffix>
-                            <el-tooltip effect="dark" content="同时也作为登录账号" placement="right">
-                                <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                            </el-tooltip>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item label="状态" prop="state">
-                    <dict-select v-model="edit.form.state" dict_code="sys_user_state" placeholder="请选择状态" />
-                </el-form-item>
-                <el-form-item label="角色" prop="role_ids">
-                    <el-select
-                        v-model="edit.form.role_ids"
-                        append-to=".box-content"
-                        value-key="id"
-                        multiple
-                        placeholder="请选择角色"
-                        clearable>
-                        <el-option v-for="item in edit.roles" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="所属组织" prop="organization_id">
-                    <el-tree-select
-                        v-model="edit.form.organization_id"
-                        :data="orgTree"
-                        node-key="id"
-                        clearable
-                        check-strictly
-                        default-expand-all
-                        append-to=".box-content"
-                        :props="treeProps" />
-                </el-form-item>
-            </el-form>
-        </template>
-        <template #footer>
-            <el-button @click="() => (edit.dialog = false)">取消</el-button>
-            <el-button type="primary" @click="handleUserSave">确定</el-button>
-        </template>
-    </el-dialog>
+    <!-- 用户组件区 -->
+    <user-edit :open="dialog_edit.open" :form="dialog_edit.form" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

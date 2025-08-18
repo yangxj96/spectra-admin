@@ -17,7 +17,9 @@
 
 package com.yangxj96.spectra.core.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 2025-6-14
  */
 @Slf4j
+@SaCheckLogin
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -46,50 +49,38 @@ public class UserController {
     @Resource
     private UserService bindService;
 
-    /**
-     * 分页查询用户列表
-     *
-     * @param page   分页参数
-     * @param params 查询条件参数
-     * @return 分页结果
-     */
     @ULog("分页查询用户列表")
-    @SaCheckPermission(value = "ROLE:RELEVANCE_ROLES", orRole = "DEV_ADMIN")
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         return bindService.page(page, params);
     }
 
-    /**
-     * 创建用户
-     *
-     * @param params 请求参数
-     */
     @ULog("创建用户")
     @PostMapping
+    @SaCheckRole("DEV_ADMIN")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
 
-    /**
-     * 根据ID更新用户
-     *
-     * @param params 请求参数
-     */
     @ULog("根据ID更新用户信息")
     @PutMapping
+    @SaCheckRole("DEV_ADMIN")
     public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.updateById(params);
     }
 
-    /**
-     * 根据用户ID删除用户信息
-     *
-     * @param uid 用户ID
-     */
+
     @ULog("根据ID删除用户")
     @DeleteMapping("/{uid}")
+    @SaCheckRole("DEV_ADMIN")
     public void deleteById(@PathVariable String uid) {
         bindService.deleteById(uid);
+    }
+
+    @ULog("重置用户密码")
+    @PutMapping("/password/reset/{uid}")
+    @SaCheckRole("DEV_ADMIN")
+    public void passwordResetById(@PathVariable String uid) {
+        bindService.passwordResetById(uid);
     }
 }

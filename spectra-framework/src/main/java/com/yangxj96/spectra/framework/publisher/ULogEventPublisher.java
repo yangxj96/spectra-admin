@@ -10,13 +10,7 @@ import org.springframework.context.ApplicationEventPublisher;
  * @version 1.0
  * @since 2025/7/3
  */
-public class ULogEventPublisher {
-
-    private final ApplicationEventPublisher publisher;
-
-    public ULogEventPublisher(ApplicationEventPublisher publisher) {
-        this.publisher = publisher;
-    }
+public record ULogEventPublisher(ApplicationEventPublisher publisher) {
 
     public void save(ULogEntity entity) {
         publisher.publishEvent(entity);
