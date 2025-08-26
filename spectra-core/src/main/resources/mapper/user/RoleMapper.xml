@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Role">
         <!--@mbg.generated-->
-        <!--@Table "T_SYS_ROLE"-->
+        <!--@Table "SYS_ROLE"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
         <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
         <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
@@ -46,8 +46,8 @@
                R.UPDATED_BY,
                R.UPDATED_AT,
                R.DELETED
-        FROM SPECTRA.T_SYS_ROLE R,
-             SPECTRA.T_SYS_USER_ROLE_MAP ARM
+        FROM SPECTRA.SYS_ROLE R,
+             SPECTRA.SYS_REL_USER_ROLE ARM
         WHERE ARM.USER_ID = #{userId}
           AND ARM.ROLE_ID = R."ID"
           AND R.STATE = 1
@@ -57,13 +57,13 @@
     </select>
 
     <update id="removeRelevanceRoles">
-        UPDATE SPECTRA.T_SYS_USER_ROLE_MAP
+        UPDATE SPECTRA.SYS_REL_USER_ROLE
         SET DELETED = CURRENT_TIMESTAMP
         WHERE USER_ID = #{userId}
     </update>
 
     <insert id="insertRelevanceRole">
-        INSERT INTO SPECTRA.T_SYS_USER_ROLE_MAP(ID, USER_ID, ROLE_ID, CREATED_BY, CREATED_AT, UPDATED_BY, UPDATED_AT)
+        INSERT INTO SPECTRA.SYS_REL_USER_ROLE(ID, USER_ID, ROLE_ID, CREATED_BY, CREATED_AT, UPDATED_BY, UPDATED_AT)
         VALUES (#{id}, #{uid}, #{rid}, 0, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP)
     </insert>
 </mapper>

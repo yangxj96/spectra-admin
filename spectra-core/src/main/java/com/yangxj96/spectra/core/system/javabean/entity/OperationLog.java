@@ -43,7 +43,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "T_SYS_OPERATION_LOG")
+@TableName(value = "SYS_OPERATION_LOG")
 public class OperationLog extends BaseEntity implements Serializable {
 
     @Serial

@@ -41,7 +41,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "T_SYS_USER")
+@TableName(value = "SYS_USER")
 public class User extends BaseEntity implements Serializable {
 
     @Serial

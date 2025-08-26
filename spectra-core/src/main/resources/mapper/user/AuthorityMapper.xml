@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table "T_SYS_AUTHORITY"-->
+        <!--@Table "SYS_AUTHORITY"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
         <result column="PID"        jdbcType="BIGINT"    property="pid"/>
         <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
@@ -39,8 +39,8 @@
                A.UPDATED_BY,
                A.UPDATED_AT,
                A.DELETED
-        FROM SPECTRA.T_SYS_AUTHORITY A,
-             SPECTRA.T_SYS_ROLE_AUTHORITY_MAP RAM
+        FROM SPECTRA.SYS_AUTHORITY A,
+             SPECTRA.SYS_REL_AUTHORITY_ROLE RAM
         WHERE RAM.ROLE_ID IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}

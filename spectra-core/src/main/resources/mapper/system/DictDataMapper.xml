@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.system.javabean.entity.DictData">
         <!--@mbg.generated-->
-        <!--@Table "T_SYS_DICT_DATA"-->
+        <!--@Table "SYS_DICT_DATA"-->
         <id     column="ID"           jdbcType="BIGINT"    property="id"/>
         <result column="GID"          jdbcType="BIGINT"    property="gid"/>
         <result column="LABEL"        jdbcType="VARCHAR"   property="label"/>

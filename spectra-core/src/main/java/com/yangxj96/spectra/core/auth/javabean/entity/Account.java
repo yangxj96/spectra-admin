@@ -42,7 +42,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "T_SYS_ACCOUNT")
+@TableName(value = "SYS_ACCOUNT")
 public class Account extends BaseEntity implements Serializable {
 
     @Serial
