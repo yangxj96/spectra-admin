@@ -17,8 +17,8 @@
 
 package com.yangxj96.spectra.core.system.controller;
 
+import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
 import com.yangxj96.spectra.core.system.javabean.from.DictDataFrom;
@@ -56,7 +56,7 @@ public class DictController {
      */
     @ULog("创建字典组")
     @PostMapping("/group")
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:INSERT')")
     public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
         bindService.createGroup(params);
     }
@@ -68,7 +68,7 @@ public class DictController {
      */
     @ULog("删除字典组")
     @DeleteMapping("/group/{id}")
-    @SaCheckPermission(value = "DICT:DELETE", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:DELETE')")
     public void deleteGroup(@PathVariable String id) {
         bindService.deleteGroup(Long.parseLong(id));
     }
@@ -80,7 +80,7 @@ public class DictController {
      */
     @ULog("修改字典组")
     @PutMapping("/group")
-    @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:UPDATE')")
     public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params) {
         bindService.modifyGroup(params);
     }
@@ -92,7 +92,7 @@ public class DictController {
      */
     @ULog("创建字典数据")
     @PostMapping("/data")
-    @SaCheckPermission(value = "DICT:INSERT", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:INSERT')")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }
@@ -104,7 +104,7 @@ public class DictController {
      */
     @ULog("删除字典项")
     @DeleteMapping("/data/{id}")
-    @SaCheckPermission(value = "DICT:DELETE", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:DELETE')")
     public void deleteData(@PathVariable String id) {
         bindService.deleteData(Long.parseLong(id));
     }
@@ -116,7 +116,7 @@ public class DictController {
      */
     @ULog("修改字典数据")
     @PutMapping("/data")
-    @SaCheckPermission(value = "DICT:UPDATE", orRole = "DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('DICT:UPDATE')")
     public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params) {
         bindService.modifyData(params);
     }

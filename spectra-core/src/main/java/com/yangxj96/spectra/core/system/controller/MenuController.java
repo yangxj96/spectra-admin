@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.core.system.controller;
 
+import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
@@ -62,8 +63,16 @@ public class MenuController {
      */
     @ULog("新增菜单")
     @PostMapping("/created")
+    @SaCheckEL("@ss.hasPermission('MENU:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
+    }
+
+    @ULog("删除菜单")
+    @DeleteMapping("/{id}")
+    @SaCheckEL("@ss.hasPermission('MENU:DELETE')")
+    public void deleteById(@PathVariable String id) {
+        // TODO 暂未实现
     }
 
     /**
@@ -73,7 +82,9 @@ public class MenuController {
      */
     @ULog("修改菜单")
     @PutMapping("/modify")
+    @SaCheckEL("@ss.hasPermission('MENU:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
     }
+
 }

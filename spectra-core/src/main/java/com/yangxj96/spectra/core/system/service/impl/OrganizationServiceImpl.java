@@ -31,7 +31,10 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 组织机构业务层-实现
@@ -78,4 +81,40 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
         this.updateById(entity);
     }
 
+    @Override
+    public List<Organization> getAllChildrenById(Long organizationId) {
+        List<Organization> organizations = this.list();
+        // 2. 构建父ID -> 子节点列表的映射
+        Map<Long, List<Organization>> childrenMap = organizations.stream()
+                .filter(org -> org.getPid() != null)
+                .collect(Collectors.groupingBy(Organization::getPid));
+        // 3. 存放结果的集合
+        List<Organization> result = new ArrayList<>();
+        // 4. 从指定ID开始递归收集所有子节点
+        collectAllChildren(organizationId, childrenMap, result);
+        return result;
+    }
+
+
+    /**
+     * 递归收集指定节点的所有子节点
+     *
+     * @param parentId    要查找子节点的父节点ID
+     * @param childrenMap 父ID -> 子节点列表的映射
+     * @param result      收集结果的列表
+     */
+    private void collectAllChildren(Long parentId, Map<Long, List<Organization>> childrenMap, List<Organization> result) {
+        // 获取该父节点的所有直接子节点
+        List<Organization> directChildren = childrenMap.get(parentId);
+        // 如果没有子节点，直接返回（递归终止条件）
+        if (directChildren == null || directChildren.isEmpty()) {
+            return;
+        }
+        // 将所有直接子节点添加到结果中
+        result.addAll(directChildren);
+        // 递归处理每个直接子节点，查找它们的子节点
+        for (Organization child : directChildren) {
+            collectAllChildren(child.getId(), childrenMap, result);
+        }
+    }
 }

@@ -20,6 +20,8 @@ package com.yangxj96.spectra.core.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.yangxj96.spectra.core.system.javabean.entity.Organization;
 
+import java.util.List;
+
 
 /**
  * 组织机构Mapper
@@ -29,4 +31,5 @@ import com.yangxj96.spectra.core.system.javabean.entity.Organization;
  * @since 2025-6-15
  */
 public interface OrganizationMapper extends BaseMapper<Organization> {
+
 }

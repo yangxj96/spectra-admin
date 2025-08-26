@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.core.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
@@ -57,29 +58,28 @@ public class UserController {
 
     @ULog("创建用户")
     @PostMapping
-    @SaCheckRole("DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('USER:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
 
-    @ULog("根据ID更新用户信息")
-    @PutMapping
-    @SaCheckRole("DEV_ADMIN")
-    public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
-        bindService.updateById(params);
-    }
-
-
     @ULog("根据ID删除用户")
     @DeleteMapping("/{uid}")
-    @SaCheckRole("DEV_ADMIN")
+    @SaCheckEL("@ss.hasPermission('USER:DELETE')")
     public void deleteById(@PathVariable String uid) {
         bindService.deleteById(uid);
     }
 
+    @ULog("根据ID更新用户信息")
+    @PutMapping
+    @SaCheckEL("@ss.hasPermission('USER:UPDATE')")
+    public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
+        bindService.updateById(params);
+    }
+
     @ULog("重置用户密码")
     @PutMapping("/password/reset/{uid}")
-    @SaCheckRole("DEV_ADMIN")
+    @SaCheckEL("@ss.hasRole('ADMIN')")
     public void passwordResetById(@PathVariable String uid) {
         bindService.passwordResetById(uid);
     }

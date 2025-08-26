@@ -1,5 +1,6 @@
 package com.yangxj96.spectra.core.system.controller;
 
+import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.yangxj96.spectra.common.annotation.ULog;
 import com.yangxj96.spectra.common.base.Verify;
@@ -45,6 +46,7 @@ public class OrganizationController {
      */
     @ULog("新增组织机构")
     @PostMapping
+    @SaCheckEL("@ss.hasPermission('ORGANIZATION:INSERT')")
     public void created(@RequestBody @Validated(Verify.Insert.class) OrganizationFrom from) {
         bindService.created(from);
     }
@@ -56,6 +58,7 @@ public class OrganizationController {
      */
     @ULog("新增组织机构")
     @DeleteMapping("/{id}")
+    @SaCheckEL("@ss.hasPermission('ORGANIZATION:DELETE')")
     public void deleteById(@PathVariable String id) {
         bindService.deleteById(id);
     }
@@ -67,6 +70,7 @@ public class OrganizationController {
      */
     @ULog("编辑组织机构")
     @PutMapping
+    @SaCheckEL("@ss.hasPermission('ORGANIZATION:UPDATE')")
     public void modify(@RequestBody @Validated(Verify.Update.class) OrganizationFrom from) {
         bindService.modify(from);
     }

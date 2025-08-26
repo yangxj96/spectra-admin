@@ -61,4 +61,12 @@ public interface OrganizationService extends IService<Organization> {
      */
     void modify(OrganizationFrom from);
 
+    /**
+     * 根据ID获取他的所有子级,包含孙级..曾孙级...等 <br/>
+     * 使用递归实现主要是为了后期如果适配其他数据库少点修改
+     *
+     * @param organizationId 组织机构ID
+     * @return 所有子级列表
+     */
+    List<Organization> getAllChildrenById(Long organizationId);
 }

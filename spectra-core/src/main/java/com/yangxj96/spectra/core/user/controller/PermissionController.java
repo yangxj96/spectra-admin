@@ -17,6 +17,7 @@
 
 package com.yangxj96.spectra.core.user.controller;
 
+import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.yangxj96.spectra.common.annotation.ULog;
@@ -48,57 +49,60 @@ public class PermissionController {
     @Resource
     private PermissionService bindService;
 
-    /**
-     * 分页查询角色信息
-     *
-     * @param page   分页信息,页码和每页数量
-     * @param params 角色分页入参
-     * @return 分页结果
-     */
+    @ULog("创建角色")
+    @PostMapping("/role")
+    @SaCheckEL("@ss.hasPermission('ROLE:INSERT')")
+    public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
+        bindService.createdRole(params);
+    }
+
+    @ULog("删除角色")
+    @DeleteMapping("/role/{id}")
+    @SaCheckEL("@ss.hasPermission('ROLE:DELETE')")
+    public void deleteRole(@PathVariable String id) {
+        // TODO 暂未实现
+    }
+
+    @ULog("修改角色")
+    @PutMapping("/role")
+    @SaCheckEL("@ss.hasPermission('ROLE:UPDATE')")
+    public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        bindService.modifyRole(params);
+    }
+
+    @ULog("创建权限")
+    @PostMapping("/authority")
+    @SaCheckEL("@ss.hasPermission('AUTHORITY:INSERT')")
+    public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
+        // TODO 暂未实现
+    }
+
+    @ULog("删除权限")
+    @DeleteMapping("/authority/{id}")
+    @SaCheckEL("@ss.hasPermission('AUTHORITY:DELETE')")
+    public void deleteAuthority(@PathVariable String id) {
+        // TODO 暂未实现
+    }
+
+    @ULog("修改权限信息")
+    @PutMapping("/authority")
+    @SaCheckEL("@ss.hasPermission('AUTHORITY:UPDATE')")
+    public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        // TODO 暂未实现
+    }
+
     @ULog("分页查询角色列表")
     @GetMapping("/role/page")
     public IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params) {
         return bindService.pageRole(page, params);
     }
 
-    /**
-     * 查询角色列表
-     *
-     * @return 角色列表
-     */
     @ULog("查询角色列表")
     @GetMapping("/role/list")
     public List<RoleVO> listRole() {
         return bindService.listRole();
     }
 
-    /**
-     * 创建角色
-     *
-     * @param params 角色实体
-     */
-    @ULog("创建角色")
-    @PostMapping("/role")
-    public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        bindService.createdRole(params);
-    }
-
-    /**
-     * 修改角色信息
-     *
-     * @param params 角色实体
-     */
-    @ULog("修改角色信息")
-    @PutMapping("/role")
-    public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        bindService.modifyRole(params);
-    }
-
-    /**
-     * 获取权限树
-     *
-     * @return 权限树列表
-     */
     @ULog("获取权限树列表")
     @GetMapping("/authority/tree")
     public List<AuthorityTreeVO> authorityTree() {
