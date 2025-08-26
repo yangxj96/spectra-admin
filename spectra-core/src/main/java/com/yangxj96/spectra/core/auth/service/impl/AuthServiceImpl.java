@@ -20,12 +20,12 @@ package com.yangxj96.spectra.core.auth.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import com.yangxj96.spectra.common.exception.KaptchaNotMatchException;
-import com.yangxj96.spectra.core.auth.javabean.entity.Account;
 import com.yangxj96.spectra.core.auth.javabean.from.UsernamePasswordFrom;
 import com.yangxj96.spectra.core.auth.javabean.vo.TokenVO;
-import com.yangxj96.spectra.core.auth.service.AccountService;
 import com.yangxj96.spectra.core.auth.service.AuthService;
 import com.yangxj96.spectra.core.common.service.KaptchaService;
+import com.yangxj96.spectra.core.user.javabean.entity.User;
+import com.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -45,7 +45,7 @@ import javax.security.auth.login.LoginException;
 public class AuthServiceImpl implements AuthService {
 
     @Resource
-    private AccountService accountService;
+    private UserService userService;
 
     @Resource
     private BCryptPasswordEncoder encoder;
@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
                 }
             }
             // 账户查询
-            Account datum = accountService.getByUsername(params.getUsername());
+            User datum = userService.getByEmail(params.getUsername());
             // 账号不存在或者密码匹配失败
             if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
                 throw new LoginException("账号或密码错误");
@@ -75,12 +75,11 @@ public class AuthServiceImpl implements AuthService {
                     .setDeviceType("PC")
                     .setIsLastingCookie(false)
                     .setIsWriteHeader(false)
-                    .setTerminalExtra("user_id", datum.getUserId())
             );
             // 组件token
             return TokenVO.builder()
                     .id(datum.getId())
-                    .username(datum.getUsername())
+                    .username(datum.getEmail())
                     .accessToken(StpUtil.getTokenValue())
                     .authorities(StpUtil.getPermissionList())
                     .roles(StpUtil.getRoleList())

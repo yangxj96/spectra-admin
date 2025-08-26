@@ -16,6 +16,7 @@
         <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
+        <result column="VERSION"    jdbcType="TIMESTAMP" property="version"/>
     </resultMap>
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
@@ -30,7 +31,8 @@
         CREATED_AT,
         UPDATED_BY,
         UPDATED_AT,
-        DELETED
+        DELETED,
+        VERSION
     </sql>
 
     <!-- state在DM中是BIT类型 0=false 非0=true -->
@@ -53,17 +55,37 @@
           AND R.STATE = 1
           AND R.DELETED IS NULL
           AND ARM.DELETED IS NULL
-        ORDER BY CREATED_AT DESC;
+        ORDER BY R.CREATED_AT DESC;
+    </select>
+
+    <select id="getRoleIdsByUserId" resultType="java.lang.Long">
+        SELECT R.ID
+        FROM SPECTRA.SYS_ROLE R,
+        SPECTRA.SYS_REL_USER_ROLE ARM
+        WHERE ARM.USER_ID = #{userId}
+        AND ARM.ROLE_ID = R."ID"
+        AND R.STATE = 1
+        AND R.DELETED IS NULL
+        AND ARM.DELETED IS NULL
+        ORDER BY R.CREATED_AT DESC;
     </select>
 
     <update id="removeRelevanceRoles">
         UPDATE SPECTRA.SYS_REL_USER_ROLE
         SET DELETED = CURRENT_TIMESTAMP
         WHERE USER_ID = #{userId}
+        <if test="rid != null and rid.size() != 0">
+            AND ROLE_ID IN
+            <foreach collection="rid" item="r" open="(" close=")" separator=",">
+                #{r}
+            </foreach>
+        </if>
     </update>
 
     <insert id="insertRelevanceRole">
         INSERT INTO SPECTRA.SYS_REL_USER_ROLE(ID, USER_ID, ROLE_ID, CREATED_BY, CREATED_AT, UPDATED_BY, UPDATED_AT)
         VALUES (#{id}, #{uid}, #{rid}, 0, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP)
     </insert>
+
+
 </mapper>

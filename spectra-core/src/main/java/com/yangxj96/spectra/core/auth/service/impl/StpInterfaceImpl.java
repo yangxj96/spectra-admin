@@ -46,28 +46,19 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        Object userId = StpUtil.getTerminalInfo().getExtra("user_id");
-
-        if (userId instanceof Long uid) {
-            List<Role> roles = roleService.getByUserId(uid);
-            if (roles.isEmpty()) {
-                return Collections.emptyList();
-            }
-            List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).toList());
-            return authorities.stream().map(Authority::getCode).toList();
-        } else {
+        Long uid = StpUtil.getLoginIdAsLong();
+        List<Role> roles = roleService.getByUserId(uid);
+        if (roles.isEmpty()) {
             return Collections.emptyList();
         }
+        List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).toList());
+        return authorities.stream().map(Authority::getCode).toList();
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        Object userId = StpUtil.getTerminalInfo().getExtra("user_id");
-        if (userId instanceof Long uid) {
-            List<Role> roles = roleService.getByUserId(uid);
-            return roles.stream().map(Role::getCode).toList();
-        } else {
-            return Collections.emptyList();
-        }
+        Long uid = StpUtil.getLoginIdAsLong();
+        List<Role> roles = roleService.getByUserId(uid);
+        return roles.stream().map(Role::getCode).toList();
     }
 }

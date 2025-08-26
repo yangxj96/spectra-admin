@@ -18,6 +18,7 @@
     <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy" />
     <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt" />
     <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted" />
+    <result column="VERSION"    jdbcType="TIMESTAMP" property="version" />
   </resultMap>
   <!-- @formatter:on -->
 
@@ -35,6 +36,7 @@
         CREATED_AT,
         UPDATED_BY,
         UPDATED_AT,
-        DELETED
+        DELETED,
+        VERSION
     </sql>
 </mapper>

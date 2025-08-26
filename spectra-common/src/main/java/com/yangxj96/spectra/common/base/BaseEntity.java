@@ -46,6 +46,7 @@ public class BaseEntity implements Serializable {
     /**
      * 数据id.
      */
+    @OrderBy(asc = true)
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private Long id;
 
@@ -58,7 +59,6 @@ public class BaseEntity implements Serializable {
     /**
      * 创建时间
      */
-    @OrderBy(asc = true)
     @TableField(value = "CREATED_AT", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
@@ -75,8 +75,15 @@ public class BaseEntity implements Serializable {
     private LocalDateTime updatedAt;
 
     /**
-     * 删除标识
+     * 软删除标识。null 表示未删除，非 null 表示已删除，其值为删除时间。
      */
     @TableField(value = "DELETED")
     private LocalDateTime deleted;
+
+    /**
+     * 软删除标识。null 表示未删除，非 null 表示已删除，其值为删除时间。
+     */
+    @Version
+    @TableField(value = "VERSION")
+    private Long version;
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.yangxj96.spectra.framework.mybatis.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -77,6 +78,8 @@ public class MyBatisPlusConfiguration {
         interceptor.addInnerInterceptor(pageInterceptor);
         // 针对 update 和 delete 语句 作用: 阻止恶意的全表更新删除
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
+        // 乐观锁
+        interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         // 收集的bean进行注册
         innerInterceptors.orderedStream().forEach(interceptor::addInnerInterceptor);
         return interceptor;

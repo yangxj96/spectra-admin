@@ -72,6 +72,12 @@ public class User extends BaseEntity implements Serializable {
     private Long organizationId;
 
     /**
+     * 用户密码
+     */
+    @TableField(value = "PASSWORD")
+    private String password;
+
+    /**
      * 用户状态
      */
     @TableField(value = "STATE")

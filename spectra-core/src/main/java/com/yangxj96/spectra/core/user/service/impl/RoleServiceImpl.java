@@ -43,9 +43,19 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     }
 
     @Override
+    public List<Long> getRoleIdsByUserId(Long uid) {
+        return this.baseMapper.getRoleIdsByUserId(uid);
+    }
+
+    @Override
     @Transactional
     public int removeRelevanceRoles(Long uid) {
-        return this.baseMapper.removeRelevanceRoles(uid);
+        return this.baseMapper.removeRelevanceRoles(uid, null);
+    }
+
+    @Override
+    public int removeRelevanceRoles(Long uid, List<Long> roleIds) {
+        return this.baseMapper.removeRelevanceRoles(uid, roleIds);
     }
 
     @Override

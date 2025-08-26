@@ -5,16 +5,19 @@
     <resultMap id="BaseResultMap" type="com.yangxj96.spectra.core.user.javabean.entity.User">
         <!--@mbg.generated-->
         <!--@Table "SYS_USER"-->
-        <id column="ID"             jdbcType="BIGINT"    property="id"/>
-        <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
-        <result column="EMAIL"      jdbcType="VARCHAR"   property="email"/>
-        <result column="AVATAR"     jdbcType="VARCHAR"   property="avatar"/>
-        <result column="STATE"      jdbcType="SMALLINT"  property="state"/>
-        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
+        <id column="ID"                  jdbcType="BIGINT"    property="id"/>
+        <result column="NAME"            jdbcType="VARCHAR"   property="name"/>
+        <result column="EMAIL"           jdbcType="VARCHAR"   property="email"/>
+        <result column="AVATAR"          jdbcType="VARCHAR"   property="avatar"/>
+        <result column="STATE"           jdbcType="SMALLINT"  property="state"/>
+        <result column="ORGANIZATION_ID" jdbcType="SMALLINT"  property="organizationId"/>
+        <result column="PASSWORD"        jdbcType="SMALLINT"  property="password"/>
+        <result column="CREATED_BY"      jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT"      jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY"      jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT"      jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"         jdbcType="TIMESTAMP" property="deleted"/>
+        <result column="VERSION"         jdbcType="TIMESTAMP" property="version"/>
     </resultMap>
     <!-- @formatter:on -->
     <sql id="Base_Column_List">
@@ -25,10 +28,12 @@
         AVATAR,
         STATE,
         ORGANIZATION_ID,
+        PASSWORD,
         CREATED_BY,
         CREATED_AT,
         UPDATED_BY,
         UPDATED_AT,
-        DELETED
+        DELETED,
+        VERSION
     </sql>
 </mapper>

@@ -40,12 +40,29 @@ public interface RoleService extends BaseService<Role> {
     List<Role> getByUserId(Long uid);
 
     /**
+     * 根据账号ID获取所拥有的角色的ID列表
+     *
+     * @param uid 账号ID
+     * @return 角色ID列表
+     */
+    List<Long> getRoleIdsByUserId(Long uid);
+
+    /**
      * 删除关联的角色列表
      *
      * @param uid 用户ID
      * @return 删除的条目数
      */
     int removeRelevanceRoles(Long uid);
+
+    /**
+     * 删除关联的角色列表(指定角色列表)
+     *
+     * @param uid     用户ID
+     * @param roleIds 角色列表
+     * @return 删除的条目数
+     */
+    int removeRelevanceRoles(Long uid, List<Long> roleIds);
 
     /**
      * 新增关联角色列表

@@ -22,6 +22,7 @@ import com.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -69,4 +70,13 @@ public interface UserMapstruct {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "avatar", ignore = true)
     User toEntity(UserSaveFrom vo);
+
+
+    /**
+     * 使用params更新现有的user实体
+     *
+     * @param params 更新的参数
+     * @param user   现有的实体
+     */
+    void updateUserFrom(UserSaveFrom params, @MappingTarget User user);
 }

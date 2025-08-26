@@ -41,12 +41,20 @@ public interface RoleMapper extends BaseMapper<Role> {
     List<Role> getByUserId(@Param("userId") Long userId);
 
     /**
+     * 根据账号ID获取所拥有的角色的ID列表
+     *
+     * @param uid 账号ID
+     * @return 角色ID列表
+     */
+    List<Long> getRoleIdsByUserId(Long uid);
+
+    /**
      * 删除关联的角色列表
      *
      * @param uid 用户ID
      * @return 删除的条目数
      */
-    int removeRelevanceRoles(@Param("userId") Long uid);
+    int removeRelevanceRoles(@Param("userId") Long uid, @Param("rid") List<Long> roleId);
 
     /**
      * 新增关联的角色列表
@@ -57,4 +65,5 @@ public interface RoleMapper extends BaseMapper<Role> {
      * @return 收影响的行数
      */
     int insertRelevanceRole(@Param("id") Long id, @Param("uid") Long uid, @Param("rid") Long roleId);
+
 }

@@ -24,6 +24,7 @@ import com.yangxj96.spectra.core.user.javabean.entity.User;
 import com.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import com.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
 import com.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
+import jakarta.validation.constraints.NotEmpty;
 
 /**
  * 用户service层
@@ -70,4 +71,12 @@ public interface UserService extends BaseService<User> {
      * @param uid 用户ID
      */
     void passwordResetById(String uid);
+
+    /**
+     * 根据用户邮箱查询用户信息
+     *
+     * @param email 用于邮箱
+     * @return 用户信息,可能为null
+     */
+    User getByEmail(@NotEmpty(message = "用户名不能为空") String email);
 }
