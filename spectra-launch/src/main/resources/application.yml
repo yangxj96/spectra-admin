@@ -15,10 +15,10 @@ spectra:
         - png
         - pdf
       strategies:
-        - com.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
-        - com.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
-        - com.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
-        - com.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
+        - io.github.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
+        - io.github.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
+        - io.github.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
+        - io.github.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
   # 验证码相关
   kaptcha:
     type: math
