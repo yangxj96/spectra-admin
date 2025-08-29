@@ -25,16 +25,16 @@
 
 ### 后端技术栈
 
-| 技术           | 版本     | 说明             |
-|--------------|--------|----------------|
-| Java         | JDK 21 | 使用最新LTS版本，性能更强 |
-| Maven        | 3.9.9  | 构建工具           |
-| Spring Boot  | 3.5.4  | 核心框架           |
-| MyBatis-Plus | 3.5.12 | 增强ORM，简化CRUD   |
-| Sa-Token     | 1.44.0 | 轻量级Java权限认证框架  |
-| MapStruct    | 1.6.3  | 实体映射工具，提升性能    |
-| MySQL        | 8.4.4  | 主流开源关系型数据库     |
-| Jasypt       | 3.0.5  | 配置加密，保障敏感信息安全  |
+| 技术              | 版本     | 说明             |
+|-----------------|--------|----------------|
+| Java            | JDK 21 | 使用最新LTS版本，性能更强 |
+| Maven           | 3.9.9  | 构建工具           |
+| Spring Boot     | 3.5.5  | 核心框架           |
+| MyBatis-Plus    | 3.5.12 | 增强ORM，简化CRUD   |
+| Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
+| MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
+| DM8(兼容Oracle模式) | 8      | 国产数据库          |
+| Jasypt          | 3.0.5  | 配置加密，保障敏感信息安全  |
 
 > ✅ 所有依赖均采用当前稳定最新版，并将持续跟进生态更新。
 
@@ -48,9 +48,9 @@
 | Vue Router   | 4.5.1   | 路由管理                   |
 | Pinia        | 3.0.3   | 状态管理（Vuex替代）           |
 | @vueuse/core | 13.5.0  | 实用 Composition API 工具库 |
-| Vite         | 7.0.2   | 构建工具，极速启动              |
+| Vite         | 7.0.3   | 构建工具，极速启动              |
 | Element Plus | 2.10.3  | UI 组件库                 |
-| Axios        | 1.10.0  | HTTP 请求客户端             |
+| Axios        | 1.11.0  | HTTP 请求客户端             |
 | ECharts      | 5.6.0   | 数据可视化图表                |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
 | ESLint       | 9.30.1  | 代码质量检查                 |
@@ -100,6 +100,7 @@
 |---------------------|----------------------------------------|----------------------------------|
 | `spectra-common`    | [spectra-common](spectra-common)       | 通用工具类、注解、常量、DTO等共享内容             |
 | `spectra-core`      | [spectra-core](spectra-core)           | 核心接口定义、领域模型、服务契约                 |
+| `spectra-workflow`  | [spectra-workflow](spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
 | `spectra-framework` | [spectra-framework](spectra-framework) | 框架级配置（如权限、日志、异常处理、拦截器等）          |
 | `spectra-ui`        | [spectra-ui](spectra-ui)               | 前端 Vue 项目，基于 Vite + Element Plus |
 | `spectra-launch`    | [spectra-launch](spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
@@ -117,7 +118,7 @@
 
 2. 创建 `.env` 文件并配置环境变量（前后端分别配置）
 
-3. 启动后端服务（确保 PostgreSQL 已运行）：
+3. 启动后端服务（确保 DM数据库 已运行）：
    ```bash
    cd spectra-launch
    mvn spring-boot:run
