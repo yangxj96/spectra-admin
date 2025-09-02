@@ -25,31 +25,36 @@ const chartCPUOption = {
         max: 100,
         name: "使用率(%)"
     },
-    series: [{
-        name: "CPU使用率",
-        type: "line",
-        smooth: true,
-        data: [],
-        areaStyle: {
-            color: {
-                type: "linear",
-                x: 0,
-                y: 0,
-                x2: 0,
-                y2: 1,
-                colorStops: [{
-                    offset: 0,
-                    color: "rgba(58, 162, 235, 0.5)"
-                }, {
-                    offset: 1,
-                    color: "rgba(58, 162, 235, 0.1)"
-                }]
+    series: [
+        {
+            name: "CPU使用率",
+            type: "line",
+            smooth: true,
+            data: [],
+            areaStyle: {
+                color: {
+                    type: "linear",
+                    x: 0,
+                    y: 0,
+                    x2: 0,
+                    y2: 1,
+                    colorStops: [
+                        {
+                            offset: 0,
+                            color: "rgba(58, 162, 235, 0.5)"
+                        },
+                        {
+                            offset: 1,
+                            color: "rgba(58, 162, 235, 0.1)"
+                        }
+                    ]
+                }
+            },
+            itemStyle: {
+                color: "#3a82eb"
             }
-        },
-        itemStyle: {
-            color: "#3a82eb"
         }
-    }]
+    ]
 };
 const chartRAMOption = {};
 const chartJVMOption = {};
@@ -57,18 +62,13 @@ const chartJVMOption = {};
 // ref内容
 const cpuChart = useTemplateRef("cpuChart");
 
-
 onMounted(() => {
     initData();
 });
 
 // 初始化所需数据
 function initData() {
-    let requests = [
-        ServiceMonitorApi.getCPUInfo(),
-        ServiceMonitorApi.getRAMInfo(),
-        ServiceMonitorApi.getJVMInfo()
-    ];
+    let requests = [ServiceMonitorApi.getCPUInfo(), ServiceMonitorApi.getRAMInfo(), ServiceMonitorApi.getJVMInfo()];
     Promise.all(requests).then(res => {
         cpuInfo.value = res[0].data as CPUInfo;
         ramInfo.value = res[1].data as RAMInfo;
@@ -76,14 +76,12 @@ function initData() {
     });
 }
 
-
 //////////////// 以下位辅助方法,还需要整理
 
 // 时间数据
-const timeData = [] as any[];
-const cpuData = [] as any[];
+const timeData = [] as string[];
+const cpuData = [] as number[];
 let currentTime = new Date();
-
 
 function updateData() {
     // 生成随机CPU使用率
@@ -91,8 +89,11 @@ function updateData() {
 
     // 更新时间和数据数组
     currentTime = new Date();
-    const timeStr = currentTime.getHours() + ":" +
-        (currentTime.getMinutes() < 10 ? "0" + currentTime.getMinutes() : currentTime.getMinutes()) + ":" +
+    const timeStr =
+        currentTime.getHours() +
+        ":" +
+        (currentTime.getMinutes() < 10 ? "0" + currentTime.getMinutes() : currentTime.getMinutes()) +
+        ":" +
         (currentTime.getSeconds() < 10 ? "0" + currentTime.getSeconds() : currentTime.getSeconds());
 
     timeData.push(timeStr);
@@ -109,9 +110,11 @@ function updateData() {
         xAxis: {
             data: timeData
         },
-        series: [{
-            data: cpuData
-        }]
+        series: [
+            {
+                data: cpuData
+            }
+        ]
     });
 }
 
@@ -140,20 +143,12 @@ setInterval(updateData, 2000);
                         <el-col :span="12">是否64位: {{ cpuInfo?.is64bit ? "是" : "否" }}</el-col>
                     </el-row>
                     <el-row>
-                        <el-col :span="12">
-                            物理核心数: {{ cpuInfo?.physical_cores }}
-                        </el-col>
-                        <el-col :span="12">
-                            逻辑核心数: {{ cpuInfo?.logical_cores }}
-                        </el-col>
+                        <el-col :span="12">物理核心数: {{ cpuInfo?.physical_cores }}</el-col>
+                        <el-col :span="12">逻辑核心数: {{ cpuInfo?.logical_cores }}</el-col>
                     </el-row>
                     <el-row>
-                        <el-col :span="12">
-                            最大频率: {{ cpuInfo?.max_frequency_hz }}
-                        </el-col>
-                        <el-col :span="12">
-                            最大频率: {{ cpuInfo?.max_frequency_ghz }}
-                        </el-col>
+                        <el-col :span="12">最大频率: {{ cpuInfo?.max_frequency_hz }}</el-col>
+                        <el-col :span="12">最大频率: {{ cpuInfo?.max_frequency_ghz }}</el-col>
                     </el-row>
                 </el-card>
             </el-col>
@@ -162,16 +157,17 @@ setInterval(updateData, 2000);
                 <el-card class="card" body-class="card-body" header="内存信息">
                     <el-row>
                         <el-col :span="12">合计:{{ ramInfo?.summary }}</el-col>
-
                     </el-row>
                     <el-row>
                         <el-col :span="12">数量合计:{{ ramInfo?.count }}</el-col>
                         <el-col :span="12">容量合计:{{ ramInfo?.total_capacity_gb }}</el-col>
                     </el-row>
                     <el-tabs model-value="1">
-                        <el-tab-pane v-for="(item,idx) in ramInfo?.slots" :index="idx"
-                                     :name="item.slot + ''"
-                                     :label="'内存' + item.slot + '('+ item.memory_type + ')' ">
+                        <el-tab-pane
+                            v-for="(item, idx) in ramInfo?.slots"
+                            :index="idx"
+                            :name="item.slot + ''"
+                            :label="'内存' + item.slot + '(' + item.memory_type + ')'">
                             <el-row>
                                 <el-col :span="12">频率:{{ item?.clock_speed_mhz }}</el-col>
                                 <el-col :span="12">容量:{{ item?.capacity_gb }}</el-col>
@@ -183,19 +179,13 @@ setInterval(updateData, 2000);
 
             <el-col :span="8">
                 <el-card class="card" body-class="card-body-jvm" header="JVM信息">
-                    <el-row>
-                        名称: {{ jvmInfo?.jvm_name }}
-                    </el-row>
-                    <el-row>
-                        版本: {{ jvmInfo?.jvm_version }}
-                    </el-row>
+                    <el-row>名称: {{ jvmInfo?.jvm_name }}</el-row>
+                    <el-row>版本: {{ jvmInfo?.jvm_version }}</el-row>
                     <el-row>
                         <el-col :span="12">供应商: {{ jvmInfo?.jvm_vendor }}</el-col>
                         <el-col :span="12">主页: {{ jvmInfo?.java_vendor_url }}</el-col>
                     </el-row>
-                    <el-row>
-                        安装位置: {{ jvmInfo?.java_home }}
-                    </el-row>
+                    <el-row>安装位置: {{ jvmInfo?.java_home }}</el-row>
                     <el-row>
                         <el-col :span="12">PID:{{ jvmInfo?.process_id }}</el-col>
                         <el-col :span="12">启动时间:{{ jvmInfo?.start_time }}</el-col>
@@ -211,7 +201,7 @@ setInterval(updateData, 2000);
             </el-col>
             <el-col :span="12">
                 <el-card class="card" header="CPU使用率">
-                    <v-chart ref="cpuChart" :option="chartCPUOption" autoresize style="width: 100%;height: 24vh" />
+                    <v-chart ref="cpuChart" :option="chartCPUOption" autoresize style="width: 100%; height: 24vh" />
                 </el-card>
             </el-col>
         </el-row>
@@ -239,10 +229,9 @@ setInterval(updateData, 2000);
 </template>
 
 <style scoped lang="scss">
-
 .card {
     width: 98%;
-    height: 30vh
+    height: 30vh;
 }
 
 .card-body > div {
