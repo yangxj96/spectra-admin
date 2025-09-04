@@ -19,9 +19,15 @@ package io.github.yangxj96.spectra.core.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
+import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
+import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 
 import java.util.List;
@@ -73,4 +79,35 @@ public interface PermissionService {
      */
     List<AuthorityTreeVO> authorityTree();
 
+    /**
+     * 根据角色ID获取角色关联的权限列表
+     *
+     * @param id 角色ID
+     * @return 关联的权限列表
+     */
+    List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id);
+
+    /**
+     * 根据角色ID获取角色关联的菜单列表
+     *
+     * @param id 角色ID
+     * @return 关联的菜单列表
+     */
+    List<MenuVO> getRoleRelevanceMenuByRoleId(long id);
+
+    /**
+     * 根据角色ID保存角色关联的权限列表
+     *
+     * @param id   角色ID
+     * @param from 入参条件
+     */
+    void saveRoleRelevanceAuthorityByRoleId(long id, RoleAuthorityFrom from);
+
+    /**
+     * 根据角色ID保存角色关联的菜单列表
+     *
+     * @param id   角色ID
+     * @param from 入参条件
+     */
+    void saveRoleRelevanceMenuByRoleId(long id, RoleMenuFrom from);
 }

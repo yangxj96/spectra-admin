@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -119,6 +120,20 @@ public class CommonExceptionAdvice {
         } else {
             return R.failure(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    /**
+     * 运行时异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常响应返回
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        log.atError().log(PREFIX + "JSON 反序列化失败: {}", e.getMessage(), e);
+        return R.failure("请求数据格式错误，请检查JSON格式和字段类型");
     }
 
     /**

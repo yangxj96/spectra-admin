@@ -2,40 +2,37 @@ package io.github.yangxj96.spectra.core.user.javabean.vo;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
 /**
- * 权限树形VO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/11
+ * 权限VO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
+public class AuthorityVO {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+    /**
+     * 数据id.
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
+    /**
+     * 父级ID,用于构建树形结构
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
+    /**
+     * 权限名称
+     */
     private String name;
 
+    /**
+     * 编码
+     */
     private String code;
-
-    private List<AuthorityTreeVO> children;
-
 }

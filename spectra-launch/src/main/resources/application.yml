@@ -125,6 +125,8 @@ mybatis-plus:
       logic-not-delete-value: "null"
       logic-delete-value: "now()"
       schema: SPECTRA
+  # TODO 需要检测下这个配置会不会导致什么bug
+  executor-type: batch
 # 日志配置
 logging:
   level:

@@ -20,6 +20,7 @@ package io.github.yangxj96.spectra.core.user.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
+import io.github.yangxj96.spectra.common.enums.AuthScope;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,7 +70,7 @@ public class Role extends BaseEntity implements Serializable {
      * 范围
      */
     @TableField(value = "SCOPE")
-    private Short scope;
+    private AuthScope scope;
 
     /**
      * 备注

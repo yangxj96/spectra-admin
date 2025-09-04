@@ -42,13 +42,13 @@
                A.UPDATED_AT,
                A.DELETED
         FROM SPECTRA.SYS_AUTHORITY A,
-             SPECTRA.SYS_REL_AUTHORITY_ROLE RAM
-        WHERE RAM.ROLE_ID IN
+             SPECTRA.SYS_REL_ROLE_AUTHORITY RA
+        WHERE RA.ROLE_ID IN
         <foreach collection="roleIds" open="(" close=")" item="i" separator=",">
             #{i}
         </foreach>
-        AND RAM.AUTHORITY_ID = A.ID
+        AND RA.AUTHORITY_ID = A.ID
         AND A.DELETED IS NULL
-        AND RAM.DELETED IS NULL
+        AND RA.DELETED IS NULL
     </select>
 </mapper>

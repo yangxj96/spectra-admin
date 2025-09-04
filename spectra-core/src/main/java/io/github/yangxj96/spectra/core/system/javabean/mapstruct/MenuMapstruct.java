@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.system.javabean.mapstruct;
 
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
+import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -34,8 +35,37 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface MenuMapstruct {
 
-    List<MenuTreeVO> toTreeVOS(List<Menu> menus);
-
+    /**
+     * 实体转 树形实体VO
+     *
+     * @param entity 实体
+     * @return 树形实体VO
+     */
     @Mapping(target = "children", ignore = true)
-    MenuTreeVO toTreeVO(Menu menu);
+    MenuTreeVO toTreeVO(Menu entity);
+
+    /**
+     * 实体列表 转 树形实体VO列表
+     *
+     * @param coll 实体列表
+     * @return 树形实体VO列表
+     */
+    List<MenuTreeVO> toTreeVOS(List<Menu> coll);
+
+    /**
+     * 实体转VO
+     *
+     * @param entity 实体
+     * @return VO
+     */
+    MenuVO toVO(Menu entity);
+
+    /**
+     * 实体列表转VO列表
+     *
+     * @param coll 实体泪飙
+     * @return VO列表
+     */
+    List<MenuVO> toVOS(List<Menu> coll);
+
 }

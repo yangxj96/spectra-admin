@@ -23,12 +23,19 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
+import io.github.yangxj96.spectra.core.system.javabean.mapstruct.MenuMapstruct;
+import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
+import io.github.yangxj96.spectra.core.user.javabean.mapstruct.AuthorityMapstruct;
 import io.github.yangxj96.spectra.core.user.javabean.mapstruct.PermissionMapstruct;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 import io.github.yangxj96.spectra.core.user.service.AuthorityService;
 import io.github.yangxj96.spectra.core.user.service.PermissionService;
@@ -59,6 +66,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Resource
     private PermissionMapstruct mapstruct;
+
+    @Resource
+    private AuthorityMapstruct authorityMapstruct;
+
+    @Resource
+    private MenuMapstruct menuMapstruct;
 
     @Override
     @Transactional
@@ -102,5 +115,27 @@ public class PermissionServiceImpl implements PermissionService {
         List<Authority> authorities = authorityService.list();
         List<AuthorityTreeVO> vos = mapstruct.authorityToTreeVos(authorities);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
+    }
+
+    @Override
+    public List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id) {
+        List<Authority> authority = roleService.getAuthorityById(id);
+        return authorityMapstruct.toVOS(authority);
+    }
+
+    @Override
+    public List<MenuVO> getRoleRelevanceMenuByRoleId(long id) {
+        List<Menu> menus = roleService.getMenuById(id);
+        return menuMapstruct.toVOS(menus);
+    }
+
+    @Override
+    public void saveRoleRelevanceAuthorityByRoleId(long id, RoleAuthorityFrom from) {
+        roleService.saveAuthorityById(id, from);
+    }
+
+    @Override
+    public void saveRoleRelevanceMenuByRoleId(long id, RoleMenuFrom from) {
+        roleService.saveMenuById(id, from);
     }
 }

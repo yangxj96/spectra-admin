@@ -49,24 +49,24 @@
                R.UPDATED_AT,
                R.DELETED
         FROM SPECTRA.SYS_ROLE R,
-             SPECTRA.SYS_REL_USER_ROLE ARM
-        WHERE ARM.USER_ID = #{userId}
-          AND ARM.ROLE_ID = R."ID"
+             SPECTRA.SYS_REL_USER_ROLE UR
+        WHERE UR.USER_ID = #{userId}
+          AND UR.ROLE_ID = R."ID"
           AND R.STATE = 1
           AND R.DELETED IS NULL
-          AND ARM.DELETED IS NULL
+          AND UR.DELETED IS NULL
         ORDER BY R.CREATED_AT DESC;
     </select>
 
     <select id="getRoleIdsByUserId" resultType="java.lang.Long">
         SELECT R.ID
         FROM SPECTRA.SYS_ROLE R,
-        SPECTRA.SYS_REL_USER_ROLE ARM
-        WHERE ARM.USER_ID = #{userId}
-        AND ARM.ROLE_ID = R."ID"
-        AND R.STATE = 1
-        AND R.DELETED IS NULL
-        AND ARM.DELETED IS NULL
+             SPECTRA.SYS_REL_USER_ROLE UR
+        WHERE UR.USER_ID = #{userId}
+          AND UR.ROLE_ID = R."ID"
+          AND R.STATE = 1
+          AND R.DELETED IS NULL
+          AND UR.DELETED IS NULL
         ORDER BY R.CREATED_AT DESC;
     </select>
 
@@ -87,5 +87,45 @@
         VALUES (#{id}, #{uid}, #{rid}, 0, CURRENT_TIMESTAMP, 0, CURRENT_TIMESTAMP)
     </insert>
 
+    <select id="getAuthorityById" resultType="io.github.yangxj96.spectra.core.user.javabean.entity.Authority">
+        SELECT A.ID,
+               A.PID,
+               A.NAME,
+               A.CODE,
+               A.CREATED_BY,
+               A.CREATED_AT,
+               A.UPDATED_BY,
+               A.UPDATED_AT,
+               A.DELETED,
+               A.VERSION
+        FROM SPECTRA.SYS_AUTHORITY A
+                 INNER JOIN SPECTRA.SYS_REL_ROLE_AUTHORITY RA
+                            ON RA.AUTHORITY_ID = A.ID AND RA.DELETED IS NULL
+        WHERE RA.ROLE_ID = #{id}
+          AND A.DELETED IS NULL
+        ORDER BY A.ID
+    </select>
 
+    <select id="getMenuById" resultType="io.github.yangxj96.spectra.core.system.javabean.entity.Menu">
+        SELECT A.id,
+               A.name,
+               A.pid,
+               A.icon,
+               A.path,
+               A.component,
+               A.layout,
+               A.sort,
+               A.created_by,
+               A.created_at,
+               A.updated_by,
+               A.updated_at,
+               A.deleted,
+               A.version
+        FROM SPECTRA.SYS_MENU A
+                 INNER JOIN SPECTRA.SYS_REL_ROLE_MENU RM
+                            ON RM.MENU_ID = A.ID AND RM.DELETED IS NULL
+        WHERE RM.ROLE_ID = #{id}
+          AND A.DELETED IS NULL
+        ORDER BY A.ID
+    </select>
 </mapper>

@@ -1,37 +1,29 @@
 <script setup lang="ts">
+import { ElMessage, ElMessageBox, ElTree } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import MenuApi from "@/api/MenuApi.ts";
-import { ElMessage, ElMessageBox, ElTree, type FormInstance, type FormRules } from "element-plus";
+import RoleEdit from "./components/RoleEdit/index.vue";
+import { treeDefaultProps } from "@/utils/Config.ts";
 import PermissionApi from "@/api/PermissionApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
+import MenuApi from "@/api/MenuApi.ts";
 import _ from "lodash";
 
-const formRef = useTemplateRef<FormInstance>("formRef");
+// refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
 const menuRef = useTemplateRef<InstanceType<typeof ElTree>>("menuRef");
 
-const ready = ref(false);
-
-// 查询条件
+// 数据
+const menu_tree = ref<Menu[]>();
+const authority_tree = ref<AuthorityTree[]>();
 const condition = ref<RolePageParams>({
     page_num: 1,
     page_size: 100
 });
-
-const tree_props = {
-    label: "name"
-};
-
-const tree_data = ref<Menu[]>();
-
-const authority_tree = ref<AuthorityTree[]>();
-
 const edit = reactive({
     dialog: false,
-    modify: false,
-    form: {} as Role,
-    rules: {} as FormRules
+    form: {} as Role
 });
+const currentRow = ref<Role>();
 
 const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination, table_data } = UseTable<Role>(
     PermissionApi.pageRole,
@@ -39,7 +31,6 @@ const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination
 );
 
 onMounted(() => {
-    ready.value = true;
     handleInitData();
 });
 
@@ -47,21 +38,13 @@ onMounted(() => {
 function handleInitData() {
     let requests = [MenuApi.tree(), PermissionApi.authorityTree()];
     Promise.all(requests).then(([menuRes, authorityTreeRes]) => {
-        tree_data.value = menuRes.data as Menu[];
+        menu_tree.value = menuRes.data as Menu[];
         authority_tree.value = authorityTreeRes.data as AuthorityTree[];
     });
 }
 
-// 角色新增打开
-function handleRoleAddDialog() {
-    edit.modify = false;
-    edit.form = {} as Role;
-    edit.dialog = true;
-}
-
-// 角色编辑框打开
-function handleRoleEditDialog(row: Role) {
-    edit.modify = true;
+// 角色编辑框Dialog
+function handleRoleEditDialogOpen(row: Role) {
     edit.form = _.cloneDeep(row);
     edit.dialog = true;
 }
@@ -73,30 +56,84 @@ function handleRoleDelete(row: Role) {
     });
 }
 
-// 角色保存
-async function handleRoleSave() {
-    if (!formRef.value) return;
-    await formRef.value?.validate((valid, _) => {
-        if (valid) {
-            let request = edit.modify ? PermissionApi.modifyRole : PermissionApi.createdRole;
-            request(edit.form).then(() => {
-                ElMessage.success({
-                    message: edit.modify ? "修改角色成功" : "新增角色成功",
-                    onClose() {
-                        edit.dialog = false;
-                        handlerConditionQuery();
-                    }
-                });
-            });
-        }
+// 条件查询
+function handleRoleConditionQuery() {
+    cleanTreeCheckState();
+    handlerConditionQuery();
+}
+
+// 清理右边两棵树的选中状态
+function cleanTreeCheckState() {
+    authority_tree.value?.forEach(item => {
+        powerRef.value?.setChecked(item.id, false, true);
+    });
+
+    menu_tree.value?.forEach(item => {
+        menuRef.value?.setChecked(item.id, false, true);
     });
 }
 
 // 角色列表行被单机
-function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
-    console.log(row);
-    console.log(column);
-    console.log(event);
+async function handleRoleTableRowClick(row: Role) {
+    if (currentRow.value && currentRow.value.id && currentRow.value.id == row.id) return;
+    try {
+        currentRow.value = row;
+        cleanTreeCheckState();
+        // 权限部分
+        PermissionApi.getRoleAuthority(row.id).then(res => {
+            if (res.code == 200 && res.data && res.data.length > 0) {
+                let ids = res.data.map(i => i.id);
+                powerRef.value?.setCheckedKeys(ids);
+            }
+        });
+
+        // 菜单部分
+        PermissionApi.getRoleMenu(row.id).then(res => {
+            if (res.code == 200 && res.data && res.data.length > 0) {
+                menuRef.value?.setCheckedKeys(res.data.map(i => i.id));
+            }
+        });
+    } catch (error: unknown) {
+        console.error("未知错误", error);
+    }
+}
+
+// 角色-权限关联关系保存
+function handleSaveRoleAuthority() {
+    if (!currentRow.value) {
+        ElMessage.warning("请先选中一个角色");
+        return;
+    }
+    let params = {
+        role_id: currentRow.value.id,
+        authority_ids: powerRef.value?.getCheckedKeys()
+    };
+    PermissionApi.saveRoleAuthority(params).then(res => {
+        if (res.code === 200) {
+            ElMessage.success("保存成功");
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
+}
+
+// 角色-菜单 关联关系保存
+function handleSaveRoleMenu() {
+    if (!currentRow.value) {
+        ElMessage.warning("请先选中一个角色");
+        return;
+    }
+    let params = {
+        role_id: currentRow.value.id,
+        menu_ids: menuRef.value?.getCheckedKeys()
+    };
+    PermissionApi.saveRoleMenu(params).then(res => {
+        if (res.code === 200) {
+            ElMessage.success("保存成功");
+        } else {
+            ElMessage.error(res.msg);
+        }
+    });
 }
 </script>
 
@@ -125,8 +162,8 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
-                        <el-button @click="handleRoleAddDialog">新增</el-button>
+                        <el-button type="primary" @click="handleRoleConditionQuery">查询</el-button>
+                        <el-button @click="handleRoleEditDialogOpen({} as Role)">新增</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
@@ -138,14 +175,10 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
                 height="88%"
                 style="width: 100%"
                 class="loading-box"
-                @row-dblclick="handleRoleTableRowClick">
+                @row-click="handleRoleTableRowClick">
                 <el-table-column align="center" label="序号" width="60" type="index" />
                 <el-table-column align="center" prop="name" width="220" label="名称" />
-                <el-table-column align="center" width="220" label="范围">
-                    <template #default="scope">
-                        <dict-tag v-model="scope.row.scope" dict_code="sys_power_scope" />
-                    </template>
-                </el-table-column>
+                <el-table-column align="center" width="220" prop="scope" label="范围" />
                 <el-table-column align="center" width="220" label="状态">
                     <template #default="scope">
                         <el-tag :type="scope.row.state ? 'primary' : 'danger'">
@@ -156,7 +189,7 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
                 <el-table-column align="center" prop="remark" label="备注" show-overflow-tooltip />
                 <el-table-column align="center" label="编辑" width="120">
                     <template #default="scope">
-                        <el-button link type="primary" size="small" @click="handleRoleEditDialog(scope.row)">
+                        <el-button link type="primary" size="small" @click="handleRoleEditDialogOpen(scope.row)">
                             编辑
                         </el-button>
                         <el-button link type="primary" size="small" @click="handleRoleDelete(scope.row)">
@@ -180,11 +213,13 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
         <!-- 权限 -->
         <el-col :span="4" style="padding: 10px">
             <el-text type="primary">角色权限</el-text>
-            <el-divider />
+            <el-divider class="divider-box" />
+            <el-button link type="primary" @click="handleSaveRoleAuthority">保存角色权限</el-button>
             <el-tree
                 ref="powerRef"
                 :data="authority_tree"
-                :props="tree_props"
+                :props="treeDefaultProps"
+                node-key="id"
                 default-expand-all
                 empty-text="暂无权限"
                 show-checkbox />
@@ -192,54 +227,25 @@ function handleRoleTableRowClick(row: Role, column: unknown, event: Event) {
         <!-- 菜单 -->
         <el-col :span="4" style="padding: 10px">
             <el-text type="primary">角色菜单</el-text>
-            <el-divider />
+            <el-divider class="divider-box" />
+            <el-button link type="primary" @click="handleSaveRoleMenu">保存角色菜单</el-button>
             <el-tree
                 ref="menuRef"
-                :data="tree_data"
-                :props="tree_props"
+                :data="menu_tree"
+                :props="treeDefaultProps"
+                node-key="id"
                 default-expand-all
                 empty-text="暂无菜单"
                 show-checkbox />
         </el-col>
     </el-row>
-    <!-- 编辑框 -->
-    <el-dialog
-        v-if="ready"
-        v-model="edit.dialog"
-        :title="`${edit.modify ? '编辑' : '新增'}角色`"
-        :append-to="'.box-content'"
-        width="30%"
-        class="loading-box"
-        :show-close="false"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false">
-        <template #default>
-            <el-form ref="formRef" :model="edit.form" :rules="edit.rules" label-width="auto">
-                <el-form-item label="角色名称" prop="name">
-                    <el-input v-model="edit.form.name" clearable />
-                </el-form-item>
-                <el-form-item label="角色范围" prop="scope">
-                    <el-select v-model="edit.form.scope" clearable append-to=".box-content">
-                        <el-option value="本级包含下级" label="本级包含下级" />
-                        <el-option value="本级" label="本级" />
-                        <el-option value="全局" label="全局" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="是否启用" prop="state">
-                    <el-select v-model="edit.form.state" clearable append-to=".box-content">
-                        <el-option :value="true" label="是" />
-                        <el-option :value="false" label="否" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="备注" prop="remark">
-                    <el-input v-model="edit.form.remark" type="textarea" clearable />
-                </el-form-item>
-            </el-form>
-        </template>
-        <template #footer>
-            <el-button @click="() => (edit.dialog = false)">关闭</el-button>
-            <el-button @click="handleRoleSave">提交</el-button>
-        </template>
-    </el-dialog>
+    <!-- 角色编辑框 -->
+    <role-edit v-model:show="edit.dialog" v-model:form="edit.form" />
+
 </template>
+
+<style scoped lang="scss">
+.divider-box {
+    margin: 18px 0 10px 0;
+}
+</style>

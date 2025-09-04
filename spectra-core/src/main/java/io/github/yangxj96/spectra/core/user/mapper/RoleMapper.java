@@ -18,9 +18,14 @@
 package io.github.yangxj96.spectra.core.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
+import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -66,4 +71,19 @@ public interface RoleMapper extends BaseMapper<Role> {
      */
     int insertRelevanceRole(@Param("id") Long id, @Param("uid") Long uid, @Param("rid") Long roleId);
 
+    /**
+     * 根据角色ID获取角色关联的权限列表
+     *
+     * @param id 角色ID
+     * @return 关联的权限列表
+     */
+    List<Authority> getAuthorityById(long id);
+
+    /**
+     * 根据角色ID获取角色关联的菜单列表
+     *
+     * @param id 角色ID
+     * @return 关联的菜单列表
+     */
+    List<Menu> getMenuById(long id);
 }

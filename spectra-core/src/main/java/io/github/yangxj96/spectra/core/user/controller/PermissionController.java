@@ -23,9 +23,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
+import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
+import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 import io.github.yangxj96.spectra.core.user.service.PermissionService;
 import jakarta.annotation.Resource;
@@ -108,4 +114,50 @@ public class PermissionController {
     public List<AuthorityTreeVO> authorityTree() {
         return bindService.authorityTree();
     }
+
+    @ULog("获取角色关联的权限列表")
+    @GetMapping("/role/{roleId}/authority")
+    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return bindService.getRoleRelevanceAuthorityByRoleId(id);
+        } catch (Exception e) {
+            throw new RuntimeException("参数转换失败");
+        }
+    }
+
+    @ULog("获取角色关联的菜单列表")
+    @GetMapping("/role/{roleId}/menu")
+    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return bindService.getRoleRelevanceMenuByRoleId(id);
+        } catch (Exception e) {
+            throw new RuntimeException("参数转换失败");
+        }
+    }
+
+
+    @ULog("保存角色关联的权限列表")
+    @PostMapping("/role/{roleId}/authority")
+    public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            bindService.saveRoleRelevanceAuthorityByRoleId(id, from);
+        } catch (Exception e) {
+            throw new RuntimeException("参数转换失败");
+        }
+    }
+
+    @ULog("保存角色关联的菜单列表")
+    @PostMapping("/role/{roleId}/menu")
+    public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            bindService.saveRoleRelevanceMenuByRoleId(id, from);
+        } catch (Exception e) {
+            throw new RuntimeException("参数转换失败");
+        }
+    }
+
 }

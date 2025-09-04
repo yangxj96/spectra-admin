@@ -88,6 +88,7 @@ const responseRejected = (error: AxiosError) => {
             case 401: {
                 ElMessage.error({
                     message: result.msg,
+                    duration: 2000,
                     onClose: () => {
                         GlobalUtils.exit();
                     }
@@ -99,12 +100,16 @@ const responseRejected = (error: AxiosError) => {
                 return;
             }
             default: {
-                ElMessage.error((error.response?.data as IResult).msg);
+                ElMessage.error({
+                    duration: 2000,
+                    message: (error.response?.data as IResult).msg
+                });
             }
         }
     } else {
         ElMessage.error({
             type: "error",
+            duration: 2000,
             message: "网络错误,请检查网络"
         });
     }

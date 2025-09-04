@@ -78,19 +78,18 @@ public class PermissionServiceImpl implements PermissionService {
         }
         Role maxRole = roles
                 .stream()
-                .min(Comparator.comparingInt(Role::getScope))
+                .min(Comparator.comparing(role -> role.getScope().getValue()))
                 .orElse(null);
         if (maxRole == null || maxRole.getScope() == null) {
             throw new RuntimeException("无角色或角色配置异常");
         }
         return switch (maxRole.getScope()) {
             // 全局
-            case 0 -> organizationService.list();
+            case ALL -> organizationService.list();
             // 本级及以下
-            case 1 -> organizationService.getAllChildrenById(user.getOrganizationId());
+            case DEPT_AND_CHILD -> organizationService.getAllChildrenById(user.getOrganizationId());
             // 本级
-            case 2 -> List.of(organizationService.getById(user.getOrganizationId()));
-            default -> List.of();
+            case DEPT_ONLY -> List.of(organizationService.getById(user.getOrganizationId()));
         };
     }
 
