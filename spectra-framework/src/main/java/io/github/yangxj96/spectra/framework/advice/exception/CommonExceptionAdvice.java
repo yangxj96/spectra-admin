@@ -116,7 +116,7 @@ public class CommonExceptionAdvice {
 
         var errors = e.getBindingResult().getAllErrors();
         if (!errors.isEmpty()) {
-            return R.failure(HttpStatus.BAD_REQUEST, errors.get(0).getDefaultMessage());
+            return R.failure(HttpStatus.BAD_REQUEST, errors.getFirst().getDefaultMessage());
         } else {
             return R.failure(HttpStatus.BAD_REQUEST);
         }

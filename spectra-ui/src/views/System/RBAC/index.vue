@@ -64,13 +64,15 @@ function handleRoleConditionQuery() {
 
 // 清理右边两棵树的选中状态
 function cleanTreeCheckState() {
-    authority_tree.value?.forEach(item => {
-        powerRef.value?.setChecked(item.id, false, true);
-    });
+    if (authority_tree.value)
+        for (const item of authority_tree.value) {
+            powerRef.value?.setChecked(item.id, false, true);
+        }
 
-    menu_tree.value?.forEach(item => {
-        menuRef.value?.setChecked(item.id, false, true);
-    });
+    if (menu_tree.value)
+        for (const item of menu_tree.value) {
+            menuRef.value?.setChecked(item.id, false, true);
+        }
 }
 
 // 角色列表行被单机
@@ -180,9 +182,7 @@ function handleSaveRoleMenu() {
                 <el-table-column align="center" width="150" prop="name" label="名称" />
                 <el-table-column align="center" width="120" prop="code" label="标识" show-overflow-tooltip />
                 <el-table-column align="center" width="60" prop="level" label="级别">
-                    <template v-slot:default="scope">
-                        1
-                    </template>
+                    <template v-slot:default="scope">1</template>
                 </el-table-column>
                 <el-table-column align="center" width="120" prop="scope" label="范围" />
                 <el-table-column align="center" width="120" label="状态">
@@ -247,7 +247,6 @@ function handleSaveRoleMenu() {
     </el-row>
     <!-- 角色编辑框 -->
     <role-edit v-model:show="edit.dialog" v-model:form="edit.form" />
-
 </template>
 
 <style scoped lang="scss">

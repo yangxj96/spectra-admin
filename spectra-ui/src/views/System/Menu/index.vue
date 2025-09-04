@@ -95,7 +95,7 @@ async function handleMenuSave() {
             <el-form-item>
                 <el-button type="primary" @click="handleCriteriaQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleMenuAddDialog">新增</el-button>
+                <el-button v-owner="'MENU:INSERT'" @click="handleMenuAddDialog">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -122,10 +122,20 @@ async function handleMenuSave() {
             <el-table-column align="center" prop="sort" label="排序" />
             <el-table-column align="center" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="handleTableItemModify(scope.row)">
+                    <el-button
+                        v-owner="'MENU:UPDATE'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleTableItemModify(scope.row)">
                         编辑
                     </el-button>
-                    <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
+                    <el-button
+                        v-owner="'MENU:DELETE'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleTableItemDelete(scope.row)">
                         删除
                     </el-button>
                 </template>

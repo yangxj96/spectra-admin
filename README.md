@@ -5,7 +5,7 @@
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.4-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.17-green)
-![MySQL](https://img.shields.io/badge/MySQL-8.4.4-blue)
+![达梦8](https://img.shields.io/badge/DM-8-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
 ---
@@ -33,7 +33,7 @@
 | MyBatis-Plus    | 3.5.12 | 增强ORM，简化CRUD   |
 | Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
-| DM8(兼容Oracle模式) | 8      | 国产数据库          |
+| DM8(兼容Oracle模式) | 8      | 国产关系型数据库       |
 | Jasypt          | 3.0.5  | 配置加密，保障敏感信息安全  |
 
 > ✅ 所有依赖均采用当前稳定最新版，并将持续跟进生态更新。

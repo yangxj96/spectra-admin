@@ -18,6 +18,8 @@ type AuthorityTree = Authority & {
 type Role = BaseEntity & {
     //角色名称
     name: string;
+    // 角色代码
+    code: string;
     //角色状态
     state: boolean;
     //角色范围

@@ -101,11 +101,11 @@ initData();
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary">查询</el-button>
-                    <el-button @click="handleDialogOpen('DictGroup')">
+                    <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictGroup')">
                         <icons name="icon-edit" />
                         新增字典组
                     </el-button>
-                    <el-button @click="handleDialogOpen('DictData')">
+                    <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictData')">
                         <icons name="icon-edit" />
                         新增字典数据
                     </el-button>
@@ -132,6 +132,7 @@ initData();
                             <icons v-if="data.builtin" name="icon-builtin" class-name="icon-sidebar" />
                             <el-button
                                 v-if="!data.builtin"
+                                v-owner="'DICT:UPDATE'"
                                 class="tree-node__label-btn"
                                 link
                                 type="primary"
@@ -157,17 +158,26 @@ initData();
                         </template>
                     </el-table-column>
                     <el-table-column align="center" label="备注" prop="remark" :show-overflow-tooltip="true" />
-                    <el-table-column v-if="!currentGroup?.builtin" align="center" label="操作">
+                    <el-table-column
+                        v-show="!currentGroup?.builtin"
+                        v-owner.or="['DICT:UPDATE', 'DICT:DELETE']"
+                        align="center"
+                        label="操作">
                         <template #default="scope">
-                            <el-button link type="primary" @click="handleDialogOpen('DictData', scope.row)">
+                            <el-button
+                                v-owner="'DICT:UPDATE'"
+                                link
+                                type="primary"
+                                @click="handleDialogOpen('DictData', scope.row)">
                                 编辑
                             </el-button>
-                            <el-button link type="primary">删除</el-button>
+                            <el-button v-owner="'DICT:DELETE'" link type="primary">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
             </el-col>
         </el-row>
+
         <!-- 动态组件,字典组或者字典数据的编辑或新增弹框 -->
         <component
             :is="dynamic.component"

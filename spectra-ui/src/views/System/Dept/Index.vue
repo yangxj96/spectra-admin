@@ -86,7 +86,7 @@ async function handleOrganizationSave() {
             <el-form-item>
                 <el-button type="primary" @click="handleCriteriaQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleDialogOpen({} as Organization)">新增</el-button>
+                <el-button v-owner="'DEPT:INSERT'" @click="handleDialogOpen({} as Organization)">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -106,8 +106,20 @@ async function handleOrganizationSave() {
             <el-table-column align="center" prop="remark" label="说明" show-overflow-tooltip />
             <el-table-column align="center" label="操作">
                 <template #default="scope">
-                    <el-button link type="primary" size="small" @click="handleDialogOpen(scope.row)">编辑</el-button>
-                    <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
+                    <el-button
+                        v-owner="'DEPT:UPDATE'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleDialogOpen(scope.row)">
+                        编辑
+                    </el-button>
+                    <el-button
+                        v-owner="'DEPT:DELETE'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleTableItemDelete(scope.row)">
                         删除
                     </el-button>
                 </template>

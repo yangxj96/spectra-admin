@@ -1,21 +1,40 @@
-import type { Directive, DirectiveBinding } from "vue";
-import useUserStore from "@/plugin/store/modules/useUserStore";
-import CommonUtils from "@/utils/CommonUtils";
+import type { Directive } from "vue";
+import useUserStore from "@/plugin/store/modules/useUserStore.ts";
 
-let del: boolean = false;
-
+/**
+ * v-owner 指令
+ * 支持：
+ * - v-owner="'USER:INSERT'"
+ * - v-owner="['USER:INSERT', 'ROLE:ADMIN']"        → AND（默认）
+ * - v-owner.or="['USER:INSERT', 'USER:UPDATE']"    → OR
+ */
 export default {
-    created(element: HTMLElement, binging: DirectiveBinding<string>) {
-        const authority = useUserStore().token.authorities;
-        if (!authority.includes(binging.value)) {
-            element.hidden = true;
-            del = true;
-        }
+    mounted(el, binding) {
+        checkPermission(el, binding);
     },
-    mounted(element: HTMLElement) {
-        if (del) {
-            element.id = CommonUtils.UUID();
-            document.querySelector("#" + element.id)?.remove();
-        }
+    // 可选
+    updated(el, binding) {
+        checkPermission(el, binding);
     }
 } as Directive;
+
+function checkPermission(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {
+    const userStore = useUserStore();
+    const { value, modifiers } = binding;
+    if (!value) {
+        console.warn("[v-owner] 缺少绑定值");
+        el.remove();
+        return;
+    }
+    const requiredPerms: string[] = Array.isArray(value) ? value : [value];
+    let hasAccess: boolean;
+    hasAccess = modifiers.or
+        ? requiredPerms.some(perm => userStore.hasPermission(perm))
+        : requiredPerms.every(perm => userStore.hasPermission(perm));
+    if (hasAccess) {
+        el.style.display = ""; // 恢复显示
+    } else {
+        // el.style.display = "none"; // 隐藏（保留 DOM 结构）
+        el.remove(); // 或使用 el.remove() 彻底移除
+    }
+}

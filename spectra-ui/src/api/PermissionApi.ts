@@ -35,11 +35,11 @@ export default {
         return http.get<IResult<Menu[]>>(`/api/permission/role/${roleId}/menu`).then(res => res.data);
     },
     // 获取当前角色下有哪些权限
-    async saveRoleAuthority(params: { role_id: string, authority_ids: TreeKey[] | undefined }): Promise<IResult> {
+    async saveRoleAuthority(params: { role_id: string; authority_ids: TreeKey[] | undefined }): Promise<IResult> {
         return http.post<IResult>(`/api/permission/role/${params.role_id}/authority`, params).then(res => res.data);
     },
     // 获取当前角色下有哪些菜单
-    async saveRoleMenu(params: { role_id: string, menu_ids: TreeKey[] | undefined }): Promise<IResult> {
+    async saveRoleMenu(params: { role_id: string; menu_ids: TreeKey[] | undefined }): Promise<IResult> {
         return http.post<IResult>(`/api/permission/role/${params.role_id}/menu`, params).then(res => res.data);
     }
 };

@@ -6,8 +6,6 @@ import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class PermissionControllerTest {
 
@@ -17,20 +15,18 @@ class PermissionControllerTest {
 
 
     @Test
-    void addAuthority(){
+    void addAuthority() {
         Authority dictAuthority = Authority.builder()
                 .pid(1L)
-                .name("字典管理")
-                .code("DICT:*")
+                .name("角色管理")
+                .code("USER:*")
                 .build();
 
         authorityService.save(dictAuthority);
-
-        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("字典新增").code("DICT:INSERT").build());
-        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("字典删除").code("DICT:DELETE").build());
-        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("字典修改").code("DICT:UPDATE").build());
+        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("用户新增").code("USER:INSERT").build());
+        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("用户删除").code("USER:DELETE").build());
+        authorityService.save(Authority.builder().pid(dictAuthority.getId()).name("用户修改").code("USER:UPDATE").build());
     }
-
 
 
 }
