@@ -28,6 +28,7 @@ import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.mapper.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.user.mapper.RelRoleMenuMapper;
 import io.github.yangxj96.spectra.core.user.mapper.RoleMapper;
@@ -158,4 +159,6 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
             roleMenuService.saveBatch(newMenu);
         }
     }
+
+
 }

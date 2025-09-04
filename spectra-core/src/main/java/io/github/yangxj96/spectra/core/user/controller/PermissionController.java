@@ -137,7 +137,6 @@ public class PermissionController {
         }
     }
 
-
     @ULog("保存角色关联的权限列表")
     @PostMapping("/role/{roleId}/authority")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
