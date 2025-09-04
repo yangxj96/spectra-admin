@@ -30,13 +30,7 @@ import java.util.*;
  * @version 1.0
  * @since 2025-6-14
  */
-public final class TreeBuilder<T extends Tree<T>> {
-
-    private final List<T> dataList;
-
-    public TreeBuilder(List<T> dataList) {
-        this.dataList = dataList;
-    }
+public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
 
     /**
      * 构建树形结构
