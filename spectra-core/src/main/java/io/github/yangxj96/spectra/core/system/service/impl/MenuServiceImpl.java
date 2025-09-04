@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.auth.service.PermissionService;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.system.javabean.mapstruct.MenuMapstruct;
@@ -47,9 +48,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Resource
     private MenuMapstruct mapstruct;
 
+    @Resource
+    private PermissionService permissionService;
+
     @Override
     public List<MenuTreeVO> tree() {
-        List<Menu> menus = this.list();
+        List<Menu> menus = permissionService.getCurrentMenus();
         // 先转树形VO
         List<MenuTreeVO> vos = mapstruct.toTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);

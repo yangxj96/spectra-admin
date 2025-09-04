@@ -4,6 +4,7 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.yangxj96.spectra.core.auth.service.PermissionService;
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.service.OrganizationService;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -103,5 +105,16 @@ public class PermissionServiceImpl implements PermissionService {
      */
     private boolean absoluteness() {
         return StpUtil.hasRole(ADMINISTRATORS);
+    }
+
+
+    @Override
+    public List<Menu> getCurrentMenus() {
+        List<Role> roles = roleService.getByUserId(StpUtil.getLoginIdAsLong());
+        List<Menu> menus = new ArrayList<>();
+        for (Role role : roles) {
+            menus.addAll(roleService.getMenuById(role.getId()));
+        }
+        return menus.stream().distinct().toList();
     }
 }

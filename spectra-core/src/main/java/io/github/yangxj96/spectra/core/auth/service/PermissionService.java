@@ -1,5 +1,6 @@
 package io.github.yangxj96.spectra.core.auth.service;
 
+import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 
 import java.util.List;
@@ -33,4 +34,11 @@ public interface PermissionService {
      * @return 组织机构ID列表
      */
     List<Organization> getCurrentDataScope();
+
+    /**
+     * 获取当前用户菜单
+     * @return 用户菜单
+     */
+    List<Menu> getCurrentMenus();
+
 }
