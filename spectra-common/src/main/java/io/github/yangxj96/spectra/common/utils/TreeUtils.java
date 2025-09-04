@@ -3,7 +3,9 @@ package io.github.yangxj96.spectra.common.utils;
 import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -21,10 +23,10 @@ public class TreeUtils {
      * @param <T>         实现 Tree<T> 的具体类型
      * @return 压缩处理后的选中ID集合
      */
-    public static <T extends Tree<T>> List<Long> compressSelectedNodes(List<T> tree, List<Long> selectedIds, Function<T, Long> idExtractor) {
-        List<Long> result = new ArrayList<>();
+    public static <T extends Tree<T>> Set<Long> compressSelectedNodes(List<T> tree, Set<Long> selectedIds, Function<T, Long> idExtractor) {
+        Set<Long> result = new HashSet<>();
         for (T node : tree) {
-            List<Long> nodeResult = new ArrayList<>();
+            Set<Long> nodeResult = new HashSet<>();
             collectCompressedIds(node, selectedIds, idExtractor, nodeResult);
             result.addAll(nodeResult);
         }
@@ -34,7 +36,7 @@ public class TreeUtils {
     /**
      * 递归收集压缩后的节点ID
      */
-    private static <T extends Tree<T>> boolean collectCompressedIds(T node, List<Long> selectedIds, Function<T, Long> idExtractor, List<Long> result) {
+    private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<Long> selectedIds, Function<T, Long> idExtractor, Set<Long> result) {
 
         if (node == null) return false;
 
@@ -54,10 +56,10 @@ public class TreeUtils {
 
         // 非叶子节点：递归处理子节点
         boolean allChildrenSelected = true;
-        List<List<Long>> childResults = new ArrayList<>();
+        List<Set<Long>> childResults = new ArrayList<>();
 
         for (T child : children) {
-            List<Long> childResult = new ArrayList<>();
+            Set<Long> childResult = new HashSet<>();
             boolean isSelected = collectCompressedIds(child, selectedIds, idExtractor, childResult);
             childResults.add(childResult);
             if (!isSelected) {
@@ -72,7 +74,7 @@ public class TreeUtils {
         }
 
         // 否则，保留子节点的结果
-        for (List<Long> childResult : childResults) {
+        for (Set<Long> childResult : childResults) {
             result.addAll(childResult);
         }
 
