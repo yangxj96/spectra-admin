@@ -17,7 +17,6 @@
 
 package io.github.yangxj96.spectra.core.user.javabean.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import io.github.yangxj96.spectra.common.enums.AuthScope;
@@ -51,25 +50,26 @@ public class RoleVO implements Serializable {
     /**
      * 名称
      */
-    @TableField(value = "\"name\"")
     private String name;
 
     /**
      * 状态
      */
-    @TableField(value = "\"state\"")
     private Boolean state;
+
+    /**
+     * 编码
+     */
+    private String code;
 
     /**
      * 范围
      */
-    @TableField(value = "\"scope\"")
     private AuthScope scope;
 
     /**
      * 备注
      */
-    @TableField(value = "remark")
     private String remark;
 
 }

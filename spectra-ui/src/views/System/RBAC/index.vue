@@ -176,10 +176,16 @@ function handleSaveRoleMenu() {
                 style="width: 100%"
                 class="loading-box"
                 @row-click="handleRoleTableRowClick">
-                <el-table-column align="center" label="序号" width="60" type="index" />
-                <el-table-column align="center" prop="name" width="220" label="名称" />
-                <el-table-column align="center" width="220" prop="scope" label="范围" />
-                <el-table-column align="center" width="220" label="状态">
+                <el-table-column align="center" width="060" type="index" label="序号" />
+                <el-table-column align="center" width="150" prop="name" label="名称" />
+                <el-table-column align="center" width="120" prop="code" label="标识" show-overflow-tooltip />
+                <el-table-column align="center" width="60" prop="level" label="级别">
+                    <template v-slot:default="scope">
+                        1
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" width="120" prop="scope" label="范围" />
+                <el-table-column align="center" width="120" label="状态">
                     <template #default="scope">
                         <el-tag :type="scope.row.state ? 'primary' : 'danger'">
                             {{ scope.row.state ? "启用" : "禁用" }}
