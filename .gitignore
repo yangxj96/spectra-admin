@@ -13,6 +13,8 @@ document/jar
 .env.*
 files
 spectra-files
+# 忽略特定测试文件
+**/src/test/**/jasypt/**.java
 
 ## autoimport
 auto-imports.d.ts
