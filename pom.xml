@@ -41,6 +41,8 @@
         <kaptcha.version>2.3.3</kaptcha.version>
         <bitwalker.version>1.21</bitwalker.version>
         <oshi.version>6.8.1</oshi.version>
+        <jasypt.version>3.0.5</jasypt.version>
+        <mica.version>3.5.4</mica.version>
 
     </properties>
 
@@ -151,6 +153,24 @@
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
+            <!-- 配置加解密 -->
+            <dependency>
+                <groupId>com.github.ulisesbocchio</groupId>
+                <artifactId>jasypt-spring-boot-starter</artifactId>
+                <version>${jasypt.version}</version>
+            </dependency>
+            <!-- XSS攻击防范 -->
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-xss</artifactId>
+                <version>${mica.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-core</artifactId>
+                <version>${mica.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 

@@ -16,6 +16,4 @@ if (navigationEntry?.type === "reload") {
 // 创建APP
 const app = createApp(App);
 loadPlugins(app);
-app
-    .directive("owner", Owner)
-    .mount("#app");
+app.directive("owner", Owner).mount("#app");
