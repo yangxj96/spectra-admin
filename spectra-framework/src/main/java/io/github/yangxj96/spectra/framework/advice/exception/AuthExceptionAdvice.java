@@ -58,6 +58,9 @@ public class AuthExceptionAdvice {
         if (e.getCode() == SaErrorCode.CODE_11016) {
             return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
         }
+        if (e.getCode() == SaErrorCode.CODE_11012) {
+            return R.failure(HttpStatus.UNAUTHORIZED, "无效token，请重新登录以继续。");
+        }
         return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
     }
 

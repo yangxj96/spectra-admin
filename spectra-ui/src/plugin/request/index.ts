@@ -1,9 +1,9 @@
 import axios, { type AxiosError, type AxiosResponse, type Canceler, type InternalAxiosRequestConfig } from "axios";
 import { hideLoading, showLoading } from "@/plugin/element/loading";
-import { ElMessage } from "element-plus/es";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
 import qs from "qs";
+import { ElMessageBox, ElNotification } from "element-plus";
 
 // 常见内容类型
 // application/x-www-form-urlencoded
@@ -78,6 +78,8 @@ const responseFulfilled = (response: AxiosResponse<IResult>) => {
 
 // 网络错误、请求未完成,HTTP 状态码为 4xx、5xx
 const responseRejected = (error: AxiosError) => {
+    // 出现错误,关闭loading,尝试停止还没请求完的接口
+    stopAllRequest();
     hideLoading();
     if (error.name === "CanceledError") {
         return Promise.reject(error);
@@ -86,12 +88,10 @@ const responseRejected = (error: AxiosError) => {
         let result = error.response?.data as IResult;
         switch (error.response?.status) {
             case 401: {
-                ElMessage.error({
-                    message: result.msg,
-                    duration: 2000,
-                    onClose: () => {
-                        GlobalUtils.exit();
-                    }
+                ElMessageBox.alert(result.msg, "认证异常", {
+                    type: "error"
+                }).finally(() => {
+                    GlobalUtils.exit();
                 });
                 return;
             }
@@ -100,16 +100,13 @@ const responseRejected = (error: AxiosError) => {
                 return;
             }
             default: {
-                ElMessage.error({
-                    duration: 2000,
+                ElNotification.error({
                     message: (error.response?.data as IResult).msg
                 });
             }
         }
     } else {
-        ElMessage.error({
-            type: "error",
-            duration: 2000,
+        ElNotification.error({
             message: "网络错误,请检查网络"
         });
     }
