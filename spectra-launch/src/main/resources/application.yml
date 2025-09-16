@@ -104,6 +104,8 @@ spring:
       timeout: 10s
   cache:
     type: redis
+    redis:
+      time-to-live: 1h
 # XSS防范
 mica:
   xss:

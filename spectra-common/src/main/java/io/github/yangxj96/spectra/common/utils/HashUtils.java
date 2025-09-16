@@ -1,5 +1,7 @@
 package io.github.yangxj96.spectra.common.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -23,7 +25,7 @@ public final class HashUtils {
      * @param input 需要进行md5加密的字符串
      * @return 加密结果
      */
-    public static String md5(String input) {
+    public static @NotNull String md5(@NotNull String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes(StandardCharsets.UTF_8));
@@ -37,6 +39,5 @@ public final class HashUtils {
             throw new RuntimeException("Error generating MD5 hash", e);
         }
     }
-
 
 }

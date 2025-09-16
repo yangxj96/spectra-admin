@@ -4,6 +4,7 @@ import cn.dev33.satoken.annotation.SaIgnore;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import jakarta.annotation.Resource;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class TestController {
     @Resource
     private WorkflowService workflowService;
 
-
+    @Cacheable(cacheNames = "Test", keyGenerator = "keyGenerator")
     @GetMapping("/getWorkflows")
     public List<Map<String, Object>> getWorkflows() {
         var result = new ArrayList<Map<String, Object>>();

@@ -2,6 +2,7 @@ package io.github.yangxj96.spectra.framework.configure;
 
 import io.github.yangxj96.spectra.common.utils.HashUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.interceptor.KeyGenerator;
@@ -14,6 +15,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 /**
@@ -30,6 +32,9 @@ public class CacheConfiguration {
 
     private static final String PREFIX = "[缓存配置]:";
 
+    @Value("${spring.cache.redis.time-to-live}")
+    private Duration duration;
+
     /**
      * Redis缓存管理器
      *
@@ -43,6 +48,11 @@ public class CacheConfiguration {
                 .defaultCacheConfig()
                 // 是否缓存null
                 //.disableCachingNullValues()
+                // TTL配置
+                .entryTtl((k, v) -> {
+                    log.info("缓存key:{},value:{}", k, v);
+                    return duration;
+                })
                 // 缓存分隔符
                 .computePrefixWith(cacheName -> cacheName + ":")
                 // Key使用string序列化
