@@ -69,6 +69,8 @@ public interface UserMapstruct {
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "version", ignore = true)
     User toEntity(UserSaveFrom vo);
 
 
@@ -78,5 +80,13 @@ public interface UserMapstruct {
      * @param params 更新的参数
      * @param user   现有的实体
      */
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedBy", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "version", ignore = true)
     void updateUserFrom(UserSaveFrom params, @MappingTarget User user);
 }

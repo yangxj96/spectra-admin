@@ -46,6 +46,7 @@ public interface OrganizationMapstruct {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "version", ignore = true)
     Organization toEntity(OrganizationFrom from);
 
 }

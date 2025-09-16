@@ -53,6 +53,7 @@ public interface DictMapstruct {
     @Mapping(target = "deleted", ignore = true)
     @Mapping(target = "builtin", ignore = true)
     @Mapping(target = "hide", ignore = true)
+    @Mapping(target = "version", ignore = true)
     DictGroup groupFromToEntity(DictGroupFrom from);
 
     /**
@@ -66,6 +67,7 @@ public interface DictMapstruct {
     @Mapping(target = "updatedBy", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "version", ignore = true)
     DictData dataFromToEntity(DictDataFrom from);
 
     /**
