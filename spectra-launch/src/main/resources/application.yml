@@ -5,7 +5,7 @@ spectra:
     default-password: ENC(iq/PQs4zwGykj1gmBxrkNlsHlaA+GgpmeyCzgF7vnvvQbhlupijAhTHcEf+woVCD)
   # 系统配置
   system:
-    base-dir: project-files
+    base-dir: files
   # 文件相关
   file:
     upload:
@@ -34,6 +34,10 @@ server:
         same-site: none
         # 如果你用的是 HTTP，否则设为 true
         secure: true
+# 配置文件加密
+jasypt:
+  encryptor:
+    password: ${JASYPT_ENCRYPTOR_PASSWORD}
 # spring 配置
 spring:
   config:
@@ -47,10 +51,10 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: jdbc:dm://127.0.0.1:5237?compatible_mode=oracle
+    url: ${DB_URL:jdbc:dm://127.0.0.1:5237?compatible_mode=oracle}
     driver-class-name: dm.jdbc.driver.DmDriver
-    username: SPECTRA
-    password: ENC(D342pOaeSsib01Sfw+duOfz9w1575go3FConG8MlCFPZzh2DH/+fcvLcWotw1B/o2EXHG7NS2e/kDdOqwQIfWQ==)
+    username: ${DB_USERNAME:SPECTRA}
+    password: ${DB_PASSWORD:ENC(D342pOaeSsib01Sfw+duOfz9w1575go3FConG8MlCFPZzh2DH/+fcvLcWotw1B/o2EXHG7NS2e/kDdOqwQIfWQ==)}
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       # 初始化连接池大小
@@ -79,9 +83,6 @@ spring:
         enabled: true
         # 配置监控后台访问路径
         url-pattern: /druid/*
-        # 配置监控后台登录的用户名、密码
-        #login-username: admin
-        #login-password: admin
       filter:
         # 统计
         stat:
@@ -97,9 +98,6 @@ spring:
             multi-statement-allow: true
   data:
     redis:
-      # 格式 redis://user:password@example.com:6379/8
-      # 格式 redis://:[password]@[host]:[port]
-      # 密码为可选
       url: redis://127.0.0.1:6379/0
       timeout: 10s
   cache:
@@ -133,10 +131,13 @@ mybatis-plus:
 # 日志配置
 logging:
   level:
+    framework: error
     spectra: debug
     root: info
   group:
     spectra: com.yangxj96.spectra
+    framework:
+      - com.ulisesbocchio.jasyptspringboot.configuration
 # Sa-Token 配置
 sa-token:
   token-name: Authorization
@@ -178,7 +179,4 @@ management:
   endpoint:
     health:
       show-details: always
-# 配置文件加密
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD}
+

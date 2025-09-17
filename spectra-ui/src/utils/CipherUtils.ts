@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2018-2025 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 // 公钥:3059301306072a8648ce3d020106082a811ccf5501822d0342000409909a0b8504ef16988cc7e74278c15d44aced900df78a03c12a2d88ca15147a06d0afcb3747b41d26234e807fa22ae1a5c88bb9d7e86e612684452b4e8e5313
 // 私钥:308193020100301306072a8648ce3d020106082a811ccf5501822d0479307702010104200cb990a680f3de34944f15e5b9183d3172c25a1cd5ab7dd0ba5feeb441fe1240a00a06082a811ccf5501822da1440342000409909a0b8504ef16988cc7e74278c15d44aced900df78a03c12a2d88ca15147a06d0afcb3747b41d26234e807fa22ae1a5c88bb9d7e86e612684452b4e8e5313
 // 加密结果(列表):RCipher(code=0, msg=请求成功, data=643f94b895e5d4ff2a7077931ab09e4a1030927f2874b51bb15053fe0e92d1fed9ace4b84fa9b6b81166f87e92b391f24abece6510a3454fe7a4094cb638100b5fc046819677a001e5db441651cc209d32183dcd5cef2fce44fe31a4e589e1058893b2d44f800c72c6f94eeb15a805ceb5e3deb97b0b515bd995153ad2a462cc, digest=XCFnDaevandh23uUiolach1P/EoobK8vr74v6bh44M8=, sign=MEYCIQDFfnHmbCuo5VVloktM7lbyuCJNHabfe4LrfZDT7c5BcgIhAPxxR3xJlCXbagz7+o9P7iVcK+g3NGmogSFbFNoapaGr)

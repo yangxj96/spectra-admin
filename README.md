@@ -3,9 +3,9 @@
 > 一个基于 Spring Boot 3 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-21-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.4-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.17-green)
-![达梦8](https://img.shields.io/badge/DM-8-blue)
+![达梦8](https://img.shields.io/badge/达梦-8-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
 ---
@@ -48,8 +48,8 @@
 | Vue Router   | 4.5.1   | 路由管理                   |
 | Pinia        | 3.0.3   | 状态管理（Vuex替代）           |
 | @vueuse/core | 13.5.0  | 实用 Composition API 工具库 |
-| Vite         | 7.0.3   | 构建工具，极速启动              |
-| Element Plus | 2.10.3  | UI 组件库                 |
+| Vite         | 7.1.5   | 构建工具，极速启动              |
+| Element Plus | 2.11.1  | UI 组件库                 |
 | Axios        | 1.11.0  | HTTP 请求客户端             |
 | ECharts      | 5.6.0   | 数据可视化图表                |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
