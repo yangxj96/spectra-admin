@@ -32,6 +32,8 @@ import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 import io.github.yangxj96.spectra.core.user.service.PermissionService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +46,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-14
  */
+@Slf4j
 @SaCheckLogin
 @RestController
 @RequestMapping("/permission")
@@ -63,7 +66,11 @@ public class PermissionController {
     @DeleteMapping("/role/{id}")
     @SaCheckEL("@ss.hasPermission('ROLE:DELETE')")
     public void deleteRole(@PathVariable String id) {
-        // TODO 暂未实现
+        try {
+            bindService.deleteRole(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            log.error("ID转换异常", e);
+        }
     }
 
     @ULog("修改角色")
@@ -75,23 +82,23 @@ public class PermissionController {
 
     @ULog("创建权限")
     @PostMapping("/authority")
-    @SaCheckEL("@ss.hasPermission('AUTHORITY:INSERT')")
+    @SaCheckEL("@ss.administrators()")
     public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        // TODO 暂未实现
+        throw new NotImplementedException("无需实现错误");
     }
 
     @ULog("删除权限")
     @DeleteMapping("/authority/{id}")
-    @SaCheckEL("@ss.hasPermission('AUTHORITY:DELETE')")
+    @SaCheckEL("@ss.administrators()")
     public void deleteAuthority(@PathVariable String id) {
-        // TODO 暂未实现
+        throw new NotImplementedException("无需实现错误");
     }
 
     @ULog("修改权限信息")
     @PutMapping("/authority")
-    @SaCheckEL("@ss.hasPermission('AUTHORITY:UPDATE')")
+    @SaCheckEL("@ss.administrators()")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        // TODO 暂未实现
+        throw new NotImplementedException("无需实现错误");
     }
 
     @ULog("分页查询角色列表")

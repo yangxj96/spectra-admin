@@ -14,19 +14,13 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.user.service.impl;
+package io.github.yangxj96.spectra.core.user.mapper;
 
-import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
-import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
-import io.github.yangxj96.spectra.core.user.mapper.RelRoleAuthorityMapper;
-import io.github.yangxj96.spectra.core.user.service.RelRoleAuthorityService;
-import org.springframework.stereotype.Service;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import io.github.yangxj96.spectra.core.user.javabean.entity.RelUserRole;
 
 /**
- * 角色关联权限中间表服务层
+ * 角色关联权限中间表
  */
-@Service
-public class RelRoleAuthorityServiceImpl
-        extends BaseServiceImpl<RelRoleAuthorityMapper, RelRoleAuthority>
-        implements RelRoleAuthorityService {
+public interface RelUserRoleMapper extends BaseMapper<RelUserRole> {
 }

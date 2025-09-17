@@ -47,6 +47,13 @@ public interface PermissionService {
     void createdRole(RoleFrom params);
 
     /**
+     * 根据ID删除角色,同时会移除此角色和用户管理的关联关系
+     *
+     * @param id 角色ID
+     */
+    void deleteRole(Long id);
+
+    /**
      * 修改角色
      *
      * @param params 角色入参实体
@@ -107,4 +114,5 @@ public interface PermissionService {
      * @param from 入参条件
      */
     void saveRoleRelevanceMenuByRoleId(long id, RoleMenuFrom from);
+
 }

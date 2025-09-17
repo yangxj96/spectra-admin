@@ -103,7 +103,7 @@ public class JVMInfoVO {
     /**
      * 系统属性
      */
-    private Map<String,String> systemProperties;
+    private Map<String, String> systemProperties;
 
     /**
      * 运行时类路径

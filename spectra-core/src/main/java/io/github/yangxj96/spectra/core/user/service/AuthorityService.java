@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.user.service;
 
 import io.github.yangxj96.spectra.common.base.BaseService;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
+import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
 
 import java.util.List;
 
@@ -31,10 +32,11 @@ import java.util.List;
 public interface AuthorityService extends BaseService<Authority> {
 
     /**
-     * 根据角色ID获取权限列表
+     * 根据关联表信息获取权限列表
      *
-     * @param roleIds 角色ID列表
+     * @param relRoleAuthorities 中间表列表
      * @return 权限列表
      */
-    List<Authority> getByRoleIds(List<Long> roleIds);
+    List<Authority> getByRelRoleAuthority(List<RelRoleAuthority> relRoleAuthorities);
+
 }

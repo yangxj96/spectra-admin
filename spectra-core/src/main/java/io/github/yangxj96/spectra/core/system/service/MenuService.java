@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
+import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
 
 import java.util.List;
 
@@ -52,4 +53,12 @@ public interface MenuService extends IService<Menu> {
      * @param params 修改参数
      */
     void modify(MenuSaveFrom params);
+
+    /**
+     * 根据关联表信息获取菜单列表
+     *
+     * @param relRoleMenus 中间表列表
+     * @return 权限列表
+     */
+    List<Menu> getByRelRoleMenu(List<RelRoleMenu> relRoleMenus);
 }

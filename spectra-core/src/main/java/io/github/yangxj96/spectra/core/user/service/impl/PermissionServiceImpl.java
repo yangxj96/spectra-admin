@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.constant.Common;
+import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.common.utils.TreeUtils;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
@@ -80,6 +81,19 @@ public class PermissionServiceImpl implements PermissionService {
         Role role = new Role();
         BeanUtils.copyProperties(params, role);
         roleService.save(role);
+    }
+
+    @Override
+    @Transactional
+    public void deleteRole(Long id) {
+        Role role = roleService.getById(id);
+        if (role == null) {
+            throw new DataNotExistException("角色不存在");
+        }
+        // 先清理关联的
+        roleService.clearRoleRel(role.getId());
+        // 在删除角色
+        roleService.removeById(role.getId());
     }
 
     @Override
@@ -150,5 +164,6 @@ public class PermissionServiceImpl implements PermissionService {
     public void saveRoleRelevanceMenuByRoleId(long id, RoleMenuFrom from) {
         roleService.saveMenuById(id, from);
     }
+
 
 }

@@ -51,30 +51,30 @@ public interface RoleService extends BaseService<Role> {
     List<Long> getRoleIdsByUserId(Long uid);
 
     /**
-     * 删除关联的角色列表
-     *
-     * @param uid 用户ID
-     * @return 删除的条目数
-     */
-    int removeRelevanceRoles(Long uid);
-
-    /**
-     * 删除关联的角色列表(指定角色列表)
-     *
-     * @param uid     用户ID
-     * @param roleIds 角色列表
-     * @return 删除的条目数
-     */
-    int removeRelevanceRoles(Long uid, List<Long> roleIds);
-
-    /**
-     * 新增关联角色列表
+     * 新增用户关联关系
      *
      * @param uid     用户ID
      * @param roleIds 角色ID
      * @return 新增的条目数
      */
-    int insertRelevanceRoles(Long uid, List<Long> roleIds);
+    int insertUserRel(Long uid, List<Long> roleIds);
+
+    /**
+     * 移除用户关联关系
+     *
+     * @param uid 用户ID
+     * @return 删除的条目数
+     */
+    int removeUserRel(Long uid);
+
+    /**
+     * 移除用户关联关系
+     *
+     * @param uid     用户ID
+     * @param roleIds 角色列表
+     * @return 删除的条目数
+     */
+    int removeUserRel(Long uid, List<Long> roleIds);
 
     /**
      * 根据角色ID获取角色关联的权限列表
@@ -82,7 +82,15 @@ public interface RoleService extends BaseService<Role> {
      * @param id 角色ID
      * @return 关联的权限列表
      */
-    List<Authority> getAuthorityById(long id);
+    List<Authority> getAuthorityById(List<Long> ids);
+
+    /**
+     * 根据角色ID获取角色关联的权限列表
+     *
+     * @param id 角色ID
+     * @return 关联的权限列表
+     */
+    List<Authority> getAuthorityById(Long id);
 
     /**
      * 根据角色ID获取角色关联的菜单列表
@@ -90,7 +98,7 @@ public interface RoleService extends BaseService<Role> {
      * @param id 角色ID
      * @return 关联的菜单列表
      */
-    List<Menu> getMenuById(long id);
+    List<Menu> getMenuById(Long id);
 
     /**
      * 根据角色ID保存角色关联的权限列表
@@ -98,7 +106,7 @@ public interface RoleService extends BaseService<Role> {
      * @param id   角色ID
      * @param from 入参条件
      */
-    void saveAuthorityById(long id, RoleAuthorityFrom from);
+    void saveAuthorityById(Long id, RoleAuthorityFrom from);
 
     /**
      * 根据角色ID保存角色关联的菜单列表
@@ -106,5 +114,12 @@ public interface RoleService extends BaseService<Role> {
      * @param id   角色ID
      * @param from 入参条件
      */
-    void saveMenuById(long id, RoleMenuFrom from);
+    void saveMenuById(Long id, RoleMenuFrom from);
+
+    /**
+     * 清理这个角色的所有关联关系
+     *
+     * @param id 角色ID
+     */
+    void clearRoleRel(Long id);
 }

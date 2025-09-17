@@ -75,7 +75,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private BCryptPasswordEncoder passwordEncoder;
 
     @Resource
-    private UserProperties properties;
+    private UserProperties userProperties;
 
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
@@ -113,12 +113,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     public void create(UserSaveFrom params) {
         var entity = mapstruct.toEntity(params);
         // 填充默认密码
-        entity.setPassword(passwordEncoder.encode(properties.getDefaultPassword()));
+        entity.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
         if (!this.save(entity)) {
             throw new DataSaveException("保存用户信息异常");
         }
         // 关联角色
-        roleService.insertRelevanceRoles(entity.getId(), params.getRoleIds());
+        roleService.insertUserRel(entity.getId(), params.getRoleIds());
     }
 
     @Override
@@ -140,20 +140,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var roleToDelete = new HashSet<>(currentRoles);
         roleToDelete.removeAll(targetRoles);
 
-        // 计算要插入的角色
-        var roleToInsert = new HashSet<>(targetRoles);
-        roleToInsert.removeAll(currentRoles);
-
         if (!roleToDelete.isEmpty()) {
             List<Long> deleteList = List.copyOf(roleToDelete);
-            if (roleService.removeRelevanceRoles(entity.getId(), deleteList) != deleteList.size()) {
+            if (roleService.removeUserRel(entity.getId(), deleteList) != deleteList.size()) {
                 throw new EntityUpdateException("删除角色关联失败，未完全删除");
             }
         }
 
+        // 计算要插入的角色
+        var roleToInsert = new HashSet<>(targetRoles);
+        roleToInsert.removeAll(currentRoles);
+
         if (!roleToInsert.isEmpty()) {
             List<Long> insertList = List.copyOf(roleToInsert);
-            if (roleService.insertRelevanceRoles(entity.getId(), insertList) != insertList.size()) {
+            if (roleService.insertUserRel(entity.getId(), insertList) != insertList.size()) {
                 throw new EntityUpdateException("新增角色关联失败，未完全插入");
             }
         }
@@ -169,7 +169,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 强制注销账号登录信息
         StpUtil.logout(user.getId());
         // 先删除角色关联
-        roleService.removeRelevanceRoles(user.getId());
+        roleService.removeUserRel(user.getId());
         // 删除用户信息
         this.removeById(user);
     }
@@ -179,7 +179,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     public void passwordResetById(String uid) {
         try {
             var user = this.getById(Long.parseLong(uid));
-            user.setPassword(passwordEncoder.encode(properties.getDefaultPassword()));
+            user.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
             this.baseMapper.updateById(user);
         } catch (Exception e) {
             throw new DataNotExistException("用户不存在");

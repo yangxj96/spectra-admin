@@ -16,12 +16,17 @@
 
 package io.github.yangxj96.spectra.core.user.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
+import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
 import io.github.yangxj96.spectra.core.user.mapper.AuthorityMapper;
 import io.github.yangxj96.spectra.core.user.service.AuthorityService;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,9 +39,12 @@ import java.util.List;
 @Service
 public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Authority> implements AuthorityService {
 
-
     @Override
-    public List<Authority> getByRoleIds(List<Long> roleIds) {
-        return this.baseMapper.getByRoleIds(roleIds);
+    public List<Authority> getByRelRoleAuthority(List<RelRoleAuthority> relRoleAuthorities) {
+        if (relRoleAuthorities == null || CollectionUtils.isEmpty(relRoleAuthorities)) {
+            return new ArrayList<>();
+        }
+        List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
+        return this.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
     }
 }

@@ -61,6 +61,14 @@ public class PermissionServiceImpl implements PermissionService {
     private UserService userService;
 
     @Override
+    public void administrators() {
+        if (absoluteness()) {
+            return;
+        }
+        throw new NotPermissionException("权限不足");
+    }
+
+    @Override
     public void hasPermission(String permission) {
         if (absoluteness()) {
             return;

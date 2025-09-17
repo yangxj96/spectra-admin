@@ -16,7 +16,9 @@
 
 package io.github.yangxj96.spectra.core.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
@@ -27,11 +29,14 @@ import io.github.yangxj96.spectra.core.system.javabean.mapstruct.MenuMapstruct;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.system.mapper.MenuMapper;
 import io.github.yangxj96.spectra.core.system.service.MenuService;
+import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -75,5 +80,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         Menu menu = new Menu();
         BeanUtils.copyProperties(params, menu);
         this.updateById(menu);
+    }
+
+    @Override
+    public List<Menu> getByRelRoleMenu(List<RelRoleMenu> relRoleMenus) {
+        if (relRoleMenus == null || CollectionUtils.isEmpty(relRoleMenus)) {
+            return new ArrayList<>();
+        }
+        List<Long> menuIds = relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList();
+        return this.list(new LambdaQueryWrapper<Menu>().in(BaseEntity::getId, menuIds));
     }
 }

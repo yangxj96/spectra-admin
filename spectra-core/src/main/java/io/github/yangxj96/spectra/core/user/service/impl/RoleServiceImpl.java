@@ -17,25 +17,25 @@
 package io.github.yangxj96.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
-import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
-import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
-import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
-import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
+import io.github.yangxj96.spectra.core.system.service.MenuService;
+import io.github.yangxj96.spectra.core.user.javabean.entity.*;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
+import io.github.yangxj96.spectra.core.user.mapper.RelRoleAuthorityMapper;
+import io.github.yangxj96.spectra.core.user.mapper.RelRoleMenuMapper;
+import io.github.yangxj96.spectra.core.user.mapper.RelUserRoleMapper;
 import io.github.yangxj96.spectra.core.user.mapper.RoleMapper;
-import io.github.yangxj96.spectra.core.user.service.RelRoleAuthorityService;
-import io.github.yangxj96.spectra.core.user.service.RelRoleMenuService;
+import io.github.yangxj96.spectra.core.user.service.AuthorityService;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -51,56 +51,109 @@ import java.util.stream.Collectors;
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 
     @Resource
-    private RelRoleAuthorityService roleAuthorityService;
+    private AuthorityService authorityService;
 
     @Resource
-    private RelRoleMenuService roleMenuService;
+    private MenuService menuService;
+
+    @Resource
+    private RelRoleAuthorityMapper roleAuthorityMapper;
+
+    @Resource
+    private RelRoleMenuMapper roleMenuMapper;
+
+    @Resource
+    private RelUserRoleMapper userRoleMapper;
 
     @Override
     public List<Role> getByUserId(Long uid) {
-        return this.baseMapper.getByUserId(uid);
+        List<RelUserRole> relUserRoles = userRoleMapper.selectList(
+                new LambdaQueryWrapper<RelUserRole>()
+                        .eq(RelUserRole::getUserId, uid)
+        );
+        if (relUserRoles == null || CollectionUtils.isEmpty(relUserRoles)) {
+            return new ArrayList<>();
+        }
+        List<Long> roleIds = relUserRoles.stream().map(RelUserRole::getRoleId).toList();
+        return this.baseMapper.selectList(
+                new LambdaQueryWrapper<Role>()
+                        .eq(Role::getState, Boolean.TRUE)
+                        .in(BaseEntity::getId, roleIds)
+        );
     }
 
     @Override
     public List<Long> getRoleIdsByUserId(Long uid) {
-        return this.baseMapper.getRoleIdsByUserId(uid);
-    }
-
-    @Override
-    @Transactional
-    public int removeRelevanceRoles(Long uid) {
-        return this.baseMapper.removeRelevanceRoles(uid, null);
-    }
-
-    @Override
-    @Transactional
-    public int removeRelevanceRoles(Long uid, List<Long> roleIds) {
-        return this.baseMapper.removeRelevanceRoles(uid, roleIds);
-    }
-
-    @Override
-    @Transactional
-    public int insertRelevanceRoles(Long uid, List<Long> roleIds) {
-        int num = 0;
-        for (Long roleId : roleIds) {
-            num += this.baseMapper.insertRelevanceRole(IdWorker.getId(), uid, roleId);
+        List<Role> roles = this.getByUserId(uid);
+        if (roles == null || CollectionUtils.isEmpty(roles)) {
+            return new ArrayList<>();
         }
-        return num;
-    }
-
-    @Override
-    public List<Authority> getAuthorityById(long id) {
-        return baseMapper.getAuthorityById(id);
-    }
-
-    @Override
-    public List<Menu> getMenuById(long id) {
-        return baseMapper.getMenuById(id);
+        return roles.stream().map(BaseEntity::getId).toList();
     }
 
     @Override
     @Transactional
-    public void saveAuthorityById(long id, RoleAuthorityFrom from) {
+    public int insertUserRel(Long uid, List<Long> roleIds) {
+        var coll = new ArrayList<RelUserRole>();
+        for (Long roleId : roleIds) {
+            coll.add(RelUserRole.builder().userId(uid).roleId(roleId).build());
+        }
+        return Math.toIntExact(userRoleMapper.insert(coll).size());
+    }
+
+    @Override
+    @Transactional
+    public int removeUserRel(Long uid) {
+        var wrapper = new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getUserId, uid);
+        return userRoleMapper.delete(wrapper);
+    }
+
+    @Override
+    @Transactional
+    public int removeUserRel(Long uid, List<Long> roleIds) {
+        var wrapper = new LambdaQueryWrapper<RelUserRole>()
+                .eq(RelUserRole::getUserId, uid)
+                .in(RelUserRole::getRoleId, roleIds);
+        return userRoleMapper.delete(wrapper);
+    }
+
+    @Override
+    public List<Authority> getAuthorityById(List<Long> ids) {
+        List<RelRoleAuthority> relRoleAuthorities = roleAuthorityMapper.selectList(
+                new LambdaQueryWrapper<RelRoleAuthority>()
+                        .in(RelRoleAuthority::getRoleId, ids)
+        );
+        if (relRoleAuthorities == null || CollectionUtils.isEmpty(relRoleAuthorities)) {
+            return new ArrayList<>();
+        }
+        List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
+        return authorityService.list(
+                new LambdaQueryWrapper<Authority>()
+                        .in(BaseEntity::getId, authorityIds)
+        );
+    }
+
+    @Override
+    public List<Authority> getAuthorityById(Long id) {
+        List<RelRoleAuthority> relRoleAuthorities = roleAuthorityMapper.selectList(
+                new LambdaQueryWrapper<RelRoleAuthority>()
+                        .eq(RelRoleAuthority::getRoleId, id)
+        );
+        return authorityService.getByRelRoleAuthority(relRoleAuthorities);
+    }
+
+    @Override
+    public List<Menu> getMenuById(Long id) {
+        List<RelRoleMenu> relRoleMenus = roleMenuMapper.selectList(
+                new LambdaQueryWrapper<RelRoleMenu>()
+                        .eq(RelRoleMenu::getRoleId, id)
+        );
+        return menuService.getByRelRoleMenu(relRoleMenus);
+    }
+
+    @Override
+    @Transactional
+    public void saveAuthorityById(Long id, RoleAuthorityFrom from) {
         var currentIds = this.getAuthorityById(id).stream().map(BaseEntity::getId).collect(Collectors.toSet());
         var targetIds = new HashSet<>(from.getAuthorityIds());
         // 计算删除且删除
@@ -110,7 +163,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
             var wrapper = new LambdaQueryWrapper<RelRoleAuthority>()
                     .eq(RelRoleAuthority::getRoleId, id)
                     .in(RelRoleAuthority::getAuthorityId, removeIds);
-            roleAuthorityService.remove(wrapper);
+            roleAuthorityMapper.delete(wrapper);
         }
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
@@ -122,13 +175,13 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
                             .authorityId(addId)
                             .build())
                     .collect(Collectors.toList());
-            roleAuthorityService.saveBatch(newRelations);
+            roleAuthorityMapper.insert(newRelations);
         }
     }
 
     @Override
     @Transactional
-    public void saveMenuById(long id, RoleMenuFrom from) {
+    public void saveMenuById(Long id, RoleMenuFrom from) {
         var currentIds = this.getMenuById(id).stream().map(BaseEntity::getId).collect(Collectors.toSet());
         var targetIds = new HashSet<>(from.getMenuIds());
         // 计算删除且删除
@@ -138,7 +191,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
             var wrapper = new LambdaQueryWrapper<RelRoleMenu>()
                     .eq(RelRoleMenu::getRoleId, id)
                     .in(RelRoleMenu::getRoleId, removeIds);
-            roleMenuService.remove(wrapper);
+            roleMenuMapper.delete(wrapper);
         }
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
@@ -150,9 +203,18 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
                             .menuId(addId)
                             .build())
                     .collect(Collectors.toList());
-            roleMenuService.saveBatch(newMenu);
+            roleMenuMapper.insert(newMenu);
         }
     }
 
-
+    @Override
+    @Transactional
+    public void clearRoleRel(Long id) {
+        // 删除角色关联的权限
+        roleAuthorityMapper.delete(new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getRoleId, id));
+        // 删除角色关联的菜单
+        roleMenuMapper.delete(new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, id));
+        // 删除用户关联的角色
+        userRoleMapper.delete(new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getRoleId, id));
+    }
 }

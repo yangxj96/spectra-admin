@@ -40,9 +40,6 @@ public class StpInterfaceImpl implements StpInterface {
     @Resource
     private RoleService roleService;
 
-    @Resource
-    private AuthorityService authorityService;
-
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
         Long uid = StpUtil.getLoginIdAsLong();
@@ -50,7 +47,7 @@ public class StpInterfaceImpl implements StpInterface {
         if (roles.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Authority> authorities = authorityService.getByRoleIds(roles.stream().map(Role::getId).toList());
+        List<Authority> authorities = roleService.getAuthorityById(roles.stream().map(Role::getId).toList());
         return authorities.stream().map(Authority::getCode).toList();
     }
 

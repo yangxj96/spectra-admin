@@ -31,6 +31,11 @@ import java.util.List;
 public interface PermissionService {
 
     /**
+     * 必须是超级管理员
+     */
+    void administrators();
+
+    /**
      * 判断是否有指定权限
      *
      * @param permission 指定权限CODE
@@ -47,12 +52,14 @@ public interface PermissionService {
     /**
      * 获取当前用户的数据范围
      * TODO 当前还是没考虑好数据范围怎么定义比较灵活,几个方案在脑海备选.等在考虑考虑
+     *
      * @return 组织机构ID列表
      */
     List<Organization> getCurrentDataScope();
 
     /**
      * 获取当前用户菜单
+     *
      * @return 用户菜单
      */
     List<Menu> getCurrentMenus();
