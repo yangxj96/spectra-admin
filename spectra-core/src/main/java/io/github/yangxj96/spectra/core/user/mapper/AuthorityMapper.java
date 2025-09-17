@@ -18,9 +18,6 @@ package io.github.yangxj96.spectra.core.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
 
 /**
  * 权限mapper层

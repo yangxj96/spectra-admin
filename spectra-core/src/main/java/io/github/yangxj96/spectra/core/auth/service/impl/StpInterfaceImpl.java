@@ -19,7 +19,6 @@ import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
-import io.github.yangxj96.spectra.core.user.service.AuthorityService;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;

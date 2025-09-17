@@ -21,19 +21,13 @@ import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.yangxj96.spectra.core.auth.service.PermissionService;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
-import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
-import io.github.yangxj96.spectra.core.system.service.OrganizationService;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
-import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
-import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -52,13 +46,7 @@ public class PermissionServiceImpl implements PermissionService {
     private static final String ADMINISTRATORS = "DEV_ADMIN";
 
     @Resource
-    private OrganizationService organizationService;
-
-    @Resource
     private RoleService roleService;
-
-    @Resource
-    private UserService userService;
 
     @Override
     public void administrators() {
@@ -90,34 +78,6 @@ public class PermissionServiceImpl implements PermissionService {
         throw new NotRoleException(role);
     }
 
-    @Override
-    public List<Organization> getCurrentDataScope() {
-        if (absoluteness()) {
-            return organizationService.list();
-        }
-        // 获取当前用户信息备用
-        User user = userService.getById(StpUtil.getLoginIdAsLong());
-        // 获取他的角色列表,从角色列表中获取最高的一个数据范围为准
-        List<Role> roles = roleService.getByUserId(user.getId());
-        if (CollectionUtils.isEmpty(roles)) {
-            return List.of();
-        }
-        Role maxRole = roles
-                .stream()
-                .min(Comparator.comparing(role -> role.getScope().getValue()))
-                .orElse(null);
-        if (maxRole == null || maxRole.getScope() == null) {
-            throw new RuntimeException("无角色或角色配置异常");
-        }
-        return switch (maxRole.getScope()) {
-            // 全局
-            case ALL -> organizationService.list();
-            // 本级及以下
-            case DEPT_AND_CHILD -> organizationService.getAllChildrenById(user.getOrganizationId());
-            // 本级
-            case DEPT_ONLY -> List.of(organizationService.getById(user.getOrganizationId()));
-        };
-    }
 
     /**
      * 内置的无限制通过的范围,在这里可以指定超级管理员的特征 <br/>
@@ -130,7 +90,6 @@ public class PermissionServiceImpl implements PermissionService {
     private boolean absoluteness() {
         return StpUtil.hasRole(ADMINISTRATORS);
     }
-
 
     @Override
     public List<Menu> getCurrentMenus() {
