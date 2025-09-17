@@ -20,7 +20,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
@@ -130,7 +129,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         mapstruct.updateUserFrom(params, entity);
-        if (!SqlHelper.retBool(this.baseMapper.updateById(entity))) {
+        if (this.baseMapper.updateById(entity) == 0) {
             throw new EntityUpdateException("更新用户发生错误");
         }
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
