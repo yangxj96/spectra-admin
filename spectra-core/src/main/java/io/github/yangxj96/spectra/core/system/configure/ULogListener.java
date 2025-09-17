@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ULogListener {
 
-    private final static String PREFIX = "[日志消息监听器]: ";
+    private static final String PREFIX = "[日志消息监听器]: ";
 
     private final OperationLogService logService;
 

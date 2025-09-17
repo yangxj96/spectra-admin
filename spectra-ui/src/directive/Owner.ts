@@ -48,9 +48,10 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding<string | str
         ? requiredPerms.some(perm => userStore.hasPermission(perm))
         : requiredPerms.every(perm => userStore.hasPermission(perm));
     if (hasAccess) {
-        el.style.display = ""; // 恢复显示
+        // 恢复显示
+        el.style.display = "";
     } else {
-        // el.style.display = "none"; // 隐藏（保留 DOM 结构）
-        el.remove(); // 或使用 el.remove() 彻底移除
+        // 彻底移除
+        el.remove();
     }
 }

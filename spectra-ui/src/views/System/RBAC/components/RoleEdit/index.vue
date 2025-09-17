@@ -50,7 +50,6 @@ async function handleRoleSave() {
                     message: modify ? "修改角色成功" : "新增角色成功",
                     onClose() {
                         dialog.value = false;
-                        // handlerConditionQuery();
                     }
                 });
             });

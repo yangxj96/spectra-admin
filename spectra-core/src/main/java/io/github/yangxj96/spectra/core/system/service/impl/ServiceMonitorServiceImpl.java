@@ -20,7 +20,6 @@ import io.github.yangxj96.spectra.core.system.javabean.vo.CPUInfoVO;
 import io.github.yangxj96.spectra.core.system.javabean.vo.JVMInfoVO;
 import io.github.yangxj96.spectra.core.system.javabean.vo.RAMInfoVO;
 import io.github.yangxj96.spectra.core.system.service.ServiceMonitorService;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -29,7 +28,6 @@ import oshi.hardware.PhysicalMemory;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -37,6 +35,8 @@ import java.util.*;
  */
 @Service
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {
+
+    private static final String UNKNOWN = "Unknown";
 
     @Override
     public CPUInfoVO getCPUInfo() {
@@ -77,11 +77,11 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
             RAMInfoVO.RAMSlot unknown = RAMInfoVO.RAMSlot
                     .builder()
                     .slot(0)
-                    .memoryType("Unknown")
+                    .memoryType(UNKNOWN)
                     .clockSpeedHz(0L)
-                    .clockSpeedMHz("Unknown")
+                    .clockSpeedMHz(UNKNOWN)
                     .capacityBytes(0L)
-                    .capacityGB("Unknown")
+                    .capacityGB(UNKNOWN)
                     .build();
             vo.getSlots().add(unknown);
             return vo;

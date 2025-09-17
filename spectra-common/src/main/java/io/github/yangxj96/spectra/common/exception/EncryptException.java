@@ -14,16 +14,20 @@
  *  limitations under the License.
  */
 
-import { defineStore } from "pinia";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
+package io.github.yangxj96.spectra.common.exception;
 
-const useAppStore = defineStore("app", {
-    state: (): StoreApp => ({
-        lang: zhCn,
-        menus: [] as Menu[],
-        isFetchingMenus: false,
-        unfold: true
-    })
-});
+/**
+ * 加密异常
+ *
+ * @since 1.0.0
+ */
+public class EncryptException extends RuntimeException {
 
-export default useAppStore;
+    public EncryptException(String message) {
+        super(message);
+    }
+
+    public EncryptException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}

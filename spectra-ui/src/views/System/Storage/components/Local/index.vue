@@ -22,5 +22,3 @@ const num = defineModel<number>("num");
 <template>
     <div>存储方式:{{ type }},数量:{{ num }}</div>
 </template>
-
-<style scoped lang="scss"></style>

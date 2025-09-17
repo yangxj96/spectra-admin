@@ -20,11 +20,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
-import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
-import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.HashSet;
 import java.util.List;
 
 /**

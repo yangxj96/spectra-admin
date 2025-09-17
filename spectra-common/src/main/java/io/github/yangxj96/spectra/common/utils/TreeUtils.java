@@ -29,6 +29,8 @@ import java.util.function.Function;
  */
 public class TreeUtils {
 
+    private TreeUtils() {
+    }
 
     /**
      * 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点

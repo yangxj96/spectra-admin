@@ -73,11 +73,11 @@ export default defineConfig(({ mode }) => {
 
                         let dir = "other";
 
-                        if (/\.png|jpe?g|gif|svg|webp|avif$/i.test(fileName)) {
+                        if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(fileName)) {
                             dir = "img";
-                        } else if (/\.ttf|otf|woff2?|eot$/i.test(fileName)) {
+                        } else if (/\.(ttf|otf|woff2?|eot)$/i.test(fileName)) {
                             dir = "fonts";
-                        } else if (/\.mp4|webm|ogg|mp3|wav|flac|aac$/i.test(fileName)) {
+                        } else if (/\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i.test(fileName)) {
                             dir = "media";
                         } else if (/\.css$/i.test(fileName)) {
                             return `css/[name]-[hash][extname]`;

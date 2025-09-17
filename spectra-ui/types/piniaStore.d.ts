@@ -22,6 +22,8 @@ type StoreApp = {
     menus: Menu[];
     // 是否展开菜单
     unfold: boolean;
+    // 防止重复请求
+    isFetchingMenus: boolean;
 };
 
 // usePropsStore()的state

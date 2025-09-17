@@ -14,16 +14,16 @@
  *  limitations under the License.
  */
 
-import { defineStore } from "pinia";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
+package io.github.yangxj96.spectra.common.exception;
 
-const useAppStore = defineStore("app", {
-    state: (): StoreApp => ({
-        lang: zhCn,
-        menus: [] as Menu[],
-        isFetchingMenus: false,
-        unfold: true
-    })
-});
+/**
+ * 内置数据异常
+ *
+ * @since 1.0.0
+ */
+public class InlayException extends RuntimeException {
 
-export default useAppStore;
+    public InlayException(String message) {
+        super(message);
+    }
+}

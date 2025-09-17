@@ -22,9 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
-import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
-import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
@@ -121,7 +119,7 @@ public class PermissionController {
             long id = Long.parseLong(roleId);
             return bindService.getRoleRelevanceAuthorityByRoleId(id);
         } catch (Exception e) {
-            throw new RuntimeException("参数转换失败");
+            throw new IllegalArgumentException("参数转换失败");
         }
     }
 
@@ -132,7 +130,7 @@ public class PermissionController {
             long id = Long.parseLong(roleId);
             return bindService.getRoleRelevanceMenuByRoleId(id);
         } catch (Exception e) {
-            throw new RuntimeException("参数转换失败");
+            throw new IllegalArgumentException("参数转换失败");
         }
     }
 
@@ -143,7 +141,7 @@ public class PermissionController {
             long id = Long.parseLong(roleId);
             bindService.saveRoleRelevanceAuthorityByRoleId(id, from);
         } catch (Exception e) {
-            throw new RuntimeException("参数转换失败");
+            throw new IllegalArgumentException("参数转换失败");
         }
     }
 
@@ -154,7 +152,7 @@ public class PermissionController {
             long id = Long.parseLong(roleId);
             bindService.saveRoleRelevanceMenuByRoleId(id, from);
         } catch (Exception e) {
-            throw new RuntimeException("参数转换失败");
+            throw new IllegalArgumentException("参数转换失败");
         }
     }
 

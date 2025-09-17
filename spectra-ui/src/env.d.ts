@@ -16,6 +16,8 @@
 
 /// <reference types="vite/client" />
 
+import "vue-router";
+
 interface ImportMetaEnvironment {
     /** api请求地址 **/
     readonly VITE_API_URL: string;
@@ -34,3 +36,12 @@ declare module "*.vue" {
     const component: DefineComponent<{}, {}, any>;
     export default component;
 }
+
+declare module "vue-router" {
+    interface RouteMeta {
+        /** 修改的标题 */
+        title?: string | (() => string);
+    }
+}
+
+

@@ -20,10 +20,12 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.toolkit.SqlHelper;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
+import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.core.auth.properties.UserProperties;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
@@ -114,7 +116,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 填充默认密码
         entity.setPassword(passwordEncoder.encode(properties.getDefaultPassword()));
         if (!this.save(entity)) {
-            throw new RuntimeException("保存用户信息异常");
+            throw new DataSaveException("保存用户信息异常");
         }
         // 关联角色
         roleService.insertRelevanceRoles(entity.getId(), params.getRoleIds());
@@ -127,8 +129,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
-        mapstruct.updateUserFrom(params,entity);
-        if (!this.updateById(entity)) {
+        mapstruct.updateUserFrom(params, entity);
+        if (!SqlHelper.retBool(this.baseMapper.updateById(entity))) {
             throw new EntityUpdateException("更新用户发生错误");
         }
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
@@ -179,7 +181,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         try {
             var user = this.getById(Long.parseLong(uid));
             user.setPassword(passwordEncoder.encode(properties.getDefaultPassword()));
-            this.updateById(user);
+            this.baseMapper.updateById(user);
         } catch (Exception e) {
             throw new DataNotExistException("用户不存在");
         }

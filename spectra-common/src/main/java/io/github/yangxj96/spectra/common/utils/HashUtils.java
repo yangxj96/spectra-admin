@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.common.utils;
 
+import io.github.yangxj96.spectra.common.exception.EncryptException;
 import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
@@ -52,7 +53,7 @@ public final class HashUtils {
             }
             return hashText.toString();
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Error generating MD5 hash", e);
+            throw new EncryptException("生成MD5异常", e);
         }
     }
 

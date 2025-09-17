@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.common.strategy.impl;
 
 import io.github.yangxj96.spectra.common.enums.FileType;
+import io.github.yangxj96.spectra.common.exception.FileTypeException;
 import io.github.yangxj96.spectra.common.strategy.FileTypeValidationStrategy;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
@@ -87,7 +88,7 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
                 .orElse(0);
 
         if (length <= 0) {
-            throw new RuntimeException("不允许的文件类型");
+            throw new FileTypeException("不允许的文件类型");
         }
 
         try (InputStream is = new ByteArrayInputStream(file.getBytes())) {

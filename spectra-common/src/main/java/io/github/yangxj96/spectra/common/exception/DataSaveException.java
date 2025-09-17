@@ -14,16 +14,18 @@
  *  limitations under the License.
  */
 
-import { defineStore } from "pinia";
-import zhCn from "element-plus/es/locale/lang/zh-cn";
+package io.github.yangxj96.spectra.common.exception;
 
-const useAppStore = defineStore("app", {
-    state: (): StoreApp => ({
-        lang: zhCn,
-        menus: [] as Menu[],
-        isFetchingMenus: false,
-        unfold: true
-    })
-});
+/**
+ * 数据保存异常
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-6-14
+ */
+public class DataSaveException extends RuntimeException {
 
-export default useAppStore;
+    public DataSaveException(String message) {
+        super(message);
+    }
+}

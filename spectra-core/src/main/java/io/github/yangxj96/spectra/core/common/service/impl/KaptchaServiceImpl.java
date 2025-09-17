@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.common.service.impl;
 import com.google.code.kaptcha.Producer;
 import io.github.yangxj96.spectra.common.constant.RedisKey;
 import io.github.yangxj96.spectra.common.exception.KaptchaExpiresException;
+import io.github.yangxj96.spectra.common.exception.ReadPropertiesException;
 import io.github.yangxj96.spectra.common.properties.KaptchaProperties;
 import io.github.yangxj96.spectra.core.common.service.KaptchaService;
 import jakarta.annotation.Resource;
@@ -86,7 +87,7 @@ public class KaptchaServiceImpl implements KaptchaService {
                 capStr = code = kaptchaProducer.createText();
                 image = kaptchaProducer.createImage(capStr);
             }
-            default -> throw new RuntimeException("为获取到验证码生成方式");
+            default -> throw new ReadPropertiesException("未获取到验证码生成方式");
         }
 
         // 存储到缓存中

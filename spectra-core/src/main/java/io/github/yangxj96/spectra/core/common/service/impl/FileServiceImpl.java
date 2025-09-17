@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.common.service.impl;
 
+import io.github.yangxj96.spectra.common.exception.FileTypeException;
 import io.github.yangxj96.spectra.common.properties.FileUploadProperties;
 import io.github.yangxj96.spectra.common.verify.FileTypeValidator;
 import io.github.yangxj96.spectra.core.common.service.FileService;
@@ -28,6 +29,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * <p>
@@ -56,7 +58,7 @@ public class FileServiceImpl implements FileService {
         }
         // 2. 使用策略模式进行文件类型验证
         if (!validator.validate(file)) {
-            throw new RuntimeException("此类文件不允许上传");
+            throw new FileTypeException("此类文件不允许上传");
         }
         // 创建目录（如果不存在）
         Path uploadDirPath = Paths.get(properties.getUploadDir());
@@ -64,7 +66,7 @@ public class FileServiceImpl implements FileService {
             Files.createDirectories(uploadDirPath);
         }
         // 构建目标文件路径
-        Path targetLocation = uploadDirPath.resolve(file.getOriginalFilename());
+        Path targetLocation = uploadDirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
         file.transferTo(targetLocation); // Spring 提供的方法直接保存
         log.atDebug().log("文件已保存至: {}", targetLocation);
     }

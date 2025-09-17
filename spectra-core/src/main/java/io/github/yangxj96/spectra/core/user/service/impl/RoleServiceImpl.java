@@ -27,9 +27,6 @@ import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
-import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
-import io.github.yangxj96.spectra.core.user.mapper.RelRoleAuthorityMapper;
-import io.github.yangxj96.spectra.core.user.mapper.RelRoleMenuMapper;
 import io.github.yangxj96.spectra.core.user.mapper.RoleMapper;
 import io.github.yangxj96.spectra.core.user.service.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.user.service.RelRoleMenuService;
@@ -39,10 +36,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
