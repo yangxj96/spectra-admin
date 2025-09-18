@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.user.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.user.javabean.converter;
 
 
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
@@ -22,7 +22,7 @@ import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -33,8 +33,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-14
  */
-@Mapper(componentModel = "spring")
-public interface PermissionMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface PermissionConverter {
 
     /**
      * 角色实体到VO
@@ -58,7 +58,6 @@ public interface PermissionMapstruct {
      * @param authority 权限实体
      * @return 权限树形VO
      */
-    @Mapping(target = "children", ignore = true)
     AuthorityTreeVO authorityToTreeVo(Authority authority);
 
     /**

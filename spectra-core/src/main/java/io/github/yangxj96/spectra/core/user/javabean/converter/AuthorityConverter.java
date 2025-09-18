@@ -14,11 +14,12 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.user.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.user.javabean.converter;
 
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025/7/16
  */
-@Mapper(componentModel = "spring")
-public interface AuthorityMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface AuthorityConverter {
 
     /**
      * 实体转VO

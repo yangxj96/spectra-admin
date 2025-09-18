@@ -23,9 +23,9 @@ import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.auth.service.PermissionService;
+import io.github.yangxj96.spectra.core.system.javabean.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
-import io.github.yangxj96.spectra.core.system.javabean.mapstruct.MenuMapstruct;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.system.mapper.MenuMapper;
 import io.github.yangxj96.spectra.core.system.service.MenuService;
@@ -50,7 +50,7 @@ import java.util.List;
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
     @Resource
-    private MenuMapstruct mapstruct;
+    private MenuConverter menuConverter;
 
     @Resource
     private PermissionService permissionService;
@@ -59,7 +59,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public List<MenuTreeVO> tree() {
         List<Menu> menus = permissionService.getCurrentMenus();
         // 先转树形VO
-        List<MenuTreeVO> vos = mapstruct.toTreeVOS(menus);
+        List<MenuTreeVO> vos = menuConverter.toTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.system.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.system.javabean.converter;
 
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictData;
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictGroup;
@@ -23,7 +23,7 @@ import io.github.yangxj96.spectra.core.system.javabean.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.system.javabean.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.system.javabean.vo.DictTypeTreeVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -36,8 +36,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/18
  */
-@Mapper(componentModel = "spring")
-public interface DictMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface DictConverter {
 
     /**
      * 字典类型入参转实体
@@ -45,14 +45,6 @@ public interface DictMapstruct {
      * @param from 字典类型入参
      * @return 转换后的实体
      */
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "builtin", ignore = true)
-    @Mapping(target = "hide", ignore = true)
-    @Mapping(target = "version", ignore = true)
     DictGroup groupFromToEntity(DictGroupFrom from);
 
     /**
@@ -61,12 +53,6 @@ public interface DictMapstruct {
      * @param from 字典数据入参
      * @return 转换后的实体
      */
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "version", ignore = true)
     DictData dataFromToEntity(DictDataFrom from);
 
     /**
@@ -75,7 +61,6 @@ public interface DictMapstruct {
      * @param datum 字典类型
      * @return 字典类型
      */
-    @Mapping(target = "children", ignore = true)
     DictTypeTreeVO typeToTreeVO(DictGroup datum);
 
     /**

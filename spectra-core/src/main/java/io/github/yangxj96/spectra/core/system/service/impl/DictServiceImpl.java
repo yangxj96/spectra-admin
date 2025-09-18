@@ -21,11 +21,11 @@ import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.InlayException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.system.javabean.converter.DictConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictData;
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictGroup;
 import io.github.yangxj96.spectra.core.system.javabean.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.system.javabean.from.DictGroupFrom;
-import io.github.yangxj96.spectra.core.system.javabean.mapstruct.DictMapstruct;
 import io.github.yangxj96.spectra.core.system.javabean.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.system.javabean.vo.DictTypeTreeVO;
 import io.github.yangxj96.spectra.core.system.service.DictDataService;
@@ -53,7 +53,7 @@ import java.util.List;
 public class DictServiceImpl implements DictService {
 
     @Resource
-    private DictMapstruct mapstruct;
+    private DictConverter dictConverter;
 
     @Resource
     private DictGroupService groupService;
@@ -65,7 +65,7 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void createGroup(DictGroupFrom params) {
-        DictGroup entity = mapstruct.groupFromToEntity(params);
+        DictGroup entity = dictConverter.groupFromToEntity(params);
         groupService.save(entity);
     }
 
@@ -93,14 +93,14 @@ public class DictServiceImpl implements DictService {
         if (Boolean.TRUE.equals(group.getBuiltin())) {
             throw new InlayException("内置字典,无法修改");
         }
-        DictGroup entity = mapstruct.groupFromToEntity(params);
+        DictGroup entity = dictConverter.groupFromToEntity(params);
         groupService.updateById(entity);
     }
 
     @Override
     @Transactional
     public void createData(DictDataFrom params) {
-        DictData entity = mapstruct.dataFromToEntity(params);
+        DictData entity = dictConverter.dataFromToEntity(params);
         dataService.save(entity);
     }
 
@@ -125,7 +125,7 @@ public class DictServiceImpl implements DictService {
         if (Boolean.TRUE.equals(group.getBuiltin())) {
             throw new InlayException("内置字典,无法修改");
         }
-        DictData entity = mapstruct.dataFromToEntity(params);
+        DictData entity = dictConverter.dataFromToEntity(params);
         dataService.updateById(entity);
     }
 
@@ -137,7 +137,7 @@ public class DictServiceImpl implements DictService {
                 .eq(DictGroup::getState, 0)
                 .eq(DictGroup::getHide, Boolean.FALSE);
         List<DictGroup> menus = groupService.list(wrapper);
-        List<DictTypeTreeVO> vos = mapstruct.typeToTreeVOS(menus);
+        List<DictTypeTreeVO> vos = dictConverter.typeToTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
@@ -150,6 +150,6 @@ public class DictServiceImpl implements DictService {
         List<DictData> dictData = dataService.listByGid(group.getId());
         // 根据sort字段进行一个排序
         dictData.sort(Comparator.comparing(DictData::getSort));
-        return mapstruct.dataToVos(dictData);
+        return dictConverter.dataToVos(dictData);
     }
 }

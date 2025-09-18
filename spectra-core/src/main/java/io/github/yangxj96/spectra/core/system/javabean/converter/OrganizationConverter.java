@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.system.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.system.javabean.converter;
 
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.javabean.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.system.javabean.vo.OrganizationTreeVo;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -31,8 +31,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025/7/14
  */
-@Mapper(componentModel = "spring")
-public interface OrganizationMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface OrganizationConverter {
 
     /**
      * 实体转树形
@@ -48,7 +48,6 @@ public interface OrganizationMapstruct {
      * @param organization 实体
      * @return 树形
      */
-    @Mapping(target = "children", ignore = true)
     OrganizationTreeVo toTreeVO(Organization organization);
 
     /**
@@ -57,12 +56,6 @@ public interface OrganizationMapstruct {
      * @param from 入参
      * @return 实体
      */
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "version", ignore = true)
     Organization toEntity(OrganizationFrom from);
 
 }

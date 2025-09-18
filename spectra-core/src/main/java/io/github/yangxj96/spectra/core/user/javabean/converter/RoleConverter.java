@@ -14,9 +14,10 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.user.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.user.javabean.converter;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
 
 /**
  * 角色转换用的
@@ -25,7 +26,7 @@ import org.mapstruct.Mapper;
  * @version 1.0
  * @since 2025/7/16
  */
-@Mapper(componentModel = "spring")
-public interface RoleMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface RoleConverter {
 
 }

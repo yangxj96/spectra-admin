@@ -20,9 +20,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.system.javabean.converter.OrganizationConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.javabean.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.system.javabean.mapstruct.OrganizationMapstruct;
 import io.github.yangxj96.spectra.core.system.javabean.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.system.mapper.OrganizationMapper;
 import io.github.yangxj96.spectra.core.system.service.OrganizationService;
@@ -46,19 +46,19 @@ import java.util.stream.Collectors;
 public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
 
     @Resource
-    private OrganizationMapstruct mapstruct;
+    private OrganizationConverter organizationConverter;
 
     @Override
     public List<OrganizationTreeVo> tree() {
         var list = this.list();
-        var vos = mapstruct.toTreeVOS(list);
+        var vos = organizationConverter.toTreeVOS(list);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
     @Transactional
     public void created(OrganizationFrom from) {
-        Organization entity = mapstruct.toEntity(from);
+        Organization entity = organizationConverter.toEntity(from);
         this.save(entity);
     }
 
@@ -76,7 +76,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
         if (null == organization) {
             throw new DataNotExistException("没找到组织机构信息");
         }
-        Organization entity = mapstruct.toEntity(from);
+        Organization entity = organizationConverter.toEntity(from);
         this.updateById(entity);
     }
 

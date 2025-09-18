@@ -29,11 +29,11 @@ import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.core.auth.properties.UserProperties;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.service.OrganizationService;
+import io.github.yangxj96.spectra.core.user.javabean.converter.PermissionConverter;
+import io.github.yangxj96.spectra.core.user.javabean.converter.UserConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
-import io.github.yangxj96.spectra.core.user.javabean.mapstruct.PermissionMapstruct;
-import io.github.yangxj96.spectra.core.user.javabean.mapstruct.UserMapstruct;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.user.mapper.UserMapper;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
@@ -60,13 +60,13 @@ import java.util.stream.Collectors;
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
     @Resource
-    private UserMapstruct mapstruct;
+    private UserConverter userConverter;
 
     @Resource
     private RoleService roleService;
 
     @Resource
-    private PermissionMapstruct permissionMapstruct;
+    private PermissionConverter permissionConverter;
 
     @Resource
     private OrganizationService organizationService;
@@ -89,7 +89,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         var db = this.page(page.toPage(), wrapper);
         BeanUtils.copyProperties(db, result);
-        result.setRecords(mapstruct.toVOs(db.getRecords()));
+        result.setRecords(userConverter.toVOs(db.getRecords()));
 
         // 获取所需内容
         var organizationNameMap = organizationService.list()
@@ -100,7 +100,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.getRecords().forEach(vo -> {
             var roles = roleService.getByUserId(vo.getId());
             if (null != roles && !roles.isEmpty()) {
-                vo.setRoles(permissionMapstruct.roleToVOs(roles));
+                vo.setRoles(permissionConverter.roleToVOs(roles));
             }
             vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
         });
@@ -111,7 +111,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
-        var entity = mapstruct.toEntity(params);
+        var entity = userConverter.toEntity(params);
         // 填充默认密码
         entity.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
         if (!this.save(entity)) {
@@ -128,7 +128,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
-        mapstruct.updateUserFrom(params, entity);
+        userConverter.updateUserFrom(params, entity);
         if (this.baseMapper.updateById(entity) == 0) {
             throw new EntityUpdateException("更新用户发生错误");
         }

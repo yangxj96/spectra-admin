@@ -80,7 +80,7 @@ public class BaseEntity implements Serializable {
     private LocalDateTime deleted;
 
     /**
-     * 软删除标识。null 表示未删除，非 null 表示已删除，其值为删除时间。
+     * 乐观锁版本号
      */
     @Version
     @TableField(value = "VERSION")

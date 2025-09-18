@@ -14,14 +14,14 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.user.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.user.javabean.converter;
 
 import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -34,8 +34,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/15
  */
-@Mapper(componentModel = "spring")
-public interface UserMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface UserConverter {
 
     /**
      * 实体转分页VO
@@ -43,8 +43,6 @@ public interface UserMapstruct {
      * @param user 实体
      * @return 分页实体
      */
-    @Mapping(target = "roles", ignore = true)
-    @Mapping(target = "organizationName", ignore = true)
     UserPageVO toVO(User user);
 
     /**
@@ -53,7 +51,6 @@ public interface UserMapstruct {
      * @param users 实体列表
      * @return 分页vo列表
      */
-    @Mapping(target = "roles", ignore = true)
     List<UserPageVO> toVOs(List<User> users);
 
     /**
@@ -62,16 +59,7 @@ public interface UserMapstruct {
      * @param vo 入参vo
      * @return 实体
      */
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "avatar", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "version", ignore = true)
     User toEntity(UserSaveFrom vo);
-
 
     /**
      * 使用params更新现有的user实体
@@ -79,13 +67,5 @@ public interface UserMapstruct {
      * @param params 更新的参数
      * @param user   现有的实体
      */
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedBy", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deleted", ignore = true)
-    @Mapping(target = "avatar", ignore = true)
-    @Mapping(target = "password", ignore = true)
-    @Mapping(target = "version", ignore = true)
     void updateUserFrom(UserSaveFrom params, @MappingTarget User user);
 }

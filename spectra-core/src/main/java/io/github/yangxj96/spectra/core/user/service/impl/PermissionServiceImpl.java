@@ -24,17 +24,17 @@ import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.common.utils.TreeUtils;
+import io.github.yangxj96.spectra.core.system.javabean.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
-import io.github.yangxj96.spectra.core.system.javabean.mapstruct.MenuMapstruct;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
+import io.github.yangxj96.spectra.core.user.javabean.converter.AuthorityConverter;
+import io.github.yangxj96.spectra.core.user.javabean.converter.PermissionConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
-import io.github.yangxj96.spectra.core.user.javabean.mapstruct.AuthorityMapstruct;
-import io.github.yangxj96.spectra.core.user.javabean.mapstruct.PermissionMapstruct;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
@@ -67,13 +67,13 @@ public class PermissionServiceImpl implements PermissionService {
     private AuthorityService authorityService;
 
     @Resource
-    private PermissionMapstruct mapstruct;
+    private PermissionConverter permissionConverter;
 
     @Resource
-    private AuthorityMapstruct authorityMapstruct;
+    private AuthorityConverter authorityConverter;
 
     @Resource
-    private MenuMapstruct menuMapstruct;
+    private MenuConverter menuConverter;
 
     @Override
     @Transactional
@@ -114,7 +114,7 @@ public class PermissionServiceImpl implements PermissionService {
         Page<Role> db = roleService.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         Page<RoleVO> result = new Page<>();
         BeanUtils.copyProperties(db, result);
-        result.setRecords(mapstruct.roleToVOs(db.getRecords()));
+        result.setRecords(permissionConverter.roleToVOs(db.getRecords()));
         return result;
     }
 
@@ -122,26 +122,26 @@ public class PermissionServiceImpl implements PermissionService {
     public List<RoleVO> listRole() {
         var wrapper = new LambdaQueryWrapper<Role>();
         wrapper.eq(Role::getState, Boolean.TRUE);
-        return mapstruct.roleToVOs(roleService.list(wrapper));
+        return permissionConverter.roleToVOs(roleService.list(wrapper));
     }
 
     @Override
     public List<AuthorityTreeVO> authorityTree() {
         List<Authority> authorities = authorityService.list();
-        List<AuthorityTreeVO> vos = mapstruct.authorityToTreeVos(authorities);
+        List<AuthorityTreeVO> vos = permissionConverter.authorityToTreeVos(authorities);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
     public List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id) {
         List<Authority> authority = roleService.getAuthorityById(id);
-        return authorityMapstruct.toVOS(authority);
+        return authorityConverter.toVOS(authority);
     }
 
     @Override
     public List<MenuVO> getRoleRelevanceMenuByRoleId(long id) {
         List<Menu> menus = roleService.getMenuById(id);
-        return menuMapstruct.toVOS(menus);
+        return menuConverter.toVOS(menus);
     }
 
     @Override

@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.system.javabean.mapstruct;
+package io.github.yangxj96.spectra.core.system.javabean.converter;
 
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -31,8 +31,8 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-14
  */
-@Mapper(componentModel = "spring")
-public interface MenuMapstruct {
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+public interface MenuConverter {
 
     /**
      * 实体转 树形实体VO
@@ -40,7 +40,6 @@ public interface MenuMapstruct {
      * @param entity 实体
      * @return 树形实体VO
      */
-    @Mapping(target = "children", ignore = true)
     MenuTreeVO toTreeVO(Menu entity);
 
     /**
