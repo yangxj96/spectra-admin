@@ -43,5 +43,3 @@ declare module "vue-router" {
         title?: string | (() => string);
     }
 }
-
-

@@ -39,7 +39,6 @@ public class RedisConfiguration {
 
     private static final String PREFIX = "[Redis配置]:";
 
-
     @Resource
     private ObjectMapper om;
 

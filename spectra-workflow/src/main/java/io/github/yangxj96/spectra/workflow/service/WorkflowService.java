@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.workflow.service;
 
-import org.flowable.engine.repository.ProcessDefinition;
+import io.github.yangxj96.spectra.workflow.javabean.vo.ProcessDefinitionVO;
 
 import java.util.List;
 
@@ -26,11 +26,6 @@ import java.util.List;
 public interface WorkflowService {
 
 
-    /**
-     * 获取所有可执行的工作流
-     *
-     * @return 流程定义列表
-     */
-    List<ProcessDefinition> getWorkflows();
+    List<ProcessDefinitionVO> getWorkflows();
 
 }

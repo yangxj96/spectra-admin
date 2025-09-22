@@ -16,12 +16,14 @@
 
 package io.github.yangxj96.spectra.workflow.service.impl;
 
+import io.github.yangxj96.spectra.workflow.javabean.vo.ProcessDefinitionVO;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import jakarta.annotation.Resource;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -34,12 +36,27 @@ public class WorkflowServiceImpl implements WorkflowService {
     private RepositoryService repositoryService;
 
     @Override
-    public List<ProcessDefinition> getWorkflows() {
-        return repositoryService
+    public List<ProcessDefinitionVO> getWorkflows() {
+        List<ProcessDefinition> definitions = repositoryService
                 .createProcessDefinitionQuery()
                 .latestVersion()
                 .orderByProcessDefinitionKey().asc()
                 .list();
+        var result = new ArrayList<ProcessDefinitionVO>();
+        for (ProcessDefinition definition : definitions) {
+            ProcessDefinitionVO vo = ProcessDefinitionVO.builder()
+                    .id(definition.getId())
+                    .name(definition.getName())
+                    .key(definition.getKey())
+                    .version(definition.getVersion())
+                    .deploymentId(definition.getDeploymentId())
+                    .resourceName(definition.getResourceName())
+                    .suspended(definition.isSuspended())
+                    .build();
+            result.add(vo);
+        }
+
+        return result;
     }
 
 }

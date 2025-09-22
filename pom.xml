@@ -43,6 +43,8 @@
         <oshi.version>6.8.1</oshi.version>
         <jasypt.version>3.0.5</jasypt.version>
         <mica.version>3.5.4</mica.version>
+        <jetcache.version>2.7.8</jetcache.version>
+        <druid.version>1.2.27</druid.version>
 
     </properties>
 
@@ -68,7 +70,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-3-starter</artifactId>
-                <version>1.2.27</version>
+                <version>${druid.version}</version>
             </dependency>
 
             <!-- SaToken -->

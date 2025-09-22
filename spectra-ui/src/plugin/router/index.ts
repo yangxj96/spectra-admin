@@ -84,11 +84,8 @@ router.beforeEach(async (to, _, next) => {
 // 路由后置守卫
 router.afterEach(to => {
     const title = getRouteTitle(to.meta.title);
-    document.title = title
-        ? `${import.meta.env.VITE_WEB_TITLE} - ${title}`
-        : import.meta.env.VITE_WEB_TITLE;
+    document.title = title ? `${import.meta.env.VITE_WEB_TITLE} - ${title}` : import.meta.env.VITE_WEB_TITLE;
     hideLoading();
 });
-
 
 export default router;

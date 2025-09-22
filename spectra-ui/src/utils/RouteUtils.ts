@@ -110,7 +110,6 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
     }
 };
 
-
 /**
  * 安全获取路由标题，防止 [object Object] 或异常
  */
@@ -129,7 +128,7 @@ export function getRouteTitle(title: unknown): string {
         }
     }
 
-    if (title != null && typeof title === "object") {
+    if (title != undefined && typeof title === "object") {
         console.warn("[getRouteTitle] Title is an object, may stringify to [object Object]:", title);
     }
 

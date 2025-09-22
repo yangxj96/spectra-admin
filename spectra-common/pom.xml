@@ -20,13 +20,12 @@
     </properties>
 
     <dependencies>
-
-        <!-- Spring Boot Begin -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-cache</artifactId>
-        </dependency>
-        <!-- Spring Boot End -->
+        <!--&lt;!&ndash; Spring Boot Begin &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.boot</groupId>-->
+        <!--    <artifactId>spring-boot-starter-cache</artifactId>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; Spring Boot End &ndash;&gt;-->
 
         <!-- 通用工具包 Begin -->
         <dependency>
@@ -104,10 +103,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.lettuce</groupId>
-            <artifactId>lettuce-core</artifactId>
         </dependency>
         <!-- 数据库 End -->
 
