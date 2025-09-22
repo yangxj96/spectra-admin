@@ -31,7 +31,7 @@ const dialog_edit = ref({
 // 查询条件
 const condition = ref<UserPageParams>({
     page_num: 1,
-    page_size: 100
+    page_size: 10
 });
 
 // table分页请求
@@ -140,7 +140,7 @@ function handleDialogClose() {
     <!-- 数据区 -->
     <el-row class="box-body">
         <!-- 列表 -->
-        <el-table :data="table_data" height="90%" stripe @sort-change="handleTableSortChange">
+        <el-table :data="table_data" height="92%" stripe @sort-change="handleTableSortChange">
             <el-table-column align="center" type="index" />
             <el-table-column align="center" :sortable="true" label="姓名" prop="name" />
             <el-table-column align="center" :sortable="true" label="邮箱" prop="email" />
@@ -173,13 +173,11 @@ function handleDialogClose() {
         </el-table>
         <!-- 分页 -->
         <el-pagination
-            background
-            hide-on-single-page
             layout="total, sizes, prev, pager, next"
             :default-page-size="pagination.default_page_size"
             :page-sizes="pagination.page_sizes"
             :total="pagination.total"
-            style="padding: 10px; float: right"
+            style="padding: 0 10px;margin-left: auto"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </el-row>

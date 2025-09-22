@@ -25,8 +25,8 @@ export function useTable<T>(
     const pagination = ref<Pagination>({
         size: 10,
         page: 1,
-        page_sizes: [15, 50, 100, 150, 300],
-        default_page_size: 15,
+        page_sizes: [10, 50, 100, 150, 300],
+        default_page_size: 10,
         total: 0
     });
 

@@ -103,8 +103,8 @@
 | `spectra-core`      | [spectra-core](spectra-core)           | 核心接口定义、领域模型、服务契约                 |
 | `spectra-workflow`  | [spectra-workflow](spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
 | `spectra-framework` | [spectra-framework](spectra-framework) | 框架级配置（如权限、日志、异常处理、拦截器等）          |
-| `spectra-ui`        | [spectra-ui](spectra-ui)               | 前端 Vue 项目，基于 Vite + Element Plus |
 | `spectra-launch`    | [spectra-launch](spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
+| `spectra-ui`        | [spectra-ui](spectra-ui)               | 前端 Vue 项目，基于 Vite + Element Plus |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
 
