@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
@@ -60,8 +61,9 @@ public class Organization extends BaseEntity implements Serializable {
 
     /**
      * 编码
+     * <p>插入时候生成,后续不参与更新等操作</p>
      */
-    @TableField(value = "CODE")
+    @TableField(value = "CODE", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
     /**
@@ -69,18 +71,6 @@ public class Organization extends BaseEntity implements Serializable {
      */
     @TableField(value = "TYPE")
     private Short type;
-
-    /**
-     * 组织机构所在地址
-     */
-    @TableField(value = "ADDRESS")
-    private String address;
-
-    /**
-     * 负责人ID
-     */
-    @TableField(value = "MANAGER_ID")
-    private Long managerId;
 
     /**
      * 备注

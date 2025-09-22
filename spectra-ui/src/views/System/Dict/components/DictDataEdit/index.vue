@@ -109,7 +109,11 @@ function handleSaveDictGroup() {
 </script>
 
 <template>
-    <el-dialog v-model="edit.visible" :title="edit.title" width="500" class="loading-box">
+    <el-dialog v-model="edit.visible" width="500" class="loading-box">
+        <template #header>
+            <icons name="icon-edit" />
+            {{ edit.title }}
+        </template>
         <template #default>
             <el-form ref="editForm" :model="edit.form" :rules="edit.rules" label-width="auto">
                 <el-form-item v-if="has_edit" label="主键ID">

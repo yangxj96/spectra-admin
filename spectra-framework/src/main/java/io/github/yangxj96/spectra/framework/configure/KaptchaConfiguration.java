@@ -55,7 +55,7 @@ public class KaptchaConfiguration {
      * @return {@link Producer}
      */
     @Bean
-    @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "char")
+    @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() {
         log.atDebug().log(PREFIX + "开始配置图片验证码,字符模式");
         DefaultKaptcha defaultKaptcha = new DefaultKaptcha();

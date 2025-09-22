@@ -20,7 +20,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
@@ -84,7 +83,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var wrapper = new LambdaQueryWrapper<User>()
                 .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
                 .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                .ne(BaseEntity::getId, StpUtil.getLoginIdAsLong())
+                //.ne(BaseEntity::getId, StpUtil.getLoginIdAsLong())
                 .eq(params.getStatus() != null, User::getState, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);

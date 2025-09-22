@@ -45,17 +45,6 @@ public class OrganizationController {
     private OrganizationService bindService;
 
     /**
-     * 组织机构树形结构
-     *
-     * @return 组织机构树形结构数组
-     */
-    @ULog("获取组织机构树形列表")
-    @GetMapping("/tree")
-    public List<OrganizationTreeVo> tree() {
-        return bindService.tree();
-    }
-
-    /**
      * 新增组织机构
      *
      * @param from 请求入参
@@ -89,6 +78,17 @@ public class OrganizationController {
     @SaCheckEL("@ss.hasPermission('ORGANIZATION:UPDATE')")
     public void modify(@RequestBody @Validated(Verify.Update.class) OrganizationFrom from) {
         bindService.modify(from);
+    }
+
+    /**
+     * 组织机构树形结构
+     *
+     * @return 组织机构树形结构数组
+     */
+    @ULog("获取组织机构树形列表")
+    @GetMapping("/tree")
+    public List<OrganizationTreeVo> tree() {
+        return bindService.tree();
     }
 
 }

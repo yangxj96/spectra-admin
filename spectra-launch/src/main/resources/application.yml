@@ -21,8 +21,9 @@ spectra:
         - io.github.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
   # 验证码相关
   kaptcha:
-    type: math
+    type: chat
     verify: false
+    duration: 1m
 # 服务器配置
 server:
   port: 8888
@@ -130,9 +131,10 @@ mybatis-plus:
     banner: false
     db-config:
       id-type: assign_id
-      logic-delete-field: deleted
-      logic-not-delete-value: "null"
-      logic-delete-value: "now()"
+      # 开发过程中,不使用逻辑删除
+      # logic-delete-field: deleted
+      # logic-not-delete-value: "null"
+      # logic-delete-value: "now()"
       schema: SPECTRA
 # 日志配置
 logging:

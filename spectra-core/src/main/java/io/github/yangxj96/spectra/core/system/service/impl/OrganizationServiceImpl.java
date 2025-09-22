@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.system.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
@@ -49,16 +50,10 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     private OrganizationConverter organizationConverter;
 
     @Override
-    public List<OrganizationTreeVo> tree() {
-        var list = this.list();
-        var vos = organizationConverter.toTreeVOS(list);
-        return new TreeBuilder<>(vos).buildTree(Common.PID);
-    }
-
-    @Override
     @Transactional
     public void created(OrganizationFrom from) {
         Organization entity = organizationConverter.toEntity(from);
+        entity.setCode(IdWorker.get32UUID().toUpperCase());
         this.save(entity);
     }
 
@@ -78,6 +73,13 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
         }
         Organization entity = organizationConverter.toEntity(from);
         this.updateById(entity);
+    }
+
+    @Override
+    public List<OrganizationTreeVo> tree() {
+        var list = this.list();
+        var vos = organizationConverter.toTreeVOS(list);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override

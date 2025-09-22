@@ -33,13 +33,6 @@ import java.util.List;
 public interface OrganizationService extends IService<Organization> {
 
     /**
-     * 组织机构树形结构
-     *
-     * @return 组织机构树形结构数组
-     */
-    List<OrganizationTreeVo> tree();
-
-    /**
      * 新增组织机构
      *
      * @param from 请求入参
@@ -68,4 +61,11 @@ public interface OrganizationService extends IService<Organization> {
      * @return 所有子级列表
      */
     List<Organization> getAllChildrenById(Long organizationId);
+
+    /**
+     * 组织机构树形结构
+     *
+     * @return 组织机构树形结构数组
+     */
+    List<OrganizationTreeVo> tree();
 }

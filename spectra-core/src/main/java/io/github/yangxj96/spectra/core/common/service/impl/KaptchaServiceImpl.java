@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码服务默认实现
@@ -91,7 +90,7 @@ public class KaptchaServiceImpl implements KaptchaService {
         }
 
         // 存储到缓存中
-        redisTemplate.opsForValue().set(RedisKey.KAPTCHA + request.getSession().getId(), code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set(RedisKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration());
 
         ServletOutputStream out = response.getOutputStream();
         try (out) {

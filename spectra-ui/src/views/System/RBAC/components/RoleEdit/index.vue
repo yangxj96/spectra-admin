@@ -61,13 +61,16 @@ async function handleRoleSave() {
 <template>
     <el-dialog
         v-model="dialog"
-        :title="`${modify ? '编辑' : '新增'}角色`"
         width="30%"
         class="loading-box"
         :show-close="false"
         :destroy-on-close="true"
         :close-on-click-modal="false"
         :close-on-press-escape="false">
+        <template #header>
+            <icons name="icon-edit" />
+            {{ `${modify ? '编辑' : '新增'}角色` }}
+        </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto">
                 <el-form-item label="角色名称" prop="name">

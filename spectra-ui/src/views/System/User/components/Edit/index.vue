@@ -90,8 +90,11 @@ async function handleUserSave() {
         :close-on-press-escape="false"
         :show-close="false"
         :destroy-on-close="true"
-        :title="(form.id ? '编辑' : '新增') + '用户'"
         width="30vw">
+        <template #header>
+            <icons name="icon-edit" />
+            {{ (form.id ? "编辑" : "新增") + "用户" }}
+        </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" @submit.prevent>
                 <el-form-item label="姓名" prop="name">

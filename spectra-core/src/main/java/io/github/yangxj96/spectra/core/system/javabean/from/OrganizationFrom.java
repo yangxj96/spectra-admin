@@ -52,22 +52,13 @@ public class OrganizationFrom {
     /**
      * 编码
      */
+    @Null(message = "组织机构编码只能自动生成", groups = Verify.Insert.class)
     private String code;
 
     /**
      * 组织机构类型
      */
     private Short type;
-
-    /**
-     * 组织机构所在地址
-     */
-    private String address;
-
-    /**
-     * 负责人ID
-     */
-    private Long managerId;
 
     /**
      * 备注

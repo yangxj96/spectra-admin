@@ -20,6 +20,8 @@ import io.github.yangxj96.spectra.common.enums.KaptchaType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.time.Duration;
+
 /**
  * 验证码生成相关配置
  *
@@ -41,4 +43,8 @@ public class KaptchaProperties {
      */
     private KaptchaType type = KaptchaType.MATH;
 
+    /**
+     * 验证码存储时长,默认1分钟
+     */
+    private Duration duration = Duration.ofMinutes(1);
 }

@@ -168,8 +168,11 @@ async function handleMenuSave() {
         :close-on-press-escape="false"
         :show-close="false"
         :destroy-on-close="true"
-        :title="(menu.modify ? '编辑' : '新增') + '菜单'"
         width="30vw">
+        <template #header>
+            <icons name="icon-edit" />
+            {{ (menu.modify ? "编辑" : "新增") + "菜单" }}
+        </template>
         <template #default>
             <el-form
                 ref="ruleFormRef"

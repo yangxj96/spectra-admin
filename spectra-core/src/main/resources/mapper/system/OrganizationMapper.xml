@@ -10,8 +10,6 @@
         <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
         <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
         <result column="TYPE"       jdbcType="SMALLINT"  property="type"/>
-        <result column="ADDRESS"    jdbcType="SMALLINT"  property="address"/>
-        <result column="MANAGER_ID" jdbcType="BIGINT"    property="managerId"/>
         <result column="REMARK"     jdbcType="VARCHAR"   property="remark"/>
         <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
@@ -28,8 +26,6 @@
         NAME,
         CODE,
         TYPE,
-        ADDRESS,
-        MANAGER_ID,
         REMARK,
         CREATED_BY,
         CREATED_AT,
