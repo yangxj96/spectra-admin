@@ -53,7 +53,7 @@ async function handleRoleSave() {
         :close-on-press-escape="false">
         <template #header>
             <icons name="icon-edit" />
-            {{ `${modify ? '编辑' : '新增'}角色` }}
+            {{ `${modify ? "编辑" : "新增"}角色` }}
         </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto">

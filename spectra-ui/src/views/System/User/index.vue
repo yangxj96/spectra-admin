@@ -161,7 +161,7 @@ function handleDialogClose() {
             :default-page-size="pagination.default_page_size"
             :page-sizes="pagination.page_sizes"
             :total="pagination.total"
-            style="padding: 0 10px;margin-left: auto"
+            style="padding: 0 10px; margin-left: auto"
             @size-change="handleSizeChange"
             @current-change="handleCurrentChange" />
     </el-row>

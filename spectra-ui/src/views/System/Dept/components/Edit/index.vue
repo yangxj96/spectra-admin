@@ -78,10 +78,10 @@ async function handleOrganizationSave() {
                 label-width="auto"
                 style="padding: 20px"
                 @submit.prevent>
-                <el-form-item label="主键" prop="id" v-if="modify">
+                <el-form-item v-if="modify" label="主键" prop="id">
                     <el-text type="info">{{ form.id }}</el-text>
                 </el-form-item>
-                <el-form-item label="编码" prop="code" v-if="modify">
+                <el-form-item v-if="modify" label="编码" prop="code">
                     <el-text type="info">{{ form.code }}</el-text>
                 </el-form-item>
                 <el-form-item label="父级" prop="pid">
@@ -98,18 +98,10 @@ async function handleOrganizationSave() {
                     <el-input v-model="form.name" clearable placeholder="请输入部门名称" />
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
-                    <dict-select
-                        v-model="form.type"
-                        dict_code="sys_organization_type"
-                        placeholder="请选择部门类型" />
+                    <dict-select v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
-                    <el-input
-                        v-model="form.remark"
-                        type="textarea"
-                        :rows="5"
-                        clearable
-                        placeholder="请输入相关备注" />
+                    <el-input v-model="form.remark" type="textarea" :rows="5" clearable placeholder="请输入相关备注" />
                 </el-form-item>
             </el-form>
         </template>

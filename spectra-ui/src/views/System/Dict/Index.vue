@@ -145,7 +145,7 @@ initData();
             </el-col>
             <el-col :span="20">
                 <el-row>
-                    <el-text size="large">编码: {{ currentGroup?.code}}</el-text>
+                    <el-text size="large">编码: {{ currentGroup?.code }}</el-text>
                 </el-row>
                 <el-table :data="dictDataTableData" row-key="id" stripe height="78vh">
                     <template #empty>

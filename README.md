@@ -2,9 +2,9 @@
 
 > 一个基于 Spring Boot 3 + Vue 3 的现代化前后端分离通用框架
 
-![Java](https://img.shields.io/badge/Java-21-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-brightgreen)
-![Vue](https://img.shields.io/badge/Vue-3.5.17-green)
+![Java](https://img.shields.io/badge/Java-25-blue)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.6-brightgreen)
+![Vue](https://img.shields.io/badge/Vue-3.5.21-green)
 ![达梦8](https://img.shields.io/badge/达梦-8-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
@@ -27,9 +27,9 @@
 
 | 技术              | 版本     | 说明             |
 |-----------------|--------|----------------|
-| Java            | JDK 21 | 使用最新LTS版本，性能更强 |
+| Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.9  | 构建工具           |
-| Spring Boot     | 3.5.5  | 核心框架           |
+| Spring Boot     | 3.5.6  | 核心框架           |
 | MyBatis-Plus    | 3.5.12 | 增强ORM，简化CRUD   |
 | Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
@@ -44,13 +44,13 @@
 
 | 包名           | 版本      | 用途                     |
 |--------------|---------|------------------------|
-| Vue          | 3.5.17  | 渐进式前端框架                |
+| Vue          | 3.5.21  | 渐进式前端框架                |
 | Vue Router   | 4.5.1   | 路由管理                   |
 | Pinia        | 3.0.3   | 状态管理（Vuex替代）           |
-| @vueuse/core | 13.5.0  | 实用 Composition API 工具库 |
-| Vite         | 7.1.5   | 构建工具，极速启动              |
-| Element Plus | 2.11.1  | UI 组件库                 |
-| Axios        | 1.11.0  | HTTP 请求客户端             |
+| @vueuse/core | 13.9.0  | 实用 Composition API 工具库 |
+| Vite         | 7.1.7   | 构建工具，极速启动              |
+| Element Plus | 2.11.3  | UI 组件库                 |
+| Axios        | 1.12.2  | HTTP 请求客户端             |
 | ECharts      | 5.6.0   | 数据可视化图表                |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
 | ESLint       | 9.30.1  | 代码质量检查                 |
@@ -119,7 +119,7 @@
 
 2. 创建 `.env` 文件并配置环境变量（前后端分别配置）
 
-3. 启动后端服务（确保 DM数据库 已运行）：
+3. 启动后端服务（确保`达梦数据库`已运行）：
    ```bash
    cd spectra-launch
    mvn spring-boot:run
@@ -138,7 +138,7 @@
 
 ## 🌟 特性亮点
 
-- ✅ 基于 Spring Boot 3 + Java 21，响应式编程支持
+- ✅ 基于 Spring Boot 3 + Java 25，响应式编程支持
 - ✅ 前后端完全分离，Vite 提供极速 HMR
 - ✅ Sa-Token 实现 RBAC 权限模型（用户、角色、菜单、按钮权限）
 - ✅ MyBatis-Plus + MapStruct 提升开发效率

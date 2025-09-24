@@ -13,14 +13,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.5</version>
+        <version>3.5.6</version>
         <relativePath/>
     </parent>
 
     <properties>
-        <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <java.version>25</java.version>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <!-- 项目版本 -->
         <revision>0.0.1-SNAPSHOT</revision>
@@ -66,6 +66,17 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
+            <!-- 统一netty版本 -->
+            <!-- 较低版本使用了不安全代码 -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>4.2.6.Final</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- druid -->
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -172,7 +183,6 @@
                 <artifactId>mica-core</artifactId>
                 <version>${mica.version}</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 
@@ -197,6 +207,7 @@
             <scope>test</scope>
         </dependency>
         <!-- Spring Boot End -->
+
 
         <!-- MapStruct -->
         <!-- 这三个的顺序不能调整,不然生成的mapstruct实现类会出问题 -->

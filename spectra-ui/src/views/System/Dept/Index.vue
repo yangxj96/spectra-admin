@@ -53,7 +53,6 @@ function handleDialogClose() {
     }
     handleCriteriaQuery();
 }
-
 </script>
 
 <template>
@@ -106,7 +105,6 @@ function handleDialogClose() {
     </el-row>
     <!-- 新增或编辑 -->
     <organization-edit :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
-
 </template>
 
 <style scoped lang="scss">
