@@ -2,6 +2,8 @@ package io.github.yangxj96.spectra.core.auth.configure;
 
 import cn.dev33.satoken.listener.SaTokenListenerForSimple;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.yangxj96.spectra.common.enums.SysLogType;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.system.javabean.entity.OperationLog;
@@ -20,6 +22,9 @@ import org.springframework.stereotype.Component;
 public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
 
     @Resource
+    private ObjectMapper om;
+
+    @Resource
     private OperationLogService logService;
 
     @Resource
@@ -30,17 +35,23 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
 
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
-        var datum = OperationLog.builder()
-                .type(SysLogType.SAFETY)
-                .explain("登录")
-                .status(Short.parseShort(String.valueOf(response.getStatus())))
-                .ip(IpUtils.getClientIP(request))
-                .url(request.getRequestURI())
-                .method(request.getMethod())
-                .createdBy(Long.parseLong(loginId.toString()))
-                .updatedBy(Long.parseLong(loginId.toString()))
-                .build();
-        logService.save(datum);
+        try {
+            OperationLog datum = OperationLog.builder()
+                    .type(SysLogType.SAFETY)
+                    .explain("登录")
+                    .status(Short.parseShort(String.valueOf(response.getStatus())))
+                    .ip(IpUtils.getClientIP(request))
+                    .url(request.getRequestURI())
+                    .method(request.getMethod())
+                    .args(om.writeValueAsString(loginParameter))
+                    .result(tokenValue)
+                    .createdBy(Long.parseLong(loginId.toString()))
+                    .updatedBy(Long.parseLong(loginId.toString()))
+                    .build();
+            logService.save(datum);
+        } catch (JsonProcessingException e) {
+            log.atError().log("序列化登录参数失败,{}", e.getMessage(), e);
+        }
     }
 
     @Override
@@ -52,6 +63,7 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
                 .ip(IpUtils.getClientIP(request))
                 .url(request.getRequestURI())
                 .method(request.getMethod())
+                .args(tokenValue)
                 .createdBy(Long.parseLong(loginId.toString()))
                 .updatedBy(Long.parseLong(loginId.toString()))
                 .build();
