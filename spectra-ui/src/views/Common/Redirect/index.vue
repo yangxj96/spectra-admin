@@ -17,11 +17,10 @@ if (typeof route.params.path === "string") {
 console.log("target:", targetPath);
 
 onMounted(async () => {
-    // router.replace(targetPath);
-    // ✅ 等待动态菜单加载完成
+    // 等待动态菜单加载完成
     await waitForMenuLoad().then(() => console.log("菜单加载完成,准备跳转路由."));
 
-    // ✅ 确保路由已添加
+    // 确保路由已添加
     if (router.hasRoute(targetPath) || isRouteExists(targetPath)) {
         await router.replace(targetPath);
     } else {
@@ -32,7 +31,7 @@ onMounted(async () => {
 });
 
 
-// ✅ 等待菜单加载完成
+// 等待菜单加载完成
 function waitForMenuLoad() {
     return new Promise<void>((resolve) => {
         // 如果菜单已加载，直接返回
@@ -54,7 +53,7 @@ function waitForMenuLoad() {
     });
 }
 
-// ✅ 辅助函数：判断路由是否存在（更精确）
+// 辅助函数：判断路由是否存在（更精确）
 function isRouteExists(path: string) {
     try {
         return router.resolve(path).name !== undefined;
