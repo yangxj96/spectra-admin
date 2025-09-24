@@ -53,7 +53,7 @@ async function handleLogin() {
                         message: "登录成功",
                         onClose() {
                             useUserStore().token = res.data!;
-                            let path = "/redirect" + (redirect.value !== undefined ? redirect.value : "");
+                            let path = "/redirect" + (redirect.value === undefined ? "" : redirect.value);
                             router.push({
                                 path: path
                             });

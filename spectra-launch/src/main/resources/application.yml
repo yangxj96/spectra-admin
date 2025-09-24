@@ -85,6 +85,7 @@ spring:
         enabled: true
         # 配置监控后台访问路径
         url-pattern: /druid/*
+        reset-enable: false
       filter:
         # 统计
         stat:

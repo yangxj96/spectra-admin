@@ -20,15 +20,16 @@ export default {
             globalThis.sessionStorage.clear();
 
             // 👇 关键：使用 fromPath，而不是再次读取 currentRoute
-            router.push({
-                path: "/login",
-                query: {
-                    redirect: fromPath
-                }
-            }).then(() => {
-                console.log(`用户已登出，跳转至登录页，来源: ${fromPath}`);
-            });
-
+            router
+                .push({
+                    path: "/login",
+                    query: {
+                        redirect: fromPath
+                    }
+                })
+                .then(() => {
+                    console.log(`用户已登出，跳转至登录页，来源: ${fromPath}`);
+                });
         } catch (error) {
             console.error("登出过程发生错误:", error);
             // 确保无论如何都跳转

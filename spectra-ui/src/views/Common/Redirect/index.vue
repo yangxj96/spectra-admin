@@ -16,7 +16,7 @@ if (typeof route.params.path === "string") {
 
 onMounted(async () => {
     // 等待动态菜单加载完成
-    await waitForMenuLoad().then(() => console.log("菜单加载完成,准备跳转路由."));
+    await waitForMenuLoad().then(() => console.debug("菜单加载完成,准备跳转路由."));
 
     // 确保路由已添加
     if (router.hasRoute(targetPath) || isRouteExists(targetPath)) {
@@ -28,10 +28,9 @@ onMounted(async () => {
     }
 });
 
-
 // 等待菜单加载完成
 function waitForMenuLoad() {
-    return new Promise<void>((resolve) => {
+    return new Promise<void>(resolve => {
         // 如果菜单已加载，直接返回
         if (UseAppStore().menus.length > 0 && !UseAppStore().isFetchingMenus) {
             return resolve();
