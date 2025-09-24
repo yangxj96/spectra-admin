@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.common.javabean;
 
+import io.github.yangxj96.spectra.common.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -35,6 +36,11 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ULogEntity implements Serializable {
+
+    /**
+     * 日志类型
+     */
+    private SysLogType type;
 
     /**
      * 操作说明

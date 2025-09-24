@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.system.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
+import io.github.yangxj96.spectra.common.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,11 +43,17 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_OPERATION_LOG")
+@TableName(value = "SYS_LOG")
 public class OperationLog extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 日志类型
+     */
+    @TableField(value = "TYPE")
+    private SysLogType type;
 
     /**
      * 日志说明

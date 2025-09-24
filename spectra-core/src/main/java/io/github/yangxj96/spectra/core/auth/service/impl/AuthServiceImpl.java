@@ -69,8 +69,6 @@ public class AuthServiceImpl implements AuthService {
             if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
                 throw new LoginException("账号或密码错误");
             }
-            // 先登出,清空旧的接口
-            StpUtil.logout(datum.getId());
             // 登录
             StpUtil.login(datum.getId(), new SaLoginParameter()
                     .setDeviceType("PC")

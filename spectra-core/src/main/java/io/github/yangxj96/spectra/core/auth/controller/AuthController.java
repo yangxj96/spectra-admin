@@ -46,14 +46,12 @@ public class AuthController {
     private AuthService bindService;
 
     @SaIgnore
-    @ULog("登录")
     @PostMapping("/login")
     public TokenVO login(@Validated @RequestBody UsernamePasswordFrom params) throws LoginException {
         return bindService.login(params);
     }
 
     @SaCheckLogin
-    @ULog("退出登录")
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout() {

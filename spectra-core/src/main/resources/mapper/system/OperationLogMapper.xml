@@ -4,8 +4,9 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.system.javabean.entity.OperationLog">
         <!--@mbg.generated-->
-        <!--@Table "SYS_OPERATION_LOG"-->
+        <!--@Table "SYS_LOG"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
+        <result column="TYPE"       jdbcType="INTEGER"   property="type"/>
         <result column="EXPLAIN"    jdbcType="VARCHAR"   property="explain"/>
         <result column="STATUS"     jdbcType="SMALLINT"  property="status"/>
         <result column="IP"         jdbcType="VARCHAR"   property="ip"/>
@@ -26,6 +27,7 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
+        TYPE,
         EXPLAIN,
         STATUS,
         IP,

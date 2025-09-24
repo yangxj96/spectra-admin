@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.framework.aspect;
 import cn.dev33.satoken.stp.StpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.yangxj96.spectra.common.annotation.ULog;
+import io.github.yangxj96.spectra.common.enums.SysLogType;
 import io.github.yangxj96.spectra.common.javabean.ULogEntity;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.framework.publisher.ULogEventPublisher;
@@ -97,6 +98,7 @@ public class ULogAspect {
             // 初始化记录实体
             ULogEntity datum = ULogEntity
                     .builder()
+                    .type(SysLogType.GENERAL)
                     .explain(annotation.value())
                     .ip(IpUtils.getClientIP(request))
                     .method(request.getMethod())
@@ -130,7 +132,7 @@ public class ULogAspect {
         try {
             return om.writeValueAsString(obj);
         } catch (Exception e) {
-            log.atError().log(PREFIX + "JSON 序列化失败: {}", obj.getClass());
+            log.atError().log(PREFIX + "JSON 序列化失败: {}", obj.getClass(), e);
             return null;
         }
     }
