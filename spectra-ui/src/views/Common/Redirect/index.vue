@@ -14,8 +14,6 @@ if (typeof route.params.path === "string") {
     targetPath += route.params.path;
 }
 
-console.log("target:", targetPath);
-
 onMounted(async () => {
     // 等待动态菜单加载完成
     await waitForMenuLoad().then(() => console.log("菜单加载完成,准备跳转路由."));
