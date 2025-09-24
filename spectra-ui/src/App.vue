@@ -22,7 +22,6 @@ function check() {
         return;
     }
     AuthApi.check().then(res => {
-        console.log(res);
         if (res.code !== 200) {
             ElMessage.error({
                 message: res.msg,

@@ -91,7 +91,7 @@ const responseRejected = (error: AxiosError) => {
                 ElMessageBox.alert(result.msg, "认证异常", {
                     type: "error"
                 }).finally(() => {
-                    GlobalUtils.exit();
+                    GlobalUtils.toLogin();
                 });
                 return;
             }

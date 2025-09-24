@@ -49,7 +49,7 @@ router.beforeEach(async (to, _, next) => {
     // 4. 需要加载菜单（首次进入或刷新）
     if (menus.length === 0 || sessionStorage.getItem("reloaded")) {
         console.log("[守卫] 需要加载菜单");
-        await loadMenu(router, to, next);
+        return await loadMenu(router, to, next);
     }
 
     // 5. 路由未匹配（404）

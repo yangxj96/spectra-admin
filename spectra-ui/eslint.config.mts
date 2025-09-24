@@ -44,11 +44,13 @@ const sharedRules = {
 };
 
 export default [
+    // 忽略指定文件
     {
         ignores: ["**/build", "**/node_modules", "src/assets/iconfont/*", "src/env.d.ts"]
     },
+    // --- TypeScript 文件 ---
     {
-        files: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs", "**/*.mjs"],
+        files: ["**/*.ts", "**/*.tsx"],
         languageOptions: {
             parser: parserTypescript,
             globals: globals.builtin
@@ -63,12 +65,38 @@ export default [
             ...sharedRules
         }
     },
+    // --- JavaScript 文件 ---
+    {
+        files: ["**/*.js", "**/*.cjs", "**/*.mjs"],
+        languageOptions: {
+            globals: {
+                ...globals.builtin,
+                ...globals.browser, // 假设是浏览器环境
+                ...globals.node
+            }
+        },
+        plugins: {
+            unicorn: pluginUnicorn
+        },
+        rules: {
+            ...pluginUnicorn.configs.recommended.rules,
+            ...sharedRules
+        }
+    },
+    // --- Vue 文件 ---
     {
         files: ["**/*.vue"],
         languageOptions: {
             parser: parserVue,
             parserOptions: {
-                parser: parserTypescript
+                // parser: parserTypescript
+                parser: "@typescript-eslint/parser",
+                sourceType: "module",
+                ecmaVersion: 2022
+            },
+            globals: {
+                ...globals.browser,
+                ...globals.node
             }
         },
         rules: {
@@ -76,7 +104,7 @@ export default [
             ...pluginVue.configs.recommended.rules,
             ...pluginTypescript.configs.recommended.rules,
             ...sharedRules,
-            // "vue/no-v-html": "error",
+            // vue文件的排序
             "vue/block-order": [
                 "error",
                 {
@@ -90,5 +118,6 @@ export default [
             "@typescript-eslint": pluginTypescript
         }
     },
+    // --- Prettier ---
     pluginPrettierRecommended
 ];

@@ -3,10 +3,11 @@ import AuthApi from "@/api/AuthApi.ts";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import { ElForm, ElMessage, type FormRules } from "element-plus";
 
+const route = useRoute();
 const router = useRouter();
 const loginRef = useTemplateRef<InstanceType<typeof ElForm>>("loginForm");
 const kaptchaUrl = ref(import.meta.env.VITE_API_URL + "api/common/kaptcha?_t=" + Date.now());
-
+const redirect = ref<string>(route.query.redirect as string | "/");
 const login = reactive({
     form: {
         username: "yangxj96@gmail.com",
@@ -52,7 +53,10 @@ async function handleLogin() {
                         message: "登录成功",
                         onClose() {
                             useUserStore().token = res.data!;
-                            router.push({ path: "/" });
+                            let path = "/redirect" + (redirect.value !== undefined ? redirect.value : "");
+                            router.push({
+                                path: path
+                            });
                         }
                     });
                 }

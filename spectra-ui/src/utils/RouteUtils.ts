@@ -34,7 +34,7 @@ export const convertMenuToRoutes = (menus: Menu[]): RouteRecordRaw[] => {
         };
         // 根据菜单是否有下级,进行转换
         if (menu.children && menu.children.length > 0) {
-            route.redirect = menu.children[0].path;
+            route.redirect = menu.children[0]!.path;
             route.children = convertMenuToRoutes(menu.children);
         }
         return route;
