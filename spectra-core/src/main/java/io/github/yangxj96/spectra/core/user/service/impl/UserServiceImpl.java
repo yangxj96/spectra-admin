@@ -30,6 +30,7 @@ import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.service.OrganizationService;
 import io.github.yangxj96.spectra.core.user.javabean.converter.PermissionConverter;
 import io.github.yangxj96.spectra.core.user.javabean.converter.UserConverter;
+import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
@@ -134,7 +135,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new EntityUpdateException("更新用户发生错误");
         }
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
-        var currentRoles = new HashSet<>(roleService.getRoleIdsByUserId(params.getId()));
+        var currentRoles = new HashSet<>(roleService.getByUserId(params.getId()).stream().map(Role::getId).toList());
         var targetRoles = new HashSet<>(params.getRoleIds() != null ? params.getRoleIds() : List.of());
 
         // 计算要删除的

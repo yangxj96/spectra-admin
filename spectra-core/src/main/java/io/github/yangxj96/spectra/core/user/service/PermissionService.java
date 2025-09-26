@@ -16,20 +16,6 @@
 
 package io.github.yangxj96.spectra.core.user.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
-import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
-import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
-import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
-import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
-import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
-import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
-import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
-import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
-
-import java.util.List;
-
-
 /**
  * 权限service层
  *
@@ -39,80 +25,5 @@ import java.util.List;
  */
 public interface PermissionService {
 
-    /**
-     * 新增角色
-     *
-     * @param params 角色入参实体
-     */
-    void createdRole(RoleFrom params);
-
-    /**
-     * 根据ID删除角色,同时会移除此角色和用户管理的关联关系
-     *
-     * @param id 角色ID
-     */
-    void deleteRole(Long id);
-
-    /**
-     * 修改角色
-     *
-     * @param params 角色入参实体
-     */
-    void modifyRole(RoleFrom params);
-
-    /**
-     * 分页查询角色信息
-     *
-     * @param page   分页信息
-     * @param params 查询参数
-     * @return 分页结果
-     */
-    IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params);
-
-    /**
-     * 获取角色列表
-     *
-     * @return 角色列表
-     */
-    List<RoleVO> listRole();
-
-    /**
-     * 获取权限树
-     *
-     * @return 权限树列表
-     */
-    List<AuthorityTreeVO> authorityTree();
-
-    /**
-     * 根据角色ID获取角色关联的权限列表
-     *
-     * @param id 角色ID
-     * @return 关联的权限列表
-     */
-    List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id);
-
-    /**
-     * 根据角色ID获取角色关联的菜单列表
-     *
-     * @param id 角色ID
-     * @return 关联的菜单列表
-     */
-    List<MenuVO> getRoleRelevanceMenuByRoleId(long id);
-
-    /**
-     * 根据角色ID保存角色关联的权限列表
-     *
-     * @param id   角色ID
-     * @param from 入参条件
-     */
-    void saveRoleRelevanceAuthorityByRoleId(long id, RoleAuthorityFrom from);
-
-    /**
-     * 根据角色ID保存角色关联的菜单列表
-     *
-     * @param id   角色ID
-     * @param from 入参条件
-     */
-    void saveRoleRelevanceMenuByRoleId(long id, RoleMenuFrom from);
 
 }

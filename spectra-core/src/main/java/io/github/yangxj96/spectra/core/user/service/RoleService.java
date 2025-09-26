@@ -16,11 +16,18 @@
 
 package io.github.yangxj96.spectra.core.user.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.BaseService;
+import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
+import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
+import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 
 import java.util.List;
 
@@ -40,14 +47,6 @@ public interface RoleService extends BaseService<Role> {
      * @return 角色列表
      */
     List<Role> getByUserId(Long uid);
-
-    /**
-     * 根据账号ID获取所拥有的角色的ID列表
-     *
-     * @param uid 账号ID
-     * @return 角色ID列表
-     */
-    List<Long> getRoleIdsByUserId(Long uid);
 
     /**
      * 新增用户关联关系
@@ -83,21 +82,6 @@ public interface RoleService extends BaseService<Role> {
      */
     List<Authority> getAuthorityById(List<Long> ids);
 
-    /**
-     * 根据角色ID保存角色关联的权限列表
-     *
-     * @param id   角色ID
-     * @param from 入参条件
-     */
-    void saveAuthorityById(Long id, RoleAuthorityFrom from);
-
-    /**
-     * 根据角色ID保存角色关联的菜单列表
-     *
-     * @param id   角色ID
-     * @param from 入参条件
-     */
-    void saveMenuById(Long id, RoleMenuFrom from);
 
     /**
      * 清理这个角色的所有关联关系
@@ -105,4 +89,72 @@ public interface RoleService extends BaseService<Role> {
      * @param id 角色ID
      */
     void clearRoleRel(Long id);
+
+    /**
+     * 创建角色
+     *
+     * @param params 实体入参
+     */
+    void created(RoleFrom params);
+
+    /**
+     * 删除角色
+     *
+     * @param id 角色ID
+     */
+    void delete(long id);
+
+    /**
+     * 修改角色
+     *
+     * @param params 实体入参
+     */
+    void modify(RoleFrom params);
+
+    /**
+     * 分页查询角色信息
+     *
+     * @param page   分页信息
+     * @param params 查询参数
+     */
+    IPage<RoleVO> page(PageFrom page, RolePageFrom params);
+
+    /**
+     * 查询所有角色列表
+     *
+     * @return 角色列表
+     */
+    List<RoleVO> all();
+
+    /**
+     * 根据角色获取角色关联的权限信息
+     *
+     * @param roleId 角色id
+     * @return 权限信息
+     */
+    List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long roleId);
+
+    /**
+     * 根据角色获取角色关联的菜单信息
+     *
+     * @param roleId 角色id
+     * @return 菜单信息
+     */
+    List<MenuVO> getRoleRelevanceMenuByRoleId(long roleId);
+
+    /**
+     * 保存角色关联权限的信息
+     *
+     * @param roleId 角色id
+     * @param from   关联信息
+     */
+    void saveRoleRelevanceAuthorityByRoleId(long roleId, RoleAuthorityFrom from);
+
+    /**
+     * 保存角色关联权限的信息
+     *
+     * @param roleId 角色id
+     * @param from   关联信息
+     */
+    void saveRoleRelevanceMenuByRoleId(long roleId, RoleMenuFrom from);
 }

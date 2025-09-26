@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.user.javabean.converter;
 
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
@@ -49,4 +50,10 @@ public interface AuthorityConverter {
      */
     List<AuthorityVO> toVOS(List<Authority> coll);
 
+    /**
+     * 转成树形需要的vo
+     * @param authorities 权限列表
+     * @return 树形vo
+     */
+    List<AuthorityTreeVO> toTreeVos(List<Authority> authorities);
 }

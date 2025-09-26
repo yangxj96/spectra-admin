@@ -16,19 +16,19 @@
 
 package io.github.yangxj96.spectra.core.user.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
+import io.github.yangxj96.spectra.common.constant.Common;
+import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.user.javabean.converter.AuthorityConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.mapper.AuthorityMapper;
 import io.github.yangxj96.spectra.core.user.mapper.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.user.service.AuthorityService;
 import jakarta.annotation.Resource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -43,16 +43,11 @@ import java.util.List;
 public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Authority> implements AuthorityService {
 
     @Resource
+    private AuthorityConverter authorityConverter;
+
+    @Resource
     private RelRoleAuthorityMapper relRoleAuthorityMapper;
 
-    @Override
-    public List<Authority> getByRelRoleAuthority(List<RelRoleAuthority> relRoleAuthorities) {
-        if (relRoleAuthorities == null || CollectionUtils.isEmpty(relRoleAuthorities)) {
-            return new ArrayList<>();
-        }
-        List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
-        return this.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
-    }
 
     @Override
     public List<Authority> getByRelRoleId(long id) {
@@ -61,5 +56,12 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
             return Collections.emptyList();
         }
         return this.listByIds(relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList());
+    }
+
+    @Override
+    public List<AuthorityTreeVO> tree() {
+        List<Authority> authorities = this.list();
+        List<AuthorityTreeVO> vos = authorityConverter.toTreeVos(authorities);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 }

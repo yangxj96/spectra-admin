@@ -60,11 +60,4 @@ public interface PermissionConverter {
      */
     AuthorityTreeVO authorityToTreeVo(Authority authority);
 
-    /**
-     * 权限实体列表到权限树形VO列表
-     *
-     * @param authority 权限实体列表
-     * @return 权限树形VO列表
-     */
-    List<AuthorityTreeVO> authorityToTreeVos(List<Authority> authority);
 }

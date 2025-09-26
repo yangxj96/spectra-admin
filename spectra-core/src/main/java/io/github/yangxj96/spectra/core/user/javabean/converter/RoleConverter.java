@@ -16,8 +16,12 @@
 
 package io.github.yangxj96.spectra.core.user.javabean.converter;
 
+import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
+import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
 
 /**
  * 角色转换用的
@@ -28,5 +32,21 @@ import org.mapstruct.ReportingPolicy;
  */
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RoleConverter {
+
+    /**
+     * 实体转分页VO
+     *
+     * @param entity 实体
+     * @return 分页实体
+     */
+    RoleVO toVO(Role entity);
+
+    /**
+     * 实体列表转分页VO列表
+     *
+     * @param coll 实体列表
+     * @return 分页vo列表
+     */
+    List<RoleVO> toVOs(List<Role> coll);
 
 }

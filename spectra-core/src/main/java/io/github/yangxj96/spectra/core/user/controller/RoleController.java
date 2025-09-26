@@ -1,19 +1,3 @@
-/*
- *  Copyright 2018-2025 yangxj96
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package io.github.yangxj96.spectra.core.user.controller;
 
 import cn.dev33.satoken.annotation.SaCheckEL;
@@ -27,100 +11,58 @@ import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
-import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
-import io.github.yangxj96.spectra.core.user.service.PermissionService;
+import io.github.yangxj96.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 /**
- * 权限操作相关
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
+ * 角色操作
  */
 @Slf4j
 @SaCheckLogin
 @RestController
-@RequestMapping("/permission")
-public class PermissionController {
+@RequestMapping("/role")
+public class RoleController {
 
     @Resource
-    private PermissionService bindService;
+    private RoleService bindService;
+
 
     @ULog("创建角色")
-    @PostMapping("/role")
+    @PostMapping
     @SaCheckEL("@ss.hasPermission('ROLE:INSERT')")
-    public void createdRole(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        bindService.createdRole(params);
+    public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
+        bindService.created(params);
     }
 
     @ULog("删除角色")
-    @DeleteMapping("/role/{id}")
+    @DeleteMapping("/{id}")
     @SaCheckEL("@ss.hasPermission('ROLE:DELETE')")
-    public void deleteRole(@PathVariable String id) {
+    public void delete(@PathVariable String id) {
         try {
-            bindService.deleteRole(Long.parseLong(id));
+            bindService.delete(Long.parseLong(id));
         } catch (NumberFormatException e) {
             log.error("ID转换异常", e);
         }
     }
 
     @ULog("修改角色")
-    @PutMapping("/role")
+    @PutMapping
     @SaCheckEL("@ss.hasPermission('ROLE:UPDATE')")
-    public void modifyRole(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        bindService.modifyRole(params);
+    public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        bindService.modify(params);
     }
 
-    @ULog("创建权限")
-    @PostMapping("/authority")
-    @SaCheckEL("@ss.administrators()")
-    public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        throw new NotImplementedException("无需实现错误");
-    }
-
-    @ULog("删除权限")
-    @DeleteMapping("/authority/{id}")
-    @SaCheckEL("@ss.administrators()")
-    public void deleteAuthority(@PathVariable String id) {
-        throw new NotImplementedException("无需实现错误");
-    }
-
-    @ULog("修改权限信息")
-    @PutMapping("/authority")
-    @SaCheckEL("@ss.administrators()")
-    public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        throw new NotImplementedException("无需实现错误");
-    }
-
-    @ULog("分页查询角色列表")
-    @GetMapping("/role/page")
-    public IPage<RoleVO> pageRole(PageFrom page, RolePageFrom params) {
-        return bindService.pageRole(page, params);
-    }
-
-    @ULog("查询角色列表")
-    @GetMapping("/role/list")
-    public List<RoleVO> listRole() {
-        return bindService.listRole();
-    }
-
-    @ULog("获取权限树列表")
-    @GetMapping("/authority/tree")
-    public List<AuthorityTreeVO> authorityTree() {
-        return bindService.authorityTree();
-    }
+    /* 关联处理部分 */
 
     @ULog("获取角色关联的权限列表")
-    @GetMapping("/role/{roleId}/authority")
+    @GetMapping("/{roleId}/authority")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
         try {
             long id = Long.parseLong(roleId);
@@ -131,7 +73,7 @@ public class PermissionController {
     }
 
     @ULog("获取角色关联的菜单列表")
-    @GetMapping("/role/{roleId}/menu")
+    @GetMapping("/{roleId}/menu")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
         try {
             long id = Long.parseLong(roleId);
@@ -142,7 +84,7 @@ public class PermissionController {
     }
 
     @ULog("保存角色关联的权限列表")
-    @PostMapping("/role/{roleId}/authority")
+    @PostMapping("/{roleId}/authority")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
             long id = Long.parseLong(roleId);
@@ -153,7 +95,7 @@ public class PermissionController {
     }
 
     @ULog("保存角色关联的菜单列表")
-    @PostMapping("/role/{roleId}/menu")
+    @PostMapping("/{roleId}/menu")
     public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
             long id = Long.parseLong(roleId);
@@ -163,4 +105,18 @@ public class PermissionController {
         }
     }
 
+
+    /* 查询部分 */
+
+    @ULog("分页查询角色列表")
+    @GetMapping("/page")
+    public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
+        return bindService.page(page, params);
+    }
+
+    @ULog("查询角色列表")
+    @GetMapping("/list")
+    public List<RoleVO> list() {
+        return bindService.all();
+    }
 }
