@@ -16,7 +16,9 @@
 
 package io.github.yangxj96.spectra.core.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
+import io.github.yangxj96.spectra.core.auth.configure.datascope.DataScope;
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictData;
 import io.github.yangxj96.spectra.core.system.mapper.DictDataMapper;
 import io.github.yangxj96.spectra.core.system.service.DictDataService;
@@ -35,8 +37,9 @@ import java.util.List;
 public class DictDataServiceImpl extends BaseServiceImpl<DictDataMapper, DictData> implements DictDataService {
 
     @Override
+    @DataScope
     public List<DictData> listByGid(Long gid) {
-        var wrapper = this.getWrapper()
+        var wrapper = new LambdaQueryWrapper<DictData>()
                 .eq(DictData::getGid, gid);
         return this.list(wrapper);
     }

@@ -44,11 +44,11 @@
             <version>${project.version}</version>
         </dependency>
         <!-- 许可配置,私单用来防止客户白嫖 -->
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-license</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--<dependency>-->
+        <!--    <groupId>io.github.yangxj96.spectra</groupId>-->
+        <!--    <artifactId>spectra-license</artifactId>-->
+        <!--    <version>${project.version}</version>-->
+        <!--</dependency>-->
         <!-- 项目模块 End -->
 
 

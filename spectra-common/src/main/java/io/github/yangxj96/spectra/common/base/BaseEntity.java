@@ -45,7 +45,6 @@ public class BaseEntity implements Serializable {
     /**
      * 数据id.
      */
-    @OrderBy(asc = true)
     @TableId(value = "ID", type = IdType.ASSIGN_ID)
     private Long id;
 

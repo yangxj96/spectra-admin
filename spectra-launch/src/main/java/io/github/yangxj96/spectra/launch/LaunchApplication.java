@@ -33,7 +33,10 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("io.github.yangxj96.spectra")
 public class LaunchApplication {
 
-    public static void main(String[] args) {
+    private LaunchApplication() {
+    }
+
+    static void main(String[] args) {
         SpringApplication.run(LaunchApplication.class, args);
     }
 
