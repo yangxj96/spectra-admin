@@ -6,6 +6,10 @@ spectra:
   # 系统配置
   system:
     base-dir: files
+    license:
+      license-path: ${spectra.system.base-dir}/license.lic
+      public-key: classpath:key/publicKey.pem
+      private-key: classpath:key/privateKey.pem
   # 文件相关
   file:
     upload:
@@ -41,6 +45,8 @@ jasypt:
     password: ${JASYPT_ENCRYPTOR_PASSWORD}
 # spring 配置
 spring:
+  jackson:
+    time-zone: Asia/Shanghai
   config:
     import:
       - optional:dotenv:./

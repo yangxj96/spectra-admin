@@ -19,7 +19,7 @@
     </properties>
 
     <dependencies>
-
+        <!-- 项目模块 Begin -->
         <!-- 核心 不可移除 Begin -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
@@ -37,13 +37,21 @@
             <version>${project.version}</version>
         </dependency>
         <!-- 核心 不可移除 End -->
-
         <!-- 工作流 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 许可配置,私单用来防止客户白嫖 -->
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-license</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 项目模块 End -->
+
+
         <!-- 配置文件加密 -->
         <dependency>
             <groupId>com.github.ulisesbocchio</groupId>

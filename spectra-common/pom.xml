@@ -22,12 +22,6 @@
     </properties>
 
     <dependencies>
-        <!--&lt;!&ndash; Spring Boot Begin &ndash;&gt;-->
-        <!--<dependency>-->
-        <!--    <groupId>org.springframework.boot</groupId>-->
-        <!--    <artifactId>spring-boot-starter-cache</artifactId>-->
-        <!--</dependency>-->
-        <!--&lt;!&ndash; Spring Boot End &ndash;&gt;-->
 
         <!-- 通用工具包 Begin -->
         <dependency>
@@ -71,6 +65,11 @@
                     <groupId>javax.servlet</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- 加密补充包 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk18on</artifactId>
         </dependency>
         <!-- 通用工具包 End -->
 

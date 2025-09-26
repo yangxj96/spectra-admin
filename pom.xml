@@ -54,6 +54,7 @@
         <module>spectra-launch</module>
         <module>spectra-core</module>
         <module>spectra-workflow</module>
+        <module>spectra-license</module>
     </modules>
 
     <dependencyManagement>
@@ -182,6 +183,12 @@
                 <groupId>net.dreamlu</groupId>
                 <artifactId>mica-core</artifactId>
                 <version>${mica.version}</version>
+            </dependency>
+            <!-- 加密补充包 -->
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcprov-jdk18on</artifactId>
+                <version>1.82</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
