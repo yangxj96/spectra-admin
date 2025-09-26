@@ -55,7 +55,6 @@ spring:
       enabled: true
   main:
     banner-mode: off
-    allow-circular-references: true
   application:
     name: spectra-framework-launch
   datasource:

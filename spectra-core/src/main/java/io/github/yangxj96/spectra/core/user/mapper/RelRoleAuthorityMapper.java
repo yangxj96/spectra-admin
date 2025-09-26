@@ -18,10 +18,20 @@ package io.github.yangxj96.spectra.core.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleAuthority;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * 角色关联权限中间表
  */
 public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
 
+    /**
+     * 根据角色ID获取关联权限信息
+     *
+     * @param roleId 角色ID
+     * @return 关联权限信息
+     */
+    List<RelRoleAuthority> getByRoleId(@Param("roleId") Long roleId);
 }

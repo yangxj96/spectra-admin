@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
-import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
 
 import java.util.List;
 
@@ -32,13 +31,6 @@ import java.util.List;
  * @since 2025-6-14
  */
 public interface MenuService extends IService<Menu> {
-
-    /**
-     * 生成树形菜单
-     *
-     * @return 生成的树形菜单
-     */
-    List<MenuTreeVO> tree();
 
     /**
      * 创建菜单
@@ -55,10 +47,17 @@ public interface MenuService extends IService<Menu> {
     void modify(MenuSaveFrom params);
 
     /**
-     * 根据关联表信息获取菜单列表
+     * 生成树形菜单
      *
-     * @param relRoleMenus 中间表列表
-     * @return 权限列表
+     * @return 生成的树形菜单
      */
-    List<Menu> getByRelRoleMenu(List<RelRoleMenu> relRoleMenus);
+    List<MenuTreeVO> tree();
+
+    /**
+     * 根据角色ID获取角色关联的菜单
+     *
+     * @param id 角色ID
+     * @return 关联的菜单
+     */
+    List<Menu> getByRelRoleId(long id);
 }

@@ -15,6 +15,7 @@ public @interface DataScope {
     /**
      * 是否进行过滤
      * <p>默认需要过滤,预留这个接口主要是为了临时方法不过滤使用</p>
+     *
      * @return 是否进行过滤
      */
     boolean filter() default true;

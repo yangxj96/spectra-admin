@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.core.system.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
-import io.github.yangxj96.spectra.core.auth.service.PermissionService;
+import io.github.yangxj96.spectra.core.auth.service.SecurityService;
 import io.github.yangxj96.spectra.core.system.javabean.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
@@ -30,13 +28,13 @@ import io.github.yangxj96.spectra.core.system.javabean.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.system.mapper.MenuMapper;
 import io.github.yangxj96.spectra.core.system.service.MenuService;
 import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
+import io.github.yangxj96.spectra.core.user.mapper.RelRoleMenuMapper;
 import jakarta.annotation.Resource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -53,15 +51,10 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     private MenuConverter menuConverter;
 
     @Resource
-    private PermissionService permissionService;
+    private SecurityService securityService;
 
-    @Override
-    public List<MenuTreeVO> tree() {
-        List<Menu> menus = permissionService.getCurrentMenus();
-        // 先转树形VO
-        List<MenuTreeVO> vos = menuConverter.toTreeVOS(menus);
-        return new TreeBuilder<>(vos).buildTree(Common.PID);
-    }
+    @Resource
+    private RelRoleMenuMapper roleMenuMapper;
 
     @Override
     @Transactional
@@ -83,11 +76,19 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    public List<Menu> getByRelRoleMenu(List<RelRoleMenu> relRoleMenus) {
-        if (relRoleMenus == null || CollectionUtils.isEmpty(relRoleMenus)) {
-            return new ArrayList<>();
+    public List<MenuTreeVO> tree() {
+        List<Menu> menus = securityService.getCurrentMenus();
+        // 先转树形VO
+        List<MenuTreeVO> vos = menuConverter.toTreeVOS(menus);
+        return new TreeBuilder<>(vos).buildTree(Common.PID);
+    }
+
+    @Override
+    public List<Menu> getByRelRoleId(long id) {
+        List<RelRoleMenu> relRoleMenus = roleMenuMapper.getByRoleId(id);
+        if (relRoleMenus.isEmpty()) {
+            return Collections.emptyList();
         }
-        List<Long> menuIds = relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList();
-        return this.list(new LambdaQueryWrapper<Menu>().in(BaseEntity::getId, menuIds));
+        return this.listByIds(relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList());
     }
 }

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.yangxj96.spectra.core.auth.mapper.SecurityMapper">
+    <select id="getRolesByUserId" resultType="io.github.yangxj96.spectra.core.user.javabean.entity.Role">
+        SELECT R.*
+        FROM SYS_ROLE R
+        INNER JOIN SYS_REL_USER_ROLE UR ON R.ID = UR.ROLE_ID
+        WHERE UR.USER_ID = #{uid}
+        AND UR.DELETED IS NULL
+        AND R.DELETED IS NULL;
+    </select>
+
+    <select id="getMenusByUserId" resultType="io.github.yangxj96.spectra.core.system.javabean.entity.Menu">
+        SELECT DISTINCT m.*
+        FROM sys_menu m
+        INNER JOIN sys_rel_role_menu rm ON m.id = rm.menu_id
+        INNER JOIN sys_rel_user_role ur ON rm.role_id = ur.role_id
+        WHERE ur.user_id = #{userId}
+        AND m.deleted IS NULL
+        AND rm.deleted IS NULL
+        AND ur.deleted IS NULL
+        ORDER BY m.sort;
+    </select>
+</mapper>

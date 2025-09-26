@@ -16,10 +16,6 @@
 
 package io.github.yangxj96.spectra.core.auth.service;
 
-import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
-
-import java.util.List;
-
 /**
  * 权限类,主要用作在SpEL表达式中进行计算
  *
@@ -47,12 +43,5 @@ public interface PermissionService {
      * @param role 指定角色CODE
      */
     void hasRole(String role);
-
-    /**
-     * 获取当前用户菜单
-     *
-     * @return 用户菜单
-     */
-    List<Menu> getCurrentMenus();
 
 }

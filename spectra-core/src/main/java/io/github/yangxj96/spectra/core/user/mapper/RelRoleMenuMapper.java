@@ -18,10 +18,22 @@ package io.github.yangxj96.spectra.core.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 /**
  * 角色关联菜单中间表mapper
  */
 public interface RelRoleMenuMapper extends BaseMapper<RelRoleMenu> {
+
+    /**
+     * 根据角色ID获取角色的菜单关联信息
+     *
+     * @param roleId 角色ID
+     * @return 关联信息
+     */
+    List<RelRoleMenu> getByRoleId(@Param("roleId") Long roleId);
+
 
 }

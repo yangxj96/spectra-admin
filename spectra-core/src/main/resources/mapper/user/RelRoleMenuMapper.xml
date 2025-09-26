@@ -26,4 +26,10 @@
         UPDATED_AT,
         DELETED
     </sql>
+
+    <select id="getByRoleId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM SYS_REL_ROLE_MENU WHERE ROLE_ID = #{roleId}
+    </select>
 </mapper>

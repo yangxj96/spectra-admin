@@ -20,15 +20,8 @@ import cn.dev33.satoken.exception.NotPermissionException;
 import cn.dev33.satoken.exception.NotRoleException;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.yangxj96.spectra.core.auth.service.PermissionService;
-import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
-import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
-import io.github.yangxj96.spectra.core.user.service.RoleService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 权限类,主要用作在SpEL表达式中进行计算 <br/>
@@ -45,8 +38,6 @@ public class PermissionServiceImpl implements PermissionService {
 
     private static final String ADMINISTRATORS = "DEV_ADMIN";
 
-    @Resource
-    private RoleService roleService;
 
     @Override
     public void administrators() {
@@ -78,7 +69,6 @@ public class PermissionServiceImpl implements PermissionService {
         throw new NotRoleException(role);
     }
 
-
     /**
      * 内置的无限制通过的范围,在这里可以指定超级管理员的特征 <br/>
      * 比如存在角色CODE为DEV_ADMIN的 <br/>
@@ -91,13 +81,4 @@ public class PermissionServiceImpl implements PermissionService {
         return StpUtil.hasRole(ADMINISTRATORS);
     }
 
-    @Override
-    public List<Menu> getCurrentMenus() {
-        List<Role> roles = roleService.getByUserId(StpUtil.getLoginIdAsLong());
-        List<Menu> menus = new ArrayList<>();
-        for (Role role : roles) {
-            menus.addAll(roleService.getMenuById(role.getId()));
-        }
-        return menus.stream().distinct().toList();
-    }
 }

@@ -17,7 +17,6 @@
 package io.github.yangxj96.spectra.core.user.service;
 
 import io.github.yangxj96.spectra.common.base.BaseService;
-import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.from.RoleAuthorityFrom;
@@ -83,22 +82,6 @@ public interface RoleService extends BaseService<Role> {
      * @return 关联的权限列表
      */
     List<Authority> getAuthorityById(List<Long> ids);
-
-    /**
-     * 根据角色ID获取角色关联的权限列表
-     *
-     * @param id 角色ID
-     * @return 关联的权限列表
-     */
-    List<Authority> getAuthorityById(Long id);
-
-    /**
-     * 根据角色ID获取角色关联的菜单列表
-     *
-     * @param id 角色ID
-     * @return 关联的菜单列表
-     */
-    List<Menu> getMenuById(Long id);
 
     /**
      * 根据角色ID保存角色关联的权限列表

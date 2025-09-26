@@ -38,6 +38,7 @@ import io.github.yangxj96.spectra.core.user.mapper.UserMapper;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
 import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -55,6 +56,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2025-6-14
  */
+@Slf4j
 @Service
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
@@ -181,6 +183,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             user.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
             this.baseMapper.updateById(user);
         } catch (Exception e) {
+            log.atError().log("用户不存在", e);
             throw new DataNotExistException("用户不存在");
         }
     }

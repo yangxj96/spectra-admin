@@ -27,6 +27,7 @@ import io.github.yangxj96.spectra.common.utils.TreeUtils;
 import io.github.yangxj96.spectra.core.system.javabean.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.system.javabean.vo.MenuVO;
+import io.github.yangxj96.spectra.core.system.service.MenuService;
 import io.github.yangxj96.spectra.core.user.javabean.converter.AuthorityConverter;
 import io.github.yangxj96.spectra.core.user.javabean.converter.PermissionConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
@@ -62,6 +63,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private MenuService menuService;
 
     @Resource
     private AuthorityService authorityService;
@@ -134,13 +138,13 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id) {
-        List<Authority> authority = roleService.getAuthorityById(id);
+        List<Authority> authority = authorityService.getByRelRoleId(id);
         return authorityConverter.toVOS(authority);
     }
 
     @Override
     public List<MenuVO> getRoleRelevanceMenuByRoleId(long id) {
-        List<Menu> menus = roleService.getMenuById(id);
+        List<Menu> menus = menuService.getByRelRoleId(id);
         return menuConverter.toVOS(menus);
     }
 
