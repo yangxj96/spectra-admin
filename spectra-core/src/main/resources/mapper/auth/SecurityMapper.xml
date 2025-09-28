@@ -3,22 +3,22 @@
 <mapper namespace="io.github.yangxj96.spectra.core.auth.mapper.SecurityMapper">
     <select id="getRolesByUserId" resultType="io.github.yangxj96.spectra.core.user.javabean.entity.Role">
         SELECT R.*
-        FROM SYS_ROLE R
-        INNER JOIN SYS_REL_USER_ROLE UR ON R.ID = UR.ROLE_ID
+        FROM SPECTRA.SYS_ROLE R
+        INNER JOIN SPECTRA.SYS_REL_USER_ROLE UR ON R.ID = UR.ROLE_ID
         WHERE UR.USER_ID = #{uid}
         AND UR.DELETED IS NULL
         AND R.DELETED IS NULL;
     </select>
 
     <select id="getMenusByUserId" resultType="io.github.yangxj96.spectra.core.system.javabean.entity.Menu">
-        SELECT DISTINCT m.*
-        FROM sys_menu m
-        INNER JOIN sys_rel_role_menu rm ON m.id = rm.menu_id
-        INNER JOIN sys_rel_user_role ur ON rm.role_id = ur.role_id
-        WHERE ur.user_id = #{userId}
-        AND m.deleted IS NULL
-        AND rm.deleted IS NULL
-        AND ur.deleted IS NULL
-        ORDER BY m.sort;
+        SELECT DISTINCT M.*
+        FROM SPECTRA.SYS_MENU M
+                 INNER JOIN SPECTRA.SYS_REL_ROLE_MENU RM ON M.ID = RM.MENU_ID
+                 INNER JOIN SPECTRA.SYS_REL_USER_ROLE UR ON RM.ROLE_ID = UR.ROLE_ID
+        WHERE UR.USER_ID = #{userId}
+          AND M.DELETED IS NULL
+          AND RM.DELETED IS NULL
+          AND UR.DELETED IS NULL
+        ORDER BY M.SORT;
     </select>
 </mapper>

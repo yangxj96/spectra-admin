@@ -16,6 +16,6 @@ public interface LicenseService {
     /**
      * 验证许可
      */
-    void verifyLicense();
+    void verifyLicense() throws Exception;
 
 }
