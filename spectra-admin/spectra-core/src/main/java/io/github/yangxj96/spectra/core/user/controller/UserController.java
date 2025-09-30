@@ -47,12 +47,6 @@ public class UserController {
     @Resource
     private UserService bindService;
 
-    @ULog("分页查询用户列表")
-    @GetMapping("/page")
-    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
-        return bindService.page(page, params);
-    }
-
     @ULog("创建用户")
     @PostMapping
     @SaCheckEL("@ss.hasPermission('USER:INSERT')")
@@ -76,8 +70,14 @@ public class UserController {
 
     @ULog("重置用户密码")
     @PutMapping("/password/reset/{uid}")
-    @SaCheckEL("@ss.hasRole('ADMIN')")
+    @SaCheckEL("@ss.hasRole('ROLE_ADMIN_SYSTEM')")
     public void passwordResetById(@PathVariable String uid) {
         bindService.passwordResetById(uid);
+    }
+
+    @ULog("分页查询用户列表")
+    @GetMapping("/page")
+    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
+        return bindService.page(page, params);
     }
 }

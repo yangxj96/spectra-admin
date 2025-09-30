@@ -45,17 +45,6 @@ public class MenuController {
     private MenuService bindService;
 
     /**
-     * 获取树形菜单
-     *
-     * @return 构建的树形菜单
-     */
-    @ULog(value = "获取树形菜单")
-    @GetMapping("/tree")
-    public List<MenuTreeVO> tree() {
-        return bindService.tree();
-    }
-
-    /**
      * 新增菜单信息
      *
      * @param params 菜单信息
@@ -86,4 +75,14 @@ public class MenuController {
         bindService.modify(params);
     }
 
+    /**
+     * 获取树形菜单
+     *
+     * @return 构建的树形菜单
+     */
+    @ULog(value = "获取树形菜单")
+    @GetMapping("/tree")
+    public List<MenuTreeVO> tree() {
+        return bindService.tree();
+    }
 }

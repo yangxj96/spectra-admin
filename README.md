@@ -72,7 +72,7 @@
 
 ## 🔐 环境变量配置说明
 
-### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch) 模块的resources文件夹下）
+### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
 
 > ⚠️ 该文件不会提交至 Git，请自行创建。
 

@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 @Service("ss")
 public class PermissionServiceImpl implements PermissionService {
 
-    private static final String ADMINISTRATORS = "ROLE_DEV_ADMIN";
+    private static final String ADMINISTRATORS = "ROLE_ADMIN_OPS";
 
 
     @Override
@@ -71,14 +71,14 @@ public class PermissionServiceImpl implements PermissionService {
 
     /**
      * 内置的无限制通过的范围,在这里可以指定超级管理员的特征 <br/>
-     * 比如存在角色CODE为DEV_ADMIN的 <br/>
+     * 比如存在角色CODE为ROLE_ADMIN_OPS的 <br/>
      * 比如存在权限CODE为 * 的 <br/>
      * 等等方式,进行自定义 <br/>
      *
      * @return 是否为无限制
      */
     private boolean absoluteness() {
-        return StpUtil.hasRole(ADMINISTRATORS);
+        return StpUtil.hasRole(ADMINISTRATORS) || StpUtil.hasPermission("*");
     }
 
 }
