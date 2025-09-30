@@ -67,11 +67,11 @@ async function handleRoleSave() {
         </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto">
-                <el-form-item label="ID" prop="name" v-if="modify">
-                    <el-text type="info">{{ form.id}}</el-text>
+                <el-form-item v-if="modify" label="ID" prop="name">
+                    <el-text type="info">{{ form.id }}</el-text>
                 </el-form-item>
-                <el-form-item label="编码" prop="name" v-if="modify">
-                    <el-text type="info">{{ form.code}}</el-text>
+                <el-form-item v-if="modify" label="编码" prop="name">
+                    <el-text type="info">{{ form.code }}</el-text>
                 </el-form-item>
                 <el-form-item label="角色名称" prop="name">
                     <el-input v-model="form.name" clearable />

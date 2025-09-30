@@ -6,7 +6,7 @@ export default {
     async created(params: Role) {
         return http.post("/api/role", params).then(res => res.data);
     },
-    async delete(id: string): Promise<IResult<any>> {
+    async delete(id: string): Promise<IResult> {
         return http.delete("/api/role/" + id).then(res => res.data);
     },
     // 修改角色

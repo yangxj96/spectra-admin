@@ -1,26 +1,54 @@
 <script setup lang="ts">
 import "echarts";
 import VChart from "vue-echarts";
+import { useTemplateRef } from "vue";
+
+const charts = useTemplateRef<HTMLDivElement>("charts");
+
+const grid = {
+    left: 80,
+    right: 50
+};
+const width = 1000 - grid.left - grid.right;
+const data = [];
+for (let day = 0; day < 7; ++day) {
+    for (let i = 0; i < 1000; ++i) {
+        const y = Math.tan(i) / 2 + 7;
+        data.push([day, y, Math.random()]);
+    }
+}
 
 const option = ref({
+    title: {
+        text: "带有抖动的分散排列"
+    },
+    grid,
     xAxis: {
         type: "category",
-        data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+        jitter: (width / 7) * 0.8,
+        data: ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
     },
     yAxis: {
-        type: "value"
+        type: "value",
+        max: 10,
+        min: 0
     },
     series: [
         {
-            data: [150, 230, 224, 218, 135, 147, 260],
-            type: "line"
+            name: "Sleeping Hours",
+            type: "scatter",
+            data,
+            colorBy: "data",
+            itemStyle: {
+                opacity: 0.4
+            }
         }
     ]
 });
 </script>
 
 <template>
-    <v-chart :option="option" autoresize class="chart" />
+    <v-chart ref="charts" :option="option" autoresize class="chart" />
 </template>
 
 <style lang="scss" scoped>
