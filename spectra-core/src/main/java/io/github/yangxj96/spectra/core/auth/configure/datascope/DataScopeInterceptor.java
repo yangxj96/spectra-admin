@@ -16,7 +16,7 @@ import java.sql.SQLException;
  * 数据范围拦截器
  */
 @Slf4j
-@Component
+//@Component
 public class DataScopeInterceptor implements InnerInterceptor {
 
     @Override

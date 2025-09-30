@@ -3,11 +3,15 @@ import { ref, useTemplateRef } from "vue";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import UserApi from "@/api/UserApi.ts";
-import PermissionApi from "@/api/PermissionApi.ts";
 import OrganizationApi from "@/api/OrganizationApi.ts";
+import RoleApi from "@/api/RoleApi.ts";
 
 // 定义Model
-const form = defineModel<User>("form", { default: {} });
+const form = defineModel("form", {
+    required: false,
+    default: {} as User
+});
+
 const open = defineModel<boolean>("open", { required: true, default: false });
 
 // 定义响应方法
@@ -34,10 +38,10 @@ const organization_tree = ref<OrganizationTree[]>();
 const formRef = useTemplateRef<FormInstance>("formRef");
 
 onMounted(() => {
-    let request = [PermissionApi.listRole(), OrganizationApi.tree()];
+    let request = [RoleApi.list(), OrganizationApi.tree()];
     Promise.all(request).then(([role, org]) => {
-        roles.value = role.data as Role[];
-        organization_tree.value = org.data as OrganizationTree[];
+        roles.value = role!.data as Role[];
+        organization_tree.value = org!.data as OrganizationTree[];
     });
 });
 

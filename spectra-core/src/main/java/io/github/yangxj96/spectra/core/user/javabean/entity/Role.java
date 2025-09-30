@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.user.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
@@ -56,7 +57,7 @@ public class Role extends BaseEntity implements Serializable {
     /**
      * 编码
      */
-    @TableField(value = "CODE")
+    @TableField(value = "CODE", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
     /**
@@ -72,8 +73,15 @@ public class Role extends BaseEntity implements Serializable {
     private AuthScope scope;
 
     /**
+     * 是否内置字段,为true则不允许他进行修改删除操作
+     */
+    @TableField(value = "BUILTIN")
+    private Boolean builtin;
+
+    /**
      * 备注
      */
     @TableField(value = "REMARK")
     private String remark;
+
 }

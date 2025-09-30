@@ -29,18 +29,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PermissionServiceImpl implements PermissionService {
 
-    //@Override
-    //public List<AuthorityVO> getRoleRelevanceAuthorityByRoleId(long id) {
-    //    List<Authority> authority = authorityService.getByRelRoleId(id);
-    //    return authorityConverter.toVOS(authority);
-    //}
-    //
-    //@Override
-    //public List<MenuVO> getRoleRelevanceMenuByRoleId(long id) {
-    //    List<Menu> menus = menuService.getByRelRoleId(id);
-    //    return menuConverter.toVOS(menus);
-    //}
-    //
+
     //@Override
     //public void saveRoleRelevanceAuthorityByRoleId(long id, RoleAuthorityFrom from) {
     //    // 权限树过滤

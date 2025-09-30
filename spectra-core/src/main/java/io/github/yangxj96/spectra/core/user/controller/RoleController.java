@@ -13,6 +13,8 @@ import io.github.yangxj96.spectra.core.user.javabean.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.RolePageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.RoleVO;
+import io.github.yangxj96.spectra.core.user.service.RelRoleAuthorityService;
+import io.github.yangxj96.spectra.core.user.service.RelRoleMenuService;
 import io.github.yangxj96.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,11 @@ public class RoleController {
     @Resource
     private RoleService bindService;
 
+    @Resource
+    private RelRoleMenuService relRoleMenuService;
+
+    @Resource
+    private RelRoleAuthorityService relRoleAuthorityService;
 
     @ULog("创建角色")
     @PostMapping
@@ -59,53 +66,6 @@ public class RoleController {
         bindService.modify(params);
     }
 
-    /* 关联处理部分 */
-
-    @ULog("获取角色关联的权限列表")
-    @GetMapping("/{roleId}/authority")
-    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
-        try {
-            long id = Long.parseLong(roleId);
-            return bindService.getRoleRelevanceAuthorityByRoleId(id);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("参数转换失败");
-        }
-    }
-
-    @ULog("获取角色关联的菜单列表")
-    @GetMapping("/{roleId}/menu")
-    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
-        try {
-            long id = Long.parseLong(roleId);
-            return bindService.getRoleRelevanceMenuByRoleId(id);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("参数转换失败");
-        }
-    }
-
-    @ULog("保存角色关联的权限列表")
-    @PostMapping("/{roleId}/authority")
-    public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
-        try {
-            long id = Long.parseLong(roleId);
-            bindService.saveRoleRelevanceAuthorityByRoleId(id, from);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("参数转换失败");
-        }
-    }
-
-    @ULog("保存角色关联的菜单列表")
-    @PostMapping("/{roleId}/menu")
-    public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
-        try {
-            long id = Long.parseLong(roleId);
-            bindService.saveRoleRelevanceMenuByRoleId(id, from);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("参数转换失败");
-        }
-    }
-
-
     /* 查询部分 */
 
     @ULog("分页查询角色列表")
@@ -119,4 +79,56 @@ public class RoleController {
     public List<RoleVO> list() {
         return bindService.all();
     }
+
+    /* 关联处理部分 */
+
+    @ULog("获取角色关联的权限列表")
+    @GetMapping("/{roleId}/authority")
+    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return relRoleAuthorityService.get(id);
+        } catch (Exception e) {
+            log.atError().log("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("获取角色关联的菜单列表")
+    @GetMapping("/{roleId}/menu")
+    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return relRoleMenuService.get(id);
+        } catch (Exception e) {
+            log.atError().log("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("保存角色关联的权限列表")
+    @PostMapping("/{roleId}/authority")
+    public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            relRoleAuthorityService.grant(id, from);
+        } catch (Exception e) {
+            log.atError().log("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("保存角色关联的菜单列表")
+    @PostMapping("/{roleId}/menu")
+    public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            relRoleMenuService.grant(id, from);
+        } catch (Exception e) {
+            log.atError().log("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+
 }

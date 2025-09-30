@@ -146,7 +146,7 @@ mybatis-plus:
 logging:
   level:
     framework: error
-    spectra: debug
+    io.github.yangxj96.spectra.core: debug
     root: info
   group:
     spectra: com.yangxj96.spectra

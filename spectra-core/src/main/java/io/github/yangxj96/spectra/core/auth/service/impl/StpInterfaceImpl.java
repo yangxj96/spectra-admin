@@ -17,9 +17,10 @@ package io.github.yangxj96.spectra.core.auth.service.impl;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
-import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
-import io.github.yangxj96.spectra.core.user.service.RoleService;
+import io.github.yangxj96.spectra.core.user.javabean.vo.AuthorityVO;
+import io.github.yangxj96.spectra.core.user.service.RelRoleAuthorityService;
+import io.github.yangxj96.spectra.core.user.service.RelUserRoleService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Component;
 
@@ -37,23 +38,26 @@ import java.util.List;
 public class StpInterfaceImpl implements StpInterface {
 
     @Resource
-    private RoleService roleService;
+    private RelRoleAuthorityService relRoleAuthorityService;
+
+    @Resource
+    private RelUserRoleService relUserRoleService;
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
         Long uid = StpUtil.getLoginIdAsLong();
-        List<Role> roles = roleService.getByUserId(uid);
+        List<Role> roles = relUserRoleService.getRoles(uid);
         if (roles.isEmpty()) {
             return Collections.emptyList();
         }
-        List<Authority> authorities = roleService.getAuthorityById(roles.stream().map(Role::getId).toList());
-        return authorities.stream().map(Authority::getCode).toList();
+        var authorities = relRoleAuthorityService.get(roles.stream().map(Role::getId).toList());
+        return authorities.stream().map(AuthorityVO::getCode).toList();
     }
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
         Long uid = StpUtil.getLoginIdAsLong();
-        List<Role> roles = roleService.getByUserId(uid);
+        List<Role> roles = relUserRoleService.getRoles(uid);
         return roles.stream().map(Role::getCode).toList();
     }
 }

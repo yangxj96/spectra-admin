@@ -3,9 +3,10 @@ import { ElMessage, ElMessageBox, ElTree } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import RoleEdit from "./components/RoleEdit/index.vue";
 import { treeDefaultProps } from "@/utils/Config.ts";
-import PermissionApi from "@/api/PermissionApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import MenuApi from "@/api/MenuApi.ts";
+import RoleApi from "@/api/RoleApi.ts";
+import AuthorityApi from "@/api/AuthorityApi.ts";
 import _ from "lodash";
 
 // refs
@@ -26,7 +27,7 @@ const edit = reactive({
 const currentRow = ref<Role>();
 
 const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination, table_data } = UseTable<Role>(
-    PermissionApi.pageRole,
+    RoleApi.page,
     condition.value
 );
 
@@ -36,10 +37,10 @@ onMounted(() => {
 
 // 初始化数据
 function handleInitData() {
-    let requests = [MenuApi.tree(), PermissionApi.authorityTree()];
+    let requests = [MenuApi.tree(), AuthorityApi.tree()];
     Promise.all(requests).then(([menuRes, authorityTreeRes]) => {
-        menu_tree.value = menuRes.data as Menu[];
-        authority_tree.value = authorityTreeRes.data as AuthorityTree[];
+        menu_tree.value = menuRes!.data as Menu[];
+        authority_tree.value = authorityTreeRes!.data as AuthorityTree[];
     });
 }
 
@@ -52,7 +53,18 @@ function handleRoleEditDialogOpen(row: Role) {
 // 角色删除
 function handleRoleDelete(row: Role) {
     ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning" }).then(() => {
-        ElMessage.success("执行删除了");
+        RoleApi.delete(row.id).then(res => {
+            if (res.code === 200) {
+                ElMessage.success({
+                    message: "删除成功"
+                });
+            } else {
+                ElMessage.error({
+                    message: res.msg
+                });
+            }
+            handlerConditionQuery();
+        });
     });
 }
 
@@ -82,7 +94,7 @@ async function handleRoleTableRowClick(row: Role) {
         currentRow.value = row;
         cleanTreeCheckState();
         // 权限部分
-        PermissionApi.getRoleAuthority(row.id).then(res => {
+        RoleApi.getRoleAuthority(row.id).then(res => {
             if (res.code == 200 && res.data && res.data.length > 0) {
                 let ids = res.data.map(i => i.id);
                 powerRef.value?.setCheckedKeys(ids);
@@ -90,7 +102,7 @@ async function handleRoleTableRowClick(row: Role) {
         });
 
         // 菜单部分
-        PermissionApi.getRoleMenu(row.id).then(res => {
+        RoleApi.getRoleMenu(row.id).then(res => {
             if (res.code == 200 && res.data && res.data.length > 0) {
                 menuRef.value?.setCheckedKeys(res.data.map(i => i.id));
             }
@@ -110,7 +122,7 @@ function handleSaveRoleAuthority() {
         role_id: currentRow.value.id,
         authority_ids: powerRef.value?.getCheckedKeys()
     };
-    PermissionApi.saveRoleAuthority(params).then(res => {
+    RoleApi.saveRoleAuthority(params).then(res => {
         if (res.code === 200) {
             ElMessage.success("保存成功");
         } else {
@@ -129,7 +141,7 @@ function handleSaveRoleMenu() {
         role_id: currentRow.value.id,
         menu_ids: menuRef.value?.getCheckedKeys()
     };
-    PermissionApi.saveRoleMenu(params).then(res => {
+    RoleApi.saveRoleMenu(params).then(res => {
         if (res.code === 200) {
             ElMessage.success("保存成功");
         } else {
@@ -192,6 +204,13 @@ function handleSaveRoleMenu() {
                         </el-tag>
                     </template>
                 </el-table-column>
+                <el-table-column align="center" width="120" label="内置">
+                    <template #default="scope">
+                        <el-tag :type="scope.row.builtin ? 'primary' : 'danger'">
+                            {{ scope.row.builtin ? "是" : "否" }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column align="center" prop="remark" label="备注" show-overflow-tooltip />
                 <el-table-column align="center" label="编辑" width="120">
                     <template #default="scope">
@@ -246,7 +265,7 @@ function handleSaveRoleMenu() {
         </el-col>
     </el-row>
     <!-- 角色编辑框 -->
-    <role-edit v-model:show="edit.dialog" v-model:form="edit.form" />
+    <role-edit v-model:show="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
 </template>
 
 <style scoped lang="scss">

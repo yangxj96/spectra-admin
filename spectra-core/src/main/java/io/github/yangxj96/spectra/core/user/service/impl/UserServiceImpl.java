@@ -28,7 +28,7 @@ import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.core.auth.properties.UserProperties;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
 import io.github.yangxj96.spectra.core.system.service.OrganizationService;
-import io.github.yangxj96.spectra.core.user.javabean.converter.PermissionConverter;
+import io.github.yangxj96.spectra.core.user.javabean.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.user.javabean.converter.UserConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
 import io.github.yangxj96.spectra.core.user.javabean.entity.User;
@@ -36,7 +36,7 @@ import io.github.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.user.mapper.UserMapper;
-import io.github.yangxj96.spectra.core.user.service.RoleService;
+import io.github.yangxj96.spectra.core.user.service.RelUserRoleService;
 import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -65,10 +65,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private UserConverter userConverter;
 
     @Resource
-    private RoleService roleService;
+    private RoleConverter roleConverter;
 
     @Resource
-    private PermissionConverter permissionConverter;
+    private RelUserRoleService relUserRoleService;
 
     @Resource
     private OrganizationService organizationService;
@@ -80,37 +80,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private UserProperties userProperties;
 
     @Override
-    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
-        var result = new Page<UserPageVO>();
-        // 条件构建
-        var wrapper = new LambdaQueryWrapper<User>()
-                .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
-                .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                //.ne(BaseEntity::getId, StpUtil.getLoginIdAsLong())
-                .eq(params.getStatus() != null, User::getState, params.getStatus());
-
-        var db = this.page(page.toPage(), wrapper);
-        BeanUtils.copyProperties(db, result);
-        result.setRecords(userConverter.toVOs(db.getRecords()));
-
-        // 获取所需内容
-        var organizationNameMap = organizationService.list()
-                .stream()
-                .collect(Collectors.toMap(Organization::getId, Organization::getName));
-
-        // vo扩展字段补充
-        result.getRecords().forEach(vo -> {
-            var roles = roleService.getByUserId(vo.getId());
-            if (null != roles && !roles.isEmpty()) {
-                vo.setRoles(permissionConverter.roleToVOs(roles));
-            }
-            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
-        });
-        // 响应
-        return result;
-    }
-
-    @Override
     @Transactional
     public void create(UserSaveFrom params) {
         var entity = userConverter.toEntity(params);
@@ -120,7 +89,22 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataSaveException("保存用户信息异常");
         }
         // 关联角色
-        roleService.insertUserRel(entity.getId(), params.getRoleIds());
+        relUserRoleService.grant(entity.getId(), params.getRoleIds());
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(String uid) {
+        var user = this.getById(uid);
+        if (null == user) {
+            throw new DataNotExistException("用户不存在");
+        }
+        // 强制注销账号登录信息
+        StpUtil.logout(user.getId());
+        // 先删除角色关联
+        relUserRoleService.revoke(user.getId());
+        // 删除用户信息
+        this.removeById(user);
     }
 
     @Override
@@ -135,7 +119,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new EntityUpdateException("更新用户发生错误");
         }
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
-        var currentRoles = new HashSet<>(roleService.getByUserId(params.getId()).stream().map(Role::getId).toList());
+        var currentRoles = new HashSet<>(relUserRoleService.getRoles(params.getId()).stream().map(Role::getId).toList());
         var targetRoles = new HashSet<>(params.getRoleIds() != null ? params.getRoleIds() : List.of());
 
         // 计算要删除的
@@ -144,7 +128,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         if (!roleToDelete.isEmpty()) {
             List<Long> deleteList = List.copyOf(roleToDelete);
-            if (roleService.removeUserRel(entity.getId(), deleteList) != deleteList.size()) {
+            try {
+                relUserRoleService.revoke(entity.getId(), deleteList);
+            } catch (Exception e) {
+                log.atError().log("删除角色关联失败，未完全删除,{}", e.getMessage(), e);
                 throw new EntityUpdateException("删除角色关联失败，未完全删除");
             }
         }
@@ -155,25 +142,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         if (!roleToInsert.isEmpty()) {
             List<Long> insertList = List.copyOf(roleToInsert);
-            if (roleService.insertUserRel(entity.getId(), insertList) != insertList.size()) {
+            try {
+                relUserRoleService.grant(entity.getId(), insertList);
+            } catch (Exception e) {
+                log.atError().log("新增角色关联失败，未完全插入,{}", e.getMessage(), e);
                 throw new EntityUpdateException("新增角色关联失败，未完全插入");
             }
         }
-    }
-
-    @Override
-    @Transactional
-    public void deleteById(String uid) {
-        var user = this.getById(uid);
-        if (null == user) {
-            throw new DataNotExistException("用户不存在");
-        }
-        // 强制注销账号登录信息
-        StpUtil.logout(user.getId());
-        // 先删除角色关联
-        roleService.removeUserRel(user.getId());
-        // 删除用户信息
-        this.removeById(user);
     }
 
     @Override
@@ -190,7 +165,38 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
+    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
+        var result = new Page<UserPageVO>();
+        // 条件构建
+        var wrapper = new LambdaQueryWrapper<User>()
+                .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
+                .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
+                .eq(params.getStatus() != null, User::getState, params.getStatus());
+
+        var db = this.page(page.toPage(), wrapper);
+        BeanUtils.copyProperties(db, result);
+        result.setRecords(userConverter.toVOs(db.getRecords()));
+
+        // 获取所需内容
+        var organizationNameMap = organizationService.list()
+                .stream()
+                .collect(Collectors.toMap(Organization::getId, Organization::getName));
+
+        // vo扩展字段补充
+        result.getRecords().forEach(vo -> {
+            var roles = relUserRoleService.getRoles(vo.getId());
+            if (null != roles && !roles.isEmpty()) {
+                vo.setRoles(roleConverter.toVOs(roles));
+            }
+            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
+        });
+        // 响应
+        return result;
+    }
+
+    @Override
     public User getByEmail(String email) {
         return this.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
     }
+
 }

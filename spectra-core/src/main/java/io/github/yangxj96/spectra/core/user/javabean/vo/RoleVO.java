@@ -67,6 +67,11 @@ public class RoleVO implements Serializable {
     private AuthScope scope;
 
     /**
+     * 是否内置
+     */
+    private Boolean builtin;
+
+    /**
      * 备注
      */
     private String remark;

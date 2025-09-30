@@ -25,21 +25,20 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
 );
 
 // 用户新增或编辑dialog配置
-function handleUserEditDialog(row?: User | undefined) {
+function handleUserEditDialog(row: User) {
     let form;
-    if (row != undefined) {
-        let datum = _.cloneDeep(row);
-        if (datum.roles && datum.roles.length > 0) {
-            if (!datum.role_ids) {
-                datum.role_ids = [] as string[];
-            }
-            for (let role of datum.roles) {
-                datum.role_ids.push(role.id);
-            }
-            datum.roles = [];
+    let datum = _.cloneDeep(row);
+    if (datum.roles && datum.roles.length > 0) {
+        if (!datum.role_ids) {
+            datum.role_ids = [] as string[];
         }
-        form = datum;
+        for (let role of datum.roles) {
+            datum.role_ids.push(role.id);
+        }
+        datum.roles = [];
     }
+    form = datum;
+
     dialog_edit.value = {
         form: form,
         open: true
@@ -117,7 +116,7 @@ function handleDialogClose() {
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleUserEditDialog()">新增用户</el-button>
+                <el-button @click="handleUserEditDialog({} as User)">新增用户</el-button>
             </el-form-item>
         </el-form>
     </el-row>

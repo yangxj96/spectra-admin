@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PermissionApi from "@/api/PermissionApi.ts";
+import RoleApi from "@/api/RoleApi.ts";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { useTemplateRef } from "vue";
 
@@ -8,14 +8,18 @@ const dialog = defineModel("show", {
     required: true,
     default: false
 });
+
 const form = defineModel("form", {
     required: false,
     default: {} as Role
 });
 
+// 定义响应方法
+const emits = defineEmits(["close"]);
+
+// 获取是否为修改
 const modify = computed(() => {
-    const formValue = form.value;
-    return formValue && Object.keys(formValue).length > 0;
+    return !!form.value.id;
 });
 
 // 表单
@@ -23,17 +27,23 @@ const rules = ref<FormRules>();
 // refs
 const formRef = useTemplateRef<FormInstance>("formRef");
 
+// 处理关闭
+function handleCurrentDialogClose() {
+    dialog.value = false;
+    emits("close");
+}
+
 // 角色保存
 async function handleRoleSave() {
     if (!formRef.value) return;
     await formRef.value?.validate((valid, _) => {
         if (valid) {
-            let request = modify ? PermissionApi.modifyRole : PermissionApi.createdRole;
+            let request = modify.value ? RoleApi.modify : RoleApi.created;
             request(form.value).then(() => {
                 ElMessage.success({
-                    message: modify ? "修改角色成功" : "新增角色成功",
+                    message: modify.value ? "修改角色成功" : "新增角色成功",
                     onClose() {
-                        dialog.value = false;
+                        handleCurrentDialogClose();
                     }
                 });
             });
@@ -57,6 +67,12 @@ async function handleRoleSave() {
         </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto">
+                <el-form-item label="ID" prop="name" v-if="modify">
+                    <el-text type="info">{{ form.id}}</el-text>
+                </el-form-item>
+                <el-form-item label="编码" prop="name" v-if="modify">
+                    <el-text type="info">{{ form.code}}</el-text>
+                </el-form-item>
                 <el-form-item label="角色名称" prop="name">
                     <el-input v-model="form.name" clearable />
                 </el-form-item>

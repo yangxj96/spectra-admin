@@ -14,34 +14,22 @@
  *  limitations under the License.
  */
 
-// 权限
-type Authority = BaseEntity & {
-    // 父ID
-    pid?: string;
-    // 权限名称
-    name: string;
-    // 权限编码
-    code: string;
-};
+package io.github.yangxj96.spectra.common.exception;
 
-// 权限树形
-type AuthorityTree = Authority & {
-    // 下级权限
-    children: AuthorityTree[];
-};
+/**
+ * 系统默认数据
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-6-14
+ */
+public class SystemDefaultDataException extends RuntimeException {
 
-// 角色
-type Role = BaseEntity & {
-    //角色名称
-    name: string;
-    // 角色代码
-    code: string;
-    //角色状态
-    state: boolean;
-    //角色范围
-    scope: number;
-    // 是否内置
-    builtin: boolean;
-    //角色备注
-    remark: string;
-};
+    public SystemDefaultDataException() {
+        super("系统默认数据");
+    }
+
+    public SystemDefaultDataException(String message) {
+        super(message);
+    }
+}

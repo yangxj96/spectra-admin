@@ -10,6 +10,7 @@
         <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
         <result column="STATE"      jdbcType="BIT"       property="state"/>
         <result column="SCOPE"      jdbcType="SMALLINT"  property="scope"/>
+        <result column="BUILTIN"    jdbcType="BIT"       property="builtin"/>
         <result column="REMARK"     jdbcType="VARCHAR"   property="remark"/>
         <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
@@ -26,6 +27,7 @@
         CODE,
         STATE,
         SCOPE,
+        BUILTIN,
         REMARK,
         CREATED_BY,
         CREATED_AT,
