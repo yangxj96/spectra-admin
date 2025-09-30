@@ -24,10 +24,10 @@ public class DataScopeInterceptor implements InnerInterceptor {
         var scope = DataScopeContext.get();
         // 只处理 SELECT 请求
         // 注解为过滤现线程为true
-        if (ms.getSqlCommandType() != SqlCommandType.SELECT || Boolean.FALSE.equals(scope)) {
-            return;
-        }
-        log.atInfo().log("进入拦截:{}", boundSql.getSql());
+        //if (ms.getSqlCommandType() != SqlCommandType.SELECT || Boolean.FALSE.equals(scope)) {
+        //    return;
+        //}
+        log.atDebug().log("进入拦截:{}", boundSql.getSql());
     }
 
 

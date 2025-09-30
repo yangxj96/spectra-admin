@@ -89,7 +89,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         try {
             return StpUtil.getLoginIdAsLong();
         } catch (Exception e) {
-            log.atError().log(PREFIX + "获取ID出错,默认ID为{}", Common.PID);
+            log.atError().log(PREFIX + "获取ID出错,默认ID为{}", Common.PID, e);
             return Common.PID;
         }
     }

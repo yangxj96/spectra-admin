@@ -144,14 +144,16 @@ mybatis-plus:
       schema: SPECTRA
 # 日志配置
 logging:
-  level:
-    framework: error
-    io.github.yangxj96.spectra.core: debug
-    root: info
   group:
-    spectra: com.yangxj96.spectra
-    framework:
-      - com.ulisesbocchio.jasyptspringboot.configuration
+    spectra: >-
+      io.github.yangxj96.spectra.core,
+      io.github.yangxj96.spectra.framework
+    other: >-
+      com.ulisesbocchio.jasyptspringboot.configuration
+  level:
+    root: info
+    other: error
+    spectra: debug
 # Sa-Token 配置
 sa-token:
   token-name: Authorization

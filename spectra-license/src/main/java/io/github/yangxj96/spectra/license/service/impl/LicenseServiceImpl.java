@@ -79,7 +79,7 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Override
     public void verifyLicense() {
-        log.atInfo().log("🔍 正在验证许可证...");
+        log.atDebug().log("🔍 正在验证许可证...");
 
         try {
             // 1. 加载公钥
@@ -117,7 +117,7 @@ public class LicenseServiceImpl implements LicenseService {
                 log.atError().log("❌ 许可证已被篡改！签名验证失败。");
                 System.exit(1);
             }
-            log.atInfo().log("✅ 数字签名验证通过。");
+            log.atDebug().log("✅ 数字签名验证通过。");
 
             // 4. 验证硬件 ID
             String expectedHwid = license.getHwid();
@@ -129,7 +129,7 @@ public class LicenseServiceImpl implements LicenseService {
                 log.atError().log("   Actual   HWID: {}", actualHwid);
                 System.exit(1);
             }
-            log.atInfo().log("✅ 硬件 ID 验证通过。");
+            log.atDebug().log("✅ 硬件 ID 验证通过。");
 
             // 5. 验证过期时间
             var expiresAt = license.getExpiresAt();
@@ -140,10 +140,10 @@ public class LicenseServiceImpl implements LicenseService {
                 System.exit(1);
             }
             Duration remaining = Duration.between(Instant.now(), expiresAt);
-            log.atInfo().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
+            log.atDebug().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
 
             // 🎉 所有验证通过
-            log.atInfo().log("🎉 许可证验证全部通过，系统即将启动！");
+            log.atDebug().log("🎉 许可证验证全部通过，系统即将启动！");
 
         } catch (Exception e) {
             log.atError().log("❌ 许可证验证过程中发生严重错误: {}", e.getMessage(), e);

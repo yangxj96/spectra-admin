@@ -114,7 +114,7 @@ public class JKSLicenseService implements LicenseService {
 
             var publicCert = (X509Certificate) cert;
 
-            log.atInfo().log("公钥证书加载成功: {}", publicCert.getSubjectX500Principal().getName());
+            log.atDebug().log("公钥证书加载成功: {}", publicCert.getSubjectX500Principal().getName());
 
             // 3. 加载 License 文件
             var licenseResource = Paths.get(properties.getLicensePath());
@@ -137,7 +137,7 @@ public class JKSLicenseService implements LicenseService {
                 log.atError().log("❌ 许可证已被篡改！签名验证失败。");
                 System.exit(1);
             }
-            log.atInfo().log("✅ 数字签名验证通过。");
+            log.atDebug().log("✅ 数字签名验证通过。");
 
             // 4. 验证硬件 ID
             String expectedHwid = license.getHwid();
@@ -149,7 +149,7 @@ public class JKSLicenseService implements LicenseService {
                 log.atError().log("   Actual   HWID: {}", actualHwid);
                 System.exit(1);
             }
-            log.atInfo().log("✅ 硬件 ID 验证通过。");
+            log.atDebug().log("✅ 硬件 ID 验证通过。");
 
             // 5. 验证过期时间
             var expiresAt = license.getExpiresAt();
@@ -160,10 +160,10 @@ public class JKSLicenseService implements LicenseService {
                 System.exit(1);
             }
             Duration remaining = Duration.between(Instant.now(), expiresAt);
-            log.atInfo().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
+            log.atDebug().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
 
             // 🎉 所有验证通过
-            log.atInfo().log("🎉 许可证验证全部通过，系统即将启动！");
+            log.atDebug().log("🎉 许可证验证全部通过，系统即将启动！");
         } catch (Exception e) {
             log.atError().log("❌ 许可证验证过程中发生严重错误: {}", e.getMessage(), e);
             System.exit(1);
