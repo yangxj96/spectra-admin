@@ -72,7 +72,7 @@
 
 ## 🔐 环境变量配置说明
 
-### 后端 `.env` 文件（位于 `spectra-admin` 目录）
+### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch) 模块的resources文件夹下）
 
 > ⚠️ 该文件不会提交至 Git，请自行创建。
 
@@ -84,7 +84,7 @@
 
 ---
 
-### 前端 `.env` 文件（位于 `spectra-ui` 目录）
+### 前端 `.env` 文件（位于 [spectra-ui](spectra-ui) 目录）
 
 | 环境变量             | 说明                  | 示例                                    |
 |------------------|---------------------|---------------------------------------|
@@ -97,14 +97,14 @@
 
 ## 🧩 项目模块结构
 
-| 模块                  | 路径                                     | 说明                               |
-|---------------------|----------------------------------------|----------------------------------|
-| `spectra-common`    | [spectra-common](spectra-common)       | 通用工具类、注解、常量、DTO等共享内容             |
-| `spectra-core`      | [spectra-core](spectra-core)           | 核心接口定义、领域模型、服务契约                 |
-| `spectra-workflow`  | [spectra-workflow](spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
-| `spectra-framework` | [spectra-framework](spectra-framework) | 框架级配置（如权限、日志、异常处理、拦截器等）          |
-| `spectra-launch`    | [spectra-launch](spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
-| `spectra-ui`        | [spectra-ui](spectra-ui)               | 前端 Vue 项目，基于 Vite + Element Plus |
+| 模块                  | 路径                                                   | 说明                               |
+|---------------------|------------------------------------------------------|----------------------------------|
+| `spectra-common`    | [spectra-common](spectra-admin/spectra-common)       | 通用工具类、注解、常量、DTO等共享内容             |
+| `spectra-core`      | [spectra-core](spectra-admin/spectra-core)           | 核心接口定义、领域模型、服务契约                 |
+| `spectra-workflow`  | [spectra-workflow](spectra-admin/spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
+| `spectra-framework` | [spectra-framework](spectra-admin/spectra-framework) | 框架级配置（如权限、日志、异常处理、拦截器等）          |
+| `spectra-launch`    | [spectra-launch](spectra-admin/spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
+| `spectra-ui`        | [spectra-ui](spectra-ui)                             | 前端 Vue 项目，基于 Vite + Element Plus |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
 
