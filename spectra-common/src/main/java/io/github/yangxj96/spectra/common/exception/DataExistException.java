@@ -23,7 +23,11 @@ package io.github.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025-6-14
  */
-public class DataExistException extends RuntimeException {
+public class DataExistException extends DataException {
+
+    public DataExistException() {
+        super("数据已存在");
+    }
 
     public DataExistException(String message) {
         super(message);

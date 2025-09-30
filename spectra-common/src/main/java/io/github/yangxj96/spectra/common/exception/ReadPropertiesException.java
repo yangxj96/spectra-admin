@@ -21,7 +21,7 @@ package io.github.yangxj96.spectra.common.exception;
  *
  * @since 1.0.0
  */
-public class ReadPropertiesException extends RuntimeException {
+public class ReadPropertiesException extends SpectraException {
 
     public ReadPropertiesException(String message) {
         super(message);

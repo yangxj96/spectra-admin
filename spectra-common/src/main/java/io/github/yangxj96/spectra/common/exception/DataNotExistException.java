@@ -23,7 +23,11 @@ package io.github.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025-6-14
  */
-public class DataNotExistException extends RuntimeException {
+public class DataNotExistException extends DataException {
+
+    public DataNotExistException() {
+        super("数据不存在");
+    }
 
     public DataNotExistException(String message) {
         super(message);

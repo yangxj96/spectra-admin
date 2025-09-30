@@ -21,7 +21,11 @@ package io.github.yangxj96.spectra.common.exception;
  *
  * @since 1.0.0
  */
-public class FileTypeException extends RuntimeException {
+public class FileTypeException extends SpectraException {
+
+    public FileTypeException() {
+        super("文件类型异常");
+    }
 
     public FileTypeException(String message) {
         super(message);

@@ -23,7 +23,7 @@ package io.github.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025/7/28
  */
-public class KaptchaNotMatchException extends RuntimeException {
+public class KaptchaNotMatchException extends KaptchaException {
 
     public KaptchaNotMatchException() {
         super();

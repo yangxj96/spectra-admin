@@ -17,19 +17,20 @@
 package io.github.yangxj96.spectra.common.exception;
 
 /**
- * 系统默认数据
+ * 验证码相关异常
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025-6-14
+ * @since 2025/7/28
  */
-public class SystemDefaultDataException extends RuntimeException {
+public class KaptchaException extends SpectraException {
 
-    public SystemDefaultDataException() {
-        super("系统默认数据");
+    public KaptchaException() {
+        super();
     }
 
-    public SystemDefaultDataException(String message) {
+    public KaptchaException(String message) {
         super(message);
     }
+
 }

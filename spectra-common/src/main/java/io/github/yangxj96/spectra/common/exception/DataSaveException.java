@@ -23,7 +23,11 @@ package io.github.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025-6-14
  */
-public class DataSaveException extends RuntimeException {
+public class DataSaveException extends DataException {
+
+    public DataSaveException() {
+        super("数据保存异常");
+    }
 
     public DataSaveException(String message) {
         super(message);

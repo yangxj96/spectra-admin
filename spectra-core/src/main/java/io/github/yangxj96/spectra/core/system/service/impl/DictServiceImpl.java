@@ -18,8 +18,8 @@ package io.github.yangxj96.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.yangxj96.spectra.common.constant.Common;
+import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
-import io.github.yangxj96.spectra.common.exception.InlayException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.system.javabean.converter.DictConverter;
 import io.github.yangxj96.spectra.core.system.javabean.entity.DictData;
@@ -77,7 +77,7 @@ public class DictServiceImpl implements DictService {
             throw new DataNotExistException("字典组不存在");
         }
         if (Boolean.TRUE.equals(group.getBuiltin())) {
-            throw new InlayException("内置字典,无法删除");
+            throw new BuiltinDataException("内置字典,无法删除");
         }
         // 获取他的字典数据
         List<DictData> dictData = dataService.listByGid(id);
@@ -91,7 +91,7 @@ public class DictServiceImpl implements DictService {
     public void modifyGroup(DictGroupFrom params) {
         DictGroup group = groupService.getById(params.getId());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
-            throw new InlayException("内置字典,无法修改");
+            throw new BuiltinDataException("内置字典,无法修改");
         }
         DictGroup entity = dictConverter.groupFromToEntity(params);
         groupService.updateById(entity);
@@ -113,7 +113,7 @@ public class DictServiceImpl implements DictService {
         }
         DictGroup group = groupService.getById(dictData.getGid());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
-            throw new InlayException("内置字典,无法删除");
+            throw new BuiltinDataException("内置字典,无法删除");
         }
         dataService.removeById(id);
     }
@@ -123,7 +123,7 @@ public class DictServiceImpl implements DictService {
     public void modifyData(DictDataFrom params) {
         DictGroup group = groupService.getById(params.getGid());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
-            throw new InlayException("内置字典,无法修改");
+            throw new BuiltinDataException("内置字典,无法修改");
         }
         DictData entity = dictConverter.dataFromToEntity(params);
         dataService.updateById(entity);

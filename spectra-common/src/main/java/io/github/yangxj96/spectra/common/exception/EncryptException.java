@@ -21,7 +21,11 @@ package io.github.yangxj96.spectra.common.exception;
  *
  * @since 1.0.0
  */
-public class EncryptException extends RuntimeException {
+public class EncryptException extends SpectraException {
+
+    public EncryptException() {
+        super("加密出现异常");
+    }
 
     public EncryptException(String message) {
         super(message);

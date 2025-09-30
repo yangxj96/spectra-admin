@@ -23,7 +23,7 @@ package io.github.yangxj96.spectra.common.exception;
  * @version 1.0
  * @since 2025/7/28
  */
-public class KaptchaExpiresException extends RuntimeException {
+public class KaptchaExpiresException extends KaptchaException {
 
     public KaptchaExpiresException() {
         super();
