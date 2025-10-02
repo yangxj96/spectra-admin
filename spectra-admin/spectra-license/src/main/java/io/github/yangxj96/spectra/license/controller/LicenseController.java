@@ -1,5 +1,6 @@
 package io.github.yangxj96.spectra.license.controller;
 
+import cn.dev33.satoken.exception.NotImplException;
 import io.github.yangxj96.spectra.license.javabean.from.LicenseCreateFrom;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,8 @@ public class LicenseController {
      */
     @PostMapping
     public void create(@RequestBody LicenseCreateFrom from) {
-
+        log.atDebug().log("请求参数:{}", from);
+        throw new NotImplException("暂未实现");
     }
 
 }

@@ -8,7 +8,6 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.stereotype.Component;
 
 import java.sql.SQLException;
 
@@ -24,9 +23,9 @@ public class DataScopeInterceptor implements InnerInterceptor {
         var scope = DataScopeContext.get();
         // 只处理 SELECT 请求
         // 注解为过滤现线程为true
-        //if (ms.getSqlCommandType() != SqlCommandType.SELECT || Boolean.FALSE.equals(scope)) {
-        //    return;
-        //}
+        if (ms.getSqlCommandType() != SqlCommandType.SELECT || Boolean.FALSE.equals(scope)) {
+            return;
+        }
         log.atDebug().log("进入拦截:{}", boundSql.getSql());
     }
 

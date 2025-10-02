@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.system.controller;
 
 import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.exception.NotImplException;
 import io.github.yangxj96.spectra.common.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.core.system.javabean.from.MenuSaveFrom;
@@ -60,7 +61,7 @@ public class MenuController {
     @DeleteMapping("/{id}")
     @SaCheckEL("@ss.hasPermission('MENU:DELETE')")
     public void deleteById(@PathVariable String id) {
-        // TODO 暂未实现
+        throw new NotImplException("暂未实现");
     }
 
     /**

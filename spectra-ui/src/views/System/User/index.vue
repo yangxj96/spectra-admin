@@ -132,7 +132,7 @@ function handleDialogClose() {
                     <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_user_state" />
                 </template>
             </el-table-column>
-            <el-table-column align="center" label="所属组织" prop="organization_name" />
+            <el-table-column align="center" label="所属组织" prop="organization_name" show-overflow-tooltip />
             <el-table-column align="center" label="角色" prop="roles">
                 <template #default="scope">
                     <el-tag v-for="(item, idx) in scope.row.roles" :index="idx" style="margin-right: 4px">

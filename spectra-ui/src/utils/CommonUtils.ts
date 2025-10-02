@@ -14,17 +14,25 @@ export default class CommonUtils {
      * 生成UUID
      * @constructor
      */
-    public static UUID() {
-        const randomBytes = new Uint8Array(16);
-        crypto.getRandomValues(randomBytes);
-        // 设置版本号（第 7 位为 4）
-        randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40;
-        // 设置变体号（第 9 位为 8, 9, a, b）
-        randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80;
-        // 将字节数组转换为十六进制字符串
-        const hex = [...randomBytes].map(byte => byte.toString(16).padStart(2, "0")).join("");
-        // 插入分隔符
-        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    public static UUID(): string {
+        if (typeof crypto !== "undefined" && crypto.getRandomValues) {
+            const randomBytes = new Uint8Array(16);
+            crypto.getRandomValues(randomBytes);
+
+            // 使用 ! 断言 randomBytes 不为 undefined（实际不可能）
+            randomBytes[6] = (randomBytes[6]! & 0x0f) | 0x40;
+            randomBytes[8] = (randomBytes[8]! & 0x3f) | 0x80;
+
+            const hex = Array.from(randomBytes, byte => byte.toString(16).padStart(2, "0")).join("");
+            return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+        } else {
+            // 回退方案
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replaceAll(/[xy]/g, c => {
+                const r = Math.trunc(Math.random() * 16);
+                const v = c === "x" ? r : (r & 0x3) | 0x8;
+                return v.toString(16);
+            });
+        }
     }
 
     /**

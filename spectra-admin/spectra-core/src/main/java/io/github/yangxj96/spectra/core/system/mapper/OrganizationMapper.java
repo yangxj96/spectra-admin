@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
+import org.apache.ibatis.annotations.Param;
 
 
 /**
@@ -29,4 +30,12 @@ import io.github.yangxj96.spectra.core.system.javabean.entity.Organization;
  */
 public interface OrganizationMapper extends BaseMapper<Organization> {
 
+    /**
+     * 根据ID生成组织机构路径
+     * <p>如:光谱平台/云南分公司/保山分公司/测试小组</p>
+     *
+     * @param id 组织机构ID
+     * @return 组织机构路径
+     */
+    String generatePath(@Param("id") Long id);
 }

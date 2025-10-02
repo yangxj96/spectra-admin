@@ -5,6 +5,7 @@ import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import UserApi from "@/api/UserApi.ts";
 import OrganizationApi from "@/api/OrganizationApi.ts";
 import RoleApi from "@/api/RoleApi.ts";
+import { treeDefaultProps } from "@/utils/Config.ts";
 
 // 定义Model
 const form = defineModel("form", {
@@ -17,8 +18,6 @@ const open = defineModel<boolean>("open", { required: true, default: false });
 // 定义响应方法
 const emits = defineEmits(["close"]);
 
-// 树形props配置
-const treeProps = { children: "children", label: "name", value: "id" };
 // 表单规则
 const rules = {
     name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
@@ -56,7 +55,7 @@ async function handleUserSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        const request = form.value.id ? UserApi.modify : UserApi.created;
+        let request = form.value.id ? UserApi.modify : UserApi.created;
         await request(form.value!);
         ElMessage.success({
             message: form.value.id ? "修改用户成功" : "新增用户成功",
@@ -113,7 +112,7 @@ async function handleUserSave() {
                         clearable
                         check-strictly
                         default-expand-all
-                        :props="treeProps" />
+                        :props="treeDefaultProps" />
                 </el-form-item>
             </el-form>
         </template>

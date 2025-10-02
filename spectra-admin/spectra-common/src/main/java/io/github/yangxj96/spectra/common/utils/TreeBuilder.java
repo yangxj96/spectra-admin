@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.common.utils;
 
 
 import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 
@@ -29,6 +30,7 @@ import java.util.*;
  * @version 1.0
  * @since 2025-6-14
  */
+@Slf4j
 public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
 
     /**
@@ -91,6 +93,7 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
             // 反射获取 sort 字段（如果存在）
             return (Integer) node.getClass().getMethod("getSort").invoke(node);
         } catch (Exception e) {
+            log.atError().log("获取排序字段值失败:{}", e.getMessage(), e);
             return 0; // 默认无排序
         }
     }

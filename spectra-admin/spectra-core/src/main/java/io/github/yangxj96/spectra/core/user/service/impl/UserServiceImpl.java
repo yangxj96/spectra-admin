@@ -180,7 +180,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 获取所需内容
         var organizationNameMap = organizationService.list()
                 .stream()
-                .collect(Collectors.toMap(Organization::getId, Organization::getName));
+                .collect(Collectors.toMap(Organization::getId, Organization::getPath));
 
         // vo扩展字段补充
         result.getRecords().forEach(vo -> {

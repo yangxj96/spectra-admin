@@ -42,7 +42,6 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
     @Serial
     private static final long serialVersionUID = 1L;
 
-
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
@@ -66,6 +65,11 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
      * 组织机构类型
      */
     private Short type;
+
+    /**
+     * 路径
+     */
+    private String path;
 
     /**
      * 组织机构所在地址

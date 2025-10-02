@@ -84,7 +84,7 @@ public class JKSLicenseService implements LicenseService {
     }
 
     @Override
-    public void verifyLicense() throws Exception {
+    public void verifyLicense() {
         try {
             log.atDebug().log("开始验证许可证...");
 

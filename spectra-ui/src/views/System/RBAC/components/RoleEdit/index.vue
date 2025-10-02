@@ -22,8 +22,16 @@ const modify = computed(() => {
     return !!form.value.id;
 });
 
-// 表单
-const rules = ref<FormRules>();
+// 路由规则
+const rules = {
+    name: [
+        { required: true, message: "请输入角色名称", trigger: "blur" },
+        { min: 2, max: 20, message: "角色名称长度需要在2-20字符范围内", trigger: "blur" }
+    ],
+    scope: [{ required: true, message: "请选择角色分类", trigger: "change" }],
+    state: [{ required: true, message: "请选择角色状态", trigger: "change" }]
+} as FormRules;
+
 // refs
 const formRef = useTemplateRef<FormInstance>("formRef");
 
@@ -36,19 +44,19 @@ function handleCurrentDialogClose() {
 // 角色保存
 async function handleRoleSave() {
     if (!formRef.value) return;
-    await formRef.value?.validate((valid, _) => {
-        if (valid) {
-            let request = modify.value ? RoleApi.modify : RoleApi.created;
-            request(form.value).then(() => {
-                ElMessage.success({
-                    message: modify.value ? "修改角色成功" : "新增角色成功",
-                    onClose() {
-                        handleCurrentDialogClose();
-                    }
-                });
-            });
-        }
-    });
+    try {
+        await formRef.value?.validate();
+        let request = modify.value ? RoleApi.modify : RoleApi.created;
+        await request(form.value);
+        ElMessage.success({
+            message: modify.value ? "修改角色成功" : "新增角色成功",
+            onClose() {
+                handleCurrentDialogClose();
+            }
+        });
+    } catch (error) {
+        console.error(error);
+    }
 }
 </script>
 
@@ -74,7 +82,7 @@ async function handleRoleSave() {
                     <el-text type="info">{{ form.code }}</el-text>
                 </el-form-item>
                 <el-form-item label="角色名称" prop="name">
-                    <el-input v-model="form.name" clearable />
+                    <el-input v-model="form.name" show-word-limit clearable />
                 </el-form-item>
                 <el-form-item label="角色范围" prop="scope">
                     <el-select v-model="form.scope" clearable append-to=".box-content">

@@ -54,6 +54,8 @@ type Organization = BaseEntity & {
     address: string;
     // 负责人ID
     manager_id: string;
+    // 路径
+    path: string;
     // 备注
     remark?: string;
 };

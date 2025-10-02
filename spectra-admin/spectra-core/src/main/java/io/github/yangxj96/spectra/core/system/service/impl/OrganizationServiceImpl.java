@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.system.service.impl;
 
+import cn.dev33.satoken.exception.NotImplException;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
@@ -60,8 +61,8 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     @Override
     @Transactional
     public void deleteById(String id) {
-        // TODO 现在的删除并不完善,还需要修改
-        this.removeById(Long.parseLong(id));
+        // this.removeById(Long.parseLong(id))
+        throw new NotImplException("暂未实现");
     }
 
     @Override
@@ -73,6 +74,11 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
         }
         Organization entity = organizationConverter.toEntity(from);
         this.updateById(entity);
+    }
+
+    @Override
+    public String generatePath(Long id) {
+        return baseMapper.generatePath(id);
     }
 
     @Override

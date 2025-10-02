@@ -14,7 +14,7 @@ public class KeyGenerator {
     private KeyGenerator() {
     }
 
-    static void main(String[] args) throws Exception {
+    static void main() throws Exception {
         // 1. 生成 RSA 密钥对（2048位）
         KeyPair keyPair = RSAUtils.generateKeyPair();
 

@@ -54,6 +54,14 @@ public interface OrganizationService extends IService<Organization> {
     void modify(OrganizationFrom from);
 
     /**
+     * 计算组织机构路径
+     *
+     * @param id 组织机构ID
+     * @return 组织机构路径
+     */
+    String generatePath(Long id);
+
+    /**
      * 根据ID获取他的所有子级,包含孙级..曾孙级...等 <br/>
      * 使用递归实现主要是为了后期如果适配其他数据库少点修改
      *

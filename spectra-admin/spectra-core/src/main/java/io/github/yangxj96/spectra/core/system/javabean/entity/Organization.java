@@ -73,6 +73,13 @@ public class Organization extends BaseEntity implements Serializable {
     private Short type;
 
     /**
+     * 构建路径
+     * <p>格式:比如总部/二级/三级/部门</p>
+     */
+    @TableField(value = "PATH")
+    private String path;
+
+    /**
      * 备注
      */
     @TableField(value = "REMARK")

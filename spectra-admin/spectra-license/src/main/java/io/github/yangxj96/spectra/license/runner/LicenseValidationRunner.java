@@ -26,6 +26,6 @@ public class LicenseValidationRunner implements ApplicationRunner {
         //        .issuedAt(Instant.now())
         //        .expiresAt(Instant.now().plusSeconds(365L * 24 * 3600))
         //        .hwid(HardwareIdUtil.generateHWID())
-        //        .build());
+        //        .build())
     }
 }
