@@ -8,13 +8,13 @@ public class DataScopeContext {
     private DataScopeContext() {
     }
 
-    private static final ThreadLocal<Boolean> DATA_SCOPE_HOLDER = new ThreadLocal<>();
+    private static final ThreadLocal<DataScopeInfo> DATA_SCOPE_HOLDER = new ThreadLocal<>();
 
-    public static void set(Boolean filter) {
-        DATA_SCOPE_HOLDER.set(filter);
+    public static void set(DataScopeInfo info) {
+        DATA_SCOPE_HOLDER.set(info);
     }
 
-    public static Boolean get() {
+    public static DataScopeInfo get() {
         return DATA_SCOPE_HOLDER.get();
     }
 

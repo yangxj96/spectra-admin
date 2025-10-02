@@ -1,6 +1,6 @@
 # 自己项目的配置
 spectra:
-  # 用户相关
+  # 用户相关(admin123)
   user:
     default-password: ENC(iq/PQs4zwGykj1gmBxrkNlsHlaA+GgpmeyCzgF7vnvvQbhlupijAhTHcEf+woVCD)
   # 系统配置
@@ -131,7 +131,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
-    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    # log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -146,10 +147,11 @@ mybatis-plus:
 logging:
   group:
     spectra: >-
-      io.github.yangxj96.spectra.core,
-      io.github.yangxj96.spectra.framework
+      io.github.yangxj96.spectra.core
     other: >-
-      com.ulisesbocchio.jasyptspringboot.configuration
+      com.ulisesbocchio.jasyptspringboot.configuration,
+      io.github.yangxj96.spectra.framework,
+      io.github.yangxj96.spectra.core.system.configure.ULogListener
   level:
     root: info
     other: error
