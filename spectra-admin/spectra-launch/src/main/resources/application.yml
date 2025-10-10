@@ -91,6 +91,8 @@ spring:
         # 配置监控后台访问路径
         url-pattern: /druid/*
         reset-enable: false
+        login-username: sysadmin
+        login-password: sysadmin
       filter:
         # 统计
         stat:
@@ -102,8 +104,11 @@ spring:
           merge-sql: true
         # 防火墙
         wall:
+          enabled: true
+          db-type: oracle
           config:
             multi-statement-allow: true
+            inited: true
   data:
     redis:
       url: redis://127.0.0.1:6379/0

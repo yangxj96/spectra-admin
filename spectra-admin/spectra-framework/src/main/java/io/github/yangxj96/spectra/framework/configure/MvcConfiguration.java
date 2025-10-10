@@ -16,12 +16,7 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.yangxj96.spectra.framework.filter.DruidMonitorFilter;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -38,17 +33,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class MvcConfiguration implements WebMvcConfigurer {
 
     private static final String PREFIX = "[MVC]:";
-
-    @Resource
-    private ObjectMapper om;
-
-    @Bean
-    public FilterRegistrationBean<DruidMonitorFilter> druidMonitorFilter() {
-        FilterRegistrationBean<DruidMonitorFilter> bean = new FilterRegistrationBean<>();
-        bean.setFilter(new DruidMonitorFilter(om));
-        bean.addUrlPatterns("/druid/*");
-        return bean;
-    }
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
