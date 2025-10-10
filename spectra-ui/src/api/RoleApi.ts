@@ -33,12 +33,12 @@ export default {
     async getRoleMenu(roleId: string): Promise<IResult<Menu[]>> {
         return http.get<IResult<Menu[]>>(`/api/role/${roleId}/menu`).then(res => res.data);
     },
-    // 获取当前角色下有哪些权限
+    // 关联角色-权限(全量)
     async saveRoleAuthority(params: { role_id: string; authority_ids: TreeKey[] | undefined }): Promise<IResult> {
-        return http.post<IResult>(`/api/role/${params.role_id}/authority`, params).then(res => res.data);
+        return http.put<IResult>(`/api/role/${params.role_id}/authorities`, params).then(res => res.data);
     },
-    // 获取当前角色下有哪些菜单
+    // 管理角色-菜单
     async saveRoleMenu(params: { role_id: string; menu_ids: TreeKey[] | undefined }): Promise<IResult> {
-        return http.post<IResult>(`/api/role/${params.role_id}/menu`, params).then(res => res.data);
+        return http.put<IResult>(`/api/role/${params.role_id}/menus`, params).then(res => res.data);
     }
 };

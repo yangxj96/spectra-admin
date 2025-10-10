@@ -87,6 +87,11 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
     private String remark;
 
     /**
+     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+     */
+    private Integer sort = 0;
+
+    /**
      * 下级菜单
      */
     private List<OrganizationTreeVo> children;

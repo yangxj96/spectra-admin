@@ -38,6 +38,7 @@ import javax.security.auth.login.LoginException;
  * @since 2025-6-14
  */
 @Slf4j
+@SaCheckLogin
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -51,14 +52,12 @@ public class AuthController {
         return bindService.login(params);
     }
 
-    @SaCheckLogin
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     public void logout() {
         bindService.logout();
     }
 
-    @SaCheckLogin
     @ULog("token检查")
     @PostMapping("/check")
     public void check() {

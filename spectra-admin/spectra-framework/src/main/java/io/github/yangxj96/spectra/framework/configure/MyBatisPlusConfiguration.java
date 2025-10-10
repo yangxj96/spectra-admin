@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.RollbackOn;
  */
 @Slf4j
 @Configuration
-@MapperScan("io.github.yangxj96.spectra.**.mapper")
+@MapperScan("io.github.yangxj96.spectra.core.*.mapper")
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 

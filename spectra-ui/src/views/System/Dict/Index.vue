@@ -20,13 +20,16 @@ const dictGroupTableData = ref<DictTypeTree[]>([]);
 const dictDataTableData = ref<DictData[]>([]);
 
 // 当前选中的字典组
-const currentGroup = ref<DictGroup>();
+const currentGroup = ref<DictTypeTree>();
 
 // 监听当前字典组的变化
 watch(
     () => currentGroup.value,
     newVal => {
         if (newVal) {
+            if (newVal.children && newVal.children.length > 0) {
+                return;
+            }
             handleGetDictData();
         } else {
             // 如果没有选中任何字典组，清空字典数据表格

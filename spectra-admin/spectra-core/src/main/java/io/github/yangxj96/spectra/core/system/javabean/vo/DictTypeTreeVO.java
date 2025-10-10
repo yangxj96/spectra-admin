@@ -83,6 +83,11 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     private String remark;
 
     /**
+     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+     */
+    private Integer sort = 0;
+
+    /**
      * 子级
      */
     private List<DictTypeTreeVO> children = new ArrayList<>();

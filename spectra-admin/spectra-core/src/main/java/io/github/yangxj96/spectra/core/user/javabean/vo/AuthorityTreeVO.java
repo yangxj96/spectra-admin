@@ -42,16 +42,36 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 权限ID
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
+    /**
+     * 权限父级ID
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
+    /**
+     * 权限说明
+     */
     private String name;
 
+    /**
+     * 权限编码
+     */
     private String code;
 
+    /**
+     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+     */
+    private Integer sort = 0;
+
+    /**
+     * 子级
+     */
     private List<AuthorityTreeVO> children;
 
 }

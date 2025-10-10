@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2018-2025 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package io.github.yangxj96.spectra.core.user.controller;
 
 import cn.dev33.satoken.annotation.SaCheckEL;
@@ -107,7 +123,7 @@ public class RoleController {
     }
 
     @ULog("保存角色关联的权限列表")
-    @PostMapping("/{roleId}/authority")
+    @PutMapping("/{roleId}/authorities")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
             long id = Long.parseLong(roleId);
@@ -119,7 +135,7 @@ public class RoleController {
     }
 
     @ULog("保存角色关联的菜单列表")
-    @PostMapping("/{roleId}/menu")
+    @PutMapping("/{roleId}/menus")
     public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
             long id = Long.parseLong(roleId);

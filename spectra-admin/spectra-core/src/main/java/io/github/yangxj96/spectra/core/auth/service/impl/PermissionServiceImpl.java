@@ -36,8 +36,7 @@ import org.springframework.stereotype.Service;
 @Service("ss")
 public class PermissionServiceImpl implements PermissionService {
 
-    private static final String ADMINISTRATORS = "ROLE_ADMIN_OPS";
-
+    private static final String ADMINISTRATORS = "ROLE_DEV_OPS";
 
     @Override
     public void administrators() {
