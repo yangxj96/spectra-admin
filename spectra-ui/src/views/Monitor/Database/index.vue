@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const url = import.meta.env.VITE_API_URL + "api/druid/index.html";
+const url = import.meta.env.VITE_API_URL + "api/druid/index.html?t_" + Date.now();
 </script>
 
 <template>

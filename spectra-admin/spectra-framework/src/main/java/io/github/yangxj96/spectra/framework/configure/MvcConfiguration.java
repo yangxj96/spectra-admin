@@ -21,6 +21,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * mvc配置
  *
@@ -41,9 +44,11 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 // 匹配所有路径
                 .addMapping("/**")
                 // 指定允许的源
-                .allowedOrigins("http://localhost:5173")
+                // .allowedOrigins("http://localhost:5173")
+                .allowedOriginPatterns("http://localhost:5173")
                 // 允许的方法
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                // .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                .allowedMethods("*")
                 // 允许的头部信息
                 .allowedHeaders("*")
                 // 是否支持凭证
