@@ -19,7 +19,6 @@ package io.github.yangxj96.spectra.common.strategy.impl;
 import io.github.yangxj96.spectra.common.enums.FileType;
 import io.github.yangxj96.spectra.common.exception.FileTypeException;
 import io.github.yangxj96.spectra.common.strategy.FileTypeValidationStrategy;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -81,7 +80,7 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
      * @param file 需要读取的文件
      * @return 读取到的头部长度
      */
-    public static byte @NotNull [] readHeader(MultipartFile file) throws IOException {
+    public static byte[] readHeader(MultipartFile file) throws IOException {
         var length = Arrays.stream(FileType.values())
                 .mapToInt(t -> t.getMagicNumber().length)
                 .max()

@@ -23,7 +23,6 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.CaseUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -49,9 +48,9 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
     private static final String PREFIX = "[Get请求参数下滑先转驼峰命名]:";
 
     @Override
-    protected void doFilterInternal(@NotNull HttpServletRequest request,
-                                    @NotNull HttpServletResponse response,
-                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
         log.atDebug().log(PREFIX + "开始处理请求参数下划线转小驼峰命名");
         if (!request.getMethod().toUpperCase(Locale.getDefault()).equals("GET")) {
             log.atDebug().log(PREFIX + "非GET方法,跳过");

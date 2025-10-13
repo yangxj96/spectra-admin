@@ -17,7 +17,6 @@
 package io.github.yangxj96.spectra.common.utils;
 
 import io.github.yangxj96.spectra.common.exception.EncryptException;
-import org.jetbrains.annotations.NotNull;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -42,7 +41,7 @@ public final class HashUtils {
      * @param input 需要进行md5加密的字符串
      * @return 加密结果
      */
-    public static @NotNull String md5(@NotNull String input) {
+    public static String md5(String input) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] messageDigest = md.digest(input.getBytes(StandardCharsets.UTF_8));

@@ -2,7 +2,7 @@
 spectra:
   # 用户相关(admin123)
   user:
-    default-password: ENC(iq/PQs4zwGykj1gmBxrkNlsHlaA+GgpmeyCzgF7vnvvQbhlupijAhTHcEf+woVCD)
+    default-password: admin123
   # 系统配置
   system:
     base-dir: files
@@ -39,10 +39,6 @@ server:
         same-site: none
         # 如果你用的是 HTTP，否则设为 true
         secure: true
-# 配置文件加密
-jasypt:
-  encryptor:
-    password: ${JASYPT_ENCRYPTOR_PASSWORD}
 # spring 配置
 spring:
   jackson:
@@ -58,10 +54,10 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    url: ${DB_URL:jdbc:dm://127.0.0.1:5237?compatible_mode=oracle}
     driver-class-name: dm.jdbc.driver.DmDriver
-    username: ${DB_USERNAME:SPECTRA}
-    password: ${DB_PASSWORD:ENC(D342pOaeSsib01Sfw+duOfz9w1575go3FConG8MlCFPZzh2DH/+fcvLcWotw1B/o2EXHG7NS2e/kDdOqwQIfWQ==)}
+    url: ${DB_URL:jdbc:dm://127.0.0.1:5237?compatible_mode=oracle}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       # 初始化连接池大小

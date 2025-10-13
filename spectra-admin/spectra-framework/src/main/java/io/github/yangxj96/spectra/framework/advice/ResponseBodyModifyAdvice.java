@@ -18,8 +18,6 @@ package io.github.yangxj96.spectra.framework.advice;
 
 import io.github.yangxj96.spectra.common.response.R;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,8 +47,8 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     private static final Pattern PATTERN = Pattern.compile("io\\.github\\.yangxj96\\.spectra\\..*\\.controller");
 
     @Override
-    public boolean supports(@NotNull MethodParameter returnType,
-                            @NotNull Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(MethodParameter returnType,
+                            Class<? extends HttpMessageConverter<?>> converterType) {
         log.atDebug().log(PREFIX + "进入修改");
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
@@ -63,12 +61,12 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    public @NotNull Object beforeBodyWrite(@Nullable Object body,
-                                           @NotNull MethodParameter returnType,
-                                           @NotNull MediaType contentType,
-                                           @NotNull Class<? extends HttpMessageConverter<?>> converterType,
-                                           @NotNull ServerHttpRequest request,
-                                           @NotNull ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body,
+                                           MethodParameter returnType,
+                                           MediaType contentType,
+                                           Class<? extends HttpMessageConverter<?>> converterType,
+                                           ServerHttpRequest request,
+                                           ServerHttpResponse response) {
         // 跳过 String 和 byte[] 类型（避免 JSON 包装干扰）
         if (body instanceof String || body instanceof byte[]) {
             log.atDebug().log(PREFIX + "跳过 String 和 byte[] 类型(避免 JSON 包装干扰)");
