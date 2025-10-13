@@ -90,6 +90,7 @@ spring:
         enabled: true
         # 配置监控后台访问路径
         url-pattern: /druid/*
+        # 允许清空数据
         reset-enable: false
         login-username: sysadmin
         login-password: sysadmin
@@ -101,6 +102,7 @@ spring:
           log-slow-sql: true
           # 若执行耗时大于 2s，则视为慢 sql
           slow-sql-millis: 2000
+          # 合并SQL
           merge-sql: true
         # 防火墙
         wall:

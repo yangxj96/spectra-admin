@@ -52,7 +52,7 @@ public class R<T> implements Serializable {
      *
      * @param status http状态码
      */
-    public R(HttpStatus status) {
+    public R(@NotNull HttpStatus status) {
         this.code = status.value();
         this.msg = status.getReasonPhrase();
     }
@@ -87,7 +87,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
-    public static R<Object> failure(HttpStatus status) {
+    public static R<Object> failure(@NotNull HttpStatus status) {
         return R.builder().code(status.value()).msg(status.getReasonPhrase()).build();
     }
 
@@ -98,7 +98,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
-    public static R<Object> failure(HttpStatus status, String msg) {
+    public static R<Object> failure(@NotNull HttpStatus status, String msg) {
         return R.builder().code(status.value()).msg(msg).build();
     }
 
