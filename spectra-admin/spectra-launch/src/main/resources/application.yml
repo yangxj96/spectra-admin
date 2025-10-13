@@ -43,9 +43,6 @@ server:
 spring:
   jackson:
     time-zone: Asia/Shanghai
-  config:
-    import:
-      - optional:dotenv:./
   threads:
     virtual:
       enabled: true
