@@ -48,7 +48,7 @@ public class DataScopeInterceptor implements InnerInterceptor {
             return;
         }
 
-        log.atDebug().log("进入拦截: {}", boundSql.getSql());
+        log.debug("进入拦截: {}", boundSql.getSql());
     }
 
     /**

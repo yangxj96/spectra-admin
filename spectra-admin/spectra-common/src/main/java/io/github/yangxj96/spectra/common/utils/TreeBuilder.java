@@ -93,7 +93,7 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
             // 反射获取 sort 字段（如果存在）
             return (Integer) node.getClass().getMethod("getSort").invoke(node);
         } catch (Exception e) {
-            log.atError().log("获取排序字段值失败:{}", e.getMessage(), e);
+            log.error("获取排序字段值失败:{}", e.getMessage(), e);
             return 0; // 默认无排序
         }
     }

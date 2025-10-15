@@ -53,7 +53,7 @@ public class OperationLog extends BaseEntity implements Serializable {
      * 日志类型
      */
     @TableField(value = "TYPE")
-    private SysLogType type;
+    private SysLogType logType;
 
     /**
      * 日志说明

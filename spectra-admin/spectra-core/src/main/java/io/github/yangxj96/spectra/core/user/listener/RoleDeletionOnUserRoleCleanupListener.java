@@ -55,7 +55,7 @@ public class RoleDeletionOnUserRoleCleanupListener {
      */
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
-        log.atDebug().log("角色删除事件监听-用户角色关联关系:{}", event.roleId());
+        log.debug("角色删除事件监听-用户角色关联关系:{}", event.roleId());
         // 获取保底角色
         var defaultRole = roleService.getSystemDefaultUserRole();
         // 查询所有有这个角色的用户,

@@ -41,4 +41,9 @@ public class LicenseProperties {
      */
     private String privateKey;
 
+    /**
+     * 密钥密码
+     */
+    private String password;
+
 }

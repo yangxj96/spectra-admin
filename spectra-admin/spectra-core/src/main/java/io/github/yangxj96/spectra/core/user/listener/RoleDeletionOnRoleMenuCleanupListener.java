@@ -38,7 +38,7 @@ public class RoleDeletionOnRoleMenuCleanupListener {
 
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
-        log.atDebug().log("角色删除事件监听-角色菜单关联关系:{}", event.roleId());
+        log.debug("角色删除事件监听-角色菜单关联关系:{}", event.roleId());
         relRoleMenuService.revoke(event.roleId());
     }
 

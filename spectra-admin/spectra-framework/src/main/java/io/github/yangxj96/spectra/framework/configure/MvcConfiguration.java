@@ -36,7 +36,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        log.atDebug().log(PREFIX + "载入Cors");
+        log.debug(PREFIX + "载入Cors");
         registry
                 // 匹配所有路径
                 .addMapping("/**")

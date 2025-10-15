@@ -49,7 +49,7 @@ public class ULogListener {
     @Async("uLogTaskExecutor")
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
-        log.atDebug().log(PREFIX + "开始记录");
+        log.debug(PREFIX + "开始记录");
         var datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
         if (StringUtils.isNotBlank(entity.getToken())) {
@@ -60,7 +60,7 @@ public class ULogListener {
                     datum.setUpdatedBy(Long.parseLong(loginId.toString()));
                 }
             } catch (Exception e) {
-                log.atError().log("获取登录用户ID失败", e);
+                log.error("获取登录用户ID失败", e);
             }
         }
         logService.save(datum);

@@ -49,7 +49,7 @@ public record FileTypeValidator(List<FileTypeValidationStrategy> strategies) {
                 }
             } catch (IOException e) {
                 // 可以根据需要记录日志或抛出异常
-                log.atError().log("验证策略失败:" + e.getMessage(), e);
+                log.error("验证策略失败:" + e.getMessage(), e);
                 return false;
             }
         }

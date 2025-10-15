@@ -45,12 +45,12 @@ public class FolderCheckRunner implements ApplicationRunner {
         if (!folder.exists()) {
             var created = folder.mkdirs();
             if (created) {
-                log.atDebug().log("已创建文件夹: " + folder.getAbsolutePath());
+                log.debug("已创建文件夹: {}", folder.getAbsolutePath());
             } else {
-                log.atDebug().log("无法创建文件夹: " + folder.getAbsolutePath());
+                log.debug("无法创建文件夹: {}", folder.getAbsolutePath());
             }
         } else {
-            log.atDebug().log("文件夹已存在: " + folder.getAbsolutePath());
+            log.debug("文件夹已存在: {}", folder.getAbsolutePath());
         }
     }
 }

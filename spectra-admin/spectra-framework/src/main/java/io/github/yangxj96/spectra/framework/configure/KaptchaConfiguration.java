@@ -57,7 +57,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() {
-        log.atDebug().log(PREFIX + "开始配置图片验证码,字符模式");
+        log.debug(PREFIX + "开始配置图片验证码,字符模式");
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no
@@ -94,7 +94,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() {
-        log.atDebug().log(PREFIX + "开始配置图片验证码,算术模式");
+        log.debug(PREFIX + "开始配置图片验证码,算术模式");
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no

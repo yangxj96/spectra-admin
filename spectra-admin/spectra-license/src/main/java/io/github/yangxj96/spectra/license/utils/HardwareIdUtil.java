@@ -55,7 +55,7 @@ public class HardwareIdUtil {
             sb.append(mac);
         } catch (Exception e) {
             sb.append("NO_MAC");
-            log.atError().log("NO_MAC", e);
+            log.error("NO_MAC", e);
         }
 
         // 主机名
@@ -63,7 +63,7 @@ public class HardwareIdUtil {
             sb.append(InetAddress.getLocalHost().getHostName());
         } catch (UnknownHostException e) {
             sb.append("UNKNOWN_HOST");
-            log.atError().log("UNKNOWN_HOST", e);
+            log.error("UNKNOWN_HOST", e);
         }
 
         return sha256(sb.toString());
@@ -79,7 +79,7 @@ public class HardwareIdUtil {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
-            log.atError().log("ERROR_HASH", e);
+            log.error("ERROR_HASH", e);
             return "ERROR_HASH";
         }
     }

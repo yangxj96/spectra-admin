@@ -61,13 +61,13 @@ public class MyBatisPlusConfiguration {
     @Bean
     @ConditionalOnClass(StpUtil.class)
     public MetaObjectHandler metaObjectHandler() {
-        log.atDebug().log(PREFIX + "载入元数据处理器");
+        log.debug(PREFIX + "载入元数据处理器");
         return new MetaObjectHandlerImpl();
     }
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
-        log.atDebug().log(PREFIX + "载入MybatisPlusInterceptor");
+        log.debug(PREFIX + "载入MybatisPlusInterceptor");
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);

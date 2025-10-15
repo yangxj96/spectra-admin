@@ -6,7 +6,7 @@
         <!--@mbg.generated-->
         <!--@Table "SYS_LOG"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
-        <result column="TYPE"       jdbcType="INTEGER"   property="type"/>
+        <result column="TYPE"       jdbcType="INTEGER"   property="logType"/>
         <result column="EXPLAIN"    jdbcType="VARCHAR"   property="explain"/>
         <result column="STATUS"     jdbcType="SMALLINT"  property="status"/>
         <result column="IP"         jdbcType="VARCHAR"   property="ip"/>

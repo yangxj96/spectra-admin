@@ -50,7 +50,7 @@ public class RedisConfiguration {
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        log.atDebug().log(PREFIX + "开始配置Redis");
+        log.debug(PREFIX + "开始配置Redis");
         var template = new RedisTemplate<String, Object>();
         template.setConnectionFactory(factory);
 

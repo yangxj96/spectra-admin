@@ -53,7 +53,7 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
         try {
             var datum = OperationLog.builder()
-                    .type(SysLogType.SAFETY)
+                    .logType(SysLogType.SAFETY)
                     .explain("登录")
                     .status(Short.parseShort(String.valueOf(response.getStatus())))
                     .ip(IpUtils.getClientIP(request))
@@ -66,14 +66,14 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
                     .build();
             logService.save(datum);
         } catch (JsonProcessingException e) {
-            log.atError().log("序列化登录参数失败,{}", e.getMessage(), e);
+            log.error("序列化登录参数失败,{}", e.getMessage(), e);
         }
     }
 
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
         var datum = OperationLog.builder()
-                .type(SysLogType.SAFETY)
+                .logType(SysLogType.SAFETY)
                 .explain("登出")
                 .status(Short.parseShort(String.valueOf(response.getStatus())))
                 .ip(IpUtils.getClientIP(request))

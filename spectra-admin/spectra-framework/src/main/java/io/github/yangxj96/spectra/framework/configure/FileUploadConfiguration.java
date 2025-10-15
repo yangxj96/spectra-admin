@@ -59,7 +59,7 @@ public class FileUploadConfiguration {
      */
     @Bean
     public FileTypeValidator fileTypeValidator() {
-        log.atDebug().log(PREFIX + "载入文件类型验证策略管理器");
+        log.debug(PREFIX + "载入文件类型验证策略管理器");
         var strategies = new ArrayList<FileTypeValidationStrategy>();
         var allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器

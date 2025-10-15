@@ -51,7 +51,7 @@ public class ULogConfiguration {
      */
     @Bean
     public ULogEventPublisher uLogEventPublisher(ApplicationEventPublisher publisher) {
-        log.atDebug().log(PREFIX + "载入日志消息订阅发布者");
+        log.debug(PREFIX + "载入日志消息订阅发布者");
         return new ULogEventPublisher(publisher);
     }
 
@@ -62,7 +62,7 @@ public class ULogConfiguration {
      */
     @Bean
     public ULogAspect uLogAspect() {
-        log.atDebug().log(PREFIX + "载入ULogAspect");
+        log.debug(PREFIX + "载入ULogAspect");
         return new ULogAspect();
     }
 
@@ -74,7 +74,7 @@ public class ULogConfiguration {
     @Bean
     @ConditionalOnBean(ULogAspect.class)
     public Executor uLogTaskExecutor() {
-        log.atDebug().log(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
+        log.debug(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
         return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(
                 Thread
                         .ofVirtual()

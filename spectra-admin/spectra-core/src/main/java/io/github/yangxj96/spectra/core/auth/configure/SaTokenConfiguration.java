@@ -44,7 +44,7 @@ public class SaTokenConfiguration {
      */
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        log.atDebug().log(PREFIX + "加载密码加解密工具");
+        log.debug(PREFIX + "加载密码加解密工具");
         return new BCryptPasswordEncoder();
     }
 }

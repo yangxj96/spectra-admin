@@ -10,6 +10,7 @@ spectra:
       license-path: ${spectra.system.base-dir}/license.lic
       public-key: classpath:key/publicKey.pem
       private-key: classpath:key/privateKey.pem
+      password: QuVsKppcWvwwX2Vv
   # 文件相关
   file:
     upload:

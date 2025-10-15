@@ -105,7 +105,7 @@ public class RoleController {
             long id = Long.parseLong(roleId);
             return relRoleAuthorityService.get(id);
         } catch (Exception e) {
-            log.atError().log("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            log.error("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -117,7 +117,7 @@ public class RoleController {
             long id = Long.parseLong(roleId);
             return relRoleMenuService.get(id);
         } catch (Exception e) {
-            log.atError().log("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            log.error("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -129,7 +129,7 @@ public class RoleController {
             long id = Long.parseLong(roleId);
             relRoleAuthorityService.grant(id, from);
         } catch (Exception e) {
-            log.atError().log("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            log.error("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -141,7 +141,7 @@ public class RoleController {
             long id = Long.parseLong(roleId);
             relRoleMenuService.grant(id, from);
         } catch (Exception e) {
-            log.atError().log("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            log.error("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }

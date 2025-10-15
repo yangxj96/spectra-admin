@@ -137,7 +137,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             try {
                 relUserRoleService.revoke(entity.getId(), deleteList);
             } catch (Exception e) {
-                log.atError().log("删除角色关联失败，未完全删除,{}", e.getMessage(), e);
+                log.error("删除角色关联失败，未完全删除,{}", e.getMessage(), e);
                 throw new EntityUpdateException("删除角色关联失败，未完全删除");
             }
         }
@@ -151,7 +151,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             try {
                 relUserRoleService.grant(entity.getId(), insertList);
             } catch (Exception e) {
-                log.atError().log("新增角色关联失败，未完全插入,{}", e.getMessage(), e);
+                log.error("新增角色关联失败，未完全插入,{}", e.getMessage(), e);
                 throw new EntityUpdateException("新增角色关联失败，未完全插入");
             }
         }
@@ -165,7 +165,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             user.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
             this.baseMapper.updateById(user);
         } catch (Exception e) {
-            log.atError().log("用户不存在", e);
+            log.error("用户不存在", e);
             throw new DataNotExistException("用户不存在");
         }
     }
@@ -220,13 +220,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             var loginRecords = new ArrayList<UserOnlineVO.LoginRecordVo>();
             // 根据会话id，查询对应的 SaSession 对象，此处一个 SaSession 对象即代表一个登录的账号
             var session = StpUtil.getSessionBySessionId(sessionId);
-            log.atDebug().log("登录ID:{}", session.getLoginId());
+            log.debug("登录ID:{}", session.getLoginId());
             // 查询这个账号都在哪些设备登录了，依据上面的示例，
             // 账号A 的 SaTerminalInfo 数量是 3，账号B 的 SaTerminalInfo 数量是 2
             var terminalList = session.terminalListCopy();
-            log.atDebug().log("会话id：" + sessionId + "，共在 " + terminalList.size() + " 设备登录");
+            log.debug("会话id：" + sessionId + "，共在 " + terminalList.size() + " 设备登录");
             for (SaTerminalInfo info : terminalList) {
-                log.atDebug().log("分别是:{}", info);
+                log.debug("分别是:{}", info);
                 loginRecords.add(new UserOnlineVO.LoginRecordVo(
                         info.getTokenValue(),
                         info.getDeviceType(),

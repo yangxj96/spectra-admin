@@ -56,7 +56,7 @@ public class AuthExceptionAdvice {
     @ExceptionHandler(NotPermissionException.class)
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());
-        log.atError().log(PREFIX + "无权限异常,{}", e.getMessage(), e);
+        log.error(PREFIX + "无权限异常,{}", e.getMessage(), e);
         return R.failure(HttpStatus.FORBIDDEN, "无权操作");
     }
 
@@ -70,7 +70,7 @@ public class AuthExceptionAdvice {
     @ExceptionHandler(NotLoginException.class)
     public R<Object> notLoginException(NotLoginException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        log.atError().log(PREFIX + "未登录异常,{}", e.getMessage(), e);
+        log.error(PREFIX + "未登录异常,{}", e.getMessage(), e);
         if (e.getCode() == SaErrorCode.CODE_11016) {
             return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
         }
@@ -90,7 +90,7 @@ public class AuthExceptionAdvice {
     @ExceptionHandler(LoginException.class)
     public R<Object> loginException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.atError().log(PREFIX + "登录异常,{}", e.getMessage(), e);
+        log.error(PREFIX + "登录异常,{}", e.getMessage(), e);
         return R.failure(e.getMessage());
     }
 

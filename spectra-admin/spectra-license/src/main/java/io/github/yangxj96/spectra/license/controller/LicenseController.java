@@ -39,7 +39,7 @@ public class LicenseController {
      */
     @PostMapping
     public void create(@RequestBody LicenseCreateFrom from) {
-        log.atDebug().log("请求参数:{}", from);
+        log.debug("请求参数:{}", from);
         throw new NotImplException("暂未实现");
     }
 

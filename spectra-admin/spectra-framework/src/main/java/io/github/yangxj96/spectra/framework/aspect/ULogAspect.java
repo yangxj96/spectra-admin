@@ -85,7 +85,7 @@ public class ULogAspect {
      * @param jsonResult 响应信息
      */
     protected void handleLog(final JoinPoint point, ULog annotation, final Exception e, Object jsonResult) {
-        log.atDebug().log(PREFIX + "操作日志-开始记录");
+        log.debug(PREFIX + "操作日志-开始记录");
         try {
             // 获取当前用户
             // 获取请求上下文
@@ -107,13 +107,13 @@ public class ULogAspect {
                     .token(StpUtil.getTokenValue())
                     .build();
             publisher.save(datum);
-            log.atDebug().log(PREFIX + "操作日志-记录结束");
+            log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {
-            log.atError().log("记录日志异常:{}", e.getMessage(), ex);
+            log.error("记录日志异常:{}", e.getMessage(), ex);
         } finally {
             TIME_THREADLOCAL.remove();
         }
-        log.atDebug().log(PREFIX + "操作日志-记录结束");
+        log.debug(PREFIX + "操作日志-记录结束");
     }
 
 
@@ -130,7 +130,7 @@ public class ULogAspect {
         try {
             return om.writeValueAsString(obj);
         } catch (Exception e) {
-            log.atError().log(PREFIX + "JSON 序列化失败: {}", obj.getClass(), e);
+            log.error(PREFIX + "JSON 序列化失败: {}", obj.getClass(), e);
             return null;
         }
     }

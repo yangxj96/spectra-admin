@@ -51,9 +51,9 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        log.atDebug().log(PREFIX + "开始处理请求参数下划线转小驼峰命名");
+        log.debug(PREFIX + "开始处理请求参数下划线转小驼峰命名");
         if (!request.getMethod().toUpperCase(Locale.getDefault()).equals("GET")) {
-            log.atDebug().log(PREFIX + "非GET方法,跳过");
+            log.debug(PREFIX + "非GET方法,跳过");
             filterChain.doFilter(request, response);
             return;
         }
@@ -67,7 +67,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
             }
             formatted.put(k, request.getParameterValues(param));
         }
-        log.atDebug().log(PREFIX + "转换成功,继续往下执行");
+        log.debug(PREFIX + "转换成功,继续往下执行");
         filterChain.doFilter(new ParamsModifyHttpServletRequestWrapper(request, formatted), response);
     }
 

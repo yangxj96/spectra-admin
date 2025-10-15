@@ -58,20 +58,20 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
 
     @Override
     public void customize(Jackson2ObjectMapperBuilder builder) {
-        log.atDebug().log(PREFIX + "自定义ObjectMapper");
-        log.atDebug().log(PREFIX + "注册java8时间模块");
+        log.debug(PREFIX + "自定义ObjectMapper");
+        log.debug(PREFIX + "注册java8时间模块");
         builder.modules(new JavaTimeModule());
-        log.atDebug().log(PREFIX + "不显示null元素");
+        log.debug(PREFIX + "不显示null元素");
         builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-        log.atDebug().log(PREFIX + "格式化响应字段为下划线分割");
+        log.debug(PREFIX + "格式化响应字段为下划线分割");
         builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        log.atDebug().log(PREFIX + "设置时区为UTC");
+        log.debug(PREFIX + "设置时区为UTC");
         builder.timeZone(TimeZone.getTimeZone("UTC"));
         var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
-        log.atDebug().log(PREFIX + "加载时间格式化");
+        log.debug(PREFIX + "加载时间格式化");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         builder.dateFormat(sdf);
-        log.atDebug().log(PREFIX + "加载java8新时间序列化");
+        log.debug(PREFIX + "加载java8新时间序列化");
         var serializers = new HashMap<Class<?>, JsonSerializer<?>>();
         serializers.put(LocalDateTime.class,
                 new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
@@ -80,7 +80,7 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
         serializers.put(LocalTime.class,
                 new LocalTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
         builder.serializersByType(serializers);
-        log.atDebug().log(PREFIX + "加载java8新时间反序列化");
+        log.debug(PREFIX + "加载java8新时间反序列化");
         var deserializers = new HashMap<Class<?>, JsonDeserializer<?>>();
         deserializers.put(LocalDateTime.class,
                 new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
@@ -89,6 +89,6 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
         deserializers.put(LocalTime.class,
                 new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
         builder.deserializersByType(deserializers);
-        log.atDebug().log(PREFIX + "配置完成");
+        log.debug(PREFIX + "配置完成");
     }
 }

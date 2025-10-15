@@ -54,7 +54,7 @@ public class LicenseServiceImpl implements LicenseService {
     @Override
     public void generateLicense(License license) {
         try {
-            log.atDebug().log("开始生成许可证");
+            log.debug("开始生成许可证");
 
             var resource = resourceLoader.getResource(properties.getPrivateKey());
             if (!resource.exists()) {
@@ -66,7 +66,7 @@ public class LicenseServiceImpl implements LicenseService {
 
                 //生成签名原文（不含 signature 字段）
                 var contentToSign = LicenseUtils.toJsonWithoutSignature(license, om);
-                log.atDebug().log("签名原文: \n{}", contentToSign);
+                log.debug("签名原文: \n{}", contentToSign);
 
                 // 签名
                 var signature = RSAUtils.sign(contentToSign, privateKey);
@@ -84,16 +84,16 @@ public class LicenseServiceImpl implements LicenseService {
                 var fullJson = LicenseUtils.toJson(license, om);
                 Files.write(outputPath, fullJson.getBytes());
 
-                log.atDebug().log("✅ 许可证已生成: {}", outputPath.toAbsolutePath());
+                log.debug("✅ 许可证已生成: {}", outputPath.toAbsolutePath());
             }
         } catch (Exception e) {
-            log.atError().log("生成许可失败,{}", e.getMessage(), e);
+            log.error("生成许可失败,{}", e.getMessage(), e);
         }
     }
 
     @Override
     public void verifyLicense() {
-        log.atDebug().log("🔍 正在验证许可证...");
+        log.debug("🔍 正在验证许可证...");
 
         try {
             // 1. 加载公钥
@@ -110,7 +110,7 @@ public class LicenseServiceImpl implements LicenseService {
             // 2. 读取 license 文件
             var licensePath = Paths.get(properties.getLicensePath());
             if (!Files.exists(licensePath)) {
-                log.atError().log("❌ 许可证文件不存在: {}", licensePath.toAbsolutePath());
+                log.error("❌ 许可证文件不存在: {}", licensePath.toAbsolutePath());
                 System.exit(1);
             }
 
@@ -118,7 +118,7 @@ public class LicenseServiceImpl implements LicenseService {
             var license = om.readValue(content, License.class);
 
             if (license.getSignature() == null || license.getSignature().trim().isEmpty()) {
-                log.atError().log("❌ 许可证缺少有效的签名字段！");
+                log.error("❌ 许可证缺少有效的签名字段！");
                 System.exit(1);
             }
 
@@ -128,39 +128,39 @@ public class LicenseServiceImpl implements LicenseService {
 
             // 3. 验证数字签名
             if (!RSAUtils.verify(contentToVerify, license.getSignature(), publicKey)) {
-                log.atError().log("❌ 许可证已被篡改！签名验证失败。");
+                log.error("❌ 许可证已被篡改！签名验证失败。");
                 System.exit(1);
             }
-            log.atDebug().log("✅ 数字签名验证通过。");
+            log.debug("✅ 数字签名验证通过。");
 
             // 4. 验证硬件 ID
             var expectedHwid = license.getHwid();
             var actualHwid = HardwareIdUtil.generateHWID();
 
             if (!expectedHwid.equals(actualHwid)) {
-                log.atError().log("❌ 硬件不匹配！请在授权机器上运行。");
-                log.atError().log("   Expected HWID: {}", expectedHwid);
-                log.atError().log("   Actual   HWID: {}", actualHwid);
+                log.error("❌ 硬件不匹配！请在授权机器上运行。");
+                log.error("   Expected HWID: {}", expectedHwid);
+                log.error("   Actual   HWID: {}", actualHwid);
                 System.exit(1);
             }
-            log.atDebug().log("✅ 硬件 ID 验证通过。");
+            log.debug("✅ 硬件 ID 验证通过。");
 
             // 5. 验证过期时间
             var expiresAt = license.getExpiresAt();
             if (Instant.now().isAfter(expiresAt)) {
-                log.atError().log("❌ 许可证已过期，请联系供应商续期！");
-                log.atError().log("   当前时间: {}", Instant.now());
-                log.atError().log("   过期时间: {}", expiresAt);
+                log.error("❌ 许可证已过期，请联系供应商续期！");
+                log.error("   当前时间: {}", Instant.now());
+                log.error("   过期时间: {}", expiresAt);
                 System.exit(1);
             }
             var remaining = Duration.between(Instant.now(), expiresAt);
-            log.atDebug().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
+            log.debug("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
 
             // 🎉 所有验证通过
-            log.atDebug().log("🎉 许可证验证全部通过，系统即将启动！");
+            log.debug("🎉 许可证验证全部通过，系统即将启动！");
 
         } catch (Exception e) {
-            log.atError().log("❌ 许可证验证过程中发生严重错误: {}", e.getMessage(), e);
+            log.error("❌ 许可证验证过程中发生严重错误: {}", e.getMessage(), e);
             System.exit(1);
         }
     }
