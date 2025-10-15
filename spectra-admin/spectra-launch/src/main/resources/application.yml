@@ -2,7 +2,7 @@
 spectra:
   # 用户相关(admin123)
   user:
-    default-password: admin123
+    default-password: ${DEFAULT_PASSWORD}
   # 系统配置
   system:
     base-dir: files
@@ -10,7 +10,7 @@ spectra:
       license-path: ${spectra.system.base-dir}/license.lic
       public-key: classpath:key/publicKey.pem
       private-key: classpath:key/privateKey.pem
-      password: QuVsKppcWvwwX2Vv
+      password: ${LICENSE_PASSWORD}
   # 文件相关
   file:
     upload:
@@ -42,6 +42,11 @@ server:
         secure: true
 # spring 配置
 spring:
+  config:
+    # .env文件内是K=V的键值对符合properties的解析方式,
+    # [.properties]是告诉他用properties的方式进行解析
+    # [.yaml]是告诉他用.yaml的方式进行计息
+    import: classpath:.env[.properties]
   jackson:
     time-zone: Asia/Shanghai
   threads:
@@ -53,7 +58,7 @@ spring:
     name: spectra-framework-launch
   datasource:
     driver-class-name: dm.jdbc.driver.DmDriver
-    url: ${DB_URL:jdbc:dm://127.0.0.1:5237?compatible_mode=oracle}
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     type: com.alibaba.druid.pool.DruidDataSource

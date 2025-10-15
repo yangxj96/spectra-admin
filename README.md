@@ -76,9 +76,13 @@
 
 > ⚠️ 该文件不会提交至 Git，请自行创建。
 
-| 环境变量                        | 说明            | 示例                                 |
-|-----------------------------|---------------|------------------------------------|
-| `JASYPT_ENCRYPTOR_PASSWORD` | Jasypt 加密解密密钥 | `JASYPT_ENCRYPTOR_PASSWORD=123456` |
+| 环境变量               | 说明                | 示例                                                       |
+|--------------------|-------------------|----------------------------------------------------------|
+| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:dm://127.0.0.1:5237?compatible_mode=oracle` |
+| `DB_USERNAME`      | 数据库用户名            | `DB_USERNAME=XXX`                                        |
+| `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                        |
+| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                              |
+| `LICENSE_PASSWORD` | 许可模式,使用的密钥密码(临时用) | `LICENSE_PASSWORD=XXX`                                   |
 
 > 用于数据库密码等敏感配置的加密保护。
 
@@ -142,7 +146,6 @@
 - ✅ 前后端完全分离，Vite 提供极速 HMR
 - ✅ Sa-Token 实现 RBAC 权限模型（用户、角色、菜单、按钮权限）
 - ✅ MyBatis-Plus + MapStruct 提升开发效率
-- ✅ 敏感配置加密（Jasypt）
 - ✅ 标准 RESTful API 设计
 - ✅ 可扩展的模块化架构，便于二次开发
 
@@ -166,11 +169,3 @@
 > **Spectra** —— 简洁有力，照亮你的开发之路 🌈
 
 ---
-
-### ✅ 后续规划（Roadmap）
-
-- [ ] 集成代码生成器
-- [ ] 添加多租户支持
-- [ ] 引入 Redis 缓存示例
-- [ ] 提供 Docker 部署脚本
-- [ ] 完善文档与示例页面
