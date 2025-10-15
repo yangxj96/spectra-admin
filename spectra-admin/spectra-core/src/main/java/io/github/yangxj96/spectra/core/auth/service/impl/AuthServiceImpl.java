@@ -19,17 +19,21 @@ package io.github.yangxj96.spectra.core.auth.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
+import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.auth.javabean.from.UsernamePasswordFrom;
 import io.github.yangxj96.spectra.core.auth.javabean.vo.TokenVO;
 import io.github.yangxj96.spectra.core.auth.service.AuthService;
+import io.github.yangxj96.spectra.core.auth.service.IpLocationService;
 import io.github.yangxj96.spectra.core.common.service.KaptchaService;
 import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
+import java.util.HashMap;
 
 /**
  * 认证service层-实现
@@ -51,6 +55,11 @@ public class AuthServiceImpl implements AuthService {
     @Resource
     private KaptchaService kaptchaService;
 
+    @Resource
+    private IpLocationService ipLocationService;
+
+    @Resource
+    private HttpServletRequest request;
 
     @Override
     public TokenVO login(UsernamePasswordFrom params) throws LoginException {
@@ -68,11 +77,19 @@ public class AuthServiceImpl implements AuthService {
             if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
                 throw new LoginException("账号或密码错误");
             }
+
+            // 开始进行登录
+            var terminalExtraData = new HashMap<String, Object>();
+            var ip = IpUtils.getClientIP(request);
+            terminalExtraData.put("ip", ip);
+            terminalExtraData.put("address", ipLocationService.getCityEn(ip));
+
             // 登录
             StpUtil.login(datum.getId(), new SaLoginParameter()
                     .setDeviceType("PC")
                     .setIsLastingCookie(false)
                     .setIsWriteHeader(false)
+                    .setTerminalExtraData(terminalExtraData)
             );
             // 组件token
             return TokenVO.builder()

@@ -45,6 +45,7 @@
         <jetcache.version>2.7.8</jetcache.version>
         <druid.version>1.2.27</druid.version>
         <bcprov.version>1.82</bcprov.version>
+        <ip2region.version>3.1.0</ip2region.version>
 
     </properties>
 
@@ -183,6 +184,12 @@
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
+            </dependency>
+            <!-- ip转区域 -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
