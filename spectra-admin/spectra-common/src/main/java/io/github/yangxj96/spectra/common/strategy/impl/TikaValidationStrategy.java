@@ -46,7 +46,7 @@ public class TikaValidationStrategy implements FileTypeValidationStrategy {
             return false;
         }
 
-        String detectedMimeType = tika.detect(file.getInputStream(), file.getOriginalFilename());
+        var detectedMimeType = tika.detect(file.getInputStream(), file.getOriginalFilename());
         return allowedMimes.stream().anyMatch(mime -> mime.equalsIgnoreCase(detectedMimeType));
     }
 }

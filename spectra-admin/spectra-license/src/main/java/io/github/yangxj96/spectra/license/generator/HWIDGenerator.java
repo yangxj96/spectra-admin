@@ -31,7 +31,7 @@ public class HWIDGenerator {
 
     static void main() {
         // bf15a08c8ec82a4d399437c98e0f7dfe10f6a252da8189e7824d2a3506522c42
-        String string = HardwareIdUtil.generateHWID();
+        var string = HardwareIdUtil.generateHWID();
         log.atDebug().log("当前硬件ID:{}", string);
     }
 

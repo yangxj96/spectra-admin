@@ -22,8 +22,8 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
-import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
+import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DefaultDataException;
 import io.github.yangxj96.spectra.core.user.javabean.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
@@ -87,7 +87,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
             throw new BuiltinDataException("内置角色,不可删除");
         }
         Role defaultRole = this.getSystemDefaultUserRole();
-        if (defaultRole == null ||  defaultRole.getId().equals(id)) {
+        if (defaultRole == null || defaultRole.getId().equals(id)) {
             throw new DefaultDataException();
         }
 

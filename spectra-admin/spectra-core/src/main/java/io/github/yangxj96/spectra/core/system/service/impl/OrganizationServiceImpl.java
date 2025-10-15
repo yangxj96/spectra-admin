@@ -53,7 +53,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     @Override
     @Transactional
     public void created(OrganizationFrom from) {
-        Organization entity = organizationConverter.toEntity(from);
+        var entity = organizationConverter.toEntity(from);
         entity.setCode(IdWorker.get32UUID().toUpperCase());
         this.save(entity);
     }
@@ -68,11 +68,11 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     @Override
     @Transactional
     public void modify(OrganizationFrom from) {
-        Organization organization = this.getById(from.getId());
+        var organization = this.getById(from.getId());
         if (null == organization) {
             throw new DataNotExistException("没找到组织机构信息");
         }
-        Organization entity = organizationConverter.toEntity(from);
+        var entity = organizationConverter.toEntity(from);
         this.updateById(entity);
     }
 
@@ -90,13 +90,13 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
 
     @Override
     public List<Organization> getAllChildrenById(Long organizationId) {
-        List<Organization> organizations = this.list();
+        var organizations = this.list();
         // 2. 构建父ID -> 子节点列表的映射
-        Map<Long, List<Organization>> childrenMap = organizations.stream()
+        var childrenMap = organizations.stream()
                 .filter(org -> org.getPid() != null)
                 .collect(Collectors.groupingBy(Organization::getPid));
         // 3. 存放结果的集合
-        List<Organization> result = new ArrayList<>();
+        var result = new ArrayList<Organization>();
         // 4. 从指定ID开始递归收集所有子节点
         collectAllChildren(organizationId, childrenMap, result);
         return result;
@@ -112,7 +112,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
      */
     private void collectAllChildren(Long parentId, Map<Long, List<Organization>> childrenMap, List<Organization> result) {
         // 获取该父节点的所有直接子节点
-        List<Organization> directChildren = childrenMap.get(parentId);
+        var directChildren = childrenMap.get(parentId);
         // 如果没有子节点，直接返回（递归终止条件）
         if (directChildren == null || directChildren.isEmpty()) {
             return;

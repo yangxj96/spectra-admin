@@ -18,15 +18,12 @@ package io.github.yangxj96.spectra.license.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.NetworkIF;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.List;
 
 /**
  * 硬件工具类
@@ -38,19 +35,19 @@ public class HardwareIdUtil {
     }
 
     public static String generateHWID() {
-        SystemInfo si = new SystemInfo();
-        HardwareAbstractionLayer hal = si.getHardware();
+        var si = new SystemInfo();
+        var hal = si.getHardware();
 
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
 
         // CPU ID
-        CentralProcessor cpu = hal.getProcessor();
+        var cpu = hal.getProcessor();
         sb.append(cpu.getProcessorIdentifier().getProcessorID());
 
         // MAC Address (first non-loopback)
         try {
-            List<NetworkIF> nets = hal.getNetworkIFs();
-            String mac = nets.stream()
+            var nets = hal.getNetworkIFs();
+            var mac = nets.stream()
                     .filter(n -> n.getMacaddr() != null && !n.getMacaddr().isEmpty())
                     .map(NetworkIF::getMacaddr)
                     .findFirst()
@@ -74,10 +71,10 @@ public class HardwareIdUtil {
 
     private static String sha256(String input) {
         try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(input.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
+            var md = MessageDigest.getInstance("SHA-256");
+            var hash = md.digest(input.getBytes());
+            var sb = new StringBuilder();
+            for (var b : hash) {
                 sb.append(String.format("%02x", b));
             }
             return sb.toString();

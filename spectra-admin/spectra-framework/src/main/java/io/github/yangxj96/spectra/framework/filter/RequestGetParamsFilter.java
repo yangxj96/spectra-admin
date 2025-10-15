@@ -58,7 +58,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
             return;
         }
         var formatted = new ConcurrentHashMap<String, String[]>();
-        for (String param : request.getParameterMap().keySet()) {
+        for (var param : request.getParameterMap().keySet()) {
             var k = "";
             if (param.contains("_")) {
                 k = CaseUtils.toCamelCase(param, false, '_');

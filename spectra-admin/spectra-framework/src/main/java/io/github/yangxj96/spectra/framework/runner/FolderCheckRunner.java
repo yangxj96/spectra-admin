@@ -41,9 +41,9 @@ public class FolderCheckRunner implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        File folder = new File(properties.getBaseDir());
+        var folder = new File(properties.getBaseDir());
         if (!folder.exists()) {
-            boolean created = folder.mkdirs();
+            var created = folder.mkdirs();
             if (created) {
                 log.atDebug().log("已创建文件夹: " + folder.getAbsolutePath());
             } else {

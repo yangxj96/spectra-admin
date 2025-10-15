@@ -40,7 +40,7 @@ public final class IpUtils {
         if (request == null) {
             return UNKNOWN;
         }
-        String ip = request.getHeader("x-forwarded-for");
+        var ip = request.getHeader("x-forwarded-for");
         if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
@@ -69,8 +69,8 @@ public final class IpUtils {
     public static String getMultistageReverseProxyIp(String ip) {
         // 多级反向代理检测
         if (ip != null && ip.indexOf(",") <= 0) {
-            final String[] ips = ip.trim().split(",");
-            for (String subIp : ips) {
+            var ips = ip.trim().split(",");
+            for (var subIp : ips) {
                 if (!(StringUtils.isBlank(subIp) || UNKNOWN.equalsIgnoreCase(subIp))) {
                     ip = subIp;
                     break;

@@ -42,9 +42,9 @@ public class TreeUtils {
      * @return 压缩处理后的选中ID集合
      */
     public static <T extends Tree<T>> Set<Long> compressSelectedNodes(List<T> tree, Set<Long> selectedIds, Function<T, Long> idExtractor) {
-        Set<Long> result = new HashSet<>();
+        var result = new HashSet<Long>();
         for (T node : tree) {
-            Set<Long> nodeResult = new HashSet<>();
+            var nodeResult = new HashSet<Long>();
             collectCompressedIds(node, selectedIds, idExtractor, nodeResult);
             result.addAll(nodeResult);
         }
@@ -58,10 +58,10 @@ public class TreeUtils {
 
         if (node == null) return false;
 
-        Long nodeId = idExtractor.apply(node);
+        var nodeId = idExtractor.apply(node);
         if (nodeId == null) return false;
 
-        List<T> children = node.getChildren();
+        var children = node.getChildren();
 
         // 叶子节点
         if (children == null || children.isEmpty()) {
@@ -73,12 +73,12 @@ public class TreeUtils {
         }
 
         // 非叶子节点：递归处理子节点
-        boolean allChildrenSelected = true;
-        List<Set<Long>> childResults = new ArrayList<>();
+        var allChildrenSelected = true;
+        var childResults = new ArrayList<Set<Long>>();
 
         for (T child : children) {
-            Set<Long> childResult = new HashSet<>();
-            boolean isSelected = collectCompressedIds(child, selectedIds, idExtractor, childResult);
+            var childResult = new HashSet<Long>();
+            var isSelected = collectCompressedIds(child, selectedIds, idExtractor, childResult);
             childResults.add(childResult);
             if (!isSelected) {
                 allChildrenSelected = false;
@@ -92,7 +92,7 @@ public class TreeUtils {
         }
 
         // 否则，保留子节点的结果
-        for (Set<Long> childResult : childResults) {
+        for (var childResult : childResults) {
             result.addAll(childResult);
         }
 

@@ -27,7 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
@@ -61,12 +60,12 @@ public class FileServiceImpl implements FileService {
             throw new FileTypeException("此类文件不允许上传");
         }
         // 创建目录（如果不存在）
-        Path uploadDirPath = Paths.get(properties.getUploadDir());
+        var uploadDirPath = Paths.get(properties.getUploadDir());
         if (!Files.exists(uploadDirPath)) {
             Files.createDirectories(uploadDirPath);
         }
         // 构建目标文件路径
-        Path targetLocation = uploadDirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
+        var targetLocation = uploadDirPath.resolve(Objects.requireNonNull(file.getOriginalFilename()));
         file.transferTo(targetLocation); // Spring 提供的方法直接保存
         log.atDebug().log("文件已保存至: {}", targetLocation);
     }

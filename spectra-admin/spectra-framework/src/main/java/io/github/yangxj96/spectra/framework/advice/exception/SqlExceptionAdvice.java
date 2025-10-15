@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLException;
 import java.util.Objects;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -59,12 +58,12 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Object> handleDuplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        String message = e.getMessage();
-        Pattern pattern = Pattern.compile("键值\"\\(name\\)=\\((?<value>[^)]+)\\)\" 已经存在");
-        Matcher matcher = pattern.matcher(message);
-        String errorMessage = "数据重复,请检查输入内容";
+        var message = e.getMessage();
+        var pattern = Pattern.compile("键值\"\\(name\\)=\\((?<value>[^)]+)\\)\" 已经存在");
+        var matcher = pattern.matcher(message);
+        var errorMessage = "数据重复,请检查输入内容";
         if (matcher.find()) {
-            String value = matcher.group("value");
+            var value = matcher.group("value");
 
             return R.failure("\"%s\"已存在,请更换名称".formatted(value));
         }

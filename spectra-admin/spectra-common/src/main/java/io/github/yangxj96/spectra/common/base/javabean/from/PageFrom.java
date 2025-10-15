@@ -53,7 +53,7 @@ public class PageFrom {
     private List<OrderItem> orders;
 
     public <T> Page<T> toPage() {
-        Page<T> page = new Page<>(this.pageNum, this.pageSize);
+        var page = new Page<T>(this.pageNum, this.pageSize);
         if (CollectionUtils.isNotEmpty(orders)) {
             page.setOrders(this.orders);
         }

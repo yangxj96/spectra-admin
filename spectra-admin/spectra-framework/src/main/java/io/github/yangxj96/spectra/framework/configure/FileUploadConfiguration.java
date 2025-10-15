@@ -60,8 +60,8 @@ public class FileUploadConfiguration {
     @Bean
     public FileTypeValidator fileTypeValidator() {
         log.atDebug().log(PREFIX + "载入文件类型验证策略管理器");
-        List<FileTypeValidationStrategy> strategies = new ArrayList<>();
-        List<FileType> allowedTypes = properties.getAllowedTypes();
+        var strategies = new ArrayList<FileTypeValidationStrategy>();
+        var allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器
         for (var strategy : properties.getStrategies()) {
             if (strategy.isAssignableFrom(MimeValidationStrategy.class)) {
@@ -88,7 +88,7 @@ public class FileUploadConfiguration {
      * @return mime列表
      */
     private List<String> mimes(List<FileType> allowedTypes) {
-        List<String> m = new ArrayList<>();
+        var m = new ArrayList<String>();
         for (FileType allowedType : allowedTypes) {
             m.add(allowedType.getMime());
         }

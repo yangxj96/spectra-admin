@@ -52,7 +52,7 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
         try {
-            OperationLog datum = OperationLog.builder()
+            var datum = OperationLog.builder()
                     .type(SysLogType.SAFETY)
                     .explain("登录")
                     .status(Short.parseShort(String.valueOf(response.getStatus())))

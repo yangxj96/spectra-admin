@@ -39,9 +39,9 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
         if (file == null || file.isEmpty()) {
             return false;
         }
-        String filename = file.getOriginalFilename();
+        var filename = file.getOriginalFilename();
         if (StringUtils.isNotBlank(filename)) {
-            String fileExtension = getFileExtension(filename);
+            var fileExtension = getFileExtension(filename);
             return allowed.stream().anyMatch(ext -> ext.getExtension().equalsIgnoreCase(fileExtension));
         }
         return false;
@@ -54,7 +54,7 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
      * @return 扩展名
      */
     private String getFileExtension(String filename) {
-        int lastIndexOfDot = filename.lastIndexOf('.');
+        var lastIndexOfDot = filename.lastIndexOf('.');
         if (lastIndexOfDot == MIN) {
             return "";
         }

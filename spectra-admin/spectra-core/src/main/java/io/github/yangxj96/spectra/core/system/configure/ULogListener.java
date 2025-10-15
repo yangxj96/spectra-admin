@@ -50,11 +50,11 @@ public class ULogListener {
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
         log.atDebug().log(PREFIX + "开始记录");
-        OperationLog datum = new OperationLog();
+        var datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
         if (StringUtils.isNotBlank(entity.getToken())) {
             try {
-                Object loginId = StpUtil.getLoginIdByToken(entity.getToken());
+                var loginId = StpUtil.getLoginIdByToken(entity.getToken());
                 if (loginId != null) {
                     datum.setCreatedBy(Long.parseLong(loginId.toString()));
                     datum.setUpdatedBy(Long.parseLong(loginId.toString()));

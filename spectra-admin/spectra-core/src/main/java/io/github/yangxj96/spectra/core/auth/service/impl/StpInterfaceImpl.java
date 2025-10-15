@@ -45,8 +45,8 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
-        Long uid = StpUtil.getLoginIdAsLong();
-        List<Role> roles = relUserRoleService.getRoles(uid);
+        var uid = StpUtil.getLoginIdAsLong();
+        var roles = relUserRoleService.getRoles(uid);
         if (roles.isEmpty()) {
             return Collections.emptyList();
         }
@@ -56,8 +56,8 @@ public class StpInterfaceImpl implements StpInterface {
 
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
-        Long uid = StpUtil.getLoginIdAsLong();
-        List<Role> roles = relUserRoleService.getRoles(uid);
+        var uid = StpUtil.getLoginIdAsLong();
+        var roles = relUserRoleService.getRoles(uid);
         return roles.stream().map(Role::getCode).toList();
     }
 }

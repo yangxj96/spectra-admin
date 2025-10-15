@@ -59,7 +59,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     @Transactional
     public void created(MenuSaveFrom params) {
-        Menu menu = new Menu();
+        var menu = new Menu();
         BeanUtils.copyProperties(params, menu);
         this.save(menu);
     }
@@ -70,22 +70,22 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         if (null == this.getById(params.getId())) {
             throw new DataNotExistException("[" + params.getId() + "]不存在");
         }
-        Menu menu = new Menu();
+        var menu = new Menu();
         BeanUtils.copyProperties(params, menu);
         this.updateById(menu);
     }
 
     @Override
     public List<MenuTreeVO> tree() {
-        List<Menu> menus = securityService.getCurrentMenus();
+        var menus = securityService.getCurrentMenus();
         // 先转树形VO
-        List<MenuTreeVO> vos = menuConverter.toTreeVOS(menus);
+        var vos = menuConverter.toTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
     public List<Menu> getByRelRoleId(long id) {
-        List<RelRoleMenu> relRoleMenus = roleMenuMapper.getByRoleId(id);
+        var relRoleMenus = roleMenuMapper.getByRoleId(id);
         if (relRoleMenus.isEmpty()) {
             return Collections.emptyList();
         }

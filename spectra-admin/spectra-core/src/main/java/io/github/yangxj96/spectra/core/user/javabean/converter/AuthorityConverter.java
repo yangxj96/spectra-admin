@@ -52,6 +52,7 @@ public interface AuthorityConverter {
 
     /**
      * 转成树形需要的vo
+     *
      * @param authorities 权限列表
      * @return 树形vo
      */

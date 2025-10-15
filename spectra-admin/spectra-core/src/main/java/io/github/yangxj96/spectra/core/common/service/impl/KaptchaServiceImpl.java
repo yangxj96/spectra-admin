@@ -23,7 +23,6 @@ import io.github.yangxj96.spectra.common.exception.ReadPropertiesException;
 import io.github.yangxj96.spectra.common.properties.KaptchaProperties;
 import io.github.yangxj96.spectra.core.common.service.KaptchaService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -92,7 +91,7 @@ public class KaptchaServiceImpl implements KaptchaService {
         // 存储到缓存中
         redisTemplate.opsForValue().set(RedisKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration());
 
-        ServletOutputStream out = response.getOutputStream();
+        var out = response.getOutputStream();
         try (out) {
             ImageIO.write(image, "jpg", out);
             out.flush();

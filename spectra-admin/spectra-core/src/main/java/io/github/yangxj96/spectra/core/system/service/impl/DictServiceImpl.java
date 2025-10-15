@@ -65,14 +65,14 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void createGroup(DictGroupFrom params) {
-        DictGroup entity = dictConverter.groupFromToEntity(params);
+        var entity = dictConverter.groupFromToEntity(params);
         groupService.save(entity);
     }
 
     @Override
     @Transactional
     public void deleteGroup(Long id) {
-        DictGroup group = groupService.getById(id);
+        var group = groupService.getById(id);
         if (null == group) {
             throw new DataNotExistException("字典组不存在");
         }
@@ -80,7 +80,7 @@ public class DictServiceImpl implements DictService {
             throw new BuiltinDataException("内置字典,无法删除");
         }
         // 获取他的字典数据
-        List<DictData> dictData = dataService.listByGid(id);
+        var dictData = dataService.listByGid(id);
         dataService.removeBatchByIds(dictData.stream().map(DictData::getId).toList());
         // 删除字典组
         groupService.removeById(id);
@@ -89,29 +89,29 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void modifyGroup(DictGroupFrom params) {
-        DictGroup group = groupService.getById(params.getId());
+        var group = groupService.getById(params.getId());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
-        DictGroup entity = dictConverter.groupFromToEntity(params);
+        var entity = dictConverter.groupFromToEntity(params);
         groupService.updateById(entity);
     }
 
     @Override
     @Transactional
     public void createData(DictDataFrom params) {
-        DictData entity = dictConverter.dataFromToEntity(params);
+        var entity = dictConverter.dataFromToEntity(params);
         dataService.save(entity);
     }
 
     @Override
     @Transactional
     public void deleteData(Long id) {
-        DictData dictData = dataService.getById(id);
+        var dictData = dataService.getById(id);
         if (null == dictData) {
             throw new DataNotExistException("字典项不存在");
         }
-        DictGroup group = groupService.getById(dictData.getGid());
+        var group = groupService.getById(dictData.getGid());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
             throw new BuiltinDataException("内置字典,无法删除");
         }
@@ -121,33 +121,32 @@ public class DictServiceImpl implements DictService {
     @Override
     @Transactional
     public void modifyData(DictDataFrom params) {
-        DictGroup group = groupService.getById(params.getGid());
+        var group = groupService.getById(params.getGid());
         if (Boolean.TRUE.equals(group.getBuiltin())) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
-        DictData entity = dictConverter.dataFromToEntity(params);
+        var entity = dictConverter.dataFromToEntity(params);
         dataService.updateById(entity);
     }
 
     @Override
     public List<DictTypeTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
-        LambdaQueryWrapper<DictGroup> wrapper = new LambdaQueryWrapper<>();
-        wrapper
+        var wrapper = new LambdaQueryWrapper<DictGroup>()
                 .eq(DictGroup::getState, 0)
                 .eq(DictGroup::getHide, Boolean.FALSE);
-        List<DictGroup> menus = groupService.list(wrapper);
-        List<DictTypeTreeVO> vos = dictConverter.typeToTreeVOS(menus);
+        var menus = groupService.list(wrapper);
+        var vos = dictConverter.typeToTreeVOS(menus);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
     public List<DictDataVo> listDictDataByGroupCode(String code) {
-        DictGroup group = groupService.getByCode(code);
+        var group = groupService.getByCode(code);
         if (null == group) {
             throw new DataNotExistException("字典类型不存在");
         }
-        List<DictData> dictData = dataService.listByGid(group.getId());
+        var dictData = dataService.listByGid(group.getId());
         // 根据sort字段进行一个排序
         dictData.sort(Comparator.comparing(DictData::getSort));
         return dictConverter.dataToVos(dictData);

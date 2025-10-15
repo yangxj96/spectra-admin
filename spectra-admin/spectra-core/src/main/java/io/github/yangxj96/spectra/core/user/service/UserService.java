@@ -26,8 +26,6 @@ import io.github.yangxj96.spectra.core.user.javabean.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.util.List;
-
 /**
  * 用户service层
  *

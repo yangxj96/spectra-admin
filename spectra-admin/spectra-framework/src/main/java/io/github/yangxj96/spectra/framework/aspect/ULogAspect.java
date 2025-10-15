@@ -24,8 +24,6 @@ import io.github.yangxj96.spectra.common.javabean.ULogEntity;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.framework.publisher.ULogEventPublisher;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -91,12 +89,12 @@ public class ULogAspect {
         try {
             // 获取当前用户
             // 获取请求上下文
-            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-            HttpServletRequest request = attributes.getRequest();
-            HttpServletResponse response = attributes.getResponse();
+            var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            var request = attributes.getRequest();
+            var response = attributes.getResponse();
 
             // 初始化记录实体
-            ULogEntity datum = ULogEntity
+            var datum = ULogEntity
                     .builder()
                     .type(SysLogType.GENERAL)
                     .explain(annotation.value())

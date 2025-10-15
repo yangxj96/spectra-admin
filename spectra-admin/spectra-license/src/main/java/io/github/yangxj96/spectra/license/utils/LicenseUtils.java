@@ -53,17 +53,17 @@ public class LicenseUtils {
             return "已过期";
         }
 
-        long seconds = duration.getSeconds();
-        long days = seconds / (24 * 3600);
-        long hours = (seconds % (24 * 3600)) / 3600;
-        long minutes = (seconds % 3600) / 60;
+        var seconds = duration.getSeconds();
+        var days = seconds / (24 * 3600);
+        var hours = (seconds % (24 * 3600)) / 3600;
+        var minutes = (seconds % 3600) / 60;
 
-        StringBuilder sb = new StringBuilder();
+        var sb = new StringBuilder();
         if (days > 0) sb.append(days).append("天 ");
         if (hours > 0) sb.append(hours).append("小时 ");
         if (minutes > 0) sb.append(minutes).append("分钟");
 
-        String result = sb.toString().trim();
+        var result = sb.toString().trim();
         return result.isEmpty() ? "少于1分钟" : result;
     }
 

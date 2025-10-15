@@ -39,15 +39,15 @@
 
     <select id="generatePath" resultType="java.lang.String">
         SELECT
-            ID,
-            LTRIM(SYS_CONNECT_BY_PATH(NAME, '/'), '/') AS PATH
+        ID,
+        LTRIM(SYS_CONNECT_BY_PATH(NAME, '/'), '/') AS PATH
         FROM
-            SPECTRA.SYS_ORGANIZATION
+        SPECTRA.SYS_ORGANIZATION
         WHERE
-            ID = #{id}
+        ID = #{id}
         START WITH
-            PID IS NULL OR PID = 0
+        PID IS NULL OR PID = 0
         CONNECT BY
-            PRIOR ID = PID;
+        PRIOR ID = PID;
     </select>
 </mapper>

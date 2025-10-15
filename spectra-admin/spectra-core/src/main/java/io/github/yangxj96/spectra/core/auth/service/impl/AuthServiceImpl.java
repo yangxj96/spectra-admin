@@ -23,7 +23,6 @@ import io.github.yangxj96.spectra.core.auth.javabean.from.UsernamePasswordFrom;
 import io.github.yangxj96.spectra.core.auth.javabean.vo.TokenVO;
 import io.github.yangxj96.spectra.core.auth.service.AuthService;
 import io.github.yangxj96.spectra.core.common.service.KaptchaService;
-import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -58,13 +57,13 @@ public class AuthServiceImpl implements AuthService {
         try {
             // 验证码验证
             if (kaptchaService.isCheck() == Boolean.TRUE) {
-                String code = kaptchaService.getKaptchaCode();
+                var code = kaptchaService.getKaptchaCode();
                 if (!params.getCode().equals(code)) {
                     throw new KaptchaNotMatchException("验证码错误");
                 }
             }
             // 账户查询
-            User datum = userService.getByEmail(params.getUsername());
+            var datum = userService.getByEmail(params.getUsername());
             // 账号不存在或者密码匹配失败
             if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
                 throw new LoginException("账号或密码错误");

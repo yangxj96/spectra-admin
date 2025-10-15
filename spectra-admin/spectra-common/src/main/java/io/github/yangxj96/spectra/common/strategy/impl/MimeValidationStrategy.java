@@ -37,7 +37,7 @@ public record MimeValidationStrategy(List<String> allowedMimes) implements FileT
         if (file == null || file.isEmpty()) {
             return false;
         }
-        String mimeType = file.getContentType();
+        var mimeType = file.getContentType();
         return allowedMimes.stream().anyMatch(mime -> mime.equalsIgnoreCase(mimeType));
     }
 

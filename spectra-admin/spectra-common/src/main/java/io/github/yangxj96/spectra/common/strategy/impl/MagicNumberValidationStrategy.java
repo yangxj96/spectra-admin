@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,10 +41,10 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
             return false;
         }
 
-        byte[] fileHeader = readHeader(file);
+        var fileHeader = readHeader(file);
 
-        for (FileType type : allowedTypes) {
-            byte[] magic = type.getMagicNumber();
+        for (var type : allowedTypes) {
+            var magic = type.getMagicNumber();
             if (matches(fileHeader, magic)) {
                 return true;
             }
@@ -90,9 +89,9 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
             throw new FileTypeException("不允许的文件类型");
         }
 
-        try (InputStream is = new ByteArrayInputStream(file.getBytes())) {
-            byte[] header = new byte[length];
-            int bytesRead = is.read(header);
+        try (var is = new ByteArrayInputStream(file.getBytes())) {
+            var header = new byte[length];
+            var bytesRead = is.read(header);
             if (bytesRead < 1) {
                 throw new IOException("空文件");
             }

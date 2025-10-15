@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -73,24 +72,24 @@ public class JKSLicenseService implements LicenseService {
             var privateKey = (PrivateKey) keyStore.getKey("privatekey", PASSWORD);
 
             //生成签名原文（不含 signature 字段）
-            String contentToSign = LicenseUtils.toJsonWithoutSignature(license, om);
+            var contentToSign = LicenseUtils.toJsonWithoutSignature(license, om);
             log.atDebug().log("签名原文: \n{}", contentToSign);
 
             // 签名
-            String signature = RSAUtils.sign(contentToSign, privateKey);
+            var signature = RSAUtils.sign(contentToSign, privateKey);
 
             license.setSignature(signature);
 
             // 保存许可证
-            String outputPathStr = properties.getLicensePath();
+            var outputPathStr = properties.getLicensePath();
             if (outputPathStr.startsWith("classpath:")) {
                 throw new IllegalArgumentException("license-path 不能以 classpath: 开头");
             }
 
-            Path outputPath = Paths.get(outputPathStr);
+            var outputPath = Paths.get(outputPathStr);
             Files.createDirectories(outputPath.getParent());
 
-            String fullJson = LicenseUtils.toJson(license, om);
+            var fullJson = LicenseUtils.toJson(license, om);
             Files.write(outputPath, fullJson.getBytes());
 
             log.atDebug().log("✅ 许可证已生成: {}", outputPath.toAbsolutePath());
@@ -139,15 +138,15 @@ public class JKSLicenseService implements LicenseService {
                 System.exit(1);
             }
 
-            String content = Files.readString(licenseResource);
-            License license = om.readValue(content, License.class);
+            var content = Files.readString(licenseResource);
+            var license = om.readValue(content, License.class);
 
             if (license == null) {
                 log.atError().log("License 内容为空");
                 System.exit(1);
             }
 
-            String contentToVerify = LicenseUtils.toJsonWithoutSignature(license, om);
+            var contentToVerify = LicenseUtils.toJsonWithoutSignature(license, om);
             log.debug("📝 用于签名验证的原文: \n{}", contentToVerify);
             if (!RSAUtils.verify(contentToVerify, license.getSignature(), publicCert.getPublicKey())) {
                 log.atError().log("❌ 许可证已被篡改！签名验证失败。");
@@ -156,8 +155,8 @@ public class JKSLicenseService implements LicenseService {
             log.atDebug().log("✅ 数字签名验证通过。");
 
             // 4. 验证硬件 ID
-            String expectedHwid = license.getHwid();
-            String actualHwid = HardwareIdUtil.generateHWID();
+            var expectedHwid = license.getHwid();
+            var actualHwid = HardwareIdUtil.generateHWID();
 
             if (!expectedHwid.equals(actualHwid)) {
                 log.atError().log("❌ 硬件不匹配！请在授权机器上运行。");
@@ -175,7 +174,7 @@ public class JKSLicenseService implements LicenseService {
                 log.atError().log("   过期时间: {}", expiresAt);
                 System.exit(1);
             }
-            Duration remaining = Duration.between(Instant.now(), expiresAt);
+            var remaining = Duration.between(Instant.now(), expiresAt);
             log.atDebug().log("✅ 许可证在有效期内，剩余时间: {}", LicenseUtils.formatDuration(remaining));
 
             // 🎉 所有验证通过

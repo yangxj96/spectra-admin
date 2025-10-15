@@ -58,8 +58,8 @@ public class KaptchaConfiguration {
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() {
         log.atDebug().log(PREFIX + "开始配置图片验证码,字符模式");
-        DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
-        Properties properties = new Properties();
+        var defaultKaptcha = new DefaultKaptcha();
+        var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no
         properties.setProperty(KAPTCHA_BORDER, "yes");
         // 验证码文本字符颜色 默认为Color.BLACK
@@ -81,7 +81,7 @@ public class KaptchaConfiguration {
         // 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy
         // 阴影com.google.code.kaptcha.impl.ShadowGimpy
         properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
-        Config config = new Config(properties);
+        var config = new Config(properties);
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
     }
@@ -95,8 +95,8 @@ public class KaptchaConfiguration {
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() {
         log.atDebug().log(PREFIX + "开始配置图片验证码,算术模式");
-        DefaultKaptcha defaultKaptcha = new DefaultKaptcha();
-        Properties properties = new Properties();
+        var defaultKaptcha = new DefaultKaptcha();
+        var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no
         properties.setProperty(KAPTCHA_BORDER, "yes");
         // 边框颜色 默认为Color.BLACK
@@ -125,7 +125,7 @@ public class KaptchaConfiguration {
         properties.setProperty(KAPTCHA_NOISE_IMPL, "com.google.code.kaptcha.impl.NoNoise");
         // 图片样式 水纹com.google.code.kaptcha.impl.WaterRipple 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy 阴影com.google.code.kaptcha.impl.ShadowGimpy
         properties.setProperty(KAPTCHA_OBSCURIFICATOR_IMPL, "com.google.code.kaptcha.impl.ShadowGimpy");
-        Config config = new Config(properties);
+        var config = new Config(properties);
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
     }

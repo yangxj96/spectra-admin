@@ -19,8 +19,6 @@ package io.github.yangxj96.spectra.license.generator;
 import io.github.yangxj96.spectra.license.utils.RSAUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import java.security.KeyPair;
-
 /**
  * 生成key
  */
@@ -32,7 +30,7 @@ public class KeyGenerator {
 
     static void main() throws Exception {
         // 1. 生成 RSA 密钥对（2048位）
-        KeyPair keyPair = RSAUtils.generateKeyPair();
+        var keyPair = RSAUtils.generateKeyPair();
 
         // 2. 保存私钥到文件（你自己保留！）
         RSAUtils.savePrivateKey(keyPair.getPrivate(), "private-key.pem");

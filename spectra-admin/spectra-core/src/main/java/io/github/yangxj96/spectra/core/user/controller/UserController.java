@@ -32,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 /**
  * 用户控制器
  *
@@ -87,7 +85,7 @@ public class UserController {
     @ULog("获取在线用户")
     @GetMapping("/online")
     @SaCheckEL("@ss.hasRole('ROLE_AUDIT')")
-    public IPage<UserOnlineVO> online(PageFrom page){
+    public IPage<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }
 }

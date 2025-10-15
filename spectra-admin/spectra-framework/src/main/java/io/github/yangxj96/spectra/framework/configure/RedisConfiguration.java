@@ -51,7 +51,7 @@ public class RedisConfiguration {
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         log.atDebug().log(PREFIX + "开始配置Redis");
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        var template = new RedisTemplate<String, Object>();
         template.setConnectionFactory(factory);
 
         // 设置Key的序列化方式为String

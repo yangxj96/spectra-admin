@@ -37,53 +37,38 @@ public class KaptchaTextCreator extends DefaultTextCreator {
 
     @Override
     public String getText() {
-        int result;
 
-        int x = random.nextInt(10);
-        int y = random.nextInt(10);
-        StringBuilder suChinese = new StringBuilder();
-        int operands = random.nextInt(3);
-        switch (operands) {
-            case 0: {
-                result = x * y;
-                suChinese.append(NUMBERS[x]);
-                suChinese.append("*");
-                suChinese.append(NUMBERS[y]);
-                break;
-            }
-            case 1: {
-                if ((x != 0) && y % x == 0) {
-                    result = y / x;
-                    suChinese.append(NUMBERS[y]);
-                    suChinese.append("/");
-                    suChinese.append(NUMBERS[x]);
+        var x = random.nextInt(10);
+        var y = random.nextInt(10);
+        var operands = random.nextInt(3);
+
+        // 使用 switch 表达式（JDK 14+）返回结果
+        var result = switch (operands) {
+            case 0 -> x * y;
+            case 1 -> {
+                if (x != 0 && y % x == 0) {
+                    yield y / x;
                 } else {
-                    result = x + y;
-                    suChinese.append(NUMBERS[x]);
-                    suChinese.append("+");
-                    suChinese.append(NUMBERS[y]);
+                    yield x + y;
                 }
-                break;
             }
-            case 2: {
-                if (x >= y) {
-                    result = x - y;
-                    suChinese.append(NUMBERS[x]);
-                    suChinese.append("-");
-                    suChinese.append(NUMBERS[y]);
-                } else {
-                    result = y - x;
-                    suChinese.append(NUMBERS[y]);
-                    suChinese.append("-");
-                    suChinese.append(NUMBERS[x]);
-                }
-                break;
-            }
-            default:
-                throw new IndexOutOfBoundsException("操作数数据越界");
-        }
-        suChinese.append("=?@").append(result);
-        return suChinese.toString();
+            case 2 -> Math.abs(x - y);  // 可简化为表达式
+            default -> throw new IllegalArgumentException("操作数越界: " + operands);
+        };
+
+        // 使用 StringBuilder 构建表达式
+        var expression = switch (operands) {
+            case 0 -> String.format("%s*%s", NUMBERS[x], NUMBERS[y]);
+            case 1 -> (x != 0 && y % x == 0) ?
+                    String.format("%s/%s", NUMBERS[y], NUMBERS[x]) :
+                    String.format("%s+%s", NUMBERS[x], NUMBERS[y]);
+            case 2 -> (x >= y) ?
+                    String.format("%s-%s", NUMBERS[x], NUMBERS[y]) :
+                    String.format("%s-%s", NUMBERS[y], NUMBERS[x]);
+            default -> throw new IllegalStateException();
+        };
+
+        return expression + "=?@" + result;
     }
 
 }

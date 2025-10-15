@@ -22,12 +22,9 @@ import io.github.yangxj96.spectra.core.system.javabean.vo.RAMInfoVO;
 import io.github.yangxj96.spectra.core.system.service.ServiceMonitorService;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
-import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.PhysicalMemory;
 
 import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 import java.util.*;
 
 /**
@@ -40,12 +37,12 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     @Override
     public CPUInfoVO getCPUInfo() {
-        SystemInfo systemInfo = new SystemInfo();
-        HardwareAbstractionLayer hardware = systemInfo.getHardware();
-        CentralProcessor processor = hardware.getProcessor();
+        var systemInfo = new SystemInfo();
+        var hardware = systemInfo.getHardware();
+        var processor = hardware.getProcessor();
         // 获取 CPU 标识信息（来自 ProcessorIdentifier）
-        CentralProcessor.ProcessorIdentifier identifier = processor.getProcessorIdentifier();
-        long maxFreq = processor.getMaxFreq();
+        var identifier = processor.getProcessorIdentifier();
+        var maxFreq = processor.getMaxFreq();
         return CPUInfoVO.builder()
                 .vendor(identifier.getVendor())
                 .name(identifier.getName())
@@ -69,12 +66,12 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         vo.setSlots(new ArrayList<>());
 
         // 获取信息
-        SystemInfo systemInfo = new SystemInfo();
-        HardwareAbstractionLayer hardware = systemInfo.getHardware();
-        List<PhysicalMemory> memoryList = hardware.getMemory().getPhysicalMemory();
+        var systemInfo = new SystemInfo();
+        var hardware = systemInfo.getHardware();
+        var memoryList = hardware.getMemory().getPhysicalMemory();
         if (memoryList.isEmpty()) {
             // 如果无法获取物理内存条信息（如在某些虚拟机中），提供一个默认信息
-            RAMInfoVO.RAMSlot unknown = RAMInfoVO.RAMSlot
+            var unknown = RAMInfoVO.RAMSlot
                     .builder()
                     .slot(0)
                     .memoryType(UNKNOWN)
@@ -88,8 +85,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
 
         for (int i = 0; i < memoryList.size(); i++) {
-            PhysicalMemory memory = memoryList.get(i);
-            RAMInfoVO.RAMSlot unknown = RAMInfoVO.RAMSlot
+            var memory = memoryList.get(i);
+            var unknown = RAMInfoVO.RAMSlot
                     .builder()
                     .slot(i + 1)
                     .memoryType(memory.getMemoryType())
@@ -101,7 +98,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
             vo.getSlots().add(unknown);
         }
 
-        long totalCapacity = memoryList.stream().mapToLong(PhysicalMemory::getCapacity).sum();
+        var totalCapacity = memoryList.stream().mapToLong(PhysicalMemory::getCapacity).sum();
 
         vo.setSummary("Total Physical Memory");
         vo.setCount(memoryList.size() + " sticks");
@@ -113,7 +110,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     @Override
     public JVMInfoVO getJVMInfo() {
-        RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+        var runtimeMXBean = ManagementFactory.getRuntimeMXBean();
         return JVMInfoVO.builder()
                 // 基础信息
                 .jvmName(runtimeMXBean.getVmName())
@@ -147,8 +144,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
      * @return 属性map
      */
     private static Map<String, String> getFilteredProps() {
-        Properties systemProps = System.getProperties();
-        Map<String, String> filteredProps = new HashMap<>();
+        var systemProps = System.getProperties();
+        var filteredProps = new HashMap<String, String>();
         // 只保留常见的、非敏感的系统属性
         List<String> includedKeys = Arrays.asList(
                 "os.name",

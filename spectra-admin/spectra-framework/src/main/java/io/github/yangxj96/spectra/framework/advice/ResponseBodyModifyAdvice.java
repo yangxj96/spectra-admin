@@ -55,18 +55,18 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
-        Class<?> declaringClass = returnType.getContainingClass();
+        var declaringClass = returnType.getContainingClass();
         // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
         return PATTERN.matcher(declaringClass.getPackageName()).matches();
     }
 
     @Override
     public Object beforeBodyWrite(Object body,
-                                           MethodParameter returnType,
-                                           MediaType contentType,
-                                           Class<? extends HttpMessageConverter<?>> converterType,
-                                           ServerHttpRequest request,
-                                           ServerHttpResponse response) {
+                                  MethodParameter returnType,
+                                  MediaType contentType,
+                                  Class<? extends HttpMessageConverter<?>> converterType,
+                                  ServerHttpRequest request,
+                                  ServerHttpResponse response) {
         // 跳过 String 和 byte[] 类型（避免 JSON 包装干扰）
         if (body instanceof String || body instanceof byte[]) {
             log.atDebug().log(PREFIX + "跳过 String 和 byte[] 类型(避免 JSON 包装干扰)");

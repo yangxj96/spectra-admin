@@ -13,12 +13,12 @@
     <select id="getMenusByUserId" resultType="io.github.yangxj96.spectra.core.system.javabean.entity.Menu">
         SELECT DISTINCT M.*
         FROM SPECTRA.SYS_MENU M
-                 INNER JOIN SPECTRA.SYS_REL_ROLE_MENU RM ON M.ID = RM.MENU_ID
-                 INNER JOIN SPECTRA.SYS_REL_USER_ROLE UR ON RM.ROLE_ID = UR.ROLE_ID
+        INNER JOIN SPECTRA.SYS_REL_ROLE_MENU RM ON M.ID = RM.MENU_ID
+        INNER JOIN SPECTRA.SYS_REL_USER_ROLE UR ON RM.ROLE_ID = UR.ROLE_ID
         WHERE UR.USER_ID = #{userId}
-          AND M.DELETED IS NULL
-          AND RM.DELETED IS NULL
-          AND UR.DELETED IS NULL
+        AND M.DELETED IS NULL
+        AND RM.DELETED IS NULL
+        AND UR.DELETED IS NULL
         ORDER BY M.SORT;
     </select>
 </mapper>

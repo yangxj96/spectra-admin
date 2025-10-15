@@ -53,11 +53,11 @@ public class SecurityServiceImpl implements SecurityService {
     public AuthScope getCurrentMaxScope() {
         // 具体实现是没有获取到角色则返回最小范围
         // 有待仔细考虑
-        List<Role> roles = this.getCurrentRoles();
+        var roles = this.getCurrentRoles();
         if (roles.isEmpty()) {
             return AuthScope.DEPT_ONLY;
         }
-        List<AuthScope> scopes = roles.stream().map(Role::getScope).toList();
+        var scopes = roles.stream().map(Role::getScope).toList();
         return scopes.stream().min(Comparator.comparingInt(AuthScope::getValue)).orElse(AuthScope.DEPT_ONLY);
     }
 }

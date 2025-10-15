@@ -40,45 +40,43 @@ public class RSAUtils {
     }
 
     public static KeyPair generateKeyPair() throws Exception {
-        KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA", "BC");
+        var gen = KeyPairGenerator.getInstance("RSA", "BC");
         gen.initialize(2048);
         return gen.generateKeyPair();
     }
 
     public static void savePrivateKey(PrivateKey key, String path) throws IOException {
-        try (FileWriter fw = new FileWriter(path)) {
-            PemObject pem = new PemObject("PRIVATE KEY", key.getEncoded());
-            PemWriter pw = new PemWriter(fw);
+        try (var fw = new FileWriter(path)) {
+            var pem = new PemObject("PRIVATE KEY", key.getEncoded());
+            var pw = new PemWriter(fw);
             pw.writeObject(pem);
             pw.close();
         }
     }
 
     public static void savePublicKey(PublicKey key, String path) throws IOException {
-        try (FileWriter fw = new FileWriter(path)) {
-            PemObject pem = new PemObject("PUBLIC KEY", key.getEncoded());
-            PemWriter pw = new PemWriter(fw);
+        try (var fw = new FileWriter(path)) {
+            var pem = new PemObject("PUBLIC KEY", key.getEncoded());
+            var pw = new PemWriter(fw);
             pw.writeObject(pem);
             pw.close();
         }
     }
 
     public static PrivateKey loadPrivateKey(String path) throws Exception {
-        try (FileReader fr = new FileReader(path);
-             PemReader pr = new PemReader(fr)) {
-            PemObject pem = pr.readPemObject();
-            PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(pem.getContent());
-            KeyFactory kf = KeyFactory.getInstance("RSA");
+        try (var fr = new FileReader(path); var pr = new PemReader(fr)) {
+            var pem = pr.readPemObject();
+            var spec = new PKCS8EncodedKeySpec(pem.getContent());
+            var kf = KeyFactory.getInstance("RSA");
             return kf.generatePrivate(spec);
         }
     }
 
     public static PublicKey loadPublicKey(String path) throws Exception {
-        try (FileReader fr = new FileReader(path);
-             PemReader pr = new PemReader(fr)) {
-            PemObject pem = pr.readPemObject();
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(pem.getContent());
-            KeyFactory kf = KeyFactory.getInstance("RSA");
+        try (var fr = new FileReader(path); var pr = new PemReader(fr)) {
+            var pem = pr.readPemObject();
+            var spec = new X509EncodedKeySpec(pem.getContent());
+            var kf = KeyFactory.getInstance("RSA");
             return kf.generatePublic(spec);
         }
     }
@@ -87,13 +85,13 @@ public class RSAUtils {
      * 加载私钥 (PEM 格式)
      */
     public static PrivateKey loadPrivateKey(InputStream in) throws Exception {
-        String content = new String(in.readAllBytes());
+        var content = new String(in.readAllBytes());
         content = content.replace("-----BEGIN PRIVATE KEY-----", "")
                 .replace("-----END PRIVATE KEY-----", "")
                 .replaceAll("\\s", "");
-        byte[] decoded = Base64.getDecoder().decode(content);
-        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        var decoded = Base64.getDecoder().decode(content);
+        var spec = new PKCS8EncodedKeySpec(decoded);
+        var kf = KeyFactory.getInstance("RSA");
         return kf.generatePrivate(spec);
     }
 
@@ -101,29 +99,29 @@ public class RSAUtils {
      * 加载公钥 (PEM 格式)
      */
     public static PublicKey loadPublicKey(InputStream in) throws Exception {
-        String content = new String(in.readAllBytes());
+        var content = new String(in.readAllBytes());
         content = content.replace("-----BEGIN PUBLIC KEY-----", "")
                 .replace("-----END PUBLIC KEY-----", "")
                 .replaceAll("\\s", "");
-        byte[] decoded = Base64.getDecoder().decode(content);
-        X509EncodedKeySpec spec = new X509EncodedKeySpec(decoded);
-        KeyFactory kf = KeyFactory.getInstance("RSA");
+        var decoded = Base64.getDecoder().decode(content);
+        var spec = new X509EncodedKeySpec(decoded);
+        var kf = KeyFactory.getInstance("RSA");
         return kf.generatePublic(spec);
     }
 
     public static String sign(String content, PrivateKey privateKey) throws Exception {
-        Signature sign = Signature.getInstance("SHA256withRSA", "BC");
+        var sign = Signature.getInstance("SHA256withRSA", "BC");
         sign.initSign(privateKey);
         sign.update(content.getBytes());
-        byte[] signature = sign.sign();
+        var signature = sign.sign();
         return Base64.getEncoder().encodeToString(signature);
     }
 
     public static boolean verify(String content, String signature, PublicKey publicKey) throws Exception {
-        Signature verify = Signature.getInstance("SHA256withRSA", "BC");
+        var verify = Signature.getInstance("SHA256withRSA", "BC");
         verify.initVerify(publicKey);
         verify.update(content.getBytes());
-        byte[] sig = Base64.getDecoder().decode(signature);
+        var sig = Base64.getDecoder().decode(signature);
         return verify.verify(sig);
     }
 }

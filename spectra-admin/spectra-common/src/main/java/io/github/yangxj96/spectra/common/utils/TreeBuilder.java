@@ -44,8 +44,8 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
             return Collections.emptyList();
         }
 
-        Map<Long, T> nodeMap = new HashMap<>();
-        List<T> rootNodes = new ArrayList<>();
+        var nodeMap = new HashMap<Long, T>();
+        var rootNodes = new ArrayList<T>();
 
         // 第一步：放入 map
         for (T node : dataList) {
@@ -54,7 +54,7 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
 
         // 第二步：组装父子关系
         for (T node : dataList) {
-            Long parentId = node.getPid();
+            var parentId = node.getPid();
 
             if (parentId == null || parentId.equals(rootPid)) {
                 rootNodes.add(node);
