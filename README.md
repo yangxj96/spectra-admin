@@ -30,7 +30,7 @@
 | Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.9  | 构建工具           |
 | Spring Boot     | 3.5.6  | 核心框架           |
-| MyBatis-Plus    | 3.5.12 | 增强ORM，简化CRUD   |
+| MyBatis-Plus    | 3.5.14 | 增强ORM，简化CRUD   |
 | Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
 | DM8(兼容Oracle模式) | 8      | 国产关系型数据库       |

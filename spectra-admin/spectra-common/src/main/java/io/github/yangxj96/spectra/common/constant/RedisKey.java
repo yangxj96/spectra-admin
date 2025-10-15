@@ -33,9 +33,4 @@ public class RedisKey {
      */
     public static final String KAPTCHA = "kaptcha:";
 
-    /**
-     * 用户组织机构列表
-     */
-    public static final String ORGANIZATION_LIST = "authority:organization:list:";
-
 }

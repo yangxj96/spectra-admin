@@ -20,5 +20,9 @@ export default {
     // 重置用户密码
     async passwordResetById(id: string) {
         return http.put<IResult>(`/api/user/password/reset/${id}`).then(res => res.data);
+    },
+    // 获取所有在线用户
+    async online(): Promise<IResult> {
+        return http.get<IResult>("/api/user/online").then(res => res.data);
     }
 };

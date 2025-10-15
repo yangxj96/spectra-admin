@@ -24,12 +24,15 @@ import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
+import io.github.yangxj96.spectra.core.user.javabean.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.user.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 用户控制器
@@ -79,5 +82,12 @@ public class UserController {
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         return bindService.page(page, params);
+    }
+
+    @ULog("获取在线用户")
+    @GetMapping("/online")
+    @SaCheckEL("@ss.hasRole('ROLE_AUDIT')")
+    public IPage<UserOnlineVO> online(PageFrom page){
+        return bindService.online(page);
     }
 }

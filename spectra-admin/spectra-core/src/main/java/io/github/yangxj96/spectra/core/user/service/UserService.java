@@ -22,8 +22,11 @@ import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.entity.User;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.user.javabean.from.UserSaveFrom;
+import io.github.yangxj96.spectra.core.user.javabean.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.user.javabean.vo.UserPageVO;
 import jakarta.validation.constraints.NotEmpty;
+
+import java.util.List;
 
 /**
  * 用户service层
@@ -78,4 +81,13 @@ public interface UserService extends BaseService<User> {
      * @return 用户信息,可能为null
      */
     User getByEmail(@NotEmpty(message = "用户名不能为空") String email);
+
+
+    /**
+     * 分页获取在线用户
+     *
+     * @return 获取到的数据
+     */
+    IPage<UserOnlineVO> online(PageFrom page);
+
 }

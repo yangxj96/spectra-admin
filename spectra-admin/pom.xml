@@ -26,7 +26,7 @@
         <revision>0.0.1-SNAPSHOT</revision>
 
         <!-- 数据库 -->
-        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <mybatis-plus.version>3.5.14</mybatis-plus.version>
         <dm.version>8.1.4.125</dm.version>
         <!-- 身份认证 -->
         <sa-token.version>1.44.0</sa-token.version>
@@ -44,6 +44,7 @@
         <mica.version>3.5.4</mica.version>
         <jetcache.version>2.7.8</jetcache.version>
         <druid.version>1.2.27</druid.version>
+        <bcprov.version>1.82</bcprov.version>
 
     </properties>
 
@@ -181,7 +182,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk18on</artifactId>
-                <version>1.82</version>
+                <version>${bcprov.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

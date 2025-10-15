@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import UserApi from "@/api/UserApi.ts";
+
 const tableData = [] as unknown[];
 
 for (let i = 0; i < 25; i++) {
@@ -6,12 +8,19 @@ for (let i = 0; i < 25; i++) {
         account: "yangxj96@gmail.com",
         name: "平台管理员",
         organization_name: "Tom",
-        ip: "255.255.255.255",
-        address: "No. 189, Grove St, Los Angeles",
-        browser: "Chrome 101",
-        login_time: "2019-02-05 00:00:00"
+        ac: [
+            {
+                token: "96402775-f65a-4ad2-8a04-a9fb26fbc442",
+                device_type: "PC",
+                create_time: "2025-10-15 00:00:00",
+                ip: "255.255.255.255",
+                address: "内网地址"
+            }
+        ]
     });
 }
+
+UserApi.online();
 </script>
 
 <template>
@@ -36,13 +45,28 @@ for (let i = 0; i < 25; i++) {
     <!-- 数据区 -->
     <el-row class="box-body">
         <el-table :data="tableData" border style="width: 100%; height: 70vh">
+            <el-table-column type="expand">
+                <template #default="props">
+                    <el-row style="width: 100%; padding-left: 1vw; padding-right: 1vw">
+                        <el-table :data="props.row.ac" border style="width: 100%">
+                            <el-table-column align="center" width="060" type="index" label="序号" />
+                            <el-table-column align="center" width="300" prop="token" label="令牌" />
+                            <el-table-column align="center" width="100" prop="device_type" label="设备类型" />
+                            <el-table-column align="center" width="200" prop="ip" label="登录IP" />
+                            <el-table-column align="center" prop="address" label="登录地点" />
+                            <el-table-column align="center" width="200" prop="create_time" label="登录时间" />
+                            <el-table-column align="center" label="操作">
+                                <template #default="scope">
+                                    <el-button link type="primary">踢出此设备</el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </el-row>
+                </template>
+            </el-table-column>
             <el-table-column align="center" prop="account" label="登录账号" />
             <el-table-column align="center" prop="name" label="姓名" />
             <el-table-column align="center" width="200" prop="organization_name" label="部门" show-overflow-tooltip />
-            <el-table-column align="center" width="130" prop="ip" label="登录IP" />
-            <el-table-column align="center" width="150" prop="address" label="登录地点" show-overflow-tooltip />
-            <el-table-column align="center" width="120" prop="browser" label="浏览器" />
-            <el-table-column align="center" width="160" prop="login_time" label="登录时间" />
             <el-table-column align="center" label="操作">
                 <template #default="scope">
                     <el-button link type="primary">冻结</el-button>

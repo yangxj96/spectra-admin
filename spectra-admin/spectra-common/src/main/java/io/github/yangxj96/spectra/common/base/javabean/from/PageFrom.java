@@ -40,12 +40,12 @@ public class PageFrom {
     /**
      * 页码
      */
-    private Long pageSize;
+    private Long pageSize = 10L;
 
     /**
      * 每页数量
      */
-    private Long pageNum;
+    private Long pageNum = 1L;
 
     /**
      * 排序字段,前端
