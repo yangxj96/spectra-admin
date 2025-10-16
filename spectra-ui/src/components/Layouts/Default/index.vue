@@ -2,6 +2,9 @@
 import { type RouteLocationMatched } from "vue-router";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 import { useDark, useFullscreen, useToggle } from "@vueuse/core";
+import Navbar from "@/components/Layouts/components/Navbar/index.vue";
+import Footer from "@/components/Layouts/components/Footer/index.vue";
+import Sidebar from "./components/sidebar/index.vue";
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -48,7 +51,7 @@ function handleMenu() {
 <template>
     <el-container class="box">
         <el-header class="box-header">
-            <navbar />
+            <Navbar />
         </el-header>
 
         <el-container class="box-container">
@@ -107,14 +110,7 @@ function handleMenu() {
                     <router-view></router-view>
                 </div>
                 <!-- 底部版权 -->
-                <el-footer class="footer">
-                    Copyright © 2018-2023
-                    <strong><a href="//yangxj96.com/" target="_blank">yangxj96</a></strong>
-                    &nbsp;
-                    <strong><a href="//yangxj96.com/" target="_blank">yangxj96.com</a></strong>
-                    All Rights Reserved. 备案号：
-                    <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">滇ICP备2023006063号-1</a>
-                </el-footer>
+                <Footer />
             </el-main>
         </el-container>
     </el-container>

@@ -34,7 +34,6 @@
 | Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
 | DM8(兼容Oracle模式) | 8      | 国产关系型数据库       |
-| Jasypt          | 3.0.5  | 配置加密，保障敏感信息安全  |
 
 > ✅ 所有依赖均采用当前稳定最新版，并将持续跟进生态更新。
 
@@ -51,7 +50,8 @@
 | Vite         | 7.1.7   | 构建工具，极速启动              |
 | Element Plus | 2.11.3  | UI 组件库                 |
 | Axios        | 1.12.2  | HTTP 请求客户端             |
-| ECharts      | 5.6.0   | 数据可视化图表                |
+| ECharts      | 6.0.0   | 数据可视化图表                |
+| vue-echarts  | 8.0.0   | 转为vue封装的echarts操作组件    |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
 | ESLint       | 9.30.1  | 代码质量检查                 |
 | Prettier     | 3.6.2   | 统一代码格式风格               |
@@ -125,7 +125,7 @@
 
 3. 启动后端服务（确保`达梦数据库`已运行）：
    ```bash
-   cd spectra-launch
+   cd ./spectra-admin/spectra-launch
    mvn spring-boot:run
    ```
 

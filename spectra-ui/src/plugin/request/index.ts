@@ -3,7 +3,7 @@ import { hideLoading, showLoading } from "@/plugin/element/loading";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
 import qs from "qs";
-import { ElMessageBox, ElNotification } from "element-plus";
+import { ElMessage, ElNotification } from "element-plus";
 
 // 常见内容类型
 // application/x-www-form-urlencoded
@@ -78,38 +78,73 @@ const responseFulfilled = (response: AxiosResponse<IResult>) => {
 
 // 网络错误、请求未完成,HTTP 状态码为 4xx、5xx
 const responseRejected = (error: AxiosError) => {
-    // 出现错误,关闭loading,尝试停止还没请求完的接口
-    stopAllRequest();
+    // 无论什么错误，先关闭 loading 并尝试取消所有待定请求
     hideLoading();
+    stopAllRequest();
+
+    // 如果是请求被取消（如重复请求触发 cancelToken），直接 reject，不提示
     if (error.name === "CanceledError") {
         return Promise.reject(error);
     }
-    if (error.response?.data as IResult) {
-        let result = error.response?.data as IResult;
-        switch (error.response?.status) {
-            case 401: {
-                ElMessageBox.alert(result.msg, "认证异常", {
-                    type: "error"
-                }).finally(() => {
+
+    const response = error.response;
+
+    // 情况1：服务器有响应（状态码 4xx/5xx 等）
+    if (response && response.data) {
+        const status = response.status;
+        const rawData = response.data;
+        const msg = isIResult(rawData) ? rawData.msg : "未知错误";
+
+        // 401 认证失败：跳转登录
+        if (status === 401) {
+            ElMessage.error({
+                message: "认证异常:" + msg,
+                duration: 2000,
+                onClose: () => {
                     GlobalUtils.toLogin();
-                });
-                return;
-            }
-            case 402: {
-                console.log("占位用一下");
-                return;
-            }
-            default: {
-                ElNotification.error({
-                    message: (error.response?.data as IResult).msg
-                });
-            }
+                }
+            });
+            return Promise.resolve(); // 阻止后续 then/catch，不 reject
         }
-    } else {
-        ElNotification.error({
-            message: "网络错误,请检查网络"
+
+        // 402 占位处理（可扩展）
+        if (status === 402) {
+            console.log("预留状态码 402:", msg);
+            return Promise.resolve();
+        }
+
+        // 其他客户端错误 (400-499)
+        if (isStatusCodeInRange(status, 400, 499)) {
+            ElMessage.error({
+                message: msg,
+                duration: 3000
+            });
+            return Promise.reject(error);
+        }
+
+        // 服务端错误 (500-599)
+        if (isStatusCodeInRange(status, 500, 599)) {
+            ElNotification.error({
+                title: "服务器错误",
+                message: `服务暂时不可用：${msg}`
+            });
+            return Promise.reject(error);
+        }
+
+        // 其他状态码（如 3xx 重定向错误等）
+        ElNotification.warning({
+            title: "请求异常",
+            message: msg
         });
+        return Promise.reject(error);
     }
+
+    // 情况2：无响应（网络断开、超时、DNS 失败等）
+    ElNotification.error({
+        title: "网络异常",
+        message: "无法连接到服务器，请检查网络连接"
+    });
+
     return Promise.reject(error);
 };
 
@@ -118,5 +153,20 @@ http.interceptors.request.use(requestFulfilled, requestRejected);
 
 // 响应拦截器
 http.interceptors.response.use(responseFulfilled, responseRejected);
+
+// 类型守卫：确保 response.data 是 IResult
+const isIResult = (data: unknown): data is IResult => {
+    return (
+        typeof data === "object" &&
+        data !== null &&
+        "msg" in data &&
+        typeof (data as { msg?: unknown }).msg === "string"
+    );
+};
+
+// 判断状态码是否在指定范围内
+const isStatusCodeInRange = (status: number, min: number, max: number): boolean => {
+    return status >= min && status <= max;
+};
 
 export default http;

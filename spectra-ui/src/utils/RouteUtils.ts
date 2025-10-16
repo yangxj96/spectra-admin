@@ -15,28 +15,52 @@ const loadComponent = (componentPath?: string): ReturnType<typeof defineAsyncCom
     return () => import(/* @vite-ignore */ `/src/views/${normalizedPath}.vue`);
 };
 
+// 动态加载布局组件
+const loadLayout = (layoutName: string) => {
+    const layouts: Record<string, () => Promise<unknown>> = {
+        default: () => import("@/components/Layouts/Default/index.vue"),
+        blank: () => import("@/components/Layouts/Blank/index.vue")
+    };
+    return layouts[layoutName] || layouts["default"];
+};
+
 /**
  * menus数组转换成路由数组对象
  * @param menus 菜单数组
  */
 export const convertMenuToRoutes = (menus: Menu[]): RouteRecordRaw[] => {
     return menus.map(menu => {
+        // 确保 menu.path 以 / 开头
+        const path = menu.path.startsWith("/") ? menu.path : "/" + menu.path;
+
         const route: RouteRecordRaw = {
             path: menu.path,
             name: menu.name,
-            component: menu.layout
-                ? () => import(/* @vite-ignore */ `@/components/Layout/index.vue`)
-                : loadComponent(menu.component),
+            component: menu.layout ? loadLayout(menu.layout.trim().toLowerCase()) : loadComponent(menu.component),
             meta: {
                 title: menu.name
             },
             children: []
         };
-        // 根据菜单是否有下级,进行转换
+
+        // 处理有子菜单的情况
         if (menu.children && menu.children.length > 0) {
-            route.redirect = menu.children[0]!.path;
-            route.children = convertMenuToRoutes(menu.children);
+            // 生成子路由
+            const childRoutes = convertMenuToRoutes(menu.children);
+
+            // 计算第一个子路由的完整路径
+            const firstChildPath = childRoutes[0]?.path;
+            if (firstChildPath) {
+                // 拼接成绝对路径：/system + /user → /system/user
+                // 注意：如果 firstChildPath 是相对路径（如 'user'），需要拼接
+                route.redirect = path.endsWith("/")
+                    ? path + firstChildPath.replace(/^\//, "")
+                    : path + "/" + firstChildPath.replace(/^\//, ""); // 设置 redirect 为完整路径
+            }
+
+            route.children = childRoutes;
         }
+
         return route;
     });
 };

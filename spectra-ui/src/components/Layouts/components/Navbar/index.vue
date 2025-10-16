@@ -6,6 +6,26 @@ import { stopAllRequest } from "@/plugin/request";
 import logo from "@/assets/images/logo.svg";
 import avatar from "@/assets/images/avatar.png";
 import usePropsStore from "@/plugin/store/modules/usePropsStore.ts";
+import { useRoute } from "vue-router";
+
+// 定义菜单前缀映射
+const menuPrefixes = ["/", "/workbench", "/system", "/monitor", "/example"];
+
+const active = computed(() => {
+    const path = useRoute().path;
+    // 从最长到最短排序，避免 /System 匹配到 /SystemManage 等情况（可选优化）
+    const sortedPrefixes = [...menuPrefixes].sort((a, b) => b.length - a.length);
+    for (const prefix of sortedPrefixes) {
+        if (prefix === "/" && path === "/") {
+            return "/";
+        }
+        if (prefix !== "/" && path.startsWith(prefix)) {
+            return prefix;
+        }
+    }
+    // 默认返回首页
+    return "/";
+});
 
 function handleUserLogout() {
     stopAllRequest();
@@ -34,7 +54,30 @@ function handlePersonalPopup() {
             <el-image :src="logo" />
         </el-col>
 
-        <el-col :span="20" style="padding-right: 40px"></el-col>
+        <el-col :span="20" style="padding-right: 40px">
+            <el-menu :default-active="active" :router="true" mode="horizontal">
+                <el-menu-item index="/">
+                    <icons name="icon-home" class-name="icon-sidebar" />
+                    首页
+                </el-menu-item>
+                <el-menu-item index="/workbench">
+                    <icons name="icon-home" class-name="icon-sidebar" />
+                    工作台
+                </el-menu-item>
+                <el-menu-item index="/system">
+                    <icons name="icon-home" class-name="icon-sidebar" />
+                    系统管理
+                </el-menu-item>
+                <el-menu-item index="/monitor">
+                    <icons name="icon-home" class-name="icon-sidebar" />
+                    系统监控
+                </el-menu-item>
+                <el-menu-item index="/example">
+                    <icons name="icon-home" class-name="icon-sidebar" />
+                    组件示例
+                </el-menu-item>
+            </el-menu>
+        </el-col>
 
         <el-col :span="1">
             <el-dropdown>

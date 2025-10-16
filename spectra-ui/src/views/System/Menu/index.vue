@@ -194,7 +194,8 @@ async function handleMenuSave() {
                 </el-form-item>
                 <el-form-item label="布局" prop="layout">
                     <el-select v-model="menu.form.layout" clearable placeholder="请输入布局" append-to=".box-content">
-                        <el-option label="默认布局" value="layout" />
+                        <el-option label="默认布局" value="default" />
+                        <el-option label="空白布局" value="blank" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">

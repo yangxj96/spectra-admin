@@ -42,4 +42,11 @@ public interface SecurityMapper {
      * @return 菜单列表
      */
     List<Menu> getMenusByUserId(@Param("uid") long uid);
+
+    /**
+     * 获取所有菜单信息
+     * @return 所有菜单信息
+     */
+    List<Menu> getAllMenus();
+
 }

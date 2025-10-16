@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.auth.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import io.github.yangxj96.spectra.common.enums.AuthScope;
 import io.github.yangxj96.spectra.core.auth.mapper.SecurityMapper;
+import io.github.yangxj96.spectra.core.auth.service.PermissionService;
 import io.github.yangxj96.spectra.core.auth.service.SecurityService;
 import io.github.yangxj96.spectra.core.system.javabean.entity.Menu;
 import io.github.yangxj96.spectra.core.user.javabean.entity.Role;
@@ -39,6 +40,9 @@ public class SecurityServiceImpl implements SecurityService {
     @Resource
     private SecurityMapper bindMapper;
 
+    @Resource
+    private PermissionService permissionService;
+
     @Override
     public List<Role> getCurrentRoles() {
         return bindMapper.getRolesByUserId(StpUtil.getLoginIdAsLong());
@@ -46,7 +50,12 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public List<Menu> getCurrentMenus() {
-        return bindMapper.getMenusByUserId(StpUtil.getLoginIdAsLong());
+        try {
+            permissionService.administrators();
+            return bindMapper.getAllMenus();
+        } catch (Exception _) {
+            return bindMapper.getMenusByUserId(StpUtil.getLoginIdAsLong());
+        }
     }
 
     @Override

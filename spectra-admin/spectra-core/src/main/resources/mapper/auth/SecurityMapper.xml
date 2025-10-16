@@ -21,4 +21,10 @@
         AND UR.DELETED IS NULL
         ORDER BY M.SORT;
     </select>
+
+    <select id="getAllMenus" resultType="io.github.yangxj96.spectra.core.system.javabean.entity.Menu">
+        SELECT *
+        FROM SPECTRA.SYS_MENU
+        WHERE DELETED IS NULL
+    </select>
 </mapper>
