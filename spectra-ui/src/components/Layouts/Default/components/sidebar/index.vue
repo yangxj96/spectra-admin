@@ -48,8 +48,7 @@ function onMenuItemClick() {
                     v-for="o in item.children"
                     :key="o.path"
                     :index="item.path + '/' + o.path"
-                    :route="{ path: item.path + '/' + o.path }"
-                >
+                    :route="{ path: item.path + '/' + o.path }">
                     <icons :name="o.icon" class-name="icon-sidebar" />
                     {{ o.name }}
                 </el-menu-item>
