@@ -131,7 +131,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 // 启动参数
                 .jvmArguments(runtimeMXBean.getInputArguments())
                 // 系统属性
-                .systemProperties(getFilteredProps())
+                .systemProps(getFilteredProps())
                 // 运行时类路径
                 .classPath(runtimeMXBean.getClassPath())
                 .libraryPath(runtimeMXBean.getLibraryPath())

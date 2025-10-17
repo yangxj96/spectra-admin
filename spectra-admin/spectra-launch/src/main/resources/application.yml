@@ -11,6 +11,14 @@ spectra:
       public-key: classpath:key/publicKey.pem
       private-key: classpath:key/privateKey.pem
       password: ${LICENSE_PASSWORD}
+    # 系统配置
+    cors:
+      mapping: "/**"
+      origin-patterns: "http://localhost:5173"
+      methods: "*"
+      headers: "*"
+      credentials: true
+      max-age: 3600
   # 文件相关
   file:
     upload:

@@ -18,7 +18,6 @@ package io.github.yangxj96.spectra.common.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * <p>
@@ -30,9 +29,8 @@ import org.springframework.stereotype.Component;
  * @since 2025/6/19
  */
 @Data
-@Component
 @ConfigurationProperties(prefix = "spectra.system")
-public class SystemProperties {
+public class SpectraSystemProperties {
 
     /**
      * 基础文件位置,所有文件都会在这个目录下面进行存放

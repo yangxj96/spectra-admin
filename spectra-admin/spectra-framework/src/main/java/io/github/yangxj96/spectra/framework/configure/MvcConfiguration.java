@@ -16,7 +16,11 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
+import io.github.yangxj96.spectra.common.properties.CorsProperties;
+import io.github.yangxj96.spectra.common.properties.SpectraSystemProperties;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,25 +34,31 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Slf4j
 @Configuration
+@EnableConfigurationProperties({SpectraSystemProperties.class, CorsProperties.class})
 public class MvcConfiguration implements WebMvcConfigurer {
 
     private static final String PREFIX = "[MVC]:";
+
+    @Resource
+    private CorsProperties corsProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.debug(PREFIX + "载入Cors");
         registry
                 // 匹配所有路径
-                .addMapping("/**")
+                .addMapping(corsProperties.getMapping())
                 // 指定允许的源
                 // .allowedOrigins("http://localhost:5173")
-                .allowedOriginPatterns("http://localhost:5173")
+                .allowedOriginPatterns(corsProperties.getOriginPatterns().toArray(new String[0]))
                 // 允许的方法
                 // .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedMethods("*")
+                .allowedMethods(corsProperties.getMethods().toArray(new String[0]))
                 // 允许的头部信息
-                .allowedHeaders("*")
+                .allowedHeaders(corsProperties.getHeaders().toArray(new String[0]))
                 // 是否支持凭证
-                .allowCredentials(true);
+                .allowCredentials(corsProperties.getCredentials())
+                // 预检后缓存策略时长
+                .maxAge(corsProperties.getMaxAge());
     }
 }
