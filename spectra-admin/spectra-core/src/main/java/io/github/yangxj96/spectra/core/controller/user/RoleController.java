@@ -1,0 +1,150 @@
+/*
+ *  Copyright 2018-2025 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package io.github.yangxj96.spectra.core.controller.user;
+
+import cn.dev33.satoken.annotation.SaCheckEL;
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.common.base.Verify;
+import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.MenuVO;
+import io.github.yangxj96.spectra.core.javabean.user.from.RoleAuthorityFrom;
+import io.github.yangxj96.spectra.core.javabean.user.from.RoleFrom;
+import io.github.yangxj96.spectra.core.javabean.user.from.RoleMenuFrom;
+import io.github.yangxj96.spectra.core.javabean.user.from.RolePageFrom;
+import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityVO;
+import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
+import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
+import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
+import io.github.yangxj96.spectra.core.service.user.RoleService;
+import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 角色操作
+ */
+@Slf4j
+@SaCheckLogin
+@RestController
+@RequestMapping("/role")
+public class RoleController {
+
+    @Resource
+    private RoleService bindService;
+
+    @Resource
+    private RelRoleMenuService relRoleMenuService;
+
+    @Resource
+    private RelRoleAuthorityService relRoleAuthorityService;
+
+    @ULog("创建角色")
+    @PostMapping
+    @SaCheckEL("@ss.hasPermission('ROLE:INSERT')")
+    public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
+        bindService.created(params);
+    }
+
+    @ULog("删除角色")
+    @DeleteMapping("/{id}")
+    @SaCheckEL("@ss.hasPermission('ROLE:DELETE')")
+    public void delete(@PathVariable String id) {
+        try {
+            bindService.delete(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            log.error("ID转换异常", e);
+        }
+    }
+
+    @ULog("修改角色")
+    @PutMapping
+    @SaCheckEL("@ss.hasPermission('ROLE:UPDATE')")
+    public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        bindService.modify(params);
+    }
+
+    /* 查询部分 */
+
+    @ULog("分页查询角色列表")
+    @GetMapping("/page")
+    public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
+        return bindService.page(page, params);
+    }
+
+    @ULog("查询角色列表")
+    @GetMapping("/list")
+    public List<RoleVO> list() {
+        return bindService.all();
+    }
+
+    /* 关联处理部分 */
+
+    @ULog("获取角色关联的权限列表")
+    @GetMapping("/{roleId}/authority")
+    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return relRoleAuthorityService.get(id);
+        } catch (Exception e) {
+            log.error("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("获取角色关联的菜单列表")
+    @GetMapping("/{roleId}/menu")
+    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
+        try {
+            long id = Long.parseLong(roleId);
+            return relRoleMenuService.get(id);
+        } catch (Exception e) {
+            log.error("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("保存角色关联的权限列表")
+    @PutMapping("/{roleId}/authorities")
+    public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            relRoleAuthorityService.grant(id, from);
+        } catch (Exception e) {
+            log.error("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+    @ULog("保存角色关联的菜单列表")
+    @PutMapping("/{roleId}/menus")
+    public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
+        try {
+            long id = Long.parseLong(roleId);
+            relRoleMenuService.grant(id, from);
+        } catch (Exception e) {
+            log.error("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            throw new IllegalArgumentException("参数转换失败");
+        }
+    }
+
+
+}

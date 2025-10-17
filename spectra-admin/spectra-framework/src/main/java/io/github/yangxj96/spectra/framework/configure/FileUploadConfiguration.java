@@ -16,14 +16,14 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
-import io.github.yangxj96.spectra.common.enums.FileType;
-import io.github.yangxj96.spectra.common.properties.FileUploadProperties;
-import io.github.yangxj96.spectra.common.strategy.FileTypeValidationStrategy;
-import io.github.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy;
-import io.github.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy;
-import io.github.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy;
-import io.github.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy;
-import io.github.yangxj96.spectra.common.verify.FileTypeValidator;
+import io.github.yangxj96.spectra.framework.features.fileupload.FileType;
+import io.github.yangxj96.spectra.framework.features.fileupload.properties.FileUploadProperties;
+import io.github.yangxj96.spectra.framework.features.fileupload.strategy.FileTypeValidationStrategy;
+import io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.ExtensionValidationStrategy;
+import io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.MagicNumberValidationStrategy;
+import io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.MimeValidationStrategy;
+import io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.TikaValidationStrategy;
+import io.github.yangxj96.spectra.framework.features.fileupload.verify.FileTypeValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -61,7 +61,7 @@ public class FileUploadConfiguration {
     public FileTypeValidator fileTypeValidator() {
         log.debug(PREFIX + "载入文件类型验证策略管理器");
         var strategies = new ArrayList<FileTypeValidationStrategy>();
-        var allowedTypes = properties.getAllowedTypes();
+        List<FileType> allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器
         for (var strategy : properties.getStrategies()) {
             if (strategy.isAssignableFrom(MimeValidationStrategy.class)) {

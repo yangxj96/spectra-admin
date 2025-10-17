@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.system.mapper.SysConfigMapper">
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.system.javabean.entity.SysConfig">
+<mapper namespace="io.github.yangxj96.spectra.core.mapper.system.SysConfigMapper">
+    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.system.entity.SysConfig">
         <!--@mbg.generated-->
         <!--@Table SYS_CONFIG-->
         <id column="ID" jdbcType="DECIMAL" property="id"/>

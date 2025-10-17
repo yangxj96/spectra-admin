@@ -16,8 +16,8 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
-import io.github.yangxj96.spectra.framework.aspect.ULogAspect;
-import io.github.yangxj96.spectra.framework.publisher.ULogEventPublisher;
+import io.github.yangxj96.spectra.framework.features.ulog.aspect.ULogAspect;
+import io.github.yangxj96.spectra.framework.features.ulog.publisher.ULogEventPublisher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.ApplicationEventPublisher;

@@ -44,7 +44,7 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
 
     private static final String PREFIX = "[响应结果统一修改]:";
 
-    private static final Pattern PATTERN = Pattern.compile("io\\.github\\.yangxj96\\.spectra\\..*\\.controller");
+    private static final Pattern PATTERN = Pattern.compile("io\\.github\\.yangxj96\\.spectra\\..*\\.controller.*");
 
     @Override
     public boolean supports(MethodParameter returnType,

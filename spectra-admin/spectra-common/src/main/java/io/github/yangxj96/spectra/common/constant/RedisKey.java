@@ -23,7 +23,7 @@ package io.github.yangxj96.spectra.common.constant;
  * @version 1.0
  * @since 2025/7/25
  */
-public class RedisKey {
+public final class RedisKey {
 
     private RedisKey() {
     }

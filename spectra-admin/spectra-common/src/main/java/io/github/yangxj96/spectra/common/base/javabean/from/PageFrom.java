@@ -40,11 +40,13 @@ public class PageFrom {
     /**
      * 页码
      */
+    @Builder.Default
     private Long pageSize = 10L;
 
     /**
      * 每页数量
      */
+    @Builder.Default
     private Long pageNum = 1L;
 
     /**
@@ -52,6 +54,12 @@ public class PageFrom {
      */
     private List<OrderItem> orders;
 
+    /**
+     * 转换成mybatis plus分页查询用的分页参数
+     *
+     * @param <T> 具体类型
+     * @return 分页参数对象
+     */
     public <T> Page<T> toPage() {
         var page = new Page<T>(this.pageNum, this.pageSize);
         if (CollectionUtils.isNotEmpty(orders)) {

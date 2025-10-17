@@ -19,7 +19,7 @@ package io.github.yangxj96.spectra.framework.advice.exception;
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import io.github.yangxj96.spectra.common.annotation.ULog;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;

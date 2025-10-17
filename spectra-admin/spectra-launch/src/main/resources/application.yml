@@ -20,10 +20,10 @@ spectra:
         - png
         - pdf
       strategies:
-        - io.github.yangxj96.spectra.common.strategy.impl.TikaValidationStrategy
-        - io.github.yangxj96.spectra.common.strategy.impl.MimeValidationStrategy
-        - io.github.yangxj96.spectra.common.strategy.impl.ExtensionValidationStrategy
-        - io.github.yangxj96.spectra.common.strategy.impl.MagicNumberValidationStrategy
+        - io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.TikaValidationStrategy
+        - io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.MimeValidationStrategy
+        - io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.ExtensionValidationStrategy
+        - io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl.MagicNumberValidationStrategy
   # 验证码相关
   kaptcha:
     type: chat

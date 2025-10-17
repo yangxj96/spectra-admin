@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.launch.user.controller;
 
-import io.github.yangxj96.spectra.core.user.javabean.entity.Authority;
-import io.github.yangxj96.spectra.core.user.service.AuthorityService;
+import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
+import io.github.yangxj96.spectra.core.service.user.AuthorityService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

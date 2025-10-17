@@ -31,7 +31,6 @@ function handlerRouter(r: RouteLocationMatched[] = []) {
     }
     breadcrumb.value = r;
 }
-
 </script>
 
 <template>

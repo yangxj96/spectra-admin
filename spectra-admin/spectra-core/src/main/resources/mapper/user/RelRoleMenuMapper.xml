@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.user.mapper.RelRoleMenuMapper">
+<mapper namespace="io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.user.javabean.entity.RelRoleMenu">
+    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleMenu">
         <!--@mbg.generated-->
         <!--@Table "SYS_REL_ROLE_MENU"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>

@@ -24,7 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
-import io.github.yangxj96.spectra.framework.mybatis.MetaObjectHandlerImpl;
+import io.github.yangxj96.spectra.framework.features.mybatis.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.ObjectProvider;
@@ -43,7 +43,7 @@ import org.springframework.transaction.annotation.RollbackOn;
  */
 @Slf4j
 @Configuration
-@MapperScan("io.github.yangxj96.spectra.core.*.mapper")
+@MapperScan("io.github.yangxj96.spectra.core.mapper")
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 
