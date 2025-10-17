@@ -31,21 +31,38 @@ function onMenuItemClick() {
         :collapse-transition="true"
         :unique-opened="true"
         @select="onMenuItemClick">
-        <el-menu-item index="home" :route="{ path: '/' }">
+        <el-menu-item index="/">
             <icons name="icon-home" class-name="icon-sidebar" />
             <template #title>首页</template>
         </el-menu-item>
 
-        <el-sub-menu v-for="item in menus" :index="item.path">
-            <template #title>
-                <icons :name="item.icon" class-name="icon-sidebar" />
-                <span>{{ item.name }}</span>
-            </template>
-            <el-menu-item v-for="o in item.children" :index="item.path + '/' + o.path">
-                <icons :name="o.icon" class-name="icon-sidebar" />
-                {{ o.name }}
+        <!-- 动态菜单：根据是否有 children 决定渲染方式 -->
+        <template v-for="item in menus" :key="item.path">
+            <!-- 情况1：有子菜单，渲染为 el-sub-menu -->
+            <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
+                <template #title>
+                    <icons :name="item.icon" class-name="icon-sidebar" />
+                    <span>{{ item.name }}</span>
+                </template>
+                <el-menu-item
+                    v-for="o in item.children"
+                    :key="o.path"
+                    :index="item.path + '/' + o.path"
+                    :route="{ path: item.path + '/' + o.path }"
+                >
+                    <icons :name="o.icon" class-name="icon-sidebar" />
+                    {{ o.name }}
+                </el-menu-item>
+            </el-sub-menu>
+
+            <!-- 情况2：无子菜单，直接渲染为 el-menu-item -->
+            <el-menu-item v-else :index="item.path" :route="{ path: item.path }">
+                <template #title>
+                    <icons :name="item.icon" class-name="icon-sidebar" />
+                    <span>{{ item.name }}</span>
+                </template>
             </el-menu-item>
-        </el-sub-menu>
+        </template>
     </el-menu>
 </template>
 

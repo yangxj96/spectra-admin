@@ -11,21 +11,30 @@ import { useRoute } from "vue-router";
 // 定义菜单前缀映射
 const menuPrefixes = ["/", "/workbench", "/system", "/monitor", "/example"];
 
-const active = computed(() => {
-    const path = useRoute().path;
-    // 从最长到最短排序，避免 /System 匹配到 /SystemManage 等情况（可选优化）
-    const sortedPrefixes = [...menuPrefixes].sort((a, b) => b.length - a.length);
-    for (const prefix of sortedPrefixes) {
-        if (prefix === "/" && path === "/") {
-            return "/";
+const active = ref("/");
+
+// 获取路由对象（useRoute 是响应式的）
+const route = useRoute();
+
+// 监听路由变化
+watch(
+    () => route.path,
+    path => {
+        const sortedPrefixes = [...menuPrefixes].sort((a, b) => b.length - a.length);
+        for (const prefix of sortedPrefixes) {
+            if (prefix === "/" && path === "/") {
+                active.value = "/";
+                return;
+            }
+            if (prefix !== "/" && path.startsWith(prefix)) {
+                active.value = prefix;
+                return;
+            }
         }
-        if (prefix !== "/" && path.startsWith(prefix)) {
-            return prefix;
-        }
-    }
-    // 默认返回首页
-    return "/";
-});
+        active.value = "/";
+    },
+    { immediate: true, flush: "pre" }
+);
 
 function handleUserLogout() {
     stopAllRequest();
