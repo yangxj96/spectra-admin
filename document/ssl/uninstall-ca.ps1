@@ -3,7 +3,7 @@
 # 保存脚本执行前的当前目录
 $OriginalLocation = Get-Location
 
-$CA_Name = "Development CA"
+$CA_Name = "Spectra CA"
 $WorkDir = Join-Path $env:USERPROFILE "dev-https"
 
 # ==================== 检查管理员权限 ====================

@@ -192,6 +192,11 @@ sa-token:
   token-style: uuid
   is-log: true
   is-print: false
+  cookie:
+    path: /
+    secure: true
+    same-site: None
+    http-only: true
 # 工作流配置
 flowable:
   database-schema: SPECTRA_WORKFLOW

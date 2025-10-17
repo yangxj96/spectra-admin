@@ -6,8 +6,8 @@
 $OriginalLocation = Get-Location
 
 $WorkDir = Join-Path $env:USERPROFILE "dev-https"
-$CA_Cert = Join-Path $WorkDir "rootCA.crt"
-$CA_Key  = Join-Path $WorkDir "rootCA.key"
+$CA_Cert = Join-Path $WorkDir "SpectraRootCA.crt"
+$CA_Key  = Join-Path $WorkDir "SpectraRootCA.key"
 
 if (!(Test-Path $WorkDir)) {
     Write-Host "❌ 工作目录不存在: $WorkDir" -ForegroundColor Red
@@ -16,7 +16,7 @@ if (!(Test-Path $WorkDir)) {
 }
 
 if (!(Test-Path $CA_Cert) -or !(Test-Path $CA_Key)) {
-    Write-Host "❌ 缺少 CA 文件，请确保 rootCA.crt 和 rootCA.key 存在" -ForegroundColor Red
+    Write-Host "❌ 缺少 CA 文件，请确保 SpectraRootCA.crt 和 SpectraRootCA.key 存在" -ForegroundColor Red
     exit 1
 }
 

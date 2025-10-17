@@ -4,8 +4,8 @@
 $OriginalLocation = Get-Location
 
 $WorkDir = Join-Path $env:USERPROFILE "dev-https"
-$CA_Name = "Development CA"
-$Org = "Development"
+$CA_Name = "Spectra CA"
+$Org = "Spectra"
 $Country = "CN"
 $State = "Kunming"
 $City = "Kunming"
@@ -40,21 +40,21 @@ if (!(Get-Command openssl -ErrorAction SilentlyContinue)) {
 }
 
 # 生成 CA 私钥和证书
-openssl genrsa -out rootCA.key 2048
+openssl genrsa -out SpectraRootCA.key 2048
 if ($LASTEXITCODE -ne 0) { Write-Host "❌ 生成 CA 私钥失败" -ForegroundColor Red; exit 1 }
 
-openssl req -x509 -new -nodes -key rootCA.key `
+openssl req -x509 -new -nodes -key SpectraRootCA.key `
   -sha256 -days $ValidDays `
   -subj "/C=$Country/ST=$State/L=$City/O=$Org/CN=$CA_Name" `
-  -out rootCA.crt
+  -out SpectraRootCA.crt
 if ($LASTEXITCODE -ne 0) { Write-Host "❌ 生成 CA 证书失败" -ForegroundColor Red; exit 1 }
 
 # 安装到信任库
 Write-Host "🛡️ 正在安装 CA 到 '受信任的根证书颁发机构' ..." -ForegroundColor Cyan
-Import-Certificate -FilePath "$WorkDir\rootCA.crt" -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
+Import-Certificate -FilePath "$WorkDir\SpectraRootCA.crt" -CertStoreLocation Cert:\CurrentUser\Root | Out-Null
 
 Write-Host "✅ 根 CA 已生成并安装！" -ForegroundColor Green
-Write-Host "   📄 $WorkDir\rootCA.crt" -ForegroundColor Yellow
+Write-Host "   📄 $WorkDir\SpectraRootCA.crt" -ForegroundColor Yellow
 Write-Host "   💡 可将此文件分发给团队成员用于信任" -ForegroundColor Cyan
 
 # 脚本执行完毕后，跳回原来的目录
