@@ -132,7 +132,7 @@ spring:
             inited: true
   data:
     redis:
-      url: redis://127.0.0.1:6379/0
+      url: redis://QuVsKppcWvwwX2Vv@127.0.0.1:6379/0
       timeout: 10s
       connect-timeout: 5s
       lettuce:
