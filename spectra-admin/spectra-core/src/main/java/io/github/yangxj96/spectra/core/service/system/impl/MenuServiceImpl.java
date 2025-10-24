@@ -20,15 +20,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
-import io.github.yangxj96.spectra.core.service.auth.SecurityService;
 import io.github.yangxj96.spectra.core.javabean.system.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
 import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
-import io.github.yangxj96.spectra.core.mapper.system.MenuMapper;
-import io.github.yangxj96.spectra.core.service.system.MenuService;
 import io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleMenu;
+import io.github.yangxj96.spectra.core.mapper.system.MenuMapper;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper;
+import io.github.yangxj96.spectra.core.service.system.MenuService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -49,9 +48,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Resource
     private MenuConverter menuConverter;
-
-    @Resource
-    private SecurityService securityService;
 
     @Resource
     private RelRoleMenuMapper roleMenuMapper;
@@ -77,9 +73,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Override
     public List<MenuTreeVO> tree() {
-        var menus = securityService.getCurrentMenus();
         // 先转树形VO
-        var vos = menuConverter.toTreeVOS(menus);
+        var vos = menuConverter.toTreeVOS(this.list());
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 

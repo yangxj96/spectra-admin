@@ -16,30 +16,17 @@
 
 package io.github.yangxj96.spectra.workflow.controller;
 
-import cn.dev33.satoken.annotation.SaIgnore;
-import io.github.yangxj96.spectra.workflow.javabean.vo.ProcessDefinitionVO;
-import io.github.yangxj96.spectra.workflow.service.WorkflowService;
-import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
- * 测试控制器
+ * 工作流-流程实例
  */
-@SaIgnore
+@Slf4j
 @RestController
-@RequestMapping("/test")
-public class TestController {
+@RequestMapping("/workflow/process-instances")
+public class WorkflowProcessInstancesController {
 
-    @Resource
-    private WorkflowService workflowService;
-
-    @GetMapping("/getWorkflows")
-    public List<ProcessDefinitionVO> getWorkflows() {
-        return workflowService.getWorkflows();
-    }
 
 }

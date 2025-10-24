@@ -47,10 +47,11 @@ spectra:
 server:
   port: 8888
   ssl:
-    key-store: classpath:ssl/keystore.p12
-    key-store-password: QuVsKppcWvwwX2Vv
-    key-store-type: PKCS12
-    key-alias: tomcat
+    # key-store: classpath:ssl/keystore.p12
+    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+    key-store-password: ${SSL_PASSWORD}
+    key-store-type: ${SSL_TYPE}
+    key-alias: ${SSL_ALIAS}
   servlet:
     context-path: /api
     session:
@@ -217,10 +218,10 @@ flowable:
     enabled: false
 # 健康检查
 management:
-  health:
-    # windows下安装的redis非官方版本,存在一定问题,所以关闭检查
-    redis:
-      enabled: false
+#  health:
+#    # windows下安装的redis非官方版本,存在一定问题,所以关闭检查
+#    redis:
+#      enabled: false
   endpoints:
     web:
       exposure:
