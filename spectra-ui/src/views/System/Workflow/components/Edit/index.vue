@@ -125,6 +125,8 @@ onMounted(() => {
 <template>
     <el-row style="padding: 10px">
         <el-button-group>
+            <el-button type="primary" link @click="handleExportXML">保存</el-button>
+            <el-button type="primary" link @click="handleExportXML">导出XML</el-button>
             <el-button type="primary" link @click="handleExportXML">导出XML</el-button>
             <el-button type="primary" link @click="handleExportSVG">导出SVG</el-button>
         </el-button-group>

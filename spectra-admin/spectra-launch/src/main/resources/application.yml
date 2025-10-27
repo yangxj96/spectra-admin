@@ -183,6 +183,9 @@ logging:
     root: info
     other: error
     spectra: debug
+  charset:
+    console: utf-8
+    file: UTF-8
 # Sa-Token 配置
 sa-token:
   token-name: Authorization
