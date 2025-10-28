@@ -18,7 +18,7 @@ onUnmounted(() => {
 });
 
 function handleBack() {
-    if (time.value != -1) {
+    if (time.value !== -1) {
         clearTimeout(time.value);
     }
     router.replace("/");

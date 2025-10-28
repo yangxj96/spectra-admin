@@ -89,13 +89,13 @@ function cleanTreeCheckState() {
 
 // 角色列表行被单机
 async function handleRoleTableRowClick(row: Role) {
-    if (currentRow.value && currentRow.value.id && currentRow.value.id == row.id) return;
+    if (currentRow.value && currentRow.value.id && currentRow.value.id === row.id) return;
     try {
         currentRow.value = row;
         cleanTreeCheckState();
         // 权限部分
         RoleApi.getRoleAuthority(row.id).then(res => {
-            if (res.code == 200 && res.data && res.data.length > 0) {
+            if (res.code === 200 && res.data && res.data.length > 0) {
                 let ids = res.data.map(i => i.id);
                 powerRef.value?.setCheckedKeys(ids);
             }
@@ -103,7 +103,7 @@ async function handleRoleTableRowClick(row: Role) {
 
         // 菜单部分
         RoleApi.getRoleMenu(row.id).then(res => {
-            if (res.code == 200 && res.data && res.data.length > 0) {
+            if (res.code === 200 && res.data && res.data.length > 0) {
                 menuRef.value?.setCheckedKeys(res.data.map(i => i.id));
             }
         });

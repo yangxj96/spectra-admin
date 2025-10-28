@@ -50,12 +50,12 @@ export function stopAllRequest() {
 
 // 每次发起 HTTP 请求时都会首先触发这个拦截器。
 const requestFulfilled = (config: InternalAxiosRequestConfig) => {
-    if (config.headers.loading == undefined || config.headers.loading === true) {
+    if (config.headers.loading === undefined || config.headers.loading === true) {
         showLoading();
         config.headers.loading = undefined;
     }
     const token = useUserStore().token.access_token;
-    if (token != undefined || token != "") {
+    if (token !== undefined || token !== "") {
         config.headers["Authorization"] = `Bearer ${token}`;
     }
     config.cancelToken = new axios.CancelToken(function executor(c) {

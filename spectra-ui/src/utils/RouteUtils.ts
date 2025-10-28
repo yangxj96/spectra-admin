@@ -136,7 +136,7 @@ export function getRouteTitle(title: unknown): string {
         }
     }
 
-    if (title != undefined && typeof title === "object") {
+    if (title !== undefined && typeof title === "object") {
         console.warn("[getRouteTitle] Title is an object, may stringify to [object Object]:", title);
     }
 

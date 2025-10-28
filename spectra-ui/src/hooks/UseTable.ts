@@ -57,7 +57,7 @@ export function useTable<T>(
      * @param response 响应内容
      */
     function handleRequestResult(response: IResult<Page<T>>) {
-        if (response.code != 200) {
+        if (response.code !== 200) {
             ElMessage.success({
                 message: response.msg
             });

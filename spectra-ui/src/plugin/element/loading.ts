@@ -45,7 +45,7 @@ async function close(): Promise<void> {
  * 显示loading层
  */
 export function showLoading(): void {
-    if (count == 0 && loading == undefined) {
+    if (count === 0 && loading === undefined) {
         open();
     }
     count++;
@@ -59,7 +59,7 @@ export function hideLoading(): void {
         return;
     }
     count--;
-    if (count == 0) {
+    if (count === 0) {
         close();
     }
 }
