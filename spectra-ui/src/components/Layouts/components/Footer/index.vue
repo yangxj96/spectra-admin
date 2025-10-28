@@ -3,12 +3,12 @@
 <template>
     <!-- 底部版权 -->
     <el-footer class="footer">
-        Copyright © 2018-2023
-        <strong><a href="//yangxj96.com/" target="_blank">yangxj96</a></strong>
+        Copyright © 20xx-20xx
+        <strong><a href="#" target="_blank">xxxx</a></strong>
         &nbsp;
-        <strong><a href="//yangxj96.com/" target="_blank">yangxj96.com</a></strong>
+        <strong><a href="#" target="_blank">xxxxx.xxx</a></strong>
         All Rights Reserved. 备案号：
-        <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">滇ICP备2023006063号-1</a>
+        <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">ICP备xxxxxxxxxx号</a>
     </el-footer>
 </template>
 

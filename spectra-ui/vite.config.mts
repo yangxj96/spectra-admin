@@ -21,7 +21,6 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             vue(),
-            VueDevTools(),
             AutoImport({
                 resolvers: [ElementPlusResolver()],
                 imports: ["vue", "vue-router", "pinia"],
@@ -31,16 +30,9 @@ export default defineConfig(({ mode }) => {
                 resolvers: [ElementPlusResolver()],
                 dts: "./types/components.d.ts"
             }),
-            viteCompression({})
+            viteCompression({}),
+            VueDevTools()
         ],
-        css: {
-            preprocessorOptions: {
-                scss: {
-                    // 屏蔽sass提示高版本删除api的警告信息
-                    silenceDeprecations: ["legacy-js-api"]
-                }
-            }
-        },
         resolve: {
             alias: {
                 "@": fileURLToPath(new URL("./src", import.meta.url))
