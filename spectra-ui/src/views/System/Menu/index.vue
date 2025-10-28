@@ -51,10 +51,11 @@ function handleTableItemDelete(row: Menu) {
     ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
+        appendTo: ".box-content",
         type: "warning"
     }).then(() => {
         console.log(`确定删除`);
-        ElMessage.success("执行删除了");
+        ElMessage.success({ message: "执行删除了", appendTo: ".box-content" });
     });
 }
 
@@ -74,6 +75,7 @@ async function handleMenuSave() {
             request(menu.form).then(() => {
                 ElMessage.success({
                     message: menu.modify ? "修改菜单成功" : "新增菜单成功",
+                    appendTo: ".box-content",
                     onClose() {
                         menu.dialog = false;
                         handleCriteriaQuery();

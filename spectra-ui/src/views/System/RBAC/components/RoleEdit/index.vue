@@ -50,6 +50,7 @@ async function handleRoleSave() {
         await request(form.value);
         ElMessage.success({
             message: modify.value ? "修改角色成功" : "新增角色成功",
+            appendTo: ".box-content",
             onClose() {
                 handleCurrentDialogClose();
             }

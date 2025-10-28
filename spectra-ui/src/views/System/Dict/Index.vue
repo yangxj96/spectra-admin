@@ -53,7 +53,7 @@ const handleGetDictData = () => {
         if (res.code === 200) {
             dictDataTableData.value = res.data!;
         } else {
-            ElMessage.error("获取字典数据失败");
+            ElMessage.error({ message: "获取字典数据失败", appendTo: ".box-content" });
         }
     });
 };
@@ -70,7 +70,7 @@ const handleDialogOpen = (type: string, row: DictGroup | DictData | unknown = {}
             break;
         }
         default: {
-            ElMessage.error("组件加载失败,请检查");
+            ElMessage.error({ message: "组件加载失败,请检查", appendTo: ".box-content" });
             return;
         }
     }

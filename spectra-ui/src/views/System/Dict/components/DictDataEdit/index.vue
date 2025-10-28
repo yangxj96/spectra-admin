@@ -58,11 +58,11 @@ function handleInitData() {
             if (res.code === 200) {
                 gropus.value = res.data || [];
             } else {
-                ElMessage.error(res.msg || "获取字典组列表失败");
+                ElMessage.error({ message: res.msg || "获取字典组列表失败", appendTo: ".box-content" });
             }
         })
         .catch(() => {
-            ElMessage.error("获取字典组列表失败");
+            ElMessage.error({ message: "获取字典组列表失败", appendTo: ".box-content" });
         });
 }
 
@@ -71,7 +71,7 @@ function handleSaveDictGroup() {
     if (!editForm.value) return;
     editForm.value?.validate(valid => {
         if (!valid) {
-            ElMessage.error("请检查必填内容");
+            ElMessage.error({ message: "请检查必填内容", appendTo: ".box-content" });
             return;
         }
         let request = has_edit ? DictApi.modifyData : DictApi.createData;
@@ -80,12 +80,13 @@ function handleSaveDictGroup() {
                 ElMessage.success({
                     message: "保存成功",
                     duration: 1000,
+                    appendTo: ".box-content",
                     onClose() {
                         emit("close");
                     }
                 });
             } else {
-                ElMessage.error(res.msg || "保存失败");
+                ElMessage.error({ message: res.msg || "保存失败", appendTo: ".box-content" });
             }
         });
     });

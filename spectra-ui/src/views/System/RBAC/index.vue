@@ -52,15 +52,17 @@ function handleRoleEditDialogOpen(row: Role) {
 
 // 角色删除
 function handleRoleDelete(row: Role) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning" }).then(() => {
+    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(() => {
         RoleApi.delete(row.id).then(res => {
             if (res.code === 200) {
                 ElMessage.success({
-                    message: "删除成功"
+                    message: "删除成功",
+                    appendTo: ".box-content"
                 });
             } else {
                 ElMessage.error({
-                    message: res.msg
+                    message: res.msg,
+                    appendTo: ".box-content"
                 });
             }
             handlerConditionQuery();
@@ -115,7 +117,7 @@ async function handleRoleTableRowClick(row: Role) {
 // 角色-权限关联关系保存
 function handleSaveRoleAuthority() {
     if (!currentRow.value) {
-        ElMessage.warning("请先选中一个角色");
+        ElMessage.warning({ message: "请先选中一个角色", appendTo: ".box-content" });
         return;
     }
     let params = {
@@ -124,9 +126,9 @@ function handleSaveRoleAuthority() {
     };
     RoleApi.saveRoleAuthority(params).then(res => {
         if (res.code === 200) {
-            ElMessage.success("保存成功");
+            ElMessage.success({ message: "保存成功", appendTo: ".box-content" });
         } else {
-            ElMessage.error(res.msg);
+            ElMessage.error({ message: res.msg, appendTo: ".box-content" });
         }
     });
 }
@@ -134,7 +136,7 @@ function handleSaveRoleAuthority() {
 // 角色-菜单 关联关系保存
 function handleSaveRoleMenu() {
     if (!currentRow.value) {
-        ElMessage.warning("请先选中一个角色");
+        ElMessage.warning({ message: "请先选中一个角色", appendTo: ".box-content" });
         return;
     }
     let params = {
@@ -143,9 +145,9 @@ function handleSaveRoleMenu() {
     };
     RoleApi.saveRoleMenu(params).then(res => {
         if (res.code === 200) {
-            ElMessage.success("保存成功");
+            ElMessage.success({ message: "保存成功", appendTo: ".box-content" });
         } else {
-            ElMessage.error(res.msg);
+            ElMessage.error({ message: res.msg, appendTo: ".box-content" });
         }
     });
 }
@@ -188,7 +190,6 @@ function handleSaveRoleMenu() {
                 highlight-current-row
                 height="88%"
                 style="width: 100%"
-                class="loading-box"
                 @row-click="handleRoleTableRowClick">
                 <el-table-column align="center" width="060" type="index" label="序号" />
                 <el-table-column align="center" width="150" prop="name" label="名称" />

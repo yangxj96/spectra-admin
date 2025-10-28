@@ -40,20 +40,27 @@ function handleCurrentDialogClose() {
 // 新增或编辑
 async function handleOrganizationSave() {
     if (!formRef.value) return;
-    await formRef.value?.validate(valid => {
-        if (!valid) {
-            return;
-        }
+    try {
+        await formRef.value?.validate();
         let request = modify.value ? OrganizationApi.modify : OrganizationApi.created;
-        request(form.value).then(() => {
+        let res = await request(form.value);
+        if (res.code === 200 ) {
             ElMessage.success({
                 message: modify.value ? "修改组织机构成功" : "新增组织机构成功",
+                appendTo: ".box-content",
                 onClose() {
                     handleCurrentDialogClose();
                 }
             });
-        });
-    });
+        } else {
+            ElMessage.error({
+                message: res.msg,
+                appendTo: ".box-content"
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
 }
 </script>
 

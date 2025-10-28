@@ -10,7 +10,8 @@ const locale = ref(useAppStore().lang as Language);
 const message = reactive({
     max: 3,
     duration: 500,
-    plain: true
+    plain: true,
+    appendTo: ".box-content"
 });
 
 const userStore = useUserStore();
