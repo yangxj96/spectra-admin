@@ -2,6 +2,9 @@
 import AuthApi from "@/api/AuthApi.ts";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import { ElForm, ElMessage, type FormRules } from "element-plus";
+import { useRoute, useRouter } from "vue-router";
+import { reactive, ref, useTemplateRef } from "vue";
+import icons from "@/components/Icons/index.vue";
 
 const route = useRoute();
 const router = useRouter();

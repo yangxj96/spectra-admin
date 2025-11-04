@@ -62,17 +62,19 @@ function handleTableItemDelete(row: User) {
 // 用户重置密码
 function handleTableItemResetPassword(row: User) {
     console.log(`重置密码:${JSON.stringify(row)}`);
-    ElMessageBox.confirm(`是否要重置[${row.name}]的密码`, "提示", { type: "warning", appendTo: ".box-content" }).then(() => {
-        UserApi.passwordResetById(row.id).then(() => {
-            ElMessage.success({
-                message: "重置成功",
-                appendTo: ".box-content",
-                onClose() {
-                    handlerConditionQuery();
-                }
+    ElMessageBox.confirm(`是否要重置[${row.name}]的密码`, "提示", { type: "warning", appendTo: ".box-content" }).then(
+        () => {
+            UserApi.passwordResetById(row.id).then(() => {
+                ElMessage.success({
+                    message: "重置成功",
+                    appendTo: ".box-content",
+                    onClose() {
+                        handlerConditionQuery();
+                    }
+                });
             });
-        });
-    });
+        }
+    );
 }
 
 // 排序字段改变

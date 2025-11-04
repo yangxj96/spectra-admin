@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 import ServiceMonitorApi from "@/api/ServiceMonitorApi.ts";
 import "echarts";
 import VChart from "vue-echarts";

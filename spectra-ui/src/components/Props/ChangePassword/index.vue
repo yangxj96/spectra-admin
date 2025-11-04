@@ -1,9 +1,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import usePropsStore from "@/plugin/store/modules/usePropsStore";
+import icons from "@/components/Icons/index.vue";
 
 export default defineComponent({
     name: "PropsChangePassword",
+    components: { icons },
     data() {
         return {
             isShow: usePropsStore().change_password,

@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { type RouteLocationMatched } from "vue-router";
+import { type RouteLocationMatched, useRouter } from "vue-router";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 import { useDark, useFullscreen, useToggle } from "@vueuse/core";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
 import Sidebar from "./components/sidebar/index.vue";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import icons from "@/components/Icons/index.vue";
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -13,6 +15,7 @@ const context = useTemplateRef<HTMLElement>("content");
 // 面包屑
 const breadcrumb = ref<RouteLocationMatched[]>([]);
 const { toggle } = useFullscreen(context);
+const fullscreenToggle = toggle;
 const theme = ref(useDark());
 
 onMounted(() => {
@@ -100,7 +103,7 @@ function handleMenu() {
                                     name="icon-fullScreen"
                                     class="box-unfold-a"
                                     style="width: 1.4em; height: 1.4em"
-                                    @click="toggle" />
+                                    @click="fullscreenToggle" />
                             </el-form-item>
                         </el-form>
                     </el-col>

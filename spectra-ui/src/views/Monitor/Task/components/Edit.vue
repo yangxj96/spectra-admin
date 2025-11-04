@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import icons from "@/components/Icons/index.vue";
 
 const visible = ref(true);
 

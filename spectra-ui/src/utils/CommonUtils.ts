@@ -69,4 +69,16 @@ export default class CommonUtils {
         // 日出前 或 日落后，开启深色模式
         return now < sunrise || now >= sunset;
     }
+
+    /**
+     * 是否是刷新进入
+     */
+    public static hasReload() {
+        // 判断是否是刷新进来的
+        const navigationEntries = globalThis.performance?.getEntriesByType?.("navigation");
+        const navigationEntry = navigationEntries?.[0] as PerformanceNavigationTiming | undefined;
+        if (navigationEntry?.type === "reload") {
+            sessionStorage.setItem("reloaded", "true");
+        }
+    }
 }

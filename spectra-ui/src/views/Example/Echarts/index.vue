@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import "echarts";
 import VChart from "vue-echarts";
-import { useTemplateRef } from "vue";
+import { ref, useTemplateRef } from "vue";
 
 const charts = useTemplateRef<HTMLDivElement>("charts");
 

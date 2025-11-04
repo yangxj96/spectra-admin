@@ -1,4 +1,4 @@
-import type { Directive } from "vue";
+import type { Directive, DirectiveBinding } from "vue";
 import useUserStore from "@/plugin/store/modules/useUserStore.ts";
 
 /**

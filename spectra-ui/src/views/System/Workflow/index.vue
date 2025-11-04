@@ -1,7 +1,10 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import DictSelect from "@/components/DictSelect/index.vue";
+
 const condition = ref({
-    username: undefined,
-    email: undefined
+    name: undefined,
+    type: undefined
 });
 
 const table_data = [
@@ -52,15 +55,21 @@ const table_data = [
     <!-- 搜索区 -->
     <el-row class="box-search">
         <el-form :inline="true" :model="condition">
-            <el-form-item label="姓名" prop="username">
-                <el-input v-model="condition.username" placeholder="请输入姓名" clearable />
+            <el-form-item label="流程名称" prop="name">
+                <el-input v-model="condition.name" placeholder="请输入流程名称" clearable style="width: 10vw" />
             </el-form-item>
-            <el-form-item label="邮箱" prop="email">
-                <el-input v-model="condition.email" placeholder="请输入电话" clearable />
+            <el-form-item label="相关分类" prop="type">
+                <dict-select
+                    v-model="condition.type"
+                    placeholder="请选择相关类型"
+                    dict_code="dict_workflow_type"
+                    style="width: 10vw" />
             </el-form-item>
             <el-form-item>
                 <el-button type="primary">查询</el-button>
                 <el-button>重置</el-button>
+                <el-button type="success">新增流程</el-button>
+                <el-button type="success">新增表单</el-button>
             </el-form-item>
         </el-form>
     </el-row>

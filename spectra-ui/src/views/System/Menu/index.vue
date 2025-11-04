@@ -4,6 +4,7 @@ import MenuApi from "@/api/MenuApi.ts";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
 import _ from "lodash";
 import IconPicker from "@/components/IconPicker/index.vue";
+import icons from "@/components/Icons/index.vue";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);

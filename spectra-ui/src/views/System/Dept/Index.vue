@@ -4,6 +4,7 @@ import { ElMessage, ElMessageBox } from "element-plus";
 import _ from "lodash";
 import OrganizationApi from "@/api/OrganizationApi.ts";
 import OrganizationEdit from "./components/Edit/index.vue";
+import DictTag from "@/components/DictTag/index.vue";
 
 const table_data = ref<OrganizationTree[]>();
 
@@ -29,17 +30,19 @@ function handleCriteriaQuery() {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Organization) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(async () => {
-        try {
-            let { code, msg } = await OrganizationApi.deleteById(row.id);
-            ElMessage.success({
-                message: code === 200 ? "删除成功" : msg,
-                appendTo: ".box-content"
-            });
-        } finally {
-            handleCriteriaQuery();
+    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(
+        async () => {
+            try {
+                let { code, msg } = await OrganizationApi.deleteById(row.id);
+                ElMessage.success({
+                    message: code === 200 ? "删除成功" : msg,
+                    appendTo: ".box-content"
+                });
+            } finally {
+                handleCriteriaQuery();
+            }
         }
-    });
+    );
 }
 
 // 处理菜单Dialog打开
