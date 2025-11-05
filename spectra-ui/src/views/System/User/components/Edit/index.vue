@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from "vue";
-import * as VerifyRules from "@/utils/VerifyRules.ts";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { treeDefaultProps } from "@/utils/Config.ts";
+import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UserApi from "@/api/UserApi.ts";
 import OrganizationApi from "@/api/OrganizationApi.ts";
 import RoleApi from "@/api/RoleApi.ts";
-import { treeDefaultProps } from "@/utils/Config.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 

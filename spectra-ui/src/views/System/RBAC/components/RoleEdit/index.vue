@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import RoleApi from "@/api/RoleApi.ts";
-import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { computed, useTemplateRef } from "vue";
+import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import RoleApi from "@/api/RoleApi.ts";
 import icons from "@/components/Icons/index.vue";
 
 // model

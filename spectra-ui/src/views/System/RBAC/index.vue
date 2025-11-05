@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { ElMessage, ElMessageBox, ElTree } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import RoleEdit from "./components/RoleEdit/index.vue";
+import { ElMessage, ElMessageBox, ElTree } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
+import RoleEdit from "./components/RoleEdit/index.vue";
 import UseTable from "@/hooks/UseTable.ts";
 import MenuApi from "@/api/MenuApi.ts";
 import RoleApi from "@/api/RoleApi.ts";
 import AuthorityApi from "@/api/AuthorityApi.ts";
-import _ from "lodash";
 
 // refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
@@ -46,7 +45,7 @@ function handleInitData() {
 
 // 角色编辑框Dialog
 function handleRoleEditDialogOpen(row: Role) {
-    edit.form = _.cloneDeep(row);
+    edit.form = structuredClone(row);
     edit.dialog = true;
 }
 

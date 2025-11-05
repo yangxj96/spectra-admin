@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { stopAllRequest } from "@/plugin/request";
-import useAppStore from "@/plugin/store/modules/useAppStore.ts";
-import { useRoute } from "vue-router";
 import { onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
+import { stopAllRequest } from "@/plugin/request";
 import icons from "@/components/Icons/index.vue";
+import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 
 const route = useRoute();
 const unfold = ref(true);

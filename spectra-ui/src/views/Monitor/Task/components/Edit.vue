@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import icons from "@/components/Icons/index.vue";
+import JsonEditor from "@/components/JsonEditor/index.vue";
 
 const visible = ref(true);
 

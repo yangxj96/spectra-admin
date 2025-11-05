@@ -1,15 +1,15 @@
 <script setup lang="ts">
+import { ref, watch } from "vue";
+import { useRoute } from "vue-router";
+import { ElMessage } from "element-plus/es";
+import icons from "@/components/Icons/index.vue";
+import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import AuthApi from "@/api/AuthApi.ts";
 import GlobalUtils from "@/utils/GlobalUtils";
-import { ElMessage } from "element-plus/es";
 import { stopAllRequest } from "@/plugin/request";
 import logo from "@/assets/images/logo.svg";
 import avatar from "@/assets/images/avatar.png";
 import usePropsStore from "@/plugin/store/modules/usePropsStore.ts";
-import { useRoute } from "vue-router";
-import { ref, watch } from "vue";
-import icons from "@/components/Icons/index.vue";
-import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
 
 // 定义菜单前缀映射

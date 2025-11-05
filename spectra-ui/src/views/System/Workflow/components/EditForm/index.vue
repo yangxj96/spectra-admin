@@ -13,7 +13,7 @@ const config = {
 
 const designer = useTemplateRef("designer");
 
-function handleSave(data: { rule: string, options: string }) {
+function handleSave(data: { rule: string; options: string }) {
     console.log(`保存数据`);
     console.log(`路由规则: `, JSON.parse(data.rule));
     console.log(`配置规则: `, JSON.parse(data.options));
@@ -27,7 +27,6 @@ function handleSave(data: { rule: string, options: string }) {
 </template>
 
 <style scoped lang="scss">
-
 .designer {
     width: 100%;
     height: 100%;
@@ -36,5 +35,4 @@ function handleSave(data: { rule: string, options: string }) {
 :deep(.el-aside._fc-l-menu) {
     display: none !important;
 }
-
 </style>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import DictApi from "@/api/DictApi";
-import { ElMessage } from "element-plus";
 import { markRaw, reactive, ref, watch } from "vue";
 import { defineAsyncComponent } from "@vue/runtime-core";
+import { ElMessage } from "element-plus";
+import DictApi from "@/api/DictApi";
 import icons from "@/components/Icons/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 
@@ -129,7 +129,7 @@ initData();
                     default-expand-all
                     :props="treeProps"
                     @node-click="
-                        node => {
+                        (node: DictTypeTree) => {
                             currentGroup = node;
                         }
                     ">

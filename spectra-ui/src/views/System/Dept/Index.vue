@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import _ from "lodash";
 import OrganizationApi from "@/api/OrganizationApi.ts";
 import OrganizationEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
@@ -47,7 +46,7 @@ function handleTableItemDelete(row: Organization) {
 
 // 处理菜单Dialog打开
 function handleDialogOpen(row: Organization) {
-    edit.form = _.cloneDeep(row);
+    edit.form = structuredClone(row);
     edit.dialog = true;
 }
 

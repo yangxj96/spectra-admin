@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import AuthApi from "@/api/AuthApi.ts";
-import useUserStore from "@/plugin/store/modules/useUserStore";
-import { ElForm, ElMessage, type FormRules } from "element-plus";
-import { useRoute, useRouter } from "vue-router";
 import { reactive, ref, useTemplateRef } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { ElForm, ElMessage, type FormRules } from "element-plus";
+import useUserStore from "@/plugin/store/modules/useUserStore";
+import AuthApi from "@/api/AuthApi.ts";
 import icons from "@/components/Icons/index.vue";
 
 const route = useRoute();

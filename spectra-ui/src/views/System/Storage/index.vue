@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import Local from "./components/Local/index.vue";
 
 const type = ref("本地存储");

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed, shallowRef } from "vue";
 import Icons from "@/components/Icons/index.vue";
 
 const model = defineModel<string>();

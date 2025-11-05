@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import UserApi from "@/api/UserApi.ts";
 import { ElMessage, ElMessageBox } from "element-plus";
+import UserApi from "@/api/UserApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import UserEdit from "./components/Edit/index.vue";
-import _ from "lodash";
+import DictTag from "@/components/DictTag/index.vue";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -27,7 +27,7 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
 // 用户新增或编辑dialog配置
 function handleUserEditDialog(row: User) {
     let form;
-    let datum = _.cloneDeep(row);
+    let datum = structuredClone(row);
     if (datum.roles && datum.roles.length > 0) {
         if (!datum.role_ids) {
             datum.role_ids = [] as string[];

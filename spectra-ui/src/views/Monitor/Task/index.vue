@@ -46,7 +46,7 @@ for (let i = 0; i < 21; i++) {
             </el-table-column>
             <el-table-column align="center" label="描述" prop="remarks" />
             <el-table-column align="center" width="220" label="操作">
-                <template #default="scope">
+                <template #default>
                     <el-button link type="primary">执行</el-button>
                     <el-button link type="primary">暂停</el-button>
                     <el-button link type="primary">编辑</el-button>

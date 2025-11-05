@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
-import { useDark } from "@vueuse/core";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
-import { onMounted, ref, watch } from "vue";
 
 const router = useRouter();
 
 // 面包屑
 const breadcrumb = ref<RouteLocationMatched[]>([]);
-const theme = ref(useDark());
 
 onMounted(() => {
     handlerRouter();

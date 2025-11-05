@@ -4,25 +4,27 @@
     "env": {
         "browser": true
     },
-    "globals": {
-        "foo": "readonly"
-    },
+    "globals": {},
     "settings": {},
     "rules": {
         "eqeqeq": "warn",
-        "import/no-cycle": "error",
-        "react/self-closing-comp": [
-            "error",
-            {
-                "html": false
-            }
-        ]
+        "noEmpty": "error",
+        "noImplicitGlobals": "error",
+        "noEmptyInterface": "error",
+        "noUnusedVars": "error",
+        "useIsNaN": "error",
+        "noExplicitAny": "error",
+        "noVarRequires": "error",
+        "import/order": "error",
+        "import/noCycle": "error",
+        "import/noUnresolved": "error",
+        "noVar": "error"
     },
     "overrides": [
         {
             "files": ["*.test.ts", "*.spec.ts"],
             "rules": {
-                "@typescript-eslint/no-explicit-any": "off"
+                "noExplicitAny": "off"
             }
         }
     ]

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
-// 定义 props
 const props = defineProps({
     prefix: {
         type: String,

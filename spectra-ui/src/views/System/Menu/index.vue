@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import MenuApi from "@/api/MenuApi.ts";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import _ from "lodash";
+import MenuApi from "@/api/MenuApi.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
 import icons from "@/components/Icons/index.vue";
 
@@ -43,7 +42,7 @@ function handleCriteriaQuery() {
 function handleTableItemModify(row: Menu) {
     console.log(`菜单`, row);
     menu.modify = true;
-    menu.form = _.cloneDeep(row);
+    menu.form = structuredClone(row);
     menu.dialog = true;
 }
 

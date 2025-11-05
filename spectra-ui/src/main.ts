@@ -26,8 +26,7 @@ toggleDark(CommonUtils.shouldEnableDarkMode());
 // 创建APP
 const app = createApp(App);
 
-app
-    .use(createStore())
+app.use(createStore())
     .use(router)
     .use(ElementPlus)
     .use(FcDesigner)
