@@ -72,55 +72,54 @@ async function handleUserSave() {
 
 <template>
     <!-- 新增或编辑 -->
-    <el-dialog
-        v-model="open"
-        class="loading-box"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :destroy-on-close="true"
-        width="30vw">
+    <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleCurrentDialogClose">
         <template #header>
-            <icons name="icon-edit" />
-            {{ (form.id ? "编辑" : "新增") + "用户" }}
+            <div>
+                <icons name="icon-edit" />
+                {{ (form.id ? "编辑" : "新增") + "用户" }}
+            </div>
         </template>
+
         <template #default>
-            <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" @submit.prevent>
-                <el-form-item label="姓名" prop="name">
-                    <el-input v-model="form.name" placeholder="请输入姓名" />
-                </el-form-item>
-                <el-form-item label="邮箱" prop="email">
-                    <el-input v-model="form.email" placeholder="请输入邮箱">
-                        <template #suffix>
-                            <el-tooltip effect="dark" content="同时也作为登录账号" placement="right">
-                                <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
-                            </el-tooltip>
-                        </template>
-                    </el-input>
-                </el-form-item>
-                <el-form-item label="状态" prop="state">
-                    <dict-select v-model="form.state" dict_code="sys_user_state" placeholder="请选择状态" />
-                </el-form-item>
-                <el-form-item label="角色" prop="role_ids">
-                    <el-select v-model="form.role_ids" value-key="id" multiple placeholder="请选择角色" clearable>
-                        <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id" />
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="所属组织" prop="organization_id">
-                    <el-tree-select
-                        v-model="form.organization_id"
-                        :data="organization_tree"
-                        node-key="id"
-                        clearable
-                        check-strictly
-                        default-expand-all
-                        :props="treeDefaultProps" />
-                </el-form-item>
-            </el-form>
+            <el-watermark style="height: 100%; width: 100%">
+                <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" @submit.prevent>
+                    <el-form-item label="姓名" prop="name">
+                        <el-input v-model="form.name" placeholder="请输入姓名" />
+                    </el-form-item>
+                    <el-form-item label="邮箱" prop="email">
+                        <el-input v-model="form.email" placeholder="请输入邮箱">
+                            <template #suffix>
+                                <el-tooltip effect="dark" content="同时也作为登录账号" placement="right">
+                                    <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                                </el-tooltip>
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item label="状态" prop="state">
+                        <dict-select v-model="form.state" dict_code="sys_user_state" placeholder="请选择状态" />
+                    </el-form-item>
+                    <el-form-item label="角色" prop="role_ids">
+                        <el-select v-model="form.role_ids" value-key="id" multiple placeholder="请选择角色" clearable>
+                            <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="所属组织" prop="organization_id">
+                        <el-tree-select
+                            v-model="form.organization_id"
+                            :data="organization_tree"
+                            node-key="id"
+                            clearable
+                            check-strictly
+                            default-expand-all
+                            :props="treeDefaultProps" />
+                    </el-form-item>
+                </el-form>
+            </el-watermark>
         </template>
+
         <template #footer>
             <el-button @click="handleCurrentDialogClose">取消</el-button>
             <el-button type="primary" @click="handleUserSave">确定</el-button>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>

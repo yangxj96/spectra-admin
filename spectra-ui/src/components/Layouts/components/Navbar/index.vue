@@ -2,7 +2,7 @@
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus/es";
-import icons from "@/components/Icons/index.vue";
+import Icons from "@/components/Icons/index.vue";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import AuthApi from "@/api/AuthApi.ts";
 import GlobalUtils from "@/utils/GlobalUtils";

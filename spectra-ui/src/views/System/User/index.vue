@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
 import UserApi from "@/api/UserApi.ts";
+import OrganizationApi from "@/api/OrganizationApi.ts";
+import { treeDefaultProps } from "@/utils/Config.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
@@ -23,6 +25,18 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     UserApi.page,
     condition.value
 );
+
+const organizationTree = ref<OrganizationTree[]>([]);
+
+function handleInitData() {
+    OrganizationApi.tree().then(res => {
+        if (res.code !== 200) {
+            ElMessage.error(res.msg);
+            return;
+        }
+        organizationTree.value = res.data!;
+    });
+}
 
 // 用户新增或编辑dialog配置
 function handleUserEditDialog(row: User) {
@@ -87,6 +101,12 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
     handlerConditionQuery();
 }
 
+// 组织机构树节点被单击
+function handleOrganizationTreeNodeClick(row: OrganizationTree) {
+    condition.value.organization_id = row.id;
+    handlerConditionQuery();
+}
+
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
 function handleDialogClose() {
     if (dialog_edit.value.open) {
@@ -98,6 +118,11 @@ function handleDialogClose() {
     // 最后重新获取下列表数据
     handlerConditionQuery();
 }
+
+// 挂载后执行
+onMounted(() => {
+    handleInitData();
+});
 </script>
 
 <template>
@@ -125,47 +150,59 @@ function handleDialogClose() {
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <!-- 列表 -->
-        <el-table :data="table_data" height="92%" stripe @sort-change="handleTableSortChange">
-            <el-table-column align="center" type="index" />
-            <el-table-column align="center" :sortable="true" label="姓名" prop="name" />
-            <el-table-column align="center" :sortable="true" label="邮箱" prop="email" />
-            <el-table-column align="center" :sortable="true" label="状态" prop="state">
-                <template #default="scope">
-                    <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_user_state" />
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="所属组织" prop="organization_name" show-overflow-tooltip />
-            <el-table-column align="center" label="角色" prop="roles">
-                <template #default="scope">
-                    <el-tag v-for="(item, idx) in scope.row.roles" :index="idx" style="margin-right: 4px">
-                        {{ item.name }}
-                    </el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column align="center" label="操作">
-                <template #default="scope">
-                    <el-button link type="primary" size="small" @click="handleTableItemResetPassword(scope.row)">
-                        重置密码
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="handleUserEditDialog(scope.row)">
-                        编辑
-                    </el-button>
-                    <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
-                        删除
-                    </el-button>
-                </template>
-            </el-table-column>
-        </el-table>
-        <!-- 分页 -->
-        <el-pagination
-            layout="total, sizes, prev, pager, next"
-            :default-page-size="pagination.default_page_size"
-            :page-sizes="pagination.page_sizes"
-            :total="pagination.total"
-            style="padding: 0 10px; margin-left: auto"
-            @size-change="handleSizeChange"
-            @current-change="handleCurrentChange" />
+        <el-col :span="4">
+            <el-tree
+                :data="organizationTree"
+                :props="treeDefaultProps"
+                empty-text="暂无组织机构"
+                node-key="id"
+                :default-expand-all="true"
+                :expand-on-click-node="false"
+                @node-click="handleOrganizationTreeNodeClick" />
+        </el-col>
+        <el-col :span="20">
+            <!-- 列表 -->
+            <el-table :data="table_data" height="92%" stripe @sort-change="handleTableSortChange">
+                <el-table-column align="center" type="index" />
+                <el-table-column align="center" :sortable="true" label="姓名" prop="name" />
+                <el-table-column align="center" :sortable="true" label="邮箱" prop="email" />
+                <el-table-column align="center" :sortable="true" label="状态" prop="state">
+                    <template #default="scope">
+                        <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_user_state" />
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="所属组织" prop="organization_name" show-overflow-tooltip />
+                <el-table-column align="center" label="角色" prop="roles">
+                    <template #default="scope">
+                        <el-tag v-for="(item, idx) in scope.row.roles" :index="idx" style="margin-right: 4px">
+                            {{ item.name }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="操作">
+                    <template #default="scope">
+                        <el-button link type="primary" size="small" @click="handleTableItemResetPassword(scope.row)">
+                            重置密码
+                        </el-button>
+                        <el-button link type="primary" size="small" @click="handleUserEditDialog(scope.row)">
+                            编辑
+                        </el-button>
+                        <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
+                            删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <!-- 分页 -->
+            <el-pagination
+                layout="total, sizes, prev, pager, next"
+                :default-page-size="pagination.default_page_size"
+                :page-sizes="pagination.page_sizes"
+                :total="pagination.total"
+                style="padding: 0 10px; margin-left: auto"
+                @size-change="handleSizeChange"
+                @current-change="handleCurrentChange" />
+        </el-col>
     </el-row>
     <!-- 用户组件区 -->
     <user-edit :open="dialog_edit.open" :form="dialog_edit.form" @close="handleDialogClose" />

@@ -21,14 +21,13 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
-import io.github.yangxj96.spectra.core.properties.UserProperties;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
-import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
@@ -38,10 +37,13 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.mapper.user.UserMapper;
+import io.github.yangxj96.spectra.core.properties.UserProperties;
+import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -173,10 +175,24 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         var result = new Page<UserPageVO>();
+        List<Long> organizationIds = new ArrayList<>();
+        if (params.getOrganizationId() != null) {
+            Organization organization = organizationService.getById(params.getOrganizationId());
+            List<Organization> listed = organizationService.list(
+                    new LambdaQueryWrapper<Organization>()
+                            .eq(Organization::getId, organization.getId())
+                            .or()
+                            .likeRight(Organization::getPath, organization.getPath())
+            );
+            organizationIds = listed.stream().map(BaseEntity::getId).toList();
+            log.info("organizationIds:{}", organizationIds);
+        }
+
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>()
                 .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
                 .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
+                .in(CollectionUtils.isNotEmpty(organizationIds), User::getOrganizationId, organizationIds)
                 .eq(params.getStatus() != null, User::getState, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);

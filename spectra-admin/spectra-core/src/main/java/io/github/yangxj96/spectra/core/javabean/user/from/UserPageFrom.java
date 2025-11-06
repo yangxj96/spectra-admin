@@ -46,4 +46,9 @@ public class UserPageFrom {
      * 状态
      */
     private Boolean status;
+
+    /**
+     * 组织机构ID
+     */
+    private Long organizationId;
 }
