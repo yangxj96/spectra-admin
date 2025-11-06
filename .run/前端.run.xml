@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="光谱前端" type="js.build_tools.npm">
+  <configuration default="false" name="前端" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/spectra-ui/package.json" />
     <command value="run" />
     <scripts>

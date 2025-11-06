@@ -45,7 +45,7 @@ function handleInitData() {
 
 // 角色编辑框Dialog
 function handleRoleEditDialogOpen(row: Role) {
-    edit.form = structuredClone(row);
+    edit.form = JSON.parse(JSON.stringify(row));
     edit.dialog = true;
 }
 

@@ -46,7 +46,7 @@ const edit = reactive({
 
 onMounted(() => {
     handleInitData();
-    edit.form = has_edit ? structuredClone(props.row || edit.form) : ({ state: 0, sort: 999 } as DictData);
+    edit.form = has_edit ? JSON.parse(JSON.stringify(props.row || edit.form)) : ({ state: 0, sort: 999 } as DictData);
     if (!has_edit && props.group) {
         edit.form.gid = props.group.id;
     }

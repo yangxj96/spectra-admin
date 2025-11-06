@@ -27,7 +27,7 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
 // 用户新增或编辑dialog配置
 function handleUserEditDialog(row: User) {
     let form;
-    let datum = structuredClone(row);
+    let datum = JSON.parse(JSON.stringify(row));
     if (datum.roles && datum.roles.length > 0) {
         if (!datum.role_ids) {
             datum.role_ids = [] as string[];

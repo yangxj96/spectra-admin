@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef } from "vue";
+import { onMounted, useTemplateRef } from "vue";
 import FcDesigner, { type Config } from "@form-create/designer";
 
 const config = {
@@ -17,7 +17,14 @@ function handleSave(data: { rule: string; options: string }) {
     console.log(`保存数据`);
     console.log(`路由规则: `, JSON.parse(data.rule));
     console.log(`配置规则: `, JSON.parse(data.options));
+    let json = designer.value?.getJson();
+    console.log(`json:${JSON.stringify(json)}`);
 }
+
+onMounted(() => {
+    let json = designer.value?.getJson();
+    console.log(`json:${JSON.stringify(json)}`);
+});
 </script>
 
 <template>

@@ -43,7 +43,7 @@ const edit = reactive({
 
 onMounted(() => {
     handleInitData();
-    edit.form = has_edit ? structuredClone(props.row || edit.form) : ({ state: 0 } as DictGroup);
+    edit.form = has_edit ? JSON.parse(JSON.stringify(props.row || edit.form)) : ({ state: 0 } as DictGroup);
 });
 
 // 初始化数据

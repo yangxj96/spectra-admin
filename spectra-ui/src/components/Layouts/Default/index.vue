@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef, watch } from "vue";
+import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 import { useDark, useFullscreen, useToggle } from "@vueuse/core";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
@@ -110,7 +110,9 @@ function handleMenu() {
                 </el-row>
                 <!-- 内容部分 -->
                 <div ref="content" class="box-content loading-box">
-                    <router-view></router-view>
+                    <el-watermark style="height: 97%" :content="['yangxj96@gmail.com', '2025-11-06 00:11:22']">
+                        <router-view></router-view>
+                    </el-watermark>
                 </div>
                 <!-- 底部版权 -->
                 <Footer />

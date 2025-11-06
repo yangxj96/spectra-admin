@@ -46,7 +46,7 @@ function handleTableItemDelete(row: Organization) {
 
 // 处理菜单Dialog打开
 function handleDialogOpen(row: Organization) {
-    edit.form = structuredClone(row);
+    edit.form = JSON.parse(JSON.stringify(row));
     edit.dialog = true;
 }
 

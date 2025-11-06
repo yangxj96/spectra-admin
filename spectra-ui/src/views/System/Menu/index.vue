@@ -42,7 +42,7 @@ function handleCriteriaQuery() {
 function handleTableItemModify(row: Menu) {
     console.log(`菜单`, row);
     menu.modify = true;
-    menu.form = structuredClone(row);
+    menu.form = JSON.parse(JSON.stringify(row));
     menu.dialog = true;
 }
 
