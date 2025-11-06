@@ -16,6 +16,8 @@
 
 package io.github.yangxj96.spectra.framework.features.ulog.annotation;
 
+import io.github.yangxj96.spectra.common.enums.SysLogType;
+
 import java.lang.annotation.*;
 
 /**
@@ -36,5 +38,12 @@ public @interface ULog {
      * @return 操作说明
      */
     String value() default "未填写操作说明";
+
+    /**
+     * 日志类型
+     *
+     * @return 默认为一般日志
+     */
+    SysLogType type() default SysLogType.GENERAL;
 
 }

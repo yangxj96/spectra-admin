@@ -53,7 +53,7 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
         try {
             var datum = OperationLog.builder()
-                    .logType(SysLogType.SAFETY)
+                    .type(SysLogType.SAFETY)
                     .explain("登录")
                     .status(Short.parseShort(String.valueOf(response.getStatus())))
                     .ip(IpUtils.getClientIP(request))
@@ -73,7 +73,7 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
     @Override
     public void doLogout(String loginType, Object loginId, String tokenValue) {
         var datum = OperationLog.builder()
-                .logType(SysLogType.SAFETY)
+                .type(SysLogType.SAFETY)
                 .explain("登出")
                 .status(Short.parseShort(String.valueOf(response.getStatus())))
                 .ip(IpUtils.getClientIP(request))

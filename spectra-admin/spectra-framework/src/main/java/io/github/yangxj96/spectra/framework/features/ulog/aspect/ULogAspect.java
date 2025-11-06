@@ -96,7 +96,7 @@ public class ULogAspect {
             // 初始化记录实体
             var datum = ULogEntity
                     .builder()
-                    .type(SysLogType.GENERAL)
+                    .type(annotation.type())
                     .explain(annotation.value())
                     .ip(IpUtils.getClientIP(request))
                     .method(request.getMethod())

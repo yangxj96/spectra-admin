@@ -84,6 +84,12 @@ public class AuthServiceImpl implements AuthService {
             terminalExtraData.put("ip", ip);
             terminalExtraData.put("address", ipLocationTemplate.getCityEn(ip));
 
+            // 判断下这个人之前是否已经登录了
+            // 如果之前登录了则先踢掉
+            if (StpUtil.isLogin(datum.getId())) {
+                StpUtil.kickout(datum.getId());
+            }
+
             // 登录
             StpUtil.login(datum.getId(), new SaLoginParameter()
                     .setDeviceType("PC")

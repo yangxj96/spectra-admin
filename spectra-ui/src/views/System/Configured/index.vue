@@ -12,7 +12,6 @@ const table_data = ref([
     { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" },
     { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" }
 ]);
-
 </script>
 
 <template>
@@ -43,7 +42,7 @@ const table_data = ref([
         </el-table>
     </el-row>
     <!-- 配置编辑 -->
-    <el-drawer v-model="drawer" :modal="true" modal-penetrable destroy-on-close >
+    <el-drawer v-model="drawer" :modal="true" modal-penetrable destroy-on-close>
         <template #header>
             <div>
                 <icons name="icon-edit" />
@@ -55,24 +54,28 @@ const table_data = ref([
             <el-watermark style="height: 100%; width: 100%">
                 <el-form ref="formRef" :model="configuredForm" label-width="auto" @submit.prevent>
                     <el-form-item label="ID" prop="id">
-                        <el-text >{{ configuredForm.id }}</el-text>
+                        <el-text>{{ configuredForm.id }}</el-text>
                     </el-form-item>
                     <el-form-item label="配置键" prop="key">
-                        <el-text >{{ configuredForm.key }}</el-text>
+                        <el-text>{{ configuredForm.key }}</el-text>
                     </el-form-item>
                     <el-form-item label="配置值" prop="value">
                         <el-input v-model="configuredForm.value" placeholder="请输入配置值" />
                     </el-form-item>
                     <el-form-item label="备注" prop="remarks">
-                        <el-input v-model="configuredForm.remarks" type="textarea" :rows="5" placeholder="请输入配置说明" />
+                        <el-input
+                            v-model="configuredForm.remarks"
+                            type="textarea"
+                            :rows="5"
+                            placeholder="请输入配置说明" />
                     </el-form-item>
                 </el-form>
             </el-watermark>
         </template>
 
         <template #footer>
-            <el-button >取消</el-button>
-            <el-button type="primary" >确定</el-button>
+            <el-button>取消</el-button>
+            <el-button type="primary">确定</el-button>
         </template>
     </el-drawer>
 </template>
