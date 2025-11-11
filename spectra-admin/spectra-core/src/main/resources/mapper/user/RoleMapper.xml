@@ -4,14 +4,14 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.user.entity.Role">
         <!--@mbg.generated-->
-        <!--@Table "SYS_ROLE"-->
+        <!--@Table "SPECTRA"."SYS_ROLE"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
         <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
         <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
-        <result column="STATE"      jdbcType="BIT"       property="state"/>
+        <result column="STATE"      jdbcType="NUMERIC"   property="state"/>
         <result column="SCOPE"      jdbcType="SMALLINT"  property="scope"/>
-        <result column="BUILTIN"    jdbcType="BIT"       property="builtin"/>
-        <result column="REMARK"     jdbcType="VARCHAR"   property="remark"/>
+        <result column="BUILTIN"    jdbcType="NUMERIC"   property="builtin"/>
+        <result column="REMARK"     jdbcType="CLOB"      property="remark"/>
         <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
@@ -20,6 +20,7 @@
         <result column="VERSION"    jdbcType="TIMESTAMP" property="version"/>
     </resultMap>
     <!-- @formatter:on -->
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,

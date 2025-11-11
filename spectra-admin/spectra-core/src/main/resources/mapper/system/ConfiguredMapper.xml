@@ -5,17 +5,17 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.system.entity.Configured">
         <!--@mbg.generated-->
-        <!--@Table SPECTRA.SYS_CONFIG-->
-        <id column="ID"             jdbcType="DECIMAL"   property="id"/>
+        <!--@Table "SPECTRA"."SYS_CONFIG"-->
+        <id column="ID"             jdbcType="BIGINT"    property="id"/>
         <result column="KEY"        jdbcType="VARCHAR"   property="key"/>
         <result column="VALUE"      jdbcType="VARCHAR"   property="value"/>
         <result column="REMARKS"    jdbcType="VARCHAR"   property="remarks"/>
-        <result column="CREATED_BY" jdbcType="DECIMAL"   property="createdBy"/>
+        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="UPDATED_BY" jdbcType="DECIMAL"   property="updatedBy"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
-        <result column="VERSION"    jdbcType="DECIMAL"   property="version"/>
+        <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
     </resultMap>
     <!-- @formatter:on -->
 

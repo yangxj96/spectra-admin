@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.user.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table "SYS_AUTHORITY"-->
+        <!--@Table "SPECTRA"."SYS_AUTHORITY"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
         <result column="PID"        jdbcType="BIGINT"    property="pid"/>
         <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
@@ -14,9 +14,10 @@
         <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
-        <result column="VERSION"    jdbcType="TIMESTAMP" property="version"/>
+        <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
     </resultMap>
     <!-- @formatter:on -->
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,

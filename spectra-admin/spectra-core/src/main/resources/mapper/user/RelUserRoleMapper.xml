@@ -4,7 +4,7 @@
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.user.entity.RelUserRole">
         <!--@mbg.generated-->
-        <!--@Table "SYS_REL_USER_ROLE"-->
+        <!--@Table "SPECTRA"."SYS_REL_USER_ROLE"-->
         <id column="ID"               jdbcType="BIGINT"    property="id"/>
         <result column="USER_ID"      jdbcType="BIGINT"    property="userId"/>
         <result column="ROLE_ID"      jdbcType="BIGINT"    property="roleId"/>
@@ -13,8 +13,10 @@
         <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT"   jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"      jdbcType="TIMESTAMP" property="deleted"/>
+        <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
     </resultMap>
     <!-- @formatter:on -->
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -24,6 +26,7 @@
         CREATED_AT,
         UPDATED_BY,
         UPDATED_AT,
-        DELETED
+        DELETED,
+        VERSION
     </sql>
 </mapper>
