@@ -63,6 +63,21 @@ export default defineConfig(({ mode }) => {
                     comments: true
                 }
             }
+        },
+        test: {
+            // 使用 happy-dom 或 jsdom
+            environment: "happy-dom", // 或 'jsdom'
+            // 匹配测试文件
+            include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+            // 全局注册 Vue Test Utils 的 API（可选）
+            globals: true,
+            // 支持 setup 文件
+            setupFiles: "./tests/setup.ts",
+            // 覆盖率（可选）
+            coverage: {
+                provider: "v8", // or 'istanbul'
+                reporter: ["text", "json", "html"]
+            }
         }
     };
 });
