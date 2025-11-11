@@ -20,6 +20,10 @@ import java.io.Serial;
 
 /**
  * 光谱平台基础异常
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public class SpectraException extends RuntimeException {
 

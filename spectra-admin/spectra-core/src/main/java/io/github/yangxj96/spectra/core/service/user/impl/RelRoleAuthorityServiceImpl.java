@@ -40,6 +40,10 @@ import java.util.stream.Collectors;
 
 /**
  * 关联服务-用户和权限
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Service
 public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {

@@ -19,7 +19,9 @@ package io.github.yangxj96.spectra.common.exception;
 /**
  * 加密异常
  *
- * @since 1.0.0
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public class EncryptException extends SpectraException {
 

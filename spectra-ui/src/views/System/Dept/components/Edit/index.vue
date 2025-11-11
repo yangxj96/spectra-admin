@@ -6,7 +6,7 @@ import OrganizationApi from "@/api/OrganizationApi.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 
-// model
+// model<
 const dialog = defineModel("show", {
     required: true,
     default: false

@@ -43,6 +43,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+/**
+ * jackson相关配置
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
+ */
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(JacksonProperties.class)

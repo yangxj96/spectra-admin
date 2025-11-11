@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 系统配置控制器
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @SaCheckEL("@ss.administrators()")
 @RestController

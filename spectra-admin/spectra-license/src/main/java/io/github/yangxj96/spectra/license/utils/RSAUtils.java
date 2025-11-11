@@ -30,6 +30,13 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+/**
+ * RAS加解密
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
+ */
 public class RSAUtils {
 
     private RSAUtils() {

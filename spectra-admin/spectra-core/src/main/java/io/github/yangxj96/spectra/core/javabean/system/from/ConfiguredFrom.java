@@ -8,8 +8,11 @@ import lombok.NoArgsConstructor;
 
 /**
  * 系统配置入参
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

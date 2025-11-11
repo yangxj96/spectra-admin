@@ -23,6 +23,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * 数据范围上下文信息
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @AllArgsConstructor

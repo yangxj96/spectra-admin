@@ -20,6 +20,10 @@ import java.lang.annotation.*;
 
 /**
  * 数据范围注解
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Documented
 @Target(ElementType.METHOD)

@@ -40,29 +40,29 @@ const icons = shallowRef([
 <template>
     <el-select
         v-model="model"
-        popper-class="icon-select"
+        popper-class="picker-icon-select"
         :teleported="false"
         filterable
         placeholder="请选择图标"
         clearable>
         <el-option v-for="(icon, index) in icons" :key="index" :label="icon" :value="icon">
             <el-tooltip :content="icon">
-                <icons :name="icon" class-name="icon-sidebar" />
+                <icons :name="icon" class-name="picker-icon-sidebar" />
             </el-tooltip>
         </el-option>
         <template #prefix>
-            <icons v-if="safeModel !== ''" :name="safeModel" class-name="icon-sidebar" />
+            <icons v-if="safeModel !== ''" :name="safeModel" class-name="picker-icon-sidebar" />
         </template>
     </el-select>
 </template>
 
 <style scoped lang="scss">
-.icon-sidebar {
+.picker-icon-sidebar {
     width: 1.4em;
     height: 1.4em;
 }
 
-:deep(.icon-select) {
+:deep(.picker-icon-select) {
     max-width: 500px;
 
     ul.el-select-dropdown__list {

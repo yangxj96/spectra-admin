@@ -32,6 +32,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * sa-token事件监听器
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Slf4j
 @Component

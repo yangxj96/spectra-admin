@@ -22,6 +22,10 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.RAMInfoVO;
 
 /**
  * 服务器信息监控
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public interface ServiceMonitorService {
 

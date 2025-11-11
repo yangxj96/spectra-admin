@@ -30,6 +30,10 @@ import java.io.Serializable;
 
 /**
  * 用户和角色中间表
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @SuperBuilder

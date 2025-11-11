@@ -24,6 +24,10 @@ import lombok.NoArgsConstructor;
 
 /**
  * 菜单VO
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @NoArgsConstructor

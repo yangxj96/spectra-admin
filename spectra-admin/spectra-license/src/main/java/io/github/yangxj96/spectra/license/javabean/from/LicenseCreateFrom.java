@@ -25,6 +25,10 @@ import java.io.Serializable;
 
 /**
  * 创建许可入参
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @Builder

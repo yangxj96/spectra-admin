@@ -3,23 +3,16 @@ import { computed, onMounted, type PropType, ref } from "vue";
 import { ElMessage } from "element-plus";
 import UseDictStore from "@/plugin/store/modules/useDictStore";
 
-const props = defineProps({
-    modelValue: {
-        type: [String, Number] as PropType<string | number | undefined>,
-        required: false,
-        default: undefined
-    },
-    placeholder: {
-        type: String as PropType<string>,
-        default: ""
-    },
-    dict_code: {
-        type: String as PropType<string>,
-        required: true
-    }
+const model = defineModel({
+    type: [String, Number] as PropType<string | number | undefined>,
+    required: true,
+    default: undefined
 });
 
-const emit = defineEmits(["update:modelValue"]);
+const dict_code = defineModel("dict_code", {
+    required: true,
+    type: String as PropType<string>
+});
 
 const dictStore = UseDictStore();
 
@@ -27,18 +20,17 @@ const options = ref<DictData[]>([]);
 
 const localValue = computed({
     get() {
-        return props.modelValue === undefined ? "" : String(props.modelValue);
+        return model === undefined ? "" : String(model);
     },
-    set(val) {
-        const parsedVal = Number.isNaN(Number(val)) ? val : Number(val);
-        emit("update:modelValue", parsedVal);
+    set(val: string) {
+        model.value = val === "" ? undefined : Number.isNaN(Number(val)) ? val : Number(val);
     }
 });
 
 // 挂载的时候读取字典
 onMounted(async () => {
     try {
-        options.value = (await dictStore.getDictData(props.dict_code)) || [];
+        options.value = (await dictStore.getDictData(dict_code.value)) || [];
     } catch {
         ElMessage.error("获取字典数据失败");
     }
@@ -46,7 +38,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <el-select v-model="localValue" :placeholder="placeholder" clearable append-to=".box-content">
+    <el-select v-model="localValue" v-bind="{ clearable: true, ...$attrs }" append-to=".box-content">
         <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item.value" />
     </el-select>
 </template>

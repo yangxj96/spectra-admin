@@ -14,8 +14,6 @@ import Owner from "@/directive/Owner.ts";
 import { useDark, useToggle } from "@vueuse/core";
 // 工具类
 import CommonUtils from "@/utils/CommonUtils.ts";
-// form create 只能是全量引入，不然老是出问题
-import FcDesigner from "@form-create/designer";
 
 CommonUtils.hasReload();
 
@@ -29,7 +27,5 @@ const app = createApp(App);
 app.use(createStore())
     .use(router)
     .use(ElementPlus)
-    .use(FcDesigner)
-    .use(FcDesigner.formCreate)
     .directive("owner", Owner)
     .mount("#app");

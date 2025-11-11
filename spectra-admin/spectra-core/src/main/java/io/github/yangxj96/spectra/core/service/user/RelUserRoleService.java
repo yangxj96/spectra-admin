@@ -23,6 +23,10 @@ import java.util.List;
 
 /**
  * 关联服务-用户和角色
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public interface RelUserRoleService {
 

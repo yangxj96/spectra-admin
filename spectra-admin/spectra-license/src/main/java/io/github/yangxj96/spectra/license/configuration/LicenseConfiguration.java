@@ -23,6 +23,10 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * 许可相关配置
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Slf4j
 @Configuration

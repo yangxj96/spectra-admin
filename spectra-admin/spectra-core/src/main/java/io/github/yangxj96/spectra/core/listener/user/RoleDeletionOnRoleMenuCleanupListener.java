@@ -27,6 +27,10 @@ import org.springframework.transaction.event.TransactionalEventListener;
 /**
  * 角色删除事件
  * <p>角色-菜单关联处理</p>
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Slf4j
 @Component

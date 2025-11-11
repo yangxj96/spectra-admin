@@ -1,5 +1,12 @@
 import * as SunCalc from "suncalc";
 
+/**
+ * 通用工具类
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11 15:00:00
+ */
 export default class CommonUtils {
     /**
      * 获取随机数

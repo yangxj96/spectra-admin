@@ -27,6 +27,10 @@ import java.time.Instant;
 
 /**
  * 许可证实体
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @Builder

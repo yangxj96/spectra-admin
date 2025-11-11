@@ -18,6 +18,10 @@ package io.github.yangxj96.spectra.common.exception;
 
 /**
  * 系统数据异常
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public class DataException extends SpectraException {
 

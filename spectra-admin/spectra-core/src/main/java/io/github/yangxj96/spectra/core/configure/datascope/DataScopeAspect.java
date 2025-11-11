@@ -24,6 +24,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * 数据范围注解切面
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Aspect
 @Component

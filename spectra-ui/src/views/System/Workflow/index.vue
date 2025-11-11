@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { ref } from "vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 
 const condition = ref({

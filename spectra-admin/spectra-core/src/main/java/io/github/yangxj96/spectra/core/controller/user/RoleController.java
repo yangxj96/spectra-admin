@@ -41,6 +41,10 @@ import java.util.List;
 
 /**
  * 角色操作
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Slf4j
 @SaCheckLogin

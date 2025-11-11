@@ -23,6 +23,10 @@ import java.util.List;
 
 /**
  * 关联服务-角色和菜单
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public interface RelRoleMenuService {
 

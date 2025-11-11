@@ -11,6 +11,10 @@ import java.io.Serializable;
 
 /**
  * 系统配置分页响应
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Data
 @AllArgsConstructor

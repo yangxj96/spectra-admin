@@ -25,6 +25,10 @@ import org.springframework.stereotype.Component;
 
 /**
  * 许可验证
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 @Slf4j
 @Component

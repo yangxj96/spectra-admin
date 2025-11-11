@@ -21,6 +21,10 @@ import io.github.yangxj96.spectra.core.javabean.user.entity.RelUserRole;
 
 /**
  * 角色关联权限中间表
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025-11-11
  */
 public interface RelUserRoleMapper extends BaseMapper<RelUserRole> {
 }
