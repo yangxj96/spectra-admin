@@ -16,7 +16,7 @@
         "lint": "oxlint  ./src -c ./.oxlintrc.json",
         "lint:fix": "oxlint  ./src --fix -c ./.oxlintrc.json",
         "type-check": "vue-tsc --noEmit --composite false",
-        "test": "vitest run -- --verbose",
+        "test": "vitest run",
         "test:watch": "vitest",
         "prestart": "npm run format && npm run lint && npm run type-check"
     },

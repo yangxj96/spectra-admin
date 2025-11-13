@@ -1,13 +1,15 @@
 import { defineConfig, loadEnv } from "vite";
 import vue from "@vitejs/plugin-vue";
 import VueDevTools from "vite-plugin-vue-devtools";
-import { fileURLToPath, URL } from "url";
 import viteCompression from "vite-plugin-compression";
+import { resolve } from "path";
 
 export default defineConfig(({ mode }) => {
     const root = process.cwd();
     const env = loadEnv(mode, root);
     console.log("环境变量:", env);
+    // src路径，用于配置别名
+    const srcPath = resolve(__dirname, "src");
     return {
         base: "./",
         server: {
@@ -19,7 +21,7 @@ export default defineConfig(({ mode }) => {
         plugins: [vue(), viteCompression({}), VueDevTools()],
         resolve: {
             alias: {
-                "@": fileURLToPath(new URL("./src", import.meta.url))
+                "@": srcPath
             }
         },
         build: {
@@ -67,12 +69,17 @@ export default defineConfig(({ mode }) => {
         test: {
             // 使用 happy-dom 或 jsdom
             environment: "happy-dom", // 或 'jsdom'
+            // 打印日志输出
+            console: true,
             // 匹配测试文件
             include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
             // 全局注册 Vue Test Utils 的 API（可选）
             globals: true,
             // 支持 setup 文件
             setupFiles: "./tests/setup.ts",
+            alias: {
+                "@": srcPath
+            },
             // 覆盖率（可选）
             coverage: {
                 provider: "v8", // or 'istanbul'
