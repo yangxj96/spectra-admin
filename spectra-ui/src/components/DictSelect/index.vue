@@ -38,7 +38,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <el-select v-model="localValue" v-bind="{ clearable: true, ...$attrs }" append-to=".box-content">
+    <el-select v-model="localValue" v-bind="{ clearable: true, 'append-to': '.box-content', ...$attrs }">
         <el-option v-for="item in options" :key="item.id" :label="item.label" :value="item.value" />
     </el-select>
 </template>

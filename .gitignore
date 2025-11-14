@@ -13,7 +13,6 @@ document/jar
 .env.*
 files
 spectra-files
-spectra-app
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java
 
