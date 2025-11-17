@@ -64,7 +64,7 @@ function handlePersonalPopup() {
 <template>
     <el-row style="height: 60px">
         <el-col :span="3">
-            <el-image :src="logo" />
+            <el-image :src="logo" style="height: 55px;width: 90%"/>
         </el-col>
 
         <el-col :span="20" style="padding-right: 40px">

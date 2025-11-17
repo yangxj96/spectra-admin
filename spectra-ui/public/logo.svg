@@ -1,0 +1,39 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- 背景网格（象征数据结构） -->
+    <rect x="30" y="30" width="140" height="140" fill="#f9fafb" stroke="#e2e8f0" stroke-width="1" />
+    <path d="M30,70 H170 M30,110 H170 M30,150 H170 M70,30 V170 M110,30 V170 M150,30 V170" stroke="#e2e8f0" stroke-width="1" />
+
+    <!-- 光谱数据流（核心视觉） -->
+    <g>
+        <!-- 红色数据波 -->
+        <path d="M50,100 Q75,70 100,100 T150,100" stroke="url(#redData)" stroke-width="4" fill="none" stroke-linecap="round" />
+        <!-- 绿色数据波 -->
+        <path d="M50,100 Q75,100 100,100 T150,100" stroke="url(#greenData)" stroke-width="4" fill="none" stroke-linecap="round" />
+        <!-- 蓝色数据波 -->
+        <path d="M50,100 Q75,130 100,100 T150,100" stroke="url(#blueData)" stroke-width="4" fill="none" stroke-linecap="round" />
+    </g>
+
+    <!-- 数据流节点（象征数据点） -->
+    <circle cx="50" cy="100" r="5" fill="#4b6fff" />
+    <circle cx="100" cy="100" r="5" fill="#4b6fff" />
+    <circle cx="150" cy="100" r="5" fill="#4b6fff" />
+
+    <!-- 渐变定义 -->
+    <defs>
+        <linearGradient id="redData" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff6b6b" />
+            <stop offset="100%" stop-color="#ff8e8e" />
+        </linearGradient>
+        <linearGradient id="greenData" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4ecdc4" />
+            <stop offset="100%" stop-color="#7ee8e1" />
+        </linearGradient>
+        <linearGradient id="blueData" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#45b7d1" />
+            <stop offset="100%" stop-color="#6fc3df" />
+        </linearGradient>
+    </defs>
+
+    <!-- 外框装饰 -->
+    <rect x="25" y="25" width="150" height="150" fill="none" stroke="#4b6fff" stroke-width="2" stroke-dasharray="5,3" />
+</svg>

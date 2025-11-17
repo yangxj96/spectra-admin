@@ -1,24 +1,40 @@
-<!--
-  -  Copyright 2018-2025 yangxj96
-  -
-  -  Licensed under the Apache License, Version 2.0 (the "License");
-  -  you may not use this file except in compliance with the License.
-  -  You may obtain a copy of the License at
-  -
-  -      http://www.apache.org/licenses/LICENSE-2.0
-  -
-  -  Unless required by applicable law or agreed to in writing, software
-  -  distributed under the License is distributed on an "AS IS" BASIS,
-  -  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  -  See the License for the specific language governing permissions and
-  -  limitations under the License.
-  -->
-
-<svg width="200" height="50" viewBox="0 0 200 50" xmlns="http://www.w3.org/2000/svg">
-  <text x="100" y="35"
-        dominant-baseline="middle"
-        text-anchor="middle"
-        font-size="35"
-        fill="#409eff"
-        font-family="Arial, sans-serif">光谱平台</text>
+<svg width="520" height="150" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient y2="0%" x2="100%" y1="0%" x1="0%" id="redData">
+            <stop stop-color="#ff6b6b" offset="0%"/>
+            <stop stop-color="#ff8e8e" offset="100%"/>
+        </linearGradient>
+        <linearGradient y2="0%" x2="100%" y1="0%" x1="0%" id="greenData">
+            <stop stop-color="#4ecdc4" offset="0%"/>
+            <stop stop-color="#7ee8e1" offset="100%"/>
+        </linearGradient>
+        <linearGradient y2="0%" x2="100%" y1="0%" x1="0%" id="blueData">
+            <stop stop-color="#45b7d1" offset="0%"/>
+            <stop stop-color="#6fc3df" offset="100%"/>
+        </linearGradient>
+    </defs>
+    <!-- 外框装饰 -->
+    <g>
+        <title>Layer 1</title>
+        <!-- 修正背景线条错位，调整为均匀分布 -->
+        <path stroke="#e2e8f0" id="svg_2" d="m20,56l125,0m-125,30l125,0m-125,30l125,0m-89.28572,-90l0,110m35.71429,-110l0,110m35.71429,-110l0,110"/>
+        <!-- 三条线 -->
+        <g id="svg_3">
+            <!-- 红色数据波 -->
+            <path id="svg_4" stroke-linecap="round" fill="none" stroke-width="4" stroke="url(#redData)" d="m32,86q25,-35 50,0t50,0"/>
+            <!-- 绿色数据波 -->
+            <path id="svg_5" stroke-linecap="round" fill="none" stroke-width="4" stroke="url(#greenData)" d="m32,86q25,0 50,0t50,0"/>
+            <!-- 蓝色数据波 -->
+            <path id="svg_6" stroke-linecap="round" fill="none" stroke-width="4" stroke="url(#blueData)" d="m32,86q25,35 50,0t50,0"/>
+        </g>
+        <!-- 三个点点 -->
+        <circle id="svg_7" fill="#4b6fff" r="5" cy="86" cx="32"/>
+        <circle id="svg_8" fill="#4b6fff" r="5" cy="86" cx="82"/>
+        <circle id="svg_9" fill="#4b6fff" r="5" cy="86" cx="132"/>
+        <!-- 虚线框 -->
+        <rect stroke="#4b6fff" stroke-dasharray="5,5" id="svg_10" stroke-width="3" fill="none" height="130" width="130" y="20" x="15"/>
+        <g stroke="null">
+            <text stroke="null" transform="matrix(2.55006 0 0 3.51847 -264.065 -38.9414)" font-family="Arial, sans-serif" fill="#409eff" font-size="35" text-anchor="middle" dominant-baseline="middle" y="37" x="236">光谱平台</text>
+        </g>
+    </g>
 </svg>
