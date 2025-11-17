@@ -70,7 +70,7 @@ export default defineConfig(({ mode }) => {
             // 使用 happy-dom 或 jsdom
             environment: "happy-dom", // 或 'jsdom'
             // 打印日志输出
-            reporters: ['verbose'],
+            reporters: ["verbose"],
             silent: false,
             // 匹配测试文件
             include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],

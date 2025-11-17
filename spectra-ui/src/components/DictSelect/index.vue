@@ -4,7 +4,7 @@ import { ElMessage } from "element-plus";
 import UseDictStore from "@/plugin/store/modules/useDictStore";
 
 const model = defineModel({
-    type: [String, Number] as PropType<string | number | undefined>,
+    type: [String, Number, null] as PropType<string | number | null | undefined>,
     required: true,
     default: undefined
 });
@@ -20,9 +20,10 @@ const options = ref<DictData[]>([]);
 
 const localValue = computed({
     get() {
-        return model === undefined ? "" : String(model);
+        return model.value === undefined ? "" : String(model.value);
     },
     set(val: string) {
+        console.log(`设置值:${val}`);
         model.value = val === "" ? undefined : Number.isNaN(Number(val)) ? val : Number(val);
     }
 });

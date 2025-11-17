@@ -24,8 +24,4 @@ toggleDark(CommonUtils.shouldEnableDarkMode());
 // 创建APP
 const app = createApp(App);
 
-app.use(createStore())
-    .use(router)
-    .use(ElementPlus)
-    .directive("owner", Owner)
-    .mount("#app");
+app.use(createStore()).use(router).use(ElementPlus).directive("owner", Owner).mount("#app");
