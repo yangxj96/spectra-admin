@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.license.utils;
 
+import io.github.yangxj96.spectra.common.exception.EncryptException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -26,6 +27,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -46,89 +48,117 @@ public class RSAUtils {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static KeyPair generateKeyPair() throws Exception {
-        var gen = KeyPairGenerator.getInstance("RSA", "BC");
-        gen.initialize(2048);
-        return gen.generateKeyPair();
+    public static KeyPair generateKeyPair() throws EncryptException {
+        try {
+            var gen = KeyPairGenerator.getInstance("RSA", "BC");
+            gen.initialize(2048);
+            return gen.generateKeyPair();
+        } catch (NoSuchAlgorithmException | NoSuchProviderException e) {
+            throw new EncryptException("生成key出现异常", e);
+        }
     }
 
-    public static void savePrivateKey(PrivateKey key, String path) throws IOException {
+    public static void savePrivateKey(PrivateKey key, String path) throws EncryptException {
         try (var fw = new FileWriter(path)) {
             var pem = new PemObject("PRIVATE KEY", key.getEncoded());
             var pw = new PemWriter(fw);
             pw.writeObject(pem);
             pw.close();
+        } catch (IOException e) {
+            throw new EncryptException("保存私钥异常", e);
         }
     }
 
-    public static void savePublicKey(PublicKey key, String path) throws IOException {
+    public static void savePublicKey(PublicKey key, String path) throws EncryptException {
         try (var fw = new FileWriter(path)) {
             var pem = new PemObject("PUBLIC KEY", key.getEncoded());
             var pw = new PemWriter(fw);
             pw.writeObject(pem);
             pw.close();
+        } catch (IOException e) {
+            throw new EncryptException("保存私钥异常", e);
         }
     }
 
-    public static PrivateKey loadPrivateKey(String path) throws Exception {
+    public static PrivateKey loadPrivateKey(String path) throws EncryptException {
         try (var fr = new FileReader(path); var pr = new PemReader(fr)) {
             var pem = pr.readPemObject();
             var spec = new PKCS8EncodedKeySpec(pem.getContent());
             var kf = KeyFactory.getInstance("RSA");
             return kf.generatePrivate(spec);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | RuntimeException | IOException e) {
+            throw new EncryptException("加载私钥异常", e);
         }
     }
 
-    public static PublicKey loadPublicKey(String path) throws Exception {
+    public static PublicKey loadPublicKey(String path) throws EncryptException {
         try (var fr = new FileReader(path); var pr = new PemReader(fr)) {
             var pem = pr.readPemObject();
             var spec = new X509EncodedKeySpec(pem.getContent());
             var kf = KeyFactory.getInstance("RSA");
             return kf.generatePublic(spec);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+            throw new EncryptException("加载公钥异常", e);
         }
     }
 
     /**
      * 加载私钥 (PEM 格式)
      */
-    public static PrivateKey loadPrivateKey(InputStream in) throws Exception {
-        var content = new String(in.readAllBytes());
-        content = content.replace("-----BEGIN PRIVATE KEY-----", "")
-                .replace("-----END PRIVATE KEY-----", "")
-                .replaceAll("\\s", "");
-        var decoded = Base64.getDecoder().decode(content);
-        var spec = new PKCS8EncodedKeySpec(decoded);
-        var kf = KeyFactory.getInstance("RSA");
-        return kf.generatePrivate(spec);
+    public static PrivateKey loadPrivateKey(InputStream in) throws EncryptException {
+        try {
+            var content = new String(in.readAllBytes());
+            content = content.replace("-----BEGIN PRIVATE KEY-----", "")
+                    .replace("-----END PRIVATE KEY-----", "")
+                    .replaceAll("\\s", "");
+            var decoded = Base64.getDecoder().decode(content);
+            var spec = new PKCS8EncodedKeySpec(decoded);
+            var kf = KeyFactory.getInstance("RSA");
+            return kf.generatePrivate(spec);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+            throw new EncryptException("加载私钥异常", e);
+        }
     }
 
     /**
      * 加载公钥 (PEM 格式)
      */
-    public static PublicKey loadPublicKey(InputStream in) throws Exception {
-        var content = new String(in.readAllBytes());
-        content = content.replace("-----BEGIN PUBLIC KEY-----", "")
-                .replace("-----END PUBLIC KEY-----", "")
-                .replaceAll("\\s", "");
-        var decoded = Base64.getDecoder().decode(content);
-        var spec = new X509EncodedKeySpec(decoded);
-        var kf = KeyFactory.getInstance("RSA");
-        return kf.generatePublic(spec);
+    public static PublicKey loadPublicKey(InputStream in) throws EncryptException {
+        try {
+            var content = new String(in.readAllBytes());
+            content = content.replace("-----BEGIN PUBLIC KEY-----", "")
+                    .replace("-----END PUBLIC KEY-----", "")
+                    .replaceAll("\\s", "");
+            var decoded = Base64.getDecoder().decode(content);
+            var spec = new X509EncodedKeySpec(decoded);
+            var kf = KeyFactory.getInstance("RSA");
+            return kf.generatePublic(spec);
+        } catch (InvalidKeySpecException | NoSuchAlgorithmException | IOException e) {
+            throw new EncryptException("加载公钥异常", e);
+        }
     }
 
-    public static String sign(String content, PrivateKey privateKey) throws Exception {
-        var sign = Signature.getInstance("SHA256withRSA", "BC");
-        sign.initSign(privateKey);
-        sign.update(content.getBytes());
-        var signature = sign.sign();
-        return Base64.getEncoder().encodeToString(signature);
+    public static String sign(String content, PrivateKey privateKey) throws EncryptException {
+        try {
+            var sign = Signature.getInstance("SHA256withRSA", "BC");
+            sign.initSign(privateKey);
+            sign.update(content.getBytes());
+            var signature = sign.sign();
+            return Base64.getEncoder().encodeToString(signature);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException e) {
+            throw new EncryptException("签名异常", e);
+        }
     }
 
-    public static boolean verify(String content, String signature, PublicKey publicKey) throws Exception {
-        var verify = Signature.getInstance("SHA256withRSA", "BC");
-        verify.initVerify(publicKey);
-        verify.update(content.getBytes());
-        var sig = Base64.getDecoder().decode(signature);
-        return verify.verify(sig);
+    public static boolean verify(String content, String signature, PublicKey publicKey) throws EncryptException {
+        try {
+            var verify = Signature.getInstance("SHA256withRSA", "BC");
+            verify.initVerify(publicKey);
+            verify.update(content.getBytes());
+            var sig = Base64.getDecoder().decode(signature);
+            return verify.verify(sig);
+        } catch (NoSuchAlgorithmException | NoSuchProviderException | InvalidKeyException | SignatureException e) {
+            throw new EncryptException("验证异常", e);
+        }
     }
 }

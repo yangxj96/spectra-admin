@@ -63,6 +63,9 @@ public class JacksonConfiguration {
 
     @Bean
     public ObjectMapper objectMapper() {
+        log.debug("{}开始配置jackson3", PREFIX);
+
+        log.debug("{}java.time包下的时间格式化处理", PREFIX);
         // 注册 JavaTimeModule
         var javaTimeModule = new SimpleModule();
 
@@ -82,11 +85,15 @@ public class JacksonConfiguration {
         javaTimeModule.addDeserializer(LocalTime.class,
                 new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
 
+        // 理论上是非线程安全的,如果用不到传统time类,可以注释掉
+        log.debug("{}传统time进行处理", PREFIX);
         var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+        log.debug("{}配置响应", PREFIX);
         return JsonMapper
-                .builder()
+                // 接近原来jackson2的默认配置,但是好像还不是完全等于.
+                .builderWithJackson2Defaults()
                 // 忽略控制
                 .changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(
                         JsonInclude.Include.NON_NULL,

@@ -40,8 +40,6 @@ public class DataScopeAspect {
             var info = new DataScopeInfo();
             if (dataScope.filter()) {
                 info.setFilter(true);
-                // 获取用户最大权限范围
-                // info.setScope(securityService.getCurrentMaxScope());
             }
             DataScopeContext.set(info);
             return pjp.proceed();

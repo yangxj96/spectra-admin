@@ -19,8 +19,6 @@ package io.github.yangxj96.spectra.license.utils;
 import io.github.yangxj96.spectra.license.javabean.bean.License;
 import tools.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-
 /**
  * 许可证工具类
  *
@@ -33,7 +31,7 @@ public class LicenseUtils {
     private LicenseUtils() {
     }
 
-    public static String toJsonWithoutSignature(License license, ObjectMapper om) throws IOException {
+    public static String toJsonWithoutSignature(License license, ObjectMapper om) {
         var temp = License.builder()
                 .id(license.getId())
                 .productName(license.getProductName())
@@ -46,7 +44,7 @@ public class LicenseUtils {
                 .writeValueAsString(temp);
     }
 
-    public static String toJson(License license, ObjectMapper om) throws IOException {
+    public static String toJson(License license, ObjectMapper om) {
         return om
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(license);

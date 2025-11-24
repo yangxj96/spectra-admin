@@ -33,6 +33,10 @@ public class EncryptException extends SpectraException {
         super(message);
     }
 
+    public EncryptException(Throwable cause) {
+        super(cause);
+    }
+
     public EncryptException(String message, Throwable cause) {
         super(message, cause);
     }
