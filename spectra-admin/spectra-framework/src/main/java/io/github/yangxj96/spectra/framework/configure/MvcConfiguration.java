@@ -22,6 +22,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -60,5 +61,16 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .allowCredentials(corsProperties.getCredentials())
                 // 预检后缓存策略时长
                 .maxAge(corsProperties.getMaxAge());
+    }
+
+    /**
+     * api版本策略配置
+     *
+     * @param configurer {@link ApiVersionConfigurer}
+     */
+    @Override
+    public void configureApiVersioning(ApiVersionConfigurer configurer) {
+        configurer.setVersionRequired(true)
+                .useRequestHeader("ver");
     }
 }

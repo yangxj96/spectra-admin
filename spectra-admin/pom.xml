@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.7</version>
+        <version>4.0.0</version>
         <relativePath/>
     </parent>
 
@@ -26,7 +26,7 @@
         <revision>0.0.1-SNAPSHOT</revision>
 
         <!-- 数据库 -->
-        <mybatis-plus.version>3.5.14</mybatis-plus.version>
+        <mybatis-plus.version>3.5.15-SNAPSHOT</mybatis-plus.version>
         <dm.version>8.1.4.125</dm.version>
         <!-- 身份认证 -->
         <sa-token.version>1.44.0</sa-token.version>
@@ -41,7 +41,6 @@
         <kaptcha.version>2.3.3</kaptcha.version>
         <bitwalker.version>1.21</bitwalker.version>
         <oshi.version>6.8.1</oshi.version>
-        <mica.version>3.5.4</mica.version>
         <jetcache.version>2.7.8</jetcache.version>
         <druid.version>1.2.27</druid.version>
         <bcprov.version>1.82</bcprov.version>
@@ -57,6 +56,13 @@
         <module>spectra-workflow</module>
         <module>spectra-license</module>
     </modules>
+
+    <repositories>
+        <repository>
+            <id>snapshots</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </repository>
+    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -167,17 +173,6 @@
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
-            </dependency>
-            <!-- XSS攻击防范 -->
-            <dependency>
-                <groupId>net.dreamlu</groupId>
-                <artifactId>mica-xss</artifactId>
-                <version>${mica.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.dreamlu</groupId>
-                <artifactId>mica-core</artifactId>
-                <version>${mica.version}</version>
             </dependency>
             <!-- 加密补充包 -->
             <dependency>

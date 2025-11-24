@@ -17,11 +17,9 @@
 package io.github.yangxj96.spectra.framework.features.ulog.aspect;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
-import io.github.yangxj96.spectra.common.enums.SysLogType;
-import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.framework.features.ulog.publisher.ULogEventPublisher;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +31,7 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * ULog注解AOP切面

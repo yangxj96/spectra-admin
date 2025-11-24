@@ -18,29 +18,27 @@ package io.github.yangxj96.spectra.framework.configure;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
 import io.github.yangxj96.spectra.common.properties.JacksonProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
+import tools.jackson.databind.ext.javatime.deser.LocalTimeDeserializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalDateTimeSerializer;
+import tools.jackson.databind.ext.javatime.ser.LocalTimeSerializer;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.module.SimpleModule;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 /**
@@ -53,7 +51,7 @@ import java.util.TimeZone;
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(JacksonProperties.class)
-public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomizer {
+public class JacksonConfiguration {
 
     private static final String PREFIX = "[Jackson]:";
 
@@ -63,39 +61,46 @@ public class JacksonConfiguration implements Jackson2ObjectMapperBuilderCustomiz
         this.properties = properties;
     }
 
-    @Override
-    public void customize(Jackson2ObjectMapperBuilder builder) {
-        log.debug(PREFIX + "自定义ObjectMapper");
-        log.debug(PREFIX + "注册java8时间模块");
-        builder.modules(new JavaTimeModule());
-        log.debug(PREFIX + "不显示null元素");
-        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-        log.debug(PREFIX + "格式化响应字段为下划线分割");
-        builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        log.debug(PREFIX + "设置时区为UTC");
-        builder.timeZone(TimeZone.getTimeZone("UTC"));
-        var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
-        log.debug(PREFIX + "加载时间格式化");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        builder.dateFormat(sdf);
-        log.debug(PREFIX + "加载java8新时间序列化");
-        var serializers = new HashMap<Class<?>, JsonSerializer<?>>();
-        serializers.put(LocalDateTime.class,
+    @Bean
+    public ObjectMapper objectMapper() {
+        // 注册 JavaTimeModule
+        var javaTimeModule = new SimpleModule();
+
+        // 添加自定义序列化器
+        javaTimeModule.addSerializer(LocalDateTime.class,
                 new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-        serializers.put(LocalDate.class,
+        javaTimeModule.addSerializer(LocalDate.class,
                 new LocalDateSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-        serializers.put(LocalTime.class,
+        javaTimeModule.addSerializer(LocalTime.class,
                 new LocalTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
-        builder.serializersByType(serializers);
-        log.debug(PREFIX + "加载java8新时间反序列化");
-        var deserializers = new HashMap<Class<?>, JsonDeserializer<?>>();
-        deserializers.put(LocalDateTime.class,
+
+        // 添加反序列化器
+        javaTimeModule.addDeserializer(LocalDateTime.class,
                 new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-        deserializers.put(LocalDate.class,
+        javaTimeModule.addDeserializer(LocalDate.class,
                 new LocalDateDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-        deserializers.put(LocalTime.class,
+        javaTimeModule.addDeserializer(LocalTime.class,
                 new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
-        builder.deserializersByType(deserializers);
-        log.debug(PREFIX + "配置完成");
+
+        var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        return JsonMapper
+                .builder()
+                // 忽略控制
+                .changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(
+                        JsonInclude.Include.NON_NULL,
+                        JsonInclude.Include.ALWAYS
+                ))
+                // 响应下划线分割
+                .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+                // 旧的时间进行格式化
+                .defaultDateFormat(sdf)
+                // 新时间格式化
+                .addModule(javaTimeModule)
+                // 默认时区
+                .defaultTimeZone(TimeZone.getTimeZone("UTC"))
+                .build();
     }
+
 }

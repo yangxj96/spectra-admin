@@ -16,15 +16,15 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Redis配置类
@@ -60,7 +60,7 @@ public class RedisConfiguration {
         template.setHashKeySerializer(keySerializer);
 
         // 使用Jackson作为Value的序列化方式
-        var valueSerializer = new Jackson2JsonRedisSerializer<>(om, Object.class);
+        var valueSerializer = new JacksonJsonRedisSerializer<>(om, Object.class);
         template.setValueSerializer(valueSerializer);
         template.setHashValueSerializer(valueSerializer);
 

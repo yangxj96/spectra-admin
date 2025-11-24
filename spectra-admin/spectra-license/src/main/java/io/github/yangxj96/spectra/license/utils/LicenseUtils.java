@@ -16,8 +16,8 @@
 
 package io.github.yangxj96.spectra.license.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.yangxj96.spectra.license.javabean.bean.License;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 

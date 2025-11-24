@@ -1,0 +1,18 @@
+# 工作流配置
+flowable:
+  database-schema: SPECTRA_WORKFLOW
+  database-schema-update: true
+  process-definition-location-prefix: classpath*:/processes/
+  jpa-enabled: false
+  # 异步任务
+  async-executor-activate: true
+  history-level: full
+  # 身份管理引擎
+  idm:
+    enabled: false
+  # 决策模型引擎
+  dmn:
+    enabled: false
+  # 案例管理引擎
+  cmmn:
+    enabled: false

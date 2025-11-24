@@ -18,8 +18,6 @@ package io.github.yangxj96.spectra.core.configure.satoken;
 
 import cn.dev33.satoken.listener.SaTokenListenerForSimple;
 import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.yangxj96.spectra.common.enums.SysLogType;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog;
@@ -29,6 +27,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * sa-token事件监听器
@@ -55,23 +54,19 @@ public class SaTokenListenerForApplication extends SaTokenListenerForSimple {
 
     @Override
     public void doLogin(String loginType, Object loginId, String tokenValue, SaLoginParameter loginParameter) {
-        try {
-            var datum = OperationLog.builder()
-                    .type(SysLogType.SAFETY)
-                    .explain("登录")
-                    .status(Short.parseShort(String.valueOf(response.getStatus())))
-                    .ip(IpUtils.getClientIP(request))
-                    .url(request.getRequestURI())
-                    .method(request.getMethod())
-                    .args(om.writeValueAsString(loginParameter))
-                    .result(tokenValue)
-                    .createdBy(Long.parseLong(loginId.toString()))
-                    .updatedBy(Long.parseLong(loginId.toString()))
-                    .build();
-            logService.save(datum);
-        } catch (JsonProcessingException e) {
-            log.error("序列化登录参数失败,{}", e.getMessage(), e);
-        }
+        var datum = OperationLog.builder()
+                .type(SysLogType.SAFETY)
+                .explain("登录")
+                .status(Short.parseShort(String.valueOf(response.getStatus())))
+                .ip(IpUtils.getClientIP(request))
+                .url(request.getRequestURI())
+                .method(request.getMethod())
+                .args(om.writeValueAsString(loginParameter))
+                .result(tokenValue)
+                .createdBy(Long.parseLong(loginId.toString()))
+                .updatedBy(Long.parseLong(loginId.toString()))
+                .build();
+        logService.save(datum);
     }
 
     @Override
