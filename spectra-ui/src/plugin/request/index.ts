@@ -14,7 +14,8 @@ const http = axios.create({
     timeout: 60 * 1000,
     withCredentials: true,
     headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Api-Version": "1.0.0"
     },
     /**
      * 自定义 paramsSerializer，用于 axios 请求参数的序列化，支持嵌套对象和数组。

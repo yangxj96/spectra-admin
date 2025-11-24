@@ -71,6 +71,6 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         configurer.setVersionRequired(true)
-                .useRequestHeader("ver");
+                .useRequestHeader("Api-Version");
     }
 }
