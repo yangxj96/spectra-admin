@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.CaseUtils;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -48,6 +49,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
     private static final String PREFIX = "[Get请求参数下滑先转驼峰命名]:";
 
     @Override
+    @NullMarked
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
@@ -75,8 +77,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
 
         private final ConcurrentMap<String, String[]> formatted;
 
-        public ParamsModifyHttpServletRequestWrapper(HttpServletRequest request,
-                                                     ConcurrentMap<String, String[]> formatted) {
+        public ParamsModifyHttpServletRequestWrapper(HttpServletRequest request, ConcurrentMap<String, String[]> formatted) {
             super(request);
             this.formatted = formatted;
         }

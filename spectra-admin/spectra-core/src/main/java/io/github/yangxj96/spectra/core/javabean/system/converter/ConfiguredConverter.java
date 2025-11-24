@@ -30,9 +30,9 @@ public interface ConfiguredConverter {
     /**
      * 数据库实体列表转VO列表
      *
-     * @param configureds 数据库实体列表
+     * @param configures 数据库实体列表
      * @return VO列表
      */
-    List<ConfiguredVO> toVOs(List<Configured> configureds);
+    List<ConfiguredVO> toVOs(List<Configured> configures);
 
 }

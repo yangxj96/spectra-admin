@@ -18,6 +18,8 @@ package io.github.yangxj96.spectra.framework.advice;
 
 import io.github.yangxj96.spectra.common.response.R;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,8 +49,8 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     private static final Pattern PATTERN = Pattern.compile("io\\.github\\.yangxj96\\.spectra\\..*\\.controller.*");
 
     @Override
-    public boolean supports(MethodParameter returnType,
-                            Class<? extends HttpMessageConverter<?>> converterType) {
+    @NullMarked
+    public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         log.debug(PREFIX + "进入修改");
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
@@ -61,7 +63,8 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    public Object beforeBodyWrite(Object body,
+    @NullMarked
+    public Object beforeBodyWrite(@Nullable Object body,
                                   MethodParameter returnType,
                                   MediaType contentType,
                                   Class<? extends HttpMessageConverter<?>> converterType,
@@ -95,7 +98,11 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
         // 如果能获取到响应则直接响应
         if (response instanceof ServletServerHttpResponse resp) {
             int status = resp.getServletResponse().getStatus();
-            r = new R<>(HttpStatus.resolve(status));
+            HttpStatus resolve = HttpStatus.resolve(status);
+            if (resolve == null) {
+                resolve = HttpStatus.INTERNAL_SERVER_ERROR;
+            }
+            r = new R<>(resolve);
         } else {
             // 否则根据方法的RESTFull API设计规范进行响应
             String httpMethod = request.getMethod().name();

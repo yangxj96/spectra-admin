@@ -210,10 +210,10 @@ public class IpLocationTemplate {
             int a = Integer.parseInt(parts[0]);
             int b = Integer.parseInt(parts[1]);
 
-            return (a == 10) ||                                    // 10.x.x.x
-                    (a == 127) ||                                  // 127.x.x.x
-                    (a == 192 && b == 168) ||                      // 192.168.x.x
-                    (a == 172 && b >= 16 && b <= 31);              // 172.16.0.0 ~ 172.31.255.255
+            return (a == 10) ||                       // 10.x.x.x
+                    (a == 127) ||                     // 127.x.x.x
+                    (a == 192 && b == 168) ||         // 192.168.x.x
+                    (a == 172 && b >= 16 && b <= 31); // 172.16.0.0 ~ 172.31.255.255
         } catch (NumberFormatException _) {
             return false;
         }

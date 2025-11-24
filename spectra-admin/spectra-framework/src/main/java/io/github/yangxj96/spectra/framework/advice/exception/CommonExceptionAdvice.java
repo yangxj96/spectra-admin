@@ -22,6 +22,7 @@ import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -39,6 +40,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
  */
 @Slf4j
 @Order
+@NullMarked
 @RestControllerAdvice
 public class CommonExceptionAdvice {
 

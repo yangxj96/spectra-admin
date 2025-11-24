@@ -21,7 +21,9 @@ import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.framework.features.ulog.publisher.ULogEventPublisher;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -85,10 +87,16 @@ public class ULogAspect {
      */
     protected void handleLog(final JoinPoint point, ULog annotation, final Exception e, Object jsonResult) {
         log.debug(PREFIX + "操作日志-开始记录");
+
         try {
             // 获取当前用户
             // 获取请求上下文
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes == null) {
+                log.warn(PREFIX + "非 Web 请求上下文，跳过日志记录");
+                return;
+            }
+
             var request = attributes.getRequest();
             var response = attributes.getResponse();
 
@@ -100,7 +108,7 @@ public class ULogAspect {
                     .ip(IpUtils.getClientIP(request))
                     .method(request.getMethod())
                     .url(request.getRequestURI())
-                    .status((short) response.getStatus())
+                    .status(getHttpResponseStatus(response))
                     .result(safeWriteValueAsString(jsonResult))
                     .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
                     .token(StpUtil.getTokenValue())
@@ -132,6 +140,25 @@ public class ULogAspect {
             log.error(PREFIX + "JSON 序列化失败: {}", obj.getClass(), e);
             return null;
         }
+    }
+
+    /**
+     * 获取状态码,如果失败则返回未知
+     *
+     * @param response Http响应
+     * @return 状态码
+     */
+    private short getHttpResponseStatus(@Nullable HttpServletResponse response) {
+        short status = 500;
+        if (response == null) {
+            return status;
+        }
+        try {
+            status = (short) response.getStatus();
+        } catch (IllegalStateException e) {
+            log.error("无法获取响应状态码", e);
+        }
+        return status;
     }
 
 }

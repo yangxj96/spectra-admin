@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.framework.advice.exception;
 import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -41,6 +42,7 @@ import java.util.regex.Pattern;
  * @since 2025/7/28
  */
 @Slf4j
+@NullMarked
 @Order(Integer.MIN_VALUE)
 @RestControllerAdvice
 public class SqlExceptionAdvice {

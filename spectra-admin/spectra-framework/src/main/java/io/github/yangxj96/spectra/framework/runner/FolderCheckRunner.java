@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.framework.runner;
 import io.github.yangxj96.spectra.common.properties.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -40,7 +41,7 @@ public class FolderCheckRunner implements ApplicationRunner {
     private SpectraSystemProperties properties;
 
     @Override
-    public void run(ApplicationArguments args) {
+    public void run(@Nullable ApplicationArguments args) {
         var folder = new File(properties.getBaseDir());
         if (!folder.exists()) {
             var created = folder.mkdirs();

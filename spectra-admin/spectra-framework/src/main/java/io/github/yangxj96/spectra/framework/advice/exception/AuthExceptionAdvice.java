@@ -19,10 +19,10 @@ package io.github.yangxj96.spectra.framework.advice.exception;
 import cn.dev33.satoken.error.SaErrorCode;
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -38,6 +38,7 @@ import javax.security.auth.login.LoginException;
  * @since 2025/7/28
  */
 @Slf4j
+@NullMarked
 @Order(Integer.MIN_VALUE)
 @RestControllerAdvice
 public class AuthExceptionAdvice {
@@ -52,7 +53,6 @@ public class AuthExceptionAdvice {
      * @param response 响应
      * @return 格式化为正常响应返回
      */
-    @ULog("无权操作")
     @ExceptionHandler(NotPermissionException.class)
     public R<Object> notPermissionException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.FORBIDDEN.value());

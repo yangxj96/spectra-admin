@@ -27,12 +27,13 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import io.github.yangxj96.spectra.framework.features.mybatis.MetaObjectHandlerImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
+
+import java.util.List;
 
 /**
  * MyBatisPlus配置
@@ -52,9 +53,9 @@ public class MyBatisPlusConfiguration {
     /**
      * 使用 ObjectProvider 自动收集所有 InnerInterceptor 类型的 Bean
      */
-    private final ObjectProvider<InnerInterceptor> innerInterceptors;
+    private final List<InnerInterceptor> innerInterceptors;
 
-    public MyBatisPlusConfiguration(ObjectProvider<InnerInterceptor> innerInterceptors) {
+    public MyBatisPlusConfiguration(List<InnerInterceptor> innerInterceptors) {
         this.innerInterceptors = innerInterceptors;
     }
 
@@ -80,7 +81,7 @@ public class MyBatisPlusConfiguration {
         // 乐观锁
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         // 收集的bean进行注册
-        innerInterceptors.orderedStream().forEach(interceptor::addInnerInterceptor);
+        innerInterceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }
 
