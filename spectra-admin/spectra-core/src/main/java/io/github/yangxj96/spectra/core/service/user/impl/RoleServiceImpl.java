@@ -25,6 +25,7 @@ import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DefaultDataException;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
 import io.github.yangxj96.spectra.core.javabean.user.event.RoleDeletedEvent;
@@ -36,7 +37,6 @@ import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -109,7 +109,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
         wrapper
-                .like(StringUtils.isNotBlank(params.getName()), Role::getName, params.getName())
+                .like(StrUtils.isNotBlank(params.getName()), Role::getName, params.getName())
                 .eq(null != params.getState(), Role::getState, params.getState())
                 .orderByAsc(Role::getCreatedAt);
         Page<Role> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);

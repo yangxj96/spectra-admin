@@ -17,7 +17,10 @@
 package io.github.yangxj96.spectra.common.utils;
 
 import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
+import java.util.Objects;
 
 /**
  * ip工具类
@@ -26,58 +29,93 @@ import org.apache.commons.lang3.StringUtils;
  * @version 1.0
  * @since 2025/7/23
  */
+@NullMarked
 public final class IpUtils {
 
     private IpUtils() {
+        // 工具类禁止实例化
     }
 
     private static final String UNKNOWN = "unknown";
+    private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
+    private static final String LOCALHOST_IPV4 = "127.0.0.1";
 
     /**
-     * 获取客户端真实 IP（考虑代理）
+     * 获取客户端真实 IP 地址（支持多级代理）
+     *
+     * @param request HTTP 请求（允许 null）
+     * @return 非 null 的 IP 字符串，若无法获取则返回 "unknown"
      */
-    public static String getClientIP(HttpServletRequest request) {
+    public static String getClientIP(@Nullable HttpServletRequest request) {
         if (request == null) {
             return UNKNOWN;
         }
-        var ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
+
+        // 按优先级尝试获取 IP（标准 header 名称）
+        String ip = extractIpFromHeader(request, "X-Forwarded-For");
+        if (isInvalidIp(ip)) {
+            ip = extractIpFromHeader(request, "Proxy-Client-IP");
         }
-        if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Forwarded-For");
+        if (isInvalidIp(ip)) {
+            ip = extractIpFromHeader(request, "WL-Proxy-Client-IP");
         }
-        if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
+        if (isInvalidIp(ip)) {
+            ip = extractIpFromHeader(request, "X-Real-IP");
         }
-        if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || UNKNOWN.equalsIgnoreCase(ip)) {
+        if (isInvalidIp(ip)) {
             ip = request.getRemoteAddr();
         }
-        return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : getMultistageReverseProxyIp(ip);
+
+        // 处理本地回环地址
+        if (LOCALHOST_IPV6.equals(ip)) {
+            ip = LOCALHOST_IPV4;
+        }
+
+        // 处理多级代理（如 "1.2.3.4, 5.6.7.8, unknown"）
+        ip = getFirstValidIpFromList(ip);
+
+        // 安全截断（防止超长 IP 攻击）
+        return StrUtils.isNotBlank(ip)
+                ? Objects.requireNonNullElse(StrUtils.substring(ip, 0, 255), UNKNOWN)
+                : UNKNOWN;
     }
 
+    /**
+     * 从指定 header 中提取 IP，自动 trim 并转为小写比较
+     */
+    private static @Nullable String extractIpFromHeader(
+            HttpServletRequest request, String headerName) {
+        String value = request.getHeader(headerName);
+        return (value == null || value.isEmpty()) ? null : value.trim();
+    }
 
     /**
-     * 从多级反向代理中获得第一个非unknown IP地址
-     *
-     * @param ip 获得的IP地址
-     * @return 第一个非unknown IP地址
+     * 判断 IP 是否无效（null、empty、blank 或 "unknown"）
      */
-    public static String getMultistageReverseProxyIp(String ip) {
-        // 多级反向代理检测
-        if (ip != null && ip.indexOf(",") <= 0) {
-            var ips = ip.trim().split(",");
-            for (var subIp : ips) {
-                if (!(StringUtils.isBlank(subIp) || UNKNOWN.equalsIgnoreCase(subIp))) {
-                    ip = subIp;
-                    break;
-                }
+    private static boolean isInvalidIp(@Nullable String ip) {
+        return StrUtils.isBlank(ip) || UNKNOWN.equalsIgnoreCase(ip);
+    }
+
+    /**
+     * 从逗号分隔的 IP 列表中提取第一个有效 IP
+     *
+     * @param ipList 可能为 null 或单个 IP 或 "ip1, ip2, ..."
+     * @return 第一个有效 IP，若无则返回原值（可能为 invalid）
+     */
+    private static String getFirstValidIpFromList(@Nullable String ipList) {
+        if (StrUtils.isBlank(ipList) || !ipList.contains(",")) {
+            return ipList == null ? "" : ipList;
+        }
+
+        String[] ips = ipList.split(",");
+        for (String ip : ips) {
+            ip = ip.trim();
+            if (!isInvalidIp(ip)) {
+                return ip;
             }
         }
-        return StringUtils.substring(ip, 0, 255);
+        // 全部无效，返回第一个（或原值）
+        return ips.length > 0 ? ips[0].trim() : "";
     }
 
 }

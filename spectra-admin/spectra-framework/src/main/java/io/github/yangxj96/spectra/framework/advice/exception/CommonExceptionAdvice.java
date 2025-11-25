@@ -18,10 +18,10 @@ package io.github.yangxj96.spectra.framework.advice.exception;
 
 import io.github.yangxj96.spectra.common.exception.DataExistException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
+import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;

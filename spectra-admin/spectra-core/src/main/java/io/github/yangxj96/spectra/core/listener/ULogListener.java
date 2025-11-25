@@ -17,11 +17,11 @@
 package io.github.yangxj96.spectra.core.listener;
 
 import cn.dev33.satoken.stp.StpUtil;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog;
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
 import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
@@ -52,7 +52,7 @@ public class ULogListener {
         log.debug(PREFIX + "开始记录,{}", entity.toString());
         var datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
-        if (StringUtils.isNotBlank(entity.getToken())) {
+        if (StrUtils.isNotBlank(entity.getToken())) {
             try {
                 var loginId = StpUtil.getLoginIdByToken(entity.getToken());
                 if (loginId != null) {

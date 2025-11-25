@@ -18,8 +18,8 @@ package io.github.yangxj96.spectra.common.base.javabean.from;
 
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
 import lombok.*;
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
@@ -62,7 +62,7 @@ public class PageFrom {
      */
     public <T> Page<T> toPage() {
         var page = new Page<T>(this.pageNum, this.pageSize);
-        if (CollectionUtils.isNotEmpty(orders)) {
+        if (CollUtils.isNotEmpty(this.orders)) {
             page.setOrders(this.orders);
         }
         return page;

@@ -27,6 +27,8 @@ import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
@@ -43,8 +45,6 @@ import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -190,9 +190,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>()
-                .like(StringUtils.isNotBlank(params.getName()), User::getName, params.getName())
-                .like(StringUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                .in(CollectionUtils.isNotEmpty(organizationIds), User::getOrganizationId, organizationIds)
+                .like(StrUtils.isNotBlank(params.getName()), User::getName, params.getName())
+                .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
+                .in(CollUtils.isNotEmpty(organizationIds), User::getOrganizationId, organizationIds)
                 .eq(params.getStatus() != null, User::getState, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);
@@ -240,7 +240,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             // 查询这个账号都在哪些设备登录了，依据上面的示例，
             // 账号A 的 SaTerminalInfo 数量是 3，账号B 的 SaTerminalInfo 数量是 2
             var terminalList = session.terminalListCopy();
-            log.debug("会话id：" + sessionId + "，共在 " + terminalList.size() + " 设备登录");
+            log.debug("会话id：{}，共在 {} 设备登录", sessionId, terminalList.size());
             for (SaTerminalInfo info : terminalList) {
                 log.debug("分别是:{}", info);
                 loginRecords.add(new UserOnlineVO.LoginRecordVo(

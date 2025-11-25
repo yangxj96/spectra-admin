@@ -16,9 +16,9 @@
 
 package io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl;
 
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.framework.features.fileupload.FileType;
 import io.github.yangxj96.spectra.framework.features.fileupload.strategy.FileTypeValidationStrategy;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
             return false;
         }
         var filename = file.getOriginalFilename();
-        if (StringUtils.isNotBlank(filename)) {
+        if (StrUtils.isNotBlank(filename)) {
             var fileExtension = getFileExtension(filename);
             return allowed.stream().anyMatch(ext -> ext.getExtension().equalsIgnoreCase(fileExtension));
         }

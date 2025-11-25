@@ -17,16 +17,16 @@
 package io.github.yangxj96.spectra.core.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.core.javabean.system.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuVO;
-import io.github.yangxj96.spectra.core.service.system.MenuService;
 import io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleMenu;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper;
+import io.github.yangxj96.spectra.core.service.system.MenuService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import jakarta.annotation.Resource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,7 +64,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
-        if (CollectionUtils.isNotEmpty(removeIds)) {
+        if (CollUtils.isNotEmpty(removeIds)) {
             var wrapper = new LambdaQueryWrapper<RelRoleMenu>()
                     .eq(RelRoleMenu::getRoleId, roleId)
                     .in(RelRoleMenu::getRoleId, removeIds);
@@ -73,7 +73,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
         addIds.removeAll(currentIds);  // target - current = 新增
-        if (CollectionUtils.isNotEmpty(addIds)) {
+        if (CollUtils.isNotEmpty(addIds)) {
             List<RelRoleMenu> newMenu = addIds.stream()
                     .map(addId -> RelRoleMenu.builder()
                             .roleId(roleId)

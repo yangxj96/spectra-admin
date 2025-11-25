@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.javabean.system.converter.ConfiguredConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Configured;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
@@ -14,7 +15,6 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.mapper.system.ConfiguredMapper;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
 import jakarta.annotation.Resource;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +50,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         var result = new Page<ConfiguredVO>();
         // 条件构建
         var wrapper = new LambdaQueryWrapper<Configured>()
-                .like(StringUtils.isNotBlank(params.getKey()), Configured::getKey, params.getKey());
+                .like(StrUtils.isNotBlank(params.getKey()), Configured::getKey, params.getKey());
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         BeanUtils.copyProperties(db, result);

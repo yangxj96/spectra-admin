@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.service.user.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.TreeUtils;
 import io.github.yangxj96.spectra.core.javabean.user.converter.AuthorityConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
@@ -29,7 +30,6 @@ import io.github.yangxj96.spectra.core.mapper.user.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import jakarta.annotation.Resource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +76,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
-        if (CollectionUtils.isNotEmpty(removeIds)) {
+        if (CollUtils.isNotEmpty(removeIds)) {
             var wrapper = new LambdaQueryWrapper<RelRoleAuthority>()
                     .eq(RelRoleAuthority::getRoleId, roleId)
                     .in(RelRoleAuthority::getAuthorityId, removeIds);
@@ -85,7 +85,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
         addIds.removeAll(currentIds); // target - current = 新增
-        if (CollectionUtils.isNotEmpty(addIds)) {
+        if (CollUtils.isNotEmpty(addIds)) {
             List<RelRoleAuthority> newRelations = addIds.stream()
                     .map(addId -> RelRoleAuthority.builder()
                             .roleId(roleId)
@@ -116,7 +116,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
                 new LambdaQueryWrapper<RelRoleAuthority>()
                         .in(RelRoleAuthority::getRoleId, ids)
         );
-        if (relRoleAuthorities == null || CollectionUtils.isEmpty(relRoleAuthorities)) {
+        if (CollUtils.isEmpty(relRoleAuthorities)) {
             return new ArrayList<>();
         }
         List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();

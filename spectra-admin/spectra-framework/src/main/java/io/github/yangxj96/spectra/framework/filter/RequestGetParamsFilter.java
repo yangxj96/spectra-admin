@@ -16,13 +16,13 @@
 
 package io.github.yangxj96.spectra.framework.filter;
 
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.CaseUtils;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -63,7 +63,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
         for (var param : request.getParameterMap().keySet()) {
             var k = "";
             if (param.contains("_")) {
-                k = CaseUtils.toCamelCase(param, false, '_');
+                k = StrUtils.toCamelCase(param, false, '_');
             } else {
                 k = param;
             }

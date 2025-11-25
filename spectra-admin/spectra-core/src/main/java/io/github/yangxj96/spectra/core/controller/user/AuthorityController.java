@@ -18,14 +18,14 @@ package io.github.yangxj96.spectra.core.controller.user;
 
 import cn.dev33.satoken.annotation.SaCheckEL;
 import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
+import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -58,6 +58,7 @@ public class AuthorityController {
     @DeleteMapping("/{id}")
     @SaCheckEL("@ss.administrators()")
     public void deleteAuthority(@PathVariable String id) {
+        log.debug("请求参数:{}", id);
         throw new NotImplementedException("无需实现错误");
     }
 
@@ -65,6 +66,7 @@ public class AuthorityController {
     @PutMapping
     @SaCheckEL("@ss.administrators()")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
+        log.debug("请求参数:{}", params);
         throw new NotImplementedException("无需实现错误");
     }
 
