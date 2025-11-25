@@ -19,6 +19,7 @@ const userStore = useUserStore();
 
 // 检查token
 function check() {
+    console.log(userStore.token);
     if (!userStore.token || userStore.token.access_token === undefined) {
         console.debug("无token信息");
         return;

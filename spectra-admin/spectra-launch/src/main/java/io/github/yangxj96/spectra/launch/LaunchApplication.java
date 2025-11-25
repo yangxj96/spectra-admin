@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.launch;
 
+import cn.dev33.satoken.spring.SaBeanInject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,7 +30,7 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2025/7/23
  */
 @Slf4j
-@SpringBootApplication
+@SpringBootApplication(exclude = SaBeanInject.class)
 @ComponentScan("io.github.yangxj96.spectra")
 public class LaunchApplication {
 
