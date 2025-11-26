@@ -3,7 +3,7 @@
 > 一个基于 Spring Boot 3 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.6-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.0-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.21-green)
 ![达梦8](https://img.shields.io/badge/达梦-8-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
@@ -29,7 +29,7 @@
 |-----------------|--------|----------------|
 | Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.9  | 构建工具           |
-| Spring Boot     | 3.5.7  | 核心框架           |
+| Spring Boot     | 4.0.0  | 核心框架           |
 | MyBatis-Plus    | 3.5.14 | 增强ORM，简化CRUD   |
 | Sa-Token        | 1.44.0 | 轻量级Java权限认证框架  |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
@@ -142,7 +142,7 @@
 
 ## 🌟 特性亮点
 
-- ✅ 基于 Spring Boot 3 + Java 25，响应式编程支持
+- ✅ 基于 Spring Boot 4 + Java 25，响应式编程支持
 - ✅ 前后端完全分离，Vite 提供极速 HMR
 - ✅ Sa-Token 实现 RBAC 权限模型（用户、角色、菜单、按钮权限）
 - ✅ MyBatis-Plus + MapStruct 提升开发效率
