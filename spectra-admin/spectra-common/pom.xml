@@ -56,19 +56,20 @@
             <artifactId>DmJdbcDriver8</artifactId>
             <version>${dm.version}</version>
         </dependency>
-        <!-- druid -->
-        <!--<dependency>-->
-        <!--    <groupId>com.alibaba</groupId>-->
-        <!--    <artifactId>druid-spring-boot-3-starter</artifactId>-->
-        <!--</dependency>-->
         <!-- mybatis -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
         </dependency>
+        <!-- js sql parser -->
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-jsqlparser</artifactId>
+        </dependency>
+        <!-- 获取数据源监控必要信息 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
         <!-- redis -->
         <dependency>
@@ -99,12 +100,24 @@
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-redis-jackson</artifactId>
         </dependency>
+        <!-- SaToken End -->
 
+        <!-- spring security -->
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.boot</groupId>-->
+        <!--    <artifactId>spring-boot-starter-security</artifactId>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
-        <!-- SaToken End -->
+        <!--<dependency>-->
+        <!--    <groupId>org.springframework.boot</groupId>-->
+        <!--    <artifactId>spring-boot-starter-security-test</artifactId>-->
+        <!--    <scope>test</scope>-->
+        <!--</dependency>-->
+        <!-- spring security -->
+
 
     </dependencies>
 

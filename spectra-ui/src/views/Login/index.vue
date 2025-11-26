@@ -97,7 +97,11 @@ async function handleLogin() {
                                 <el-input v-model="login.form.code" placeholder="请输入验证码" />
                             </el-col>
                             <el-col :span="12">
-                                <el-image :src="kaptchaUrl" class="v-code" @click="refreshKaptcha" />
+                                <el-image :src="kaptchaUrl" class="v-code" @click="refreshKaptcha">
+                                    <template v-slot:placeholder>
+                                        {{ "验证码加载中..." }}
+                                    </template>
+                                </el-image>
                             </el-col>
                         </el-row>
                     </el-form-item>

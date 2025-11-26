@@ -143,15 +143,15 @@ sa-token:
     http-only: true
 # 健康检查
 management:
-  #  health:
-  #    # windows下安装的redis非官方版本,存在一定问题,所以关闭检查
-  #    redis:
-  #      enabled: false
   endpoints:
     web:
       exposure:
-        include: "*"
+        # 仅暴露数据源监控信息
+        include: prometheus
+        # 暴露所有
+        #include: "*"
   endpoint:
     health:
-      show-details: always
+      # 显示详情状态,开发环境可以用always,生产用never
+      show-details: never
 
