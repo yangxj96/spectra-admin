@@ -41,6 +41,7 @@ import java.util.regex.Pattern;
  * @since 2025-6-14
  */
 @Slf4j
+@NullMarked
 @ControllerAdvice
 public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
 
@@ -49,7 +50,6 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     private static final Pattern PATTERN = Pattern.compile("io\\.github\\.yangxj96\\.spectra\\..*\\.controller.*");
 
     @Override
-    @NullMarked
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         log.debug(PREFIX + "进入修改");
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
@@ -63,7 +63,6 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     }
 
     @Override
-    @NullMarked
     public Object beforeBodyWrite(@Nullable Object body,
                                   MethodParameter returnType,
                                   MediaType contentType,

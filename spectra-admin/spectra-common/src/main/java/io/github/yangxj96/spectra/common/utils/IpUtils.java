@@ -83,10 +83,10 @@ public final class IpUtils {
     /**
      * 从指定 header 中提取 IP，自动 trim 并转为小写比较
      */
-    private static @Nullable String extractIpFromHeader(
+    private static String extractIpFromHeader(
             HttpServletRequest request, String headerName) {
         String value = request.getHeader(headerName);
-        return (value == null || value.isEmpty()) ? null : value.trim();
+        return (value == null || value.isEmpty()) ? UNKNOWN : value.trim();
     }
 
     /**

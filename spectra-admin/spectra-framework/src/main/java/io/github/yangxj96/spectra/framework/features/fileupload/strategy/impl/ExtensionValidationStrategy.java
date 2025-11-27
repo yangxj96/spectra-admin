@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.framework.features.fileupload.strategy.impl;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.framework.features.fileupload.FileType;
 import io.github.yangxj96.spectra.framework.features.fileupload.strategy.FileTypeValidationStrategy;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -53,6 +54,7 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
      * @param filename 文件名称
      * @return 扩展名
      */
+    @NullMarked
     private String getFileExtension(String filename) {
         var lastIndexOfDot = filename.lastIndexOf('.');
         if (lastIndexOfDot == MIN) {

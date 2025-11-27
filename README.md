@@ -72,9 +72,9 @@
 
 ## 🔐 环境变量配置说明
 
-### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
-
 > ⚠️ 该文件不会提交至 Git，请自行创建。
+
+### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
 
 | 环境变量               | 说明                | 示例                                                       |
 |--------------------|-------------------|----------------------------------------------------------|
@@ -118,32 +118,6 @@
 | `spectra-ui`        | [spectra-ui](spectra-ui)                             | 前端 Vue 项目，基于 Vite + Element Plus |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
-
----
-
-## 📦 快速开始
-
-1. 克隆项目：
-   ```bash
-   git clone https://github.com/yangxj96/spectra-admin.git
-   ```
-
-2. 创建 `.env` 文件并配置环境变量（前后端分别配置）
-
-3. 启动后端服务（确保`达梦数据库`已运行）：
-   ```bash
-   cd ./spectra-admin/spectra-launch
-   mvn spring-boot:run
-   ```
-
-4. 启动前端（进入前端项目目录）：
-   ```bash
-   cd spectra-ui
-   npm install
-   npm run start
-   ```
-
-5. 浏览器访问：`http://localhost:5173`
 
 ---
 

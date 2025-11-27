@@ -26,12 +26,13 @@ class ConfiguredControllerTest {
         var list = new ArrayList<Configured>();
         list.add(Configured.builder().key("system.watermark.enable").value("true").remarks("是否开启水").build());
         list.add(Configured.builder().key("system.watermark.type").value("1").remarks("水印类型,1-系统生成 2-固定值").build());
-        list.add(Configured.builder().key("system.watermark.fixed.value" ).value("yangxj96.com,2025-11-06").remarks("固定值水印类型的值").build());
-        configuredService.saveBatch(list);
+        list.add(Configured.builder().key("system.watermark.fixed.value").value("yangxj96.com,2025-11-06").remarks("固定值水印类型的值").build());
+        var r = configuredService.saveBatch(list);
+        Assertions.assertTrue(r, "插入失败");
     }
 
     @Test
-    void listConfig(){
+    void listConfig() {
         List<Configured> configureds = configuredService.list();
         Assertions.assertNotNull(configureds);
     }
