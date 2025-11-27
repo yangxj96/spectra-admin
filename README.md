@@ -1,6 +1,6 @@
 # 光谱后台管理系统（Spectra Admin System）
 
-> 一个基于 Spring Boot 3 + Vue 3 的现代化前后端分离通用框架
+> 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.0-brightgreen)
@@ -83,8 +83,15 @@
 | `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                        |
 | `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                              |
 | `LICENSE_PASSWORD` | 许可模式,使用的密钥密码(临时用) | `LICENSE_PASSWORD=XXX`                                   |
+| `SSL_PASSWORD`     | SSL的密码            | `SSL_PASSWORD=xxx`                                       |
+| `SSL_TYPE`         | SSL的类型            | `SSL_TYPE=PKCS12`                                        |
+| `SSL_ALIAS`        | SSL的别名            | `SSL_ALIAS=xxx`                                          |
 
 > 用于数据库密码等敏感配置的加密保护。
+
+1. SSL开头的几个配置根据实际需要进行配置即可
+2. LICENSE开头的如果没用到LICENSE模块则无效
+
 
 ---
 
