@@ -15,6 +15,7 @@ files
 spectra-files
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java
+env.properties
 
 ## autoimport
 auto-imports.d.ts

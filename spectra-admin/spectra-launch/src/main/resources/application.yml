@@ -67,7 +67,7 @@ spring:
     # .env文件内是K=V的键值对符合properties的解析方式,
     # [.properties]是告诉他用properties的方式进行解析
     # [.yaml]是告诉他用.yaml的方式进行计息
-    import: classpath:.env[.properties]
+    import: classpath:env.properties
   threads:
     virtual:
       enabled: true
