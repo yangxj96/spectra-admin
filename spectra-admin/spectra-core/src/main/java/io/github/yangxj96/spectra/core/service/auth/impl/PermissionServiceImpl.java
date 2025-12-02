@@ -16,9 +16,7 @@
 
 package io.github.yangxj96.spectra.core.service.auth.impl;
 
-import cn.dev33.satoken.exception.NotPermissionException;
-import cn.dev33.satoken.exception.NotRoleException;
-import cn.dev33.satoken.stp.StpUtil;
+
 import io.github.yangxj96.spectra.core.service.auth.PermissionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -43,7 +41,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (absoluteness()) {
             return;
         }
-        throw new NotPermissionException("权限不足");
+        //throw new NotPermissionException("权限不足");
     }
 
     @Override
@@ -51,10 +49,10 @@ public class PermissionServiceImpl implements PermissionService {
         if (absoluteness()) {
             return;
         }
-        if (StpUtil.hasPermission(permission)) {
-            return;
-        }
-        throw new NotPermissionException(permission);
+        //if (StpUtil.hasPermission(permission)) {
+        //    return;
+        //}
+        //throw new NotPermissionException(permission);
     }
 
     @Override
@@ -62,10 +60,10 @@ public class PermissionServiceImpl implements PermissionService {
         if (absoluteness()) {
             return;
         }
-        if (StpUtil.hasRole(role)) {
-            return;
-        }
-        throw new NotRoleException(role);
+        //if (StpUtil.hasRole(role)) {
+        //    return;
+        //}
+        //throw new NotRoleException(role);
     }
 
     /**
@@ -77,7 +75,8 @@ public class PermissionServiceImpl implements PermissionService {
      * @return 是否为无限制
      */
     private boolean absoluteness() {
-        return StpUtil.hasRole(ADMINISTRATORS) || StpUtil.hasPermission("*");
+        return false;
+        // return StpUtil.hasRole(ADMINISTRATORS) || StpUtil.hasPermission("*");
     }
 
 }

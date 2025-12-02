@@ -16,10 +16,7 @@
 
 package io.github.yangxj96.spectra.core.controller.user;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuVO;
@@ -32,6 +29,7 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
@@ -47,7 +45,6 @@ import java.util.List;
  * @since 2025-11-11
  */
 @Slf4j
-@SaCheckLogin
 @RestController
 @RequestMapping("/role")
 public class RoleController {
@@ -63,14 +60,12 @@ public class RoleController {
 
     @ULog("创建角色")
     @PostMapping
-    @SaCheckEL("@ss.hasPermission('ROLE:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.created(params);
     }
 
     @ULog("删除角色")
     @DeleteMapping("/{id}")
-    @SaCheckEL("@ss.hasPermission('ROLE:DELETE')")
     public void delete(@PathVariable String id) {
         try {
             bindService.delete(Long.parseLong(id));
@@ -81,7 +76,6 @@ public class RoleController {
 
     @ULog("修改角色")
     @PutMapping
-    @SaCheckEL("@ss.hasPermission('ROLE:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         bindService.modify(params);
     }

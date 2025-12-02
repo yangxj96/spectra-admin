@@ -1,6 +1,5 @@
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 2025-11-11
  */
-@SaCheckEL("@ss.administrators()")
 @RestController
 @RequestMapping("/configured")
 public class ConfiguredController {

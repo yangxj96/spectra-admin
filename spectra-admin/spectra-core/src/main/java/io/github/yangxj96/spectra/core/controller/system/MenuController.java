@@ -16,14 +16,12 @@
 
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.exception.NotImplException;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
+import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +35,6 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-14
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/menu")
 public class MenuController {
@@ -52,16 +49,14 @@ public class MenuController {
      */
     @ULog("新增菜单")
     @PostMapping("/created")
-    @SaCheckEL("@ss.hasPermission('MENU:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
     }
 
     @ULog("删除菜单")
     @DeleteMapping("/{id}")
-    @SaCheckEL("@ss.hasPermission('MENU:DELETE')")
     public void deleteById(@PathVariable String id) {
-        throw new NotImplException("暂未实现");
+        throw new NotImplementedException("暂未实现,ID:" + id);
     }
 
     /**
@@ -71,7 +66,6 @@ public class MenuController {
      */
     @ULog("修改菜单")
     @PutMapping("/modify")
-    @SaCheckEL("@ss.hasPermission('MENU:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
     }

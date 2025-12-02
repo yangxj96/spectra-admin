@@ -17,7 +17,6 @@
 package io.github.yangxj96.spectra.framework.features.mybatis;
 
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import io.github.yangxj96.spectra.common.constant.Common;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +86,9 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
      */
     private Long getCurrentUserId() {
         try {
-            return StpUtil.getLoginIdAsLong();
+            //return StpUtil.getLoginIdAsLong();
+            // TODO 更换SpringSecurity后需要修改
+            return Common.PID;
         } catch (Exception e) {
             log.error(PREFIX + "获取ID出错,默认ID为{}", Common.PID, e);
             return Common.PID;

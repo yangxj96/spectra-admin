@@ -16,12 +16,11 @@
 
 package io.github.yangxj96.spectra.framework.features.ulog.aspect;
 
-import cn.dev33.satoken.stp.StpUtil;
+
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.framework.features.ulog.publisher.ULogEventPublisher;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +29,7 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
+import org.jspecify.annotations.Nullable;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -45,6 +45,8 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Aspect
 public class ULogAspect {
+
+    // TODO 更换SpringSecurity后需要处理
 
     private static final String PREFIX = "[操作日志切面]:";
 
@@ -111,7 +113,7 @@ public class ULogAspect {
                     .status(getHttpResponseStatus(response))
                     .result(safeWriteValueAsString(jsonResult))
                     .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
-                    .token(StpUtil.getTokenValue())
+                    // .token(StpUtil.getTokenValue())
                     .build();
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");

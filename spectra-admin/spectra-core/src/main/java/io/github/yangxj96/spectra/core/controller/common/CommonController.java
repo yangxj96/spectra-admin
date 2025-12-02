@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.core.controller.common;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +31,6 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/7/25
  */
-@SaIgnore
 @RestController
 @RequestMapping("/common")
 public class CommonController {

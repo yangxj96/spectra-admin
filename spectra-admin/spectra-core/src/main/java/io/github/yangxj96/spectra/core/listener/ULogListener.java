@@ -16,13 +16,9 @@
 
 package io.github.yangxj96.spectra.core.listener;
 
-import cn.dev33.satoken.stp.StpUtil;
-import io.github.yangxj96.spectra.common.utils.StrUtils;
-import io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog;
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
 import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -49,21 +45,22 @@ public class ULogListener {
     @Async("uLogTaskExecutor")
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
+        // TODO 更换SpringSecurity需要进行修改
         log.debug(PREFIX + "开始记录,{}", entity.toString());
-        var datum = new OperationLog();
-        BeanUtils.copyProperties(entity, datum);
-        if (StrUtils.isNotBlank(entity.getToken())) {
-            try {
-                var loginId = StpUtil.getLoginIdByToken(entity.getToken());
-                if (loginId != null) {
-                    datum.setCreatedBy(Long.parseLong(loginId.toString()));
-                    datum.setUpdatedBy(Long.parseLong(loginId.toString()));
-                }
-            } catch (Exception e) {
-                log.error("获取登录用户ID失败", e);
-            }
-        }
-        logService.save(datum);
+        //var datum = new OperationLog();
+        //BeanUtils.copyProperties(entity, datum);
+        //if (StrUtils.isNotBlank(entity.getToken())) {
+        //    try {
+        //        var loginId = StpUtil.getLoginIdByToken(entity.getToken());
+        //        if (loginId != null) {
+        //            datum.setCreatedBy(Long.parseLong(loginId.toString()));
+        //            datum.setUpdatedBy(Long.parseLong(loginId.toString()));
+        //        }
+        //    } catch (Exception e) {
+        //        log.error("获取登录用户ID失败", e);
+        //    }
+        //}
+        //logService.save(datum);
     }
 
 }

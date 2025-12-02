@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.service.auth;
 
 
+import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.UsernamePasswordFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.javabean.vo.TokenVO;
 
@@ -37,10 +38,10 @@ public interface AuthService {
      * @param params 账号密码登录参数
      * @return 成功则响应token
      */
-    TokenVO login(UsernamePasswordFrom params) throws LoginException;
+    TokenVO login(LoginFrom request) throws LoginException;
 
     /**
      * 用户退出
      */
-    void logout();
+    void logout(String authHeader);
 }

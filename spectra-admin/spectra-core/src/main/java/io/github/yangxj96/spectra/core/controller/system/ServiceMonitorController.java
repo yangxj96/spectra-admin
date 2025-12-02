@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.github.yangxj96.spectra.core.javabean.system.vo.CPUInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.JVMInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RAMInfoVO;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.RestController;
  * @version 1.0
  * @since 2025-11-11
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/service/monitor")
 public class ServiceMonitorController {

@@ -46,6 +46,7 @@ import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +68,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@EnableConfigurationProperties({UserProperties.class})
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
     @Resource

@@ -16,24 +16,18 @@
 
 package io.github.yangxj96.spectra.core.service.auth.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.stp.parameter.SaLoginParameter;
-import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
-import io.github.yangxj96.spectra.common.utils.IpUtils;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.UsernamePasswordFrom;
+import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
+import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
+import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.javabean.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.auth.AuthService;
-import io.github.yangxj96.spectra.core.service.common.KaptchaService;
-import io.github.yangxj96.spectra.core.service.user.UserService;
-import io.github.yangxj96.spectra.framework.template.IpLocationTemplate;
+import io.github.yangxj96.spectra.core.service.auth.TokenService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import javax.security.auth.login.LoginException;
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * 认证service层-实现
@@ -47,74 +41,32 @@ import java.util.HashMap;
 public class AuthServiceImpl implements AuthService {
 
     @Resource
-    private UserService userService;
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Resource
-    private BCryptPasswordEncoder encoder;
+    private List<LoginStrategy> loginStrategies;
 
     @Resource
-    private KaptchaService kaptchaService;
-
-    @Resource
-    private IpLocationTemplate ipLocationTemplate;
-
-    @Resource
-    private HttpServletRequest request;
+    private TokenService tokenService;
 
     @Override
-    public TokenVO login(UsernamePasswordFrom params) throws LoginException {
-        try {
-            // 验证码验证
-            if (kaptchaService.isCheck() == Boolean.TRUE) {
-                var code = kaptchaService.getKaptchaCode();
-                if (!params.getCode().equals(code)) {
-                    throw new KaptchaNotMatchException("验证码错误");
-                }
-            }
-            // 账户查询
-            var datum = userService.getByEmail(params.getUsername());
-            // 账号不存在或者密码匹配失败
-            if (null == datum || !encoder.matches(params.getPassword(), datum.getPassword())) {
-                throw new LoginException("账号或密码错误");
-            }
+    public TokenVO login(LoginFrom request) {
+        LoginStrategy handler = loginStrategies.stream()
+                .filter(h -> h.supports(request.type()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("不支持的登录方式"));
+        SecurityUser user = handler.authenticate(request);
+        return tokenService.createTokenFor(user);
+    }
 
-            // 开始进行登录
-            var terminalExtraData = new HashMap<String, Object>();
-            var ip = IpUtils.getClientIP(request);
-            terminalExtraData.put("ip", ip);
-            terminalExtraData.put("address", ipLocationTemplate.getCityEn(ip));
-
-            // 判断下这个人之前是否已经登录了
-            // 如果之前登录了则先踢掉
-            if (StpUtil.isLogin(datum.getId())) {
-                StpUtil.kickout(datum.getId());
-            }
-
-            // 登录
-            StpUtil.login(datum.getId(), new SaLoginParameter()
-                    .setDeviceType("PC")
-                    .setIsLastingCookie(false)
-                    .setIsWriteHeader(false)
-                    .setTerminalExtraData(terminalExtraData)
-            );
-            // 组件token
-            return TokenVO.builder()
-                    .id(datum.getId())
-                    .username(datum.getEmail())
-                    .accessToken(StpUtil.getTokenValue())
-                    .authorities(StpUtil.getPermissionList())
-                    .roles(StpUtil.getRoleList())
-                    .build();
-        } finally {
-            kaptchaService.deleteBySessionId();
+    @Override
+    public void logout(String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            redisTemplate.delete(token + "*");
+        } else {
+            throw new RuntimeException("退出失败");
         }
-
     }
-
-    @Override
-    public void logout() {
-        StpUtil.logout();
-    }
-
 
 }

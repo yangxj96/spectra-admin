@@ -16,9 +16,8 @@
 
 package io.github.yangxj96.spectra.core.controller.common;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.service.common.FileService;
+import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +35,6 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/6/19
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/file")
 public class FileController {

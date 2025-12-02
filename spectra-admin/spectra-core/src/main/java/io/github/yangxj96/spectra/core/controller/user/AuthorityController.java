@@ -16,8 +16,6 @@
 
 package io.github.yangxj96.spectra.core.controller.user;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleFrom;
@@ -39,7 +37,6 @@ import java.util.List;
  * @since 2025-11-11
  */
 @Slf4j
-@SaCheckLogin
 @RestController
 @RequestMapping("/authority")
 public class AuthorityController {
@@ -49,14 +46,12 @@ public class AuthorityController {
 
     @ULog("创建权限")
     @PostMapping
-    @SaCheckEL("@ss.administrators()")
     public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         throw new NotImplementedException("无需实现错误");
     }
 
     @ULog("删除权限")
     @DeleteMapping("/{id}")
-    @SaCheckEL("@ss.administrators()")
     public void deleteAuthority(@PathVariable String id) {
         log.debug("请求参数:{}", id);
         throw new NotImplementedException("无需实现错误");
@@ -64,7 +59,6 @@ public class AuthorityController {
 
     @ULog("修改权限信息")
     @PutMapping
-    @SaCheckEL("@ss.administrators()")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         log.debug("请求参数:{}", params);
         throw new NotImplementedException("无需实现错误");

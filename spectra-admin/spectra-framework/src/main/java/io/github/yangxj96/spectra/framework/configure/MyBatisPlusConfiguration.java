@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.framework.configure;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
@@ -60,7 +59,6 @@ public class MyBatisPlusConfiguration {
     }
 
     @Bean
-    @ConditionalOnClass(StpUtil.class)
     public MetaObjectHandler metaObjectHandler() {
         log.debug(PREFIX + "载入元数据处理器");
         return new MetaObjectHandlerImpl();

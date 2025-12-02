@@ -19,13 +19,14 @@ package io.github.yangxj96.spectra.framework.configure;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import io.github.yangxj96.spectra.common.properties.JacksonProperties;
+import io.github.yangxj96.spectra.framework.features.json.SimpleGrantedAuthorityMixin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import tools.jackson.databind.PropertyNamingStrategies;
-import tools.jackson.databind.cfg.DateTimeFeature;
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
 import tools.jackson.databind.ext.javatime.deser.LocalTimeDeserializer;
@@ -99,6 +100,8 @@ public class JacksonConfiguration {
             builder.defaultDateFormat(sdf);
             builder.addModule(javaTimeModule);
             builder.defaultTimeZone(TimeZone.getTimeZone("UTC"));
+            // 注册 MixIn
+            builder.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
         };
     }
 }
