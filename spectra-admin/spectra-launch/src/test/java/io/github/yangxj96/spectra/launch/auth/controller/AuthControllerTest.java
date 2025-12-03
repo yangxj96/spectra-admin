@@ -1,6 +1,6 @@
 package io.github.yangxj96.spectra.launch.auth.controller;
 
-import io.github.yangxj96.spectra.framework.template.IpLocationTemplate;
+import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

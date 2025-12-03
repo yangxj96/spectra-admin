@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.javabean.user.from;
 
 import io.github.yangxj96.spectra.common.base.Verify;
-import io.github.yangxj96.spectra.common.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.security.AuthScope;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

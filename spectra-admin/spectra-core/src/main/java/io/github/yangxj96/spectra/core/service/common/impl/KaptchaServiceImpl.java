@@ -20,7 +20,7 @@ import com.google.code.kaptcha.Producer;
 import io.github.yangxj96.spectra.common.constant.RedisKey;
 import io.github.yangxj96.spectra.common.exception.KaptchaExpiresException;
 import io.github.yangxj96.spectra.common.exception.ReadPropertiesException;
-import io.github.yangxj96.spectra.common.properties.KaptchaProperties;
+import io.github.yangxj96.spectra.core.configure.kaptcha.KaptchaProperties;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;

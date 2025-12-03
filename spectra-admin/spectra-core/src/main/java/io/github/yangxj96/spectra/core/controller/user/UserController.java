@@ -24,7 +24,7 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.service.user.UserService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;

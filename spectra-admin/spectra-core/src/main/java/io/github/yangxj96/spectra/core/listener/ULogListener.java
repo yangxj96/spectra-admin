@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.listener;
 
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
-import io.github.yangxj96.spectra.framework.features.ulog.entity.ULogEntity;
+import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;

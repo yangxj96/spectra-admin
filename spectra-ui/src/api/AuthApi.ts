@@ -10,18 +10,9 @@ import http from "@/plugin/request";
 export default {
     /**
      * 用户登录
-     * @param username 用户名
-     * @param password 密码
-     * @param code 验证码
      */
-    async login(username: string, password: string, code: string) {
-        return await http
-            .post<IResult<Token>>("/api/auth/login", {
-                username: username,
-                password: password,
-                code: code
-            })
-            .then(response => response.data);
+    async login(form: LoginFrom) {
+        return await http.post<IResult<Token>>("/api/auth/login", form).then(response => response.data);
     },
     /**
      * 退出登录

@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.configure.datascope;
 
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import io.github.yangxj96.spectra.common.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.security.AuthScope;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;

@@ -1,10 +1,10 @@
 package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 
 
-import io.github.yangxj96.spectra.common.enums.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.LoginFrom;
+import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import org.springframework.stereotype.Component;
 
 /**

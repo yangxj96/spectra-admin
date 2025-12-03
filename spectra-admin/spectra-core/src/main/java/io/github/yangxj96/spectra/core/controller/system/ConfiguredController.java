@@ -6,7 +6,7 @@ import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredPageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

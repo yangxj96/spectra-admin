@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.controller.common;
 
 import io.github.yangxj96.spectra.core.service.common.FileService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

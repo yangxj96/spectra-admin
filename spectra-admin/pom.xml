@@ -43,7 +43,6 @@
 
     <modules>
         <module>spectra-common</module>
-        <module>spectra-framework</module>
         <module>spectra-launch</module>
         <module>spectra-core</module>
         <module>spectra-workflow</module>

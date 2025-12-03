@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.security.filter;
 
 
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
+import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.service.auth.TokenService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -12,7 +12,6 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;

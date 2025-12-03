@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.datascope;
 
-import io.github.yangxj96.spectra.common.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.security.AuthScope;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

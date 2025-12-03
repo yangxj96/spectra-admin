@@ -16,25 +16,18 @@
 
 package io.github.yangxj96.spectra.core.controller.auth;
 
-import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.LoginFrom;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.UsernamePasswordFrom;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.vo.TokenVO;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
+import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.auth.AuthService;
-import io.github.yangxj96.spectra.core.service.auth.TokenService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
-import jakarta.validation.Valid;
+import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 认证控制器
@@ -51,6 +44,7 @@ public class AuthController {
     @Resource
     private AuthService bindService;
 
+    @PermitAll
     @PostMapping("/login")
     public TokenVO login(@Validated @RequestBody LoginFrom params) throws LoginException {
         return bindService.login(params);

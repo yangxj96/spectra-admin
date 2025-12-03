@@ -1,6 +1,6 @@
 package io.github.yangxj96.spectra.core.javabean.auth.converter;
 
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
+import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;

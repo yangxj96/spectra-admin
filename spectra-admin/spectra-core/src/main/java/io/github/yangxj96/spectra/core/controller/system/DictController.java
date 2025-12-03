@@ -22,7 +22,7 @@ import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
 import io.github.yangxj96.spectra.core.service.system.DictService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;

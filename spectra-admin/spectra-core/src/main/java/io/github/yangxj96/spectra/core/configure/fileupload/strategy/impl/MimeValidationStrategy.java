@@ -1,0 +1,44 @@
+/*
+ *  Copyright 2018-2025 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
+
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+
+/**
+ * <p>
+ * 文件类型验证策略-根据文件mime方式验证
+ * </p>
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025/6/19
+ */
+public record MimeValidationStrategy(List<String> allowedMimes) implements FileTypeValidationStrategy {
+
+    @Override
+    public boolean isValid(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return false;
+        }
+        var mimeType = file.getContentType();
+        return allowedMimes.stream().anyMatch(mime -> mime.equalsIgnoreCase(mimeType));
+    }
+
+}

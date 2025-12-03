@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.core.service.auth;
 
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.dto.SecurityUser;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.vo.TokenVO;
+import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 
 /**
  * Token服务
