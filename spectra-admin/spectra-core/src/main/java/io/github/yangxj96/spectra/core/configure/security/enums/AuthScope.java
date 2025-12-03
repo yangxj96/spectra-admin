@@ -14,35 +14,36 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.json;
+package io.github.yangxj96.spectra.core.configure.security.enums;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.baomidou.mybatisplus.annotation.IEnum;
+import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
- * Jackson配置
+ * 数据范围
  *
  * @author Jack Young
  * @version 1.0
  * @since 2025-11-11
  */
-@Data
-@ConfigurationProperties(prefix = "spectra.jackson")
-public class JacksonProperties {
+@Getter
+@AllArgsConstructor
+public enum AuthScope implements IEnum<Short> {
 
-    /**
-     * LocalDateTime类序列化方式.
-     */
-    private String localDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+    ALL((short) 0, "全局"),
+    DEPT_AND_CHILD((short) 1, "本级及下级"),
+    DEPT_ONLY((short) 2, "本级");
 
-    /**
-     * LocalDate类序列化方式.
-     */
-    private String localDateFormat = "yyyy-MM-dd";
+    private final short value;
 
-    /**
-     * LocalTime类序列化方式.
-     */
-    private String localTimeFormat = "HH:mm:ss";
+    @JsonValue
+    private final String desc;
+
+    @Override
+    public Short getValue() {
+        return this.value;
+    }
 
 }

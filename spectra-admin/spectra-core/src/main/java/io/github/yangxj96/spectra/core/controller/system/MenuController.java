@@ -18,11 +18,12 @@ package io.github.yangxj96.spectra.core.controller.system;
 
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
-import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -75,6 +76,7 @@ public class MenuController {
      *
      * @return 构建的树形菜单
      */
+    @PreAuthorize("hasPermission(null , 'MENU:*')")
     @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
     public List<MenuTreeVO> tree() {

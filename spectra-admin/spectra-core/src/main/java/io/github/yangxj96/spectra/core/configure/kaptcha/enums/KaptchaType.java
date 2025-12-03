@@ -14,34 +14,15 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.service.auth;
+package io.github.yangxj96.spectra.core.configure.kaptcha.enums;
 
 /**
- * 权限类,主要用作在SpEL表达式中进行计算
+ * 验证码类型
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/7/28
+ * @since 2025/7/25
  */
-public interface PermissionService {
-
-    /**
-     * 必须是超级管理员
-     */
-    void administrators();
-
-    /**
-     * 判断是否有指定权限
-     *
-     * @param permission 指定权限CODE
-     */
-    void hasPermission(String permission);
-
-    /**
-     * 判断是否有指定角色
-     *
-     * @param role 指定角色CODE
-     */
-    void hasRole(String role);
-
+public enum KaptchaType {
+    CHAT, MATH
 }

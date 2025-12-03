@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.ulog.enums;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -22,7 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 数据范围
+ * 日志类型
  *
  * @author Jack Young
  * @version 1.0
@@ -30,20 +30,35 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum AuthScope implements IEnum<Short> {
+public enum SysLogType implements IEnum<Integer> {
 
-    ALL((short) 0, "全局"),
-    DEPT_AND_CHILD((short) 1, "本级及下级"),
-    DEPT_ONLY((short) 2, "本级");
+    /**
+     * 常规日志,主要是接口调用相关
+     */
+    GENERAL(0, "常规日志"),
 
-    private final short value;
+    /**
+     * 安全日志,账号登录,登出,改密码,封号等
+     */
+    SAFETY(1, "安全日志"),
+
+    /**
+     * 系统出现异常的时候进行记录
+     */
+    SYSTEM_ERROR(2, "系统异常日志"),
+
+    /**
+     * 定时任务等自动化操作的日志
+     */
+    AUTOMATE(3, "自动化日志");
+
+    private final Integer value;
 
     @JsonValue
     private final String desc;
 
     @Override
-    public Short getValue() {
+    public Integer getValue() {
         return this.value;
     }
-
 }

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.advice;
+package io.github.yangxj96.spectra.core.configure.mvc.advice;
 
 import io.github.yangxj96.spectra.common.response.R;
 import lombok.extern.slf4j.Slf4j;

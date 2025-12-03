@@ -14,8 +14,9 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.kaptcha;
+package io.github.yangxj96.spectra.core.configure.kaptcha.properties;
 
+import io.github.yangxj96.spectra.core.configure.kaptcha.enums.KaptchaType;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

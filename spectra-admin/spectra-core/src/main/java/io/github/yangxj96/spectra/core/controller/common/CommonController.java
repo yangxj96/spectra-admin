@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.controller.common;
 
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

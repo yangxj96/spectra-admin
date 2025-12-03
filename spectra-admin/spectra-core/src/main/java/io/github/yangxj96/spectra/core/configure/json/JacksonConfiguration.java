@@ -18,6 +18,8 @@ package io.github.yangxj96.spectra.core.configure.json;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.yangxj96.spectra.core.configure.json.mixin.SimpleGrantedAuthorityMixin;
+import io.github.yangxj96.spectra.core.configure.json.properties.JacksonProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;

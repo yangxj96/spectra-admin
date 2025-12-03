@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.configure.fileupload;
 
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
+import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.ExtensionValidationStrategy;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicNumberValidationStrategy;

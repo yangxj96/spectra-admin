@@ -14,41 +14,35 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.fileupload;
+package io.github.yangxj96.spectra.core.configure.json.properties;
 
-import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
-import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.List;
-
 /**
- * <p>
- * 文件上传参数
- * </p>
+ * Jackson配置
  *
  * @author Jack Young
  * @version 1.0
- * @since 2025/6/19
+ * @since 2025-11-11
  */
 @Data
-@ConfigurationProperties(prefix = "spectra.file.upload")
-public class FileUploadProperties {
+@ConfigurationProperties(prefix = "spectra.jackson")
+public class JacksonProperties {
 
     /**
-     * 上传的文件夹位置
+     * LocalDateTime类序列化方式.
      */
-    private String uploadDir = "uploads";
+    private String localDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
     /**
-     * 允许的类型
+     * LocalDate类序列化方式.
      */
-    private List<FileType> allowedTypes;
+    private String localDateFormat = "yyyy-MM-dd";
 
     /**
-     * 文件类型验证策略
+     * LocalTime类序列化方式.
      */
-    private List<Class<? extends FileTypeValidationStrategy>> strategies;
+    private String localTimeFormat = "HH:mm:ss";
 
 }

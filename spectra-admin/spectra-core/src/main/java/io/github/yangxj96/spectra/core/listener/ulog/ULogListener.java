@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.listener;
+package io.github.yangxj96.spectra.core.listener.ulog;
 
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.kaptcha;
+package io.github.yangxj96.spectra.core.configure.kaptcha.creator;
 
 import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 

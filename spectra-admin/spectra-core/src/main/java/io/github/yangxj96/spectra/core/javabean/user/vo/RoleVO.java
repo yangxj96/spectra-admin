@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.vo;
 
-import io.github.yangxj96.spectra.core.configure.security.AuthScope;
+import io.github.yangxj96.spectra.core.configure.security.enums.AuthScope;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

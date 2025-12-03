@@ -53,12 +53,12 @@ async function handleLogin() {
             console.log(res);
             ElMessage.success({
                 duration: 500,
-                message: "登录成功"
-                // onClose() {
-                //     useUserStore().token = res.data!;
-                //     const path = "/redirect" + (redirect.value ?? "");
-                //     router.push({ path });
-                // }
+                message: "登录成功",
+                onClose() {
+                    useUserStore().token = res.data!;
+                    const path = "/redirect" + (redirect.value ?? "");
+                    router.push({ path });
+                }
             });
         }
     } catch (error) {

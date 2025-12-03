@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.Ordered;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,6 @@ import java.io.IOException;
  */
 @Component
 @NullMarked
-@Order(Ordered.HIGHEST_PRECEDENCE)
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Resource
@@ -51,7 +48,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private @Nullable String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
+        String bearerToken = request.getHeader("authorization");
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

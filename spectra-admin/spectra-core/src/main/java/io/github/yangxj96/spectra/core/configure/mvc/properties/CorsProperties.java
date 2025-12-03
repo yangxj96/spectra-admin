@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.mvc;
+package io.github.yangxj96.spectra.core.configure.mvc.properties;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

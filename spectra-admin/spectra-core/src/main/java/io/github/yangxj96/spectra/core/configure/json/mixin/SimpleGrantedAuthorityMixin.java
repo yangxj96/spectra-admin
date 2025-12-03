@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.configure.json;
+package io.github.yangxj96.spectra.core.configure.json.mixin;
 
 
 import com.fasterxml.jackson.annotation.JsonCreator;

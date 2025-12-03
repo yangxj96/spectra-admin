@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.ulog.entity;
 
-import io.github.yangxj96.spectra.core.configure.ulog.SysLogType;
+import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

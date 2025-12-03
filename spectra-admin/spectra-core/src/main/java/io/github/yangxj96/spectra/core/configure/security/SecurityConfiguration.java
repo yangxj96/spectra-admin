@@ -5,6 +5,9 @@ import io.github.yangxj96.spectra.core.configure.security.filter.TokenAuthentica
 import jakarta.annotation.Resource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -31,6 +34,9 @@ public class SecurityConfiguration {
 
     @Resource
     private TokenAuthenticationFilter tokenAuthenticationFilter;
+
+    @Resource
+    private SpectraPermissionEvaluator spectraPermissionEvaluator;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -66,13 +72,26 @@ public class SecurityConfiguration {
                 // 权限匹配
                 .authorizeHttpRequests(authz -> {
                     authz
+                            // 放行预检资源
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                             // 放行静态资源
                             .requestMatchers("/css/**", "/js/**", "/error").permitAll()
+                            // 验证码接口
+                            .requestMatchers("/common/kaptcha").permitAll()
+                            .requestMatchers("/auth/login").permitAll()
                             // 其余接口都需要认证
-                            .anyRequest().authenticated();
+                            .anyRequest().permitAll();
                 })
         ;
+
         return http.build();
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        var handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(spectraPermissionEvaluator);
+        return handler;
     }
 
 }

@@ -64,6 +64,14 @@ public class SecurityUser implements UserDetails {
      */
     private Short state;
 
+    private boolean enabled = true;
+
+    private boolean accountNonExpired = true;
+
+    private boolean accountNonLocked = true;
+
+    private boolean credentialsNonExpired = true;
+
     /**
      * 简易权限处理,主要是为了序列化的问题
      */
@@ -79,6 +87,10 @@ public class SecurityUser implements UserDetails {
     @NullMarked
     public String getUsername() {
         return StrUtils.isNotBlank(this.getEmail()) ? this.getEmail() : "";
+    }
+
+    public void setUsername(String username) {
+        this.setEmail(username);
     }
 
 }

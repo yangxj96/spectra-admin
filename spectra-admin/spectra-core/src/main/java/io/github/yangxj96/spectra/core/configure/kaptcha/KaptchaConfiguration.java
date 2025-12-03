@@ -19,6 +19,8 @@ package io.github.yangxj96.spectra.core.configure.kaptcha;
 import com.google.code.kaptcha.Producer;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
+import io.github.yangxj96.spectra.core.configure.kaptcha.creator.KaptchaTextCreator;
+import io.github.yangxj96.spectra.core.configure.kaptcha.properties.KaptchaProperties;
 import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +95,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() {
+
         log.debug(PREFIX + "开始配置图片验证码,算术模式");
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
@@ -111,7 +114,7 @@ public class KaptchaConfiguration {
         // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCodeMath");
         // 验证码文本生成器
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, spectraSystemProperties.getPackagePrefix() + ".core.configure.kaptcha.KaptchaTextCreator");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_IMPL, KaptchaTextCreator.class.getName());
         // 验证码文本字符间距 默认为2
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_SPACE, "3");
         // 验证码文本字符长度 默认为5

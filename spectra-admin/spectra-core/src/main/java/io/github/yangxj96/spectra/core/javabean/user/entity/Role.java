@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
-import io.github.yangxj96.spectra.core.configure.security.AuthScope;
+import io.github.yangxj96.spectra.core.configure.security.enums.AuthScope;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

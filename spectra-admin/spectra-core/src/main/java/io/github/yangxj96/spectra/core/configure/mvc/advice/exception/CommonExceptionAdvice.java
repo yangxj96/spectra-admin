@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.advice.exception;
+package io.github.yangxj96.spectra.core.configure.mvc.advice.exception;
 
 import io.github.yangxj96.spectra.common.exception.DataExistException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;

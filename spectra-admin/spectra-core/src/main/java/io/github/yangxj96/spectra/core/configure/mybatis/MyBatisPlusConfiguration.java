@@ -41,7 +41,7 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-@MapperScan("io.github.yangxj96.spectra.core.mapper")
+@MapperScan("io.github.yangxj96.spectra.*.mapper")
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 
