@@ -12,9 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * 用DTO传输类
@@ -71,6 +69,8 @@ public class SecurityUser implements UserDetails {
     private boolean accountNonLocked = true;
 
     private boolean credentialsNonExpired = true;
+
+    private Map<String,Object> extend;
 
     /**
      * 简易权限处理,主要是为了序列化的问题

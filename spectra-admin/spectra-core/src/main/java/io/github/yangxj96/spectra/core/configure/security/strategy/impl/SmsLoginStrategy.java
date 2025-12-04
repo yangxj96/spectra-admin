@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 
 
+import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
@@ -25,7 +26,7 @@ public class SmsLoginStrategy extends AbstractLoginStrategy {
 
     @Override
     public SecurityUser authenticate(LoginFrom request) {
-        return null;
+        throw new NotImplementedException("短信登录尚未实现");
     }
 
 

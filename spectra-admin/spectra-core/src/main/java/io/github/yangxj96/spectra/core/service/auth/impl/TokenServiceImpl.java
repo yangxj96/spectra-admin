@@ -2,13 +2,15 @@ package io.github.yangxj96.spectra.core.service.auth.impl;
 
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
+import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
+import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.auth.TokenService;
 import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
-import org.jspecify.annotations.NullMarked;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -40,24 +42,29 @@ public class TokenServiceImpl implements TokenService {
     @Resource
     private IpLocationTemplate ipLocationTemplate;
 
-    private static final long TOKEN_EXPIRE_SECONDS = 2 * 60 * 60; // 2小时
+    @Resource
+    private SecurityProperties securityProperties;
 
     @Override
     public TokenVO createTokenFor(SecurityUser user) {
-        // 存储token内容
-        String token = generateToken();
-        redisTemplate
-                .opsForValue()
-                .set(token, user, TOKEN_EXPIRE_SECONDS, TimeUnit.SECONDS);
-
-        // 存储扩展内容
-        var terminalExtraData = new HashMap<String, Object>();
+        // token生成
+        String token = UUID.randomUUID().toString().toUpperCase();
+        // 扩展内容
+        if (user.getExtend() == null) {
+            user.setExtend(new HashMap<>());
+        }
+        var terminalExtraData = user.getExtend();
         var ip = IpUtils.getClientIP(request);
         terminalExtraData.put("ip", ip);
         terminalExtraData.put("address", ipLocationTemplate.getCityEn(ip));
-        redisTemplate
-                .opsForValue()
-                .set(token + ":" + "ext", terminalExtraData, TOKEN_EXPIRE_SECONDS, TimeUnit.SECONDS);
+
+        // 存储token
+        String mainKey = String.format(RedisCacheKey.AUTH_TOKEN_KEY, user.getId(), token);
+        String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
+
+        var ops = redisTemplate.opsForValue();
+        ops.set(mainKey, user, securityProperties.getTokenExpire(), TimeUnit.SECONDS);
+        ops.set(refKey, user.getId(), securityProperties.getTokenExpire(), TimeUnit.SECONDS);
 
         // 组件token
         return TokenVO.builder()
@@ -69,14 +76,50 @@ public class TokenServiceImpl implements TokenService {
     }
 
     @Override
-    public SecurityUser getUserByToken(String token) {
-        Object object = redisTemplate.opsForValue().get(token);
-        return om.convertValue(object, SecurityUser.class);
+    public void deleteToken(String token) {
+        SecurityUser user = getUserByToken(token);
+        if (user == null) {
+            return;
+        }
+        // 构造两个 key
+        String mainKey = String.format(RedisCacheKey.AUTH_TOKEN_KEY, user.getId(), token);
+        String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
+        // 删除
+        redisTemplate.delete(mainKey);
+        redisTemplate.delete(refKey);
+        //redisTemplate.execute((RedisCallback<Void>) connection -> {
+        //    var cmd = connection.keyCommands();
+        //    var opts = ScanOptions.scanOptions()
+        //            .match(String.format(RedisCacheKey.AUTH_TOKEN_KEY, user.getId(), token) + "*")
+        //            .build();
+        //    try (var keys = cmd.scan(opts)) {
+        //        var coll = new ArrayList<byte[]>();
+        //        while (keys.hasNext()) {
+        //            coll.add(keys.next());
+        //        }
+        //        if (CollUtils.isNotEmpty(coll)) {
+        //            cmd.del(coll.toArray(new byte[0][]));
+        //        }
+        //    }
+        //    return null;
+        //});
     }
 
-    @NullMarked
-    public static String generateToken() {
-        return "tk_" + UUID.randomUUID().toString().replace("-", "");
+    @Override
+    public SecurityUser getUserByToken(String token) {
+        var ops = redisTemplate.opsForValue();
+        String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
+        Object o1 = ops.get(refKey);
+        if (o1 == null) {
+            return null;
+        }
+        String userId = o1.toString();
+        if (StringUtils.isEmpty(userId)) {
+            return null;
+        }
+        String mainKey = String.format(RedisCacheKey.AUTH_TOKEN_KEY, userId, token);
+        Object object = ops.get(mainKey);
+        return om.convertValue(object, SecurityUser.class);
     }
 
 }

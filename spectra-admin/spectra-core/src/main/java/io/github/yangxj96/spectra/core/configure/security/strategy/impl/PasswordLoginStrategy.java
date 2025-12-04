@@ -1,8 +1,8 @@
 package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 
 
-import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
+import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
@@ -42,20 +42,25 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
     @Override
     @NullMarked
     public SecurityUser authenticate(LoginFrom request) {
-        // 验证码验证
-        if (kaptchaService.isCheck() == Boolean.TRUE) {
-            var code = kaptchaService.getKaptchaCode();
-            if (!request.captcha().equals(code)) {
-                throw new KaptchaNotMatchException("验证码错误");
+        try {
+            // 验证码验证
+            if (kaptchaService.isCheck() == Boolean.TRUE) {
+                var code = kaptchaService.getKaptchaCode();
+                if (!request.captcha().equals(code)) {
+                    throw new KaptchaNotMatchException("验证码错误");
+                }
             }
+            // 查询用户信息
+            User user = userService.getByEmail(request.identifier());
+            if (user == null || !passwordEncoder.matches(request.credential(), user.getPassword())) {
+                throw new BadCredentialsException("账号或密码错误");
+            }
+            // 验证通过,封装返回
+            return toSecurityUser(user);
+        } finally {
+            // 不管登录是否失败,都需要删除掉验证码
+            kaptchaService.deleteBySessionId();
         }
-        // 查询用户信息
-        User user = userService.getByEmail(request.identifier());
-        if (user == null || !passwordEncoder.matches(request.credential(), user.getPassword())) {
-            throw new BadCredentialsException("账号或密码错误");
-        }
-        // 验证通过,封装返回
-        return toSecurityUser(user);
     }
 
 }

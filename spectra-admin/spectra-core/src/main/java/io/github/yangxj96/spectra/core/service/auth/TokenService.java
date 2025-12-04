@@ -21,6 +21,13 @@ public interface TokenService {
     TokenVO createTokenFor(SecurityUser user);
 
     /**
+     * 根据token删除key
+     *
+     * @param token token
+     */
+    void deleteToken(String token);
+
+    /**
      * 根据token获取用户信息
      *
      * @param token token信息

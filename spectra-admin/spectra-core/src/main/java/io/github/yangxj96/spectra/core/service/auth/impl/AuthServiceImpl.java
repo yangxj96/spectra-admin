@@ -41,9 +41,6 @@ import java.util.List;
 public class AuthServiceImpl implements AuthService {
 
     @Resource
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Resource
     private List<LoginStrategy> loginStrategies;
 
     @Resource
@@ -63,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
     public void logout(String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
-            redisTemplate.delete(token + "*");
+            tokenService.deleteToken(token);
         } else {
             throw new RuntimeException("退出失败");
         }

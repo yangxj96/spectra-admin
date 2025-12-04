@@ -43,6 +43,12 @@ spectra:
     type: chat
     verify: false
     duration: 1m
+  # 安全相关
+  security:
+    token-expire: 7200
+    whitelists:
+      - "/common/kaptcha"
+      - "/auth/login"
 # 服务器配置
 server:
   port: 8888
@@ -142,6 +148,11 @@ spring:
           max-active: 20
           max-wait: 5000ms
         shutdown-timeout: 100ms
+  # 关闭他自带的用户
+  security:
+    user:
+      name:
+      password:
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -166,8 +177,8 @@ logging:
       io.github.yangxj96.spectra.core
     other: >-
       com.ulisesbocchio.jasyptspringboot.configuration,
-      io.github.yangxj96.spectra.framework,
-      io.github.yangxj96.spectra.core.system.configure.ULogListener
+      io.github.yangxj96.spectra.core.configure.mvc.filter,
+      io.github.yangxj96.spectra.core.configure.mvc.advice
   level:
     root: info
     other: error
@@ -175,21 +186,6 @@ logging:
   charset:
     console: utf-8
     file: UTF-8
-# Sa-Token 配置
-sa-token:
-  token-name: Authorization
-  token-prefix: Bearer
-  active-timeout: 3000
-  is-concurrent: false
-  is-share: false
-  token-style: uuid
-  is-log: true
-  is-print: false
-  cookie:
-    path: /
-    secure: true
-    same-site: None
-    http-only: true
 # 健康检查
 management:
   endpoints:
