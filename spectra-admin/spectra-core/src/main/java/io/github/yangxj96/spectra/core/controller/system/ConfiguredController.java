@@ -8,6 +8,7 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,12 +34,14 @@ public class ConfiguredController {
      */
     @ULog("修改系统配置")
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {
         bindService.modify(params);
     }
 
     @ULog("分页查询系统配置")
     @GetMapping("/page")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);
     }

@@ -50,12 +50,14 @@ public class MenuController {
      */
     @ULog("新增菜单")
     @PostMapping("/created")
+    @PreAuthorize("hasPermission(null ,'MENU:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
     }
 
     @ULog("删除菜单")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasPermission(null ,'MENU:DELETE')")
     public void deleteById(@PathVariable String id) {
         throw new NotImplementedException("暂未实现,ID:" + id);
     }
@@ -67,6 +69,7 @@ public class MenuController {
      */
     @ULog("修改菜单")
     @PutMapping("/modify")
+    @PreAuthorize("hasPermission(null ,'MENU:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
     }
@@ -76,7 +79,6 @@ public class MenuController {
      *
      * @return 构建的树形菜单
      */
-    @PreAuthorize("hasPermission(null , 'MENU:*')")
     @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
     public List<MenuTreeVO> tree() {

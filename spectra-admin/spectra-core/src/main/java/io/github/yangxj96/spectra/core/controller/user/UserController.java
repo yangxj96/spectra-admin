@@ -27,6 +27,7 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,24 +48,28 @@ public class UserController {
 
     @ULog("创建用户")
     @PostMapping
+    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
 
     @ULog("根据ID删除用户")
     @DeleteMapping("/{uid}")
+    @PreAuthorize("hasPermission(null ,'USER:DELETE')")
     public void deleteById(@PathVariable String uid) {
         bindService.deleteById(uid);
     }
 
     @ULog("根据ID更新用户信息")
     @PutMapping
+    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
     public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.updateById(params);
     }
 
     @ULog("重置用户密码")
     @PutMapping("/password/reset/{uid}")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void passwordResetById(@PathVariable String uid) {
         bindService.passwordResetById(uid);
     }

@@ -32,6 +32,7 @@ import io.github.yangxj96.spectra.core.service.user.RoleService;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,12 +61,14 @@ public class RoleController {
 
     @ULog("创建角色")
     @PostMapping
+    @PreAuthorize("hasPermission(null ,'ROLE:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.created(params);
     }
 
     @ULog("删除角色")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
     public void delete(@PathVariable String id) {
         try {
             bindService.delete(Long.parseLong(id));
@@ -76,6 +79,7 @@ public class RoleController {
 
     @ULog("修改角色")
     @PutMapping
+    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         bindService.modify(params);
     }
@@ -122,6 +126,7 @@ public class RoleController {
 
     @ULog("保存角色关联的权限列表")
     @PutMapping("/{roleId}/authorities")
+    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
             long id = Long.parseLong(roleId);
@@ -134,6 +139,7 @@ public class RoleController {
 
     @ULog("保存角色关联的菜单列表")
     @PutMapping("/{roleId}/menus")
+    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
             long id = Long.parseLong(roleId);

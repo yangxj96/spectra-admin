@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.JVMInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RAMInfoVO;
 import io.github.yangxj96.spectra.core.service.system.ServiceMonitorService;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,6 +46,7 @@ public class ServiceMonitorController {
      * @return CPU信息
      */
     @GetMapping("/getCPUInfo")
+    @PreAuthorize("hasRole('ROLE_AUDIT')")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
     }
@@ -55,6 +57,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getRAMInfo")
+    @PreAuthorize("hasRole('ROLE_AUDIT')")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
     }
@@ -65,6 +68,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getJVMInfo")
+    @PreAuthorize("hasRole('ROLE_AUDIT')")
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();
     }

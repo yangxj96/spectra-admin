@@ -24,6 +24,7 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
 import io.github.yangxj96.spectra.core.service.system.DictService;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,6 +53,7 @@ public class DictController {
      */
     @ULog("创建字典组")
     @PostMapping("/group")
+    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
     public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
         bindService.createGroup(params);
     }
@@ -63,6 +65,7 @@ public class DictController {
      */
     @ULog("删除字典组")
     @DeleteMapping("/group/{id}")
+    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteGroup(@PathVariable String id) {
         bindService.deleteGroup(Long.parseLong(id));
     }
@@ -74,6 +77,7 @@ public class DictController {
      */
     @ULog("修改字典组")
     @PutMapping("/group")
+    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
     public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params) {
         bindService.modifyGroup(params);
     }
@@ -85,6 +89,7 @@ public class DictController {
      */
     @ULog("创建字典数据")
     @PostMapping("/data")
+    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }
@@ -96,6 +101,7 @@ public class DictController {
      */
     @ULog("删除字典项")
     @DeleteMapping("/data/{id}")
+    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteData(@PathVariable String id) {
         bindService.deleteData(Long.parseLong(id));
     }
@@ -107,6 +113,7 @@ public class DictController {
      */
     @ULog("修改字典数据")
     @PutMapping("/data")
+    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
     public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params) {
         bindService.modifyData(params);
     }

@@ -24,6 +24,7 @@ import io.github.yangxj96.spectra.core.service.user.AuthorityService;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,12 +47,14 @@ public class AuthorityController {
 
     @ULog("创建权限")
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         throw new NotImplementedException("无需实现错误");
     }
 
     @ULog("删除权限")
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void deleteAuthority(@PathVariable String id) {
         log.debug("请求参数:{}", id);
         throw new NotImplementedException("无需实现错误");
@@ -59,6 +62,7 @@ public class AuthorityController {
 
     @ULog("修改权限信息")
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         log.debug("请求参数:{}", params);
         throw new NotImplementedException("无需实现错误");
