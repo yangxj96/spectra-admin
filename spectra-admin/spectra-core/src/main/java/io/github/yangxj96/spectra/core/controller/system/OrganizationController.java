@@ -16,14 +16,13 @@
 
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +35,6 @@ import java.util.List;
  * @version 1.0
  * @since 2025/7/14
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/organization")
 public class OrganizationController {
@@ -51,7 +49,7 @@ public class OrganizationController {
      */
     @ULog("新增组织机构")
     @PostMapping
-    @SaCheckEL("@ss.hasPermission('ORGANIZATION:INSERT')")
+    @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void created(@RequestBody @Validated(Verify.Insert.class) OrganizationFrom from) {
         bindService.created(from);
     }
@@ -63,7 +61,7 @@ public class OrganizationController {
      */
     @ULog("新增组织机构")
     @DeleteMapping("/{id}")
-    @SaCheckEL("@ss.hasPermission('ORGANIZATION:DELETE')")
+    @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void deleteById(@PathVariable String id) {
         bindService.deleteById(id);
     }
@@ -75,7 +73,7 @@ public class OrganizationController {
      */
     @ULog("编辑组织机构")
     @PutMapping
-    @SaCheckEL("@ss.hasPermission('ORGANIZATION:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void modify(@RequestBody @Validated(Verify.Update.class) OrganizationFrom from) {
         bindService.modify(from);
     }

@@ -28,8 +28,6 @@
         <!-- 数据库 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <dm.version>8.1.4.125</dm.version>
-        <!-- 身份认证 -->
-        <sa-token.version>1.44.0</sa-token.version>
         <!-- 工具包 -->
         <mapstruct.version>1.6.3</mapstruct.version>
         <apache.tika.version>3.2.0</apache.tika.version>
@@ -45,7 +43,6 @@
 
     <modules>
         <module>spectra-common</module>
-        <module>spectra-framework</module>
         <module>spectra-launch</module>
         <module>spectra-core</module>
         <module>spectra-workflow</module>
@@ -92,29 +89,6 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-4-starter</artifactId>
                 <version>${druid.version}</version>
-            </dependency>
-
-            <!-- SaToken -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-boot3-starter</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-aop</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-redis-jackson</artifactId>
-                <version>${sa-token.version}</version>
-            </dependency>
-            <!-- Sa-Token 注解鉴权使用 EL 表达式 -->
-            <dependency>
-                <groupId>cn.dev33</groupId>
-                <artifactId>sa-token-spring-el</artifactId>
-                <version>${sa-token.version}</version>
             </dependency>
 
             <!-- 工具包 -->

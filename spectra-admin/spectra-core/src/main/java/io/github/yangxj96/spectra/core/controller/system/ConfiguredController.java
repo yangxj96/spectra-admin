@@ -1,14 +1,14 @@
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredPageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 2025-11-11
  */
-@SaCheckEL("@ss.administrators()")
 @RestController
 @RequestMapping("/configured")
 public class ConfiguredController {
@@ -35,12 +34,14 @@ public class ConfiguredController {
      */
     @ULog("修改系统配置")
     @PutMapping
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {
         bindService.modify(params);
     }
 
     @ULog("分页查询系统配置")
     @GetMapping("/page")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);
     }

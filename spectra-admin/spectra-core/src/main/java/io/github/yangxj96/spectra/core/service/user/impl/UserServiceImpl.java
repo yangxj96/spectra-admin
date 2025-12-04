@@ -16,8 +16,6 @@
 
 package io.github.yangxj96.spectra.core.service.user.impl;
 
-import cn.dev33.satoken.session.SaTerminalInfo;
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,20 +37,18 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.mapper.user.UserMapper;
-import io.github.yangxj96.spectra.core.properties.UserProperties;
+import io.github.yangxj96.spectra.core.configure.system.UserProperties;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -67,6 +63,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
+@EnableConfigurationProperties({UserProperties.class})
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
     @Resource
@@ -108,7 +105,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         // 强制注销账号登录信息
-        StpUtil.logout(user.getId());
+        // StpUtil.logout(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 删除用户信息
@@ -223,52 +220,53 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public IPage<UserOnlineVO> online(PageFrom page) {
-        var records = new ArrayList<UserOnlineVO>();
-
-        // 查询所有在线的token信息
-        var sessionIdS = StpUtil.searchSessionId(
-                "",
-                Math.toIntExact(((page.getPageNum() - 1) * page.getPageSize())),
-                page.getPageSize().intValue(),
-                false);
-
-        for (String sessionId : sessionIdS) {
-            var loginRecords = new ArrayList<UserOnlineVO.LoginRecordVo>();
-            // 根据会话id，查询对应的 SaSession 对象，此处一个 SaSession 对象即代表一个登录的账号
-            var session = StpUtil.getSessionBySessionId(sessionId);
-            log.debug("登录ID:{}", session.getLoginId());
-            // 查询这个账号都在哪些设备登录了，依据上面的示例，
-            // 账号A 的 SaTerminalInfo 数量是 3，账号B 的 SaTerminalInfo 数量是 2
-            var terminalList = session.terminalListCopy();
-            log.debug("会话id：{}，共在 {} 设备登录", sessionId, terminalList.size());
-            for (SaTerminalInfo info : terminalList) {
-                log.debug("分别是:{}", info);
-                loginRecords.add(new UserOnlineVO.LoginRecordVo(
-                        info.getTokenValue(),
-                        info.getDeviceType(),
-                        "255.255.255.255",
-                        "内网地址",
-                        LocalDateTime.ofInstant(
-                                Instant.ofEpochMilli(info.getCreateTime()),
-                                ZoneId.systemDefault()
-                        )
-                ));
-            }
-            User user = this.getById(Long.valueOf(session.getLoginId().toString()));
-            records.add(new UserOnlineVO(
-                    user.getEmail(),
-                    user.getName(),
-                    user.getOrganizationId().toString(),
-                    loginRecords
-            ));
-        }
-
-        var p = new Page<UserOnlineVO>();
-        p.setCurrent(page.getPageNum());
-        p.setSize(page.getPageSize());
-        p.setRecords(records);
-        p.setTotal(StpUtil.searchSessionId("", 0, -1, false).size());
-
-        return p;
+        return null;
+        //var records = new ArrayList<UserOnlineVO>();
+        //
+        //// 查询所有在线的token信息
+        //var sessionIdS = StpUtil.searchSessionId(
+        //        "",
+        //        Math.toIntExact(((page.getPageNum() - 1) * page.getPageSize())),
+        //        page.getPageSize().intValue(),
+        //        false);
+        //
+        //for (String sessionId : sessionIdS) {
+        //    var loginRecords = new ArrayList<UserOnlineVO.LoginRecordVo>();
+        //    // 根据会话id，查询对应的 SaSession 对象，此处一个 SaSession 对象即代表一个登录的账号
+        //    var session = StpUtil.getSessionBySessionId(sessionId);
+        //    log.debug("登录ID:{}", session.getLoginId());
+        //    // 查询这个账号都在哪些设备登录了，依据上面的示例，
+        //    // 账号A 的 SaTerminalInfo 数量是 3，账号B 的 SaTerminalInfo 数量是 2
+        //    var terminalList = session.terminalListCopy();
+        //    log.debug("会话id：{}，共在 {} 设备登录", sessionId, terminalList.size());
+        //    for (SaTerminalInfo info : terminalList) {
+        //        log.debug("分别是:{}", info);
+        //        loginRecords.add(new UserOnlineVO.LoginRecordVo(
+        //                info.getTokenValue(),
+        //                info.getDeviceType(),
+        //                "255.255.255.255",
+        //                "内网地址",
+        //                LocalDateTime.ofInstant(
+        //                        Instant.ofEpochMilli(info.getCreateTime()),
+        //                        ZoneId.systemDefault()
+        //                )
+        //        ));
+        //    }
+        //    User user = this.getById(Long.valueOf(session.getLoginId().toString()));
+        //    records.add(new UserOnlineVO(
+        //            user.getEmail(),
+        //            user.getName(),
+        //            user.getOrganizationId().toString(),
+        //            loginRecords
+        //    ));
+        //}
+        //
+        //var p = new Page<UserOnlineVO>();
+        //p.setCurrent(page.getPageNum());
+        //p.setSize(page.getPageSize());
+        //p.setRecords(records);
+        //p.setTotal(StpUtil.searchSessionId("", 0, -1, false).size());
+        //
+        //return p;
     }
 }

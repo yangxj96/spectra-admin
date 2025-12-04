@@ -16,16 +16,15 @@
 
 package io.github.yangxj96.spectra.core.controller.system;
 
-import cn.dev33.satoken.annotation.SaCheckEL;
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
 import io.github.yangxj96.spectra.core.service.system.DictService;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +39,6 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/18
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/dict")
 public class DictController {
@@ -55,7 +53,7 @@ public class DictController {
      */
     @ULog("创建字典组")
     @PostMapping("/group")
-    @SaCheckEL("@ss.hasPermission('DICT:INSERT')")
+    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
     public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
         bindService.createGroup(params);
     }
@@ -67,7 +65,7 @@ public class DictController {
      */
     @ULog("删除字典组")
     @DeleteMapping("/group/{id}")
-    @SaCheckEL("@ss.hasPermission('DICT:DELETE')")
+    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteGroup(@PathVariable String id) {
         bindService.deleteGroup(Long.parseLong(id));
     }
@@ -79,7 +77,7 @@ public class DictController {
      */
     @ULog("修改字典组")
     @PutMapping("/group")
-    @SaCheckEL("@ss.hasPermission('DICT:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
     public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params) {
         bindService.modifyGroup(params);
     }
@@ -91,7 +89,7 @@ public class DictController {
      */
     @ULog("创建字典数据")
     @PostMapping("/data")
-    @SaCheckEL("@ss.hasPermission('DICT:INSERT')")
+    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
         bindService.createData(params);
     }
@@ -103,7 +101,7 @@ public class DictController {
      */
     @ULog("删除字典项")
     @DeleteMapping("/data/{id}")
-    @SaCheckEL("@ss.hasPermission('DICT:DELETE')")
+    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteData(@PathVariable String id) {
         bindService.deleteData(Long.parseLong(id));
     }
@@ -115,7 +113,7 @@ public class DictController {
      */
     @ULog("修改字典数据")
     @PutMapping("/data")
-    @SaCheckEL("@ss.hasPermission('DICT:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
     public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params) {
         bindService.modifyData(params);
     }

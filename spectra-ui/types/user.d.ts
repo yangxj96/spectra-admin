@@ -14,6 +14,14 @@
  *  limitations under the License.
  */
 
+type LoginFrom = {
+    type: "PASSWORD" | "SMS" | "SCAN" | "WECHAT" | "GITHUB";
+    identifier: string;
+    credential: string;
+    clientId: string;
+    captcha: string;
+};
+
 // 登录token
 type Token = {
     id: string;
