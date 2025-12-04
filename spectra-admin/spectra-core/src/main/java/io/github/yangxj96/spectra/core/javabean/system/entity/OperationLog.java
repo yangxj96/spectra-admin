@@ -19,7 +19,7 @@ package io.github.yangxj96.spectra.core.javabean.system.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
-import io.github.yangxj96.spectra.common.enums.SysLogType;
+import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

@@ -16,11 +16,11 @@
 
 package io.github.yangxj96.spectra.core.service.system.impl;
 
-import cn.dev33.satoken.exception.NotImplException;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
+import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.javabean.system.converter.OrganizationConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
@@ -62,7 +62,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     @Transactional
     public void deleteById(String id) {
         // this.removeById(Long.parseLong(id))
-        throw new NotImplException("暂未实现");
+        throw new NotImplementedException("暂未实现");
     }
 
     @Override

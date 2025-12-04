@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.workflow.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import io.github.yangxj96.spectra.workflow.javabean.from.TaskCompleteFrom;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import jakarta.annotation.Resource;
@@ -29,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0
  * @since 2025-11-11
  */
-@SaCheckLogin
 @RestController
 @RequestMapping("/workflow/tasks")
 public class WorkflowUserTasksController {

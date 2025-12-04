@@ -17,8 +17,8 @@
 package io.github.yangxj96.spectra.core.service.common.impl;
 
 import io.github.yangxj96.spectra.common.exception.FileTypeException;
-import io.github.yangxj96.spectra.framework.features.fileupload.properties.FileUploadProperties;
-import io.github.yangxj96.spectra.framework.features.fileupload.verify.FileTypeValidator;
+import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidator;
 import io.github.yangxj96.spectra.core.service.common.FileService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

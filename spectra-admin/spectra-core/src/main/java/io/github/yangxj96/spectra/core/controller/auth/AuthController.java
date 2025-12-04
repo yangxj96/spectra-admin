@@ -16,13 +16,12 @@
 
 package io.github.yangxj96.spectra.core.controller.auth;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
-import cn.dev33.satoken.annotation.SaIgnore;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.from.UsernamePasswordFrom;
-import io.github.yangxj96.spectra.core.javabean.auth.javabean.vo.TokenVO;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
+import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.auth.AuthService;
-import io.github.yangxj96.spectra.framework.features.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -38,7 +37,6 @@ import javax.security.auth.login.LoginException;
  * @since 2025-6-14
  */
 @Slf4j
-@SaCheckLogin
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -46,20 +44,20 @@ public class AuthController {
     @Resource
     private AuthService bindService;
 
-    @SaIgnore
+    @PermitAll
     @PostMapping("/login")
-    public TokenVO login(@Validated @RequestBody UsernamePasswordFrom params) throws LoginException {
+    public TokenVO login(@Validated @RequestBody LoginFrom params) throws LoginException {
         return bindService.login(params);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    public void logout() {
-        bindService.logout();
+    public void logout(@RequestHeader("Authorization") String authHeader) {
+        bindService.logout(authHeader);
     }
 
     @ULog("token检查")
-    @PostMapping(value = "/check",version = "2.0.0")
+    @PostMapping(value = "/check", version = "2.0.0")
     public void check() {
         // 能进入方法,就说明是正常的token了,无需多余的逻辑进行检查
     }
