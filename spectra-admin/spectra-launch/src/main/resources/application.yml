@@ -27,6 +27,8 @@ spectra:
     upload:
       # 上传文件的位置
       upload-dir: ${spectra.system.base-dir}/uploads
+      # 上传文件的位置(临时存储位置)
+      upload-temp-dir: ${spectra.system.base-dir}/temp
       # 文件允许的类型
       allowed-types:
         - jpeg

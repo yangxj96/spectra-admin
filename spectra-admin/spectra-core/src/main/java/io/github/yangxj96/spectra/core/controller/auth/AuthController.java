@@ -47,19 +47,20 @@ public class AuthController {
 
     @PermitAll
     @PostMapping("/login")
-    @ULog(value = "用户登录",type = SysLogType.SAFETY)
+    @ULog(value = "用户登录", type = SysLogType.SAFETY)
     public TokenVO login(@Validated @RequestBody LoginFrom params) throws LoginException {
         return bindService.login(params);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
-    @ULog(value = "用户登出",type = SysLogType.SAFETY)
+    @ULog(value = "用户登出", type = SysLogType.SAFETY)
     public void logout(@RequestHeader("Authorization") String authHeader) {
         bindService.logout(authHeader);
     }
 
     @ULog("token检查")
+    @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/check")
     public void check() {
 
