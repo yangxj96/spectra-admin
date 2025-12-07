@@ -6,18 +6,18 @@
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_USER"-->
         <id column="ID"                  jdbcType="BIGINT"    property="id"/>
-        <result column="NAME"            jdbcType="VARCHAR"   property="name"/>
-        <result column="EMAIL"           jdbcType="VARCHAR"   property="email"/>
-        <result column="AVATAR"          jdbcType="VARCHAR"   property="avatar"/>
-        <result column="STATE"           jdbcType="NUMERIC"   property="state"/>
-        <result column="ORGANIZATION_ID" jdbcType="BIGINT"    property="organizationId"/>
-        <result column="PASSWORD"        jdbcType="VARCHAR"   property="password"/>
         <result column="CREATED_BY"      jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT"      jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="UPDATED_BY"      jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT"      jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"         jdbcType="TIMESTAMP" property="deleted"/>
         <result column="VERSION"         jdbcType="BIGINT"    property="version"/>
+        <result column="NAME"            jdbcType="VARCHAR"   property="name"/>
+        <result column="EMAIL"           jdbcType="VARCHAR"   property="email"/>
+        <result column="AVATAR"          jdbcType="VARCHAR"   property="avatar"/>
+        <result column="STATE"           jdbcType="NUMERIC"   property="state"/>
+        <result column="ORGANIZATION_ID" jdbcType="BIGINT"    property="organizationId"/>
+        <result column="PASSWORD"        jdbcType="VARCHAR"   property="password"/>
     </resultMap>
     <!-- @formatter:on -->
 

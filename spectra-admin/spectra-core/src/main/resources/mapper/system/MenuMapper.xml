@@ -3,22 +3,22 @@
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.system.MenuMapper">
     <!-- @formatter:off -->
   <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.system.entity.Menu">
-    <!--@mbg.generated-->
-    <!--@Table "SPECTRA"."SYS_MENU"-->
-    <id column="ID"             jdbcType="BIGINT"    property="id" />
-    <result column="PID"        jdbcType="BIGINT"    property="pid" />
-    <result column="ICON"       jdbcType="VARCHAR"   property="icon" />
-    <result column="NAME"       jdbcType="VARCHAR"   property="name" />
-    <result column="PATH"       jdbcType="VARCHAR"   property="path" />
-    <result column="COMPONENT"  jdbcType="VARCHAR"   property="component" />
-    <result column="LAYOUT"     jdbcType="VARCHAR"   property="layout" />
-    <result column="SORT"       jdbcType="INTEGER"   property="sort" />
-    <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy" />
-    <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt" />
-    <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy" />
-    <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt" />
-    <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted" />
-    <result column="VERSION"    jdbcType="BIGINT"    property="version" />
+      <!--@mbg.generated-->
+      <!--@Table "SPECTRA"."SYS_MENU"-->
+      <id column="ID"             jdbcType="BIGINT"    property="id" />
+      <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy" />
+      <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt" />
+      <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy" />
+      <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt" />
+      <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted" />
+      <result column="VERSION"    jdbcType="BIGINT"    property="version" />
+      <result column="PID"        jdbcType="BIGINT"    property="pid" />
+      <result column="ICON"       jdbcType="VARCHAR"   property="icon" />
+      <result column="NAME"       jdbcType="VARCHAR"   property="name" />
+      <result column="PATH"       jdbcType="VARCHAR"   property="path" />
+      <result column="COMPONENT"  jdbcType="VARCHAR"   property="component" />
+      <result column="LAYOUT"     jdbcType="VARCHAR"   property="layout" />
+      <result column="SORT"       jdbcType="INTEGER"   property="sort" />
   </resultMap>
   <!-- @formatter:on -->
 
