@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.runner;
 
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
+import io.github.yangxj96.spectra.core.configure.system.SystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -38,7 +38,7 @@ import java.io.File;
 public class FolderCheckRunner implements ApplicationRunner {
 
     @Resource
-    private SpectraSystemProperties properties;
+    private SystemProperties properties;
 
     @Override
     public void run(@Nullable ApplicationArguments args) {

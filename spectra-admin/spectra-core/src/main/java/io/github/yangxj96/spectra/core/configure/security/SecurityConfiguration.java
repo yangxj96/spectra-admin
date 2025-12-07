@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.security;
 
 
+import io.github.yangxj96.spectra.core.configure.security.eval.SpectraPermissionEvaluator;
 import io.github.yangxj96.spectra.core.configure.security.filter.TokenAuthenticationFilter;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import jakarta.annotation.Resource;

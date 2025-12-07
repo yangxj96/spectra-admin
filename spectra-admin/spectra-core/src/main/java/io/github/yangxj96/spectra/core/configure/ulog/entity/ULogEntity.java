@@ -81,9 +81,4 @@ public class ULogEntity implements Serializable {
      * 耗时
      */
     private Long timeCost;
-
-    /**
-     * 当前用户的TOKEN
-     */
-    private String token;
 }

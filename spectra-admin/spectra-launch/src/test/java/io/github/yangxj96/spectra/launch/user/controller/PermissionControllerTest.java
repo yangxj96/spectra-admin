@@ -17,7 +17,7 @@ class PermissionControllerTest {
     void addAuthority() {
         Authority dictAuthority = Authority.builder()
                 .pid(1L)
-                .name("角色管理")
+                .name("服务监控")
                 .code("USER:*")
                 .build();
         boolean flag;

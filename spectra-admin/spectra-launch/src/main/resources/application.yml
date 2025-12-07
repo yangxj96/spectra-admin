@@ -40,7 +40,7 @@ spectra:
         - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicNumberValidationStrategy
   # 验证码相关
   kaptcha:
-    type: chat
+    type: math
     verify: false
     duration: 1m
   # 安全相关

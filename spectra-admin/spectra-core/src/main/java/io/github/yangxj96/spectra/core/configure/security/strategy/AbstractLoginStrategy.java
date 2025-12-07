@@ -24,6 +24,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/12/3 00:04
  */
+@NullMarked
 public abstract class AbstractLoginStrategy implements LoginStrategy {
 
     @Resource
@@ -35,8 +36,6 @@ public abstract class AbstractLoginStrategy implements LoginStrategy {
     @Resource
     private RelUserRoleService relUserRoleService;
 
-
-    @NullMarked
     protected SecurityUser toSecurityUser(User user) {
         SecurityUser securityUser = authConverter.toUserDTO(user);
 

@@ -18,7 +18,7 @@ public interface TokenService {
      * @param user 用户信息
      * @return token信息
      */
-    TokenVO createTokenFor(SecurityUser user);
+    TokenVO createToken(SecurityUser user);
 
     /**
      * 根据token删除key

@@ -46,8 +46,6 @@ import tools.jackson.databind.ObjectMapper;
 @Aspect
 public class ULogAspect {
 
-    // TODO 更换SpringSecurity后需要处理
-
     private static final String PREFIX = "[操作日志切面]:";
 
     @Resource
@@ -113,7 +111,6 @@ public class ULogAspect {
                     .status(getHttpResponseStatus(response))
                     .result(safeWriteValueAsString(jsonResult))
                     .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
-                    // .token(StpUtil.getTokenValue())
                     .build();
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");

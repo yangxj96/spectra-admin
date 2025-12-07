@@ -66,22 +66,4 @@ public class ULogConfiguration {
         return new ULogAspect();
     }
 
-    /**
-     * 配置一个用于日志保存的异步线程池
-     *
-     * @return {@link Executor}
-     */
-    @Bean
-    @ConditionalOnBean(ULogAspect.class)
-    public Executor uLogTaskExecutor() {
-        // TODO: 等其他框架适配启动后,测试下用虚拟线程和这个异步线程是否有影响
-        log.debug(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
-        return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(
-                Thread
-                        .ofVirtual()
-                        .name("ULog-Async-", 0)
-                        .factory()
-        ));
-    }
-
 }

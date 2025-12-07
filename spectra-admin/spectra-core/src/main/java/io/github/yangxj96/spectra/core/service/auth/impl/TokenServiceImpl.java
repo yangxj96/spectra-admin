@@ -11,6 +11,8 @@ import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2025/12/2 23:32
  */
 @Service
+@NullMarked
 public class TokenServiceImpl implements TokenService {
 
     @Resource
@@ -46,7 +49,7 @@ public class TokenServiceImpl implements TokenService {
     private SecurityProperties securityProperties;
 
     @Override
-    public TokenVO createTokenFor(SecurityUser user) {
+    public TokenVO createToken(SecurityUser user) {
         // token生成
         String token = UUID.randomUUID().toString().toUpperCase();
         // 扩展内容
@@ -87,26 +90,10 @@ public class TokenServiceImpl implements TokenService {
         // 删除
         redisTemplate.delete(mainKey);
         redisTemplate.delete(refKey);
-        //redisTemplate.execute((RedisCallback<Void>) connection -> {
-        //    var cmd = connection.keyCommands();
-        //    var opts = ScanOptions.scanOptions()
-        //            .match(String.format(RedisCacheKey.AUTH_TOKEN_KEY, user.getId(), token) + "*")
-        //            .build();
-        //    try (var keys = cmd.scan(opts)) {
-        //        var coll = new ArrayList<byte[]>();
-        //        while (keys.hasNext()) {
-        //            coll.add(keys.next());
-        //        }
-        //        if (CollUtils.isNotEmpty(coll)) {
-        //            cmd.del(coll.toArray(new byte[0][]));
-        //        }
-        //    }
-        //    return null;
-        //});
     }
 
     @Override
-    public SecurityUser getUserByToken(String token) {
+    public @Nullable SecurityUser getUserByToken(String token) {
         var ops = redisTemplate.opsForValue();
         String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
         Object o1 = ops.get(refKey);

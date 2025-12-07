@@ -33,5 +33,9 @@ public class SecurityProperties {
      */
     private Long tokenExpire = 7200L;
 
+    /**
+     * 超级管理员角色：拥有绝对权限，不需要匹配任何权限表达式
+     */
+    private String administrators = "ROLE_DEV_OPS";
 
 }

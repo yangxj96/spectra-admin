@@ -1,6 +1,8 @@
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.security.eval;
 
 
+import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -27,15 +29,13 @@ import java.util.regex.Pattern;
 @NullMarked
 public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
+    @Resource
+    private SecurityProperties securityProperties;
+
     /**
      * 前缀为 ROLE_ 的权限属于“角色”，不参与细粒度权限匹配
      */
     private static final String ROLE_PREFIX = "ROLE_";
-
-    /**
-     * 超级管理员角色：拥有绝对权限，不需要匹配任何权限表达式
-     */
-    private static final String ADMINISTRATORS = "ROLE_DEV_OPS";
 
     /**
      * LRU 缓存：用于缓存编译后的权限表达式结构，提高匹配性能
@@ -130,7 +130,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     private boolean hasAbsolutePrivilege(Authentication authentication) {
         for (GrantedAuthority ga : authentication.getAuthorities()) {
             String authority = ga.getAuthority();
-            if (ADMINISTRATORS.equals(authority) || "*".equals(authority)) {
+            if (securityProperties.getAdministrators().equals(authority) || "*".equals(authority)) {
                 return true;
             }
         }

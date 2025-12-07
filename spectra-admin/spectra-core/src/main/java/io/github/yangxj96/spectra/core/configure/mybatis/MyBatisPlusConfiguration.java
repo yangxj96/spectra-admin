@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
@@ -50,11 +51,8 @@ public class MyBatisPlusConfiguration {
     /**
      * 使用 ObjectProvider 自动收集所有 InnerInterceptor 类型的 Bean
      */
-    private final List<InnerInterceptor> innerInterceptors;
-
-    public MyBatisPlusConfiguration(List<InnerInterceptor> innerInterceptors) {
-        this.innerInterceptors = innerInterceptors;
-    }
+    @Resource
+    private List<InnerInterceptor> innerInterceptors;
 
     @Bean
     public MetaObjectHandler metaObjectHandler() {

@@ -38,7 +38,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityUser user = tokenService.getUserByToken(token);
             if (user != null) {
                 // 构建 Authentication 对象
-                var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+                var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
                 // 绑定到 SecurityContext
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }

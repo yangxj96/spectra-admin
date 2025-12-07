@@ -21,8 +21,6 @@ import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import io.github.yangxj96.spectra.core.configure.kaptcha.creator.KaptchaTextCreator;
 import io.github.yangxj96.spectra.core.configure.kaptcha.properties.KaptchaProperties;
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -46,9 +44,6 @@ import static com.google.code.kaptcha.Constants.*;
 public class KaptchaConfiguration {
 
     private static final String PREFIX = "[验证码配置]:";
-
-    @Resource
-    private SpectraSystemProperties spectraSystemProperties;
 
     /**
      * 图片验证码

@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.controller.auth;
 
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
+import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.auth.AuthService;
@@ -46,19 +47,21 @@ public class AuthController {
 
     @PermitAll
     @PostMapping("/login")
+    @ULog(value = "用户登录",type = SysLogType.SAFETY)
     public TokenVO login(@Validated @RequestBody LoginFrom params) throws LoginException {
         return bindService.login(params);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
+    @ULog(value = "用户登出",type = SysLogType.SAFETY)
     public void logout(@RequestHeader("Authorization") String authHeader) {
         bindService.logout(authHeader);
     }
 
     @ULog("token检查")
-    @PostMapping(value = "/check", version = "2.0.0")
+    @PostMapping(value = "/check")
     public void check() {
-        // 能进入方法,就说明是正常的token了,无需多余的逻辑进行检查
+
     }
 }

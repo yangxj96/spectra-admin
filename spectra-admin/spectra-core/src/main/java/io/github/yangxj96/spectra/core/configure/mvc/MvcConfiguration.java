@@ -17,7 +17,9 @@
 package io.github.yangxj96.spectra.core.configure.mvc;
 
 import io.github.yangxj96.spectra.core.configure.mvc.properties.CorsProperties;
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.MvcProperties;
+import io.github.yangxj96.spectra.core.properties.SpectraProperties;
+import io.github.yangxj96.spectra.core.configure.system.SystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -35,13 +37,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({SpectraSystemProperties.class, CorsProperties.class})
+@EnableConfigurationProperties({MvcProperties.class, SystemProperties.class, CorsProperties.class, SpectraProperties.class})
 public class MvcConfiguration implements WebMvcConfigurer {
 
-    private static final String PREFIX = "[MVC]:";
+    private static final String PREFIX = "[SpringMVC]:";
 
     @Resource
     private CorsProperties corsProperties;
+
+    @Resource
+    private MvcProperties mvcProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -70,9 +75,15 @@ public class MvcConfiguration implements WebMvcConfigurer {
      */
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
+        log.debug(
+                "{}配置API版本号,默认请求头为{},默认版本号为{}",
+                PREFIX,
+                mvcProperties.getApiHeader(),
+                mvcProperties.getApiVersion()
+        );
         configurer
-                .useRequestHeader("Api-Version")
-                .setDefaultVersion("1.0.0")
+                .useRequestHeader(mvcProperties.getApiHeader())
+                .setDefaultVersion(mvcProperties.getApiVersion())
                 .detectSupportedVersions(true);
     }
 }
