@@ -79,10 +79,6 @@ public class FileServiceLocalImpl extends AbstractFileService {
         // TODO 先检查是否有预处理文件的信息
         // 先检查文件是否符合上传要求
         super.verify(from.file());
-        // 检查文件大小
-        if (from.file().getSize() > properties.getChunkSize()) {
-            throw new FileUploadException("文件太大");
-        }
         // 保存文件
         try (var is = from.file().getInputStream()) {
             // 构建文件保存目录

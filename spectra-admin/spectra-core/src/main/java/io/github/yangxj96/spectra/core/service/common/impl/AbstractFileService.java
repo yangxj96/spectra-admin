@@ -25,13 +25,17 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     public void verify(MultipartFile file) {
-        // 1. 检查文件是否为空
+        // 检查文件是否为空
         if (file == null || file.isEmpty()) {
             throw new FileTypeException("上传的文件不能为空");
         }
-        // 2. 使用策略模式进行文件类型验证
+        // 使用策略模式进行文件类型验证
         if (!validator.validate(file)) {
             throw new FileTypeException("此类文件不允许上传");
+        }
+        // 文件大小
+        if (file.getSize() > properties.getChunkSize()) {
+            throw new FileTypeException("文件大小超过阈值");
         }
     }
 

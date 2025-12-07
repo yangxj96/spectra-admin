@@ -57,6 +57,7 @@ public class FileController {
      *
      * @param from 文件直接保存的参数
      */
+    @PostMapping("/upload")
     public void upload(FileChunkFrom from) {
         bindService.upload(from);
     }
