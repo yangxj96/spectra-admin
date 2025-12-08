@@ -53,6 +53,7 @@ spectra:
     whitelists:
       - "/common/kaptcha"
       - "/auth/login"
+      - "/druid/**"
 # 服务器配置
 server:
   port: 8888

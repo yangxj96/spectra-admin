@@ -18,12 +18,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Token服务
+ * Token 服务
  *
  * @author Jack Young
  * @version 1.0
@@ -50,7 +49,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenVO createToken(SecurityUser user) {
-        // token生成
+        // token 生成
         String token = UUID.randomUUID().toString().toUpperCase();
         // 扩展内容
         if (user.getExtend() == null) {
@@ -61,7 +60,7 @@ public class TokenServiceImpl implements TokenService {
         terminalExtraData.put("ip", ip);
         terminalExtraData.put("address", ipLocationTemplate.getCityEn(ip));
 
-        // 存储token
+        // 存储 token
         String mainKey = String.format(RedisCacheKey.AUTH_TOKEN_KEY, user.getId(), token);
         String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
 
@@ -69,12 +68,33 @@ public class TokenServiceImpl implements TokenService {
         ops.set(mainKey, user, securityProperties.getTokenExpire(), TimeUnit.SECONDS);
         ops.set(refKey, user.getId(), securityProperties.getTokenExpire(), TimeUnit.SECONDS);
 
-        // 组件token
+        // 安全获取权限列表，防止 user.getAuthorities() 本身为 null
+        Collection<? extends GrantedAuthority> authoritiesList = user.getAuthorities();
+
+        List<String> roles = new ArrayList<>();
+        List<String> authorities = new ArrayList<>();
+
+        for (GrantedAuthority ga : authoritiesList) {
+            // 显式检查 getAuthority() 是否为 null
+            String authority = ga.getAuthority();
+            if (authority == null) {
+                continue;
+            }
+
+            if (authority.startsWith("ROLE")) {
+                roles.add(authority);
+            } else {
+                authorities.add(authority);
+            }
+        }
+
+        // 组件 token
         return TokenVO.builder()
                 .id(user.getId())
                 .username(user.getEmail())
                 .accessToken(token)
-                .authorities(user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .authorities(authorities)
+                .roles(roles)
                 .build();
     }
 
