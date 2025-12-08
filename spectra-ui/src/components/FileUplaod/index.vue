@@ -103,8 +103,10 @@ const handleLargeFileUpload = async (file: File, hash: string, size: number) => 
     for (let chunk of chunks) {
         let chunk_params = new FormData();
         chunk_params.append("file", chunk);
+        chunk_params.append("fileName", file.name);
         chunk_params.append("hash", hash);
         chunk_params.append("index", idx.toString());
+        chunk_params.append("count", chunks.length.toString());
         idx++;
         let chunk_res = await FileUploadApi.chunk(chunk_params);
         console.log("分片上传", chunk_res);

@@ -2,8 +2,6 @@ package io.github.yangxj96.spectra.core.template;
 
 
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
-import io.github.yangxj96.spectra.core.service.auth.TokenService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -26,9 +24,6 @@ import java.util.List;
 @Component
 @NullMarked
 public class SecurityTemplate {
-
-    @Resource
-    private TokenService tokenService;
 
     /**
      * 获取当前用户ID

@@ -55,39 +55,4 @@ public class AuthExceptionAdvice {
         return R.failure(HttpStatus.UNAUTHORIZED, "无权操作");
     }
 
-
-    ///**
-    // * 未登录异常
-    // *
-    // * @param e        错误信息
-    // * @param response 响应
-    // * @return 格式化为正常响应返回
-    // */
-    //@ExceptionHandler(NotLoginException.class)
-    //public R<Object> notLoginException(NotLoginException e, HttpServletResponse response) {
-    //    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    //    log.error(PREFIX + "未登录异常,{}", e.getMessage(), e);
-    //    if (e.getCode() == SaErrorCode.CODE_11016) {
-    //        return R.failure(HttpStatus.UNAUTHORIZED, "您的会话已过期，请重新登录以继续。");
-    //    }
-    //    if (e.getCode() == SaErrorCode.CODE_11012) {
-    //        return R.failure(HttpStatus.UNAUTHORIZED, "无效token，请重新登录以继续。");
-    //    }
-    //    return R.failure(HttpStatus.UNAUTHORIZED, e.getMessage());
-    //}
-    //
-    ///**
-    // * 登录异常
-    // *
-    // * @param e        错误信息
-    // * @param response 响应
-    // * @return 格式化为正常响应返回
-    // */
-    //@ExceptionHandler(LoginException.class)
-    //public R<Object> loginException(Exception e, HttpServletResponse response) {
-    //    response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-    //    log.error(PREFIX + "登录异常,{}", e.getMessage(), e);
-    //    return R.failure(e.getMessage());
-    //}
-
 }

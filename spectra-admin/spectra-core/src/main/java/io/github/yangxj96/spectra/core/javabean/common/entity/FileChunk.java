@@ -28,6 +28,12 @@ import java.io.Serializable;
 public class FileChunk extends BaseEntity implements Serializable {
 
     /**
+     * 文件名
+     */
+    @TableField(value = "FILE_NAME")
+    private String fileName;
+
+    /**
      * 文件唯一标识（如 SHA256 或 UUID）
      */
     @TableField(value = "FILE_ID")

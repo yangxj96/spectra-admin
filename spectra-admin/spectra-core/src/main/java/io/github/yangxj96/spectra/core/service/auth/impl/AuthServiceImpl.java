@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.service.auth.impl;
 
+import io.github.yangxj96.spectra.common.exception.SpectraException;
 import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
@@ -61,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
             String token = authHeader.substring(7);
             tokenService.deleteToken(token);
         } else {
-            throw new RuntimeException("退出失败");
+            throw new SpectraException("退出失败");
         }
     }
 

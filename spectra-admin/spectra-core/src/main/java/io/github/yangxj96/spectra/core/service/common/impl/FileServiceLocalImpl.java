@@ -18,24 +18,30 @@ package io.github.yangxj96.spectra.core.service.common.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.yangxj96.spectra.common.exception.FileUploadException;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidator;
+import io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk;
 import io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
+import io.github.yangxj96.spectra.core.mapper.common.FileChunkMapper;
 import io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 /**
  * <p>
@@ -63,6 +69,9 @@ public class FileServiceLocalImpl extends AbstractFileService {
 
     @Resource
     private FileInfoMapper fileInfoMapper;
+
+    @Resource
+    private FileChunkMapper fileChunkMapper;
 
     public FileServiceLocalImpl(FileTypeValidator validator, FileUploadProperties properties) throws IOException {
         this.validator = validator;
@@ -98,8 +107,13 @@ public class FileServiceLocalImpl extends AbstractFileService {
     }
 
     @Override
+    @Transactional
     public void upload(FileUploadFrom from) {
-        // TODO 先检查是否有预处理文件的信息
+        // 文件如果存在就直接返回就好了
+        FileInfo fileInfo = fileInfoMapper.getByHash(from.hash());
+        if (fileInfo != null) {
+            return;
+        }
         // 先检查文件是否符合上传要求
         super.verify(from.file());
         // 保存文件
@@ -107,32 +121,85 @@ public class FileServiceLocalImpl extends AbstractFileService {
             // 构建文件保存目录
             Path fileDir = root.resolve(from.hash()).normalize();
             Files.createDirectories(fileDir);
-            // TODO 构建文件后保存文件
-            var filename = fileDir.resolve(IdWorker.get32UUID()).normalize();
-            Files.copy(is, filename, StandardCopyOption.REPLACE_EXISTING);
+
+            // 构建文件后保存文件
+            var filename = IdWorker.get32UUID();
+            var originName = from.file().getOriginalFilename();
+            if (StrUtils.isBlank(originName)) {
+                throw new FileUploadException("文件名不存在");
+            }
+            var suffix = originName.substring(originName.lastIndexOf("."));
+            var path = fileDir.resolve(filename).normalize();
+
+            Files.copy(is, path, StandardCopyOption.REPLACE_EXISTING);
+            // 保存文件记录
+            var datum = FileInfo.builder()
+                    .fileName(filename)
+                    .originName(originName)
+                    .suffix(suffix)
+                    .path(path.toAbsolutePath().toString())
+                    .size(from.file().getSize())
+                    .hash(from.hash())
+                    .storageType((short) 0)
+                    .build();
+            fileInfoMapper.insert(datum);
         } catch (IOException e) {
             throw new FileUploadException(e);
         }
     }
 
     @Override
+    @Transactional
     public void chunk(FileChunkFrom from) {
-        // TODO 获取文件信息
+        var fileChunk = fileChunkMapper.getByFileId(from.hash());
+        if (CollUtils.isNotEmpty(fileChunk)) {
+            // 检查这一个分块是否存在,存在则跳过
+            FileChunk chunk = fileChunk
+                    .stream()
+                    .filter(i -> i.getChunkIndex().equals(from.index()))
+                    .findFirst()
+                    .orElse(null);
+            // 不等于null,则说明这个分片已经存在了
+            if (chunk != null) {
+                return;
+            }
+        }
         try (var is = from.file().getInputStream()) {
+            // 如果是第一个分片则检查分片信息
+            if (from.index() == 1) {
+                this.verify(from.file());
+            }
             // 构建临时文件上传目录
             Path fileDir = temp.resolve(from.hash()).normalize();
             Files.createDirectories(fileDir);
             // 保存文件
             var filename = fileDir.resolve("chunk_" + from.index()).normalize();
             Files.copy(is, filename, StandardCopyOption.REPLACE_EXISTING);
-            // TODO 检测是否分片完成,如果完成后都在了的话需要进行合并
+            // 存到临时文件信息表
+            var datum = FileChunk.builder()
+                    .fileId(from.hash())
+                    .fileName(from.fileName())
+                    .chunkIndex(from.index())
+                    .totalChunks(from.count())
+                    .chunkPath(filename.toAbsolutePath().toString())
+                    .chunkSize(from.file().getSize())
+                    .build();
+            fileChunkMapper.insert(datum);
+            // 检测合并
+            this.merge(from.hash());
         } catch (IOException e) {
             throw new FileUploadException(e);
         }
     }
 
     @Override
-    public void merge(String md5) {
-        // TODO 获取临时文件信息
+    public void merge(String hash) {
+        List<FileChunk> chunks = fileChunkMapper.getByFileId(hash);
+        if (CollUtils.isEmpty(chunks) || chunks.size() != chunks.getFirst().getTotalChunks()) {
+            return;
+        }
+        // 开始合并
+        chunks.forEach(i -> log.debug("合并,文件ID:{},分片:{}", i.getFileId(), i.getChunkIndex()));
+
     }
 }

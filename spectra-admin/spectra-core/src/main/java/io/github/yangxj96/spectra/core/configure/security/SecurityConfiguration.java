@@ -99,15 +99,14 @@ public class SecurityConfiguration {
                 // 注册过滤器
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 // 权限匹配
-                .authorizeHttpRequests(authz -> {
-                    authz
-                            // 预检请求必须放行
-                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                            // 白名单路径放行
-                            .requestMatchers(whitelistPaths).permitAll()
-                            // 其余接口都需要认证
-                            .anyRequest().authenticated();
-                })
+                .authorizeHttpRequests(authz ->
+                        authz
+                                // 预检请求必须放行
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                                // 白名单路径放行
+                                .requestMatchers(whitelistPaths).permitAll()
+                                // 其余接口都需要认证
+                                .anyRequest().authenticated())
         ;
 
         log.debug("{}异常处理", PREFIX);
