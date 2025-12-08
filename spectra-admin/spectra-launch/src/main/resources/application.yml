@@ -40,6 +40,8 @@ spectra:
         - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MimeValidationStrategy
         - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.ExtensionValidationStrategy
         - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicNumberValidationStrategy
+      # 分片文件大小
+      chunk-size: 1048576
   # 验证码相关
   kaptcha:
     type: math
@@ -71,6 +73,11 @@ server:
         http-only: true
 # spring 配置
 spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
   config:
     # .env文件内是K=V的键值对符合properties的解析方式,
     # [.properties]是告诉他用properties的方式进行解析

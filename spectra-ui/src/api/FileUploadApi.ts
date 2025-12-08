@@ -12,10 +12,10 @@ export default {
      * 文件预处理
      * @param params 上传文件入参
      */
-    async preprocess(params: {}): Promise<IResult> {
+    async preprocess(params: FilePreprocessFrom): Promise<IResult<FilePreprocessVO>> {
         return await http
-            .get<IResult>("/api/file/preprocess", {
-                data: params
+            .get<IResult<FilePreprocessVO>>("/api/file/preprocess", {
+                params: params
             })
             .then(res => res.data);
     },

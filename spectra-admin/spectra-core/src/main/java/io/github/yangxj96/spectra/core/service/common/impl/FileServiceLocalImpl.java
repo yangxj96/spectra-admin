@@ -23,6 +23,7 @@ import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeVal
 import io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper;
 import jakarta.annotation.Resource;
@@ -97,14 +98,14 @@ public class FileServiceLocalImpl extends AbstractFileService {
     }
 
     @Override
-    public void upload(FileChunkFrom from) {
+    public void upload(FileUploadFrom from) {
         // TODO 先检查是否有预处理文件的信息
         // 先检查文件是否符合上传要求
         super.verify(from.file());
         // 保存文件
         try (var is = from.file().getInputStream()) {
             // 构建文件保存目录
-            Path fileDir = root.resolve(from.md5()).normalize();
+            Path fileDir = root.resolve(from.hash()).normalize();
             Files.createDirectories(fileDir);
             // TODO 构建文件后保存文件
             var filename = fileDir.resolve(IdWorker.get32UUID()).normalize();
@@ -119,7 +120,7 @@ public class FileServiceLocalImpl extends AbstractFileService {
         // TODO 获取文件信息
         try (var is = from.file().getInputStream()) {
             // 构建临时文件上传目录
-            Path fileDir = temp.resolve(from.md5()).normalize();
+            Path fileDir = temp.resolve(from.hash()).normalize();
             Files.createDirectories(fileDir);
             // 保存文件
             var filename = fileDir.resolve("chunk_" + from.index()).normalize();
