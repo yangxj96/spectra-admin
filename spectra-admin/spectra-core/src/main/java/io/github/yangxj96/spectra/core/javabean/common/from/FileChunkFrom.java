@@ -15,7 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public record FileChunkFrom(
         MultipartFile file,
-        String md5,
+        String hash,
         Integer index
 ) {
 }

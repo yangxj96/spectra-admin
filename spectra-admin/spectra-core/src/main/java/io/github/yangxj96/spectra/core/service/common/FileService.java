@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.service.common;
 
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -52,7 +53,7 @@ public interface FileService {
      *
      * @param from 文件直接保存的参数
      */
-    void upload(FileChunkFrom from);
+    void upload(FileUploadFrom from);
 
     /**
      * 保存分片

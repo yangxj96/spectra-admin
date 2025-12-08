@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.controller.common;
 
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import io.github.yangxj96.spectra.core.service.common.FileService;
 import jakarta.annotation.Resource;
@@ -58,7 +59,7 @@ public class FileController {
      * @param from 文件直接保存的参数
      */
     @PostMapping("/upload")
-    public void upload(FileChunkFrom from) {
+    public void upload(FileUploadFrom from) {
         bindService.upload(from);
     }
 

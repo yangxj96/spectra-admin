@@ -11,6 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public record FileUploadFrom(
         MultipartFile file,
-        String md5
+        String hash
 ) {
 }
