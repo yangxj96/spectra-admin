@@ -18,9 +18,14 @@ package io.github.yangxj96.spectra.core.service.common.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import io.github.yangxj96.spectra.common.exception.FileUploadException;
+import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidator;
+import io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
+import io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Service;
@@ -55,12 +60,18 @@ public class FileServiceLocalImpl extends AbstractFileService {
      */
     private final Path temp;
 
-    public FileServiceLocalImpl() throws IOException {
-        this.root = Paths.get(super.properties.getUploadDir());
+    @Resource
+    private FileInfoMapper fileInfoMapper;
+
+    public FileServiceLocalImpl(FileTypeValidator validator, FileUploadProperties properties) throws IOException {
+        this.validator = validator;
+        this.properties = properties;
+
+        this.root = Paths.get(properties.getUploadDir());
         if (!Files.exists(root)) {
             Files.createDirectories(root);
         }
-        this.temp = Paths.get(super.properties.getUploadTempDir());
+        this.temp = Paths.get(properties.getUploadTempDir());
         if (!Files.exists(temp)) {
             Files.createDirectories(temp);
         }
@@ -68,10 +79,21 @@ public class FileServiceLocalImpl extends AbstractFileService {
 
     @Override
     public FilePreprocessVO preprocess(FilePreprocessFrom from) {
-        if (from.size() <= properties.getChunkSize()) {
-            FilePreprocessVO.ofFalse();
+        // 先查找之前是否上传过
+        FileInfo fileInfo = fileInfoMapper.getByHash(from.hash());
+        if (fileInfo != null) {
+            return FilePreprocessVO.exist();
         }
-        return FilePreprocessVO.ofFalse();
+        // 小文件不用计算分片了
+        if (from.size() <= properties.getChunkSize()) {
+            return FilePreprocessVO.ofFalse();
+        }
+        // 计算分片信息后响应
+        int count = Math.toIntExact(from.size() / properties.getChunkSize());
+        if (from.size() % properties.getChunkSize() != 0) {
+            count++;
+        }
+        return FilePreprocessVO.chunk(Math.toIntExact(properties.getChunkSize()), count);
     }
 
     @Override

@@ -115,7 +115,7 @@ public class ULogAspect {
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {
-            log.error("记录日志异常:{}", e.getMessage(), ex);
+            log.error("记录日志异常:{}", ex.getMessage(), ex);
         } finally {
             TIME_THREADLOCAL.remove();
         }

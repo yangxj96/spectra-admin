@@ -26,6 +26,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerIntercept
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -52,7 +53,8 @@ public class MyBatisPlusConfiguration {
      * 使用 ObjectProvider 自动收集所有 InnerInterceptor 类型的 Bean
      */
     @Resource
-    private List<InnerInterceptor> innerInterceptors;
+    private ObjectProvider<InnerInterceptor> innerInterceptors;
+
 
     @Bean
     public MetaObjectHandler metaObjectHandler() {
@@ -62,7 +64,7 @@ public class MyBatisPlusConfiguration {
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
-        log.debug(PREFIX + "载入MybatisPlusInterceptor");
+        log.debug("{}载入MybatisPlusInterceptor", PREFIX);
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);
@@ -75,7 +77,9 @@ public class MyBatisPlusConfiguration {
         // 乐观锁
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         // 收集的bean进行注册
-        innerInterceptors.forEach(interceptor::addInnerInterceptor);
+        List<InnerInterceptor> interceptors = innerInterceptors.stream().toList();
+        log.debug("{}额外的Interceptor数量{}", PREFIX, interceptors.size());
+        interceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }
 

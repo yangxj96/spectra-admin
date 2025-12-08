@@ -5,7 +5,6 @@ import io.github.yangxj96.spectra.common.exception.FileTypeException;
 import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidator;
 import io.github.yangxj96.spectra.core.service.common.FileService;
-import jakarta.annotation.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -17,10 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public abstract class AbstractFileService implements FileService {
 
-    @Resource
-    private FileTypeValidator validator;
+    protected FileTypeValidator validator;
 
-    @Resource
     protected FileUploadProperties properties;
 
     @Override

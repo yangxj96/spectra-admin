@@ -2,9 +2,12 @@ package io.github.yangxj96.spectra.core.configure.security;
 
 
 import io.github.yangxj96.spectra.core.configure.security.eval.SpectraPermissionEvaluator;
+import io.github.yangxj96.spectra.core.configure.security.exception.RestAccessDeniedHandler;
+import io.github.yangxj96.spectra.core.configure.security.exception.RestAuthenticationEntryPoint;
 import io.github.yangxj96.spectra.core.configure.security.filter.TokenAuthenticationFilter;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -30,11 +34,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * @version 1.0
  * @since 2025/12/2 17:31
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfiguration {
+
+    private static final String PREFIX = "[Security配置]:";
 
     @Resource
     private SecurityProperties properties;
@@ -45,13 +52,21 @@ public class SecurityConfiguration {
     @Resource
     private SpectraPermissionEvaluator spectraPermissionEvaluator;
 
+    @Resource
+    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+
+    @Resource
+    private RestAccessDeniedHandler restAccessDeniedHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
+        log.debug("{}配置PasswordEncoder", PREFIX);
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+        log.debug("{}配置AuthenticationManager", PREFIX);
         return config.getAuthenticationManager();
     }
 
@@ -63,10 +78,14 @@ public class SecurityConfiguration {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+        log.debug("{}配置核心过滤器", PREFIX);
         // 白名单
         var whitelistPaths = properties.getWhitelists().toArray(new String[0]);
 
+        log.debug("{}白名单:{}", PREFIX, whitelistPaths);
+        log.debug("{}关闭所有自带的认证方式,开放OPTIONS预检请求,开放白名单,其他接口全认证", PREFIX);
         http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 // 安全起见关闭所有自带登录和退出方案
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -91,11 +110,19 @@ public class SecurityConfiguration {
                 })
         ;
 
+        log.debug("{}异常处理", PREFIX);
+        http.exceptionHandling(ex ->
+                ex
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
+        );
+
         return http.build();
     }
 
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        log.debug("{}开启注解方法中的EL表达式认证处理器", PREFIX);
         var handler = new DefaultMethodSecurityExpressionHandler();
         handler.setPermissionEvaluator(spectraPermissionEvaluator);
         return handler;

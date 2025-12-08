@@ -48,7 +48,7 @@ public class ULogListener {
     private SecurityTemplate securityTemplate;
 
 
-    @Async("uLogTaskExecutor")
+    @Async
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
         log.debug(PREFIX + "开始记录,{}", entity.toString());

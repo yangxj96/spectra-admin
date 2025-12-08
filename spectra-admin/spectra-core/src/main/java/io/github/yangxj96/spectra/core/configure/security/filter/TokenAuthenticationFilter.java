@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -36,14 +37,15 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = resolveToken(request);
         if (token != null) {
             SecurityUser user = tokenService.getUserByToken(token);
-            if (user != null) {
-                // 构建 Authentication 对象
-                var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
-                // 绑定到 SecurityContext
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if (user == null) {
+                // token 无效
+                throw new InsufficientAuthenticationException("Token 无效或已过期");
             }
+            // 构建 Authentication 对象
+            var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
+            // 绑定到 SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(auth);
         }
-
         chain.doFilter(request, response);
     }
 

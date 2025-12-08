@@ -13,6 +13,6 @@ package io.github.yangxj96.spectra.core.javabean.common.from;
 public record FilePreprocessFrom(
         String filename,
         Long size,
-        String md5
+        String hash
 ) {
 }

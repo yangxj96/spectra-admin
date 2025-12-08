@@ -64,7 +64,10 @@ public class JacksonConfiguration {
 
     @Bean
     public JsonMapperBuilderCustomizer jsonMapperBuilderCustomizer() {
+        log.debug("{}配置JsonMapper", PREFIX);
         return builder -> {
+
+            log.debug("{}新时间序列化", PREFIX);
             // 新时间的序列化module
             var javaTimeModule = new SimpleModule();
 
@@ -90,6 +93,7 @@ public class JacksonConfiguration {
             var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+            log.debug("{}NON_NULL,SNAKE_CASE,MixIn", PREFIX);
             // 构建详情
             builder.configureForJackson2();
             builder.changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(

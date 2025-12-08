@@ -40,4 +40,9 @@
         DELETED,
         VERSION
     </sql>
+
+    <select id="getByHash" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/>
+        FROM SPECTRA.SYS_FILE_INFO WHERE HASH = #{hash}
+    </select>
 </mapper>

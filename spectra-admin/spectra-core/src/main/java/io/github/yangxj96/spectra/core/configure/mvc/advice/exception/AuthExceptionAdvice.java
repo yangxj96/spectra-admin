@@ -50,9 +50,9 @@ public class AuthExceptionAdvice {
      */
     @ExceptionHandler(AuthorizationDeniedException.class)
     public R<Object> notPermissionException(AuthorizationDeniedException e, HttpServletResponse response) {
-        response.setStatus(HttpStatus.FORBIDDEN.value());
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.error(PREFIX + "无权限异常,{}", e.getMessage(), e);
-        return R.failure(HttpStatus.FORBIDDEN, "无权操作");
+        return R.failure(HttpStatus.UNAUTHORIZED, "无权操作");
     }
 
 
