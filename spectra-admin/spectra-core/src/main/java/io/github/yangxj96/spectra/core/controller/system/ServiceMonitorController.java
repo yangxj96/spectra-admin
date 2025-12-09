@@ -41,12 +41,12 @@ public class ServiceMonitorController {
     private ServiceMonitorService bindService;
 
     /**
-     * 获取服务器CPU信息
+     * 获取服务器 CPU 信息
      *
-     * @return CPU信息
+     * @return CPU 信息
      */
     @GetMapping("/getCPUInfo")
-    @PreAuthorize("hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasRole(@sec.getAdministrators())")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
     }
@@ -57,7 +57,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getRAMInfo")
-    @PreAuthorize("hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasRole(@sec.getAdministrators())")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
     }
@@ -68,7 +68,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getJVMInfo")
-    @PreAuthorize("hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasRole(@sec.getAdministrators())")
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();
     }

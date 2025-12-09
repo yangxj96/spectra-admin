@@ -16,13 +16,16 @@
 
 package io.github.yangxj96.spectra.core.controller.common;
 
+import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
+import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import io.github.yangxj96.spectra.core.service.common.FileService;
-import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
@@ -43,14 +46,41 @@ public class FileController {
     private FileService bindService;
 
     /**
-     * 文件上传
-     *
-     * @param file 需要上传的文件
+     * 预处理文件
      */
-    @ULog("文件上传")
+    @GetMapping("/preprocess")
+    public FilePreprocessVO preprocess(FilePreprocessFrom from) {
+        return bindService.preprocess(from);
+    }
+
+    /**
+     * 小文件直接保存
+     *
+     * @param from 文件直接保存的参数
+     */
     @PostMapping("/upload")
-    public void upload(MultipartFile file) throws IOException {
-        bindService.upload(file);
+    public void upload(FileUploadFrom from) {
+        bindService.upload(from);
+    }
+
+    /**
+     * 上传切片
+     *
+     * @param from 文件分片上传参数
+     */
+    @PostMapping("/chunk")
+    public void chunk(FileChunkFrom from) throws IOException {
+        bindService.chunk(from);
+    }
+
+    /**
+     * 查询文件上传进度
+     *
+     * @param md5 文件MD5
+     */
+    @GetMapping("/progress")
+    public void progress(String md5) {
+        // 暂时未实现
     }
 
 }

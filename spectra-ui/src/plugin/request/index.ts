@@ -56,7 +56,7 @@ const requestFulfilled = (config: InternalAxiosRequestConfig) => {
         config.headers.loading = undefined;
     }
     const token = useUserStore().token.access_token;
-    if (token !== undefined || token !== "") {
+    if (token && !config.url?.includes("/login")) {
         config.headers["Authorization"] = `Bearer ${token}`;
     }
     config.cancelToken = new axios.CancelToken(function executor(c) {
@@ -98,8 +98,9 @@ const responseRejected = (error: AxiosError) => {
 
         // 401 认证失败：跳转登录
         if (status === 401) {
+            // "认证异常:"
             ElMessage.error({
-                message: "认证异常:" + msg,
+                message: msg,
                 duration: 2000,
                 onClose: () => {
                     GlobalUtils.toLogin();

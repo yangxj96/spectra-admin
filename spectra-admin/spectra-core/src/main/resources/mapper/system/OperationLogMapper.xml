@@ -6,6 +6,12 @@
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_LOG"-->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
+        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
+        <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
         <result column="TYPE"       jdbcType="INTEGER"   property="type"/>
         <result column="EXPLAIN"    jdbcType="VARCHAR"   property="explain"/>
         <result column="STATUS"     jdbcType="SMALLINT"  property="status"/>
@@ -15,12 +21,6 @@
         <result column="ARGS"       jdbcType="VARCHAR"   property="args"/>
         <result column="RESULT"     jdbcType="VARCHAR"   property="result"/>
         <result column="TIME_COST"  jdbcType="BIGINT"    property="timeCost"/>
-        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
-        <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
     </resultMap>
     <!-- @formatter:on -->
 

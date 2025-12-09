@@ -14,32 +14,26 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.datascope;
+package io.github.yangxj96.spectra.common.exception;
 
 /**
- * 数据范围上下文工具类
+ * 文件类型异常
  *
  * @author Jack Young
  * @version 1.0
  * @since 2025-11-11
  */
-public class DataScopeContext {
+public class FileUploadException extends SpectraException {
 
-    private DataScopeContext() {
+    public FileUploadException() {
+        super("文件上传异常");
     }
 
-    private static final ThreadLocal<DataScopeInfo> DATA_SCOPE_HOLDER = new ThreadLocal<>();
-
-    public static void set(DataScopeInfo info) {
-        DATA_SCOPE_HOLDER.set(info);
+    public FileUploadException(String message) {
+        super(message);
     }
 
-    public static DataScopeInfo get() {
-        return DATA_SCOPE_HOLDER.get();
+    public FileUploadException(Throwable cause) {
+        super(cause);
     }
-
-    public static void clear() {
-        DATA_SCOPE_HOLDER.remove();
-    }
-
 }

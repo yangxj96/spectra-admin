@@ -50,4 +50,6 @@ public class TokenVO implements Serializable {
 
     private List<String> authorities;
 
+    private List<String> roles;
+
 }

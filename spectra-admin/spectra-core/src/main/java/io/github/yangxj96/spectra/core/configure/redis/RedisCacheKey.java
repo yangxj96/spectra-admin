@@ -10,6 +10,9 @@ package io.github.yangxj96.spectra.core.configure.redis;
  */
 public final class RedisCacheKey {
 
+    private RedisCacheKey() {
+    }
+
     /**
      * token存储的格式 <br/>
      * <p>auth:token:{userId}:{tokenId}</p>
@@ -19,6 +22,6 @@ public final class RedisCacheKey {
     /**
      * 反向索引:token → userId
      */
-    public static final String TOKEN_TO_USER_KEY  = "authorization:token-ref:%s";
+    public static final String TOKEN_TO_USER_KEY = "authorization:token-ref:%s";
 
 }

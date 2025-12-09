@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ULogConfiguration {
 
-    private static final String PREFIX = "[操作日志配置]:";
+    private static final String PREFIX = "[ULogConfiguration]:";
 
     /**
      * 日志消息订阅发布者
@@ -62,26 +62,8 @@ public class ULogConfiguration {
      */
     @Bean
     public ULogAspect uLogAspect() {
-        log.debug(PREFIX + "载入ULogAspect");
+        log.debug(PREFIX + "载入 ULogAspect");
         return new ULogAspect();
-    }
-
-    /**
-     * 配置一个用于日志保存的异步线程池
-     *
-     * @return {@link Executor}
-     */
-    @Bean
-    @ConditionalOnBean(ULogAspect.class)
-    public Executor uLogTaskExecutor() {
-        // TODO: 等其他框架适配启动后,测试下用虚拟线程和这个异步线程是否有影响
-        log.debug(PREFIX + "初始化一个ThreadPoolTaskExecutor供日志切面保存使用");
-        return new TaskExecutorAdapter(Executors.newThreadPerTaskExecutor(
-                Thread
-                        .ofVirtual()
-                        .name("ULog-Async-", 0)
-                        .factory()
-        ));
     }
 
 }

@@ -18,7 +18,8 @@ package io.github.yangxj96.spectra.core.configure.mybatis;
 
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import io.github.yangxj96.spectra.common.constant.Common;
+import io.github.yangxj96.spectra.core.template.SecurityTemplate;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -34,7 +35,10 @@ import java.time.LocalDateTime;
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
-    private static final String PREFIX = "[MyBatisPlus数据填充]:";
+    private static final String PREFIX = "[MetaObjectHandler]:";
+
+    @Resource
+    private SecurityTemplate securityTemplate;
 
     /**
      * 创建人
@@ -59,14 +63,15 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
+        log.debug("{}insertFill", PREFIX);
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
-            setFieldValByName(CREATED_BY, getCurrentUserId(), metaObject);
+            setFieldValByName(CREATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(CREATED_AT, metaObject) == null) {
             setFieldValByName(CREATED_AT, LocalDateTime.now(), metaObject);
         }
         if (getFieldValByName(UPDATED_BY, metaObject) == null) {
-            setFieldValByName(UPDATED_BY, getCurrentUserId(), metaObject);
+            setFieldValByName(UPDATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
             setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
@@ -75,23 +80,9 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        setFieldValByName(UPDATED_BY, getCurrentUserId(), metaObject);
+        log.debug("{}updateFill", PREFIX);
+        setFieldValByName(UPDATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
     }
 
-    /**
-     * 获取当前用户ID,如果获取失败,则返回ID为0
-     *
-     * @return 用户ID
-     */
-    private Long getCurrentUserId() {
-        try {
-            //return StpUtil.getLoginIdAsLong();
-            // TODO 更换SpringSecurity后需要修改
-            return Common.PID;
-        } catch (Exception e) {
-            log.error(PREFIX + "获取ID出错,默认ID为{}", Common.PID, e);
-            return Common.PID;
-        }
-    }
 }
