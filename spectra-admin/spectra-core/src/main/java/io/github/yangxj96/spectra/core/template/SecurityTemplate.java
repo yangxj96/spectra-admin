@@ -90,4 +90,12 @@ public class SecurityTemplate {
     public String getAdministrators() {
         return properties.getAdministrators();
     }
+
+    /**
+     * 根据用户 ID 提出用户
+     * @param userId 用户 ID
+     */
+    public void kickByUserId(Long userId) {
+
+    }
 }
