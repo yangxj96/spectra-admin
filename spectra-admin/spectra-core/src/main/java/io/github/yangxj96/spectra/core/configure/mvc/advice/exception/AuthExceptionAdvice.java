@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -53,6 +54,20 @@ public class AuthExceptionAdvice {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         log.error(PREFIX + "无权限异常,{}", e.getMessage(), e);
         return R.failure(HttpStatus.UNAUTHORIZED, "无权操作");
+    }
+
+    /**
+     * 登录异常
+     *
+     * @param e        错误信息
+     * @param response 响应
+     * @return 格式化为正常响应返回
+     */
+    @ExceptionHandler(BadCredentialsException.class)
+    public R<Object> loginException(BadCredentialsException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        log.error(PREFIX + "密码错误,{}", e.getMessage(), e);
+        return R.failure(HttpStatus.UNAUTHORIZED, "账号或密码错误");
     }
 
 }

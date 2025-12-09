@@ -1,7 +1,9 @@
 package io.github.yangxj96.spectra.core.template;
 
 
+import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -21,9 +23,14 @@ import java.util.List;
  * @since 2025/12/5 14:30
  */
 @Slf4j
-@Component
 @NullMarked
+@Component("sec")
 public class SecurityTemplate {
+
+    private static final String PREFIX = "[SecurityTemplate]";
+
+    @Resource
+    private SecurityProperties properties;
 
     /**
      * 获取当前用户ID
@@ -33,13 +40,13 @@ public class SecurityTemplate {
     public @Nullable Long getCurrentUserId() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.debug("当前用户:为null");
+            log.debug("{}当前用户:为null", PREFIX);
             return null;
         }
         if (authentication.getPrincipal() instanceof SecurityUser user) {
             return user.getId();
         }
-        log.debug("当前用户不是SecurityUser");
+        log.debug("{}当前用户不是 SecurityUser", PREFIX);
         return null;
     }
 
@@ -51,7 +58,7 @@ public class SecurityTemplate {
     public List<? extends GrantedAuthority> getCurrentUserAuthority() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.debug("当前认证信息为null");
+            log.debug("{}当前认证信息为 null", PREFIX);
             return Collections.emptyList();
         }
         return new ArrayList<>(authentication.getAuthorities());
@@ -65,13 +72,22 @@ public class SecurityTemplate {
     public @Nullable String getCurrentUserToken() {
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication.getPrincipal() == null) {
-            log.debug("未能获取到Authentication对象或用户对象");
+            log.debug("{}未能获取到 Authentication 对象或用户对象", PREFIX);
             return null;
         }
         if (authentication.getCredentials() instanceof String token) {
             return token;
         }
-        log.debug("未能获取到token");
+        log.debug("{}未能获取到 token", PREFIX);
         return null;
+    }
+
+    /**
+     * 获取当前的管理员用户信息
+     *
+     * @return 管理员角色
+     */
+    public String getAdministrators() {
+        return properties.getAdministrators();
     }
 }

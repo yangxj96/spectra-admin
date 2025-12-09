@@ -56,7 +56,7 @@ const requestFulfilled = (config: InternalAxiosRequestConfig) => {
         config.headers.loading = undefined;
     }
     const token = useUserStore().token.access_token;
-    if (token) {
+    if (token && !config.url?.includes("/login")) {
         config.headers["Authorization"] = `Bearer ${token}`;
     }
     config.cancelToken = new axios.CancelToken(function executor(c) {

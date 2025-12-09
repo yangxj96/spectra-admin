@@ -35,7 +35,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
-    private static final String PREFIX = "[MyBatisPlus数据填充]:";
+    private static final String PREFIX = "[MetaObjectHandler]:";
 
     @Resource
     private SecurityTemplate securityTemplate;
@@ -63,7 +63,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        log.debug("{}insertFill,{}", PREFIX, metaObject.toString());
+        log.debug("{}insertFill", PREFIX);
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
             setFieldValByName(CREATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         }
@@ -80,7 +80,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.debug("{}updateFill,{}", PREFIX, metaObject.toString());
+        log.debug("{}updateFill", PREFIX);
         setFieldValByName(UPDATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
     }

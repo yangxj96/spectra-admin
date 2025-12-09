@@ -14,7 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.ObjectMapper;
 
@@ -88,14 +90,22 @@ public class TokenServiceImpl implements TokenService {
             }
         }
 
-        // 组件 token
-        return TokenVO.builder()
+        // 构造响应对象
+        TokenVO vo = TokenVO.builder()
                 .id(user.getId())
                 .username(user.getEmail())
                 .accessToken(token)
                 .authorities(authorities)
                 .roles(roles)
                 .build();
+
+        // 确保所有流程都结束且没发生错误,才进行 security 上下文设置
+        // 把当前用户信息放到上下文中,主要是为了日志记录的时候登录接口无法获取到当前用户信息
+        var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        // 组件 token
+        return vo;
     }
 
     @Override

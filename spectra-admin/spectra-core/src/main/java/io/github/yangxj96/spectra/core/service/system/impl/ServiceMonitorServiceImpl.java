@@ -145,7 +145,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     /**
      * 过滤敏感属性,只保留常见属性,防止泄露
      *
-     * @return 属性map
+     * @return 属性 map
      */
     private static Map<String, String> getFilteredProps() {
         var systemProps = System.getProperties();

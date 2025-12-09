@@ -46,7 +46,7 @@ import java.util.List;
 @EnableConfigurationProperties(FileUploadProperties.class)
 public class FileUploadConfiguration {
 
-    private static final String PREFIX = "[文件上传配置]:";
+    private static final String PREFIX = "[FileUpload]:";
 
     private final FileUploadProperties properties;
 

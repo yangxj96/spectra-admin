@@ -41,7 +41,7 @@ import java.util.concurrent.Executors;
 @Configuration
 public class ULogConfiguration {
 
-    private static final String PREFIX = "[操作日志配置]:";
+    private static final String PREFIX = "[ULogConfiguration]:";
 
     /**
      * 日志消息订阅发布者
@@ -62,7 +62,7 @@ public class ULogConfiguration {
      */
     @Bean
     public ULogAspect uLogAspect() {
-        log.debug(PREFIX + "载入ULogAspect");
+        log.debug(PREFIX + "载入 ULogAspect");
         return new ULogAspect();
     }
 

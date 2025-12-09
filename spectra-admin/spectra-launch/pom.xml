@@ -74,6 +74,9 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <jvmArguments>
+                        --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED
+                    </jvmArguments>
                 </configuration>
             </plugin>
         </plugins>

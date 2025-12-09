@@ -63,6 +63,6 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/check")
     public void check() {
-        // 能进入方法就说明token是正常的
+        // 能进入方法就说明 token 是正常的
     }
 }

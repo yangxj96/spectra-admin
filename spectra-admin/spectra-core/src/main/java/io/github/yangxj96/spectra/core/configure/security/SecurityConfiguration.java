@@ -41,7 +41,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableConfigurationProperties(SecurityProperties.class)
 public class SecurityConfiguration {
 
-    private static final String PREFIX = "[Security配置]:";
+    private static final String PREFIX = "[Security]:";
 
     @Resource
     private SecurityProperties properties;
@@ -68,6 +68,14 @@ public class SecurityConfiguration {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         log.debug("{}配置AuthenticationManager", PREFIX);
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
+        log.debug("{}开启注解方法中的EL表达式认证处理器", PREFIX);
+        var handler = new DefaultMethodSecurityExpressionHandler();
+        handler.setPermissionEvaluator(spectraPermissionEvaluator);
+        return handler;
     }
 
     /**
@@ -119,12 +127,5 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    @Bean
-    public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
-        log.debug("{}开启注解方法中的EL表达式认证处理器", PREFIX);
-        var handler = new DefaultMethodSecurityExpressionHandler();
-        handler.setPermissionEvaluator(spectraPermissionEvaluator);
-        return handler;
-    }
 
 }
