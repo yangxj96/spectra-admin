@@ -6,18 +6,18 @@
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_ORGANIZATION" -->
         <id column="ID"             jdbcType="BIGINT"    property="id"/>
-        <result column="PID"        jdbcType="BIGINT"    property="pid"/>
-        <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
-        <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
-        <result column="TYPE"       jdbcType="SMALLINT"  property="type"/>
-        <result column="PATH"       jdbcType="VARCHAR"   property="path"/>
-        <result column="REMARK"     jdbcType="VARCHAR"   property="remark"/>
         <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
         <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
+        <result column="PID"        jdbcType="BIGINT"    property="pid"/>
+        <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
+        <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
+        <result column="TYPE"       jdbcType="SMALLINT"  property="type"/>
+        <result column="PATH"       jdbcType="VARCHAR"   property="path"/>
+        <result column="REMARK"     jdbcType="VARCHAR"   property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 

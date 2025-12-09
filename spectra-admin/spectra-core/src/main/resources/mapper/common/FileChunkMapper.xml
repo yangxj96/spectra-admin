@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileChunkMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
+        <!--@mbg.generated-->
+        <!--@Table "SPECTRA"."SYS_FILE_CHUNK"-->
+        <id column="ID"               jdbcType="BIGINT"    property="id"/>
+        <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
+        <result column="CREATED_AT"   jdbcType="TIMESTAMP" property="createdAt"/>
+        <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
+        <result column="UPDATED_AT"   jdbcType="TIMESTAMP" property="updatedAt"/>
+        <result column="DELETED"      jdbcType="TIMESTAMP" property="deleted"/>
+        <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
+        <result column="FILE_ID"      jdbcType="VARCHAR"   property="fileId"/>
+        <result column="TOTAL_CHUNKS" jdbcType="BIGINT"    property="totalChunks"/>
+        <result column="CHUNK_INDEX"  jdbcType="INTEGER"   property="chunkIndex"/>
+        <result column="CHUNK_PATH"   jdbcType="VARCHAR"   property="chunkPath"/>
+        <result column="CHUNK_SIZE"   jdbcType="INTEGER"   property="chunkSize"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
+        FILE_ID,
+        CHUNK_INDEX,
+        TOTAL_CHUNKS,
+        CHUNK_PATH,
+        CHUNK_SIZE,
+        CREATED_BY,
+        CREATED_AT,
+        UPDATED_BY,
+        UPDATED_AT,
+        DELETED,
+        VERSION
+    </sql>
+
+    <select id="getByFileId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM SPECTRA.SYS_FILE_CHUNK
+        WHERE FILE_ID = #{hash}
+    </select>
+</mapper>

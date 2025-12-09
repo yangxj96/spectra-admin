@@ -6,14 +6,14 @@
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_REL_USER_ROLE"-->
         <id column="ID"               jdbcType="BIGINT"    property="id"/>
-        <result column="USER_ID"      jdbcType="BIGINT"    property="userId"/>
-        <result column="ROLE_ID"      jdbcType="BIGINT"    property="roleId"/>
         <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
         <result column="CREATED_AT"   jdbcType="TIMESTAMP" property="createdAt"/>
         <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
         <result column="UPDATED_AT"   jdbcType="TIMESTAMP" property="updatedAt"/>
         <result column="DELETED"      jdbcType="TIMESTAMP" property="deleted"/>
         <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
+        <result column="USER_ID"      jdbcType="BIGINT"    property="userId"/>
+        <result column="ROLE_ID"      jdbcType="BIGINT"    property="roleId"/>
     </resultMap>
     <!-- @formatter:on -->
 

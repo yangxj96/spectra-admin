@@ -5,7 +5,7 @@ import useUserStore from "@/plugin/store/modules/useUserStore.ts";
 import AuthApi from "@/api/AuthApi.ts";
 import { ElMessage } from "element-plus";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
-import { onMounted, reactive, ref } from "vue";
+import { onMounted, reactive, ref, watch } from "vue";
 
 const locale = ref(useAppStore().lang as Language);
 const message = reactive({
@@ -19,7 +19,6 @@ const userStore = useUserStore();
 
 // 检查token
 function check() {
-    console.log(userStore.token);
     if (!userStore.token || userStore.token.access_token === undefined) {
         console.debug("无token信息");
         return;
@@ -36,10 +35,11 @@ function check() {
     });
 }
 
+// 暂时有点问题先不处理
 // 挂在的时候执行,这里也是整个APP进行挂载
-onMounted(() => {
-    check();
-});
+// onMounted(() => {
+//     check();
+// });
 </script>
 
 <template>

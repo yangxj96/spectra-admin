@@ -16,9 +16,11 @@
 
 package io.github.yangxj96.spectra.core.service.common;
 
+import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
+import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
+import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
 
 /**
  * <p>
@@ -32,10 +34,36 @@ import java.io.IOException;
 public interface FileService {
 
     /**
-     * 文件上传
+     * 验证文件是否能上传
      *
-     * @param file 文件信息
+     * @param file 文件
      */
-    void upload(MultipartFile file) throws IOException;
+    void verify(MultipartFile file);
 
+    /**
+     * 文件预处理
+     *
+     * @param from 文件信息
+     * @return 预处理结果
+     */
+    FilePreprocessVO preprocess(FilePreprocessFrom from);
+
+    /**
+     * 文件保存
+     *
+     * @param from 文件直接保存的参数
+     */
+    void upload(FileUploadFrom from);
+
+    /**
+     * 保存分片
+     *
+     * @param from 文件分片参数
+     */
+    void chunk(FileChunkFrom from);
+
+    /**
+     * 文件合并
+     */
+    void merge(String md5);
 }

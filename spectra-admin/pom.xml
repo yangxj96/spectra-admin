@@ -30,14 +30,14 @@
         <dm.version>8.1.4.125</dm.version>
         <!-- 工具包 -->
         <mapstruct.version>1.6.3</mapstruct.version>
-        <apache.tika.version>3.2.0</apache.tika.version>
+        <apache.tika.version>3.2.3</apache.tika.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <oshi.version>6.8.1</oshi.version>
+        <oshi.version>6.9.1</oshi.version>
         <jetcache.version>2.7.8</jetcache.version>
         <druid.version>1.2.28-SNAPSHOT</druid.version>
-        <bcprov.version>1.82</bcprov.version>
-        <ip2region.version>3.1.0</ip2region.version>
+        <bcprov.version>1.83</bcprov.version>
+        <ip2region.version>3.2.1</ip2region.version>
 
     </properties>
 
@@ -130,7 +130,7 @@
             <!-- 获取系统信息 -->
             <dependency>
                 <groupId>com.github.oshi</groupId>
-                <artifactId>oshi-core</artifactId>
+                <artifactId>oshi-core-java25</artifactId>
                 <version>${oshi.version}</version>
             </dependency>
             <!-- 加密补充包 -->
@@ -139,7 +139,7 @@
                 <artifactId>bcprov-jdk18on</artifactId>
                 <version>${bcprov.version}</version>
             </dependency>
-            <!-- ip转区域 -->
+            <!-- ip 转区域 -->
             <dependency>
                 <groupId>org.lionsoul</groupId>
                 <artifactId>ip2region</artifactId>

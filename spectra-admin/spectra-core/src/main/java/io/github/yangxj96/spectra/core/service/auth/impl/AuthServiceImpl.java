@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.service.auth.impl;
 
+import io.github.yangxj96.spectra.common.exception.SpectraException;
 import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
@@ -24,7 +25,6 @@ import io.github.yangxj96.spectra.core.service.auth.AuthService;
 import io.github.yangxj96.spectra.core.service.auth.TokenService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class AuthServiceImpl implements AuthService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("不支持的登录方式"));
         SecurityUser user = handler.authenticate(request);
-        return tokenService.createTokenFor(user);
+        return tokenService.createToken(user);
     }
 
     @Override
@@ -62,7 +62,7 @@ public class AuthServiceImpl implements AuthService {
             String token = authHeader.substring(7);
             tokenService.deleteToken(token);
         } else {
-            throw new RuntimeException("退出失败");
+            throw new SpectraException("退出失败");
         }
     }
 

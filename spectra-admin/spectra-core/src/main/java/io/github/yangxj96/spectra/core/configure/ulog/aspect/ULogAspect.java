@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.configure.ulog.publisher.ULogEventPublisher;
+import io.github.yangxj96.spectra.core.template.SecurityTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -46,15 +47,16 @@ import tools.jackson.databind.ObjectMapper;
 @Aspect
 public class ULogAspect {
 
-    // TODO 更换SpringSecurity后需要处理
-
-    private static final String PREFIX = "[操作日志切面]:";
+    private static final String PREFIX = "[ULogAspect]:";
 
     @Resource
     private ULogEventPublisher publisher;
 
     @Resource
     private ObjectMapper om;
+
+    @Resource
+    private SecurityTemplate sec;
 
     /**
      * 计算操作消耗时间
@@ -88,10 +90,7 @@ public class ULogAspect {
      * @param jsonResult 响应信息
      */
     protected void handleLog(final JoinPoint point, ULog annotation, final Exception e, Object jsonResult) {
-        log.debug(PREFIX + "操作日志-开始记录");
-
         try {
-            // 获取当前用户
             // 获取请求上下文
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes == null) {
@@ -101,6 +100,8 @@ public class ULogAspect {
 
             var request = attributes.getRequest();
             var response = attributes.getResponse();
+
+            log.debug("{}操作日志-开始记录,请求方法:{}", PREFIX, request.getMethod());
 
             // 初始化记录实体
             var datum = ULogEntity
@@ -113,12 +114,13 @@ public class ULogAspect {
                     .status(getHttpResponseStatus(response))
                     .result(safeWriteValueAsString(jsonResult))
                     .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
-                    // .token(StpUtil.getTokenValue())
+                    // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
+                    .currentId(sec.getCurrentUserId())
                     .build();
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {
-            log.error("记录日志异常:{}", e.getMessage(), ex);
+            log.error("记录日志异常:{}", ex.getMessage(), ex);
         } finally {
             TIME_THREADLOCAL.remove();
         }

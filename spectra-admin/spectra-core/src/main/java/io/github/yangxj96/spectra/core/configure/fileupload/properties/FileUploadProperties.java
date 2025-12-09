@@ -42,6 +42,11 @@ public class FileUploadProperties {
     private String uploadDir = "uploads";
 
     /**
+     * 上传文件的时候临时文件路径
+     */
+    private String uploadTempDir = "temp";
+
+    /**
      * 允许的类型
      */
     private List<FileType> allowedTypes;
@@ -51,4 +56,13 @@ public class FileUploadProperties {
      */
     private List<Class<? extends FileTypeValidationStrategy>> strategies;
 
+    /**
+     * 分片大小,默认5M
+     */
+    private Long chunkSize = 5242880L;
+
+    /**
+     * 清理间隔天数
+     */
+    private Integer cleanupAfterDays = 1;
 }
