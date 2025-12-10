@@ -24,7 +24,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 基础实体类
@@ -58,7 +58,7 @@ public class BaseEntity implements Serializable {
      * 创建时间
      */
     @TableField(value = "CREATED_AT", fill = FieldFill.INSERT)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     /**
      * 更新人
@@ -70,13 +70,13 @@ public class BaseEntity implements Serializable {
      * 更新时间
      */
     @TableField(value = "UPDATED_AT", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 
     /**
      * 软删除标识。null 表示未删除，非 null 表示已删除，其值为删除时间。
      */
     @TableField(value = "DELETED")
-    private LocalDateTime deleted;
+    private Instant deleted;
 
     /**
      * 乐观锁版本号

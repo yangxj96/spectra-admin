@@ -23,7 +23,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 元数据填充实现
@@ -68,13 +68,13 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
             setFieldValByName(CREATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(CREATED_AT, metaObject) == null) {
-            setFieldValByName(CREATED_AT, LocalDateTime.now(), metaObject);
+            setFieldValByName(CREATED_AT, Instant.now(), metaObject);
         }
         if (getFieldValByName(UPDATED_BY, metaObject) == null) {
             setFieldValByName(UPDATED_BY, securityTemplate.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
-            setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
+            setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
         }
     }
 
@@ -82,7 +82,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         log.debug("{}updateFill", PREFIX);
         setFieldValByName(UPDATED_BY, securityTemplate.getCurrentUserId(), metaObject);
-        setFieldValByName(UPDATED_AT, LocalDateTime.now(), metaObject);
+        setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
     }
 
 }

@@ -188,7 +188,8 @@ logging:
     other: >-
       com.ulisesbocchio.jasyptspringboot.configuration,
       io.github.yangxj96.spectra.core.configure.mvc.filter,
-      io.github.yangxj96.spectra.core.configure.mvc.advice
+      io.github.yangxj96.spectra.core.configure.mvc.advice,
+      io.github.yangxj96.spectra.core.configure
   level:
     root: info
     other: error

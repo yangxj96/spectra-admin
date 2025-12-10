@@ -21,6 +21,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.util.TimeZone;
+
 /**
  * 启动类
  *
@@ -37,6 +39,9 @@ public class LaunchApplication {
     }
 
     static void main(String[] args) {
+        // 强制程序整体使用UTC时区.在展示的时候在格式化为对应时区
+        // Asia/Shanghai
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(LaunchApplication.class, args);
     }
 
