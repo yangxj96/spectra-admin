@@ -113,5 +113,5 @@ public class User extends BaseEntity implements Serializable {
      * 时区
      */
     @TableField(value = "TIMEZONE")
-    private Short timezone;
+    private String timezone;
 }

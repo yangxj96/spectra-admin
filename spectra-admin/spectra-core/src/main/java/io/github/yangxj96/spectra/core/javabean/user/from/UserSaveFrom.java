@@ -17,11 +17,15 @@
 package io.github.yangxj96.spectra.core.javabean.user.from;
 
 import io.github.yangxj96.spectra.common.base.Verify;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,34 +45,73 @@ public class UserSaveFrom {
     /**
      * 姓名
      */
-    @Null(message = "用户ID不能为空", groups = Verify.Insert.class)
-    @NotNull(message = "用户ID不能为空", groups = Verify.Update.class)
+    @Null(message = "新增用户时不能存在 ID", groups = Verify.Insert.class)
+    @NotNull(message = "用户 ID 不能为空", groups = Verify.Update.class)
     private Long id;
 
     /**
      * 姓名
      */
-    @NotBlank(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String name;
+    private String username;
+
+    /**
+     * 真实姓名
+     */
+    private Long realName;
+
+    /**
+     * 用户状态
+     */
+    @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private Boolean status;
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 生日
+     */
+    private LocalDateTime birthday;
+
+    /**
+     * 手机号码
+     */
+    private String phone;
 
     /**
      * 邮箱
      */
     @Email(message = "邮箱格式不正确", groups = {Verify.Insert.class, Verify.Update.class})
-    @NotEmpty(message = "邮箱不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @NotNull(message = "邮箱默认为登录账户,不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String email;
+
+    /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 语言
+     */
+    private String language;
+
+    /**
+     * 时区
+     */
+    private String timezone;
 
     /**
      * 所属组织机构ID
      */
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Long organizationId;
-
-    /**
-     * 用户状态
-     */
-    @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Short state;
 
     /**
      * 角色ID列表

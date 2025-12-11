@@ -70,7 +70,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Transactional
     public void created(RoleFrom params) {
         Role role = new Role();
-        // 生成一个角色CODE
+        // 生成一个角色 CODE
         role.setCode(IdWorker.get32UUID());
         BeanUtils.copyProperties(params, role);
         this.save(role);

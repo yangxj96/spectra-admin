@@ -4,6 +4,7 @@ package io.github.yangxj96.spectra.core.configure.security;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -22,7 +23,7 @@ import java.util.*;
  * @since 2025/12/2 17:55
  */
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
@@ -62,12 +63,16 @@ public class SecurityUser implements UserDetails {
      */
     private Short state;
 
+    @Builder.Default
     private boolean enabled = true;
 
+    @Builder.Default
     private boolean accountNonExpired = true;
 
+    @Builder.Default
     private boolean accountNonLocked = true;
 
+    @Builder.Default
     private boolean credentialsNonExpired = true;
 
     private transient Map<String,Object> extend;

@@ -4,6 +4,7 @@ package io.github.yangxj96.spectra.core.javabean.auth.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
+import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,7 +39,7 @@ public class Account extends BaseEntity implements Serializable {
      * 登录类型
      */
     @TableField(value = "TYPE")
-    private Integer type;
+    private LoginType type;
 
     /**
      * 用户名（用于账号密码登录）

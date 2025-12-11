@@ -37,7 +37,7 @@ public abstract class AbstractLoginStrategy implements LoginStrategy {
     private RelUserRoleService relUserRoleService;
 
     protected SecurityUser toSecurityUser(User user) {
-        SecurityUser securityUser = authConverter.toUserDTO(user);
+        var securityUser = authConverter.toUserDTO(user);
 
         var authorities = new ArrayList<SimpleGrantedAuthority>();
 
@@ -60,7 +60,7 @@ public abstract class AbstractLoginStrategy implements LoginStrategy {
     /**
      * 获取用户角色信息
      *
-     * @param userId 用户ID
+     * @param userId 用户 ID
      * @return 角色列表,无角色则返回空数组
      */
     private List<Role> getUserRole(Long userId) {
@@ -70,7 +70,7 @@ public abstract class AbstractLoginStrategy implements LoginStrategy {
     /**
      * 获取角色包含的权限信息
      *
-     * @param roles 角色ID列表
+     * @param roles 角色 ID 列表
      * @return 权限列表
      */
     private List<AuthorityVO> getUserAuthority(List<Long> roles) {
