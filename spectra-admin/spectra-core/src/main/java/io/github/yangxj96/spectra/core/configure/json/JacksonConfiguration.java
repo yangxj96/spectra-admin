@@ -43,7 +43,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
 /**
- * jackson相关配置
+ * jackson 相关配置
  *
  * @author Jack Young
  * @version 1.0
@@ -68,7 +68,7 @@ public class JacksonConfiguration {
         return builder -> {
 
             log.debug("{}新时间序列化", PREFIX);
-            // 新时间的序列化module
+            // 新时间的序列化 module
             var javaTimeModule = new SimpleModule();
 
             // 添加自定义序列化器

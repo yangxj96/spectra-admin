@@ -17,16 +17,19 @@ export default {
         location.reload();
     },
     toLogin() {
-        // 🛡️ 安全获取当前路径
+        // 安全获取当前路径
         const currentRoute = router.currentRoute.value;
-        const fromPath = currentRoute.fullPath || "/"; // fallback 到首页
+        let fromPath = currentRoute.fullPath || "/";
+        if (currentRoute.fullPath.includes("/login")) {
+            fromPath = "/";
+        }
 
         try {
             // 清除认证数据
             globalThis.localStorage.clear();
             globalThis.sessionStorage.clear();
 
-            // 👇 关键：使用 fromPath，而不是再次读取 currentRoute
+            // 关键：使用 fromPath，而不是再次读取 currentRoute
             router
                 .push({
                     path: "/login",

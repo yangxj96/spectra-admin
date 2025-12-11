@@ -18,10 +18,10 @@ package io.github.yangxj96.spectra.core.configure.ulog.aspect;
 
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
+import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.configure.ulog.publisher.ULogEventPublisher;
-import io.github.yangxj96.spectra.core.template.SecurityTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +54,6 @@ public class ULogAspect {
 
     @Resource
     private ObjectMapper om;
-
-    @Resource
-    private SecurityTemplate sec;
 
     /**
      * 计算操作消耗时间
@@ -115,7 +112,7 @@ public class ULogAspect {
                     .result(safeWriteValueAsString(jsonResult))
                     .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
                     // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
-                    .currentId(sec.getCurrentUserId())
+                    .currentId(SecUtil.getCurrentUserId())
                     .build();
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");

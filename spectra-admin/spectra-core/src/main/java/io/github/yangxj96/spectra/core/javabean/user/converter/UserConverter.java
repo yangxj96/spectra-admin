@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.converter;
 
+import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
@@ -34,7 +35,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/15
  */
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring",uses = TimeMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserConverter {
 
     /**

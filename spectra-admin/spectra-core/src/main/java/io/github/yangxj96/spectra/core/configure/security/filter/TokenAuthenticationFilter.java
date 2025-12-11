@@ -1,15 +1,14 @@
 package io.github.yangxj96.spectra.core.configure.security.filter;
 
 
+import io.github.yangxj96.spectra.common.utils.StrUtils;
+import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
-import io.github.yangxj96.spectra.core.service.auth.TokenService;
-import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,14 +28,11 @@ import java.io.IOException;
 @NullMarked
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
-    @Resource
-    private TokenService tokenService;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String token = resolveToken(request);
-        if (token != null) {
-            SecurityUser user = tokenService.getUserByToken(token);
+        String token = SecUtil.getCurrentToken();
+        if (StrUtils.isNotBlank(token)) {
+            SecurityUser user = SecUtil.getCurrentUser(token);
             if (user == null) {
                 // token 无效
                 throw new InsufficientAuthenticationException("Token 无效或已过期");
@@ -47,14 +43,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
         chain.doFilter(request, response);
-    }
-
-    private @Nullable String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 
 }
