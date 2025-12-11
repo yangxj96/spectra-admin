@@ -3,7 +3,7 @@ package io.github.yangxj96.spectra.core.configure.security.strategy;
 
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.core.javabean.auth.converter.AuthConverter;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityVO;

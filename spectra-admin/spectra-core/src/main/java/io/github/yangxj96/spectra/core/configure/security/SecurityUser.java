@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.javabean.auth;
+package io.github.yangxj96.spectra.core.configure.security;
 
 
 import io.github.yangxj96.spectra.common.utils.CollUtils;

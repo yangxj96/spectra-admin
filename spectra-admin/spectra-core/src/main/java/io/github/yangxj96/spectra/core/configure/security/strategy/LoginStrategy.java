@@ -2,7 +2,7 @@ package io.github.yangxj96.spectra.core.configure.security.strategy;
 
 
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 
 /**

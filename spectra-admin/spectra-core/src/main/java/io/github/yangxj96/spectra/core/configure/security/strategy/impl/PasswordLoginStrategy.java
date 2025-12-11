@@ -4,7 +4,7 @@ package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;

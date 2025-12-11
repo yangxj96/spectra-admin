@@ -20,7 +20,7 @@ import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import jakarta.annotation.Resource;
@@ -30,7 +30,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.security.auth.login.LoginException;
 import java.util.List;
 
 /**

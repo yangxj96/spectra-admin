@@ -7,7 +7,7 @@ package io.github.yangxj96.spectra.core.configure.security.enums;
  * @version 1.0
  * @since 2025/12/2 23:14
  */
-public enum LoginType {
+public enum LoginType  {
     /**
      * 账号密码
      */

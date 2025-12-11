@@ -4,7 +4,7 @@ package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import org.springframework.stereotype.Component;
 
