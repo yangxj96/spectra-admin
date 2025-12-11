@@ -30,6 +30,7 @@
 | Java            | JDK25           | 使用最新LTS版本，性能更强  |
 | Maven           | 3.9.11          | 构建工具            |
 | Spring Boot     | 4.0.0           | 核心框架            |
+| Spring Security | 7.0.0           | 权限认证框架          |
 | MyBatis-Plus    | 3.5.15          | 增强ORM，简化CRUD    |
 | Druid           | 1.2.28-SNAPSHOT | 最强连接池 (等待发布正式版) |
 | MapStruct       | 1.6.3           | 实体映射工具，提升性能     |
