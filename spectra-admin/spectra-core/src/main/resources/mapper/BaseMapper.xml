@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.yangxj96.spectra.common.base.BaseMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseAuditMap" type="io.github.yangxj96.spectra.common.base.BaseEntity">
+        <id column="ID"             jdbcType="BIGINT" property="id"/>
+        <result column="CREATED_BY" jdbcType="BIGINT" property="createdBy"/>
+        <result column="UPDATED_BY" jdbcType="BIGINT" property="updatedBy"/>
+        <result column="VERSION"    jdbcType="BIGINT" property="version"/>
+        <result column="CREATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
+        <result column="UPDATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
+        <result column="DELETED"    jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
+    </resultMap>
+    <!-- @formatter:on -->
+</mapper>

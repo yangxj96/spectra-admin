@@ -2,29 +2,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.auth.AccountMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.auth.entity.Account">
+    <resultMap id="BaseResultMap"
+               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="io.github.yangxj96.spectra.core.javabean.auth.entity.Account">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_ACCOUNT"-->
-        <id column="ID"               jdbcType="BIGINT"    property="id"/>
-        <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
-        <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="CREATED_AT"   jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
-        <result column="UPDATED_AT"   jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
-        <result column="DELETED"      jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
-        <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
-
-        <result column="USER_ID"      jdbcType="BIGINT"    property="userId"/>
-        <result column="TYPE"         jdbcType="INTEGER"   property="type"/>
-        <result column="LOGIN_NAME"   jdbcType="VARCHAR"   property="loginName"/>
-        <result column="PASSWORD"     jdbcType="VARCHAR"   property="password"/>
-        <result column="PHONE"        jdbcType="VARCHAR"   property="phone"/>
-        <result column="EMAIL"        jdbcType="VARCHAR"   property="email"/>
-        <result column="OPENID"       jdbcType="VARCHAR"   property="openId"/>
-        <result column="UNIONID"      jdbcType="VARCHAR"   property="unionid"/>
-        <result column="PROVIDER"     jdbcType="VARCHAR"   property="provider"/>
-        <result column="STATUS"       jdbcType="BOOLEAN"   property="status"/>
-        <result column="VERIFIED"     jdbcType="BOOLEAN"   property="verified"/>
-        <result column="EXPIRES_AT"   jdbcType="TIMESTAMP_WITH_TIMEZONE" property="expiresAt"/>
+        <result column="USER_ID"    jdbcType="BIGINT"  property="userId"/>
+        <result column="TYPE"       jdbcType="INTEGER" property="type"/>
+        <result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName"/>
+        <result column="PASSWORD"   jdbcType="VARCHAR" property="password"/>
+        <result column="PHONE"      jdbcType="VARCHAR" property="phone"/>
+        <result column="EMAIL"      jdbcType="VARCHAR" property="email"/>
+        <result column="OPENID"     jdbcType="VARCHAR" property="openId"/>
+        <result column="UNIONID"    jdbcType="VARCHAR" property="unionid"/>
+        <result column="PROVIDER"   jdbcType="VARCHAR" property="provider"/>
+        <result column="STATUS"     jdbcType="BOOLEAN" property="status"/>
+        <result column="VERIFIED"   jdbcType="BOOLEAN" property="verified"/>
+        <result column="EXPIRES_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="expiresAt"/>
     </resultMap>
     <!-- @formatter:on -->
 

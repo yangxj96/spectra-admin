@@ -113,7 +113,6 @@
 | `spectra-common`    | [spectra-common](spectra-admin/spectra-common)       | 通用工具类、注解、常量、DTO等共享内容             |
 | `spectra-core`      | [spectra-core](spectra-admin/spectra-core)           | 核心接口定义、领域模型、服务契约                 |
 | `spectra-workflow`  | [spectra-workflow](spectra-admin/spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
-| `spectra-framework` | [spectra-framework](spectra-admin/spectra-framework) | 框架级配置（如权限、日志、异常处理、拦截器等）          |
 | `spectra-launch`    | [spectra-launch](spectra-admin/spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
 | `spectra-ui`        | [spectra-ui](spectra-ui)                             | 前端 Vue 项目，基于 Vite + Element Plus |
 

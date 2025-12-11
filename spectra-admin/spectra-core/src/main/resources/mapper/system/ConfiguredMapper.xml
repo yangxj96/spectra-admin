@@ -3,19 +3,14 @@
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.system.ConfiguredMapper">
 
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.system.entity.Configured">
+    <resultMap id="BaseResultMap"
+               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="io.github.yangxj96.spectra.core.javabean.system.entity.Configured">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_CONFIG"-->
-        <id column="ID"             jdbcType="BIGINT"    property="id"/>
-        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="CREATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
-        <result column="UPDATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
-        <result column="DELETED"    jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
-        <result column="VERSION"    jdbcType="BIGINT"    property="version"/>
-        <result column="KEY"        jdbcType="VARCHAR"   property="key"/>
-        <result column="VALUE"      jdbcType="VARCHAR"   property="value"/>
-        <result column="REMARKS"    jdbcType="VARCHAR"   property="remarks"/>
+        <result column="KEY"     jdbcType="VARCHAR" property="key"/>
+        <result column="VALUE"   jdbcType="VARCHAR" property="value"/>
+        <result column="REMARKS" jdbcType="VARCHAR" property="remarks"/>
     </resultMap>
     <!-- @formatter:on -->
 

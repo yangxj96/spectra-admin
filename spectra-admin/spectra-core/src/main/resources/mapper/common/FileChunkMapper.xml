@@ -2,21 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileChunkMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
+    <resultMap id="BaseResultMap"
+               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_FILE_CHUNK"-->
-        <id column="ID"               jdbcType="BIGINT"    property="id"/>
-        <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
-        <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="CREATED_AT"   jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
-        <result column="UPDATED_AT"   jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
-        <result column="DELETED"      jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
-        <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
-        <result column="FILE_ID"      jdbcType="VARCHAR"   property="fileId"/>
-        <result column="TOTAL_CHUNKS" jdbcType="BIGINT"    property="totalChunks"/>
-        <result column="CHUNK_INDEX"  jdbcType="INTEGER"   property="chunkIndex"/>
-        <result column="CHUNK_PATH"   jdbcType="VARCHAR"   property="chunkPath"/>
-        <result column="CHUNK_SIZE"   jdbcType="INTEGER"   property="chunkSize"/>
+        <result column="FILE_ID"      jdbcType="VARCHAR" property="fileId"/>
+        <result column="TOTAL_CHUNKS" jdbcType="BIGINT"  property="totalChunks"/>
+        <result column="CHUNK_INDEX"  jdbcType="INTEGER" property="chunkIndex"/>
+        <result column="CHUNK_PATH"   jdbcType="VARCHAR" property="chunkPath"/>
+        <result column="CHUNK_SIZE"   jdbcType="INTEGER" property="chunkSize"/>
     </resultMap>
     <!-- @formatter:on -->
 

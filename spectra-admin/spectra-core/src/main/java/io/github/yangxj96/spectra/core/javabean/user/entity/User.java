@@ -25,8 +25,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * 用户信息
@@ -43,20 +43,11 @@ import java.io.Serializable;
 @TableName(value = "SYS_USER")
 public class User extends BaseEntity implements Serializable {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
     /**
-     * 姓名
+     * 显示名称
      */
-    @TableField(value = "NAME")
-    private String name;
-
-    /**
-     * 邮箱
-     */
-    @TableField(value = "EMAIL")
-    private String email;
+    @TableField(value = "USERNAME")
+    private String username;
 
     /**
      * 头像
@@ -65,20 +56,62 @@ public class User extends BaseEntity implements Serializable {
     private String avatar;
 
     /**
-     * 所属组织机构ID
+     * 状态 (1:正常 0:禁用)
      */
-    @TableField(value = "ORGANIZATION_ID")
-    private Long organizationId;
+    @TableField(value = "STATUS")
+    private Boolean status;
 
     /**
-     * 用户密码
+     * 真实姓名
      */
-    @TableField(value = "PASSWORD")
-    private String password;
+    @TableField(value = "REAL_NAME")
+    private Long realName;
 
     /**
-     * 用户状态
+     * 性别(0:保密,1-男,2-女)
      */
-    @TableField(value = "STATE")
-    private Short state;
+    @TableField(value = "GENDER")
+    private Integer gender;
+
+    /**
+     * 生日
+     */
+    @TableField(value = "BIRTHDAY")
+    private LocalDateTime birthday;
+
+    /**
+     * 手机号
+     */
+    @TableField(value = "PHONE")
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    @TableField(value = "EMAIL")
+    private String email;
+
+    /**
+     * 国家
+     */
+    @TableField(value = "COUNTRY")
+    private String country;
+
+    /**
+     * 城市
+     */
+    @TableField(value = "CITY")
+    private String city;
+
+    /**
+     * 语言
+     */
+    @TableField(value = "LANGUAGE")
+    private String language;
+
+    /**
+     * 时区
+     */
+    @TableField(value = "TIMEZONE")
+    private Short timezone;
 }

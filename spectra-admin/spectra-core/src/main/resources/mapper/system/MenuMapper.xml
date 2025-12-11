@@ -2,23 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.system.MenuMapper">
     <!-- @formatter:off -->
-  <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.system.entity.Menu">
+  <resultMap id="BaseResultMap"
+             extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+             type="io.github.yangxj96.spectra.core.javabean.system.entity.Menu">
       <!--@mbg.generated-->
       <!--@Table "SPECTRA"."SYS_MENU"-->
-      <id column="ID"             jdbcType="BIGINT"    property="id" />
-      <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
-      <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
-      <result column="CREATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
-      <result column="UPDATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
-      <result column="DELETED"    jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
-      <result column="VERSION"    jdbcType="BIGINT"    property="version" />
-      <result column="PID"        jdbcType="BIGINT"    property="pid" />
-      <result column="ICON"       jdbcType="VARCHAR"   property="icon" />
-      <result column="NAME"       jdbcType="VARCHAR"   property="name" />
-      <result column="PATH"       jdbcType="VARCHAR"   property="path" />
-      <result column="COMPONENT"  jdbcType="VARCHAR"   property="component" />
-      <result column="LAYOUT"     jdbcType="VARCHAR"   property="layout" />
-      <result column="SORT"       jdbcType="INTEGER"   property="sort" />
+      <result column="PID"       jdbcType="BIGINT"  property="pid" />
+      <result column="ICON"      jdbcType="VARCHAR" property="icon" />
+      <result column="NAME"      jdbcType="VARCHAR" property="name" />
+      <result column="PATH"      jdbcType="VARCHAR" property="path" />
+      <result column="COMPONENT" jdbcType="VARCHAR" property="component" />
+      <result column="LAYOUT"    jdbcType="VARCHAR" property="layout" />
+      <result column="SORT"      jdbcType="INTEGER" property="sort" />
   </resultMap>
   <!-- @formatter:on -->
 
