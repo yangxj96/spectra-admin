@@ -37,19 +37,19 @@ public interface SecHolder {
     void deleteToken(String token);
 
     /**
-     * 根据 token 获取用户信息
-     *
-     * @param token token 信息
-     * @return 用户信息
-     */
-    @Nullable SecurityUser getUserByToken(String token);
-
-    /**
      * 获取当前用户信息
      *
      * @return 当前用户信息
      */
     @Nullable SecurityUser getCurrentUser();
+
+    /**
+     * 根据 token 获取用户信息
+     *
+     * @param token token 信息
+     * @return 用户信息
+     */
+    @Nullable SecurityUser getCurrentUser(String token);
 
     /**
      * 获取当前用户的 token

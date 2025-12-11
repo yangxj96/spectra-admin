@@ -68,7 +68,7 @@ public class SecUtil {
     }
 
     /**
-     * 根据用户信息登出
+     * 登出当前用户
      */
     public static void logout() {
         var token = getHolder().getCurrentToken();
@@ -84,8 +84,8 @@ public class SecUtil {
      * @param token token
      * @return 当前用户信息,可能为null
      */
-    public static @Nullable SecurityUser getUserByToken(String token) {
-        return getHolder().getUserByToken(token);
+    public static @Nullable SecurityUser getCurrentUser(String token) {
+        return getHolder().getCurrentUser(token);
     }
 
     /**
@@ -93,7 +93,7 @@ public class SecUtil {
      *
      * @return 当前用户信息,可能为null
      */
-    public static @Nullable SecurityUser getUser() {
+    public static @Nullable SecurityUser getCurrentUser() {
         return getHolder().getCurrentUser();
     }
 
@@ -102,7 +102,7 @@ public class SecUtil {
      *
      * @return 当前用户的 token,可能为null
      */
-    public static @Nullable String getToken() {
+    public static @Nullable String getCurrentToken() {
         return getHolder().getCurrentToken();
     }
 

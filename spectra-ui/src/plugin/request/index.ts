@@ -91,7 +91,7 @@ const responseRejected = (error: AxiosError) => {
     const response = error.response;
 
     // 情况1：服务器有响应（状态码 4xx/5xx 等）
-    if (response && response.data) {
+    if (response?.data) {
         const status = response.status;
         const rawData = response.data;
         const msg = isIResult(rawData) ? rawData.msg : "未知错误";

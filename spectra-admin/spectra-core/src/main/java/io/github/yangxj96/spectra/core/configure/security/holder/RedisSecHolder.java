@@ -2,6 +2,7 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
@@ -10,10 +11,13 @@ import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -28,6 +32,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @since 2025/12/11 10:06
  */
+@NullMarked
 @Component("sec")
 public class RedisSecHolder implements SecHolder {
 
@@ -115,7 +120,7 @@ public class RedisSecHolder implements SecHolder {
 
     @Override
     public void deleteToken(String token) {
-        SecurityUser user = getUserByToken(token);
+        SecurityUser user = getCurrentUser(token);
         if (user == null) {
             return;
         }
@@ -128,7 +133,24 @@ public class RedisSecHolder implements SecHolder {
     }
 
     @Override
-    public @Nullable SecurityUser getUserByToken(String token) {
+    public @Nullable SecurityUser getCurrentUser() {
+        // 优先从上下文获取用户信息
+        var su = this.getUserFromSecurityContext();
+        if (su != null) {
+            return su;
+        }
+
+        // 上下文没有,则尝试从请求头中获取token,存在token则尝试从Redis中获取
+        String token = this.getTokenFromHttpRequest();
+        if (token == null) {
+            return null;
+        }
+        return this.getCurrentUser(token);
+    }
+
+    @Override
+    public @Nullable SecurityUser getCurrentUser(String token) {
+        // 否则尝试从 redis 获取
         var ops = redis.opsForValue();
         String refKey = String.format(RedisCacheKey.TOKEN_TO_USER_KEY, token);
         Object o1 = ops.get(refKey);
@@ -144,22 +166,16 @@ public class RedisSecHolder implements SecHolder {
         return om.convertValue(object, SecurityUser.class);
     }
 
-    @Override
-    public @Nullable SecurityUser getCurrentUser() {
-        String bearerToken = getCurrentToken();
-        if (bearerToken == null) {
-            return null;
-        }
-        return this.getUserByToken(bearerToken.substring(7));
-    }
 
     @Override
     public @Nullable String getCurrentToken() {
-        String bearerToken = request.getHeader("authorization");
-        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
-            return null;
+        // 尝试从 SpringSecurity 上下文获取
+        var token = this.getTokenFromSecurityContext();
+        if (StrUtils.isNotBlank(token)) {
+            return token;
         }
-        return bearerToken.substring(7);
+        // 不存在旧在尝试下从 http 请求获取
+        return this.getTokenFromHttpRequest();
     }
 
     @Override
@@ -169,5 +185,69 @@ public class RedisSecHolder implements SecHolder {
             return null;
         }
         return user.getId();
+    }
+
+
+    //--------------------------  辅助方法  --------------------------------//
+
+
+    /**
+     * 从 SpringSecurity 上下文获取用户信息
+     *
+     * @return 上下文对象,有可能为空
+     */
+    private @Nullable String getTokenFromSecurityContext() {
+        var authentication = this.getSecurityContextAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        var credentials = authentication.getCredentials();
+        if (credentials instanceof String token) {
+            return token;
+        }
+        return null;
+    }
+
+    /**
+     * 从 HTTP 请求中获取 TOKEN
+     *
+     * @return Token,可能为null
+     */
+    private @Nullable String getTokenFromHttpRequest() {
+        var bearerToken = request.getHeader("authorization");
+        if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
+            return null;
+        }
+        return bearerToken.substring(7);
+    }
+
+    /**
+     * 从 SpringSecurity 上下文获取用户信息
+     *
+     * @return 上下文对象,有可能为空
+     */
+    private @Nullable SecurityUser getUserFromSecurityContext() {
+        var authentication = this.getSecurityContextAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        var principal = authentication.getPrincipal();
+        if (principal != null && principal instanceof SecurityUser su) {
+            return su;
+        }
+        return null;
+    }
+
+    /**
+     * 获取 SpringSecurity 的 Authentication 对象
+     *
+     * @return Authentication对象,有可能为null
+     */
+    private @Nullable Authentication getSecurityContextAuthentication() {
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+        return authentication;
     }
 }
