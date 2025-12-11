@@ -27,6 +27,7 @@ import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
+import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.configure.system.UserProperties;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
@@ -41,7 +42,6 @@ import io.github.yangxj96.spectra.core.mapper.user.UserMapper;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
-import io.github.yangxj96.spectra.core.template.SecurityTemplate;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -85,9 +85,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private UserProperties userProperties;
 
-    @Resource
-    private SecurityTemplate sec;
-
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
@@ -109,7 +106,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         // 强制注销账号登录信息
-        sec.kickByUserId(user.getId());
+        SecUtil.kick(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 删除用户信息

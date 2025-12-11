@@ -16,11 +16,13 @@
 
 package io.github.yangxj96.spectra.core.controller.auth;
 
+import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
+import io.github.yangxj96.spectra.core.configure.security.strategy.LoginStrategy;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
+import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
-import io.github.yangxj96.spectra.core.service.auth.AuthService;
 import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.security.auth.login.LoginException;
+import java.util.List;
 
 /**
  * 认证控制器
@@ -43,23 +46,28 @@ import javax.security.auth.login.LoginException;
 public class AuthController {
 
     @Resource
-    private AuthService bindService;
+    private List<LoginStrategy> loginStrategies;
 
     @PermitAll
     @PostMapping("/login")
     @ULog(value = "用户登录", type = SysLogType.SAFETY)
-    public TokenVO login(@Validated @RequestBody LoginFrom params) throws LoginException {
-        return bindService.login(params);
+    public TokenVO login(@Validated @RequestBody LoginFrom params) {
+        LoginStrategy handler = loginStrategies.stream()
+                .filter(h -> h.supports(params.type()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("不支持的登录方式"));
+        SecurityUser user = handler.authenticate(params);
+        return SecUtil.login(user);
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
     @ULog(value = "用户登出", type = SysLogType.SAFETY)
-    public void logout(@RequestHeader("Authorization") String authHeader) {
-        bindService.logout(authHeader);
+    public void logout() {
+        SecUtil.logout();
     }
 
-    @ULog("token检查")
+    @ULog("token 检查")
     @ResponseStatus(HttpStatus.OK)
     @PostMapping(value = "/check")
     public void check() {

@@ -31,45 +31,66 @@ public class TimeMapper {
     }
 
 
-    /* --------------------------------------
-       Instant <-> LocalDateTime
-    -------------------------------------- */
-
+    /**
+     * Instant 转 LocalDateTime
+     *
+     * @param instant {@link Instant}
+     * @return {@link LocalDateTime}
+     */
     public LocalDateTime toLocalDateTime(Instant instant) {
         return instant == null ? null : LocalDateTime.ofInstant(instant, getUserZoneId());
     }
 
+    /**
+     * LocalDateTime 转 Instant
+     *
+     * @param localDateTime {@link LocalDateTime}
+     * @return {@link Instant}
+     */
     public Instant toInstant(LocalDateTime localDateTime) {
         return localDateTime == null ? null :
                 localDateTime.atZone(getUserZoneId()).toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> LocalDate
-    -------------------------------------- */
-
+    /**
+     * Instant 转 LocalDate
+     *
+     * @param instant {@link Instant}
+     * @return {@link LocalDate}
+     */
     public LocalDate toLocalDate(Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toLocalDate();
     }
 
+    /**
+     * LocalDate 转 Instant
+     *
+     * @param localDate {@link LocalDate}
+     * @return {@link Instant}
+     */
     public Instant toInstant(LocalDate localDate) {
         return localDate == null ? null :
                 localDate.atStartOfDay(getUserZoneId()).toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> LocalTime
-    -------------------------------------- */
-
+    /**
+     * Instant 转 LocalTime
+     *
+     * @param instant {@link Instant}
+     * @return {@link LocalTime}
+     */
     public LocalTime toLocalTime(Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toLocalTime();
     }
 
     /**
-     * LocalTime -> Instant 需要日期，这里默认用今天
-     * 你可以根据业务改成抛异常
+     * LocalTime 转 Instant
+     * Instant 需要日期，这里默认用今天
+     *
+     * @param localTime {@link LocalTime}
+     * @return {@link Instant}
      */
     public Instant toInstant(LocalTime localTime) {
         return localTime == null ? null :
@@ -79,80 +100,132 @@ public class TimeMapper {
                         .toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> ZonedDateTime
-    -------------------------------------- */
-
+    /**
+     * Instant 转 ZonedDateTime
+     *
+     * @param instant {@link Instant}
+     * @return {@link ZonedDateTime}
+     */
     public ZonedDateTime toZonedDateTime(Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId());
     }
 
+    /**
+     * ZonedDateTime 转 Instant
+     *
+     * @param zonedDateTime {@link ZonedDateTime}
+     * @return {@link Instant}
+     */
     public Instant toInstant(ZonedDateTime zonedDateTime) {
         return zonedDateTime == null ? null :
                 zonedDateTime.toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> OffsetDateTime
-    -------------------------------------- */
-
+    /**
+     * Instant 转 OffsetDateTime
+     *
+     * @param instant {@link Instant}
+     * @return {@link OffsetDateTime}
+     */
     public OffsetDateTime toOffsetDateTime(Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toOffsetDateTime();
     }
 
+    /**
+     * OffsetDateTime 转 Instant
+     *
+     * @param offsetDateTime {@link OffsetDateTime}
+     * @return {@link Instant}
+     */
     public Instant toInstant(OffsetDateTime offsetDateTime) {
         return offsetDateTime == null ? null :
                 offsetDateTime.toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> Date
-    -------------------------------------- */
 
+    /**
+     * Instant 转 Date
+     *
+     * @param instant {@link Instant}
+     * @return {@link Date}
+     */
     public Date toDate(Instant instant) {
         return instant == null ? null : Date.from(instant);
     }
 
+    /**
+     * Date 转 Instant
+     *
+     * @param date {@link Date}
+     * @return {@link Instant}
+     */
     public Instant toInstant(Date date) {
         return date == null ? null : date.toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> Timestamp
-    -------------------------------------- */
 
+    /**
+     * Instant 转 Timestamp
+     *
+     * @param instant {@link Instant}
+     * @return {@link Timestamp}
+     */
     public Timestamp toTimestamp(Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
     }
 
+    /**
+     * Timestamp 转 Instant
+     *
+     * @param timestamp {@link Timestamp}
+     * @return {@link Instant}
+     */
     public Instant toInstant(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toInstant();
     }
 
-    /* --------------------------------------
-       Instant <-> epoch milli
-    -------------------------------------- */
 
+    /**
+     * Instant 转时间戳
+     *
+     * @param instant {@link Instant}
+     * @return 时间戳
+     */
     public Long toEpochMilli(Instant instant) {
         return instant == null ? null : instant.toEpochMilli();
     }
 
+    /**
+     * 时间戳转 Instant
+     *
+     * @param epochMilli 时间戳
+     * @return {@link Instant}
+     */
     public Instant toInstant(Long epochMilli) {
         return epochMilli == null ? null : Instant.ofEpochMilli(epochMilli);
     }
 
-    /* --------------------------------------
-       Instant <-> String (ISO 8601)
-    -------------------------------------- */
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
+    /**
+     * Instant转换为 ISO 8601 格式字符串
+     *
+     * @param instant {@link Instant}
+     * @return ISO 8601 格式字符串时间
+     */
     public String toString(Instant instant) {
         return instant == null ? null : ISO_FORMATTER.format(instant.atZone(getUserZoneId()));
     }
 
+    /**
+     * IOS 8601格式字符串转换到Instant
+     *
+     * @param text IOS 8601 格式的字符串
+     * @return Instant
+     */
     public Instant toInstant(String text) {
         if (text == null || text.isBlank()) return null;
         LocalDateTime ldt = LocalDateTime.parse(text, ISO_FORMATTER);

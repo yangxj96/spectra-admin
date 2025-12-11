@@ -46,7 +46,7 @@ public class ServiceMonitorController {
      * @return CPU 信息
      */
     @GetMapping("/getCPUInfo")
-    @PreAuthorize("hasRole(@sec.getAdministrators())")
+    @PreAuthorize("hasRole(@sec.administrators())")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
     }
@@ -57,7 +57,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getRAMInfo")
-    @PreAuthorize("hasRole(@sec.getAdministrators())")
+    @PreAuthorize("hasRole(@sec.administrators())")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
     }
@@ -68,7 +68,7 @@ public class ServiceMonitorController {
      * @return 内存信息
      */
     @GetMapping("/getJVMInfo")
-    @PreAuthorize("hasRole(@sec.getAdministrators())")
+    @PreAuthorize("hasRole(@sec.administrators())")
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();
     }

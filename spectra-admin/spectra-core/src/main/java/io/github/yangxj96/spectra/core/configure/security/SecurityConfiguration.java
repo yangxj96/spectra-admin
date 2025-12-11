@@ -102,7 +102,7 @@ public class SecurityConfiguration {
                 // .oauth2Login(AbstractHttpConfigurer::disable)
                 .rememberMe(AbstractHttpConfigurer::disable)
                 .logout(AbstractHttpConfigurer::disable)
-                // SESSION规则
+                // SESSION 规则
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 注册过滤器
                 .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
@@ -126,6 +126,5 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
 
 }
