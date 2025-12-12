@@ -16,7 +16,8 @@
 
 package io.github.yangxj96.spectra.common.base.javabean.vo;
 
-import jakarta.annotation.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 

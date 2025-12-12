@@ -26,8 +26,8 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.mapper.user.AuthorityMapper;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;

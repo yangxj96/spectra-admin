@@ -16,7 +16,8 @@
 
 package io.github.yangxj96.spectra.common.constant;
 
-import jakarta.annotation.Nullable;
+
+import org.jspecify.annotations.Nullable;
 
 /**
  * 通用常量

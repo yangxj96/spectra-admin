@@ -17,9 +17,9 @@
 package io.github.yangxj96.spectra.core.template;
 
 import io.github.yangxj96.spectra.common.utils.StrUtils;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.lionsoul.ip2region.xdb.LongByteArray;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.lionsoul.ip2region.xdb.Version;
