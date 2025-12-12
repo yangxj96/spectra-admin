@@ -29,7 +29,4 @@ public class DefaultDataException extends DataException {
         super("系统默认数据");
     }
 
-    public DefaultDataException(String message) {
-        super(message);
-    }
 }

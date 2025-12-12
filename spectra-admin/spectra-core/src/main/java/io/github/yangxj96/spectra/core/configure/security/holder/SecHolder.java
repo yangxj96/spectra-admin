@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.security.holder;
 
 
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import org.jspecify.annotations.Nullable;
 

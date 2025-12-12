@@ -45,8 +45,4 @@ public class SpectraException extends RuntimeException {
     public SpectraException(Throwable cause) {
         super(cause);
     }
-
-    protected SpectraException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }

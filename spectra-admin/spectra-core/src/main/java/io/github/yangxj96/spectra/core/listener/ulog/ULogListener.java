@@ -45,7 +45,7 @@ public class ULogListener {
     @Async
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
-        log.debug(PREFIX + "开始记录,{}", entity.toString());
+        log.debug(PREFIX + "开始记录,{}", entity);
         var datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
         datum.setCreatedBy(entity.getCurrentId());

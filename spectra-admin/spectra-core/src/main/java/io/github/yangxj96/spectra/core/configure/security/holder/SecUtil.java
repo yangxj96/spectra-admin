@@ -2,7 +2,7 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 
 
 import io.github.yangxj96.spectra.common.exception.SpectraException;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -115,12 +115,4 @@ public class SecUtil {
         return getHolder().getCurrentUserId();
     }
 
-    /**
-     * 根据用户 ID,提出用户所有登录端
-     *
-     * @param userId 用户 ID
-     */
-    public static void kick(Long userId) {
-
-    }
 }

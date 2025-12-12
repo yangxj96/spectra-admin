@@ -29,6 +29,7 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.mapper.system.OrganizationMapper;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,7 +83,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     }
 
     @Override
-    public List<OrganizationTreeVo> tree() {
+    public @Nullable List<OrganizationTreeVo> tree() {
         var list = this.list();
         var vos = organizationConverter.toTreeVOS(list);
         return new TreeBuilder<>(vos).buildTree(Common.PID);

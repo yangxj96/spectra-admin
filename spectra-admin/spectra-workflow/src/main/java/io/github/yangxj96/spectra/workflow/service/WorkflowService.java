@@ -16,10 +16,6 @@
 
 package io.github.yangxj96.spectra.workflow.service;
 
-import io.github.yangxj96.spectra.workflow.javabean.vo.ProcessDefinitionVO;
-
-import java.util.List;
-
 /**
  * 工作流业务层
  *
@@ -28,8 +24,5 @@ import java.util.List;
  * @since 2025-11-11
  */
 public interface WorkflowService {
-
-
-    List<ProcessDefinitionVO> getWorkflows();
 
 }

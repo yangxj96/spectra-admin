@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -50,6 +51,7 @@ public class Organization extends BaseEntity implements Serializable {
     /**
      * 上级ID
      */
+    @Nullable
     @TableField(value = "PID")
     private Long pid;
 

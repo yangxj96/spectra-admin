@@ -104,7 +104,7 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     @Override
     public Boolean isCheck() {
-        return properties.getVerify() == Boolean.TRUE;
+        return properties.getVerify();
     }
 
     @Override

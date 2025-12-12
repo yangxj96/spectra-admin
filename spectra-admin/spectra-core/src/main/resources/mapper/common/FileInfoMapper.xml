@@ -3,23 +3,18 @@
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper">
 
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo">
+    <resultMap id="BaseResultMap"
+               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_FILE_INFO"-->
-        <id column="ID"               jdbcType="BIGINT"    property="id"/>
-        <result column="CREATED_BY"   jdbcType="BIGINT"    property="createdBy"/>
-        <result column="CREATED_AT"   jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="UPDATED_BY"   jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="UPDATED_AT"   jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="DELETED"      jdbcType="TIMESTAMP" property="deleted"/>
-        <result column="VERSION"      jdbcType="BIGINT"    property="version"/>
-        <result column="FILE_NAME"    jdbcType="VARCHAR"   property="fileName"/>
-        <result column="ORIGIN_NAME"  jdbcType="VARCHAR"   property="originName"/>
-        <result column="SUFFIX"       jdbcType="VARCHAR"   property="suffix"/>
-        <result column="PATH"         jdbcType="VARCHAR"   property="path"/>
-        <result column="SIZE"         jdbcType="BIGINT"    property="size"/>
-        <result column="HASH"         jdbcType="VARCHAR"   property="hash"/>
-        <result column="STORAGE_TYPE" jdbcType="SMALLINT"  property="storageType"/>
+        <result column="FILE_NAME"    jdbcType="VARCHAR"  property="fileName"/>
+        <result column="ORIGIN_NAME"  jdbcType="VARCHAR"  property="originName"/>
+        <result column="SUFFIX"       jdbcType="VARCHAR"  property="suffix"/>
+        <result column="PATH"         jdbcType="VARCHAR"  property="path"/>
+        <result column="SIZE"         jdbcType="BIGINT"   property="size"/>
+        <result column="HASH"         jdbcType="VARCHAR"  property="hash"/>
+        <result column="STORAGE_TYPE" jdbcType="SMALLINT" property="storageType"/>
     </resultMap>
     <!-- @formatter:on -->
 

@@ -33,6 +33,7 @@ import io.github.yangxj96.spectra.core.service.system.DictGroupService;
 import io.github.yangxj96.spectra.core.service.system.DictService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -76,7 +77,7 @@ public class DictServiceImpl implements DictService {
         if (null == group) {
             throw new DataNotExistException("字典组不存在");
         }
-        if (Boolean.TRUE.equals(group.getBuiltin())) {
+        if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法删除");
         }
         // 获取他的字典数据
@@ -90,7 +91,7 @@ public class DictServiceImpl implements DictService {
     @Transactional
     public void modifyGroup(DictGroupFrom params) {
         var group = groupService.getById(params.getId());
-        if (Boolean.TRUE.equals(group.getBuiltin())) {
+        if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
         var entity = dictConverter.groupFromToEntity(params);
@@ -112,7 +113,7 @@ public class DictServiceImpl implements DictService {
             throw new DataNotExistException("字典项不存在");
         }
         var group = groupService.getById(dictData.getGid());
-        if (Boolean.TRUE.equals(group.getBuiltin())) {
+        if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法删除");
         }
         dataService.removeById(id);
@@ -122,7 +123,7 @@ public class DictServiceImpl implements DictService {
     @Transactional
     public void modifyData(DictDataFrom params) {
         var group = groupService.getById(params.getGid());
-        if (Boolean.TRUE.equals(group.getBuiltin())) {
+        if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
         var entity = dictConverter.dataFromToEntity(params);
@@ -130,7 +131,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<DictTypeTreeVO> listDictGroupWrapTree() {
+    public @Nullable List<DictTypeTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
         var wrapper = new LambdaQueryWrapper<DictGroup>()
                 .eq(DictGroup::getState, 0)

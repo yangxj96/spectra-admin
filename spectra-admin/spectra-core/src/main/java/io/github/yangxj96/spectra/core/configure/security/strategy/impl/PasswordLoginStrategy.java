@@ -1,12 +1,13 @@
 package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 
 
+import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.strategy.AbstractLoginStrategy;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
-import io.github.yangxj96.spectra.core.javabean.user.entity.User;
+import io.github.yangxj96.spectra.core.service.auth.AccountService;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
@@ -32,6 +33,9 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
     private UserService userService;
 
     @Resource
+    private AccountService accountService;
+
+    @Resource
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -44,16 +48,20 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
     public SecurityUser authenticate(LoginFrom request) {
         try {
             // 验证码验证
-            if (kaptchaService.isCheck() == Boolean.TRUE) {
+            if (kaptchaService.isCheck()) {
                 var code = kaptchaService.getKaptchaCode();
                 if (!request.captcha().equals(code)) {
                     throw new KaptchaNotMatchException("验证码错误");
                 }
             }
-            // 查询用户信息
-            User user = userService.getByEmail(request.identifier());
-            if (user == null || !passwordEncoder.matches(request.credential(), user.getPassword())) {
+            // 查询账户信息
+            var account = accountService.getByLoginName(request.identifier());
+            if (account == null || !passwordEncoder.matches(request.credential(), account.getPassword())) {
                 throw new BadCredentialsException("账号或密码错误");
+            }
+            var user = userService.getById(account.getUserId());
+            if (user == null) {
+                throw new DataNotExistException("用户不存在");
             }
             // 验证通过,封装返回
             return toSecurityUser(user);

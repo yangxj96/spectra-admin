@@ -1,7 +1,6 @@
 package io.github.yangxj96.spectra.common.utils;
 
 
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -14,7 +13,6 @@ import java.util.Map;
  * @version 1.0
  * @since 2025/11/25 14:43
  */
-@NullMarked
 public final class CollUtils {
 
     private CollUtils() {

@@ -23,6 +23,7 @@ import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -81,7 +82,7 @@ public class MenuController {
      */
     @ULog(value = "获取树形菜单")
     @GetMapping("/tree")
-    public List<MenuTreeVO> tree() {
+    public @Nullable List<MenuTreeVO> tree() {
         return bindService.tree();
     }
 }

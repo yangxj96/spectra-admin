@@ -4,12 +4,13 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
+import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
-import io.github.yangxj96.spectra.core.javabean.auth.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -17,9 +18,11 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.*;
@@ -32,6 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @version 1.0
  * @since 2025/12/11 10:06
  */
+@Slf4j
 @NullMarked
 @Component("sec")
 public class RedisSecHolder implements SecHolder {
@@ -47,9 +51,6 @@ public class RedisSecHolder implements SecHolder {
 
     @Resource
     private SecurityProperties properties;
-
-    @Resource
-    private HttpServletRequest request;
 
     public RedisSecHolder() {
         SecUtil.setHolder(this);
@@ -69,7 +70,7 @@ public class RedisSecHolder implements SecHolder {
             su.setExtend(new HashMap<>());
         }
         var terminalExtraData = su.getExtend();
-        var ip = IpUtils.getClientIP(request);
+        var ip = IpUtils.getClientIP(this.getHttpServletRequest());
         terminalExtraData.put("ip", ip);
         terminalExtraData.put("address", ipLocationTemplate.getCityEn(ip));
 
@@ -214,6 +215,10 @@ public class RedisSecHolder implements SecHolder {
      * @return Token,可能为null
      */
     private @Nullable String getTokenFromHttpRequest() {
+        HttpServletRequest request = this.getHttpServletRequest();
+        if (request == null) {
+            return null;
+        }
         var bearerToken = request.getHeader("authorization");
         if (bearerToken == null || !bearerToken.startsWith("Bearer ")) {
             return null;
@@ -232,7 +237,7 @@ public class RedisSecHolder implements SecHolder {
             return null;
         }
         var principal = authentication.getPrincipal();
-        if (principal != null && principal instanceof SecurityUser su) {
+        if (principal instanceof SecurityUser su) {
             return su;
         }
         return null;
@@ -244,10 +249,19 @@ public class RedisSecHolder implements SecHolder {
      * @return Authentication对象,有可能为null
      */
     private @Nullable Authentication getSecurityContextAuthentication() {
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) {
-            return null;
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    /**
+     * 获取 request
+     *
+     * @return {@link HttpServletRequest}
+     */
+    private @Nullable HttpServletRequest getHttpServletRequest() {
+        RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
+        if (attrs instanceof ServletRequestAttributes sra) {
+            return sra.getRequest();
         }
-        return authentication;
+        return null;
     }
 }

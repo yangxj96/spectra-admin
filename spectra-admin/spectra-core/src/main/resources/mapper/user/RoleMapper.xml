@@ -2,22 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.user.RoleMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap" type="io.github.yangxj96.spectra.core.javabean.user.entity.Role">
+    <resultMap id="BaseResultMap"
+               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="io.github.yangxj96.spectra.core.javabean.user.entity.Role">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_ROLE"-->
-        <id column="ID"             jdbcType="BIGINT"    property="id"/>
-        <result column="CREATED_BY" jdbcType="BIGINT"    property="createdBy"/>
-        <result column="CREATED_AT" jdbcType="TIMESTAMP" property="createdAt"/>
-        <result column="UPDATED_BY" jdbcType="BIGINT"    property="updatedBy"/>
-        <result column="UPDATED_AT" jdbcType="TIMESTAMP" property="updatedAt"/>
-        <result column="DELETED"    jdbcType="TIMESTAMP" property="deleted"/>
-        <result column="VERSION"    jdbcType="TIMESTAMP" property="version"/>
-        <result column="NAME"       jdbcType="VARCHAR"   property="name"/>
-        <result column="CODE"       jdbcType="VARCHAR"   property="code"/>
-        <result column="STATE"      jdbcType="NUMERIC"   property="state"/>
-        <result column="SCOPE"      jdbcType="SMALLINT"  property="scope"/>
-        <result column="BUILTIN"    jdbcType="NUMERIC"   property="builtin"/>
-        <result column="REMARK"     jdbcType="CLOB"      property="remark"/>
+        <result column="NAME"    jdbcType="VARCHAR"  property="name"/>
+        <result column="CODE"    jdbcType="VARCHAR"  property="code"/>
+        <result column="STATE"   jdbcType="NUMERIC"  property="state"/>
+        <result column="SCOPE"   jdbcType="SMALLINT" property="scope"/>
+        <result column="BUILTIN" jdbcType="NUMERIC"  property="builtin"/>
+        <result column="REMARK"  jdbcType="CLOB"     property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 

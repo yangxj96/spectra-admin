@@ -24,7 +24,6 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
-import jakarta.validation.constraints.NotEmpty;
 
 /**
  * 用户service层
@@ -71,15 +70,6 @@ public interface UserService extends BaseService<User> {
      * @param uid 用户ID
      */
     void passwordResetById(String uid);
-
-    /**
-     * 根据用户邮箱查询用户信息
-     *
-     * @param email 用于邮箱
-     * @return 用户信息,可能为null
-     */
-    User getByEmail(@NotEmpty(message = "用户名不能为空") String email);
-
 
     /**
      * 分页获取在线用户

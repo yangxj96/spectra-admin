@@ -58,7 +58,9 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     public void grant(Long roleId, RoleMenuFrom from) {
         // 当前角色关联的菜单信息
         var currentIds = relRoleMenuMapper.getByRoleId(roleId)
-                .stream().map(RelRoleMenu::getMenuId).collect(Collectors.toSet());
+                .stream()
+                .map(RelRoleMenu::getMenuId)
+                .collect(Collectors.toSet());
 
         var targetIds = new HashSet<>(from.getMenuIds());
         // 计算删除且删除

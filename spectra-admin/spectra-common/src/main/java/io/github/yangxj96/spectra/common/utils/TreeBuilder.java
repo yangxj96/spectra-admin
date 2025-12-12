@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.common.utils;
 
 import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
 
 import java.util.*;
 
@@ -31,7 +32,7 @@ import java.util.*;
  * @since 2025-6-14
  */
 @Slf4j
-public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
+public record TreeBuilder<T extends Tree<T>>(@Nullable List<T> dataList) {
 
     /**
      * 构建树形结构
@@ -39,7 +40,7 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
      * @param rootPid 根节点的 pid 值（例如 -1L、0L）
      * @return 树形结构列表
      */
-    public List<T> buildTree(Long rootPid) {
+    public @Nullable List<T> buildTree(@Nullable Long rootPid) {
         if (dataList == null || dataList.isEmpty()) {
             return Collections.emptyList();
         }
@@ -73,7 +74,7 @@ public record TreeBuilder<T extends Tree<T>>(List<T> dataList) {
     /**
      * 对每个层级进行排序（按 sort 字段）
      */
-    private List<T> sortTree(List<T> nodes) {
+    private @Nullable List<T> sortTree(@Nullable List<T> nodes) {
         if (nodes == null || nodes.isEmpty()) {
             return nodes;
         }

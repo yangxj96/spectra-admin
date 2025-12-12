@@ -16,6 +16,9 @@
 
 package io.github.yangxj96.spectra.common.base.javabean.vo;
 
+
+import org.jspecify.annotations.Nullable;
+
 import java.util.List;
 
 /**
@@ -32,11 +35,13 @@ public interface Tree<T> {
 
     void setId(Long id);
 
+    @Nullable
     Long getPid();
 
-    void setPid(Long pid);
+    void setPid(@Nullable Long pid);
 
+    @Nullable
     List<T> getChildren();
 
-    void setChildren(List<T> children);
+    void setChildren(@Nullable List<T> children);
 }

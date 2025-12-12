@@ -33,8 +33,6 @@ import io.github.yangxj96.spectra.core.javabean.user.from.RoleFrom;
 import io.github.yangxj96.spectra.core.javabean.user.from.RolePageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
 import io.github.yangxj96.spectra.core.mapper.user.RoleMapper;
-import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
-import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -55,12 +53,6 @@ import java.util.List;
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 
     @Resource
-    private RelRoleMenuService relRoleMenuService;
-
-    @Resource
-    private RelRoleAuthorityService relRoleAuthorityService;
-
-    @Resource
     private RoleConverter roleConverter;
 
     @Resource
@@ -70,7 +62,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Transactional
     public void created(RoleFrom params) {
         Role role = new Role();
-        // 生成一个角色CODE
+        // 生成一个角色 CODE
         role.setCode(IdWorker.get32UUID());
         BeanUtils.copyProperties(params, role);
         this.save(role);
@@ -83,11 +75,11 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         if (role == null) {
             throw new DataNotExistException("角色不存在");
         }
-        if (Boolean.TRUE.equals(role.getBuiltin())) {
+        if (role.getBuiltin()) {
             throw new BuiltinDataException("内置角色,不可删除");
         }
         Role defaultRole = this.getSystemDefaultUserRole();
-        if (defaultRole == null || defaultRole.getId().equals(id)) {
+        if (defaultRole.getId().equals(id)) {
             throw new DefaultDataException();
         }
 

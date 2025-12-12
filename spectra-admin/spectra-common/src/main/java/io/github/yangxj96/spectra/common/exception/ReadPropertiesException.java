@@ -29,7 +29,4 @@ public class ReadPropertiesException extends SpectraException {
         super(message);
     }
 
-    public ReadPropertiesException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

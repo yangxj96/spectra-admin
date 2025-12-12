@@ -17,11 +17,14 @@ export default {
         location.reload();
     },
     toLogin() {
+        let query = {};
         // 安全获取当前路径
         const currentRoute = router.currentRoute.value;
         let fromPath = currentRoute.fullPath || "/";
-        if (currentRoute.fullPath.includes("/login")) {
-            fromPath = "/";
+        if (!currentRoute.fullPath.includes("/login")) {
+            query = {
+                redirect: fromPath
+            };
         }
 
         try {
@@ -33,9 +36,7 @@ export default {
             router
                 .push({
                     path: "/login",
-                    query: {
-                        redirect: fromPath
-                    }
+                    query
                 })
                 .then(() => {
                     console.log(`用户已登出，跳转至登录页，来源: ${fromPath}`);

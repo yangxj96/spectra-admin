@@ -95,7 +95,7 @@ public class FileServiceLocalImpl extends AbstractFileService {
             return FilePreprocessVO.exist();
         }
         // 小文件不用计算分片了
-        if (from.size() <= properties.getChunkSize()) {
+        if (properties == null || from.size() <= properties.getChunkSize()) {
             return FilePreprocessVO.ofFalse();
         }
         // 计算分片信息后响应
