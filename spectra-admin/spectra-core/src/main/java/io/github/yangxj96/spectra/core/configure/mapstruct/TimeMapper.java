@@ -28,7 +28,6 @@ public class TimeMapper {
      * @return 时区
      */
     public ZoneId getUserZoneId() {
-        // return ZoneId.of("Asia/Shanghai");
         return ZoneId.of("UTC");
     }
 

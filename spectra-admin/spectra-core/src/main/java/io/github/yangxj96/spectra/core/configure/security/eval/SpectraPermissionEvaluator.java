@@ -65,7 +65,12 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
      * @param hasDoubleStar 是否包含 "**" 通配
      * @param regex         仅在 segmentBased=false 时不为空
      */
-    private record CompiledPermissionPattern(boolean segmentBased, String[] segments, boolean hasDoubleStar, Pattern regex) {
+    private record CompiledPermissionPattern(
+            boolean segmentBased,
+            String[] segments,
+            boolean hasDoubleStar,
+            Pattern regex
+    ) {
     }
 
     /**
@@ -197,7 +202,8 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
         if (!hasDoubleStar && patternSegs.length != userSegs.length) {
             return false;
         }
-        int p = 0, u = 0;
+        int p = 0;
+        int u = 0;
         while (p < patternSegs.length && u < userSegs.length) {
             String seg = patternSegs[p];
             // ** → 多级通配，剩余全部匹配

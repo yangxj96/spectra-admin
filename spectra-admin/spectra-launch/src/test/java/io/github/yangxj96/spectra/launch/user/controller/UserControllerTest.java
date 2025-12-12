@@ -2,7 +2,6 @@ package io.github.yangxj96.spectra.launch.user.controller;
 
 
 import com.google.common.collect.Lists;
-import io.github.yangxj96.spectra.core.controller.user.UserController;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
@@ -19,10 +18,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  */
 @Slf4j
 @SpringBootTest
-public class UserControllerTest {
-
-    @Resource
-    private UserController userController;
+class UserControllerTest {
 
     @Resource
     private UserService userService;
