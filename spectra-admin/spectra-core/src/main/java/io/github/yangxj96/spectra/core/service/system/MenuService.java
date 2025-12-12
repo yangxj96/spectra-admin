@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
 import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -51,7 +52,7 @@ public interface MenuService extends IService<Menu> {
      *
      * @return 生成的树形菜单
      */
-    List<MenuTreeVO> tree();
+    @Nullable List<MenuTreeVO> tree();
 
     /**
      * 根据角色ID获取角色关联的菜单

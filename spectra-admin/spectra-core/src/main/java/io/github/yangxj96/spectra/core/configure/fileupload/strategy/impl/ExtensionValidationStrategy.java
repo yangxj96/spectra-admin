@@ -20,6 +20,7 @@ import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -36,7 +37,7 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
     private static final Integer MIN = -1;
 
     @Override
-    public boolean isValid(MultipartFile file) {
+    public boolean isValid(@Nullable MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return false;
         }

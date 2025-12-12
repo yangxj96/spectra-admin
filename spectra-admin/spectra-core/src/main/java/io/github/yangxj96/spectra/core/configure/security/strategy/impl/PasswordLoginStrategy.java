@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.security.strategy.impl;
 
 
+import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
 import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
@@ -47,7 +48,7 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
     public SecurityUser authenticate(LoginFrom request) {
         try {
             // 验证码验证
-            if (kaptchaService.isCheck() == Boolean.TRUE) {
+            if (kaptchaService.isCheck()) {
                 var code = kaptchaService.getKaptchaCode();
                 if (!request.captcha().equals(code)) {
                     throw new KaptchaNotMatchException("验证码错误");
@@ -59,6 +60,9 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
                 throw new BadCredentialsException("账号或密码错误");
             }
             var user = userService.getById(account.getUserId());
+            if (user == null) {
+                throw new DataNotExistException("用户不存在");
+            }
             // 验证通过,封装返回
             return toSecurityUser(user);
         } finally {

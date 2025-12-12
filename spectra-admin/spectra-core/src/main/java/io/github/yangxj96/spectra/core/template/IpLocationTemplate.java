@@ -16,7 +16,8 @@
 
 package io.github.yangxj96.spectra.core.template;
 
-import jakarta.annotation.PostConstruct;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.lionsoul.ip2region.xdb.LongByteArray;
@@ -42,6 +43,7 @@ public class IpLocationTemplate {
 
     private static final String PREFIX = "[IP2REGION]";
 
+    @Nullable
     private Searcher searcher;
 
     /**
@@ -51,8 +53,7 @@ public class IpLocationTemplate {
      * 使用内存模式（newWithBuffer）可避免 I/O 开销，适合高频查询场景。
      * </p>
      */
-    @PostConstruct
-    public void init() {
+    public IpLocationTemplate() {
         try (var raf = createRandomAccessFileForResource()) {
             // 校验数据库完整性
             Searcher.verify(raf);
@@ -180,7 +181,7 @@ public class IpLocationTemplate {
      * 判断字段是否有效（非空、非"0"、非"内网IP"）
      */
     private static boolean isValidField(String field) {
-        return field != null && !field.isEmpty() && !"0".equals(field) && !"内网IP".equals(field);
+        return StrUtils.isNotBlank(field) && !"0".equals(field) && !"内网IP".equals(field);
     }
 
     /**
@@ -197,7 +198,7 @@ public class IpLocationTemplate {
      * 判断是否为私有（内网）IP 地址（IPv4）
      */
     private boolean isPrivateIp(String ip) {
-        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) {
+        if (StrUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
             return true;
         }
 
@@ -226,7 +227,7 @@ public class IpLocationTemplate {
     private RandomAccessFile createRandomAccessFileForResource() throws IOException {
         var resource = new ClassPathResource("ip2region/ip2region_v4.xdb");
         if (!resource.exists()) {
-            throw new FileNotFoundException(PREFIX + "IP 数据库文件不存在: ip2region/ip2region_v4.xdb");
+            throw new FileNotFoundException(PREFIX + "IP数据库文件不存在: ip2region/ip2region_v4.xdb");
         }
 
         // 创建临时文件

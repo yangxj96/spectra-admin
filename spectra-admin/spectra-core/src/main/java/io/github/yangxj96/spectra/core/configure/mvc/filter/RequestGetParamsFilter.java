@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -81,7 +82,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
         }
 
         @Override
-        public String getParameter(String name) {
+        public @Nullable String getParameter(String name) {
             if (formatted.containsKey(name)) {
                 return formatted.get(name)[0];
             } else {

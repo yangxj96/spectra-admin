@@ -63,14 +63,6 @@ public class R<T> implements Serializable {
                 .build();
     }
 
-    public static <T extends Serializable> R<T> success(T data) {
-        return R.<T>builder()
-                .code(HttpStatus.OK.value())
-                .msg(HttpStatus.OK.getReasonPhrase())
-                .data(data)
-                .build();
-    }
-
     public static <T> R<T> success(T data) {
         return R.<T>builder()
                 .code(HttpStatus.OK.value())

@@ -16,6 +16,8 @@
 
 package io.github.yangxj96.spectra.common.constant;
 
+import jakarta.annotation.Nullable;
+
 /**
  * 通用常量
  *
@@ -31,6 +33,7 @@ public final class Common {
     /**
      * 默认的PID
      */
+    @Nullable
     public static final Long PID = null;
 
 }

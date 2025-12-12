@@ -62,6 +62,7 @@ public class ULogAspect {
 
     // 请求前
     @Before("@annotation(annotation)")
+    @SuppressWarnings("unused")
     public void handleBefore(JoinPoint point, ULog annotation) {
         TIME_THREADLOCAL.set(System.currentTimeMillis());
     }
@@ -86,7 +87,8 @@ public class ULogAspect {
      * @param e          错误信息
      * @param jsonResult 响应信息
      */
-    protected void handleLog(final JoinPoint point, ULog annotation, final Exception e, Object jsonResult) {
+    @SuppressWarnings("unused")
+    protected void handleLog(final JoinPoint point, ULog annotation, @Nullable final Exception e,@Nullable Object jsonResult) {
         try {
             // 获取请求上下文
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -131,7 +133,7 @@ public class ULogAspect {
      * @param obj 对象
      * @return null或者字符串
      */
-    private String safeWriteValueAsString(Object obj) {
+    private @Nullable String safeWriteValueAsString(@Nullable Object obj) {
         if (obj == null) {
             return null;
         }

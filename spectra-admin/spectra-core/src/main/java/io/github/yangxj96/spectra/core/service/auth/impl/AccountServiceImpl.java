@@ -10,8 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 /**
  * 账号服务默认实现
  *
@@ -22,13 +20,6 @@ import java.util.List;
 @Slf4j
 @Service
 public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> implements AccountService {
-
-    @Override
-    public List<Account> getByUserId(Long userId) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getUserId, userId);
-        return this.list(wrapper);
-    }
 
     @Override
     public @Nullable Account getByLoginName(String loginName) {

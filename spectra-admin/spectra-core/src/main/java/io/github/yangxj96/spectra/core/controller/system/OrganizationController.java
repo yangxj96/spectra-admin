@@ -22,6 +22,7 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -85,7 +86,7 @@ public class OrganizationController {
      */
     @ULog("获取组织机构树形列表")
     @GetMapping("/tree")
-    public List<OrganizationTreeVo> tree() {
+    public @Nullable List<OrganizationTreeVo> tree() {
         return bindService.tree();
     }
 

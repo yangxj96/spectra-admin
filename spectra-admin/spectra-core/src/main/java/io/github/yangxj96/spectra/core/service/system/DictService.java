@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -82,7 +83,7 @@ public interface DictService {
      *
      * @return 字典类型树
      */
-    List<DictTypeTreeVO> listDictGroupWrapTree();
+    @Nullable List<DictTypeTreeVO> listDictGroupWrapTree();
 
     /**
      * 根据字典类型编码获取字典数据列表

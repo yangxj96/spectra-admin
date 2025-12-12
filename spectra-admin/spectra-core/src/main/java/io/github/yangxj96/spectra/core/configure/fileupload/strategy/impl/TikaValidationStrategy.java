@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
 import org.apache.tika.Tika;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -41,7 +42,7 @@ public class TikaValidationStrategy implements FileTypeValidationStrategy {
     }
 
     @Override
-    public boolean isValid(MultipartFile file) throws IOException {
+    public boolean isValid(@Nullable MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
             return false;
         }

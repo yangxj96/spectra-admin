@@ -16,12 +16,8 @@
 
 package io.github.yangxj96.spectra.workflow.service.impl;
 
-import io.github.yangxj96.spectra.workflow.javabean.vo.ProcessDefinitionVO;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * 工作流业务层实现
@@ -33,10 +29,6 @@ import java.util.List;
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
-    @Override
-    public List<ProcessDefinitionVO> getWorkflows() {
-        return Collections.emptyList();
-    }
 
 }
 

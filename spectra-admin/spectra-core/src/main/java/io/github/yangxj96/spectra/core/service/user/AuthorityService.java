@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.service.user;
 import io.github.yangxj96.spectra.common.base.BaseService;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -44,5 +45,5 @@ public interface AuthorityService extends BaseService<Authority> {
      *
      * @return 权限树列表
      */
-    List<AuthorityTreeVO> tree();
+    @Nullable List<AuthorityTreeVO> tree();
 }

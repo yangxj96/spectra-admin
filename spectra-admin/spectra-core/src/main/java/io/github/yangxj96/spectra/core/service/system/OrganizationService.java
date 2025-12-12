@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
@@ -75,5 +76,5 @@ public interface OrganizationService extends IService<Organization> {
      *
      * @return 组织机构树形结构数组
      */
-    List<OrganizationTreeVo> tree();
+    @Nullable List<OrganizationTreeVo> tree();
 }

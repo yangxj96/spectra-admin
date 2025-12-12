@@ -26,6 +26,7 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.mapper.user.AuthorityMapper;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +60,7 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
     }
 
     @Override
-    public List<AuthorityTreeVO> tree() {
+    public @Nullable List<AuthorityTreeVO> tree() {
         List<Authority> authorities = this.list();
         List<AuthorityTreeVO> vos = authorityConverter.toTreeVos(authorities);
         return new TreeBuilder<>(vos).buildTree(Common.PID);

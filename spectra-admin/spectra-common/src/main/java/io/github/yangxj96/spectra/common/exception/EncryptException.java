@@ -29,14 +29,6 @@ public class EncryptException extends SpectraException {
         super("加密出现异常");
     }
 
-    public EncryptException(String message) {
-        super(message);
-    }
-
-    public EncryptException(Throwable cause) {
-        super(cause);
-    }
-
     public EncryptException(String message, Throwable cause) {
         super(message, cause);
     }

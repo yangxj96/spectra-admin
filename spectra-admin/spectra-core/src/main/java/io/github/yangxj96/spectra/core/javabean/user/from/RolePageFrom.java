@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.javabean.user.from;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 /**
  * 角色分页查询
@@ -35,10 +36,12 @@ public class RolePageFrom {
     /**
      * 角色名称
      **/
+    @Nullable
     private String name;
 
     /**
      * 角色状态
      */
+    @Nullable
     private Boolean state;
 }

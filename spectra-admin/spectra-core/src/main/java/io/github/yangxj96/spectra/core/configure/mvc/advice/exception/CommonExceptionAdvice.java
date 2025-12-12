@@ -20,6 +20,7 @@ import io.github.yangxj96.spectra.common.exception.DataExistException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.common.response.R;
+import io.github.yangxj96.spectra.common.utils.StrUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -117,7 +118,11 @@ public class CommonExceptionAdvice {
 
         var errors = e.getBindingResult().getAllErrors();
         if (!errors.isEmpty()) {
-            return R.failure(HttpStatus.BAD_REQUEST, errors.getFirst().getDefaultMessage());
+            String message = errors.getFirst().getDefaultMessage();
+            if (message == null || StrUtils.isEmpty(message)) {
+                message = "参数验证一场";
+            }
+            return R.failure(HttpStatus.BAD_REQUEST, message);
         } else {
             return R.failure(HttpStatus.BAD_REQUEST);
         }

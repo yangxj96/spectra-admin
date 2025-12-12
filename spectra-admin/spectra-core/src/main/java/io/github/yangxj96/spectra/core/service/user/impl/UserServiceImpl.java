@@ -222,12 +222,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
-    public User getByEmail(String email) {
-        return null;
-        //return this.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email));
-    }
-
-    @Override
     public IPage<UserOnlineVO> online(PageFrom page) {
         return null;
     }

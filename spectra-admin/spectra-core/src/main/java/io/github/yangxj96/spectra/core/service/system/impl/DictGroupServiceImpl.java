@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import io.github.yangxj96.spectra.core.mapper.system.DictGroupMapper;
 import io.github.yangxj96.spectra.core.service.system.DictGroupService;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,7 +35,7 @@ import org.springframework.stereotype.Service;
 public class DictGroupServiceImpl extends BaseServiceImpl<DictGroupMapper, DictGroup> implements DictGroupService {
 
     @Override
-    public DictGroup getByCode(String code) {
+    public @Nullable DictGroup getByCode(String code) {
         return this.getOne(
                 new LambdaQueryWrapper<DictGroup>()
                         .eq(DictGroup::getCode, code)

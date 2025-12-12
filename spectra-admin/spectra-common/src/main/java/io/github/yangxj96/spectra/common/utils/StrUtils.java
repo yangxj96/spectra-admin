@@ -2,7 +2,6 @@ package io.github.yangxj96.spectra.common.utils;
 
 
 import com.google.common.base.Strings;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -13,7 +12,6 @@ import org.jspecify.annotations.Nullable;
  * <li>- 行为与 org.apache.commons.lang3.StringUtils 一致</li>
  * </ui>
  */
-@NullMarked
 public final class StrUtils {
 
     private StrUtils() {

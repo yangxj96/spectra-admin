@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.service.system.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.javabean.system.converter.MenuConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
@@ -29,6 +30,7 @@ import io.github.yangxj96.spectra.core.mapper.system.MenuMapper;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
 import jakarta.annotation.Resource;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,7 +74,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    public List<MenuTreeVO> tree() {
+    public @Nullable List<MenuTreeVO> tree() {
         // 先转树形VO
         var vos = menuConverter.toTreeVOS(this.list());
         return new TreeBuilder<>(vos).buildTree(Common.PID);
@@ -81,7 +83,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public List<Menu> getByRelRoleId(long id) {
         var relRoleMenus = roleMenuMapper.getByRoleId(id);
-        if (relRoleMenus.isEmpty()) {
+        if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();
         }
         return this.listByIds(relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList());

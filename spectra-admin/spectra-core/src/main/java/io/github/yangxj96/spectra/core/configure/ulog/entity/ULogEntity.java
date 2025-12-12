@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 
@@ -75,6 +76,7 @@ public class ULogEntity implements Serializable {
     /**
      * 响应内容
      */
+    @Nullable
     private String result;
 
     /**
@@ -85,5 +87,6 @@ public class ULogEntity implements Serializable {
     /**
      * 当前用户 ID
      */
+    @Nullable
     private Long currentId;
 }

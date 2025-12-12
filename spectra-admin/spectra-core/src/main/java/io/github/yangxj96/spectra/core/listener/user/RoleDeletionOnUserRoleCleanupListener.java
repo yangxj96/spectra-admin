@@ -20,7 +20,6 @@ import io.github.yangxj96.spectra.core.javabean.user.entity.RelUserRole;
 import io.github.yangxj96.spectra.core.javabean.user.event.RoleDeletedEvent;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
-import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +41,6 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class RoleDeletionOnUserRoleCleanupListener {
 
-    @Resource
-    private UserService userService;
 
     @Resource
     private RoleService roleService;

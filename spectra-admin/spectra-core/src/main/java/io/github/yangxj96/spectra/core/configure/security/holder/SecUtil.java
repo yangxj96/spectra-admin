@@ -115,12 +115,4 @@ public class SecUtil {
         return getHolder().getCurrentUserId();
     }
 
-    /**
-     * 根据用户 ID,提出用户所有登录端
-     *
-     * @param userId 用户 ID
-     */
-    public static void kick(Long userId) {
-
-    }
 }

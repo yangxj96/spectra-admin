@@ -22,12 +22,11 @@ import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import io.github.yangxj96.spectra.core.service.common.FileService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.io.IOException;
 
 /**
  * <p>
@@ -38,6 +37,7 @@ import java.io.IOException;
  * @version 1.0
  * @since 2025/6/19
  */
+@Slf4j
 @RestController
 @RequestMapping("/file")
 public class FileController {
@@ -69,7 +69,7 @@ public class FileController {
      * @param from 文件分片上传参数
      */
     @PostMapping("/chunk")
-    public void chunk(FileChunkFrom from) throws IOException {
+    public void chunk(FileChunkFrom from) {
         bindService.chunk(from);
     }
 
@@ -81,6 +81,7 @@ public class FileController {
     @GetMapping("/progress")
     public void progress(String md5) {
         // 暂时未实现
+        log.debug("入参:{}", md5);
     }
 
 }

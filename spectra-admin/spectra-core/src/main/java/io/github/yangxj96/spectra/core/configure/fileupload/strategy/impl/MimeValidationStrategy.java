@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -33,7 +34,7 @@ import java.util.List;
 public record MimeValidationStrategy(List<String> allowedMimes) implements FileTypeValidationStrategy {
 
     @Override
-    public boolean isValid(MultipartFile file) {
+    public boolean isValid(@Nullable MultipartFile file) {
         if (file == null || file.isEmpty()) {
             return false;
         }

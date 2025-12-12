@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.mapstruct;
 
 
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -18,6 +19,7 @@ import java.util.Date;
  * @since 2025/12/10 11:13
  */
 @Component
+@SuppressWarnings("unused")
 public class TimeMapper {
 
     /**
@@ -37,7 +39,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link LocalDateTime}
      */
-    public LocalDateTime toLocalDateTime(Instant instant) {
+    public @Nullable  LocalDateTime toLocalDateTime(@Nullable Instant instant) {
         return instant == null ? null : LocalDateTime.ofInstant(instant, getUserZoneId());
     }
 
@@ -47,7 +49,7 @@ public class TimeMapper {
      * @param localDateTime {@link LocalDateTime}
      * @return {@link Instant}
      */
-    public Instant toInstant(LocalDateTime localDateTime) {
+    public @Nullable Instant toInstant(@Nullable LocalDateTime localDateTime) {
         return localDateTime == null ? null :
                 localDateTime.atZone(getUserZoneId()).toInstant();
     }
@@ -58,7 +60,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link LocalDate}
      */
-    public LocalDate toLocalDate(Instant instant) {
+    public @Nullable LocalDate toLocalDate(@Nullable Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toLocalDate();
     }
@@ -69,7 +71,7 @@ public class TimeMapper {
      * @param localDate {@link LocalDate}
      * @return {@link Instant}
      */
-    public Instant toInstant(LocalDate localDate) {
+    public @Nullable Instant toInstant(@Nullable LocalDate localDate) {
         return localDate == null ? null :
                 localDate.atStartOfDay(getUserZoneId()).toInstant();
     }
@@ -80,7 +82,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link LocalTime}
      */
-    public LocalTime toLocalTime(Instant instant) {
+    public @Nullable LocalTime toLocalTime(@Nullable Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toLocalTime();
     }
@@ -92,7 +94,7 @@ public class TimeMapper {
      * @param localTime {@link LocalTime}
      * @return {@link Instant}
      */
-    public Instant toInstant(LocalTime localTime) {
+    public @Nullable Instant toInstant(@Nullable LocalTime localTime) {
         return localTime == null ? null :
                 LocalDate.now(getUserZoneId())
                         .atTime(localTime)
@@ -106,7 +108,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link ZonedDateTime}
      */
-    public ZonedDateTime toZonedDateTime(Instant instant) {
+    public @Nullable ZonedDateTime toZonedDateTime(@Nullable Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId());
     }
@@ -117,7 +119,7 @@ public class TimeMapper {
      * @param zonedDateTime {@link ZonedDateTime}
      * @return {@link Instant}
      */
-    public Instant toInstant(ZonedDateTime zonedDateTime) {
+    public @Nullable Instant toInstant(@Nullable ZonedDateTime zonedDateTime) {
         return zonedDateTime == null ? null :
                 zonedDateTime.toInstant();
     }
@@ -128,7 +130,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link OffsetDateTime}
      */
-    public OffsetDateTime toOffsetDateTime(Instant instant) {
+    public @Nullable OffsetDateTime toOffsetDateTime(@Nullable Instant instant) {
         return instant == null ? null :
                 instant.atZone(getUserZoneId()).toOffsetDateTime();
     }
@@ -139,7 +141,7 @@ public class TimeMapper {
      * @param offsetDateTime {@link OffsetDateTime}
      * @return {@link Instant}
      */
-    public Instant toInstant(OffsetDateTime offsetDateTime) {
+    public @Nullable Instant toInstant(@Nullable OffsetDateTime offsetDateTime) {
         return offsetDateTime == null ? null :
                 offsetDateTime.toInstant();
     }
@@ -151,7 +153,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link Date}
      */
-    public Date toDate(Instant instant) {
+    public @Nullable Date toDate(@Nullable Instant instant) {
         return instant == null ? null : Date.from(instant);
     }
 
@@ -161,7 +163,7 @@ public class TimeMapper {
      * @param date {@link Date}
      * @return {@link Instant}
      */
-    public Instant toInstant(Date date) {
+    public @Nullable Instant toInstant(@Nullable Date date) {
         return date == null ? null : date.toInstant();
     }
 
@@ -172,7 +174,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link Timestamp}
      */
-    public Timestamp toTimestamp(Instant instant) {
+    public @Nullable Timestamp toTimestamp(@Nullable Instant instant) {
         return instant == null ? null : Timestamp.from(instant);
     }
 
@@ -182,7 +184,7 @@ public class TimeMapper {
      * @param timestamp {@link Timestamp}
      * @return {@link Instant}
      */
-    public Instant toInstant(Timestamp timestamp) {
+    public @Nullable Instant toInstant(@Nullable Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toInstant();
     }
 
@@ -193,7 +195,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return 时间戳
      */
-    public Long toEpochMilli(Instant instant) {
+    public @Nullable Long toEpochMilli(@Nullable Instant instant) {
         return instant == null ? null : instant.toEpochMilli();
     }
 
@@ -203,7 +205,7 @@ public class TimeMapper {
      * @param epochMilli 时间戳
      * @return {@link Instant}
      */
-    public Instant toInstant(Long epochMilli) {
+    public @Nullable Instant toInstant(@Nullable Long epochMilli) {
         return epochMilli == null ? null : Instant.ofEpochMilli(epochMilli);
     }
 
@@ -216,7 +218,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return ISO 8601 格式字符串时间
      */
-    public String toString(Instant instant) {
+    public @Nullable String toString(@Nullable Instant instant) {
         return instant == null ? null : ISO_FORMATTER.format(instant.atZone(getUserZoneId()));
     }
 
@@ -226,7 +228,7 @@ public class TimeMapper {
      * @param text IOS 8601 格式的字符串
      * @return Instant
      */
-    public Instant toInstant(String text) {
+    public @Nullable Instant toInstant(@Nullable String text) {
         if (text == null || text.isBlank()) return null;
         LocalDateTime ldt = LocalDateTime.parse(text, ISO_FORMATTER);
         return ldt.atZone(getUserZoneId()).toInstant();
