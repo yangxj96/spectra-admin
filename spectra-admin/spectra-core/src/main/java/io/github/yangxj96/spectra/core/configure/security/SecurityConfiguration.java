@@ -6,17 +6,11 @@ import io.github.yangxj96.spectra.core.configure.security.exception.RestAccessDe
 import io.github.yangxj96.spectra.core.configure.security.exception.RestAuthenticationEntryPoint;
 import io.github.yangxj96.spectra.core.configure.security.filter.TokenAuthenticationFilter;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -30,12 +24,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import tools.jackson.core.StreamReadFeature;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 /**
  * SpringSecurity配置
@@ -68,11 +58,6 @@ public class SecurityConfiguration {
     @Resource
     private RestAccessDeniedHandler restAccessDeniedHandler;
 
-    @Resource
-    private ObjectMapper om;
-
-    @Resource
-    private SpectraSystemProperties spectraSystemProperties;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -143,48 +128,4 @@ public class SecurityConfiguration {
         return http.build();
     }
 
-    /**
-     * Security专用的ObjectMapper
-     *
-     * @return
-     */
-    @Bean("securityObjectMapper")
-    public ObjectMapper securityObjectMapper() {
-        log.debug(PREFIX + "开始配置专用ObjectMapper");
-
-        var validator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(spectraSystemProperties.getPackagePrefix());
-
-        return om.rebuild()
-                // 注册Security的modules
-                .addModules(SecurityJacksonModules.getModules(getClass().getClassLoader(), validator))
-                .enable(StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION)
-                .build();
-    }
-
-    /**
-     * Security专用的RedisTemplate
-     *
-     * @param factory redis连接工程
-     * @return RedisTemplate<String, Object>
-     */
-    @Bean("securityRedisTemplate")
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, @Qualifier("securityObjectMapper") ObjectMapper om) {
-        log.debug(PREFIX + "开始配置专用Redis");
-        var template = new RedisTemplate<String, Object>();
-        template.setConnectionFactory(factory);
-
-        // 设置Key的序列化方式为String
-        var keySerializer = new StringRedisSerializer();
-        template.setKeySerializer(keySerializer);
-        template.setHashKeySerializer(keySerializer);
-
-        // 使用Jackson作为Value的序列化方式
-        var valueSerializer = new JacksonJsonRedisSerializer<>(om, Object.class);
-        template.setValueSerializer(valueSerializer);
-        template.setHashValueSerializer(valueSerializer);
-
-        template.afterPropertiesSet();
-        return template;
-    }
 }
