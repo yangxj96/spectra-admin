@@ -48,7 +48,7 @@ public class PasswordLoginStrategy extends AbstractLoginStrategy {
     public SecurityUser authenticate(LoginFrom request) {
         try {
             // 验证码验证
-            if (kaptchaService.isCheck()) {
+            if (kaptchaService.isCheck() == Boolean.TRUE) {
                 var code = kaptchaService.getKaptchaCode();
                 if (!request.captcha().equals(code)) {
                     throw new KaptchaNotMatchException("验证码错误");

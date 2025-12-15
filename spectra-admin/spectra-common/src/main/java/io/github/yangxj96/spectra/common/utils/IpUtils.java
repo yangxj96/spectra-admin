@@ -100,7 +100,7 @@ public final class IpUtils {
      * @return 第一个有效 IP，若无则返回原值（可能为 invalid）
      */
     private static String getFirstValidIpFromList(@Nullable String ipList) {
-        if (StrUtils.isBlank(ipList) || !ipList.contains(",")) {
+        if (StrUtils.isEmpty(ipList) || !ipList.contains(",")) {
             return ipList == null ? "" : ipList;
         }
 
