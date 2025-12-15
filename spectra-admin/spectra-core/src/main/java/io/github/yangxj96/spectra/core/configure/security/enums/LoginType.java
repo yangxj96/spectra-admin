@@ -13,24 +13,31 @@ public enum LoginType implements IEnum<Integer> {
     /**
      * 账号密码
      */
-    PASSWORD(1),
+    PASSWORD(1,"password"),
     /**
      * 手机验证码
      */
-    SMS(2),
+    SMS(2,"sms"),
     /**
      * 扫码
      */
-    SCAN(3);
+    SCAN(3,"scan");
 
     private final Integer value;
 
-    LoginType(Integer value) {
+    private final String name;
+
+    LoginType(Integer value, String name) {
         this.value = value;
+        this.name = name;
     }
 
     @Override
     public Integer getValue() {
         return this.value;
+    }
+
+    public String getName(){
+        return this.name;
     }
 }

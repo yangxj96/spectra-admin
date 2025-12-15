@@ -55,6 +55,7 @@ public class SecUtil {
      * @return {@link TokenVO}登录后的 token 信息
      */
     public static TokenVO login(SecurityUser su) {
+        // 默认创建的就是密码,后面添加多个登录方式就要调整下
         return getHolder().createToken(su);
     }
 

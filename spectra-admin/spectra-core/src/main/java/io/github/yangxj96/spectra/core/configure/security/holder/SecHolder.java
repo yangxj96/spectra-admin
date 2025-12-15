@@ -2,6 +2,7 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 
 
 import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import org.jspecify.annotations.Nullable;
 
@@ -27,7 +28,16 @@ public interface SecHolder {
      * @param su {@link SecurityUser} 用户信息
      * @return {@link TokenVO} token 信息
      */
-    TokenVO createToken(SecurityUser su);
+    TokenVO createToken(SecurityUser user);
+
+    /**
+     * 创建一个 token 且设置安全上下文
+     *
+     * @param su        {@link SecurityUser} 用户信息
+     * @param loginType {@link LoginType} 登录方式
+     * @return {@link TokenVO} token 信息
+     */
+    TokenVO createToken(SecurityUser user, LoginType loginType);
 
     /**
      * 根据 token 删除 key
@@ -60,6 +70,7 @@ public interface SecHolder {
 
     /**
      * 获取当前用户 ID
+     *
      * @return 当前用户 ID, 可能为null
      */
     @Nullable Long getCurrentUserId();

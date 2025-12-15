@@ -104,8 +104,7 @@ public class JacksonConfiguration {
             builder.defaultDateFormat(sdf);
             builder.addModule(javaTimeModule);
             builder.defaultTimeZone(TimeZone.getTimeZone("UTC"));
-            // 注册 MixIn
-            builder.addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityMixin.class);
+
         };
     }
 }

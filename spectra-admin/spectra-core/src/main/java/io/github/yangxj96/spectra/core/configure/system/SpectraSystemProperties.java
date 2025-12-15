@@ -30,7 +30,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Data
 @ConfigurationProperties(prefix = "spectra.system")
-public class SystemProperties {
+public class SpectraSystemProperties {
 
     /**
      * 基础文件位置,所有文件都会在这个目录下面进行存放

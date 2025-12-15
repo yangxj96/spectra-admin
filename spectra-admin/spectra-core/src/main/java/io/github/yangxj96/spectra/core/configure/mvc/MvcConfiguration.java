@@ -18,7 +18,7 @@ package io.github.yangxj96.spectra.core.configure.mvc;
 
 import io.github.yangxj96.spectra.core.configure.mvc.properties.CorsProperties;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.MvcProperties;
-import io.github.yangxj96.spectra.core.configure.system.SystemProperties;
+import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,7 +36,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({MvcProperties.class, SystemProperties.class, CorsProperties.class})
+@EnableConfigurationProperties({MvcProperties.class, SpectraSystemProperties.class, CorsProperties.class})
 public class MvcConfiguration implements WebMvcConfigurer {
 
     private static final String PREFIX = "[SpringMVC]:";

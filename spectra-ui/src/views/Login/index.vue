@@ -15,7 +15,7 @@ const login = reactive({
     form: {
         type: "PASSWORD",
         identifier: "yangxj96@gmail.com",
-        credential: "sysadmin",
+        credential: "admin123",
         captcha: ""
     } as LoginFrom,
     rules: {

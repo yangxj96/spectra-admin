@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.auth.vo;
 
+import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import lombok.*;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
@@ -40,6 +41,8 @@ public class TokenVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    private LoginType loginType;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
