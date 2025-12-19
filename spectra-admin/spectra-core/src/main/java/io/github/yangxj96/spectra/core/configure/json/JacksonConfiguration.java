@@ -26,6 +26,7 @@ import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomize
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
 import tools.jackson.databind.ext.javatime.deser.LocalDateTimeDeserializer;
@@ -104,7 +105,7 @@ public class JacksonConfiguration {
             builder.defaultDateFormat(sdf);
             builder.addModule(javaTimeModule);
             builder.defaultTimeZone(TimeZone.getTimeZone("UTC"));
-
+            builder.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         };
     }
 }

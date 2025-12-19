@@ -25,7 +25,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -57,13 +58,13 @@ public class UserSaveFrom {
     /**
      * 真实姓名
      */
-    private Long realName;
+    private String realName;
 
     /**
      * 用户状态
      */
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Boolean status;
+    private Short status;
 
     /**
      * 性别
@@ -73,7 +74,7 @@ public class UserSaveFrom {
     /**
      * 生日
      */
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     /**
      * 手机号码

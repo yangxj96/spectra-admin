@@ -25,6 +25,13 @@ export default defineConfig(({ mode }) => {
                 "@": srcPath
             }
         },
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    quietDeps: true
+                }
+            }
+        },
         build: {
             minify: "terser",
             outDir: "build",

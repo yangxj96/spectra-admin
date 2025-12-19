@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 用户信息
@@ -59,13 +59,13 @@ public class User extends BaseEntity implements Serializable {
      * 状态 (1:正常 0:禁用)
      */
     @TableField(value = "STATUS")
-    private Boolean status;
+    private Short status;
 
     /**
      * 真实姓名
      */
     @TableField(value = "REAL_NAME")
-    private Long realName;
+    private String realName;
 
     /**
      * 性别(0:保密,1-男,2-女)
@@ -77,7 +77,7 @@ public class User extends BaseEntity implements Serializable {
      * 生日
      */
     @TableField(value = "BIRTHDAY")
-    private LocalDateTime birthday;
+    private Instant birthday;
 
     /**
      * 手机号
@@ -114,4 +114,10 @@ public class User extends BaseEntity implements Serializable {
      */
     @TableField(value = "TIMEZONE")
     private String timezone;
+
+    /**
+     * 组织机构ID
+     */
+    @TableField(value = "ORGANIZATION_ID")
+    private String organizationId;
 }

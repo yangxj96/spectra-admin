@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.mapper.system;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import io.github.yangxj96.spectra.core.javabean.system.entity.DictData;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 
 /**
  * 字典(字典数据)mapper层
@@ -26,5 +26,5 @@ import io.github.yangxj96.spectra.core.javabean.system.entity.DictData;
  * @version 1.0
  * @since 2025-6-18
  */
-public interface DictDataMapper extends BaseMapper<DictData> {
+public interface DictItemMapper extends BaseMapper<DictItem> {
 }

@@ -7,18 +7,19 @@
                type="io.github.yangxj96.spectra.core.javabean.user.entity.User">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_USER"-->
-        <result column="USERNAME"  jdbcType="VARCHAR" property="username"/>
-        <result column="AVATAR"    jdbcType="VARCHAR" property="avatar"/>
-        <result column="STATUS"    jdbcType="BOOLEAN" property="status"/>
-        <result column="REAL_NAME" jdbcType="VARCHAR" property="realName"/>
-        <result column="GENDER"    jdbcType="INTEGER" property="gender"/>
-        <result column="BIRTHDAY"  jdbcType="DATE"    property="birthday"/>
-        <result column="PHONE"     jdbcType="VARCHAR" property="phone"/>
-        <result column="EMAIL"     jdbcType="VARCHAR" property="email"/>
-        <result column="COUNTRY"   jdbcType="VARCHAR" property="country"/>
-        <result column="CITY"      jdbcType="VARCHAR" property="city"/>
-        <result column="LANGUAGE"  jdbcType="VARCHAR" property="language"/>
-        <result column="TIMEZONE"  jdbcType="VARCHAR" property="timezone"/>
+        <result column="USERNAME"  jdbcType="VARCHAR"  property="username"/>
+        <result column="AVATAR"    jdbcType="VARCHAR"  property="avatar"/>
+        <result column="STATUS"    jdbcType="SMALLINT" property="status"/>
+        <result column="REAL_NAME" jdbcType="VARCHAR"  property="realName"/>
+        <result column="GENDER"    jdbcType="INTEGER"  property="gender"/>
+        <result column="BIRTHDAY"  jdbcType="DATE"     property="birthday"/>
+        <result column="PHONE"     jdbcType="VARCHAR"  property="phone"/>
+        <result column="EMAIL"     jdbcType="VARCHAR"  property="email"/>
+        <result column="COUNTRY"   jdbcType="VARCHAR"  property="country"/>
+        <result column="CITY"      jdbcType="VARCHAR"  property="city"/>
+        <result column="LANGUAGE"  jdbcType="VARCHAR"  property="language"/>
+        <result column="TIMEZONE"  jdbcType="VARCHAR"  property="timezone"/>
+        <result column="ORGANIZATION_ID"  jdbcType="VARCHAR" property="organizationId"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -37,6 +38,7 @@
         CITY,
         LANGUAGE,
         TIMEZONE,
+        ORGANIZATION_ID,
         CREATED_BY,
         CREATED_AT,
         UPDATED_BY,

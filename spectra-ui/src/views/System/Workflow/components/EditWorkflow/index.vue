@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import LogicFlow from "@logicflow/core";
 import "@logicflow/core/dist/index.css";
-import { onMounted, useTemplateRef } from "vue";
-import FlowablePlugin, * as Flowable from "@yangxj96/logicflow-flowable";
 import { Control, DndPanel, SelectionSelect } from "@logicflow/extension";
 import "@logicflow/extension/dist/index.css";
+import { onMounted, useTemplateRef } from "vue";
+import Flowable from "@yangxj96/logicflow-flowable";
 
 const container = useTemplateRef<HTMLDivElement>("container");
 
@@ -18,15 +18,13 @@ onMounted(() => {
     logicFlow = new LogicFlow({
         container: container.value!,
         grid: true,
-        plugins: [Control, DndPanel, SelectionSelect, FlowablePlugin],
+        plugins: [Control, DndPanel, SelectionSelect, Flowable.Plugin],
         pluginsOptions: {
             selectionSelect: {
                 exclusiveMode: false
             }
         }
     });
-
-    logicFlow.getGraphData();
 
     (logicFlow.extension.dndPanel as DndPanel)?.setPatternItems(Flowable.getFlowableDndItems());
     (logicFlow.extension.control as Control)?.addItem({

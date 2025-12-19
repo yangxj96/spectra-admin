@@ -14,7 +14,7 @@ const redirect = ref<string>(route.query.redirect as string | "/");
 const login = reactive({
     form: {
         type: "PASSWORD",
-        identifier: "yangxj96@gmail.com",
+        identifier: "devops@devops00.com",
         credential: "admin123",
         captcha: ""
     } as LoginFrom,

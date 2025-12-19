@@ -12,7 +12,11 @@ import DictSelect from "@/components/DictSelect/index.vue";
 // 定义Model
 const form = defineModel("form", {
     required: false,
-    default: {} as User
+    default: {
+        ...({} as User),
+        timezone: "Asia/Shanghai",
+        language: "zh-CN"
+    }
 });
 
 const open = defineModel<boolean>("open", { required: true, default: false });
@@ -27,7 +31,8 @@ const rules = {
         { required: true, message: "请输入邮箱", trigger: "blur" },
         { validator: VerifyRules.email, message: "请输入正确的邮箱", trigger: "blur" }
     ],
-    state: [{ required: true, message: "请选择状态", trigger: "blur" }],
+    status: [{ required: true, message: "请选择状态", trigger: "blur" }],
+    timezone: [{ required: true, message: "请选择时区", trigger: "blur" }],
     organization_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
 } as FormRules;
 
@@ -39,6 +44,10 @@ const organization_tree = ref<OrganizationTree[]>();
 const formRef = useTemplateRef<FormInstance>("formRef");
 
 onMounted(() => {
+    if (!form.value.timezone) {
+        form.value.timezone = "Asia/Shanghai";
+    }
+
     let request = [RoleApi.list(), OrganizationApi.tree()];
     Promise.all(request).then(([role, org]) => {
         roles.value = role!.data as Role[];
@@ -68,6 +77,30 @@ async function handleUserSave() {
         console.error(error);
     }
 }
+
+const EMAIL_SUFFIXES = ["devops00.com", "gmail.com", "qq.com", "hotmail.com"];
+
+const handleEmailSuggestions = (query: string, cb: any) => {
+    // 没有 @ 不提示
+    if (!query || !query.includes("@")) {
+        cb([]);
+        return;
+    }
+
+    const [name, domainPart] = query.split("@");
+
+    // @ 前为空也不提示
+    if (!name) {
+        cb([]);
+        return;
+    }
+
+    const results = EMAIL_SUFFIXES.filter(suffix => suffix.startsWith(domainPart!)).map(suffix => ({
+        value: `${name}@${suffix}`
+    }));
+
+    cb(results);
+};
 </script>
 
 <template>
@@ -83,20 +116,52 @@ async function handleUserSave() {
         <template #default>
             <el-watermark style="height: 100%; width: 100%">
                 <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" @submit.prevent>
-                    <el-form-item label="姓名" prop="name">
-                        <el-input v-model="form.name" placeholder="请输入姓名" />
+                    <el-form-item label="名称" prop="username">
+                        <el-input v-model="form.username" placeholder="请输入名称" />
+                    </el-form-item>
+                    <el-form-item label="真实名称" prop="real_name">
+                        <el-input v-model="form.real_name" placeholder="请输入真实名称" />
+                    </el-form-item>
+                    <el-form-item label="状态" prop="status">
+                        <dict-select v-model="form.status" dict_code="sys_user_state" placeholder="请选择状态" />
+                    </el-form-item>
+                    <el-form-item label="性别" prop="gender">
+                        <dict-select v-model="form.gender" dict_code="sys_user_gender" placeholder="请选择性别" />
+                    </el-form-item>
+                    <el-form-item label="生日" prop="birthday">
+                        <el-date-picker
+                            v-model="form.birthday"
+                            type="date"
+                            placeholder="请输入选择"
+                            value-format="YYYY-MM-DD"
+                            style="width: 100%" />
+                    </el-form-item>
+                    <el-form-item label="手机号码" prop="phone">
+                        <el-input v-model="form.phone" placeholder="请输入手机号码" />
                     </el-form-item>
                     <el-form-item label="邮箱" prop="email">
-                        <el-input v-model="form.email" placeholder="请输入邮箱">
+                        <el-autocomplete
+                            v-model="form.email"
+                            :fetch-suggestions="handleEmailSuggestions"
+                            placeholder="请输入邮箱">
                             <template #suffix>
-                                <el-tooltip effect="dark" content="同时也作为登录账号" placement="right">
+                                <el-tooltip effect="dark" content="同时也作为默认登录账号" placement="right">
                                     <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
                                 </el-tooltip>
                             </template>
-                        </el-input>
+                        </el-autocomplete>
                     </el-form-item>
-                    <el-form-item label="状态" prop="state">
-                        <dict-select v-model="form.state" dict_code="sys_user_state" placeholder="请选择状态" />
+                    <el-form-item label="国家" prop="country">
+                        <el-input v-model="form.country" placeholder="请输入国家" />
+                    </el-form-item>
+                    <el-form-item label="城市" prop="city">
+                        <el-input v-model="form.city" placeholder="请输入城市" />
+                    </el-form-item>
+                    <el-form-item label="语言" prop="language">
+                        <dict-select v-model="form.language" dict_code="sys_language" placeholder="请选择语言" />
+                    </el-form-item>
+                    <el-form-item label="时区" prop="timezone">
+                        <dict-select v-model="form.timezone" dict_code="sys_timezone" placeholder="请选择时区" />
                     </el-form-item>
                     <el-form-item label="角色" prop="role_ids">
                         <el-select v-model="form.role_ids" value-key="id" multiple placeholder="请选择角色" clearable>

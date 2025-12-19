@@ -24,12 +24,28 @@ declare global {
 
     // 用户
     type User = BaseEntity & {
-        // 名称
-        name: string;
+        // 姓名
+        username: string;
+        // 真实姓名
+        real_name: string;
+        // 状态
+        status: number;
+        // 性别
+        gender: number;
+        // 生日
+        birthday: Date;
+        // 手机号码
+        phone: string;
         // 邮箱
         email: string;
-        // 状态
-        state: number;
+        // 国家
+        country: string;
+        // 城市
+        city: string;
+        // 语言
+        language: string;
+        // 时区
+        timezone: string;
         // 角色列表
         roles: Role[];
         // 角色ID列表

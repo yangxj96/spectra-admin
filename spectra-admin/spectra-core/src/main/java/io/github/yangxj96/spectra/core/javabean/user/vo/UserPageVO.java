@@ -26,6 +26,8 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -52,12 +54,7 @@ public class UserPageVO implements Serializable {
     /**
      * 姓名
      */
-    private String name;
-
-    /**
-     * 邮箱
-     */
-    private String email;
+    private String username;
 
     /**
      * 头像
@@ -67,7 +64,52 @@ public class UserPageVO implements Serializable {
     /**
      * 用户状态
      */
-    private Short state;
+    private Short status;
+
+    /**
+     * 真实姓名
+     */
+    private String realName;
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 生日
+     */
+    private LocalDate birthday;
+
+    /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 语言
+     */
+    private String language;
+
+    /**
+     * 时区
+     */
+    private String timezone;
 
     /**
      * 角色列表

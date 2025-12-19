@@ -1,31 +1,18 @@
-/*
- *  Copyright 2018-2025 yangxj96
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+package io.github.yangxj96.spectra.core.service.common.impl;
 
-package io.github.yangxj96.spectra.core.template;
 
 import io.github.yangxj96.spectra.common.utils.StrUtils;
+import io.github.yangxj96.spectra.core.service.common.IpLocationService;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.lionsoul.ip2region.xdb.LongByteArray;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.lionsoul.ip2region.xdb.Version;
 import org.lionsoul.ip2region.xdb.XdbException;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -35,25 +22,22 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 /**
- * IP位置相关操作
+ * IP转位置的实现
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2025/12/19 15:23
  */
 @Slf4j
-@Component
-public class IpLocationTemplate {
+@Service
+public class IpLocationServiceImpl implements IpLocationService {
 
     private static final String PREFIX = "[IP2REGION]";
 
     @Nullable
     private Searcher searcher;
 
-    /**
-     * 初始化 IP 地理位置查询器
-     * <p>
-     * 从 classpath 加载 ip2region_v4.xdb 文件，验证完整性，并预加载到内存以提升性能。
-     * 使用内存模式（newWithBuffer）可避免 I/O 开销，适合高频查询场景。
-     * </p>
-     */
-    public IpLocationTemplate() {
+    public IpLocationServiceImpl() {
         try (var raf = createRandomAccessFileForResource()) {
             // 校验数据库完整性
             Searcher.verify(raf);
@@ -76,19 +60,7 @@ public class IpLocationTemplate {
         }
     }
 
-    /**
-     * 查询 IP 所在地理位置，支持精度控制
-     *
-     * @param ip    客户端 IP 地址（IPv4），如 "8.8.8.8"
-     * @param level 精度级别：
-     *              <ul>
-     *                <li>0: 国家（如：中国）</li>
-     *                <li>1: 省份（如：中国 广东省）</li>
-     *                <li>2: 城市（如：中国 广东省 深圳市）</li>
-     *                <li>3: 运营商（如：中国 广东省 深圳市 电信）</li>
-     *              </ul>
-     * @return 格式化后的位置字符串，内网 IP 返回 "内网"，查询失败返回 "未知"
-     */
+    @Override
     public String getCityEn(String ip, int level) {
         if (isPrivateIp(ip)) {
             return "内网";
@@ -112,25 +84,57 @@ public class IpLocationTemplate {
         return "未知";
     }
 
-    /**
-     * 查询 IP 所在地理位置（默认精度：城市级别）
-     * <p>
-     * 相当于调用 {@link #getCityEn(String, int)} 并设置 level = 2。
-     * </p>
-     *
-     * @param ip 客户端 IP 地址
-     * @return 位置信息，格式：国家 省份 城市
-     */
+    @Override
     public String getCityEn(String ip) {
         return getCityEn(ip, 2);
     }
 
+    @Override
+    public boolean isPrivateIp(String ip) {
+        if (StrUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
+            return true;
+        }
+
+        String[] parts = ip.split("\\.");
+        if (parts.length != 4) {
+            return false;
+        }
+
+        try {
+            int a = Integer.parseInt(parts[0]);
+            int b = Integer.parseInt(parts[1]);
+
+            return (a == 10) ||                       // 10.x.x.x
+                    (a == 127) ||                     // 127.x.x.x
+                    (a == 192 && b == 168) ||         // 192.168.x.x
+                    (a == 172 && b >= 16 && b <= 31); // 172.16.0.0 ~ 172.31.255.255
+        } catch (NumberFormatException _) {
+            return false;
+        }
+    }
+
+    @Override
+    public RandomAccessFile createRandomAccessFileForResource() throws IOException {
+        var resource = new ClassPathResource("ip2region/ip2region_v4.xdb");
+        if (!resource.exists()) {
+            throw new FileNotFoundException(PREFIX + "IP数据库文件不存在: ip2region/ip2region_v4.xdb");
+        }
+
+        // 创建临时文件
+        Path tempFile = Files.createTempFile("ip2region_", ".xdb");
+        tempFile.toFile().deleteOnExit(); // JVM 退出时自动删除
+
+        // 复制资源内容
+        try (var is = resource.getInputStream()) {
+            Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 返回只读 RandomAccessFile
+        return new RandomAccessFile(tempFile.toFile(), "r");
+    }
 
     /**
-     * 释放资源
-     * <p>
-     * 关闭 Searcher 实例，释放内存映射资源。
-     * </p>
+     * 释放资源 关闭 Searcher 实例，释放内存映射资源。
      */
     @PreDestroy
     public void destroy() {
@@ -144,6 +148,7 @@ public class IpLocationTemplate {
         }
     }
 
+
     /**
      * 格式化 IP 查询结果，按精度截断
      *
@@ -151,6 +156,7 @@ public class IpLocationTemplate {
      * @param level  精度级别
      * @return 格式化后的位置字符串
      */
+    @NullMarked
     private static String formatRegion(String[] fields, int level) {
         var sb = new StringBuilder();
 
@@ -187,60 +193,12 @@ public class IpLocationTemplate {
     /**
      * 向 StringBuilder 添加内容，自动处理空格分隔
      */
+    @NullMarked
     private static void append(StringBuilder sb, String part) {
         if (!sb.isEmpty()) {
             sb.append(' ');
         }
         sb.append(part);
-    }
-
-    /**
-     * 判断是否为私有（内网）IP 地址（IPv4）
-     */
-    private boolean isPrivateIp(String ip) {
-        if (StrUtils.isBlank(ip) || "unknown".equalsIgnoreCase(ip)) {
-            return true;
-        }
-
-        String[] parts = ip.split("\\.");
-        if (parts.length != 4) {
-            return false;
-        }
-
-        try {
-            int a = Integer.parseInt(parts[0]);
-            int b = Integer.parseInt(parts[1]);
-
-            return (a == 10) ||                       // 10.x.x.x
-                    (a == 127) ||                     // 127.x.x.x
-                    (a == 192 && b == 168) ||         // 192.168.x.x
-                    (a == 172 && b >= 16 && b <= 31); // 172.16.0.0 ~ 172.31.255.255
-        } catch (NumberFormatException _) {
-            return false;
-        }
-    }
-
-
-    /**
-     * 将 classpath 下的资源复制到临时文件，并返回 RandomAccessFile
-     */
-    private RandomAccessFile createRandomAccessFileForResource() throws IOException {
-        var resource = new ClassPathResource("ip2region/ip2region_v4.xdb");
-        if (!resource.exists()) {
-            throw new FileNotFoundException(PREFIX + "IP数据库文件不存在: ip2region/ip2region_v4.xdb");
-        }
-
-        // 创建临时文件
-        Path tempFile = Files.createTempFile("ip2region_", ".xdb");
-        tempFile.toFile().deleteOnExit(); // JVM 退出时自动删除
-
-        // 复制资源内容
-        try (var is = resource.getInputStream()) {
-            Files.copy(is, tempFile, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        // 返回只读 RandomAccessFile
-        return new RandomAccessFile(tempFile.toFile(), "r");
     }
 
 }

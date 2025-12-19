@@ -15,7 +15,7 @@
         },
         "types": ["vite/client", "vue/jsx"],
         "composite": true,
-        // "lib": ["ES2022", "DOM", "DOM.Iterable"],
+        "lib": ["ES2022", "DOM", "DOM.Iterable"],
         "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
     }
 }

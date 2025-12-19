@@ -168,8 +168,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
-    # log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    # log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -189,11 +189,15 @@ logging:
       com.ulisesbocchio.jasyptspringboot.configuration,
       io.github.yangxj96.spectra.core.configure.mvc.filter,
       io.github.yangxj96.spectra.core.configure.mvc.advice,
-      io.github.yangxj96.spectra.core.configure
+      io.github.yangxj96.spectra.core.configure,
+      io.github.yangxj96.spectra.core.listener.ulog
+    mp: >-
+      io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
     other: error
     spectra: debug
+    mp: error
   charset:
     console: utf-8
     file: UTF-8
@@ -202,10 +206,8 @@ management:
   endpoints:
     web:
       exposure:
-        # 仅暴露数据源监控信息
-        include: prometheus
         # 暴露所有
-        #include: "*"
+        include: "*"
   endpoint:
     health:
       # 显示详情状态,开发环境可以用always,生产用never

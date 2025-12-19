@@ -22,13 +22,13 @@ import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.javabean.system.converter.DictConverter;
-import io.github.yangxj96.spectra.core.javabean.system.entity.DictData;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
-import io.github.yangxj96.spectra.core.service.system.DictDataService;
+import io.github.yangxj96.spectra.core.service.system.DictItemService;
 import io.github.yangxj96.spectra.core.service.system.DictGroupService;
 import io.github.yangxj96.spectra.core.service.system.DictService;
 import jakarta.annotation.Resource;
@@ -60,7 +60,7 @@ public class DictServiceImpl implements DictService {
     private DictGroupService groupService;
 
     @Resource
-    private DictDataService dataService;
+    private DictItemService dataService;
 
 
     @Override
@@ -82,7 +82,7 @@ public class DictServiceImpl implements DictService {
         }
         // 获取他的字典数据
         var dictData = dataService.listByGid(id);
-        dataService.removeBatchByIds(dictData.stream().map(DictData::getId).toList());
+        dataService.removeBatchByIds(dictData.stream().map(DictItem::getId).toList());
         // 删除字典组
         groupService.removeById(id);
     }
@@ -149,7 +149,7 @@ public class DictServiceImpl implements DictService {
         }
         var dictData = dataService.listByGid(group.getId());
         // 根据sort字段进行一个排序
-        dictData.sort(Comparator.comparing(DictData::getSort));
+        dictData.sort(Comparator.comparing(DictItem::getSort));
         return dictConverter.dataToVos(dictData);
     }
 }

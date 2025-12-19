@@ -8,7 +8,7 @@ import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
-import io.github.yangxj96.spectra.core.template.IpLocationTemplate;
+import io.github.yangxj96.spectra.core.service.common.IpLocationService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +47,7 @@ public class RedisSecHolder implements SecHolder {
     private RedisTemplate<String, Object> redis;
 
     @Resource
-    private IpLocationTemplate ipLocationTemplate;
+    private IpLocationService ipLocationService;
 
     @Resource
     private SecurityProperties properties;
@@ -76,7 +76,7 @@ public class RedisSecHolder implements SecHolder {
         }
         var extra = user.getExtraData();
         extra.put("ip", IpUtils.getClientIP(this.getHttpServletRequest()));
-        extra.put("address", ipLocationTemplate.getCityEn(extra.get("ip").toString()));
+        extra.put("address", ipLocationService.getCityEn(extra.get("ip").toString()));
 
         // 安全获取权限列表，防止 user.getAuthorities() 本身为 null
         Collection<? extends GrantedAuthority> authoritiesList = user.getAuthorities();

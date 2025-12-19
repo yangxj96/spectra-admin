@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.service.system;
 
 import io.github.yangxj96.spectra.common.base.BaseService;
-import io.github.yangxj96.spectra.core.javabean.system.entity.DictData;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025-6-18
  */
-public interface DictDataService extends BaseService<DictData> {
+public interface DictItemService extends BaseService<DictItem> {
 
     /**
      * 根据字典组ID查询字典数据列表
@@ -36,5 +36,5 @@ public interface DictDataService extends BaseService<DictData> {
      * @param gid 字典组ID
      * @return 字典数据列表
      */
-    List<DictData> listByGid(Long gid);
+    List<DictItem> listByGid(Long gid);
 }

@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.system.converter;
 
-import io.github.yangxj96.spectra.core.javabean.system.entity.DictData;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
@@ -53,7 +53,7 @@ public interface DictConverter {
      * @param from 字典数据入参
      * @return 转换后的实体
      */
-    DictData dataFromToEntity(DictDataFrom from);
+    DictItem dataFromToEntity(DictDataFrom from);
 
     /**
      * 字典类型转字典树类型
@@ -77,7 +77,7 @@ public interface DictConverter {
      * @param list 字典数据
      * @return 字典数据VO
      */
-    DictDataVo dataToVos(DictData list);
+    DictDataVo dataToVos(DictItem list);
 
     /**
      * 字典数据列表转字典数据VO列表
@@ -85,5 +85,5 @@ public interface DictConverter {
      * @param list 字典数据列表
      * @return 字典数据VO列表
      */
-    List<DictDataVo> dataToVos(List<DictData> list);
+    List<DictDataVo> dataToVos(List<DictItem> list);
 }

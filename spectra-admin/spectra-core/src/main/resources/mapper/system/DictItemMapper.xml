@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.system.DictDataMapper">
+<mapper namespace="io.github.yangxj96.spectra.core.mapper.system.DictItemMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.system.entity.DictData">
+               type="io.github.yangxj96.spectra.core.javabean.system.entity.DictItem">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_DICT_DATA"-->
+        <!--@Table "SPECTRA"."SYS_DICT_ITEM"-->
         <result column="GID"    jdbcType="BIGINT"   property="gid"/>
         <result column="LABEL"  jdbcType="VARCHAR"  property="label"/>
         <result column="VALUE"  jdbcType="VARCHAR"  property="value"/>

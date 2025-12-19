@@ -23,7 +23,6 @@ const localValue = computed({
         return model.value === undefined ? "" : String(model.value);
     },
     set(val: string) {
-        console.log(`设置值:${val}`);
         model.value = val === "" ? undefined : Number.isNaN(Number(val)) ? val : Number(val);
     }
 });

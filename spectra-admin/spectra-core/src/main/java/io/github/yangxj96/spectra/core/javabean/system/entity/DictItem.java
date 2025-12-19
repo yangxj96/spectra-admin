@@ -40,8 +40,8 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_DICT_DATA")
-public class DictData extends BaseEntity implements Serializable {
+@TableName(value = "SYS_DICT_ITEM")
+public class DictItem extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
