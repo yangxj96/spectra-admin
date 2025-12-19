@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from "vue";
-import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { ElMessage, type FormInstance, type FormRules, type AutocompleteData } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UserApi from "@/api/UserApi.ts";
@@ -8,14 +8,13 @@ import OrganizationApi from "@/api/OrganizationApi.ts";
 import RoleApi from "@/api/RoleApi.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import useDictStore from "@/plugin/store/modules/useDictStore.ts";
 
 // 定义Model
 const form = defineModel("form", {
     required: false,
     default: {
-        ...({} as User),
-        timezone: "Asia/Shanghai",
-        language: "zh-CN"
+        ...({} as User)
     }
 });
 
@@ -29,8 +28,9 @@ const rules = {
     name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
     email: [
         { required: true, message: "请输入邮箱", trigger: "blur" },
-        { validator: VerifyRules.email, message: "请输入正确的邮箱", trigger: "blur" }
+        { validator: VerifyRules.email, trigger: "blur" }
     ],
+    phone: [{ validator: VerifyRules.mobile, trigger: "blur" }],
     status: [{ required: true, message: "请选择状态", trigger: "blur" }],
     timezone: [{ required: true, message: "请选择时区", trigger: "blur" }],
     organization_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
@@ -43,10 +43,18 @@ const organization_tree = ref<OrganizationTree[]>();
 // 组件
 const formRef = useTemplateRef<FormInstance>("formRef");
 
+// 缓存 suffix 列表
+const emailSuffixes = ref<string[]>([]);
+
 onMounted(() => {
-    if (!form.value.timezone) {
-        form.value.timezone = "Asia/Shanghai";
-    }
+    console.log(form.value);
+
+    useDictStore()
+        .getDictData("sys_email_suffix")
+        .then(res => {
+            let items = res || [];
+            emailSuffixes.value = items.map(i => i.value);
+        });
 
     let request = [RoleApi.list(), OrganizationApi.tree()];
     Promise.all(request).then(([role, org]) => {
@@ -78,28 +86,38 @@ async function handleUserSave() {
     }
 }
 
-const EMAIL_SUFFIXES = ["devops00.com", "gmail.com", "qq.com", "hotmail.com"];
-
-const handleEmailSuggestions = (query: string, cb: any) => {
-    // 没有 @ 不提示
-    if (!query || !query.includes("@")) {
-        cb([]);
+// 处理自动提示补全组件的补全过程
+const handleEmailSuggestions = async (query: string, callback: (results: AutocompleteData) => void) => {
+    if (!query) {
+        callback([]);
         return;
     }
 
-    const [name, domainPart] = query.split("@");
+    let name = "";
+    let domainPart = "";
 
-    // @ 前为空也不提示
+    if (query.includes("@")) {
+        [name = "", domainPart = ""] = query.split("@");
+    } else {
+        name = query;
+    }
+
     if (!name) {
-        cb([]);
+        callback([]);
         return;
     }
 
-    const results = EMAIL_SUFFIXES.filter(suffix => suffix.startsWith(domainPart!)).map(suffix => ({
-        value: `${name}@${suffix}`
-    }));
+    const results = emailSuffixes.value
+        .filter(
+            suffix =>
+                // 没输入 @ 或 @ 后为空 → 全部展示
+                !domainPart || suffix.includes(domainPart)
+        )
+        .map(suffix => ({
+            value: `${name}@${suffix}`
+        }));
 
-    cb(results);
+    callback(results);
 };
 </script>
 
@@ -117,10 +135,10 @@ const handleEmailSuggestions = (query: string, cb: any) => {
             <el-watermark style="height: 100%; width: 100%">
                 <el-form ref="formRef" :model="form" :rules="rules" label-width="auto" @submit.prevent>
                     <el-form-item label="名称" prop="username">
-                        <el-input v-model="form.username" placeholder="请输入名称" />
+                        <el-input v-model="form.username" clearable placeholder="请输入名称" />
                     </el-form-item>
                     <el-form-item label="真实名称" prop="real_name">
-                        <el-input v-model="form.real_name" placeholder="请输入真实名称" />
+                        <el-input v-model="form.real_name" clearable placeholder="请输入真实名称" />
                     </el-form-item>
                     <el-form-item label="状态" prop="status">
                         <dict-select v-model="form.status" dict_code="sys_user_state" placeholder="请选择状态" />
@@ -137,12 +155,13 @@ const handleEmailSuggestions = (query: string, cb: any) => {
                             style="width: 100%" />
                     </el-form-item>
                     <el-form-item label="手机号码" prop="phone">
-                        <el-input v-model="form.phone" placeholder="请输入手机号码" />
+                        <el-input v-model="form.phone" clearable placeholder="请输入手机号码" />
                     </el-form-item>
                     <el-form-item label="邮箱" prop="email">
                         <el-autocomplete
                             v-model="form.email"
                             :fetch-suggestions="handleEmailSuggestions"
+                            clearable
                             placeholder="请输入邮箱">
                             <template #suffix>
                                 <el-tooltip effect="dark" content="同时也作为默认登录账号" placement="right">
@@ -152,10 +171,10 @@ const handleEmailSuggestions = (query: string, cb: any) => {
                         </el-autocomplete>
                     </el-form-item>
                     <el-form-item label="国家" prop="country">
-                        <el-input v-model="form.country" placeholder="请输入国家" />
+                        <el-input v-model="form.country" clearable placeholder="请输入国家" />
                     </el-form-item>
                     <el-form-item label="城市" prop="city">
-                        <el-input v-model="form.city" placeholder="请输入城市" />
+                        <el-input v-model="form.city" clearable placeholder="请输入城市" />
                     </el-form-item>
                     <el-form-item label="语言" prop="language">
                         <dict-select v-model="form.language" dict_code="sys_language" placeholder="请选择语言" />

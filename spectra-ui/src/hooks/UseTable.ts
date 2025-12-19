@@ -64,7 +64,7 @@ export function useTable<T>(
             return;
         }
         if (response.data) {
-            table_data.value = response.data.records as never[];
+            table_data.value = response.data.records;
             pagination.value.total = response.data.total;
             pagination.value.size = response.data.size;
             pagination.value.page = response.data.current;
