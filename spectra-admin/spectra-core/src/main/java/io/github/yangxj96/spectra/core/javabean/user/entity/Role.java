@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
-import io.github.yangxj96.spectra.core.configure.security.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -70,7 +70,7 @@ public class Role extends BaseEntity implements Serializable {
      * 范围
      */
     @TableField(value = "SCOPE")
-    private AuthScope scope;
+    private DataScopeType scope;
 
     /**
      * 是否内置字段,为true则不允许他进行修改删除操作

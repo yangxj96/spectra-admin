@@ -52,5 +52,9 @@ declare global {
         role_ids: string[];
         // 组织机构ID
         organization_id: string;
+        // 数据范围
+        data_scope: string;
+        // 数据范围为自定义的情况下的目标组织机构ID
+        target_ids: number[];
     };
 }

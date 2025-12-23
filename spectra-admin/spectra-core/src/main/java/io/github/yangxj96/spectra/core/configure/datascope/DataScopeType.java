@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.configure.security.enums;
+package io.github.yangxj96.spectra.core.configure.datascope;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -22,27 +22,29 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 数据范围
- *
+ * 数据范围 <br/>
+ * 用户直授数据范围 > 角色数据范围 > 默认 SELF
  * @author Jack Young
  * @version 1.0
  * @since 2025-11-11
  */
 @Getter
 @AllArgsConstructor
-public enum AuthScope implements IEnum<Short> {
+public enum DataScopeType implements IEnum<Integer> {
 
-    ALL((short) 0, "全局"),
-    DEPT_AND_CHILD((short) 1, "本级及下级"),
-    DEPT_ONLY((short) 2, "本级");
+    ALL(0, "全局"),
+    SELF(1, "本人"),
+    DEPT(2, "部门"),
+    DEPT_AND_CHILD(3, "部门及子部门"),
+    CUSTOM(4, "自定义");
 
-    private final short value;
+    private final Integer value;
 
     @JsonValue
     private final String desc;
 
     @Override
-    public Short getValue() {
+    public Integer getValue() {
         return this.value;
     }
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from "vue";
-import { ElMessage, type FormInstance, type FormRules, type AutocompleteData } from "element-plus";
+import { type AutocompleteData, ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UserApi from "@/api/UserApi.ts";
@@ -47,8 +47,6 @@ const formRef = useTemplateRef<FormInstance>("formRef");
 const emailSuffixes = ref<string[]>([]);
 
 onMounted(() => {
-    console.log(form.value);
-
     useDictStore()
         .getDictData("sys_email_suffix")
         .then(res => {
@@ -194,6 +192,26 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                             node-key="id"
                             clearable
                             check-strictly
+                            default-expand-all
+                            :props="treeDefaultProps" />
+                    </el-form-item>
+                    <el-form-item label="用户数据范围">
+                        <el-select v-model="form.data_scope" placeholder="请选择用户数据范围" style="width: 100%">
+                            <el-option label="全局" value="全局" />
+                            <el-option label="本人" value="本人" />
+                            <el-option label="部门" value="部门" />
+                            <el-option label="部门及子部门" value="部门及子部门" />
+                            <el-option label="自定义" value="自定义" />
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item v-if="form.data_scope === '自定义'" label="自定义数据范围">
+                        <el-tree-select
+                            v-model="form.target_ids"
+                            :data="organization_tree"
+                            node-key="id"
+                            clearable
+                            check-strictly
+                            multiple
                             default-expand-all
                             :props="treeDefaultProps" />
                     </el-form-item>

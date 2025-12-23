@@ -38,6 +38,7 @@
         <druid.version>1.2.28-SNAPSHOT</druid.version>
         <bcprov.version>1.83</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
+        <mica.version>4.0.0</mica.version>
 
     </properties>
 
@@ -144,6 +145,17 @@
                 <groupId>org.lionsoul</groupId>
                 <artifactId>ip2region</artifactId>
                 <version>${ip2region.version}</version>
+            </dependency>
+            <!-- XSS攻击防范 -->
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-xss</artifactId>
+                <version>${mica.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-core</artifactId>
+                <version>${mica.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

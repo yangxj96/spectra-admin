@@ -28,6 +28,7 @@ import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 import io.github.yangxj96.spectra.core.configure.system.UserProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
@@ -36,10 +37,14 @@ import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
+import io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope;
+import io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScopeTarget;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
+import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeMapper;
+import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeTargetMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserMapper;
 import io.github.yangxj96.spectra.core.service.auth.AccountService;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
@@ -91,6 +96,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Resource
     private AccountService accountService;
 
+    @Resource
+    private UserDataScopeMapper dataScopeMapper;
+
+    @Resource
+    private UserDataScopeTargetMapper dataScopeTargetMapper;
+
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
@@ -114,6 +125,31 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!accountService.save(defaultAccount)) {
             throw new DataSaveException("保存用户信息异常");
         }
+
+        // 数据范围处理
+        if (params.getDataScope() != null) {
+            // 新增
+            var dataScopeEntity = UserDataScope.builder()
+                    .userId(entity.getId())
+                    .scopeType(params.getDataScope())
+                    .build();
+            dataScopeMapper.insert(dataScopeEntity);
+
+            // 如果是自定义的话,要插入自定义的数据
+            if (params.getDataScope() == DataScopeType.CUSTOM) {
+                var targets = new ArrayList<UserDataScopeTarget>();
+                for (Long targetId : params.getTargetIds()) {
+                    targets.add(UserDataScopeTarget.builder()
+                            .userId(entity.getId())
+                            .targetId(targetId)
+                            .targetType(0)
+                            .build());
+                }
+                dataScopeTargetMapper.insert(targets);
+            }
+        }
+
+
         // 关联角色
         relUserRoleService.grant(entity.getId(), params.getRoleIds());
     }
@@ -155,6 +191,52 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             account.setLoginName(entity.getEmail());
             accountService.updateById(account);
         }
+
+        // 数据范围处理
+        UserDataScope dataScope = dataScopeMapper.findByUserId(entity.getId());
+        if (params.getDataScope() == null && dataScope != null) {
+            // 请求参数不存在数据范围,但是数据范围数据存在,则删除数据范围数据
+            dataScopeMapper.deleteById(dataScope.getId());
+        }
+        if (params.getDataScope() != null) {
+            if (dataScope == null) {
+                // 新增
+                var dataScopeEntity = UserDataScope.builder()
+                        .userId(entity.getId())
+                        .scopeType(params.getDataScope())
+                        .build();
+                dataScopeMapper.insert(dataScopeEntity);
+            } else {
+                // 如果之前存的是CUSTOM,则需要清除一下
+                if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
+                    List<UserDataScopeTarget> userDataScopeTargets = dataScopeTargetMapper.selectList(
+                            new LambdaQueryWrapper<UserDataScopeTarget>()
+                                    .eq(UserDataScopeTarget::getUserId, entity.getId())
+                    );
+                    dataScopeTargetMapper.deleteByIds(
+                            userDataScopeTargets.stream()
+                                    .map(BaseEntity::getId)
+                                    .toList()
+                    );
+                }
+                dataScope.setScopeType(params.getDataScope());
+                dataScopeMapper.updateById(dataScope);
+            }
+
+            // 如果现在修改成了自定义的话,要插入自定义的数据
+            if (params.getDataScope() == DataScopeType.CUSTOM) {
+                var targets = new ArrayList<UserDataScopeTarget>();
+                for (Long targetId : params.getTargetIds()) {
+                    targets.add(UserDataScopeTarget.builder()
+                            .userId(entity.getId())
+                            .targetId(targetId)
+                            .targetType(0)
+                            .build());
+                }
+                dataScopeTargetMapper.insert(targets);
+            }
+        }
+
 
         // 角色处理
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
@@ -243,6 +325,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 vo.setRoles(roleConverter.toVOs(roles));
             }
             vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
+            // 数据范围
+            UserDataScope dataScope = dataScopeMapper.findByUserId(vo.getId());
+            if (dataScope != null) {
+                vo.setDataScope(dataScope.getScopeType());
+                if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
+                    List<UserDataScopeTarget> targets = dataScopeTargetMapper.findByUserId(vo.getId());
+                    vo.setTargetIds(
+                            targets.stream()
+                                    .map(UserDataScopeTarget::getTargetId)
+                                    .map(Object::toString)
+                                    .toList()
+                    );
+                }
+            }
         });
         // 响应
         return result;

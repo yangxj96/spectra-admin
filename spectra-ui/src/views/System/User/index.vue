@@ -8,6 +8,7 @@ import UseTable from "@/hooks/UseTable.ts";
 import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 import useDictStore from "@/plugin/store/modules/useDictStore.ts";
+import icons from "@/components/Icons/index.vue";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -154,7 +155,10 @@ onMounted(async () => {
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleUserEditDialog({} as User)">新增用户</el-button>
+                <el-button @click="handleUserEditDialog({} as User)">
+                    <icons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
+                    &nbsp;新增用户
+                </el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -214,17 +218,23 @@ onMounted(async () => {
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" width="200" fixed="right" label="操作">
+                <el-table-column align="center" width="160" fixed="right" label="操作">
                     <template #default="scope">
-                        <el-button link type="primary" size="small" @click="handleTableItemResetPassword(scope.row)">
-                            重置密码
-                        </el-button>
-                        <el-button link type="primary" size="small" @click="handleUserEditDialog(scope.row)">
-                            编辑
-                        </el-button>
-                        <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
-                            删除
-                        </el-button>
+                        <el-tooltip content="重置密码" placement="top">
+                            <el-button link type="primary" @click="handleTableItemResetPassword(scope.row)">
+                                <icons name="icon-reset-passwords" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip content="编辑用户" placement="top">
+                            <el-button link type="primary" @click="handleUserEditDialog(scope.row)">
+                                <icons name="icon-user-edit" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip content="删除用户" placement="top">
+                            <el-button link type="primary" @click="handleTableItemDelete(scope.row)">
+                                <icons name="icon-user-del" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
                     </template>
                 </el-table-column>
             </el-table>

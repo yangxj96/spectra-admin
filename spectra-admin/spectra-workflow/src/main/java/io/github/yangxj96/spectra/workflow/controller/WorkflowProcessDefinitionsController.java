@@ -16,9 +16,17 @@
 
 package io.github.yangxj96.spectra.workflow.controller;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.engine.RepositoryService;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 工作流-流程定义
@@ -33,9 +41,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class WorkflowProcessDefinitionsController {
 
 
+    @Resource
+    private RepositoryService repositoryService;
 
-
-
+    /**
+     * 获取所有的流程定义
+     *
+     * @return 流程定义列表
+     */
+    @GetMapping("/definitions")
+    public List<Map<String, Object>> definitions() {
+        var definitions = repositoryService
+                .createProcessDefinitionQuery()
+                .list();
+        var result = new ArrayList<Map<String, Object>>();
+        for (var definition : definitions) {
+            var m = new HashMap<String, Object>();
+            m.put("id", definition.getId());
+            m.put("deploymentId", definition.getDeploymentId());
+            m.put("description", definition.getDescription());
+            m.put("key", definition.getKey());
+            m.put("name", definition.getName());
+            m.put("ver", definition.getVersion());
+            result.add(m);
+        }
+        return result;
+    }
 
 
 }

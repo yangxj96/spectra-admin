@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.javabean.user.from;
 
 import io.github.yangxj96.spectra.common.base.Verify;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -25,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -119,4 +119,14 @@ public class UserSaveFrom {
      */
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
     private List<Long> roleIds;
+
+    /**
+     * 数据范围
+     */
+    private DataScopeType dataScope;
+
+    /**
+     * 当数据范围是 {@link DataScopeType#CUSTOM} 的时候这个不能为空
+     */
+    private List<Long> targetIds;
 }
