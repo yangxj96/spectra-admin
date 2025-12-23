@@ -28,21 +28,15 @@ public class DataScopeAspect {
         this.dataScopeService = dataScopeService;
     }
 
-    @Around(value = "@annotation(dataScope) || @annotation(dataScopeIgnore)", argNames = "pjp,dataScope,dataScopeIgnore")
-    public Object around(ProceedingJoinPoint pjp, DataScope dataScope, DataScopeIgnore dataScopeIgnore) throws Throwable {
-        // 忽略注解.等级最高
-        if (dataScopeIgnore != null) {
-            try {
-                DataScopeHolder.set(DataScopeContext.builder()
-                        .ignore(true)
-                        .build());
-                return pjp.proceed();
-            } finally {
-                DataScopeHolder.clear();
-            }
-        }
-
-        // 没有 DataScope，直接放行
+    /**
+     * 数据权限范围环绕拦截
+     *
+     * @param pjp 进入点
+     * @return 响应数据
+     * @throws Throwable e
+     */
+    @Around(value = "@annotation(dataScope) ")
+    public Object around(ProceedingJoinPoint pjp, DataScope dataScope) throws Throwable {
         if (!dataScope.enabled()) {
             return pjp.proceed();
         }

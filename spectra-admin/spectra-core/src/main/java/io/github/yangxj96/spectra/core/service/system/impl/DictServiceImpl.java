@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScope;
 import io.github.yangxj96.spectra.core.javabean.system.converter.DictConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
@@ -142,6 +143,7 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
+    @DataScope
     public List<DictDataVo> listDictDataByGroupCode(String code) {
         var group = groupService.getByCode(code);
         if (null == group) {

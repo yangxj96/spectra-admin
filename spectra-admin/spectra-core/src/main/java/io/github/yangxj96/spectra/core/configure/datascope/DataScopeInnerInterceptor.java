@@ -27,12 +27,11 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.sql.Connection;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
@@ -44,27 +43,27 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
+@NullMarked
 public class DataScopeInnerInterceptor implements InnerInterceptor {
-
-    private final Set<String> parseFailCache = ConcurrentHashMap.newKeySet();
 
     /**
      * 拦截SELECT
      */
     @Override
-    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
-
+    public void beforeQuery(
+            Executor executor,
+            MappedStatement ms,
+            Object parameter,
+            RowBounds rowBounds,
+            ResultHandler resultHandler,
+            BoundSql boundSql
+    ) {
         final var ctx = DataScopeHolder.get();
-
         if (ctx == null || ctx.isIgnore() || ctx.getScope() == DataScopeType.ALL) {
             return;
         }
 
         final var originalSql = boundSql.getSql();
-
-        if (parseFailCache.contains(originalSql)) {
-            return;
-        }
 
         try {
             var newSql = processSql(boundSql.getSql(), ctx);
@@ -73,9 +72,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
                 metaObject.setValue("sql", newSql);
             }
         } catch (Exception e) {
-            parseFailCache.add(originalSql);
-            log.error("DataScope SQL 处理失败, mapper={}, sql={}",
-                    ms.getId(), originalSql, e);
+            log.error("DataScope SQL 处理失败, mapper={}, sql={}", ms.getId(), originalSql, e);
             // 生产环境建议：失败即放行，避免全站炸
         }
     }
@@ -101,10 +98,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
                 metaObject.setValue("sql", newSql);
             }
         } catch (DataScopeViolationException e) {
-            log.warn("DataScope blocked SQL: {}", originalSql);
+            log.warn("DataScope已阻止该SQL语句执行。: {}", originalSql);
             throw e;
         } catch (Exception e) {
-            log.error("DataScope UPDATE/DELETE SQL 处理失败: {}", originalSql, e);
+            log.error("DataScope UPDATE/DELETE SQL处理失败: {}", originalSql, e);
             // 生产环境：失败放行
         }
     }
@@ -148,15 +145,15 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
             return;
         }
 
-        Expression dataScopeExpr = buildScopeExpr(resolveScopeField(table, ctx), ctx);
+        var dataScopeExpr = buildScopeExpression(resolveScopeField(table, ctx), ctx);
         if (dataScopeExpr == null) {
             return;
         }
 
-        Expression where = update.getWhere();
+        var where = update.getWhere();
 
         if (where == null) {
-            // 🔥 批量 UPDATE 兜底
+            // 批量 UPDATE 兜底,禁止无条件更新
             throw new DataScopeViolationException("UPDATE without WHERE is forbidden under data scope");
         }
 
@@ -177,7 +174,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
             return;
         }
 
-        Expression dataScopeExpr = buildScopeExpr(resolveScopeField(table, ctx), ctx);
+        Expression dataScopeExpr = buildScopeExpression(resolveScopeField(table, ctx), ctx);
         if (dataScopeExpr == null) {
             return;
         }
@@ -187,26 +184,6 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
             throw new DataScopeViolationException("DELETE without WHERE is forbidden under data scope");
         }
         delete.setWhere(new AndExpression(where, dataScopeExpr));
-    }
-
-    /**
-     * 解决范围字段
-     *
-     * @param table table
-     * @param ctx   数据范围上下文
-     * @return 解析后
-     */
-    private String resolveScopeField(Table table, DataScopeContext ctx) {
-
-        if (StringUtils.hasText(ctx.getScopeField())) {
-            return ctx.getScopeField();
-        }
-
-        String alias = table.getAlias() != null
-                ? table.getAlias().getName()
-                : table.getName();
-
-        return alias + ".org_id";
     }
 
     /**
@@ -246,7 +223,6 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
     }
 
-
     /**
      * 处理普通 SELECT
      *
@@ -254,11 +230,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @param ctx 数据范围上下文
      */
     private void processPlainSelect(PlainSelect ps, DataScopeContext ctx) {
-
         // 处理 WITH (CTE)
         if (ps.getWithItemsList() != null) {
             for (var with : ps.getWithItemsList()) {
-                Select s = with.getSelect();
+                var s = with.getSelect();
                 if (s.getPlainSelect() != null) {
                     processPlainSelect(s.getPlainSelect(), ctx);
                 } else if (s.getSetOperationList() != null) {
@@ -281,7 +256,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         //}
 
         // WHERE 注入
-        var dataScopeExpr = buildScopeExpr(resolveScopeField(ps, ctx), ctx);
+        var dataScopeExpr = buildScopeExpression(resolveScopeField(ps, ctx), ctx);
         if (dataScopeExpr == null) {
             return;
         }
@@ -313,8 +288,14 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
     }
 
-
-    private Expression buildScopeExpr(String field, DataScopeContext ctx) {
+    /**
+     * 构建数据范围表达式
+     *
+     * @param field 字段
+     * @param ctx   数据范围上下文
+     * @return 表达式
+     */
+    private Expression buildScopeExpression(String field, DataScopeContext ctx) {
         return switch (ctx.getScope()) {
             case SELF -> new EqualsTo(
                     new Column(field),
@@ -374,6 +355,26 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
         // 没指定 → 不加 DataScope
         return null;
+    }
+
+    /**
+     * 解析范围字段
+     *
+     * @param table table
+     * @param ctx   数据范围上下文
+     * @return 解析后
+     */
+    private String resolveScopeField(Table table, DataScopeContext ctx) {
+
+        if (StringUtils.hasText(ctx.getScopeField())) {
+            return ctx.getScopeField();
+        }
+
+        String alias = table.getAlias() != null
+                ? table.getAlias().getName()
+                : table.getName();
+
+        return alias + ".org_id";
     }
 
     /**

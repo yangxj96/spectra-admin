@@ -18,7 +18,7 @@ import java.util.List;
 public class DataScopeContext {
 
     /**
-     * ALL / SELF / DEPT / DEPT_AND_CHILD / CUSTOM
+     * 注解范围
      */
     private DataScopeType scope;
 
@@ -31,7 +31,7 @@ public class DataScopeContext {
     private List<Long> targetIds;
 
     /** 表字段（可选，支持别名） */
-    private String scopeField;   // 如：org_id / o.org_id
+    private String scopeField;
 
     /**
      * 用户字段
