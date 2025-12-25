@@ -41,6 +41,7 @@
         "echarts": "6.0.0",
         "element-plus": "2.12.0",
         "jsoneditor": "10.4.2",
+        "lodash": "4.17.21",
         "p-queue": "9.0.1",
         "pinia": "3.0.4",
         "pinia-plugin-persistedstate": "4.7.1",

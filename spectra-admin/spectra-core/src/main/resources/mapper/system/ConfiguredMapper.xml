@@ -8,9 +8,11 @@
                type="io.github.yangxj96.spectra.core.javabean.system.entity.Configured">
         <!--@mbg.generated-->
         <!--@Table "SPECTRA"."SYS_CONFIG"-->
-        <result column="KEY"     jdbcType="VARCHAR" property="key"/>
-        <result column="VALUE"   jdbcType="VARCHAR" property="value"/>
-        <result column="REMARKS" jdbcType="VARCHAR" property="remarks"/>
+        <result column="KEY"       jdbcType="VARCHAR" property="key"/>
+        <result column="VALUE"     jdbcType="VARCHAR" property="value"/>
+        <result column="TYPE"      jdbcType="INTEGER" property="type"/>
+        <result column="DICT_CODE" jdbcType="VARCHAR" property="dictCode"/>
+        <result column="REMARKS"   jdbcType="VARCHAR" property="remarks"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -19,6 +21,8 @@
         ID,
         "KEY",
         "VALUE",
+        "TYPE",
+        DICT_CODE
         REMARKS,
         CREATED_BY,
         CREATED_AT,

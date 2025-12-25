@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import Icons from "@/components/Icons/index.vue";
+import { useTemplateRef } from "vue";
+import ConfiguredApi from "@/api/ConfiguredApi.ts";
+import { ElMessage } from "element-plus";
+import DictSelect from "@/components/DictSelect/index.vue";
 // 是否显示
 const show = defineModel("show", {
     type: Boolean,
@@ -7,12 +11,13 @@ const show = defineModel("show", {
     default: false
 });
 
-// 具体表单
+// 表单
 const form = defineModel<Configured>("form", {
     type: Object,
-    required: true,
-    default: () => ({})
+    required: true
 });
+
+const formRef = useTemplateRef("formRef");
 
 // 定义响应方法
 const emits = defineEmits(["close"]);
@@ -20,6 +25,20 @@ const emits = defineEmits(["close"]);
 const handleDrawerClose = () => {
     show.value = false;
     emits("close");
+};
+
+const handleConfiguredSave = async () => {
+    if (!formRef.value) return;
+    try {
+        await formRef.value.validate();
+        await ConfiguredApi.modify(form.value!);
+        ElMessage.success({
+            message: "修改配置成功",
+            onClose: handleDrawerClose
+        });
+    } catch (error) {
+        console.error(error);
+    }
 };
 </script>
 
@@ -34,28 +53,31 @@ const handleDrawerClose = () => {
         </template>
 
         <template #default>
-            <el-watermark style="height: 100%; width: 100%">
-                <el-form ref="formRef" :model="form" label-width="auto" @submit.prevent>
-                    <el-form-item label="ID" prop="id">
-                        <el-text>{{ form.id }}</el-text>
-                    </el-form-item>
-                    <el-form-item label="配置键" prop="key">
-                        <el-input v-if="form.id" v-model="form.key" placeholder="请输入配置键" />
-                        <el-text v-else>{{ form.key }}</el-text>
-                    </el-form-item>
-                    <el-form-item label="配置值" prop="value">
-                        <el-input v-model="form.value" placeholder="请输入配置值" />
-                    </el-form-item>
-                    <el-form-item label="备注" prop="remarks">
-                        <el-input v-model="form.remarks" type="textarea" :rows="5" placeholder="请输入配置说明" />
-                    </el-form-item>
-                </el-form>
-            </el-watermark>
+            <el-form ref="formRef" :model="form" label-width="auto" @submit.prevent>
+                <el-form-item label="ID" prop="id">
+                    <el-text>{{ form.id }}</el-text>
+                </el-form-item>
+                <el-form-item label="配置键" prop="key">
+                    <el-text>{{ form.key }}</el-text>
+                </el-form-item>
+                <el-form-item label="配置值" prop="value">
+                    <el-switch
+                        v-if="form.type === 'BOOL'"
+                        v-model="form.value"
+                        active-value="true"
+                        inactive-value="false" />
+                    <dict-select v-else-if="form.type === 'SELECT'" v-model="form.value" :dict_code="form.dict_code" />
+                    <el-input v-else v-model="form.value" placeholder="请输入配置值" />
+                </el-form-item>
+                <el-form-item label="备注" prop="remarks">
+                    <el-input v-model="form.remarks" type="textarea" :rows="5" placeholder="请输入配置说明" />
+                </el-form-item>
+            </el-form>
         </template>
 
         <template #footer>
             <el-button @click="handleDrawerClose">取消</el-button>
-            <el-button type="primary">确定</el-button>
+            <el-button @click="handleConfiguredSave" type="primary">确定</el-button>
         </template>
     </el-drawer>
 </template>

@@ -11,6 +11,8 @@ declare global {
         unfold: boolean;
         // 防止重复请求
         isFetchingMenus: boolean;
+        // 水印
+        watermark: boolean;
     };
 
     // usePropsStore()的state

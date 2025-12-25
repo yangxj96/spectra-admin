@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef, watch } from "vue";
+import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 import { useDark, useFullscreen, useToggle } from "@vueuse/core";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
@@ -110,9 +110,13 @@ function handleMenu() {
                 </el-row>
                 <!-- 内容部分 -->
                 <div ref="content" class="box-content loading-box">
-                    <el-watermark style="height: 97%" :content="['yangxj96@gmail.com', '2025-11-06 00:11:22']">
+                    <el-watermark
+                        v-if="appStore.watermark === true"
+                        style="height: 97%"
+                        :content="['yangxj96@gmail.com', '2025-11-06 00:11:22']">
                         <router-view></router-view>
                     </el-watermark>
+                    <router-view v-else style="height: 97%"></router-view>
                 </div>
                 <!-- 底部版权 -->
                 <Footer />

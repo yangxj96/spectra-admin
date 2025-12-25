@@ -6,7 +6,8 @@ const useAppStore = defineStore("app", {
         lang: zhCn,
         menus: [] as Menu[],
         isFetchingMenus: false,
-        unfold: true
+        unfold: true,
+        watermark: false
     })
 });
 

@@ -3,12 +3,12 @@
 <template>
     <!-- 底部版权 -->
     <el-footer class="footer">
-        Copyright © 20xx-20xx
-        <strong><a href="#" target="_blank">xxxx</a></strong>
+        Copyright © 2025
+        <strong><a href="https://www.devops00.com" target="_blank">devops00</a></strong>
         &nbsp;
-        <strong><a href="#" target="_blank">xxxxx.xxx</a></strong>
+        <strong><a href="https://www.devops00.com" target="_blank">devops00.com</a></strong>
         All Rights Reserved. 备案号：
-        <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">ICP备xxxxxxxxxx号</a>
+        <a target="_blank" rel="nofollow" href="https://beian.miit.gov.cn/">滇ICP备2025012345号-1</a>
     </el-footer>
 </template>
 

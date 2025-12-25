@@ -3,6 +3,8 @@ import { ref } from "vue";
 import ConfiguredApi from "@/api/ConfiguredApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
+import _ from "lodash";
+import DictTag from "@/components/DictTag/index.vue";
 
 const edit = ref({
     show: false,
@@ -33,8 +35,9 @@ function handleDialogClose() {
     handlerConditionQuery();
 }
 
-const handleEditConfigured = () => {
+const handleEditConfigured = (row: Configured) => {
     edit.value.show = true;
+    edit.value.form = _.cloneDeep(row);
 };
 </script>
 
@@ -48,20 +51,43 @@ const handleEditConfigured = () => {
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button type="primary" @click="handleEditConfigured">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
         <el-table :data="table_data" height="96%" stripe default-expand-all row-key="id">
+            <el-table-column align="center" type="index" label="序号" width="100" />
             <el-table-column align="center" prop="id" label="主键" />
             <el-table-column align="center" prop="key" label="配置键" />
-            <el-table-column align="center" prop="value" label="配置值" />
+            <el-table-column align="center" prop="value" label="配置值">
+                <template v-slot:default="scope">
+                    <!-- 布尔类型 -->
+                    <el-tag v-if="scope.row.type === 'BOOL'" :type="scope.row.value === 'true' ? 'success' : 'danger'">
+                        {{ scope.row.value === "true" ? "启用" : "禁用" }}
+                    </el-tag>
+                    <!-- 下拉选择的类型 -->
+                    <dict-tag
+                        v-else-if="scope.row.type === 'SELECT'"
+                        v-model="scope.row.value"
+                        :dict_code="scope.row.dict_code" />
+                    <!-- TEXT保底 -->
+                    <el-text v-else>
+                        {{ scope.row.value }}
+                    </el-text>
+                </template>
+            </el-table-column>
             <el-table-column align="center" prop="remarks" label="备注" />
             <el-table-column align="center" label="操作">
-                <template #default="">
-                    <el-button v-owner="'MENU:UPDATE'" link type="primary" size="small">编辑</el-button>
+                <template #default="scope">
+                    <el-button
+                        v-owner="'ROLE:ROLE_DEV_OPS'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleEditConfigured(scope.row)">
+                        编辑
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>

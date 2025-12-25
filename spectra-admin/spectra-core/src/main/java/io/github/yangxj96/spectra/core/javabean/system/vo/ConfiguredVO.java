@@ -1,5 +1,6 @@
 package io.github.yangxj96.spectra.core.javabean.system.vo;
 
+import io.github.yangxj96.spectra.common.constant.ConfiguredValueType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -39,6 +40,16 @@ public class ConfiguredVO implements Serializable {
      * 配置VALUE
      */
     private String value;
+
+    /**
+     * 值类型
+     */
+    private ConfiguredValueType type;
+
+    /**
+     * 字典code
+     */
+    private String dictCode;
 
     /**
      * 备注说明

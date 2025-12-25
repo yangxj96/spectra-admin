@@ -3,6 +3,7 @@ package io.github.yangxj96.spectra.core.javabean.system.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
+import io.github.yangxj96.spectra.common.constant.ConfiguredValueType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,14 +30,26 @@ public class Configured extends BaseEntity implements Serializable {
     /**
      * 配置key
      */
-    @TableField(value = "key")
+    @TableField(value = "KEY")
     private String key;
 
     /**
      * 配置VALUE
      */
-    @TableField(value = "value")
+    @TableField(value = "VALUE")
     private String value;
+
+    /**
+     * 值类型
+     */
+    @TableField(value = "TYPE")
+    private ConfiguredValueType type;
+
+    /**
+     * 字典组CODE,可能会有选项之类的,直接关联一个字典做下拉选项
+     */
+    @TableField(value = "DICT_CODE")
+    private String dictCode;
 
     /**
      * 备注说明
