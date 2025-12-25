@@ -148,4 +148,11 @@ declare global {
         class_path: string;
         library_path: string;
     };
+
+    // 系统配置信息
+    type Configured = BaseEntity & {
+        key: string;
+        value: unknown;
+        remarks: string;
+    };
 }

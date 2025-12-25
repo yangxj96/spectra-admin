@@ -28,6 +28,7 @@ import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -114,7 +115,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @return 处理后的SQL
      * @throws Exception {@link Exception} e
      */
-    private String processUpdateDeleteSql(String sql, DataScopeContext ctx) throws Exception {
+    private @Nullable String processUpdateDeleteSql(String sql, DataScopeContext ctx) throws Exception {
 
         Statement stmt = CCJSqlParserUtil.parse(sql);
 
@@ -295,7 +296,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @param ctx   数据范围上下文
      * @return 表达式
      */
-    private Expression buildScopeExpression(String field, DataScopeContext ctx) {
+    private @Nullable  Expression buildScopeExpression(String field, DataScopeContext ctx) {
         return switch (ctx.getScope()) {
             case SELF -> new EqualsTo(
                     new Column(field),
@@ -348,7 +349,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @param ctx DataScopeContext
      * @return String
      */
-    private String resolveScopeField(PlainSelect ps, DataScopeContext ctx) {
+    private @Nullable String resolveScopeField(PlainSelect ps, DataScopeContext ctx) {
         // 注解显式指定（如 o.org_id）
         if (StringUtils.hasText(ctx.getScopeField())) {
             return ctx.getScopeField();
@@ -383,7 +384,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @param ps 简单SQL
      * @return 用户字段
      */
-    private String resolveUserField(PlainSelect ps) {
+    private @Nullable String resolveUserField(PlainSelect ps) {
         FromItem from = ps.getFromItem();
         if (from instanceof Table table) {
             String alias = table.getAlias() != null

@@ -54,4 +54,9 @@ declare global {
          */
         state?: boolean;
     };
+
+    // 系统配置分页请求参数定义
+    type ConfiguredPageParams = BasePageParams & {
+        username?: string;
+    };
 }
