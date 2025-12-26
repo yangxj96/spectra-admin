@@ -3,7 +3,7 @@
 > 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.0-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.26-green)
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
@@ -28,8 +28,8 @@
 | 技术              | 版本              | 说明              |
 |-----------------|-----------------|-----------------|
 | Java            | JDK25           | 使用最新LTS版本，性能更强  |
-| Maven           | 3.9.11          | 构建工具            |
-| Spring Boot     | 4.0.0           | 核心框架            |
+| Maven           | 3.9.12          | 构建工具            |
+| Spring Boot     | 4.0.1           | 核心框架            |
 | Spring Security | 7.0.0           | 权限认证框架          |
 | MyBatis-Plus    | 3.5.15          | 增强ORM，简化CRUD    |
 | Druid           | 1.2.28-SNAPSHOT | 最强连接池 (等待发布正式版) |
