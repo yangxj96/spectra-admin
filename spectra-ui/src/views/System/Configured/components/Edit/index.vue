@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Icons from "@/components/Icons/index.vue";
 import { useTemplateRef } from "vue";
-import ConfiguredApi from "@/api/ConfiguredApi.ts";
+import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
 import { ElMessage } from "element-plus";
 import DictSelect from "@/components/DictSelect/index.vue";
 // 是否显示

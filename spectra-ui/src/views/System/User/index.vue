@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import UserApi from "@/api/UserApi.ts";
-import OrganizationApi from "@/api/OrganizationApi.ts";
+import UserApi from "@/api/user/UserApi.ts";
+import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import UserEdit from "./components/Edit/index.vue";

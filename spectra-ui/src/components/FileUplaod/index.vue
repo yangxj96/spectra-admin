@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import FileUploadApi from "@/api/FileUploadApi.ts";
+import FileUploadApi from "@/api/common/FileUploadApi.ts";
 import FileUtils from "@/utils/FileUtils.ts";
 import { ref, useTemplateRef } from "vue";
 import { ElMessage } from "element-plus";

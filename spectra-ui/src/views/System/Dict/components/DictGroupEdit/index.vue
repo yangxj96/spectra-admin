@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import DictApi from "@/api/DictApi";
+import DictApi from "@/api/system/DictApi";
 import { ElMessage, type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import icons from "@/components/Icons/index.vue";

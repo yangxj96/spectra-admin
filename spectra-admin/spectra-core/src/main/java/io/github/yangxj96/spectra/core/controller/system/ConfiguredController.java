@@ -2,11 +2,11 @@ package io.github.yangxj96.spectra.core.controller.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredPageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
-import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -44,6 +44,16 @@ public class ConfiguredController {
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);
+    }
+
+    /**
+     * 获取json形式的数据
+     *
+     * @return 转换后的数据
+     */
+    @GetMapping("/json")
+    public Object json() {
+        return bindService.json();
     }
 
 }

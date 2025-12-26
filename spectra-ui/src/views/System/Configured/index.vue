@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import ConfiguredApi from "@/api/ConfiguredApi.ts";
+import { onMounted, ref } from "vue";
+import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
 import _ from "lodash";
@@ -22,6 +22,10 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     ConfiguredApi.page,
     condition.value
 );
+
+onMounted(() => {
+    ConfiguredApi.json().then(res => console.log(res));
+});
 
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
 function handleDialogClose() {

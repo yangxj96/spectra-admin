@@ -1,4 +1,4 @@
-import DictApi from "@/api/DictApi";
+import DictApi from "@/api/system/DictApi";
 import { defineStore } from "pinia";
 import PQueue from "p-queue";
 

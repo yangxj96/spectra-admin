@@ -1,8 +1,8 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import routes from "@/plugin/router/routes";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
+import { createRouter, createWebHashHistory } from "vue-router";
 import { hideLoading, showLoading } from "@/plugin/element/loading";
-import routes from "@/plugin/router/routes";
 import { getRouteTitle, loadMenu } from "@/utils/RouteUtils.ts";
 
 const router = createRouter({

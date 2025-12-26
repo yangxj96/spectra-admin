@@ -75,7 +75,7 @@
 
 > ⚠️ 该文件不会提交至 Git，请自行创建。
 
-### 后端 `.env` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
+### 后端 `env.properties` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
 
 | 环境变量               | 说明                | 示例                                                       |
 |--------------------|-------------------|----------------------------------------------------------|

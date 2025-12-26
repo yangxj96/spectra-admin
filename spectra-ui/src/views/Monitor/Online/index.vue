@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UserApi from "@/api/UserApi.ts";
+import UserApi from "@/api/user/UserApi.ts";
 
 const tableData = [] as unknown[];
 

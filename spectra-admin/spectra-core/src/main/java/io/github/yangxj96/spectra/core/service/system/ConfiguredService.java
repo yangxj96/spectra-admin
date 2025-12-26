@@ -34,4 +34,10 @@ public interface ConfiguredService extends BaseService<Configured> {
      */
     IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params);
 
+    /**
+     * 获取JSON格式的数据
+     *
+     * @return JSON格式的数据
+     */
+    Object json();
 }
