@@ -40,7 +40,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_DICT_ITEM")
+@TableName(value = "sys_dict_item", schema = "domain_core")
 public class DictItem extends BaseEntity implements Serializable {
 
     @Serial
@@ -49,36 +49,36 @@ public class DictItem extends BaseEntity implements Serializable {
     /**
      * 字典类型ID
      */
-    @TableField(value = "GID")
+    @TableField(value = "gid")
     private Long gid;
 
     /**
      * 标签
      */
-    @TableField(value = "LABEL")
+    @TableField(value = "label")
     private String label;
 
     /**
      * 值
      */
-    @TableField(value = "VALUE")
+    @TableField(value = "value")
     private String value;
 
     /**
      * 排序
      */
-    @TableField(value = "SORT")
+    @TableField(value = "sort")
     private Short sort;
 
     /**
      * 状态
      */
-    @TableField(value = "STATE")
+    @TableField(value = "state")
     private Short state;
 
     /**
      * 备注
      */
-    @TableField(value = "REMARK")
+    @TableField(value = "remark")
     private String remark;
 }

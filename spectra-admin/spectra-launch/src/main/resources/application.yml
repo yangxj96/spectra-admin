@@ -93,7 +93,7 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    driver-class-name: dm.jdbc.driver.DmDriver
+    driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -180,7 +180,6 @@ mybatis-plus:
       # logic-delete-field: deleted
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
-      schema: SPECTRA
 # 日志配置
 logging:
   group:
@@ -216,7 +215,7 @@ management:
 # 工作流配置
 flowable:
   # 数据库确定
-  database-schema: SPECTRA_WORKFLOW
+  database-schema: domain_workflow
   database-schema-update: true
   jpa-enabled: false
   # 流程定义

@@ -40,16 +40,16 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_REL_ROLE_AUTHORITY")
+@TableName(value = "sys_rel_role_authority", schema = "domain_core")
 public class RelRoleAuthority extends BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableField("ROLE_ID")
+    @TableField("role_id")
     private Long roleId;
 
-    @TableField("AUTHORITY_ID")
+    @TableField("authority_id")
     private Long authorityId;
 
 }

@@ -7,37 +7,37 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_FILE_INFO"-->
-        <result column="FILE_NAME"    jdbcType="VARCHAR"  property="fileName"/>
-        <result column="ORIGIN_NAME"  jdbcType="VARCHAR"  property="originName"/>
-        <result column="SUFFIX"       jdbcType="VARCHAR"  property="suffix"/>
-        <result column="PATH"         jdbcType="VARCHAR"  property="path"/>
-        <result column="SIZE"         jdbcType="BIGINT"   property="size"/>
-        <result column="HASH"         jdbcType="VARCHAR"  property="hash"/>
-        <result column="STORAGE_TYPE" jdbcType="SMALLINT" property="storageType"/>
+        <!--@Table spectra.sys_file_info-->
+        <result column="file_name"    property="fileName"/>
+        <result column="origin_name"  property="originName"/>
+        <result column="suffix"       property="suffix"/>
+        <result column="path"         property="path"/>
+        <result column="size"         property="size"/>
+        <result column="hash"         property="hash"/>
+        <result column="storage_type" property="storageType"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        FILE_NAME,
-        ORIGIN_NAME,
-        SUFFIX,
-        PATH,
-        "SIZE",
-        HASH,
-        STORAGE_TYPE,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        file_name,
+        origin_name,
+        suffix,
+        path,
+        "size",
+        hash,
+        storage_type,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
     <select id="getByHash" resultMap="BaseResultMap">
         SELECT <include refid="Base_Column_List"/>
-        FROM SPECTRA.SYS_FILE_INFO WHERE HASH = #{hash}
+        FROM spectra.sys_file_info WHERE hash = #{hash}
     </select>
 </mapper>

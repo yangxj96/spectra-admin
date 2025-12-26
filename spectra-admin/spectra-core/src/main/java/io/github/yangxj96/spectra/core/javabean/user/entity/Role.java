@@ -42,7 +42,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_ROLE")
+@TableName(value = "sys_role", schema = "domain_core")
 public class Role extends BaseEntity implements Serializable {
 
     @Serial
@@ -51,37 +51,37 @@ public class Role extends BaseEntity implements Serializable {
     /**
      * 名称
      */
-    @TableField(value = "NAME")
+    @TableField(value = "name")
     private String name;
 
     /**
      * 编码
      */
-    @TableField(value = "CODE", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
+    @TableField(value = "code", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
     /**
      * 状态
      */
-    @TableField(value = "STATE")
+    @TableField(value = "state")
     private Boolean state;
 
     /**
      * 范围
      */
-    @TableField(value = "SCOPE")
+    @TableField(value = "scope")
     private DataScopeType scope;
 
     /**
      * 是否内置字段,为true则不允许他进行修改删除操作
      */
-    @TableField(value = "BUILTIN")
+    @TableField(value = "builtin")
     private Boolean builtin;
 
     /**
      * 备注
      */
-    @TableField(value = "REMARK")
+    @TableField(value = "remark")
     private String remark;
 
 }

@@ -65,7 +65,7 @@ public class DictGroupFrom {
      * 字典状态
      */
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Short state;
+    private Boolean state;
 
     /**
      * 备注

@@ -24,43 +24,43 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_FILE_CHUNK")
+@TableName(value = "sys_file_chunk", schema = "domain_core")
 public class FileChunk extends BaseEntity implements Serializable {
 
     /**
      * 文件名
      */
-    @TableField(value = "FILE_NAME")
+    @TableField(value = "file_name")
     private String fileName;
 
     /**
      * 文件唯一标识（如 SHA256 或 UUID）
      */
-    @TableField(value = "FILE_ID")
+    @TableField(value = "file_id")
     private String fileId;
 
     /**
      * 分片序号（从 0 开始）
      */
-    @TableField(value = "CHUNK_INDEX")
+    @TableField(value = "chunk_index")
     private Integer chunkIndex;
 
     /**
      * 总分片数（冗余，便于校验）
      */
-    @TableField(value = "TOTAL_CHUNKS")
+    @TableField(value = "total_chunks")
     private Integer totalChunks;
 
     /**
      * 分片在磁盘/OSS 的存储路径或 Key
      */
-    @TableField(value = "CHUNK_PATH")
+    @TableField(value = "chunk_path")
     private String chunkPath;
 
     /**
      * 当前分片字节数
      */
-    @TableField(value = "CHUNK_SIZE")
+    @TableField(value = "chunk_size")
     private Long chunkSize;
 
 }

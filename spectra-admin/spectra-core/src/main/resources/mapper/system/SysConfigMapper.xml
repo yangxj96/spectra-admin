@@ -7,24 +7,24 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.SysConfig">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_CONFIG"-->
-        <result column="KEY"     jdbcType="VARCHAR" property="key"/>
-        <result column="VALUE"   jdbcType="VARCHAR" property="value"/>
-        <result column="REMARKS" jdbcType="VARCHAR" property="remarks"/>
+        <!--@Table spectra.sys_config-->
+        <result column="key"     property="key"/>
+        <result column="value"   property="value"/>
+        <result column="remarks" property="remarks"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        "KEY",
-        "VALUE",
-        REMARKS,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        key,
+        value,
+        remarks,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

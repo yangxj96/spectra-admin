@@ -41,7 +41,7 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_CONFIG")
+@TableName(value = "sys_config", schema = "domain_core")
 public class SysConfig extends BaseEntity implements Serializable {
 
     @Serial
@@ -50,19 +50,19 @@ public class SysConfig extends BaseEntity implements Serializable {
     /**
      * 配置key
      */
-    @TableField(value = "\"KEY\"")
+    @TableField(value = "key")
     private String key;
 
     /**
      * 配置VALUE
      */
-    @TableField(value = "\"VALUE\"")
+    @TableField(value = "value")
     private String value;
 
     /**
      * 备注说明
      */
-    @TableField(value = "REMARKS")
+    @TableField(value = "remarks")
     private String remarks;
 
 }

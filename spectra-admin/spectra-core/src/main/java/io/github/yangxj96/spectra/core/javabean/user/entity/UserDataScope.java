@@ -25,19 +25,19 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_USER_DATA_SCOPE")
+@TableName(value = "sys_user_data_scope", schema = "domain_core")
 public class UserDataScope extends BaseEntity implements Serializable {
 
     /**
      * 用户ID
      */
-    @TableField(value = "USER_ID")
+    @TableField(value = "user_id")
     private Long userId;
 
     /**
      * 数据范围类型
      */
-    @TableField(value = "SCOPE_TYPE")
+    @TableField(value = "scope_type")
     private DataScopeType scopeType;
 
 }

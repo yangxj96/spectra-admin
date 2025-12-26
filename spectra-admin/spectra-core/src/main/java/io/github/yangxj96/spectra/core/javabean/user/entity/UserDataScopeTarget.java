@@ -24,25 +24,25 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_USER_DATA_SCOPE_TARGET")
+@TableName(value = "sys_user_data_scope_target", schema = "domain_core")
 public class UserDataScopeTarget extends BaseEntity implements Serializable {
 
     /**
      * 用户ID
      */
-    @TableField(value = "USER_ID")
+    @TableField(value = "user_id")
     private Long userId;
 
     /**
      * 目标ID
      */
-    @TableField(value = "TARGET_ID")
+    @TableField(value = "target_id")
     private Long targetId;
 
     /**
      * 目标类型
      */
-    @TableField(value = "TARGET_TYPE")
+    @TableField(value = "target_type")
     private Integer targetType;
 
 }

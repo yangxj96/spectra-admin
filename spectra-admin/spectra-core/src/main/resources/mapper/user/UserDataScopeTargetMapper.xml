@@ -6,22 +6,22 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScopeTarget">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_USER_DATA_SCOPE_TARGET"-->
-        <result column="USER_ID"     jdbcType="BIGINT"  property="userId"/>
-        <result column="TARGET_ID"   jdbcType="BIGINT"  property="targetId"/>
-        <result column="TARGET_TYPE" jdbcType="INTEGER" property="targetType"/>
+        <!--@Table spectra.sys_user_data_scope_target-->
+        <result column="user_id"     property="userId"/>
+        <result column="target_id"   property="targetId"/>
+        <result column="target_type" property="targetType"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID, USER_ID, TARGET_ID, TARGET_TYPE, CREATED_BY, CREATED_AT, UPDATED_BY, UPDATED_AT, DELETED, VERSION
+        id, user_id, target_id, target_type, created_by, created_at, updated_by, updated_at, deleted, version
     </sql>
 
     <select id="findByUserId"
             resultType="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScopeTarget">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM "SPECTRA"."SYS_USER_DATA_SCOPE_TARGET" WHERE USER_ID = #{userId,jdbcType=BIGINT}
+        FROM domain_core.sys_user_data_scope_target WHERE user_id = #{userId}
     </select>
 </mapper>

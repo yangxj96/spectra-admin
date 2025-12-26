@@ -134,7 +134,7 @@ public class DictServiceImpl implements DictService {
     public @Nullable List<DictTypeTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
         var wrapper = new LambdaQueryWrapper<DictGroup>()
-                .eq(DictGroup::getState, 0)
+                .eq(DictGroup::getState, Boolean.TRUE)
                 .eq(DictGroup::getHide, Boolean.FALSE);
         var menus = groupService.list(wrapper);
         var vos = dictConverter.typeToTreeVOS(menus);

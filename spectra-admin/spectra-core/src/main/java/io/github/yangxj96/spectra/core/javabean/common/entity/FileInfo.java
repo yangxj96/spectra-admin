@@ -24,49 +24,49 @@ import java.io.Serializable;
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "SYS_FILE_INFO")
+@TableName(value = "sys_file_info", schema = "domain_core")
 public class FileInfo extends BaseEntity implements Serializable {
 
     /**
      * 生成的32位的文件名称
      */
-    @TableField(value = "FILE_NAME")
+    @TableField(value = "file_name")
     private String fileName;
 
     /**
      * 文件源名称
      */
-    @TableField(value = "ORIGIN_NAME")
+    @TableField(value = "origin_name")
     private String originName;
 
     /**
      * 文件后缀
      */
-    @TableField(value = "SUFFIX")
+    @TableField(value = "suffix")
     private String suffix;
 
     /**
      * 文件存储位置
      */
-    @TableField(value = "PATH")
+    @TableField(value = "path")
     private String path;
 
     /**
      * 文件大小
      */
-    @TableField(value = "SIZE")
+    @TableField(value = "size")
     private Long size;
 
     /**
      * 文件hash值
      */
-    @TableField(value = "HASH")
+    @TableField(value = "hash")
     private String hash;
 
     /**
      * 文件存储类型
      */
-    @TableField(value = "STORAGE_TYPE")
+    @TableField(value = "storage_type")
     private Short storageType;
 
 }

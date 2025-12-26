@@ -6,32 +6,32 @@
              extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
              type="io.github.yangxj96.spectra.core.javabean.system.entity.Menu">
       <!--@mbg.generated-->
-      <!--@Table "SPECTRA"."SYS_MENU"-->
-      <result column="PID"       jdbcType="BIGINT"  property="pid" />
-      <result column="ICON"      jdbcType="VARCHAR" property="icon" />
-      <result column="NAME"      jdbcType="VARCHAR" property="name" />
-      <result column="PATH"      jdbcType="VARCHAR" property="path" />
-      <result column="COMPONENT" jdbcType="VARCHAR" property="component" />
-      <result column="LAYOUT"    jdbcType="VARCHAR" property="layout" />
-      <result column="SORT"      jdbcType="INTEGER" property="sort" />
+      <!--@Table spectra.sys_menu-->
+      <result column="pid"       property="pid" />
+      <result column="icon"      property="icon" />
+      <result column="name"      property="name" />
+      <result column="path"      property="path" />
+      <result column="component" property="component" />
+      <result column="layout"    property="layout" />
+      <result column="sort"      property="sort" />
   </resultMap>
   <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        NAME,
-        PID,
-        ICON,
-        PATH,
-        COMPONENT,
-        LAYOUT,
-        SORT,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        name,
+        pid,
+        icon,
+        path,
+        component,
+        layout,
+        sort,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

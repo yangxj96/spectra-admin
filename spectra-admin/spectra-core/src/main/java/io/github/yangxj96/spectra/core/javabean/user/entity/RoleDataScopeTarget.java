@@ -24,24 +24,24 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_ROLE_DATA_SCOPE_TARGET")
+@TableName(value = "sys_role_data_scope_target", schema = "domain_core")
 public class RoleDataScopeTarget extends BaseEntity implements Serializable {
 
     /**
      * 角色ID
      */
-    @TableField(value = "ROLE_ID")
+    @TableField(value = "role_id")
     private Long roleId;
 
     /**
      * 目标ID
      */
-    @TableField(value = "TARGET_ID")
+    @TableField(value = "target_id")
     private Long targetId;
 
     /**
      * 目标类型
      */
-    @TableField(value = "TARGET_TYPE")
+    @TableField(value = "target_type")
     private String targetType;
 }

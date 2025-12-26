@@ -6,30 +6,30 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.Role">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_ROLE"-->
-        <result column="NAME"    jdbcType="VARCHAR"  property="name"/>
-        <result column="CODE"    jdbcType="VARCHAR"  property="code"/>
-        <result column="STATE"   jdbcType="NUMERIC"  property="state"/>
-        <result column="SCOPE"   jdbcType="SMALLINT" property="scope"/>
-        <result column="BUILTIN" jdbcType="NUMERIC"  property="builtin"/>
-        <result column="REMARK"  jdbcType="CLOB"     property="remark"/>
+        <!--@Table spectra.sys_role-->
+        <result column="name"    property="name"/>
+        <result column="code"    property="code"/>
+        <result column="state"   property="state"/>
+        <result column="scope"   property="scope"/>
+        <result column="builtin" property="builtin"/>
+        <result column="remark"  property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        NAME,
-        CODE,
-        STATE,
-        SCOPE,
-        BUILTIN,
-        REMARK,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        name,
+        code,
+        state,
+        scope,
+        builtin,
+        remark,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

@@ -6,28 +6,28 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleMenu">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_REL_ROLE_MENU"-->
-        <result column="ROLE_ID" jdbcType="BIGINT" property="roleId"/>
-        <result column="MENU_ID" jdbcType="BIGINT" property="menuId"/>
+        <!--@Table spectra.sys_rel_role_menu-->
+        <result column="role_id" property="roleId"/>
+        <result column="menu_id" property="menuId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        ROLE_ID,
-        MENU_ID,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        role_id,
+        menu_id,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
     <select id="getByRoleId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM SPECTRA.SYS_REL_ROLE_MENU WHERE ROLE_ID = #{roleId}
+        FROM spectra.sys_rel_role_menu WHERE role_id = #{roleId}
     </select>
 </mapper>

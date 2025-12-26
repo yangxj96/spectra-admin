@@ -4,13 +4,13 @@
 <mapper namespace="io.github.yangxj96.spectra.common.base.BaseMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseAuditMap" type="io.github.yangxj96.spectra.common.base.BaseEntity">
-        <id column="ID"             jdbcType="BIGINT" property="id"/>
-        <result column="CREATED_BY" jdbcType="BIGINT" property="createdBy"/>
-        <result column="UPDATED_BY" jdbcType="BIGINT" property="updatedBy"/>
-        <result column="VERSION"    jdbcType="BIGINT" property="version"/>
-        <result column="CREATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="createdAt"/>
-        <result column="UPDATED_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="updatedAt"/>
-        <result column="DELETED"    jdbcType="TIMESTAMP_WITH_TIMEZONE" property="deleted"/>
+        <id column="id"             property="id"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_at" property="createdAt"/>
+        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_at" property="updatedAt"/>
+        <result column="version"    property="version"/>
+        <result column="deleted"    property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
 </mapper>

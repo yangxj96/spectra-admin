@@ -45,43 +45,43 @@ public class BaseEntity implements Serializable {
     /**
      * 数据id.
      */
-    @TableId(value = "ID", type = IdType.ASSIGN_ID)
+    @TableId(value = "id", type = IdType.ASSIGN_ID)
     private Long id;
 
     /**
      * 创建人
      */
-    @TableField(value = "CREATED_BY", fill = FieldFill.INSERT)
+    @TableField(value = "created_by", fill = FieldFill.INSERT)
     private Long createdBy;
 
     /**
      * 创建时间
      */
-    @TableField(value = "CREATED_AT", fill = FieldFill.INSERT)
+    @TableField(value = "created_at", fill = FieldFill.INSERT)
     private Instant createdAt;
 
     /**
      * 更新人
      */
-    @TableField(value = "UPDATED_BY", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updated_by", fill = FieldFill.INSERT_UPDATE)
     private Long updatedBy;
 
     /**
      * 更新时间
      */
-    @TableField(value = "UPDATED_AT", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
     private Instant updatedAt;
 
     /**
      * 软删除标识。null 表示未删除，非 null 表示已删除，其值为删除时间。
      */
-    @TableField(value = "DELETED")
+    @TableField(value = "deleted")
     private Instant deleted;
 
     /**
      * 乐观锁版本号
      */
     @Version
-    @TableField(value = "VERSION")
+    @TableField(value = "version")
     private Long version;
 }

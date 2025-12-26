@@ -6,22 +6,22 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.RelUserRole">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_REL_USER_ROLE"-->
-        <result column="USER_ID" jdbcType="BIGINT" property="userId"/>
-        <result column="ROLE_ID" jdbcType="BIGINT" property="roleId"/>
+        <!--@Table spectra.sys_rel_user_role-->
+        <result column="user_id" property="userId"/>
+        <result column="role_id" property="roleId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        USER_ID,
-        ROLE_ID,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        user_id,
+        role_id,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

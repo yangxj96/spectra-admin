@@ -6,30 +6,30 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.DictItem">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_DICT_ITEM"-->
-        <result column="GID"    jdbcType="BIGINT"   property="gid"/>
-        <result column="LABEL"  jdbcType="VARCHAR"  property="label"/>
-        <result column="VALUE"  jdbcType="VARCHAR"  property="value"/>
-        <result column="SORT"   jdbcType="SMALLINT" property="sort"/>
-        <result column="STATE"  jdbcType="SMALLINT" property="state"/>
-        <result column="REMARK" jdbcType="VARCHAR"  property="remark"/>
+        <!--@Table spectra.sys_dict_item-->
+        <result column="gid"    property="gid"/>
+        <result column="label"  property="label"/>
+        <result column="value"  property="value"/>
+        <result column="sort"   property="sort"/>
+        <result column="state"  property="state"/>
+        <result column="remark" property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        GID,
-        LABEL,
-        VALUE,
-        SORT,
-        STATE,
-        REMARK,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        gid,
+        label,
+        value,
+        sort,
+        state,
+        remark,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

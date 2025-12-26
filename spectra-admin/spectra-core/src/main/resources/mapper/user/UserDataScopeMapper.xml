@@ -6,21 +6,21 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_USER_DATA_SCOPE"-->
-        <result column="USER_ID"    jdbcType="BIGINT"  property="userId"/>
-        <result column="SCOPE_TYPE" jdbcType="INTEGER" property="scopeType"/>
+        <!--@Table spectra.sys_user_data_scope-->
+        <result column="user_id"    property="userId"/>
+        <result column="scope_type" property="scopeType"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID, USER_ID, SCOPE_TYPE, CREATED_BY, CREATED_AT, UPDATED_BY, UPDATED_AT, DELETED, VERSION
+        id, user_id, scope_type, created_by, created_at, updated_by, updated_at, deleted, version
     </sql>
 
     <select id="findByUserId" resultType="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM "SPECTRA"."SYS_USER_DATA_SCOPE"
-        WHERE USER_ID = #{userId,jdbcType=BIGINT}
+        FROM domain_core.sys_user_data_scope
+        WHERE user_id = #{userId}
     </select>
 </mapper>

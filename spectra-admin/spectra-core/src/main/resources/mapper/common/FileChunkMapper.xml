@@ -6,35 +6,35 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_FILE_CHUNK"-->
-        <result column="FILE_ID"      jdbcType="VARCHAR" property="fileId"/>
-        <result column="TOTAL_CHUNKS" jdbcType="BIGINT"  property="totalChunks"/>
-        <result column="CHUNK_INDEX"  jdbcType="INTEGER" property="chunkIndex"/>
-        <result column="CHUNK_PATH"   jdbcType="VARCHAR" property="chunkPath"/>
-        <result column="CHUNK_SIZE"   jdbcType="INTEGER" property="chunkSize"/>
+        <!--@Table spectra.sys_file_chunk-->
+        <result column="file_id"      property="fileId"/>
+        <result column="total_chunks" property="totalChunks"/>
+        <result column="chunk_index"  property="chunkIndex"/>
+        <result column="chunk_path"   property="chunkPath"/>
+        <result column="chunk_size"   property="chunkSize"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        FILE_ID,
-        CHUNK_INDEX,
-        TOTAL_CHUNKS,
-        CHUNK_PATH,
-        CHUNK_SIZE,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        file_id,
+        chunk_index,
+        total_chunks,
+        chunk_path,
+        chunk_size,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
     <select id="getByFileId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM SPECTRA.SYS_FILE_CHUNK
-        WHERE FILE_ID = #{hash}
+        FROM spectra.sys_file_chunk
+        WHERE file_id = #{hash}
     </select>
 </mapper>

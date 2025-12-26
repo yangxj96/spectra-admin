@@ -54,11 +54,11 @@
         <!-- 通用工具包 End -->
 
         <!-- 数据库 Begin -->
-        <!-- 达梦 SPECTRA -->
+        <!-- pgsql -->
         <dependency>
-            <groupId>com.dameng</groupId>
-            <artifactId>DmJdbcDriver8</artifactId>
-            <version>${dm.version}</version>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.alibaba</groupId>
