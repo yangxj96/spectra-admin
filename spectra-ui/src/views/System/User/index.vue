@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import UserApi from "@/api/UserApi.ts";
-import OrganizationApi from "@/api/OrganizationApi.ts";
+import UserApi from "@/api/user/UserApi.ts";
+import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import UseTable from "@/hooks/UseTable.ts";
 import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
+import useDictStore from "@/plugin/store/modules/useDictStore.ts";
+import icons from "@/components/Icons/index.vue";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -27,6 +29,8 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
 );
 
 const organizationTree = ref<OrganizationTree[]>([]);
+
+const dictStore = useDictStore();
 
 function handleInitData() {
     OrganizationApi.tree().then(res => {
@@ -61,27 +65,11 @@ function handleUserEditDialog(row: User) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: User) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(() => {
-        UserApi.deleteById(row.id).then(() => {
-            ElMessage.success({
-                message: "删除成功",
-                onClose() {
-                    handlerConditionQuery();
-                }
-            });
-        });
-    });
-}
-
-// 用户重置密码
-function handleTableItemResetPassword(row: User) {
-    console.log(`重置密码:${JSON.stringify(row)}`);
-    ElMessageBox.confirm(`是否要重置[${row.name}]的密码`, "提示", { type: "warning", appendTo: ".box-content" }).then(
+    ElMessageBox.confirm(`是否要删除[${row.username}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(
         () => {
-            UserApi.passwordResetById(row.id).then(() => {
+            UserApi.deleteById(row.id).then(() => {
                 ElMessage.success({
-                    message: "重置成功",
-                    appendTo: ".box-content",
+                    message: "删除成功",
                     onClose() {
                         handlerConditionQuery();
                     }
@@ -89,6 +77,25 @@ function handleTableItemResetPassword(row: User) {
             });
         }
     );
+}
+
+// 用户重置密码
+function handleTableItemResetPassword(row: User) {
+    console.log(`重置密码:${JSON.stringify(row)}`);
+    ElMessageBox.confirm(`是否要重置[${row.username}]的密码`, "提示", {
+        type: "warning",
+        appendTo: ".box-content"
+    }).then(() => {
+        UserApi.passwordResetById(row.id).then(() => {
+            ElMessage.success({
+                message: "重置成功",
+                appendTo: ".box-content",
+                onClose() {
+                    handlerConditionQuery();
+                }
+            });
+        });
+    });
 }
 
 // 排序字段改变
@@ -120,7 +127,11 @@ function handleDialogClose() {
 }
 
 // 挂载后执行
-onMounted(() => {
+onMounted(async () => {
+    // 预加载数据
+    await dictStore.getDictData("sys_user_gender");
+    await dictStore.getDictData("sys_language");
+    await dictStore.getDictData("sys_timezone");
     handleInitData();
 });
 </script>
@@ -144,7 +155,10 @@ onMounted(() => {
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleUserEditDialog({} as User)">新增用户</el-button>
+                <el-button @click="handleUserEditDialog({} as User)">
+                    <icons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
+                    &nbsp;新增用户
+                </el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -164,32 +178,63 @@ onMounted(() => {
             <!-- 列表 -->
             <el-table :data="table_data" height="92%" stripe @sort-change="handleTableSortChange">
                 <el-table-column align="center" type="index" />
-                <el-table-column align="center" :sortable="true" label="姓名" prop="name" />
-                <el-table-column align="center" :sortable="true" label="邮箱" prop="email" />
-                <el-table-column align="center" :sortable="true" label="状态" prop="state">
+                <el-table-column align="center" width="150" show-overflow-tooltip label="显示名称" prop="username" />
+                <el-table-column align="center" width="150" show-overflow-tooltip label="真实姓名" prop="real_name" />
+                <el-table-column align="center" width="250" show-overflow-tooltip label="邮箱" prop="email" />
+                <el-table-column align="center" width="080" show-overflow-tooltip label="性别" prop="gender">
+                    <template v-slot:default="scope">
+                        {{ dictStore.getDictItemSync("sys_user_gender", scope.row.gender)?.label }}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" width="130" show-overflow-tooltip label="生日" prop="birthday" />
+                <el-table-column align="center" width="120" show-overflow-tooltip label="手机号码" prop="phone" />
+                <el-table-column align="center" width="100" show-overflow-tooltip label="国家" prop="country" />
+                <el-table-column align="center" width="100" show-overflow-tooltip label="城市" prop="city" />
+                <el-table-column align="center" width="150" show-overflow-tooltip label="语言" prop="language">
+                    <template v-slot:default="scope">
+                        {{ dictStore.getDictItemSync("sys_language", scope.row.language)?.label }}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" width="200" show-overflow-tooltip label="时区" prop="timezone">
+                    <template v-slot:default="scope">
+                        {{ dictStore.getDictItemSync("sys_timezone", scope.row.timezone)?.label }}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" width="150" show-overflow-tooltip label="状态" prop="state">
                     <template #default="scope">
                         <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_user_state" />
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="所属组织" prop="organization_name" show-overflow-tooltip />
-                <el-table-column align="center" label="角色" prop="roles">
+                <el-table-column
+                    align="center"
+                    width="150"
+                    show-overflow-tooltip
+                    label="所属组织"
+                    prop="organization_name" />
+                <el-table-column align="center" width="150" show-overflow-tooltip label="角色" prop="roles">
                     <template #default="scope">
                         <el-tag v-for="(item, idx) in scope.row.roles" :index="idx" style="margin-right: 4px">
                             {{ item.name }}
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="操作">
+                <el-table-column align="center" width="160" fixed="right" label="操作">
                     <template #default="scope">
-                        <el-button link type="primary" size="small" @click="handleTableItemResetPassword(scope.row)">
-                            重置密码
-                        </el-button>
-                        <el-button link type="primary" size="small" @click="handleUserEditDialog(scope.row)">
-                            编辑
-                        </el-button>
-                        <el-button link type="primary" size="small" @click="handleTableItemDelete(scope.row)">
-                            删除
-                        </el-button>
+                        <el-tooltip content="重置密码" placement="top">
+                            <el-button link type="primary" @click="handleTableItemResetPassword(scope.row)">
+                                <icons name="icon-reset-passwords" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip content="编辑用户" placement="top">
+                            <el-button link type="primary" @click="handleUserEditDialog(scope.row)">
+                                <icons name="icon-user-edit" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
+                        <el-tooltip content="删除用户" placement="top">
+                            <el-button link type="primary" @click="handleTableItemDelete(scope.row)">
+                                <icons name="icon-user-del" style="width: 1.4em; height: 1.4em"></icons>
+                            </el-button>
+                        </el-tooltip>
                     </template>
                 </el-table-column>
             </el-table>

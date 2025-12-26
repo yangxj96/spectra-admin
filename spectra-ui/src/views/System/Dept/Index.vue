@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, ElMessageBox } from "element-plus";
-import OrganizationApi from "@/api/OrganizationApi.ts";
+import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import OrganizationEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 

@@ -6,44 +6,59 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.Organization">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_ORGANIZATION" -->
-        <result column="PID"    jdbcType="BIGINT"   property="pid"/>
-        <result column="NAME"   jdbcType="VARCHAR"  property="name"/>
-        <result column="CODE"   jdbcType="VARCHAR"  property="code"/>
-        <result column="TYPE"   jdbcType="SMALLINT" property="type"/>
-        <result column="PATH"   jdbcType="VARCHAR"  property="path"/>
-        <result column="REMARK" jdbcType="VARCHAR"  property="remark"/>
+        <!--@Table spectra.sys_organization -->
+        <result column="pid"    property="pid"/>
+        <result column="name"   property="name"/>
+        <result column="code"   property="code"/>
+        <result column="type"   property="type"/>
+        <result column="path"   property="path"/>
+        <result column="remark" property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        PID,
-        NAME,
-        CODE,
-        TYPE,
-        PATH,
-        REMARK,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        pid,
+        name,
+        code,
+        type,
+        path,
+        remark,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
     <select id="generatePath" resultType="java.lang.String">
+        WITH RECURSIVE org_tree AS (
+            -- 1. 起始节点（根节点）
+            SELECT
+                id,
+                pid,
+                name,
+                name::text AS path
+            FROM spectra.sys_organization
+            WHERE pid IS NULL OR pid = 0
+
+            UNION ALL
+
+            -- 2. 递归子节点
+            SELECT
+                o.id,
+                o.pid,
+                o.name,
+                ot.path || '/' || o.name AS path
+            FROM spectra.sys_organization o
+                     JOIN org_tree ot ON o.pid = ot.id
+        )
         SELECT
-        ID,
-        LTRIM(SYS_CONNECT_BY_PATH(NAME, '/'), '/') AS PATH
-        FROM
-        SPECTRA.SYS_ORGANIZATION
-        WHERE
-        ID = #{id}
-        START WITH
-        PID IS NULL OR PID = 0
-        CONNECT BY
-        PRIOR ID = PID;
+            id,
+            path
+        FROM org_tree
+        WHERE id = #{id};
     </select>
 </mapper>

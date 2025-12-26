@@ -4,9 +4,9 @@ import { ElMessage, ElMessageBox, ElTree } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import RoleEdit from "./components/RoleEdit/index.vue";
 import UseTable from "@/hooks/UseTable.ts";
-import MenuApi from "@/api/MenuApi.ts";
-import RoleApi from "@/api/RoleApi.ts";
-import AuthorityApi from "@/api/AuthorityApi.ts";
+import MenuApi from "@/api/system/MenuApi.ts";
+import RoleApi from "@/api/auth/RoleApi.ts";
+import AuthorityApi from "@/api/auth/AuthorityApi.ts";
 
 // refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");

@@ -2,7 +2,7 @@
 import { computed, ref, useTemplateRef } from "vue";
 import { ElMessage, type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
-import OrganizationApi from "@/api/OrganizationApi.ts";
+import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 

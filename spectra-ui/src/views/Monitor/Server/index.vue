@@ -2,7 +2,7 @@
 import { onMounted, ref, useTemplateRef } from "vue";
 import "echarts";
 import VChart from "vue-echarts";
-import ServiceMonitorApi from "@/api/ServiceMonitorApi.ts";
+import ServiceMonitorApi from "@/api/system/ServiceMonitorApi.ts";
 
 // 相关信息
 const cpuInfo = ref<CPUInfo>();

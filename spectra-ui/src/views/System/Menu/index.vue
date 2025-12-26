@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
-import MenuApi from "@/api/MenuApi.ts";
+import MenuApi from "@/api/system/MenuApi.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
 import icons from "@/components/Icons/index.vue";
 

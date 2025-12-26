@@ -14,14 +14,37 @@ public final class RedisCacheKey {
     }
 
     /**
-     * token存储的格式 <br/>
-     * <p>auth:token:{userId}:{tokenId}</p>
+     * 当前活跃 Token,存储内容为当前用户的token信息
+     * <p>格式:authorization:login_type:{login_type}:{user_id}</p>
+     * <p>示例:authorization:login_type:password:1999056543696211969</p>
      */
-    public static final String AUTH_TOKEN_KEY = "authorization:token:%s:%s";
+    public static final String AUTH_LOGIN_TYPE = "authorization:login_type:%s:%s";
 
     /**
-     * 反向索引:token → userId
+     * token信息,存储token的具体信息(包含扩展信息)
+     * <p>格式:authorization:{token}</p>
+     * <p>示例:authorization:token:02038A56-527D-498D-8E89-71CCCBAD6B36</p>
      */
-    public static final String TOKEN_TO_USER_KEY = "authorization:token-ref:%s";
+    public static final String AUTH_TOKEN = "authorization:token:%s";
 
+    /**
+     * security信息,存储security登录的具体信息
+     * <p>格式:authorization:security:{token}</p>
+     * <p>示例:authorization:security:02038A56-527D-498D-8E89-71CCCBAD6B36</p>
+     */
+    public static final String AUTH_SECURITY = "authorization:security:%s";
+
+    /**
+     * Token 到用户 ID 的快速映射,存储的是用户ID
+     * <p>格式:authorization:token_user:{token}</p>
+     * <p>示例:authorization:token_user:02038A56-527D-498D-8E89-71CCCBAD6B36</p>
+     */
+    public static final String AUTH_TOKEN_USER = "authorization:token_user:%s";
+
+    /**
+     * 用户所有活跃登录方式集合（用于管理页面）,内容是set
+     * <p>格式:authorization:user_login_types:{user_id}</p>
+     * <p>示例:authorization:user_login_types:1999056543696211969</p>
+     */
+    public static final String AUTH_USER_LOGIN_TYPES = "authorization:user_login_types:%s";
 }

@@ -1,17 +1,48 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import Icons from "@/components/Icons/index.vue";
+import { onMounted, ref } from "vue";
+import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
+import UseTable from "@/hooks/UseTable.ts";
+import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
+import _ from "lodash";
+import DictTag from "@/components/DictTag/index.vue";
 
-const drawer = ref(true);
+const edit = ref({
+    show: false,
+    form: {} as Configured
+});
 
-const configuredForm = ref({ id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" });
+// 查询条件
+const condition = ref<ConfiguredPageParams>({
+    page_num: 1,
+    page_size: 10
+});
 
-const table_data = ref([
-    { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" },
-    { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" },
-    { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" },
-    { id: 1000001, key: "system.xx", value: "true", remarks: "是否开启水印" }
-]);
+// table分页请求
+const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<Configured>(
+    ConfiguredApi.page,
+    condition.value
+);
+
+onMounted(() => {
+    ConfiguredApi.json().then(res => console.log(res));
+});
+
+// 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
+function handleDialogClose() {
+    if (edit.value.show) {
+        edit.value = {
+            show: false,
+            form: {} as Configured
+        };
+    }
+    // 最后重新获取下列表数据
+    handlerConditionQuery();
+}
+
+const handleEditConfigured = (row: Configured) => {
+    edit.value.show = true;
+    edit.value.form = _.cloneDeep(row);
+};
 </script>
 
 <template>
@@ -22,62 +53,60 @@ const table_data = ref([
                 <el-input placeholder="请输入菜单名称" clearable />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary">查询</el-button>
+                <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
             </el-form-item>
         </el-form>
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <el-table :data="table_data" height="100%" stripe default-expand-all row-key="id">
+        <el-table :data="table_data" height="96%" stripe default-expand-all row-key="id">
+            <el-table-column align="center" type="index" label="序号" width="100" />
             <el-table-column align="center" prop="id" label="主键" />
             <el-table-column align="center" prop="key" label="配置键" />
-            <el-table-column align="center" prop="value" label="配置值" />
+            <el-table-column align="center" prop="value" label="配置值">
+                <template v-slot:default="scope">
+                    <!-- 布尔类型 -->
+                    <el-tag v-if="scope.row.type === 'BOOL'" :type="scope.row.value === 'true' ? 'success' : 'danger'">
+                        {{ scope.row.value === "true" ? "启用" : "禁用" }}
+                    </el-tag>
+                    <!-- 下拉选择的类型 -->
+                    <dict-tag
+                        v-else-if="scope.row.type === 'SELECT'"
+                        v-model="scope.row.value"
+                        :dict_code="scope.row.dict_code" />
+                    <!-- TEXT保底 -->
+                    <el-text v-else>
+                        {{ scope.row.value }}
+                    </el-text>
+                </template>
+            </el-table-column>
             <el-table-column align="center" prop="remarks" label="备注" />
             <el-table-column align="center" label="操作">
-                <template #default="">
-                    <el-button v-owner="'MENU:UPDATE'" link type="primary" size="small">编辑</el-button>
+                <template #default="scope">
+                    <el-button
+                        v-owner="'ROLE:ROLE_DEV_OPS'"
+                        link
+                        type="primary"
+                        size="small"
+                        @click="handleEditConfigured(scope.row)">
+                        编辑
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <el-pagination
+            layout="total, sizes, prev, pager, next"
+            :default-page-size="pagination.default_page_size"
+            :page-sizes="pagination.page_sizes"
+            :total="pagination.total"
+            style="padding: 0 10px; margin-left: auto"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange" />
     </el-row>
-    <!-- 配置编辑 -->
-    <el-drawer v-model="drawer" :modal="true" modal-penetrable destroy-on-close>
-        <template #header>
-            <div>
-                <icons name="icon-edit" />
-                编辑配置
-            </div>
-        </template>
-
-        <template #default>
-            <el-watermark style="height: 100%; width: 100%">
-                <el-form ref="formRef" :model="configuredForm" label-width="auto" @submit.prevent>
-                    <el-form-item label="ID" prop="id">
-                        <el-text>{{ configuredForm.id }}</el-text>
-                    </el-form-item>
-                    <el-form-item label="配置键" prop="key">
-                        <el-text>{{ configuredForm.key }}</el-text>
-                    </el-form-item>
-                    <el-form-item label="配置值" prop="value">
-                        <el-input v-model="configuredForm.value" placeholder="请输入配置值" />
-                    </el-form-item>
-                    <el-form-item label="备注" prop="remarks">
-                        <el-input
-                            v-model="configuredForm.remarks"
-                            type="textarea"
-                            :rows="5"
-                            placeholder="请输入配置说明" />
-                    </el-form-item>
-                </el-form>
-            </el-watermark>
-        </template>
-
-        <template #footer>
-            <el-button>取消</el-button>
-            <el-button type="primary">确定</el-button>
-        </template>
-    </el-drawer>
+    <!-- 用户组件区 -->
+    <configured-edit :show="edit.show" :form="edit.form" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

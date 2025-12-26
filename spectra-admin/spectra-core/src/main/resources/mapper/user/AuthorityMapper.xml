@@ -6,24 +6,24 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.Authority">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_AUTHORITY"-->
-        <result column="PID"  jdbcType="BIGINT"  property="pid"/>
-        <result column="NAME" jdbcType="VARCHAR" property="name"/>
-        <result column="CODE" jdbcType="VARCHAR" property="code"/>
+        <!--@Table spectra.sys_authority-->
+        <result column="pid"  property="pid"/>
+        <result column="name" property="name"/>
+        <result column="code" property="code"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        PID,
-        NAME,
-        CODE,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        pid,
+        name,
+        code,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

@@ -6,32 +6,32 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_DICT_GROUP"-->
-        <result column="PID"     jdbcType="BIGINT"   property="pid"/>
-        <result column="NAME"    jdbcType="VARCHAR"  property="name"/>
-        <result column="CODE"    jdbcType="VARCHAR"  property="code"/>
-        <result column="STATE"   jdbcType="SMALLINT" property="state"/>
-        <result column="REMARK"  jdbcType="VARCHAR"  property="remark"/>
-        <result column="BUILTIN" jdbcType="BIT"      property="builtin"/>
-        <result column="HIDE"    jdbcType="BIT"      property="hide"/>
+        <!--@Table spectra.sys_dict_group-->
+        <result column="pid"     property="pid"/>
+        <result column="name"    property="name"/>
+        <result column="code"    property="code"/>
+        <result column="state"   property="state"/>
+        <result column="remark"  property="remark"/>
+        <result column="builtin" property="builtin"/>
+        <result column="hide"    property="hide"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        PID,
-        NAME,
-        CODE,
-        STATE,
-        REMARK,
-        BUILTIN,
-        HIDE,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        pid,
+        name,
+        code,
+        state,
+        remark,
+        builtin,
+        hide,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

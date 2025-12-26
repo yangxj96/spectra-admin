@@ -23,4 +23,19 @@ public interface AccountService extends BaseService<Account> {
      * @return 账号信息，可能为null
      */
     @Nullable Account getByLoginName(String loginName);
+
+    /**
+     * 根据用户ID获取用户的默认账号
+     *
+     * @param userId 用户ID
+     * @return 账号信息
+     */
+    Account getDefaultByUserId(Long userId);
+
+    /**
+     * 根据用户ID删除用户的所有登录方式
+     *
+     * @param userId 用户ID
+     */
+    void deleteByUserId(Long userId);
 }

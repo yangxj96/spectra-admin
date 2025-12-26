@@ -40,7 +40,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_AUTHORITY")
+@TableName(value = "sys_authority", schema = "domain_core")
 public class Authority extends BaseEntity implements Serializable {
 
     @Serial
@@ -49,18 +49,18 @@ public class Authority extends BaseEntity implements Serializable {
     /**
      * 父级ID,用于构建树形结构
      */
-    @TableField(value = "PID")
+    @TableField(value = "pid")
     private Long pid;
 
     /**
      * 权限名称
      */
-    @TableField(value = "NAME")
+    @TableField(value = "name")
     private String name;
 
     /**
      * 编码
      */
-    @TableField(value = "CODE")
+    @TableField(value = "code")
     private String code;
 }

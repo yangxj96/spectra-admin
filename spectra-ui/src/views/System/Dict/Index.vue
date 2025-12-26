@@ -2,7 +2,7 @@
 import { markRaw, reactive, ref, watch } from "vue";
 import { defineAsyncComponent } from "@vue/runtime-core";
 import { ElMessage } from "element-plus";
-import DictApi from "@/api/DictApi";
+import DictApi from "@/api/system/DictApi";
 import icons from "@/components/Icons/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 

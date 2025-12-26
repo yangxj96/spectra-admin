@@ -6,42 +6,44 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.User">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_USER"-->
-        <result column="USERNAME"  jdbcType="VARCHAR" property="username"/>
-        <result column="AVATAR"    jdbcType="VARCHAR" property="avatar"/>
-        <result column="STATUS"    jdbcType="BOOLEAN" property="status"/>
-        <result column="REAL_NAME" jdbcType="VARCHAR" property="realName"/>
-        <result column="GENDER"    jdbcType="INTEGER" property="gender"/>
-        <result column="BIRTHDAY"  jdbcType="DATE"    property="birthday"/>
-        <result column="PHONE"     jdbcType="VARCHAR" property="phone"/>
-        <result column="EMAIL"     jdbcType="VARCHAR" property="email"/>
-        <result column="COUNTRY"   jdbcType="VARCHAR" property="country"/>
-        <result column="CITY"      jdbcType="VARCHAR" property="city"/>
-        <result column="LANGUAGE"  jdbcType="VARCHAR" property="language"/>
-        <result column="TIMEZONE"  jdbcType="VARCHAR" property="timezone"/>
+        <!--@Table spectra.sys_user-->
+        <result column="username"  property="username"/>
+        <result column="avatar"    property="avatar"/>
+        <result column="status"    property="status"/>
+        <result column="real_name" property="realName"/>
+        <result column="gender"    property="gender"/>
+        <result column="birthday"  property="birthday"/>
+        <result column="phone"     property="phone"/>
+        <result column="email"     property="email"/>
+        <result column="country"   property="country"/>
+        <result column="city"      property="city"/>
+        <result column="language"  property="language"/>
+        <result column="timezone"  property="timezone"/>
+        <result column="organization_id" property="organizationId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        USERNAME,
-        AVATAR,
-        STATUS,
-        REAL_NAME,
-        GENDER,
-        BIRTHDAY,
-        PHONE,
-        EMAIL,
-        COUNTRY,
-        CITY,
-        LANGUAGE,
-        TIMEZONE,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        username,
+        avatar,
+        status,
+        real_name,
+        gender,
+        birthday,
+        phone,
+        email,
+        country,
+        city,
+        language,
+        timezone,
+        organization_id,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

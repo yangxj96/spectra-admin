@@ -6,43 +6,43 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.auth.entity.Account">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_ACCOUNT"-->
-        <result column="USER_ID"    jdbcType="BIGINT"  property="userId"/>
-        <result column="TYPE"       jdbcType="INTEGER" property="type"/>
-        <result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName"/>
-        <result column="PASSWORD"   jdbcType="VARCHAR" property="password"/>
-        <result column="PHONE"      jdbcType="VARCHAR" property="phone"/>
-        <result column="EMAIL"      jdbcType="VARCHAR" property="email"/>
-        <result column="OPENID"     jdbcType="VARCHAR" property="openId"/>
-        <result column="UNIONID"    jdbcType="VARCHAR" property="unionid"/>
-        <result column="PROVIDER"   jdbcType="VARCHAR" property="provider"/>
-        <result column="STATUS"     jdbcType="BOOLEAN" property="status"/>
-        <result column="VERIFIED"   jdbcType="BOOLEAN" property="verified"/>
-        <result column="EXPIRES_AT" jdbcType="TIMESTAMP_WITH_TIMEZONE" property="expiresAt"/>
+        <!--@Table spectra.sys_account-->
+        <result column="user_id"    property="userId"/>
+        <result column="type"       property="type"/>
+        <result column="login_name" property="loginName"/>
+        <result column="password"   property="password"/>
+        <result column="phone"      property="phone"/>
+        <result column="email"      property="email"/>
+        <result column="openid"     property="openId"/>
+        <result column="unionid"    property="unionid"/>
+        <result column="provider"   property="provider"/>
+        <result column="status"     property="status"/>
+        <result column="verified"   property="verified"/>
+        <result column="expires_at" property="expiresAt"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        USER_ID,
-        TYPE,
-        LOGIN_NAME,
-        PASSWORD,
-        PHONE,
-        EMAIL,
-        OPENID,
-        UNIONID,
-        PROVIDER,
-        STATUS,
-        VERIFIED,
-        EXPIRES_AT,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        user_id,
+        type,
+        login_name,
+        password,
+        phone,
+        email,
+        openid,
+        unionid,
+        provider,
+        status,
+        verified,
+        expires_at,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
 

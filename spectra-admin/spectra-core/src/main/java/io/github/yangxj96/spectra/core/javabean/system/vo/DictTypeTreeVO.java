@@ -70,7 +70,7 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     /**
      * 字典状态
      */
-    private Short state;
+    private Boolean state;
 
     /**
      * 是否内置

@@ -54,6 +54,7 @@ spectra:
       - "/common/kaptcha"
       - "/auth/login"
       - "/druid/**"
+      - "/workflow/**"
 # 服务器配置
 server:
   port: 8888
@@ -92,7 +93,7 @@ spring:
   application:
     name: spectra-framework-launch
   datasource:
-    driver-class-name: dm.jdbc.driver.DmDriver
+    driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -168,8 +169,8 @@ mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
-    # log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    # log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -179,7 +180,6 @@ mybatis-plus:
       # logic-delete-field: deleted
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
-      schema: SPECTRA
 # 日志配置
 logging:
   group:
@@ -189,11 +189,15 @@ logging:
       com.ulisesbocchio.jasyptspringboot.configuration,
       io.github.yangxj96.spectra.core.configure.mvc.filter,
       io.github.yangxj96.spectra.core.configure.mvc.advice,
-      io.github.yangxj96.spectra.core.configure
+      io.github.yangxj96.spectra.core.configure,
+      io.github.yangxj96.spectra.core.listener.ulog
+    mp: >-
+      io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
     other: error
     spectra: debug
+    mp: error
   charset:
     console: utf-8
     file: UTF-8
@@ -202,12 +206,44 @@ management:
   endpoints:
     web:
       exposure:
-        # 仅暴露数据源监控信息
-        include: prometheus
         # 暴露所有
-        #include: "*"
+        include: "*"
   endpoint:
     health:
       # 显示详情状态,开发环境可以用always,生产用never
       show-details: never
-
+# 工作流配置
+flowable:
+  # 数据库确定
+  database-schema: domain_workflow
+  database-schema-update: true
+  jpa-enabled: false
+  # 流程定义
+  process-definition-location-prefix: classpath*:/processes/
+  async-executor-activate: true
+  history-level: full
+  # 下面是所有可选模块,都用不到
+  # 事件注册模块
+  eventregistry:
+    enabled: false
+  # 身份管理引擎
+  idm:
+    enabled: false
+  # Flowable 的“应用元模型”
+  app:
+    enabled: false
+  # 决策模型引擎
+  dmn:
+    enabled: false
+  # 案例管理引擎
+  cmmn:
+    enabled: false
+# XSS防范
+mica:
+  xss:
+    # 是否开启
+    enabled: true
+    # 拦截的
+    path-patterns: /**
+    # 放行的
+    path-exclude-patterns:

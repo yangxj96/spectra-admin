@@ -2,10 +2,10 @@
 import useAppStore from "@/plugin/store/modules/useAppStore";
 import type { Language } from "element-plus/es/locale";
 import useUserStore from "@/plugin/store/modules/useUserStore.ts";
-import AuthApi from "@/api/AuthApi.ts";
+import AuthApi from "@/api/auth/AuthApi.ts";
 import { ElMessage } from "element-plus";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
-import { onMounted, reactive, ref, watch } from "vue";
+import { reactive, ref } from "vue";
 
 const locale = ref(useAppStore().lang as Language);
 const message = reactive({

@@ -79,7 +79,7 @@ public class SecurityUser implements UserDetails {
     private boolean credentialsNonExpired = true;
 
     @Nullable
-    private transient Map<String, Object> extend;
+    private transient Map<String, Object> extraData;
 
     /**
      * 简易权限处理,主要是为了序列化的问题

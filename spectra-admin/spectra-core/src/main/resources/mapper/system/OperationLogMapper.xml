@@ -6,36 +6,36 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_LOG"-->
-        <result column="TYPE"      jdbcType="INTEGER"  property="type"/>
-        <result column="EXPLAIN"   jdbcType="VARCHAR"  property="explain"/>
-        <result column="STATUS"    jdbcType="SMALLINT" property="status"/>
-        <result column="IP"        jdbcType="VARCHAR"  property="ip"/>
-        <result column="METHOD"    jdbcType="VARCHAR"  property="method"/>
-        <result column="URL"       jdbcType="VARCHAR"  property="url"/>
-        <result column="ARGS"      jdbcType="VARCHAR"  property="args"/>
-        <result column="RESULT"    jdbcType="VARCHAR"  property="result"/>
-        <result column="TIME_COST" jdbcType="BIGINT"   property="timeCost"/>
+        <!--@Table spectra.sys_log-->
+        <result column="type"      property="type"/>
+        <result column="explain"   property="explain"/>
+        <result column="status"    property="status"/>
+        <result column="ip"        property="ip"/>
+        <result column="method"    property="method"/>
+        <result column="url"       property="url"/>
+        <result column="args"      property="args"/>
+        <result column="result"    property="result"/>
+        <result column="time_cost" property="timeCost"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        TYPE,
-        EXPLAIN,
-        STATUS,
-        IP,
-        METHOD,
-        URL,
-        ARGS,
-        RESULT,
-        TIME_COST,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        type,
+        explain,
+        status,
+        ip,
+        method,
+        url,
+        args,
+        result,
+        time_cost,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 </mapper>

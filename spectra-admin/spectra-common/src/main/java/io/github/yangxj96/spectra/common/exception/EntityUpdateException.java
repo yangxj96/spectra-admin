@@ -29,5 +29,7 @@ public class EntityUpdateException extends DataException {
         super("实体更新异常");
     }
 
-
+    public EntityUpdateException(String message) {
+        super(message);
+    }
 }

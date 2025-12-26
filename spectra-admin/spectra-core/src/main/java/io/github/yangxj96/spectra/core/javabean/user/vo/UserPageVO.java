@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.vo;
 
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -26,6 +27,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 
@@ -52,12 +54,7 @@ public class UserPageVO implements Serializable {
     /**
      * 姓名
      */
-    private String name;
-
-    /**
-     * 邮箱
-     */
-    private String email;
+    private String username;
 
     /**
      * 头像
@@ -67,7 +64,52 @@ public class UserPageVO implements Serializable {
     /**
      * 用户状态
      */
-    private Short state;
+    private Short status;
+
+    /**
+     * 真实姓名
+     */
+    private String realName;
+
+    /**
+     * 性别
+     */
+    private Integer gender;
+
+    /**
+     * 生日
+     */
+    private LocalDate birthday;
+
+    /**
+     * 手机号
+     */
+    private String phone;
+
+    /**
+     * 邮箱
+     */
+    private String email;
+
+    /**
+     * 国家
+     */
+    private String country;
+
+    /**
+     * 城市
+     */
+    private String city;
+
+    /**
+     * 语言
+     */
+    private String language;
+
+    /**
+     * 时区
+     */
+    private String timezone;
 
     /**
      * 角色列表
@@ -84,4 +126,14 @@ public class UserPageVO implements Serializable {
      * 组织机构名称
      */
     private String organizationName;
+
+    /**
+     * 数据范围
+     */
+    private DataScopeType dataScope;
+
+    /**
+     * 自定义时的目标ID列表
+     */
+    private List<String> targetIds;
 }

@@ -3,7 +3,7 @@ import { reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElForm, ElMessage, type FormRules } from "element-plus";
 import useUserStore from "@/plugin/store/modules/useUserStore";
-import AuthApi from "@/api/AuthApi.ts";
+import AuthApi from "@/api/auth/AuthApi.ts";
 import icons from "@/components/Icons/index.vue";
 
 const route = useRoute();
@@ -14,8 +14,8 @@ const redirect = ref<string>(route.query.redirect as string | "/");
 const login = reactive({
     form: {
         type: "PASSWORD",
-        identifier: "yangxj96@gmail.com",
-        credential: "sysadmin",
+        identifier: "devops@devops00.com",
+        credential: "admin123",
         captcha: ""
     } as LoginFrom,
     rules: {

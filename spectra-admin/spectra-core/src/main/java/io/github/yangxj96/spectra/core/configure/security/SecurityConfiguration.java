@@ -58,6 +58,7 @@ public class SecurityConfiguration {
     @Resource
     private RestAccessDeniedHandler restAccessDeniedHandler;
 
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         log.debug("{}配置PasswordEncoder", PREFIX);

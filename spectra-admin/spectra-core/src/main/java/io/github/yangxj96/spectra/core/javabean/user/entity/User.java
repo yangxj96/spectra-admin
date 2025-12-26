@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 用户信息
@@ -40,78 +40,84 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_USER")
+@TableName(value = "sys_user", schema = "domain_core")
 public class User extends BaseEntity implements Serializable {
 
     /**
      * 显示名称
      */
-    @TableField(value = "USERNAME")
+    @TableField(value = "username")
     private String username;
 
     /**
      * 头像
      */
-    @TableField(value = "AVATAR")
+    @TableField(value = "avatar")
     private String avatar;
 
     /**
      * 状态 (1:正常 0:禁用)
      */
-    @TableField(value = "STATUS")
-    private Boolean status;
+    @TableField(value = "status")
+    private Short status;
 
     /**
      * 真实姓名
      */
-    @TableField(value = "REAL_NAME")
-    private Long realName;
+    @TableField(value = "real_name")
+    private String realName;
 
     /**
      * 性别(0:保密,1-男,2-女)
      */
-    @TableField(value = "GENDER")
+    @TableField(value = "gender")
     private Integer gender;
 
     /**
      * 生日
      */
-    @TableField(value = "BIRTHDAY")
-    private LocalDateTime birthday;
+    @TableField(value = "birthday")
+    private Instant birthday;
 
     /**
      * 手机号
      */
-    @TableField(value = "PHONE")
+    @TableField(value = "phone")
     private String phone;
 
     /**
      * 邮箱
      */
-    @TableField(value = "EMAIL")
+    @TableField(value = "email")
     private String email;
 
     /**
      * 国家
      */
-    @TableField(value = "COUNTRY")
+    @TableField(value = "country")
     private String country;
 
     /**
      * 城市
      */
-    @TableField(value = "CITY")
+    @TableField(value = "city")
     private String city;
 
     /**
      * 语言
      */
-    @TableField(value = "LANGUAGE")
+    @TableField(value = "language")
     private String language;
 
     /**
      * 时区
      */
-    @TableField(value = "TIMEZONE")
+    @TableField(value = "timezone")
     private String timezone;
+
+    /**
+     * 组织机构ID
+     */
+    @TableField(value = "organization_id")
+    private String organizationId;
 }

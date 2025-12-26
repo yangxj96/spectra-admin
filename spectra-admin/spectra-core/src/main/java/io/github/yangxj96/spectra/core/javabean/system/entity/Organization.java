@@ -42,7 +42,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "SYS_ORGANIZATION")
+@TableName(value = "sys_organization", schema = "domain_core")
 public class Organization extends BaseEntity implements Serializable {
 
     @Serial
@@ -52,39 +52,39 @@ public class Organization extends BaseEntity implements Serializable {
      * 上级ID
      */
     @Nullable
-    @TableField(value = "PID")
+    @TableField(value = "pid")
     private Long pid;
 
     /**
      * 名称
      */
-    @TableField(value = "NAME")
+    @TableField(value = "name")
     private String name;
 
     /**
      * 编码
      * <p>插入时候生成,后续不参与更新等操作</p>
      */
-    @TableField(value = "CODE", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
+    @TableField(value = "code", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
     /**
      * 组织机构类型
      */
-    @TableField(value = "TYPE")
+    @TableField(value = "type")
     private Short type;
 
     /**
      * 构建路径
      * <p>格式:比如总部/二级/三级/部门</p>
      */
-    @TableField(value = "PATH")
+    @TableField(value = "path")
     private String path;
 
     /**
      * 备注
      */
-    @TableField(value = "REMARK")
+    @TableField(value = "remark")
     private String remark;
 }
 

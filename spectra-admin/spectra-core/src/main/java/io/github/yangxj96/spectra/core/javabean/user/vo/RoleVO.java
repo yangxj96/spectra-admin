@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.vo;
 
-import io.github.yangxj96.spectra.core.configure.security.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -64,7 +64,7 @@ public class RoleVO implements Serializable {
     /**
      * 范围
      */
-    private AuthScope scope;
+    private DataScopeType scope;
 
     /**
      * 是否内置

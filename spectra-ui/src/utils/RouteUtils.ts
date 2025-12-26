@@ -1,7 +1,7 @@
 import { defineAsyncComponent } from "@vue/runtime-core";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
-import MenuApi from "@/api/MenuApi.ts";
+import MenuApi from "@/api/system/MenuApi.ts";
 import { ElMessage } from "element-plus";
 import { hideLoading } from "@/plugin/element/loading.ts";
 

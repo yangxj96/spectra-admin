@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="http://example.com/leave">
+
+    <bpmn:process id="leaveProcess" name="请假流程" isExecutable="true">
+
+        <!-- 开始事件 -->
+        <bpmn:startEvent id="startEvent" name="开始"/>
+
+        <!-- 提交请假 -->
+        <bpmn:userTask
+                id="applyLeave"
+                name="提交请假申请"
+                flowable:assignee="${employee}" />
+
+        <!-- 审批 -->
+        <bpmn:userTask
+                id="approveLeave"
+                name="领导审批"
+                flowable:assignee="${manager}" />
+
+        <!-- 是否通过 -->
+        <bpmn:exclusiveGateway
+                id="approveGateway"
+                name="是否同意" />
+
+        <!-- 结束（通过） -->
+        <bpmn:endEvent
+                id="endApproved"
+                name="审批通过" />
+
+        <!-- 结束（驳回） -->
+        <bpmn:endEvent
+                id="endRejected"
+                name="审批驳回" />
+
+        <!-- 顺序流 -->
+        <bpmn:sequenceFlow
+                id="flow_start_apply"
+                sourceRef="startEvent"
+                targetRef="applyLeave" />
+
+        <bpmn:sequenceFlow
+                id="flow_apply_approve"
+                sourceRef="applyLeave"
+                targetRef="approveLeave" />
+
+        <bpmn:sequenceFlow
+                id="flow_approve_gateway"
+                sourceRef="approveLeave"
+                targetRef="approveGateway" />
+
+        <!-- 通过 -->
+        <bpmn:sequenceFlow
+                id="flow_gateway_approved"
+                sourceRef="approveGateway"
+                targetRef="endApproved">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == true}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <!-- 驳回 -->
+        <bpmn:sequenceFlow
+                id="flow_gateway_rejected"
+                sourceRef="approveGateway"
+                targetRef="endRejected">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == false}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+    </bpmn:process>
+</bpmn:definitions>

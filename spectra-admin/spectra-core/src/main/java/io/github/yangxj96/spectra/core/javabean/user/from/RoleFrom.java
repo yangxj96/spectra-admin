@@ -17,7 +17,7 @@
 package io.github.yangxj96.spectra.core.javabean.user.from;
 
 import io.github.yangxj96.spectra.common.base.Verify;
-import io.github.yangxj96.spectra.core.configure.security.enums.AuthScope;
+import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -53,7 +53,7 @@ public class RoleFrom {
     /**
      * 范围
      */
-    private AuthScope scope;
+    private DataScopeType scope;
 
     /**
      * 状态

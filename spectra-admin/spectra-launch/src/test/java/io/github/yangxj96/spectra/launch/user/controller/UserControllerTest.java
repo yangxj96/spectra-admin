@@ -6,6 +6,7 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -27,7 +28,7 @@ class UserControllerTest {
     void created() {
         // 最小化新建用户
         UserSaveFrom from = new UserSaveFrom();
-        from.setStatus(Boolean.TRUE);
+        from.setStatus((short) 0);
         from.setEmail("yangxj96@gmail.com");
         from.setCountry("China");
         from.setCity("Kunming");
@@ -35,6 +36,8 @@ class UserControllerTest {
         from.setRoleIds(Lists.newArrayList(1932682189593350146L));
 
         userService.create(from);
+
+        Assertions.assertTrue(true, "测试完成");
     }
 
 

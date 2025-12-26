@@ -6,28 +6,28 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleAuthority">
         <!--@mbg.generated-->
-        <!--@Table "SPECTRA"."SYS_REL_ROLE_AUTHORITY"-->
-        <result column="ROLE_ID"      jdbcType="BIGINT" property="roleId"/>
-        <result column="AUTHORITY_ID" jdbcType="BIGINT" property="authorityId"/>
+        <!--@Table spectra.sys_rel_role_authority-->
+        <result column="role_id"      property="roleId"/>
+        <result column="authority_id" property="authorityId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID,
-        ROLE_ID,
-        AUTHORITY_ID,
-        CREATED_BY,
-        CREATED_AT,
-        UPDATED_BY,
-        UPDATED_AT,
-        DELETED,
-        VERSION
+        id,
+        role_id,
+        authority_id,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        deleted,
+        version
     </sql>
 
     <select id="getByRoleId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM SPECTRA.SYS_REL_ROLE_AUTHORITY WHERE ROLE_ID = #{roleId}
+        FROM spectra.sys_rel_role_authority WHERE role_id = #{roleId}
     </select>
 </mapper>

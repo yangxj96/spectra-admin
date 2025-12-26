@@ -4,7 +4,7 @@ import { useRoute } from "vue-router";
 import { ElMessage } from "element-plus/es";
 import Icons from "@/components/Icons/index.vue";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
-import AuthApi from "@/api/AuthApi.ts";
+import AuthApi from "@/api/auth/AuthApi.ts";
 import GlobalUtils from "@/utils/GlobalUtils";
 import { stopAllRequest } from "@/plugin/request";
 import logo from "@/assets/images/logo.svg";
