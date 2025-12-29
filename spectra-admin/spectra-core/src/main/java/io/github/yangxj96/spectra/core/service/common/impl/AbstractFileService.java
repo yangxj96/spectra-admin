@@ -34,7 +34,7 @@ public abstract class AbstractFileService implements FileService {
             throw new FileTypeException("此类文件不允许上传");
         }
         // 文件大小
-        if (properties == null ||  file.getSize() > properties.getChunkSize()) {
+        if (properties == null || file.getSize() > properties.getChunkSize()) {
             throw new FileTypeException("文件大小超过阈值");
         }
     }

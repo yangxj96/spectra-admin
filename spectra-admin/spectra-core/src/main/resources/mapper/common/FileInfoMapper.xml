@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper">
-
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
@@ -37,7 +36,8 @@
     </sql>
 
     <select id="getByHash" resultMap="BaseResultMap">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+        <include refid="Base_Column_List"/>
         FROM spectra.sys_file_info WHERE hash = #{hash}
     </select>
 </mapper>

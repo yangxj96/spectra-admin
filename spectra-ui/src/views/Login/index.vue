@@ -56,6 +56,7 @@ async function handleLogin() {
                 message: "登录成功",
                 onClose() {
                     useUserStore().token = res.data!;
+                    useUserStore().isLoggedIn = true;
                     const path = "/redirect" + (redirect.value ?? "");
                     router.push({ path });
                 }

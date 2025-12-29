@@ -22,11 +22,11 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
-        type,
-        explain,
+        TYPE,
+        EXPLAIN,
         status,
         ip,
-        method,
+        METHOD,
         url,
         args,
         result,
@@ -36,6 +36,6 @@
         updated_by,
         updated_at,
         deleted,
-        version
+        VERSION
     </sql>
 </mapper>

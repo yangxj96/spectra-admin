@@ -16,8 +16,8 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
-import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.common.exception.FileTypeException;
+import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;

@@ -24,6 +24,7 @@ import lombok.Getter;
 /**
  * 数据范围 <br/>
  * 用户直授数据范围 > 角色数据范围 > 默认 SELF
+ *
  * @author Jack Young
  * @version 1.0
  * @since 2025-11-11

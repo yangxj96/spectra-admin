@@ -3,10 +3,8 @@ import { onMounted, ref, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
-import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 
 const router = useRouter();
-const appStore = useAppStore();
 
 // 面包屑
 const breadcrumb = ref<RouteLocationMatched[]>([]);
@@ -44,13 +42,7 @@ function handlerRouter(r: RouteLocationMatched[] = []) {
             <el-main class="box-main">
                 <!-- 内容部分 -->
                 <div ref="content" class="box-content loading-box">
-                    <el-watermark
-                        v-if="appStore.watermark === true"
-                        style="height: 97%"
-                        :content="['yangxj96@gmail.com', '2025-11-06 00:11:22']">
-                        <router-view></router-view>
-                    </el-watermark>
-                    <router-view v-else style="height: 97%"></router-view>
+                    <router-view></router-view>
                 </div>
                 <!-- 底部版权 -->
                 <Footer />

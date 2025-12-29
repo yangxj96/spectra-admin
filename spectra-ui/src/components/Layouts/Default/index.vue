@@ -110,13 +110,7 @@ function handleMenu() {
                 </el-row>
                 <!-- 内容部分 -->
                 <div ref="content" class="box-content loading-box">
-                    <el-watermark
-                        v-if="appStore.watermark === true"
-                        style="height: 97%"
-                        :content="['yangxj96@gmail.com', '2025-11-06 00:11:22']">
-                        <router-view></router-view>
-                    </el-watermark>
-                    <router-view v-else style="height: 97%"></router-view>
+                    <router-view></router-view>
                 </div>
                 <!-- 底部版权 -->
                 <Footer />

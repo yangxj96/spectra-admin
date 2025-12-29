@@ -40,6 +40,7 @@ public interface IpLocationService {
 
     /**
      * 判断是否为私有（内网）IP 地址（IPv4）
+     *
      * @param ip ip
      * @return 是否
      */

@@ -17,10 +17,10 @@
 package io.github.yangxj96.spectra.core.controller.system;
 
 import io.github.yangxj96.spectra.common.base.Verify;
+import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
-import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import jakarta.annotation.Resource;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;

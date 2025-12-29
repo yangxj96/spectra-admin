@@ -44,6 +44,4 @@
         deleted,
         version
     </sql>
-
-
 </mapper>

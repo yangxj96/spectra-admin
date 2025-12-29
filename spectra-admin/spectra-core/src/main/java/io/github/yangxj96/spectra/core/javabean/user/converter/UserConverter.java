@@ -35,7 +35,7 @@ import java.util.List;
  * @version 1.0
  * @since 2025/6/15
  */
-@Mapper(componentModel = "spring",uses = TimeMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", uses = TimeMapper.class, unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface UserConverter {
 
     /**
