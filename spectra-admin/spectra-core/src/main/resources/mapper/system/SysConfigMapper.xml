@@ -7,7 +7,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.SysConfig">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_config-->
+        <!--@Table domain_core.sys_config-->
         <result column="key"     property="key"/>
         <result column="value"   property="value"/>
         <result column="remarks" property="remarks"/>

@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.runner;
 
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;

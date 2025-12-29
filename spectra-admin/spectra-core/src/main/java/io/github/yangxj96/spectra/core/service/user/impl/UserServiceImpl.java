@@ -30,7 +30,7 @@ import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
-import io.github.yangxj96.spectra.core.configure.system.UserProperties;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;

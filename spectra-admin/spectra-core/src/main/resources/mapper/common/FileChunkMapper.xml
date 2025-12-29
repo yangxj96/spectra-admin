@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_file_chunk-->
+        <!--@Table domain_core.sys_file_chunk-->
         <result column="file_id"      property="fileId"/>
         <result column="total_chunks" property="totalChunks"/>
         <result column="chunk_index"  property="chunkIndex"/>
