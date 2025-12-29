@@ -143,7 +143,7 @@ public class RedisSecHolder implements SecHolder {
         }
 
         var userId = tokenInfo.getId();
-        var loginType = tokenInfo.getLoginType();
+        var loginType = tokenInfo.getLoginType().getName();
 
         // 2. 删除 token 相关的所有 key
         redis.delete(RedisCacheKey.AUTH_TOKEN.formatted(token));

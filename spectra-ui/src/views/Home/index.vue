@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import FileUpload from "@/components/FileUplaod/index.vue";
 import { ref } from "vue";
+import AuthApi from "@/api/auth/AuthApi.ts";
 
 const fileUploadShow = ref(false);
+
+AuthApi.check();
 </script>
 
 <template>

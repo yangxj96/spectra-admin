@@ -27,6 +27,7 @@ import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
@@ -63,6 +64,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("isAuthenticated()")
     @ULog(value = "用户登出", type = SysLogType.SAFETY)
     public void logout() {
         SecUtil.logout();
@@ -70,7 +72,8 @@ public class AuthController {
 
     @ULog("token 检查")
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping(value = "/check")
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/check", version = "1.0.0+")
     public void check() {
         // 能进入方法就说明 token 是正常的
     }

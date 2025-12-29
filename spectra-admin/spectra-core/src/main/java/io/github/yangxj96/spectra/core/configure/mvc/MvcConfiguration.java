@@ -80,4 +80,6 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
                 .detectSupportedVersions(true);
     }
+
+
 }
