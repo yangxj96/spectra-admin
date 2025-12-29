@@ -25,7 +25,6 @@ import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicN
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MimeValidationStrategy;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.TikaValidationStrategy;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NullMarked;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,7 +40,6 @@ import java.util.List;
  * @since 2025-06-27
  */
 @Slf4j
-@NullMarked
 @Configuration
 @EnableConfigurationProperties(FileUploadProperties.class)
 public class FileUploadConfiguration {

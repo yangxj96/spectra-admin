@@ -18,14 +18,12 @@ package io.github.yangxj96.spectra.core.configure.json;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import io.github.yangxj96.spectra.core.configure.json.mixin.SimpleGrantedAuthorityMixin;
 import io.github.yangxj96.spectra.core.configure.json.properties.JacksonProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import tools.jackson.databind.DeserializationFeature;
 import tools.jackson.databind.PropertyNamingStrategies;
 import tools.jackson.databind.ext.javatime.deser.LocalDateDeserializer;
