@@ -3,8 +3,8 @@ export {};
 declare global {
     type LoginFrom = {
         type: "PASSWORD" | "SMS" | "SCAN" | "WECHAT" | "GITHUB";
-        identifier: string;
-        credential: string;
+        username: string;
+        password: string;
         clientId: string;
         captcha: string;
     };

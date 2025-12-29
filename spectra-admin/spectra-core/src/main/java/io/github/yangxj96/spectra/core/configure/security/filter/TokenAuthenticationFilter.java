@@ -3,7 +3,7 @@ package io.github.yangxj96.spectra.core.configure.security.filter;
 
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
-import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

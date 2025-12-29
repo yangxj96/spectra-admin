@@ -1,6 +1,8 @@
 package io.github.yangxj96.spectra.core.configure.datascope;
 
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * 数据范围上下文持有器
  *
@@ -10,13 +12,13 @@ package io.github.yangxj96.spectra.core.configure.datascope;
  */
 public class DataScopeHolder {
 
-    private static final ThreadLocal<DataScopeContext> CONTEXT = new ThreadLocal<>();
+    private static final ThreadLocal<@Nullable DataScopeContext> CONTEXT = new ThreadLocal<>();
 
     public static void set(DataScopeContext context) {
         CONTEXT.set(context);
     }
 
-    public static DataScopeContext get() {
+    public static @Nullable DataScopeContext get() {
         return CONTEXT.get();
     }
 

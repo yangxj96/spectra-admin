@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.security.configurine;
 
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

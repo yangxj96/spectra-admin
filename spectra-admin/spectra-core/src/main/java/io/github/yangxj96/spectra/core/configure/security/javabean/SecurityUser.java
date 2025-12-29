@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.security.javabean;
 
 
 import io.github.yangxj96.spectra.common.utils.CollUtils;
