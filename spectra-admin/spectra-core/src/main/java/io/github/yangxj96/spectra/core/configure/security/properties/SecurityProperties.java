@@ -28,7 +28,6 @@ public class SecurityProperties {
             "/druid/**"
     ));
 
-
     /**
      * token超时时长
      */

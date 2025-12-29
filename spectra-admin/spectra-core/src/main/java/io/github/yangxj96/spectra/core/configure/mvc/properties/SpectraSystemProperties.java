@@ -51,13 +51,13 @@ public class SpectraSystemProperties {
     private String packagePrefix = "io.github.yangxj96.spectra";
 
     /// mvc配置
-    private MvcProperties mvc;
+    private SpectraMvc mvc = new SpectraMvc();
 
     /// cors配置
-    private CorsProperties cors;
+    private SpectraCors cors = new SpectraCors();
 
     @Data
-    public static class MvcProperties {
+    public static class SpectraMvc {
 
         /// api版本号请求头
         private String apiHeader = "Api-Version";
@@ -68,7 +68,7 @@ public class SpectraSystemProperties {
     }
 
     @Data
-    public static class CorsProperties {
+    public static class SpectraCors {
 
         /**
          * 指定的路径

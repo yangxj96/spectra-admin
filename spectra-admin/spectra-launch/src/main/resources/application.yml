@@ -1,5 +1,9 @@
 # 自己项目的配置
 spectra:
+  # 系统配置
+  system:
+    # 基础文件夹位置,后续日志;文件上传保存等位置都要以这个位置为基础
+    base-dir: files
   # 用户相关(admin123)
   user:
     default-password: ${DEFAULT_PASSWORD}
@@ -13,19 +17,12 @@ spectra:
       upload-temp-dir: ${spectra.system.base-dir}/temp
   # 验证码相关
   kaptcha:
+    type: math
     verify: false
-  # 安全相关
-  security:
-    whitelists:
-      - "/common/kaptcha"
-      - "/auth/login"
-      - "/druid/**"
-      - "/workflow/**"
 # 服务器配置
 server:
   port: 8888
   ssl:
-    # key-store: classpath:ssl/keystore.p12
     key-store: ${spectra.system.base-dir}/ssl/keystore.p12
     key-store-password: ${SSL_PASSWORD}
     key-store-type: ${SSL_TYPE}
@@ -98,6 +95,7 @@ mybatis-plus:
       # logic-delete-field: deleted
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
+      schema: SPECTRA
 # 日志配置
 logging:
   group:

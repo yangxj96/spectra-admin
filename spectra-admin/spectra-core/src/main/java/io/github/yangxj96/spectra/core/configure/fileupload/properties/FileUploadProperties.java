@@ -58,7 +58,9 @@ public class FileUploadProperties {
     private List<FileType> allowedTypes = new ArrayList<>(Arrays.asList(
             FileType.JPEG,
             FileType.PNG,
-            FileType.PDF
+            FileType.GIF,
+            FileType.PDF,
+            FileType.ZIP
     ));
 
     /**
