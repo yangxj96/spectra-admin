@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.common.utils;
 
 
+import com.google.common.collect.Maps;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public final class ObjUtils {
             return Collections.emptyMap();
         }
 
-        Map<K, V> result = new HashMap<>(rawMap.size());
+        Map<K, V> result = Maps.newHashMapWithExpectedSize(rawMap.size());
         for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
             try {
                 K key = keyClass.cast(entry.getKey());
