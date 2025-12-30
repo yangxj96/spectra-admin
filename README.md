@@ -72,9 +72,13 @@
 
 ## 🔐 环境变量配置说明
 
-> ⚠️ 该文件不会提交至 Git，请自行创建。
 
-### 后端 `env.properties` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
+```text
+⚠️ 该文件不会提交至 Git，请自行创建。
+⚠️ 项目使用mise管理环境.
+```
+
+### 后端 `.mise.local.toml` 文件（位于 [spectra-admin](spectra-admin) 目录下）
 
 | 环境变量               | 说明                | 示例                                                   |
 |--------------------|-------------------|------------------------------------------------------|
