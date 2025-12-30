@@ -88,8 +88,5 @@
         "> 1%",
         "last 2 versions",
         "not dead"
-    ],
-    "volta": {
-        "node": "22.19.0"
-    }
+    ]
 }
