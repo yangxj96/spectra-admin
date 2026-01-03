@@ -57,7 +57,7 @@ public class ULogConfiguration {
      */
     @Bean
     public ULogAspect uLogAspect() {
-        log.debug(PREFIX + "载入 ULogAspect");
+        log.debug(PREFIX + "载入ULogAspect");
         return new ULogAspect();
     }
 

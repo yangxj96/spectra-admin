@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.core.javabean.auth.from;
 
 
-import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 
 /**
  * 登录入参
@@ -13,13 +13,19 @@ import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
 public record LoginFrom(
         // 登录方式
         LoginType type,
-        // email / phone / sceneId / oauthCode
-        String identifier,
-        // password / smsCode / "" / ""
-        String credential,
-        // 用于扫码登录（可选）
-        String clientId,
-        // 验证码,登录方式为email时需要进行验证
-        String captcha
+        // 账号密码
+        String username,
+        String password,
+        String captcha,
+        // 手机验证码
+        String phone,
+        String smsCode,
+        // 邮箱验证码
+        String email,
+        String emailCode,
+        // OTP
+        String principal,
+        String otp
+
 ) {
 }

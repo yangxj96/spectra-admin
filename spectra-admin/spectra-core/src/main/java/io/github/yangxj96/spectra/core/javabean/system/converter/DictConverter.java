@@ -16,8 +16,8 @@
 
 package io.github.yangxj96.spectra.core.javabean.system.converter;
 
-import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;

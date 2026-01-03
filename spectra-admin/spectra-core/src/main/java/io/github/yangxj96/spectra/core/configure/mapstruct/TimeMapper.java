@@ -38,7 +38,7 @@ public class TimeMapper {
      * @param instant {@link Instant}
      * @return {@link LocalDateTime}
      */
-    public @Nullable  LocalDateTime toLocalDateTime(@Nullable Instant instant) {
+    public @Nullable LocalDateTime toLocalDateTime(@Nullable Instant instant) {
         return instant == null ? null : LocalDateTime.ofInstant(instant, getUserZoneId());
     }
 

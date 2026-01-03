@@ -14,13 +14,13 @@ const redirect = ref<string>(route.query.redirect as string | "/");
 const login = reactive({
     form: {
         type: "PASSWORD",
-        identifier: "devops@devops00.com",
-        credential: "admin123",
-        captcha: ""
+        username: "devops@devops00.com",
+        password: "admin123",
+        captcha: "1"
     } as LoginFrom,
     rules: {
-        identifier: [{ required: true, message: "请输入用户名", trigger: "blur" }],
-        credential: [{ required: true, message: "请输入密码", trigger: "blur" }],
+        username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+        password: [{ required: true, message: "请输入密码", trigger: "blur" }],
         captcha: [{ required: true, message: "请输入验证码", trigger: "blur" }]
     } as FormRules
 });
@@ -56,6 +56,7 @@ async function handleLogin() {
                 message: "登录成功",
                 onClose() {
                     useUserStore().token = res.data!;
+                    useUserStore().isLoggedIn = true;
                     const path = "/redirect" + (redirect.value ?? "");
                     router.push({ path });
                 }
@@ -86,11 +87,11 @@ async function handleLogin() {
             </template>
             <div>
                 <el-form ref="loginForm" label-width="70px" :model="login.form" :rules="login.rules">
-                    <el-form-item label="账号" prop="identifier">
-                        <el-input v-model="login.form.identifier" placeholder="请输入账号" />
+                    <el-form-item label="账号" prop="username">
+                        <el-input v-model="login.form.username" placeholder="请输入账号" />
                     </el-form-item>
-                    <el-form-item label="密码" prop="credential">
-                        <el-input v-model="login.form.credential" placeholder="请输入密码" show-password />
+                    <el-form-item label="密码" prop="password">
+                        <el-input v-model="login.form.password" placeholder="请输入密码" show-password />
                     </el-form-item>
                     <el-form-item label="验证码" prop="captcha">
                         <el-row style="width: 100%">

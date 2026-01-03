@@ -64,10 +64,10 @@ export function useTable<T>(
             return;
         }
         if (response.data) {
-            table_data.value = response.data.records;
-            pagination.value.total = response.data.total;
-            pagination.value.size = response.data.size;
-            pagination.value.page = response.data.current;
+            table_data.value = response.data.records ?? [];
+            pagination.value.total = response.data.total ?? 0;
+            pagination.value.size = response.data.size ?? 10;
+            pagination.value.page = response.data.current ?? 1;
         }
     }
 

@@ -10,6 +10,7 @@ public interface DataScopeService {
     /**
      * 根据用户ID获取数据范围 <br/>
      * 用户直授 > 角色 > 默认
+     *
      * @param userId 用户ID
      * @return 数据范围
      */

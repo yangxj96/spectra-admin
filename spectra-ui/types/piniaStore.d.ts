@@ -35,6 +35,8 @@ declare global {
     type StoreUser = {
         // 用户登录的token
         token: Token;
+        // 是否登录
+        isLoggedIn: boolean;
     };
 
     // useDictStore()的state

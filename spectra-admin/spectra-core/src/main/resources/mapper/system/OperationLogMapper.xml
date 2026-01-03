@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_log-->
+        <!--@Table domain_core.sys_log-->
         <result column="type"      property="type"/>
         <result column="explain"   property="explain"/>
         <result column="status"    property="status"/>
@@ -22,11 +22,11 @@
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         id,
-        type,
-        explain,
+        TYPE,
+        EXPLAIN,
         status,
         ip,
-        method,
+        METHOD,
         url,
         args,
         result,
@@ -36,6 +36,6 @@
         updated_by,
         updated_at,
         deleted,
-        version
+        VERSION
     </sql>
 </mapper>

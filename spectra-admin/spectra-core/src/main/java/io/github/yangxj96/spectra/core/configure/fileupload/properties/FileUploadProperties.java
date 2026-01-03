@@ -18,9 +18,15 @@ package io.github.yangxj96.spectra.core.configure.fileupload.properties;
 
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.ExtensionValidationStrategy;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicNumberValidationStrategy;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MimeValidationStrategy;
+import io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.TikaValidationStrategy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -49,12 +55,23 @@ public class FileUploadProperties {
     /**
      * 允许的类型
      */
-    private List<FileType> allowedTypes;
+    private List<FileType> allowedTypes = new ArrayList<>(Arrays.asList(
+            FileType.JPEG,
+            FileType.PNG,
+            FileType.GIF,
+            FileType.PDF,
+            FileType.ZIP
+    ));
 
     /**
      * 文件类型验证策略
      */
-    private List<Class<? extends FileTypeValidationStrategy>> strategies;
+    private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(
+            TikaValidationStrategy.class,
+            MimeValidationStrategy.class,
+            ExtensionValidationStrategy.class,
+            MagicNumberValidationStrategy.class
+    ));
 
     /**
      * 分片大小,默认5M

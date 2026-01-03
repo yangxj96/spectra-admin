@@ -14,44 +14,44 @@
         <bpmn:userTask
                 id="applyLeave"
                 name="提交请假申请"
-                flowable:assignee="${employee}" />
+                flowable:assignee="${employee}"/>
 
         <!-- 审批 -->
         <bpmn:userTask
                 id="approveLeave"
                 name="领导审批"
-                flowable:assignee="${manager}" />
+                flowable:assignee="${manager}"/>
 
         <!-- 是否通过 -->
         <bpmn:exclusiveGateway
                 id="approveGateway"
-                name="是否同意" />
+                name="是否同意"/>
 
         <!-- 结束（通过） -->
         <bpmn:endEvent
                 id="endApproved"
-                name="审批通过" />
+                name="审批通过"/>
 
         <!-- 结束（驳回） -->
         <bpmn:endEvent
                 id="endRejected"
-                name="审批驳回" />
+                name="审批驳回"/>
 
         <!-- 顺序流 -->
         <bpmn:sequenceFlow
                 id="flow_start_apply"
                 sourceRef="startEvent"
-                targetRef="applyLeave" />
+                targetRef="applyLeave"/>
 
         <bpmn:sequenceFlow
                 id="flow_apply_approve"
                 sourceRef="applyLeave"
-                targetRef="approveLeave" />
+                targetRef="approveLeave"/>
 
         <bpmn:sequenceFlow
                 id="flow_approve_gateway"
                 sourceRef="approveLeave"
-                targetRef="approveGateway" />
+                targetRef="approveGateway"/>
 
         <!-- 通过 -->
         <bpmn:sequenceFlow

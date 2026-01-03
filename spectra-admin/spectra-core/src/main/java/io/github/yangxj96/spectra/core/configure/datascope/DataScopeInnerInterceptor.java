@@ -27,7 +27,6 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
-import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -44,7 +43,6 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@NullMarked
 public class DataScopeInnerInterceptor implements InnerInterceptor {
 
     /**
@@ -296,7 +294,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
      * @param ctx   数据范围上下文
      * @return 表达式
      */
-    private @Nullable  Expression buildScopeExpression(String field, DataScopeContext ctx) {
+    private @Nullable Expression buildScopeExpression(String field, DataScopeContext ctx) {
         return switch (ctx.getScope()) {
             case SELF -> new EqualsTo(
                     new Column(field),

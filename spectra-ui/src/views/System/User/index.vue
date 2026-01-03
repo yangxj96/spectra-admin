@@ -202,7 +202,7 @@ onMounted(async () => {
                 </el-table-column>
                 <el-table-column align="center" width="150" show-overflow-tooltip label="状态" prop="state">
                     <template #default="scope">
-                        <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_user_state" />
+                        <dict-tag v-model="scope.row.status" primary_value="0" dict_code="sys_user_state" />
                     </template>
                 </el-table-column>
                 <el-table-column

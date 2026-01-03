@@ -3,9 +3,9 @@
 > 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.0-brightgreen)
-![Vue](https://img.shields.io/badge/Vue-3.5.21-green)
-![达梦8](https://img.shields.io/badge/达梦-8-blue)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-brightgreen)
+![Vue](https://img.shields.io/badge/Vue-3.5.26-green)
+![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
 ---
@@ -25,16 +25,15 @@
 
 ### 后端技术栈
 
-| 技术              | 版本              | 说明              |
-|-----------------|-----------------|-----------------|
-| Java            | JDK25           | 使用最新LTS版本，性能更强  |
-| Maven           | 3.9.11          | 构建工具            |
-| Spring Boot     | 4.0.0           | 核心框架            |
-| Spring Security | 7.0.0           | 权限认证框架          |
-| MyBatis-Plus    | 3.5.15          | 增强ORM，简化CRUD    |
-| Druid           | 1.2.28-SNAPSHOT | 最强连接池 (等待发布正式版) |
-| MapStruct       | 1.6.3           | 实体映射工具，提升性能     |
-| DM8(兼容Oracle模式) | 8               | 国产关系型数据库        |
+| 技术              | 版本     | 说明             |
+|-----------------|--------|----------------|
+| Java            | JDK25  | 使用最新LTS版本，性能更强 |
+| Maven           | 3.9.12 | 构建工具           |
+| Spring Boot     | 4.0.1  | 核心框架           |
+| Spring Security | 7.0.0  | 权限认证框架         |
+| MyBatis-Plus    | 3.5.15 | 增强ORM，简化CRUD   |
+| MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
+| PostgreSQL      | 18     | 知名关系型数据库       |
 
 > ✅ 所有依赖均采用当前稳定最新版，并将持续跟进生态更新。
 
@@ -44,18 +43,18 @@
 
 | 包名           | 版本      | 用途                     |
 |--------------|---------|------------------------|
-| Vue          | 3.5.21  | 渐进式前端框架                |
-| Vue Router   | 4.5.1   | 路由管理                   |
-| Pinia        | 3.0.3   | 状态管理（Vuex替代）           |
-| @vueuse/core | 13.9.0  | 实用 Composition API 工具库 |
-| Vite         | 7.1.7   | 构建工具，极速启动              |
-| Element Plus | 2.11.3  | UI 组件库                 |
-| Axios        | 1.12.2  | HTTP 请求客户端             |
+| Vue          | 3.5.26  | 渐进式前端框架                |
+| Vue Router   | 4.6.4   | 路由管理                   |
+| Pinia        | 3.0.4   | 状态管理（Vuex替代）           |
+| @vueuse/core | 14.1.0  | 实用 Composition API 工具库 |
+| Vite         | 7.3.0   | 构建工具，极速启动              |
+| Element Plus | 2.12.0  | UI 组件库                 |
+| Axios        | 1.13.2  | HTTP 请求客户端             |
 | ECharts      | 6.0.0   | 数据可视化图表                |
-| vue-echarts  | 8.0.0   | 转为vue封装的echarts操作组件    |
+| vue-echarts  | 8.0.1   | 转为vue封装的echarts操作组件    |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
-| Oxlint       | 1.24.0  | 代码质量检查                 |
-| Prettier     | 3.6.2   | 统一代码格式风格               |
+| Oxlint       | 1.33.0  | 代码质量检查                 |
+| Prettier     | 3.7.4   | 统一代码格式风格               |
 
 ---
 
@@ -73,20 +72,24 @@
 
 ## 🔐 环境变量配置说明
 
-> ⚠️ 该文件不会提交至 Git，请自行创建。
 
-### 后端 `env.properties` 文件（位于 [spectra-launch](spectra-admin/spectra-launch/src/main/resources) 模块的resources文件夹下）
+```text
+⚠️ 该文件不会提交至 Git，请自行创建。
+⚠️ 项目使用mise管理环境.
+```
 
-| 环境变量               | 说明                | 示例                                                       |
-|--------------------|-------------------|----------------------------------------------------------|
-| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:dm://127.0.0.1:5237?compatible_mode=oracle` |
-| `DB_USERNAME`      | 数据库用户名            | `DB_USERNAME=XXX`                                        |
-| `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                        |
-| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                              |
-| `LICENSE_PASSWORD` | 许可模式,使用的密钥密码(临时用) | `LICENSE_PASSWORD=XXX`                                   |
-| `SSL_PASSWORD`     | SSL的密码            | `SSL_PASSWORD=xxx`                                       |
-| `SSL_TYPE`         | SSL的类型            | `SSL_TYPE=PKCS12`                                        |
-| `SSL_ALIAS`        | SSL的别名            | `SSL_ALIAS=xxx`                                          |
+### 后端 `.mise.local.toml` 文件（位于 [spectra-admin](spectra-admin) 目录下）
+
+| 环境变量               | 说明                | 示例                                                   |
+|--------------------|-------------------|------------------------------------------------------|
+| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:postgresql://127.0.0.1:5237/spectra_db` |
+| `DB_USERNAME`      | 数据库用户名            | `DB_USERNAME=XXX`                                    |
+| `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                    |
+| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                          |
+| `LICENSE_PASSWORD` | 许可模式,使用的密钥密码(临时用) | `LICENSE_PASSWORD=XXX`                               |
+| `SSL_PASSWORD`     | SSL的密码            | `SSL_PASSWORD=xxx`                                   |
+| `SSL_TYPE`         | SSL的类型            | `SSL_TYPE=PKCS12`                                    |
+| `SSL_ALIAS`        | SSL的别名            | `SSL_ALIAS=xxx`                                      |
 
 > 用于数据库密码等敏感配置的加密保护。
 
@@ -108,13 +111,13 @@
 
 ## 🧩 项目模块结构
 
-| 模块                  | 路径                                                   | 说明                               |
-|---------------------|------------------------------------------------------|----------------------------------|
-| `spectra-common`    | [spectra-common](spectra-admin/spectra-common)       | 通用工具类、注解、常量、DTO等共享内容             |
-| `spectra-core`      | [spectra-core](spectra-admin/spectra-core)           | 核心接口定义、领域模型、服务契约                 |
-| `spectra-workflow`  | [spectra-workflow](spectra-admin/spectra-workflow)   | 工作流模块,选用的flowable流程框架            |
-| `spectra-launch`    | [spectra-launch](spectra-admin/spectra-launch)       | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
-| `spectra-ui`        | [spectra-ui](spectra-ui)                             | 前端 Vue 项目，基于 Vite + Element Plus |
+| 模块                 | 路径                                                 | 说明                               |
+|--------------------|----------------------------------------------------|----------------------------------|
+| `spectra-common`   | [spectra-common](spectra-admin/spectra-common)     | 通用工具类、注解、常量、DTO等共享内容             |
+| `spectra-core`     | [spectra-core](spectra-admin/spectra-core)         | 核心接口定义、领域模型、服务契约                 |
+| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-workflow) | 工作流模块,选用的flowable流程框架            |
+| `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
+| `spectra-ui`       | [spectra-ui](spectra-ui)                           | 前端 Vue 项目，基于 Vite + Element Plus |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
 

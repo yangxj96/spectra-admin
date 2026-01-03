@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.license.service.impl;
 
-import tools.jackson.databind.ObjectMapper;
 import io.github.yangxj96.spectra.license.javabean.bean.License;
 import io.github.yangxj96.spectra.license.properties.LicenseProperties;
 import io.github.yangxj96.spectra.license.service.LicenseService;
@@ -27,6 +26,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Files;

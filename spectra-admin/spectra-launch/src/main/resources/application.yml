@@ -1,26 +1,12 @@
 # 自己项目的配置
 spectra:
-  # 用户相关(admin123)
-  user:
-    default-password: ${DEFAULT_PASSWORD}
   # 系统配置
   system:
     # 基础文件夹位置,后续日志;文件上传保存等位置都要以这个位置为基础
     base-dir: files
-    # 许可证配置,如果启用了许可证模块才会有效
-    license:
-      license-path: ${spectra.system.base-dir}/license.lic
-      public-key: classpath:key/publicKey.pem
-      private-key: classpath:key/privateKey.pem
-      password: ${LICENSE_PASSWORD}
-    # CORS配置
-    cors:
-      mapping: "/**"
-      origin-patterns: "*"
-      methods: "*"
-      headers: "*"
-      credentials: true
-      max-age: 3600
+  # 用户相关(admin123)
+  user:
+    default-password: ${DEFAULT_PASSWORD}
   # 文件相关
   file:
     # 文件上传配置
@@ -29,37 +15,14 @@ spectra:
       upload-dir: ${spectra.system.base-dir}/uploads
       # 上传文件的位置(临时存储位置)
       upload-temp-dir: ${spectra.system.base-dir}/temp
-      # 文件允许的类型
-      allowed-types:
-        - jpeg
-        - png
-        - pdf
-      # 文件验证的策略
-      strategies:
-        - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.TikaValidationStrategy
-        - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MimeValidationStrategy
-        - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.ExtensionValidationStrategy
-        - io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl.MagicNumberValidationStrategy
-      # 分片文件大小
-      chunk-size: 1048576
   # 验证码相关
   kaptcha:
     type: math
     verify: false
-    duration: 1m
-  # 安全相关
-  security:
-    token-expire: 7200
-    whitelists:
-      - "/common/kaptcha"
-      - "/auth/login"
-      - "/druid/**"
-      - "/workflow/**"
 # 服务器配置
 server:
   port: 8888
   ssl:
-    # key-store: classpath:ssl/keystore.p12
     key-store: ${spectra.system.base-dir}/ssl/keystore.p12
     key-store-password: ${SSL_PASSWORD}
     key-store-type: ${SSL_TYPE}
@@ -80,11 +43,6 @@ spring:
       enabled: true
       max-file-size: 5MB
       max-request-size: 10MB
-  config:
-    # .env文件内是K=V的键值对符合properties的解析方式,
-    # [.properties]是告诉他用properties的方式进行解析
-    # [.yaml]是告诉他用.yaml的方式进行计息
-    import: classpath:env.properties
   threads:
     virtual:
       enabled: true
@@ -97,55 +55,7 @@ spring:
     url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      # 初始化连接池大小
-      initial-size: 5
-      # 最小连接池数量
-      min-idle: 5
-      # 最大连接池数量
-      max-active: 20
-      # 连接时最大等待时间（单位：毫秒）
-      max-wait: 60000
-      test-while-idle: true
-      # 配置多久进行一次检测，检测需要关闭的连接（单位：毫秒）
-      time-between-eviction-runs-millis: 60000
-      # 配置一个连接在连接池中最小生存的时间（单位：毫秒）
-      min-evictable-idle-time-millis: 300000
-      # 配置一个连接在连接池中最大生存的时间（单位：毫秒）
-      max-evictable-idle-time-millis: 900000
-      # 配置测试连接是否可用的查询 sql
-      validation-query: SELECT 1
-      test-on-borrow: false
-      test-on-return: false
-      pool-prepared-statements: false
-      web-stat-filter:
-        enabled: true
-      stat-view-servlet:
-        enabled: true
-        # 配置监控后台访问路径
-        url-pattern: /druid/*
-        # 允许清空数据
-        reset-enable: false
-        login-username: sysadmin
-        login-password: sysadmin
-      filter:
-        # 统计
-        stat:
-          enabled: true
-          # 开启慢 sql 记录
-          log-slow-sql: true
-          # 若执行耗时大于 2s，则视为慢 sql
-          slow-sql-millis: 2000
-          # 合并SQL
-          merge-sql: true
-        # 防火墙
-        wall:
-          enabled: true
-          db-type: oracle
-          config:
-            multi-statement-allow: true
-            inited: true
+    type: com.zaxxer.hikari.HikariDataSource
   data:
     redis:
       url: redis://QuVsKppcWvwwX2Vv@127.0.0.1:6379/0
@@ -180,6 +90,7 @@ mybatis-plus:
       # logic-delete-field: deleted
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
+      schema: SPECTRA
 # 日志配置
 logging:
   group:

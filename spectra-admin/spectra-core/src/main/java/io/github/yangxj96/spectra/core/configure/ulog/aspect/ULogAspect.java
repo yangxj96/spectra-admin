@@ -88,7 +88,7 @@ public class ULogAspect {
      * @param jsonResult 响应信息
      */
     @SuppressWarnings("unused")
-    protected void handleLog(final JoinPoint point, ULog annotation, @Nullable final Exception e,@Nullable Object jsonResult) {
+    protected void handleLog(final JoinPoint point, ULog annotation, @Nullable final Exception e, @Nullable Object jsonResult) {
         try {
             // 获取请求上下文
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();

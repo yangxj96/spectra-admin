@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.security.configurine;
 
 
 import io.github.yangxj96.spectra.core.configure.security.eval.SpectraPermissionEvaluator;
@@ -15,17 +15,18 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.List;
 
 /**
  * SpringSecurity配置
@@ -58,17 +59,14 @@ public class SecurityConfiguration {
     @Resource
     private RestAccessDeniedHandler restAccessDeniedHandler;
 
+    @Resource
+    private List<AuthenticationProvider> providers;
+
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        log.debug("{}配置PasswordEncoder", PREFIX);
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
+    public AuthenticationManager authenticationManager() {
         log.debug("{}配置AuthenticationManager", PREFIX);
-        return config.getAuthenticationManager();
+        return new ProviderManager(providers);
     }
 
     @Bean

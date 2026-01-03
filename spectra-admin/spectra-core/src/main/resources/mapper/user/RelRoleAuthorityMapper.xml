@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleAuthority">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_rel_role_authority-->
+        <!--@Table domain_core.sys_rel_role_authority-->
         <result column="role_id"      property="roleId"/>
         <result column="authority_id" property="authorityId"/>
     </resultMap>

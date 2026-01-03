@@ -1,9 +1,9 @@
-package io.github.yangxj96.spectra.core.configure.security;
+package io.github.yangxj96.spectra.core.configure.security.configurine;
 
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.SpectraSystemProperties;
 import io.github.yangxj96.spectra.core.configure.redis.RedisTemplateFactory;
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;

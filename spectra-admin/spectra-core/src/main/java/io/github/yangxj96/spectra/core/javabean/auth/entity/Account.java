@@ -4,7 +4,7 @@ package io.github.yangxj96.spectra.core.javabean.auth.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
-import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

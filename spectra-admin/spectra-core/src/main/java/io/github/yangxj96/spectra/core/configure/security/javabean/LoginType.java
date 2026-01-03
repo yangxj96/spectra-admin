@@ -1,6 +1,7 @@
-package io.github.yangxj96.spectra.core.configure.security.enums;
+package io.github.yangxj96.spectra.core.configure.security.javabean;
 
 import com.baomidou.mybatisplus.annotation.IEnum;
+import lombok.Getter;
 
 /**
  * 登录方式支持
@@ -9,19 +10,23 @@ import com.baomidou.mybatisplus.annotation.IEnum;
  * @version 1.0
  * @since 2025/12/2 23:14
  */
+@Getter
 public enum LoginType implements IEnum<Integer> {
     /**
      * 账号密码
      */
-    PASSWORD(1,"password"),
+    PASSWORD(1, "password"),
     /**
      * 手机验证码
      */
-    SMS(2,"sms"),
+    SMS(2, "sms"),
     /**
      * 扫码
      */
-    SCAN(3,"scan");
+    OTP(3, "OTP"),
+    // 邮件验证码登录
+    EMAIL(4, "email"),
+    ;
 
     private final Integer value;
 
@@ -37,7 +42,4 @@ public enum LoginType implements IEnum<Integer> {
         return this.value;
     }
 
-    public String getName(){
-        return this.name;
-    }
 }

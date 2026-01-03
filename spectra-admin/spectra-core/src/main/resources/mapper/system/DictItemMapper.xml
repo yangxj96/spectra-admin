@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.DictItem">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_dict_item-->
+        <!--@Table domain_core.sys_dict_item-->
         <result column="gid"    property="gid"/>
         <result column="label"  property="label"/>
         <result column="value"  property="value"/>

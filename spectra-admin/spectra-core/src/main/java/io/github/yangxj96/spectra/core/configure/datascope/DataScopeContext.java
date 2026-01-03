@@ -27,10 +27,14 @@ public class DataScopeContext {
      */
     private Long userId;
 
-    /** 可访问组织/部门 ID */
+    /**
+     * 可访问组织/部门 ID
+     */
     private List<Long> targetIds;
 
-    /** 表字段（可选，支持别名） */
+    /**
+     * 表字段（可选，支持别名）
+     */
     private String scopeField;
 
     /**
@@ -38,6 +42,8 @@ public class DataScopeContext {
      */
     private String userField;
 
-    /** 是否忽略 */
+    /**
+     * 是否忽略
+     */
     private boolean ignore;
 }

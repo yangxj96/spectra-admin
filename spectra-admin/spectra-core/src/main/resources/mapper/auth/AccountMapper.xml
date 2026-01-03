@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.auth.entity.Account">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_account-->
+        <!--@Table domain_core.sys_account-->
         <result column="user_id"    property="userId"/>
         <result column="type"       property="type"/>
         <result column="login_name" property="loginName"/>
@@ -44,6 +44,4 @@
         deleted,
         version
     </sql>
-
-
 </mapper>

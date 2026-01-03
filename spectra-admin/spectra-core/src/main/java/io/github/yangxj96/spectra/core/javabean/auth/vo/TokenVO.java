@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.javabean.auth.vo;
 
-import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import lombok.*;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;

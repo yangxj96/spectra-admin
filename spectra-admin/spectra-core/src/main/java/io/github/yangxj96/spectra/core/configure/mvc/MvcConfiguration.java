@@ -16,9 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc;
 
-import io.github.yangxj96.spectra.core.configure.mvc.properties.CorsProperties;
-import io.github.yangxj96.spectra.core.configure.mvc.properties.MvcProperties;
-import io.github.yangxj96.spectra.core.configure.system.SpectraSystemProperties;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.SpectraSystemProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -36,35 +34,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({MvcProperties.class, SpectraSystemProperties.class, CorsProperties.class})
+@EnableConfigurationProperties({SpectraSystemProperties.class})
 public class MvcConfiguration implements WebMvcConfigurer {
 
     private static final String PREFIX = "[SpringMVC]:";
 
     @Resource
-    private CorsProperties corsProperties;
-
-    @Resource
-    private MvcProperties mvcProperties;
+    private SpectraSystemProperties spectraProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.debug(PREFIX + "载入Cors");
         registry
                 // 匹配所有路径
-                .addMapping(corsProperties.getMapping())
+                .addMapping(spectraProperties.getCors().getMapping())
                 // 指定允许的源
                 // .allowedOrigins("http://localhost:5173")
-                .allowedOriginPatterns(corsProperties.getOriginPatterns().toArray(new String[0]))
+                .allowedOriginPatterns(spectraProperties.getCors().getOriginPatterns().toArray(new String[0]))
                 // 允许的方法
                 // .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedMethods(corsProperties.getMethods().toArray(new String[0]))
+                .allowedMethods(spectraProperties.getCors().getMethods().toArray(new String[0]))
                 // 允许的头部信息
-                .allowedHeaders(corsProperties.getHeaders().toArray(new String[0]))
+                .allowedHeaders(spectraProperties.getCors().getHeaders().toArray(new String[0]))
                 // 是否支持凭证
-                .allowCredentials(corsProperties.getCredentials())
+                .allowCredentials(spectraProperties.getCors().getCredentials())
                 // 预检后缓存策略时长
-                .maxAge(corsProperties.getMaxAge());
+                .maxAge(spectraProperties.getCors().getMaxAge());
     }
 
     /**
@@ -77,12 +72,14 @@ public class MvcConfiguration implements WebMvcConfigurer {
         log.debug(
                 "{}配置API版本号,默认请求头为{},默认版本号为{}",
                 PREFIX,
-                mvcProperties.getApiHeader(),
-                mvcProperties.getApiVersion()
+                spectraProperties.getMvc().getApiHeader(),
+                spectraProperties.getMvc().getApiVersion()
         );
         configurer
-                .useRequestHeader(mvcProperties.getApiHeader())
-                .setDefaultVersion(mvcProperties.getApiVersion())
+                .useRequestHeader(spectraProperties.getMvc().getApiHeader())
+                .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
                 .detectSupportedVersions(true);
     }
+
+
 }

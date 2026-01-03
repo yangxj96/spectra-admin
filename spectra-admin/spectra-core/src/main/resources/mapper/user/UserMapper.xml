@@ -6,7 +6,7 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.user.entity.User">
         <!--@mbg.generated-->
-        <!--@Table spectra.sys_user-->
+        <!--@Table domain_core.sys_user-->
         <result column="username"  property="username"/>
         <result column="avatar"    property="avatar"/>
         <result column="status"    property="status"/>

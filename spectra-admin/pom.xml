@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.0</version>
+        <version>4.0.1</version>
         <relativePath/>
     </parent>
 
@@ -34,7 +34,6 @@
         <bitwalker.version>1.21</bitwalker.version>
         <oshi.version>6.9.1</oshi.version>
         <jetcache.version>2.7.8</jetcache.version>
-        <druid.version>1.2.28-SNAPSHOT</druid.version>
         <bcprov.version>1.83</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
         <mica.version>4.0.0</mica.version>
@@ -49,19 +48,6 @@
         <module>spectra-license</module>
     </modules>
 
-    <repositories>
-        <!-- https://gitlab.xuxiaowei.com.cn/xuxiaowei-com-cn/druid/-/packages -->
-        <repository>
-            <id>xuxiaowei-druid-gitlab-maven</id>
-            <url>https://gitlab.xuxiaowei.com.cn/api/v4/projects/432/packages/maven</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
 
     <dependencyManagement>
         <dependencies>
@@ -82,13 +68,6 @@
                 <version>4.2.6.Final</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <!-- druid -->
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>druid-spring-boot-4-starter</artifactId>
-                <version>${druid.version}</version>
             </dependency>
 
             <!-- 工具包 -->

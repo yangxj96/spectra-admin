@@ -4,8 +4,8 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
-import io.github.yangxj96.spectra.core.configure.security.SecurityUser;
-import io.github.yangxj96.spectra.core.configure.security.enums.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
 import io.github.yangxj96.spectra.core.service.common.IpLocationService;
@@ -143,7 +143,7 @@ public class RedisSecHolder implements SecHolder {
         }
 
         var userId = tokenInfo.getId();
-        var loginType = tokenInfo.getLoginType();
+        var loginType = tokenInfo.getLoginType().getName();
 
         // 2. 删除 token 相关的所有 key
         redis.delete(RedisCacheKey.AUTH_TOKEN.formatted(token));
