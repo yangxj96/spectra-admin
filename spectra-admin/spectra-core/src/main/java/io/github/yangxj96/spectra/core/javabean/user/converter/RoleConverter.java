@@ -23,13 +23,11 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-/**
- * 角色转换用的
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/16
- */
+/// 角色转换用的
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/16
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RoleConverter {
 

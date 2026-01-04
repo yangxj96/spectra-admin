@@ -20,34 +20,25 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.CPUInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.JVMInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RAMInfoVO;
 
-/**
- * 服务器信息监控
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 服务器信息监控
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public interface ServiceMonitorService {
 
-    /**
-     * 获取服务器CPU信息
-     *
-     * @return 服务器CPU信息
-     */
+    /// 获取服务器CPU信息
+    ///
+    /// @return 服务器CPU信息
     CPUInfoVO getCPUInfo();
 
-
-    /**
-     * 获取服务器内存信息
-     *
-     * @return 服务器内存信息
-     */
+    /// 获取服务器内存信息
+    ///
+    /// @return 服务器内存信息
     RAMInfoVO getRAMInfo();
 
-    /**
-     * 获取JVM信息
-     *
-     * @return JVM信息
-     */
+    /// 获取JVM信息
+    ///
+    /// @return JVM信息
     JVMInfoVO getJVMInfo();
 }

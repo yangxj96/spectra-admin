@@ -30,13 +30,13 @@ import org.jspecify.annotations.Nullable;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 组织机构
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-15
- */
+///
+/// 组织机构
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-15
+///
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -48,42 +48,30 @@ public class Organization extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 上级ID
-     */
+    /// 上级ID
     @Nullable
     @TableField(value = "pid")
     private Long pid;
 
-    /**
-     * 名称
-     */
+    /// 名称
     @TableField(value = "name")
     private String name;
 
-    /**
-     * 编码
-     * <p>插入时候生成,后续不参与更新等操作</p>
-     */
+    /// 编码
+    /// > 插入时候生成,后续不参与更新等操作
     @TableField(value = "code", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
-    /**
-     * 组织机构类型
-     */
+    /// 组织机构类型
     @TableField(value = "type")
     private Short type;
 
-    /**
-     * 构建路径
-     * <p>格式:比如总部/二级/三级/部门</p>
-     */
+    /// 构建路径
+    /// > 格式:比如总部/二级/三级/部门
     @TableField(value = "path")
     private String path;
 
-    /**
-     * 备注
-     */
+    /// 备注
     @TableField(value = "remark")
     private String remark;
 }

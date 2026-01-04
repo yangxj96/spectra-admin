@@ -30,13 +30,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 菜单控制器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 菜单控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @RestController
 @RequestMapping("/menu")
 public class MenuController {

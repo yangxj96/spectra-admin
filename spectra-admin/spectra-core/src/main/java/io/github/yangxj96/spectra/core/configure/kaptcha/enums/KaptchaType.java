@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.core.configure.kaptcha.enums;
 
-/**
- * 验证码类型
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/25
- */
+/// 验证码类型
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/25
 public enum KaptchaType {
     CHAT, MATH
 }

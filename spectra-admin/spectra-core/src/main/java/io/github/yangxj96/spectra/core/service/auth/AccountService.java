@@ -6,13 +6,11 @@ import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * 账号服务
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/11 17:05
- */
+/// 账号服务
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/11 17:05
 @NullMarked
 public interface AccountService extends BaseService<Account> {
 

@@ -5,13 +5,11 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.javabean.user.entity.RoleDataScope;
 import org.apache.ibatis.annotations.Param;
 
-/**
- * 角色数据范围Mapper
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/23 11:36
- */
+/// 角色数据范围Mapper
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/23 11:36
 public interface RoleDataScopeMapper extends BaseMapper<RoleDataScope> {
 
     /**

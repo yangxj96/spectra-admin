@@ -10,13 +10,11 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 系统配置分页响应
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 系统配置分页响应
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,35 +23,23 @@ public class ConfiguredVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 主键ID
-     */
+    /// 主键ID
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 配置key
-     */
+    /// 配置key
     private String key;
 
-    /**
-     * 配置VALUE
-     */
+    /// 配置VALUE
     private String value;
 
-    /**
-     * 值类型
-     */
+    /// 值类型
     private ConfiguredValueType type;
 
-    /**
-     * 字典code
-     */
+    /// 字典code
     private String dictCode;
 
-    /**
-     * 备注说明
-     */
+    /// 备注说明
     private String remarks;
 
 }

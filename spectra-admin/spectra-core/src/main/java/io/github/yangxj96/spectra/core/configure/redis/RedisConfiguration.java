@@ -24,13 +24,11 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Redis配置类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/28
- */
+/// Redis配置类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/28
 @Slf4j
 @Configuration
 public class RedisConfiguration {
@@ -40,12 +38,10 @@ public class RedisConfiguration {
     @Resource
     private ObjectMapper om;
 
-    /**
-     * 自定义redisTemplate
-     *
-     * @param factory redis连接工程
-     * @return RedisTemplate<String, Object>
-     */
+    /// 自定义redisTemplate
+    ///
+    /// @param factory redis连接工程
+    /// @return RedisTemplate<String, Object>
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         log.debug(PREFIX + "开始配置Redis");

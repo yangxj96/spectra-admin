@@ -11,19 +11,21 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
-/**
- * 登录分发器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/29 10:47
- */
+/// 登录分发器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/29 10:47
 @Component
 @RequiredArgsConstructor
 public class LoginDispatcher {
 
     private final AuthenticationManager authenticationManager;
 
+    /// 进行登录
+    ///
+    /// @param request 登录请求参数
+    /// @return 登录结果
     public Authentication authenticate(LoginFrom request) {
 
         return switch (request.type()) {

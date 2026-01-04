@@ -24,46 +24,36 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-/**
- * 菜单相关mapstruct
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 菜单相关mapstruct
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MenuConverter {
 
-    /**
-     * 实体转 树形实体VO
-     *
-     * @param entity 实体
-     * @return 树形实体VO
-     */
+    /// 实体转 树形实体VO
+    ///
+    /// @param entity 实体
+    /// @return 树形实体VO
     MenuTreeVO toTreeVO(Menu entity);
 
-    /**
-     * 实体列表 转 树形实体VO列表
-     *
-     * @param coll 实体列表
-     * @return 树形实体VO列表
-     */
+    /// 实体列表 转 树形实体VO列表
+    ///
+    /// @param coll 实体列表
+    /// @return 树形实体VO列表
     List<MenuTreeVO> toTreeVOS(List<Menu> coll);
 
-    /**
-     * 实体转VO
-     *
-     * @param entity 实体
-     * @return VO
-     */
+    /// 实体转VO
+    ///
+    /// @param entity 实体
+    /// @return VO
     MenuVO toVO(Menu entity);
 
-    /**
-     * 实体列表转VO列表
-     *
-     * @param coll 实体泪飙
-     * @return VO列表
-     */
+    /// 实体列表转VO列表
+    ///
+    /// @param coll 实体泪飙
+    /// @return VO列表
     List<MenuVO> toVOS(List<Menu> coll);
 
 }

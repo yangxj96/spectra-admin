@@ -2,13 +2,11 @@ package io.github.yangxj96.spectra.core.configure.datascope;
 
 import java.lang.annotation.*;
 
-///
 /// 数据范围注解
 ///
 /// * 角色之间的数据范围是并集
 /// * 用户直授与角色数据范围是并集
 /// * 除非 ALL，否则所有条件 OR 连接
-///
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

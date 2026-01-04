@@ -9,15 +9,15 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-/**
- * 时间处理 mapper <br/>
- * 这个 mapper 主要是处理 Instant 转换到 LocalDateTime等对外的类型.<br/>
- * 可以动态获取时区进行设置,具体获取时区代码还在处理<br/>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/10 11:13
- */
+/// 时间处理 mapper
+///
+/// 这个 mapper 主要是处理 Instant 转换到 LocalDateTime等对外的类型.
+///
+/// 可以动态获取时区进行设置,具体获取时区代码还在处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/10 11:13
 @Component
 @SuppressWarnings("unused")
 public class TimeMapper {

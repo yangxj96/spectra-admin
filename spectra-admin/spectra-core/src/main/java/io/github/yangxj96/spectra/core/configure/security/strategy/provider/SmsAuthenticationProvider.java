@@ -9,13 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-/**
- * 短信登录
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/29 10:44
- */
+/// 短信登录
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/29 10:44
 @Component
 @RequiredArgsConstructor
 public class SmsAuthenticationProvider implements AuthenticationProvider {

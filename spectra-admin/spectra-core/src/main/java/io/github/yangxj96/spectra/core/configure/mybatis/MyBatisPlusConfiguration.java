@@ -34,13 +34,13 @@ import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.List;
 
-/**
- * MyBatisPlus配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+///
+/// MyBatisPlus配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
+///
 @Slf4j
 @Configuration
 @MapperScan("io.github.yangxj96.spectra.*.mapper")
@@ -49,9 +49,7 @@ public class MyBatisPlusConfiguration {
 
     private static final String PREFIX = "[MyBatisPlus]:";
 
-    /**
-     * 使用 ObjectProvider 自动收集所有 InnerInterceptor 类型的 Bean
-     */
+    /// 使用ObjectProvider自动收集所有InnerInterceptor类型的Bean
     @Resource
     private ObjectProvider<InnerInterceptor> innerInterceptors;
 

@@ -18,18 +18,17 @@ package io.github.yangxj96.spectra.core.service.common;
 
 import java.io.IOException;
 
-/**
- * 验证码服务
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/28
- */
+/// 验证码服务
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/28
 public interface KaptchaService {
 
     /**
      * 生成一个验证码
      */
+    /// 生成验证码
     void generate() throws IOException;
 
     /**
@@ -37,6 +36,7 @@ public interface KaptchaService {
      *
      * @return 是否需要进行验证
      */
+    /// 是否检查
     Boolean isCheck();
 
     /**
@@ -44,11 +44,13 @@ public interface KaptchaService {
      *
      * @return 验证码
      */
+    /// 获取验证码
     String getKaptchaCode();
 
     /**
      * 根据SessionID删除验证码
      */
+    /// 根据session id删除验证码
     void deleteBySessionId();
 
 }

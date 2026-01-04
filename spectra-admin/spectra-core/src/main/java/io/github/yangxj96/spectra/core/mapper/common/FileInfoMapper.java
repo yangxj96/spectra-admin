@@ -6,13 +6,11 @@ import io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo;
 import org.apache.ibatis.annotations.Param;
 import org.jspecify.annotations.Nullable;
 
-/**
- * 文件信息Mapper
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/8 00:06
- */
+/// 文件信息Mapper
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/8 00:06
 public interface FileInfoMapper extends BaseMapper<FileInfo> {
 
     /**

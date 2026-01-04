@@ -25,13 +25,11 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
 
-/**
- * 切面中存储的数据的实体
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/27
- */
+/// 切面中存储的数据的实体
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/27
 @Data
 @Builder
 @NoArgsConstructor

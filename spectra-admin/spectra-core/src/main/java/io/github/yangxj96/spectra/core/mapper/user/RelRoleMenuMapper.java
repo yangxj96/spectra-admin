@@ -22,13 +22,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-/**
- * 角色关联菜单中间表mapper
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 角色关联菜单中间表mapper
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public interface RelRoleMenuMapper extends BaseMapper<RelRoleMenu> {
 
     /**

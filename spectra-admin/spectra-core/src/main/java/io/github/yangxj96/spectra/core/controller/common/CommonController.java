@@ -24,13 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-/**
- * 通用的一些接口
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/25
- */
+/// 通用的一些接口
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/25
 @RestController
 @RequestMapping("/common")
 public class CommonController {

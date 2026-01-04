@@ -25,72 +25,52 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * <p>
- * 字典操作业务层
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典操作业务层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 public interface DictService {
 
-    /**
-     * 创建字典组
-     *
-     * @param params 入参from
-     */
+    /// 创建字典组
+    ///
+    /// @param params 入参from
     void createGroup(DictGroupFrom params);
 
-    /**
-     * 根据ID删除字典组
-     *
-     * @param id 字典组主键ID
-     */
+    /// 根据ID删除字典组
+    ///
+    /// @param id 字典组主键ID
     void deleteGroup(Long id);
 
-    /**
-     * 修改字典组
-     *
-     * @param params 入参from
-     */
+    /// 修改字典组
+    ///
+    /// @param params 入参from
     void modifyGroup(DictGroupFrom params);
 
-    /**
-     * 创建字典数据
-     *
-     * @param params 入参from
-     */
+    /// 创建字典数据
+    ///
+    /// @param params 入参from
     void createData(DictDataFrom params);
 
-    /**
-     * 根据ID删除字典数据
-     *
-     * @param id 字典数据ID
-     */
+    /// 根据ID删除字典数据
+    ///
+    /// @param id 字典数据ID
     void deleteData(Long id);
 
-    /**
-     * 修改字典数据
-     *
-     * @param params 入参from
-     */
+    /// 修改字典数据
+    ///
+    /// @param params 入参from
     void modifyData(DictDataFrom params);
 
-    /**
-     * 获取字典类型列表且转换为树
-     *
-     * @return 字典类型树
-     */
+    /// 获取字典类型列表且转换为树
+    ///
+    /// @return 字典类型树
     @Nullable List<DictTypeTreeVO> listDictGroupWrapTree();
 
-    /**
-     * 根据字典类型编码获取字典数据列表
-     *
-     * @param code 字典类型编码
-     * @return 字典数据列表
-     */
+    /// 根据字典类型编码获取字典数据列表
+    ///
+    /// @param code 字典类型编码
+    /// @return 字典数据列表
     List<DictDataVo> listDictDataByGroupCode(String code);
 
 }

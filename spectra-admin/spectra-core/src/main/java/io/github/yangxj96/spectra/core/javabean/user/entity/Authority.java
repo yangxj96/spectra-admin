@@ -28,13 +28,11 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 权限表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 权限表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -46,21 +44,15 @@ public class Authority extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 父级ID,用于构建树形结构
-     */
+    /// 父级ID,用于构建树形结构
     @TableField(value = "pid")
     private Long pid;
 
-    /**
-     * 权限名称
-     */
+    /// 权限名称
     @TableField(value = "name")
     private String name;
 
-    /**
-     * 编码
-     */
+    /// 编码
     @TableField(value = "code")
     private String code;
 }

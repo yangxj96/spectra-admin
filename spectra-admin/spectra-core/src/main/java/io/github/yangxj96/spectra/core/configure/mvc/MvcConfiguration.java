@@ -25,13 +25,11 @@ import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/**
- * mvc配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// mvc配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @Configuration
 @EnableConfigurationProperties({SpectraSystemProperties.class})
@@ -62,11 +60,9 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .maxAge(spectraProperties.getCors().getMaxAge());
     }
 
-    /**
-     * api版本策略配置
-     *
-     * @param configurer {@link ApiVersionConfigurer}
-     */
+    /// api版本策略配置
+    ///
+    /// @param configurer 配置
     @Override
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         log.debug(

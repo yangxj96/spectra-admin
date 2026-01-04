@@ -31,13 +31,11 @@ import java.util.Properties;
 
 import static com.google.code.kaptcha.Constants.*;
 
-/**
- * 验证码配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/25
- */
+/// 验证码配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/25
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(KaptchaProperties.class)
@@ -45,11 +43,11 @@ public class KaptchaConfiguration {
 
     private static final String PREFIX = "[kaptcha]:";
 
-    /**
-     * 图片验证码
-     *
-     * @return {@link Producer}
-     */
+    ///
+    /// 图片验证码
+    ///
+    /// @return `Producer`对象
+    ///
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() {
@@ -82,11 +80,11 @@ public class KaptchaConfiguration {
         return defaultKaptcha;
     }
 
-    /**
-     * 算术验证码
-     *
-     * @return {@link Producer}
-     */
+    ///
+    /// 算术验证码
+    ///
+    /// @return `Producer`对象
+    ///
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() {

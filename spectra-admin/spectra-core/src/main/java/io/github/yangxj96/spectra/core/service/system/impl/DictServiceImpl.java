@@ -40,15 +40,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 
-/**
- * <p>
- * 字典操作业务层实现
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典操作业务层实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @Slf4j
 @Service
 public class DictServiceImpl implements DictService {

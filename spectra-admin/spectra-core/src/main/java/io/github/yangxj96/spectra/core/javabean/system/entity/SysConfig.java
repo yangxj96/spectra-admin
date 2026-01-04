@@ -29,13 +29,11 @@ import java.io.Serial;
 import java.io.Serializable;
 
 
-/**
- * 系统配置表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/9/18
- */
+/// 系统配置表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/9/18
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
@@ -47,21 +45,15 @@ public class SysConfig extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 配置key
-     */
+    /// 配置key
     @TableField(value = "key")
     private String key;
 
-    /**
-     * 配置VALUE
-     */
+    /// 配置VALUE
     @TableField(value = "value")
     private String value;
 
-    /**
-     * 备注说明
-     */
+    /// 备注说明
     @TableField(value = "remarks")
     private String remarks;
 

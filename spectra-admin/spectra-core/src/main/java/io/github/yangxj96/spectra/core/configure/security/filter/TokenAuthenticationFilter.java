@@ -17,13 +17,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * token鉴权
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/2 23:45
- */
+/// token鉴权过滤器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/2 23:45
 @Component
 @NullMarked
 public class TokenAuthenticationFilter extends OncePerRequestFilter {

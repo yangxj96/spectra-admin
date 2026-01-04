@@ -33,13 +33,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 认证控制器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 认证控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @RestController
 @RequestMapping("/auth")

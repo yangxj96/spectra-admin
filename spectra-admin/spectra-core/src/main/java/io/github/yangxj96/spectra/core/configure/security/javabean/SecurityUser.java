@@ -18,52 +18,36 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 用DTO传输类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/2 17:55
- */
+/// 用DTO传输类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/2 17:55
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
 
-    /**
-     * 用户ID
-     */
+    ///  用户ID
     private Long id;
 
-    /**
-     * 姓名
-     */
+    /// 姓名
     private String name;
 
-    /**
-     * 邮箱
-     */
+    /// 邮箱
     private String email;
 
-    /**
-     * 头像
-     */
+    /// 头像
     private String avatar;
 
-    /**
-     * 所属组织机构ID
-     */
+    /// 所属组织机构ID
     private Long organizationId;
 
-    /**
-     * 用户密码
-     */
+    /// 用户密码
     private String password;
 
-    /**
-     * 用户状态
-     */
+    /// 用户状态
     private Short state;
 
     @Builder.Default
@@ -81,9 +65,7 @@ public class SecurityUser implements UserDetails {
     @Nullable
     private transient Map<String, Object> extraData;
 
-    /**
-     * 简易权限处理,主要是为了序列化的问题
-     */
+    /// 简易权限处理,主要是为了序列化的问题
     private List<SimpleGrantedAuthority> authorities;
 
     @Override

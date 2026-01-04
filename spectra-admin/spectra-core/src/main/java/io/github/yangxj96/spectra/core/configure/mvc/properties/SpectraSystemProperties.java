@@ -22,15 +22,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * <p>
- * 文件相关配置
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 光谱平台相关配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/19
 @Data
 @ConfigurationProperties(prefix = "spectra.system")
 public class SpectraSystemProperties {
@@ -38,7 +34,6 @@ public class SpectraSystemProperties {
     /// 基础文件位置,所有文件都会在这个目录下面进行存放
     private String baseDir = "files";
 
-    ///
     /// 指定包前缀,一部分地方在使用的时候**不得不固定写死代码**,
     /// 导致如果克隆代码后需要修改包名为自己公司或者自己使用的时候,
     /// 可以直接修改这个配置,在需要写死的地方会直接使用这里,
@@ -47,7 +42,6 @@ public class SpectraSystemProperties {
     /// 1. io.github.yangxj96.spectra.framework.configure.MyBatisPlusConfiguration
     /// 2. io.github.yangxj96.spectra.framework.advice.ResponseBodyModifyAdvice
     /// 3. io.github.yangxj96.spectra.launch.LaunchApplication
-    ///
     private String packagePrefix = "io.github.yangxj96.spectra";
 
     /// mvc配置
@@ -56,6 +50,7 @@ public class SpectraSystemProperties {
     /// cors配置
     private SpectraCors cors = new SpectraCors();
 
+    /// MVC相关配置
     @Data
     public static class SpectraMvc {
 
@@ -67,38 +62,28 @@ public class SpectraSystemProperties {
 
     }
 
+    /// CORS相关配置
     @Data
     public static class SpectraCors {
 
-        /**
-         * 指定的路径
-         */
+        /// 指定的路径
         private String mapping = "/**";
 
-        /**
-         * 指定允许的源
-         */
+        /// 指定允许的源
         private List<String> originPatterns = Collections.singletonList("*");
 
-        /**
-         * 指定允许的方法
-         */
+        /// 指定允许的方法
         private List<String> methods = Collections.singletonList("*");
 
-        /**
-         * 指定运行的头信息
-         */
+        /// 指定运行的头信息
         private List<String> headers = Collections.singletonList("*");
 
-        /**
-         * 是否支持凭证
-         */
+        /// 是否支持凭证
         private Boolean credentials = Boolean.TRUE;
 
-        /**
-         * 预检后缓存策略时长,单位为妙<br/>
-         * 默认一小时
-         */
+        /// 预检后缓存策略时长,单位为妙
+        ///
+        /// 默认一小时
         private Long maxAge = 3600L;
     }
 

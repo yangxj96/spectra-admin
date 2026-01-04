@@ -22,15 +22,11 @@ import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * <p>
- * 文件业务层
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 文件业务层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/19
 public interface FileService {
 
     /**

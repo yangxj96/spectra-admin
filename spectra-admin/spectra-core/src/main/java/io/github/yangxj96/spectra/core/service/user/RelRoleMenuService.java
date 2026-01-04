@@ -21,31 +21,28 @@ import io.github.yangxj96.spectra.core.javabean.user.from.RoleMenuFrom;
 
 import java.util.List;
 
-/**
- * 关联服务-角色和菜单
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 关联服务-角色和菜单
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public interface RelRoleMenuService {
 
-    /**
-     * 授予角色菜单
-     */
+    /// 授予角色菜单
+    ///
+    /// @param roleId 角色ID
+    /// @param from   角色关联菜单信息
     void grant(Long roleId, RoleMenuFrom from);
 
-    /**
-     * 撤销角色菜单
-     */
+    /// 撤销角色菜单
+    ///
+    /// @param roleId 角色ID
     void revoke(Long roleId);
 
-    /**
-     * 获取角色菜单
-     *
-     * @param roleId 角色ID
-     * @return 菜单列表
-     */
+    /// 获取角色菜单
+    ///
+    /// @param roleId 角色ID
+    /// @return 菜单列表
     List<MenuVO> get(Long roleId);
 
 }

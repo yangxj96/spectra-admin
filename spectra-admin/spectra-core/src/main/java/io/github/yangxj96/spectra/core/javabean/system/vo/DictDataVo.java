@@ -25,15 +25,11 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * <p>
- * 字典数据VO
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典数据VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,41 +38,27 @@ public class DictDataVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 数据id.
-     */
+    /// 数据id.
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 字典类型ID
-     */
+    /// 字典类型ID
     @JsonSerialize(using = ToStringSerializer.class)
     private Long gid;
 
-    /**
-     * 标签
-     */
+    /// 标签
     private String label;
 
-    /**
-     * 值
-     */
+    /// 值
     private String value;
 
-    /**
-     * 排序
-     */
+    /// 排序
     private Short sort;
 
-    /**
-     * 状态
-     */
+    /// 状态
     private Short state;
 
-    /**
-     * 备注
-     */
+    /// 备注
     private String remark;
 
 }

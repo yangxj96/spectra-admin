@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.core.mapper.user;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
 
-/**
- * 权限mapper层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 权限mapper层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface AuthorityMapper extends BaseMapper<Authority> {
 
 }

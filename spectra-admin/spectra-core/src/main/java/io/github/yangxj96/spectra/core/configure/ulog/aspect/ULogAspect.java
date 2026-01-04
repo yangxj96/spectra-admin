@@ -36,13 +36,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * ULog注解AOP切面
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// ULog注解AOP切面
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @Aspect
 public class ULogAspect {
@@ -55,38 +53,34 @@ public class ULogAspect {
     @Resource
     private ObjectMapper om;
 
-    /**
-     * 计算操作消耗时间
-     */
+    /// 计算操作消耗时间
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
 
-    // 请求前
+    /// 请求前
     @Before("@annotation(annotation)")
     @SuppressWarnings("unused")
     public void handleBefore(JoinPoint point, ULog annotation) {
         TIME_THREADLOCAL.set(System.currentTimeMillis());
     }
 
-    // 请求后
+    /// 请求后
     @AfterReturning(value = "@annotation(annotation)", returning = "result")
     public void handleAfter(JoinPoint point, ULog annotation, Object result) {
         handleLog(point, annotation, null, result);
     }
 
-    // 请求发生错误
+    /// 请求发生错误
     @AfterThrowing(value = "@annotation(annotation)", throwing = "e")
     public void handleThrowing(JoinPoint point, ULog annotation, Exception e) {
         handleLog(point, annotation, e, null);
     }
 
-    /**
-     * 处理日志记录
-     *
-     * @param point      切入点
-     * @param annotation 注解
-     * @param e          错误信息
-     * @param jsonResult 响应信息
-     */
+    /// 处理日志记录
+    ///
+    /// @param point      切入点
+    /// @param annotation 注解
+    /// @param e          错误信息
+    /// @param jsonResult 响应信息
     @SuppressWarnings("unused")
     protected void handleLog(final JoinPoint point, ULog annotation, @Nullable final Exception e, @Nullable Object jsonResult) {
         try {
@@ -127,12 +121,10 @@ public class ULogAspect {
     }
 
 
-    /**
-     * 安全序列化
-     *
-     * @param obj 对象
-     * @return null或者字符串
-     */
+    /// 安全序列化
+    ///
+    /// @param obj 对象
+    /// @return null或者字符串
     private @Nullable String safeWriteValueAsString(@Nullable Object obj) {
         if (obj == null) {
             return null;
@@ -145,12 +137,10 @@ public class ULogAspect {
         }
     }
 
-    /**
-     * 获取状态码,如果失败则返回未知
-     *
-     * @param response Http响应
-     * @return 状态码
-     */
+    /// 获取状态码,如果失败则返回未知
+    ///
+    /// @param response Http响应
+    /// @return 状态码
     private short getHttpResponseStatus(@Nullable HttpServletResponse response) {
         short status = 500;
         if (response == null) {

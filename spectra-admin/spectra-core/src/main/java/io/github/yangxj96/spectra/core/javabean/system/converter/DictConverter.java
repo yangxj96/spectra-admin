@@ -27,63 +27,49 @@ import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
-/**
- * <p>
- * 字典Mapstruct
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典Mapstruct
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DictConverter {
 
-    /**
-     * 字典类型入参转实体
-     *
-     * @param from 字典类型入参
-     * @return 转换后的实体
-     */
+    /// 字典类型入参转实体
+    ///
+    /// @param from 字典类型入参
+    /// @return 转换后的实体
     DictGroup groupFromToEntity(DictGroupFrom from);
 
-    /**
-     * 字典数据入参转实体
-     *
-     * @param from 字典数据入参
-     * @return 转换后的实体
-     */
+    ///
+    /// 字典数据入参转实体
+    ///
+    /// @param from 字典数据入参
+    /// @return 转换后的实体
+    ///
     DictItem dataFromToEntity(DictDataFrom from);
 
-    /**
-     * 字典类型转字典树类型
-     *
-     * @param datum 字典类型
-     * @return 字典类型
-     */
+    /// 字典类型转字典树类型
+    ///
+    /// @param datum 字典类型
+    /// @return 字典类型
     DictTypeTreeVO typeToTreeVO(DictGroup datum);
 
-    /**
-     * 字典类型列表转字典类型树列表
-     *
-     * @param datum 字典类型列表
-     * @return 字典类型树列表
-     */
+    /// 字典类型列表转字典类型树列表
+    ///
+    /// @param datum 字典类型列表
+    /// @return 字典类型树列表
     List<DictTypeTreeVO> typeToTreeVOS(List<DictGroup> datum);
 
-    /**
-     * 字典数据转字典数据VO
-     *
-     * @param list 字典数据
-     * @return 字典数据VO
-     */
+    /// 字典数据转字典数据VO
+    ///
+    /// @param list 字典数据
+    /// @return 字典数据VO
     DictDataVo dataToVos(DictItem list);
 
-    /**
-     * 字典数据列表转字典数据VO列表
-     *
-     * @param list 字典数据列表
-     * @return 字典数据VO列表
-     */
+    /// 字典数据列表转字典数据VO列表
+    ///
+    /// @param list 字典数据列表
+    /// @return 字典数据VO列表
     List<DictDataVo> dataToVos(List<DictItem> list);
 }

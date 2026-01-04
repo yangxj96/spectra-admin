@@ -3,13 +3,11 @@ package io.github.yangxj96.spectra.core.javabean.auth.from;
 
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 
-/**
- * 登录入参
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/2 23:15
- */
+/// 登录入参
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/2 23:15
 public record LoginFrom(
         // 登录方式
         LoginType type,

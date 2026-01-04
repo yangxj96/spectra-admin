@@ -19,15 +19,11 @@ package io.github.yangxj96.spectra.core.configure.mvc.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * <p>
- * 用户配置相关
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/16
- */
+/// 用户配置相关
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/16
 @Data
 @ConfigurationProperties(prefix = "spectra.user")
 public class UserProperties {

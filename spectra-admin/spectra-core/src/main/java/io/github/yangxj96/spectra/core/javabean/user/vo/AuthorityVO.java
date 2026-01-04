@@ -22,37 +22,27 @@ import lombok.NoArgsConstructor;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 
-/**
- * 权限VO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 权限VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorityVO {
 
-    /**
-     * 数据id.
-     */
+    /// 数据id.
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 父级ID,用于构建树形结构
-     */
+    /// 父级ID,用于构建树形结构
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
-    /**
-     * 权限名称
-     */
+    /// 权限名称
     private String name;
 
-    /**
-     * 编码
-     */
+    /// 编码
     private String code;
 }

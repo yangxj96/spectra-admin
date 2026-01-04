@@ -24,41 +24,31 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * 菜单service层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 菜单service层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface MenuService extends IService<Menu> {
 
-    /**
-     * 创建菜单
-     *
-     * @param params 菜单信息
-     */
+    /// 创建菜单
+    ///
+    /// @param params 菜单信息
     void created(MenuSaveFrom params);
 
-    /**
-     * 修改菜单信息
-     *
-     * @param params 修改参数
-     */
+    /// 修改菜单信息
+    ///
+    /// @param params 修改参数
     void modify(MenuSaveFrom params);
 
-    /**
-     * 生成树形菜单
-     *
-     * @return 生成的树形菜单
-     */
+    /// 生成树形菜单
+    ///
+    /// @return 生成的树形菜单
     @Nullable List<MenuTreeVO> tree();
 
-    /**
-     * 根据角色ID获取角色关联的菜单
-     *
-     * @param id 角色ID
-     * @return 关联的菜单
-     */
+    /// 根据角色ID获取角色关联的菜单
+    ///
+    /// @param id 角色ID
+    /// @return 关联的菜单
     List<Menu> getByRelRoleId(long id);
 }

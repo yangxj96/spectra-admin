@@ -31,13 +31,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 权限相关操作
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 权限相关操作
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Slf4j
 @RestController
 @RequestMapping("/authority")

@@ -19,14 +19,12 @@ package io.github.yangxj96.spectra.core.javabean.user.vo;
 import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 在线用户VO
- *
- * @param account      登录账号
- * @param username     用户名
- * @param organization 组织机构
- * @param loginRecord  登录记录
- */
+/// 在线用户VO
+///
+/// @param account      登录账号
+/// @param username     用户名
+/// @param organization 组织机构
+/// @param loginRecord  登录记录
 public record UserOnlineVO(
         String account,
         String username,
@@ -34,15 +32,13 @@ public record UserOnlineVO(
         List<LoginRecordVo> loginRecord
 ) {
 
-    /**
-     * 登录记录
-     *
-     * @param token      令牌
-     * @param deviceType 设备类型
-     * @param ip         登录IP
-     * @param address    登录地址
-     * @param createTime 创建时间
-     */
+    /// 登录记录
+    ///
+    /// @param token      令牌
+    /// @param deviceType 设备类型
+    /// @param ip         登录IP
+    /// @param address    登录地址
+    /// @param createTime 创建时间
     public record LoginRecordVo(
             String token,
             String deviceType,

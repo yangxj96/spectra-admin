@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.core.service.user.impl;
 import io.github.yangxj96.spectra.core.service.user.PermissionService;
 import org.springframework.stereotype.Service;
 
-/**
- * 权限service层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 权限service层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Service
 public class PermissionServiceImpl implements PermissionService {
 

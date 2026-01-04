@@ -19,12 +19,10 @@ package io.github.yangxj96.spectra.core.mapper.system;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 
-/**
- * 字典(字典数据)mapper层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-18
- */
+/// 字典(字典数据)mapper层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-18
 public interface DictItemMapper extends BaseMapper<DictItem> {
 }

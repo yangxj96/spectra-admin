@@ -26,56 +26,42 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
 
 import java.util.List;
 
-/**
- * 角色service层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 角色service层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface RoleService extends BaseService<Role> {
 
-    /**
-     * 创建角色
-     *
-     * @param params 实体入参
-     */
+    /// 创建角色
+    ///
+    /// @param params 实体入参
     void created(RoleFrom params);
 
-    /**
-     * 删除角色
-     *
-     * @param id 角色ID
-     */
+    /// 删除角色
+    ///
+    /// @param id 角色ID
     void delete(Long id);
 
-    /**
-     * 修改角色
-     *
-     * @param params 实体入参
-     */
+    /// 修改角色
+    ///
+    /// @param params 实体入参
     void modify(RoleFrom params);
 
-    /**
-     * 分页查询角色信息
-     *
-     * @param page   分页信息
-     * @param params 查询参数
-     */
+    /// 分页查询角色信息
+    ///
+    /// @param page   分页信息
+    /// @param params 查询参数
     IPage<RoleVO> page(PageFrom page, RolePageFrom params);
 
-    /**
-     * 查询所有角色列表
-     *
-     * @return 角色列表
-     */
+    /// 查询所有角色列表
+    ///
+    /// @return 角色列表
     List<RoleVO> all();
 
-    /**
-     * 获取系统默认角色.
-     *
-     * @return 角色信息
-     */
+    /// 获取系统默认角色.
+    ///
+    /// @return 角色信息
     Role getSystemDefaultUserRole();
 
 }

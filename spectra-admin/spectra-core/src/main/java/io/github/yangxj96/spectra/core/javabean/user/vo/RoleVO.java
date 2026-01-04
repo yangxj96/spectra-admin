@@ -27,13 +27,11 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 角色响应VO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 角色响应VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
 @Builder
 @AllArgsConstructor
@@ -46,34 +44,22 @@ public class RoleVO implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 名称
-     */
+    /// 名称
     private String name;
 
-    /**
-     * 状态
-     */
+    /// 状态
     private Boolean state;
 
-    /**
-     * 编码
-     */
+    /// 编码
     private String code;
 
-    /**
-     * 范围
-     */
+    /// 范围
     private DataScopeType scope;
 
-    /**
-     * 是否内置
-     */
+    /// 是否内置
     private Boolean builtin;
 
-    /**
-     * 备注
-     */
+    /// 备注
     private String remark;
 
 }

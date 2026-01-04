@@ -33,13 +33,11 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.util.regex.Pattern;
 
-/**
- * 响应结果统一修改
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 响应结果统一修改
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-06-14
 @Slf4j
 @NullMarked
 @ControllerAdvice

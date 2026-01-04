@@ -29,104 +29,68 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * <p>
- * 用户新增/编辑操作入参
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/16
- */
+/// 用户新增/编辑操作入参
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/16
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserSaveFrom {
 
-    /**
-     * 姓名
-     */
+    /// 姓名
     @Null(message = "新增用户时不能存在 ID", groups = Verify.Insert.class)
     @NotNull(message = "用户 ID 不能为空", groups = Verify.Update.class)
     private Long id;
 
-    /**
-     * 姓名
-     */
+    /// 姓名
     private String username;
 
-    /**
-     * 真实姓名
-     */
+    /// 真实姓名
     private String realName;
 
-    /**
-     * 用户状态
-     */
+    /// 用户状态
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Short status;
 
-    /**
-     * 性别
-     */
+    /// 性别
     private Integer gender;
 
-    /**
-     * 生日
-     */
+    /// 生日
     private LocalDate birthday;
 
-    /**
-     * 手机号码
-     */
+    /// 手机号码
     private String phone;
 
-    /**
-     * 邮箱
-     */
+    /// 邮箱
     @Email(message = "邮箱格式不正确", groups = {Verify.Insert.class, Verify.Update.class})
     @NotNull(message = "邮箱默认为登录账户,不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String email;
 
-    /**
-     * 国家
-     */
+    /// 国家
     private String country;
 
-    /**
-     * 城市
-     */
+    /// 城市
     private String city;
 
-    /**
-     * 语言
-     */
+    /// 语言
     private String language;
 
-    /**
-     * 时区
-     */
+    /// 时区
     private String timezone;
 
-    /**
-     * 所属组织机构ID
-     */
+    /// 所属组织机构ID
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Long organizationId;
 
-    /**
-     * 角色ID列表
-     */
+    /// 角色ID列表
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
     private List<Long> roleIds;
 
-    /**
-     * 数据范围
-     */
+    /// 数据范围
     private DataScopeType dataScope;
 
-    /**
-     * 当数据范围是 {@link DataScopeType#CUSTOM} 的时候这个不能为空
-     */
+    /// 当数据范围是 `DataScopeType#CUSTOM` 的时候这个不能为空
     private List<Long> targetIds;
 }

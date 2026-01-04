@@ -28,13 +28,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 
-/**
- * SpringSecurity配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/2 17:31
- */
+/// SpringSecurity配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/2 17:31
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -77,12 +75,10 @@ public class SecurityConfiguration {
         return handler;
     }
 
-    /**
-     * Spring Security核心过滤器
-     *
-     * @param http {@link HttpSecurity}
-     * @return {@link SecurityFilterChain}
-     */
+    /// Spring Security核心过滤器
+    ///
+    /// @param http `HttpSecurity`
+    /// @return Security过滤器链
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         log.debug("{}配置核心过滤器", PREFIX);

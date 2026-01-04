@@ -8,13 +8,11 @@ import io.github.yangxj96.spectra.core.service.common.FileService;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-/**
- * 抽象文件类,主要是为了一些统一的处理
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/7 22:44
- */
+/// 抽象文件类,主要是为了一些统一的处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/7 22:44
 public abstract class AbstractFileService implements FileService {
 
     @Nullable

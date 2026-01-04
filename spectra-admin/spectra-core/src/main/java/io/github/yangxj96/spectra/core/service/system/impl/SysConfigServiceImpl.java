@@ -22,13 +22,11 @@ import io.github.yangxj96.spectra.core.mapper.system.SysConfigMapper;
 import io.github.yangxj96.spectra.core.service.system.SysConfigService;
 import org.springframework.stereotype.Service;
 
-/**
- * 系统配置表-业务实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/9/18
- */
+/// 系统配置表-业务实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/9/18
 @Service
 public class SysConfigServiceImpl extends BaseServiceImpl<SysConfigMapper, SysConfig> implements SysConfigService {
 

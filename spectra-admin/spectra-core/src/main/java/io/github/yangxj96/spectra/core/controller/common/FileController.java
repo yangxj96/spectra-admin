@@ -28,15 +28,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * <p>
- * 文件操作相关控制器
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 文件操作相关控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/19
 @Slf4j
 @RestController
 @RequestMapping("/file")

@@ -63,13 +63,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * 用户service层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 用户service层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @Service
 @EnableConfigurationProperties({UserProperties.class})

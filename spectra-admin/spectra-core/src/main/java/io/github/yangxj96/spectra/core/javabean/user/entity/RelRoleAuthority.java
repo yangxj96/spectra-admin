@@ -28,13 +28,11 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 角色关联权限中间表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 角色关联权限中间表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -46,9 +44,11 @@ public class RelRoleAuthority extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /// 角色ID
     @TableField("role_id")
     private Long roleId;
 
+    /// 权限ID
     @TableField("authority_id")
     private Long authorityId;
 

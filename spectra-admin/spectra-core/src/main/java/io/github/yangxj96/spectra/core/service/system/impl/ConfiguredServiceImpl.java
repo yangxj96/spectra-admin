@@ -23,13 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-/**
- * 系统配置Service层默认实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-06
- */
+/// 系统配置Service层默认实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-06
 @Service
 public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Configured> implements ConfiguredService {
 

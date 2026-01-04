@@ -21,14 +21,12 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 数据范围 <br/>
- * 用户直授数据范围 > 角色数据范围 > 默认 SELF
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 数据范围 <br/>
+/// 用户直授数据范围 > 角色数据范围 > 默认 SELF
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Getter
 @AllArgsConstructor
 public enum DataScopeType implements IEnum<Integer> {
@@ -39,8 +37,10 @@ public enum DataScopeType implements IEnum<Integer> {
     DEPT_AND_CHILD(3, "部门及子部门"),
     CUSTOM(4, "自定义");
 
+    /// 存取值
     private final Integer value;
 
+    /// 展示值
     @JsonValue
     private final String desc;
 

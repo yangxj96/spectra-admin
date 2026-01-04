@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.core.service.user;
 
-/**
- * 权限service层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 权限service层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface PermissionService {
 
 

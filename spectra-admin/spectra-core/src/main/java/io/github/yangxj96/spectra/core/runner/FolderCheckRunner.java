@@ -26,13 +26,11 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 
-/**
- * 文件夹检查
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/28
- */
+/// 文件夹检查
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/28
 @Slf4j
 @Component
 public class FolderCheckRunner implements ApplicationRunner {

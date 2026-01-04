@@ -24,51 +24,40 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * 组织机构业务层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-15
- */
+/// 组织机构业务层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-15
 public interface OrganizationService extends IService<Organization> {
 
-    /**
-     * 新增组织机构
-     *
-     * @param from 请求入参
-     */
+    /// 新增组织机构
+    ///
+    /// @param from 请求入参
     void created(OrganizationFrom from);
 
-    /**
-     * 根据ID删除组织机构
-     *
-     * @param id ID
-     */
+    /// 根据ID删除组织机构
+    ///
+    /// @param id ID
     void deleteById(String id);
 
-    /**
-     * 编辑组织机构
-     *
-     * @param from 请求入参
-     */
+    /// 编辑组织机构
+    ///
+    /// @param from 请求入参
     void modify(OrganizationFrom from);
 
-    /**
-     * 计算组织机构路径
-     *
-     * @param id 组织机构ID
-     * @return 组织机构路径
-     */
+    /// 计算组织机构路径
+    ///
+    /// @param id 组织机构ID
+    /// @return 组织机构路径
     String generatePath(Long id);
 
-    /**
-     * 根据ID获取他的所有子级,包含孙级..曾孙级...等 <br/>
-     * 使用递归实现主要是为了后期如果适配其他数据库少点修改
-     *
-     * @param organizationId 组织机构ID
-     * @return 所有子级列表
-     */
+    /// 根据ID获取他的所有子级,包含孙级..曾孙级...等
+    ///
+    /// 使用递归实现主要是为了后期如果适配其他数据库少点修改
+    ///
+    /// @param organizationId 组织机构ID
+    /// @return 所有子级列表
     List<Organization> getAllChildrenById(Long organizationId);
 
     /**

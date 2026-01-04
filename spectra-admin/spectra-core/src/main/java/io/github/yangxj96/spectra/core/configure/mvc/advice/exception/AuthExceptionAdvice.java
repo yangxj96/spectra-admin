@@ -27,13 +27,11 @@ import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/**
- * 权限错误相关处理
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/28
- */
+/// 权限错误相关处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/28
 @Slf4j
 @NullMarked
 @Order(Integer.MIN_VALUE)
@@ -42,13 +40,11 @@ public class AuthExceptionAdvice {
 
     private static final String PREFIX = "[权限错误相关处理]:";
 
-    /**
-     * 无权限异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 无权限异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(AuthorizationDeniedException.class)
     public R<Object> notPermissionException(AuthorizationDeniedException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -56,13 +52,11 @@ public class AuthExceptionAdvice {
         return R.failure(HttpStatus.UNAUTHORIZED, "无权操作");
     }
 
-    /**
-     * 登录异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 登录异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(BadCredentialsException.class)
     public R<Object> loginException(BadCredentialsException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

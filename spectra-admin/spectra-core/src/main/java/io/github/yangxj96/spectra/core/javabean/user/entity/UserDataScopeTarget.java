@@ -12,13 +12,11 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-/**
- * 用户数据范围(自定义数据范围的时候使用)
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/23 11:24
- */
+/// 用户数据范围(自定义数据范围的时候使用)
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/23 11:24
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -27,21 +25,15 @@ import java.io.Serializable;
 @TableName(value = "sys_user_data_scope_target", schema = "domain_core")
 public class UserDataScopeTarget extends BaseEntity implements Serializable {
 
-    /**
-     * 用户ID
-     */
+    /// 用户ID
     @TableField(value = "user_id")
     private Long userId;
 
-    /**
-     * 目标ID
-     */
+    /// 目标ID
     @TableField(value = "target_id")
     private Long targetId;
 
-    /**
-     * 目标类型
-     */
+    /// 目标类型
     @TableField(value = "target_type")
     private Integer targetType;
 
