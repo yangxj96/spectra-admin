@@ -35,13 +35,11 @@ import java.security.PublicKey;
 import java.time.Duration;
 import java.time.Instant;
 
-/**
- * 许可服务实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 许可服务实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Slf4j
 @Service
 public class LicenseServiceImpl implements LicenseService {
