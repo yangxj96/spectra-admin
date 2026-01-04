@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 实体更新异常
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 实体更新异常
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class EntityUpdateException extends DataException {
 
     public EntityUpdateException() {

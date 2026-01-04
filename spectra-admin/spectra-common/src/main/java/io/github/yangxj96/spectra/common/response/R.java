@@ -22,17 +22,15 @@ import org.springframework.http.HttpStatus;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 响应
- *
- * @param <T> 具体类型
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 响应
+///
+/// @param <T> 具体类型
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
-@ToString
 @Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class R<T> implements Serializable {
@@ -46,16 +44,15 @@ public class R<T> implements Serializable {
 
     private transient T data;
 
-    /**
-     * 自定义的构建方式
-     *
-     * @param status http状态码
-     */
+    /// 自定义的构建方式
+    ///
+    /// @param status http状态码
     public R(HttpStatus status) {
         this.code = status.value();
         this.msg = status.getReasonPhrase();
     }
 
+    /// 默认成功
     public static R<Object> success() {
         return R.builder()
                 .code(HttpStatus.OK.value())
@@ -63,6 +60,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    /// 成功,有响应体
     public static <T> R<T> success(T data) {
         return R.<T>builder()
                 .code(HttpStatus.OK.value())
@@ -71,6 +69,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    /// 默认失败
     public static R<Object> failure() {
         return R.builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -78,10 +77,12 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    /// 失败,指定状态码
     public static R<Object> failure(HttpStatus status) {
         return R.builder().code(status.value()).msg(status.getReasonPhrase()).build();
     }
 
+    /// 失败,自定消息
     public static R<Object> failure(String msg) {
         return R.builder()
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -89,6 +90,7 @@ public class R<T> implements Serializable {
                 .build();
     }
 
+    /// 失败,指定状态码和消息
     public static R<Object> failure(HttpStatus status, String msg) {
         return R.builder().code(status.value()).msg(msg).build();
     }

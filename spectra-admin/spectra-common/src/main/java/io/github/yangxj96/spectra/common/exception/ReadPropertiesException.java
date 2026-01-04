@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 读取配置异常
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 读取配置异常
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class ReadPropertiesException extends SpectraException {
 
     public ReadPropertiesException(String message) {

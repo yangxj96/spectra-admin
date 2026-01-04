@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 系统默认数据
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 系统默认数据
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public class DefaultDataException extends DataException {
 
     public DefaultDataException() {

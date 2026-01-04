@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 系统内置数据
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 系统内置数据
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class BuiltinDataException extends DataException {
 
     public BuiltinDataException() {
