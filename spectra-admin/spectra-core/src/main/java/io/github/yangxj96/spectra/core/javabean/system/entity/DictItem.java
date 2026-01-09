@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -35,7 +34,6 @@ import java.io.Serializable;
 /// @since 2025-6-18
 @Data
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_dict_item", schema = "domain_core")

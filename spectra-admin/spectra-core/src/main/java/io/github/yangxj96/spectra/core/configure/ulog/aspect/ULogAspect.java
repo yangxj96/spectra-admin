@@ -97,19 +97,17 @@ public class ULogAspect {
             log.debug("{}操作日志-开始记录,请求方法:{}", PREFIX, request.getMethod());
 
             // 初始化记录实体
-            var datum = ULogEntity
-                    .builder()
-                    .type(annotation.type())
-                    .explain(annotation.value())
-                    .ip(IpUtils.getClientIP(request))
-                    .method(request.getMethod())
-                    .url(request.getRequestURI())
-                    .status(getHttpResponseStatus(response))
-                    .result(safeWriteValueAsString(jsonResult))
-                    .timeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get())
-                    // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
-                    .currentId(SecUtil.getCurrentUserId())
-                    .build();
+            var datum = new ULogEntity();
+            datum.setType(annotation.type());
+            datum.setExplain(annotation.value());
+            datum.setIp(IpUtils.getClientIP(request));
+            datum.setMethod(request.getMethod());
+            datum.setUrl(request.getRequestURI());
+            datum.setStatus(getHttpResponseStatus(response));
+            datum.setResult(safeWriteValueAsString(jsonResult));
+            datum.setTimeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get());
+            // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
+            datum.setCurrentId(SecUtil.getCurrentUserId());
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {

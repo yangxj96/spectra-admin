@@ -13,7 +13,6 @@ import io.github.yangxj96.spectra.core.service.auth.AuthService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
-import jakarta.annotation.Resource;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,23 +34,27 @@ import java.util.List;
 @NullMarked
 public class AuthServiceImpl implements AuthService {
 
-    @Resource
-    private AuthConverter authConverter;
+    private final AuthConverter authConverter;
 
-    @Resource
-    private RelRoleAuthorityService relRoleAuthorityService;
+    private final RelRoleAuthorityService relRoleAuthorityService;
 
-    @Resource
-    private RelUserRoleService relUserRoleService;
+    private final RelUserRoleService relUserRoleService;
 
-    @Resource
-    private UserService userService;
+    private final UserService userService;
 
-    @Resource
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    @Resource
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthServiceImpl(AuthConverter authConverter, RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, UserService userService, AccountService accountService, PasswordEncoder passwordEncoder) {
+        this.authConverter = authConverter;
+        this.relRoleAuthorityService = relRoleAuthorityService;
+        this.relUserRoleService = relUserRoleService;
+        this.userService = userService;
+        this.accountService = accountService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
 
     @Override
     public Authentication login(String username, String password) {
@@ -78,7 +81,7 @@ public class AuthServiceImpl implements AuthService {
     /// @return SpringSecuity的用户对象
     ///
     private SecurityUser toSecurityUser(User user) {
-        var securityUser = authConverter.toUserDTO(user);
+        var securityUser = authConverter.toSecurityUser(user);
 
         var authorities = new ArrayList<SimpleGrantedAuthority>();
 

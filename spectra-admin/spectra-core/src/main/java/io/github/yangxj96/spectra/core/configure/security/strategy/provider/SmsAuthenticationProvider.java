@@ -3,7 +3,6 @@ package io.github.yangxj96.spectra.core.configure.security.strategy.provider;
 
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.core.configure.security.strategy.tokens.SmsAuthenticationToken;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 /// @version 1.0
 /// @since 2025/12/29 10:44
 @Component
-@RequiredArgsConstructor
 public class SmsAuthenticationProvider implements AuthenticationProvider {
 
     @Override

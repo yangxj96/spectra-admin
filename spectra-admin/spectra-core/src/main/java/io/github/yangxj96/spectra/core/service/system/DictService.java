@@ -17,10 +17,10 @@
 package io.github.yangxj96.spectra.core.service.system;
 
 
-import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.from.DictItemFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictGroupTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictItemVO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public interface DictService {
     /// 创建字典数据
     ///
     /// @param params 入参from
-    void createData(DictDataFrom params);
+    void createData(DictItemFrom params);
 
     /// 根据ID删除字典数据
     ///
@@ -60,17 +60,17 @@ public interface DictService {
     /// 修改字典数据
     ///
     /// @param params 入参from
-    void modifyData(DictDataFrom params);
+    void modifyData(DictItemFrom params);
 
     /// 获取字典类型列表且转换为树
     ///
     /// @return 字典类型树
-    @Nullable List<DictTypeTreeVO> listDictGroupWrapTree();
+    @Nullable List<DictGroupTreeVO> listDictGroupWrapTree();
 
     /// 根据字典类型编码获取字典数据列表
     ///
     /// @param code 字典类型编码
     /// @return 字典数据列表
-    List<DictDataVo> listDictDataByGroupCode(String code);
+    List<DictItemVO> listDictDataByGroupCode(String code);
 
 }

@@ -4,7 +4,6 @@ package io.github.yangxj96.spectra.core.configure.security.javabean;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jspecify.annotations.NullMarked;
@@ -24,7 +23,6 @@ import java.util.Map;
 /// @version 1.0
 /// @since 2025/12/2 17:55
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
@@ -50,16 +48,12 @@ public class SecurityUser implements UserDetails {
     /// 用户状态
     private Short state;
 
-    @Builder.Default
     private boolean enabled = true;
 
-    @Builder.Default
     private boolean accountNonExpired = true;
 
-    @Builder.Default
     private boolean accountNonLocked = true;
 
-    @Builder.Default
     private boolean credentialsNonExpired = true;
 
     @Nullable

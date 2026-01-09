@@ -18,7 +18,6 @@ package io.github.yangxj96.spectra.workflow.controller;
 
 import io.github.yangxj96.spectra.workflow.javabean.from.TaskCompleteFrom;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
-import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 /// 工作流-任务相关
@@ -30,8 +29,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/workflow/tasks")
 public class WorkflowUserTasksController {
 
-    @Resource
-    private WorkflowService workflowService;
+    private final WorkflowService workflowService;
+
+    public WorkflowUserTasksController(WorkflowService workflowService) {
+        this.workflowService = workflowService;
+    }
 
     @GetMapping("/pending")
     public void getPendingTasks() {

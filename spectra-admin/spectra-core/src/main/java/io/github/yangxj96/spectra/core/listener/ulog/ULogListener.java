@@ -19,7 +19,6 @@ package io.github.yangxj96.spectra.core.listener.ulog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog;
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.event.EventListener;
@@ -37,8 +36,11 @@ public class ULogListener {
 
     private static final String PREFIX = "[ULogListener]: ";
 
-    @Resource
-    private OperationLogService logService;
+    private final OperationLogService logService;
+
+    public ULogListener(OperationLogService logService) {
+        this.logService = logService;
+    }
 
     @Async
     @EventListener

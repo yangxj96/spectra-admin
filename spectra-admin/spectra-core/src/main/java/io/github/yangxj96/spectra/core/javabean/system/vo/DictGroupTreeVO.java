@@ -36,7 +36,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
+public class DictGroupTreeVO implements Tree<DictGroupTreeVO>, Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -68,6 +68,6 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     private Integer sort = 0;
 
     /// 子级
-    private List<DictTypeTreeVO> children = new ArrayList<>();
+    private List<DictGroupTreeVO> children = new ArrayList<>();
 
 }

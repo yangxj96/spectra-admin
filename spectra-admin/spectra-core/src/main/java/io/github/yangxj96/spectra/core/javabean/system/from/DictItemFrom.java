@@ -31,7 +31,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DictDataFrom {
+public class DictItemFrom {
 
     /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)

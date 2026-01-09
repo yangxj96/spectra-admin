@@ -91,6 +91,8 @@ mybatis-plus:
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
       schema: SPECTRA
+  configuration-properties:
+    schema: domain_core
 # 日志配置
 logging:
   group:

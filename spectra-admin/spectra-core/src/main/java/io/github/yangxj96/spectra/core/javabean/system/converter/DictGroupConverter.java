@@ -18,38 +18,38 @@ package io.github.yangxj96.spectra.core.javabean.system.converter;
 
 import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
 import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
-import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
+import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictGroupTreeVO;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 组织机构的数据转换使用
+/// 字典Mapstruct
 ///
 /// @author Jack Young
 /// @version 1.0
-/// @since 2025/7/14
+/// @since 2025/6/18
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
-public interface OrganizationConverter {
+public interface DictGroupConverter {
 
-    /// 实体转树形
+    /// 字典类型入参转实体
     ///
-    /// @param source 实体
-    /// @return 树形
-    OrganizationTreeVo toTreeVO(Organization source);
+    /// @param source 字典类型入参
+    /// @return 转换后的实体
+    DictGroup toEntity(DictGroupFrom source);
 
-    /// 实体转树形(列表)
+    /// 字典类型转字典树类型
     ///
-    /// @param source 实体
-    /// @return 树形
-    List<OrganizationTreeVo> toTreeVOList(List<Organization> source);
+    /// @param source 字典类型
+    /// @return 字典类型
+    DictGroupTreeVO toTreeVO(DictGroup source);
 
-    /// 入参转实体
+    /// 字典类型转字典树类型列表
     ///
-    /// @param source 入参
-    /// @return 实体
-    Organization toEntity(OrganizationFrom source);
+    /// @param source 字典类型
+    /// @return 字典类型
+    List<DictGroupTreeVO> toTreeVOList(List<DictGroup> source);
+
 
 }
-

@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -32,7 +31,6 @@ import java.time.Instant;
 /// @version 1.0
 /// @since 2025-6-14
 @Data
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseEntity implements Serializable {

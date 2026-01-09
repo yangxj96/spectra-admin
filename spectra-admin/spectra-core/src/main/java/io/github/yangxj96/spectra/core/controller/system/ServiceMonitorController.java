@@ -20,7 +20,6 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.CPUInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.JVMInfoVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RAMInfoVO;
 import io.github.yangxj96.spectra.core.service.system.ServiceMonitorService;
-import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,8 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/service/monitor")
 public class ServiceMonitorController {
 
-    @Resource
-    private ServiceMonitorService bindService;
+    private final ServiceMonitorService bindService;
+
+    public ServiceMonitorController(ServiceMonitorService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 获取服务器 CPU 信息

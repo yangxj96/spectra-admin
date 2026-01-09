@@ -22,7 +22,6 @@ import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,8 +40,11 @@ import java.util.List;
 @RequestMapping("/authority")
 public class AuthorityController {
 
-    @Resource
-    private AuthorityService bindService;
+    private final AuthorityService bindService;
+
+    public AuthorityController(AuthorityService bindService) {
+        this.bindService = bindService;
+    }
 
     @ULog("创建权限")
     @PostMapping

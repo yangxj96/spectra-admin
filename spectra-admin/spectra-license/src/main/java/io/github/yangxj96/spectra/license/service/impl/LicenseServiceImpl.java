@@ -22,7 +22,6 @@ import io.github.yangxj96.spectra.license.service.LicenseService;
 import io.github.yangxj96.spectra.license.utils.HardwareIdUtil;
 import io.github.yangxj96.spectra.license.utils.LicenseUtils;
 import io.github.yangxj96.spectra.license.utils.RSAUtils;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
@@ -44,14 +43,17 @@ import java.time.Instant;
 @Service
 public class LicenseServiceImpl implements LicenseService {
 
-    @Resource
-    private ObjectMapper om;
+    private final ObjectMapper om;
 
-    @Resource
-    private ResourceLoader resourceLoader;
+    private final ResourceLoader resourceLoader;
 
-    @Resource
-    private LicenseProperties properties;
+    private final LicenseProperties properties;
+
+    public LicenseServiceImpl(ObjectMapper om, ResourceLoader resourceLoader, LicenseProperties properties) {
+        this.om = om;
+        this.resourceLoader = resourceLoader;
+        this.properties = properties;
+    }
 
     @Override
     public void generateLicense(License license) {

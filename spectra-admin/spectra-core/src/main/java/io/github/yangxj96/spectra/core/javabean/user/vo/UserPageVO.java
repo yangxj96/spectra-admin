@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import lombok.experimental.SuperBuilder;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 
@@ -38,7 +37,6 @@ import java.util.List;
 /// @since 2025-6-14
 @Data
 @ToString
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPageVO implements Serializable {

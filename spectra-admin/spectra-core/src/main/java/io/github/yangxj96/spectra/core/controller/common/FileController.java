@@ -21,7 +21,6 @@ import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
 import io.github.yangxj96.spectra.core.javabean.common.vo.FilePreprocessVO;
 import io.github.yangxj96.spectra.core.service.common.FileService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,8 +37,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/file")
 public class FileController {
 
-    @Resource
-    private FileService bindService;
+    private final FileService bindService;
+
+    public FileController(FileService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 预处理文件

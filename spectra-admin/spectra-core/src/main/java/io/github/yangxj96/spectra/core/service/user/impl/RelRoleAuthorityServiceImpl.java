@@ -29,7 +29,6 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityVO;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleAuthorityMapper;
 import io.github.yangxj96.spectra.core.service.user.AuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,14 +45,18 @@ import java.util.stream.Collectors;
 @Service
 public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
-    @Resource
-    private RelRoleAuthorityMapper relRoleAuthorityMapper;
+    private final AuthorityConverter authorityConverter;
 
-    @Resource
-    private AuthorityService authorityService;
+    private final RelRoleAuthorityMapper relRoleAuthorityMapper;
 
-    @Resource
-    private AuthorityConverter authorityConverter;
+    private final AuthorityService authorityService;
+
+    public RelRoleAuthorityServiceImpl(AuthorityConverter authorityConverter, RelRoleAuthorityMapper relRoleAuthorityMapper, AuthorityService authorityService) {
+        this.authorityConverter = authorityConverter;
+        this.relRoleAuthorityMapper = relRoleAuthorityMapper;
+        this.authorityService = authorityService;
+    }
+
 
     @Override
     @Transactional
@@ -104,8 +107,8 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     public List<AuthorityVO> get(Long roleId) {
-        List<Authority> authority = authorityService.getByRelRoleId(roleId);
-        return authorityConverter.toVOS(authority);
+        var authority = authorityService.getByRelRoleId(roleId);
+        return authorityConverter.toVOList(authority);
     }
 
     @Override
@@ -119,7 +122,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         }
         List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
         var coll = authorityService.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
-        return authorityConverter.toVOS(coll);
+        return authorityConverter.toVOList(coll);
     }
 
 

@@ -19,7 +19,10 @@ package io.github.yangxj96.spectra.common.base.javabean.from;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -30,17 +33,14 @@ import java.util.List;
 /// @since 2025/6/3
 @Data
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class PageFrom {
 
     /// 页码
-    @Builder.Default
     private Long pageSize = 10L;
 
     /// 每页数量
-    @Builder.Default
     private Long pageNum = 1L;
 
     /// 排序字段,前端传递的

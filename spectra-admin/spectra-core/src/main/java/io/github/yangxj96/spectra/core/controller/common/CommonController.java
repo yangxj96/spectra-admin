@@ -17,7 +17,6 @@
 package io.github.yangxj96.spectra.core.controller.common;
 
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
-import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +32,11 @@ import java.io.IOException;
 @RequestMapping("/common")
 public class CommonController {
 
-    @Resource
-    private KaptchaService kaptchaService;
+    private final KaptchaService kaptchaService;
+
+    public CommonController(KaptchaService kaptchaService) {
+        this.kaptchaService = kaptchaService;
+    }
 
     /**
      * 获取验证码

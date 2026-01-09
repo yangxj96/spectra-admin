@@ -22,6 +22,6 @@
             resultType="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScopeTarget">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM domain_core.sys_user_data_scope_target WHERE user_id = #{userId}
+        FROM ${schema}.sys_user_data_scope_target WHERE user_id = #{userId}
     </select>
 </mapper>

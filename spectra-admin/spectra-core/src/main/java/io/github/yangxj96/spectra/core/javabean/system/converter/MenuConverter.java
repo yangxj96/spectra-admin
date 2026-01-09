@@ -16,11 +16,12 @@
 
 package io.github.yangxj96.spectra.core.javabean.system.converter;
 
+import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
+import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -29,31 +30,30 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-6-14
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface MenuConverter {
 
     /// 实体转 树形实体VO
     ///
-    /// @param entity 实体
+    /// @param source 实体
     /// @return 树形实体VO
-    MenuTreeVO toTreeVO(Menu entity);
+    MenuTreeVO toTreeVO(Menu source);
 
-    /// 实体列表 转 树形实体VO列表
+    /// 实体转 树形实体VO
     ///
-    /// @param coll 实体列表
-    /// @return 树形实体VO列表
-    List<MenuTreeVO> toTreeVOS(List<Menu> coll);
+    /// @param source 实体
+    /// @return 树形实体VO
+    List<MenuTreeVO> toTreeVOList(List<Menu> source);
 
     /// 实体转VO
     ///
-    /// @param entity 实体
+    /// @param source 实体
     /// @return VO
-    MenuVO toVO(Menu entity);
+    MenuVO toVO(Menu source);
 
-    /// 实体列表转VO列表
+    /// 实体转VO(列表)
     ///
-    /// @param coll 实体泪飙
-    /// @return VO列表
-    List<MenuVO> toVOS(List<Menu> coll);
-
+    /// @param source 实体
+    /// @return VO
+    List<MenuVO> toVOList(List<Menu> source);
 }
