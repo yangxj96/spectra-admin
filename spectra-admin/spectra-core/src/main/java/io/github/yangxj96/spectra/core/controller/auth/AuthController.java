@@ -23,7 +23,6 @@ import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.enums.SysLogType;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
-import jakarta.annotation.Resource;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -43,8 +42,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Resource
-    private LoginDispatcher loginDispatcher;
+    private final LoginDispatcher loginDispatcher;
+
+    public AuthController(LoginDispatcher loginDispatcher) {
+        this.loginDispatcher = loginDispatcher;
+    }
 
 
     @PermitAll

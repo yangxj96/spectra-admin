@@ -20,7 +20,7 @@
     <select id="findByUserId" resultType="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM domain_core.sys_user_data_scope
+        FROM ${schema}.sys_user_data_scope
         WHERE user_id = #{userId}
     </select>
 </mapper>

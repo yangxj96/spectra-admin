@@ -21,17 +21,17 @@ import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.BuiltinDataException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
-import io.github.yangxj96.spectra.core.javabean.system.converter.DictConverter;
+import io.github.yangxj96.spectra.core.javabean.system.converter.DictGroupConverter;
+import io.github.yangxj96.spectra.core.javabean.system.converter.DictItemConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
-import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.from.DictItemFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictGroupTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictItemVO;
 import io.github.yangxj96.spectra.core.service.system.DictGroupService;
 import io.github.yangxj96.spectra.core.service.system.DictItemService;
 import io.github.yangxj96.spectra.core.service.system.DictService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -49,20 +49,26 @@ import java.util.List;
 @Service
 public class DictServiceImpl implements DictService {
 
-    @Resource
-    private DictConverter dictConverter;
+    private final DictGroupConverter dictGroupConverter;
 
-    @Resource
-    private DictGroupService groupService;
+    private final DictItemConverter dictItemConverter;
 
-    @Resource
-    private DictItemService dataService;
+    private final DictGroupService groupService;
+
+    private final DictItemService dataService;
+
+    public DictServiceImpl(DictGroupConverter dictGroupConverter, DictItemConverter dictItemConverter, DictGroupService groupService, DictItemService dataService) {
+        this.dictGroupConverter = dictGroupConverter;
+        this.dictItemConverter = dictItemConverter;
+        this.groupService = groupService;
+        this.dataService = dataService;
+    }
 
 
     @Override
     @Transactional
     public void createGroup(DictGroupFrom params) {
-        var entity = dictConverter.groupFromToEntity(params);
+        var entity = dictGroupConverter.toEntity(params);
         groupService.save(entity);
     }
 
@@ -90,14 +96,14 @@ public class DictServiceImpl implements DictService {
         if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
-        var entity = dictConverter.groupFromToEntity(params);
+        var entity = dictGroupConverter.toEntity(params);
         groupService.updateById(entity);
     }
 
     @Override
     @Transactional
-    public void createData(DictDataFrom params) {
-        var entity = dictConverter.dataFromToEntity(params);
+    public void createData(DictItemFrom params) {
+        var entity = dictItemConverter.toEntity(params);
         dataService.save(entity);
     }
 
@@ -117,28 +123,28 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void modifyData(DictDataFrom params) {
+    public void modifyData(DictItemFrom params) {
         var group = groupService.getById(params.getGid());
         if (group.getBuiltin()) {
             throw new BuiltinDataException("内置字典,无法修改");
         }
-        var entity = dictConverter.dataFromToEntity(params);
+        var entity = dictItemConverter.toEntity(params);
         dataService.updateById(entity);
     }
 
     @Override
-    public @Nullable List<DictTypeTreeVO> listDictGroupWrapTree() {
+    public @Nullable List<DictGroupTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
         var wrapper = new LambdaQueryWrapper<DictGroup>()
                 .eq(DictGroup::getState, Boolean.TRUE)
                 .eq(DictGroup::getHide, Boolean.FALSE);
         var menus = groupService.list(wrapper);
-        var vos = dictConverter.typeToTreeVOS(menus);
-        return new TreeBuilder<>(vos).buildTree(Common.PID);
+        return new TreeBuilder<>(dictGroupConverter.toTreeVOList(menus))
+                .buildTree(Common.PID);
     }
 
     @Override
-    public List<DictDataVo> listDictDataByGroupCode(String code) {
+    public List<DictItemVO> listDictDataByGroupCode(String code) {
         var group = groupService.getByCode(code);
         if (null == group) {
             throw new DataNotExistException("字典类型不存在");
@@ -146,6 +152,6 @@ public class DictServiceImpl implements DictService {
         var dictData = dataService.listByGid(group.getId());
         // 根据sort字段进行一个排序
         dictData.sort(Comparator.comparing(DictItem::getSort));
-        return dictConverter.dataToVos(dictData);
+        return dictItemConverter.toVOList(dictData);
     }
 }

@@ -23,8 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.Accessors;
-import lombok.experimental.SuperBuilder;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 
@@ -38,8 +36,6 @@ import java.io.Serializable;
 /// @since 2025-6-14
 @Data
 @EqualsAndHashCode(callSuper = true)
-@Accessors(chain = true)
-@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_menu", schema = "domain_core")

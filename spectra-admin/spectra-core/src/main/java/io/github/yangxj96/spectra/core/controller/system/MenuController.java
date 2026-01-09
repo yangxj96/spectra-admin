@@ -22,7 +22,6 @@ import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.from.MenuSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuTreeVO;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
-import jakarta.annotation.Resource;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -39,8 +38,11 @@ import java.util.List;
 @RequestMapping("/menu")
 public class MenuController {
 
-    @Resource
-    private MenuService bindService;
+    private final MenuService bindService;
+
+    public MenuController(MenuService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 新增菜单信息

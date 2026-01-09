@@ -16,11 +16,12 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.converter;
 
+import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
+import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityVO;
 import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
 
 import java.util.List;
 
@@ -29,30 +30,39 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/7/16
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface AuthorityConverter {
 
     /**
      * 实体转VO
      *
-     * @param entity 实体对象
+     * @param source 实体对象
      * @return VO对象
      */
-    AuthorityVO toVO(Authority entity);
+    AuthorityVO toVO(Authority source);
 
     /**
-     * 实体列表转VO列表
+     * 实体转VO(列表)
      *
-     * @param coll 实体列表
-     * @return VO列表
+     * @param source 实体对象
+     * @return VO对象
      */
-    List<AuthorityVO> toVOS(List<Authority> coll);
+    List<AuthorityVO> toVOList(List<Authority> source);
 
     /**
      * 转成树形需要的vo
      *
-     * @param authorities 权限列表
+     * @param source 权限列表
      * @return 树形vo
      */
-    List<AuthorityTreeVO> toTreeVos(List<Authority> authorities);
+    AuthorityTreeVO toTreeVO(Authority source);
+
+    /**
+     * 转成树形需要的vo
+     *
+     * @param source 权限列表
+     * @return 树形vo
+     */
+    List<AuthorityTreeVO> toTreeVOList(List<Authority> source);
+
 }

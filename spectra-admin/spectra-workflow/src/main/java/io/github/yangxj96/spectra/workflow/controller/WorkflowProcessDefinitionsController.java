@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.workflow.controller;
 
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,9 +37,11 @@ import java.util.Map;
 @RequestMapping("/workflow/process-definitions")
 public class WorkflowProcessDefinitionsController {
 
+    private final RepositoryService repositoryService;
 
-    @Resource
-    private RepositoryService repositoryService;
+    public WorkflowProcessDefinitionsController(RepositoryService repositoryService) {
+        this.repositoryService = repositoryService;
+    }
 
     /**
      * 获取所有的流程定义

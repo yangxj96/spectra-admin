@@ -18,8 +18,6 @@ package io.github.yangxj96.spectra.core.listener.user;
 
 import io.github.yangxj96.spectra.core.javabean.user.event.RoleDeletedEvent;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
-import jakarta.annotation.Resource;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -32,11 +30,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 /// @since 2025-11-11
 @Slf4j
 @Component
-@RequiredArgsConstructor
 public class RoleDeletionOnRoleMenuCleanupListener {
 
-    @Resource
-    private RelRoleMenuService relRoleMenuService;
+    private final RelRoleMenuService relRoleMenuService;
+
+    public RoleDeletionOnRoleMenuCleanupListener(RelRoleMenuService relRoleMenuService) {
+        this.relRoleMenuService = relRoleMenuService;
+    }
 
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {

@@ -24,7 +24,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
@@ -38,7 +37,6 @@ import java.io.Serializable;
 /// @since 2025-6-15
 ///
 @Data
-@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)

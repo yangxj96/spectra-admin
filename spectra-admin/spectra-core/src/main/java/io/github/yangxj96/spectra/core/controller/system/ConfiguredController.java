@@ -7,7 +7,6 @@ import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredPageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
-import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +20,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/configured")
 public class ConfiguredController {
 
-    @Resource
-    private ConfiguredService bindService;
+    private final ConfiguredService bindService;
+
+    public ConfiguredController(ConfiguredService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 修改系统配置<br/>

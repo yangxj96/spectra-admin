@@ -6,7 +6,6 @@ import io.github.yangxj96.spectra.core.configure.security.strategy.tokens.EmailA
 import io.github.yangxj96.spectra.core.configure.security.strategy.tokens.SmsAuthenticationToken;
 import io.github.yangxj96.spectra.core.configure.security.strategy.tokens.UsernamePasswordCaptchaAuthenticationToken;
 import io.github.yangxj96.spectra.core.javabean.auth.from.LoginFrom;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -17,10 +16,13 @@ import org.springframework.stereotype.Component;
 /// @version 1.0
 /// @since 2025/12/29 10:47
 @Component
-@RequiredArgsConstructor
 public class LoginDispatcher {
 
     private final AuthenticationManager authenticationManager;
+
+    public LoginDispatcher(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
     /// 进行登录
     ///

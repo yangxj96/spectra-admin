@@ -29,7 +29,6 @@ import io.github.yangxj96.spectra.core.javabean.user.entity.RelRoleMenu;
 import io.github.yangxj96.spectra.core.mapper.system.MenuMapper;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
-import jakarta.annotation.Resource;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -46,11 +45,15 @@ import java.util.List;
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 
-    @Resource
-    private MenuConverter menuConverter;
+    private final MenuConverter menuConverter;
 
-    @Resource
-    private RelRoleMenuMapper roleMenuMapper;
+    private final RelRoleMenuMapper roleMenuMapper;
+
+    public MenuServiceImpl(MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper) {
+        this.menuConverter = menuConverter;
+        this.roleMenuMapper = roleMenuMapper;
+    }
+
 
     @Override
     @Transactional
@@ -74,7 +77,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public @Nullable List<MenuTreeVO> tree() {
         // 先转树形VO
-        var vos = menuConverter.toTreeVOS(this.list());
+        var db = this.list();
+        if (CollUtils.isEmpty(db)) {
+            return Collections.emptyList();
+        }
+        var vos = menuConverter.toTreeVOList(db);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 

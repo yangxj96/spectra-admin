@@ -16,7 +16,6 @@
 
 package io.github.yangxj96.spectra.workflow.javabean.vo;
 
-import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -27,7 +26,6 @@ import java.io.Serializable;
 /// @version 1.0
 /// @since 2025-11-11
 @Data
-@Builder
 public class ProcessDefinitionVO implements Serializable {
 
     /**

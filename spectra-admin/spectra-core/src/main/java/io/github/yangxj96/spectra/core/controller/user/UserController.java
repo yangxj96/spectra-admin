@@ -25,7 +25,6 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.service.user.UserService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -41,8 +40,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserController {
 
-    @Resource
-    private UserService bindService;
+    private final UserService bindService;
+
+    public UserController(UserService bindService) {
+        this.bindService = bindService;
+    }
 
     @ULog("创建用户")
     @PostMapping

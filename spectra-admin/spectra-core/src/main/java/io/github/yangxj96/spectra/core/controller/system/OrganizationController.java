@@ -21,7 +21,6 @@ import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
-import jakarta.annotation.Resource;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -38,8 +37,11 @@ import java.util.List;
 @RequestMapping("/organization")
 public class OrganizationController {
 
-    @Resource
-    private OrganizationService bindService;
+    private final OrganizationService bindService;
+
+    public OrganizationController(OrganizationService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 新增组织机构

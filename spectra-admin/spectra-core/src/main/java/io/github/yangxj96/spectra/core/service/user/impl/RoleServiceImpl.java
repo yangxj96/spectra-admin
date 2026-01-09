@@ -34,7 +34,6 @@ import io.github.yangxj96.spectra.core.javabean.user.from.RolePageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
 import io.github.yangxj96.spectra.core.mapper.user.RoleMapper;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
-import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -50,11 +49,15 @@ import java.util.List;
 @Service
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 
-    @Resource
-    private RoleConverter roleConverter;
+    private final RoleConverter roleConverter;
 
-    @Resource
-    private ApplicationEventPublisher publisher;
+    private final ApplicationEventPublisher publisher;
+
+    public RoleServiceImpl(RoleConverter roleConverter, ApplicationEventPublisher publisher) {
+        this.roleConverter = roleConverter;
+        this.publisher = publisher;
+    }
+
 
     @Override
     @Transactional
@@ -105,7 +108,12 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         Page<Role> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         Page<RoleVO> result = new Page<>();
         BeanUtils.copyProperties(db, result);
-        result.setRecords(roleConverter.toVOs(db.getRecords()));
+        result.setRecords(
+                db.getRecords()
+                        .stream()
+                        .map(roleConverter::toVO)
+                        .toList()
+        );
         return result;
     }
 
@@ -113,7 +121,10 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     public List<RoleVO> all() {
         var wrapper = new LambdaQueryWrapper<Role>();
         wrapper.eq(Role::getState, Boolean.TRUE);
-        return roleConverter.toVOs(this.list(wrapper));
+        //return roleConverter.toVOs(this.list(wrapper));
+        return this.list(wrapper).stream()
+                .map(roleConverter::toVO)
+                .toList();
     }
 
     @Override

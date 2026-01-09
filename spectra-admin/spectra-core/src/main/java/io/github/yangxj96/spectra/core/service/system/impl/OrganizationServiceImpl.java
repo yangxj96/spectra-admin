@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
+import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
 import io.github.yangxj96.spectra.core.javabean.system.converter.OrganizationConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
@@ -28,12 +29,11 @@ import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import io.github.yangxj96.spectra.core.mapper.system.OrganizationMapper;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
-import jakarta.annotation.Resource;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -46,8 +46,12 @@ import java.util.stream.Collectors;
 @Service
 public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
 
-    @Resource
-    private OrganizationConverter organizationConverter;
+    private final OrganizationConverter organizationConverter;
+
+    public OrganizationServiceImpl(OrganizationConverter organizationConverter) {
+        this.organizationConverter = organizationConverter;
+    }
+
 
     @Override
     @Transactional
@@ -81,9 +85,12 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     }
 
     @Override
-    public @Nullable List<OrganizationTreeVo> tree() {
+    public List<OrganizationTreeVo> tree() {
         var list = this.list();
-        var vos = organizationConverter.toTreeVOS(list);
+        if (CollUtils.isEmpty(list)) {
+            return Collections.emptyList();
+        }
+        var vos = organizationConverter.toTreeVOList(list);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 

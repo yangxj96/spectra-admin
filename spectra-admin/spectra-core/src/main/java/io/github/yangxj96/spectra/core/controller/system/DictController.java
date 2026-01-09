@@ -18,12 +18,11 @@ package io.github.yangxj96.spectra.core.controller.system;
 
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
-import io.github.yangxj96.spectra.core.javabean.system.from.DictDataFrom;
 import io.github.yangxj96.spectra.core.javabean.system.from.DictGroupFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictDataVo;
-import io.github.yangxj96.spectra.core.javabean.system.vo.DictTypeTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.from.DictItemFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictGroupTreeVO;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictItemVO;
 import io.github.yangxj96.spectra.core.service.system.DictService;
-import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,8 +38,11 @@ import java.util.List;
 @RequestMapping("/dict")
 public class DictController {
 
-    @Resource
-    private DictService bindService;
+    private final DictService bindService;
+
+    public DictController(DictService bindService) {
+        this.bindService = bindService;
+    }
 
     /**
      * 创建字典组
@@ -86,7 +88,7 @@ public class DictController {
     @ULog("创建字典数据")
     @PostMapping("/data")
     @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
-    public void createData(@Validated(Verify.Insert.class) @RequestBody DictDataFrom params) {
+    public void createData(@Validated(Verify.Insert.class) @RequestBody DictItemFrom params) {
         bindService.createData(params);
     }
 
@@ -110,7 +112,7 @@ public class DictController {
     @ULog("修改字典数据")
     @PutMapping("/data")
     @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
-    public void modifyData(@Validated(Verify.Update.class) @RequestBody DictDataFrom params) {
+    public void modifyData(@Validated(Verify.Update.class) @RequestBody DictItemFrom params) {
         bindService.modifyData(params);
     }
 
@@ -121,7 +123,7 @@ public class DictController {
      */
     @ULog("获取所有字典类型的树形列表")
     @GetMapping("/group/tree")
-    public List<DictTypeTreeVO> listDictGroupWrapTree() {
+    public List<DictGroupTreeVO> listDictGroupWrapTree() {
         return bindService.listDictGroupWrapTree();
     }
 
@@ -133,7 +135,7 @@ public class DictController {
      */
     @ULog("根据类型编码获取字典数据")
     @GetMapping("/data/{code}")
-    public List<DictDataVo> listDictDataByGroupCode(@PathVariable String code) {
+    public List<DictItemVO> listDictDataByGroupCode(@PathVariable String code) {
         return bindService.listDictDataByGroupCode(code);
     }
 }

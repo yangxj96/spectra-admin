@@ -18,38 +18,38 @@ package io.github.yangxj96.spectra.core.javabean.system.converter;
 
 import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
 import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
-import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
+import io.github.yangxj96.spectra.core.javabean.system.from.DictItemFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DictItemVO;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 组织机构的数据转换使用
+/// 字典Mapstruct
 ///
 /// @author Jack Young
 /// @version 1.0
-/// @since 2025/7/14
+/// @since 2025/6/18
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
-public interface OrganizationConverter {
+public interface DictItemConverter {
 
-    /// 实体转树形
     ///
-    /// @param source 实体
-    /// @return 树形
-    OrganizationTreeVo toTreeVO(Organization source);
-
-    /// 实体转树形(列表)
+    /// 字典数据入参转实体
     ///
-    /// @param source 实体
-    /// @return 树形
-    List<OrganizationTreeVo> toTreeVOList(List<Organization> source);
-
-    /// 入参转实体
+    /// @param source 字典数据入参
+    /// @return 转换后的实体
     ///
-    /// @param source 入参
-    /// @return 实体
-    Organization toEntity(OrganizationFrom source);
+    DictItem toEntity(DictItemFrom source);
 
+    /// 字典数据转字典数据VO
+    ///
+    /// @param source 字典数据
+    /// @return 字典数据VO
+    DictItemVO toVO(DictItem source);
+
+    /// 字典数据转字典数据VO(列表)
+    ///
+    /// @param source 字典数据
+    /// @return 字典数据VO(列表)
+    List<DictItemVO> toVOList(List<DictItem> source);
 }
-

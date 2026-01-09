@@ -30,7 +30,6 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.RoleVO;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import io.github.yangxj96.spectra.core.service.user.RoleService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -48,14 +47,17 @@ import java.util.List;
 @RequestMapping("/role")
 public class RoleController {
 
-    @Resource
-    private RoleService bindService;
+    private final RoleService bindService;
 
-    @Resource
-    private RelRoleMenuService relRoleMenuService;
+    private final RelRoleMenuService relRoleMenuService;
 
-    @Resource
-    private RelRoleAuthorityService relRoleAuthorityService;
+    private final RelRoleAuthorityService relRoleAuthorityService;
+
+    public RoleController(RoleService bindService, RelRoleMenuService relRoleMenuService, RelRoleAuthorityService relRoleAuthorityService) {
+        this.bindService = bindService;
+        this.relRoleMenuService = relRoleMenuService;
+        this.relRoleAuthorityService = relRoleAuthorityService;
+    }
 
     @ULog("创建角色")
     @PostMapping

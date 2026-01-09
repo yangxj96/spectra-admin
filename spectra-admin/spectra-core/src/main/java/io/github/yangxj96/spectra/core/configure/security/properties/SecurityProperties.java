@@ -16,23 +16,18 @@ import java.util.List;
 @Data
 @ConfigurationProperties(prefix = "spectra.security")
 public class SecurityProperties {
-    /**
-     * 放行白名单
-     */
+
     ///  验证白名单
     private List<String> whitelists = new ArrayList<>(Arrays.asList(
             "/common/kaptcha",
             "/auth/login",
-            "/druid/**"
+            "/druid/**",
+            "/actuator/**"
     ));
-    /**
-     * token超时时长
-     */
+
     ///  token有效期时长
     private Long tokenExpire = 7200L;
-    /**
-     * 超级管理员角色：拥有绝对权限，不需要匹配任何权限表达式
-     */
+
     /// 超管角色名称
     private String administrators = "ROLE_DEV_OPS";
 

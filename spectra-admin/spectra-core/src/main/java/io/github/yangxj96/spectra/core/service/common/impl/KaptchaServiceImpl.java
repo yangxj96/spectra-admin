@@ -22,7 +22,6 @@ import io.github.yangxj96.spectra.common.exception.KaptchaExpiresException;
 import io.github.yangxj96.spectra.common.exception.ReadPropertiesException;
 import io.github.yangxj96.spectra.core.configure.kaptcha.properties.KaptchaProperties;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -42,20 +41,23 @@ import java.io.IOException;
 @Service
 public class KaptchaServiceImpl implements KaptchaService {
 
-    @Resource
-    private Producer kaptchaProducer;
+    private final Producer kaptchaProducer;
 
-    @Resource
-    private KaptchaProperties properties;
+    private final KaptchaProperties properties;
 
-    @Resource
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    @Resource
-    private HttpServletRequest request;
+    private final HttpServletRequest request;
 
-    @Resource
-    private HttpServletResponse response;
+    private final HttpServletResponse response;
+
+    public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties, RedisTemplate<String, Object> redisTemplate, HttpServletRequest request, HttpServletResponse response) {
+        this.kaptchaProducer = kaptchaProducer;
+        this.properties = properties;
+        this.redisTemplate = redisTemplate;
+        this.request = request;
+        this.response = response;
+    }
 
     @Override
     public void generate() throws IOException {

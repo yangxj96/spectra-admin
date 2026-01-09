@@ -2,7 +2,6 @@ package io.github.yangxj96.spectra.core.service.system.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
@@ -14,8 +13,6 @@ import io.github.yangxj96.spectra.core.javabean.system.from.ConfiguredPageFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import io.github.yangxj96.spectra.core.mapper.system.ConfiguredMapper;
 import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
-import jakarta.annotation.Resource;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,8 +28,12 @@ import java.util.Map;
 @Service
 public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Configured> implements ConfiguredService {
 
-    @Resource
-    private ConfiguredConverter configuredConverter;
+    private final ConfiguredConverter configuredConverter;
+
+    public ConfiguredServiceImpl(ConfiguredConverter configuredConverter) {
+        this.configuredConverter = configuredConverter;
+    }
+
 
     @Override
     @Transactional
@@ -48,15 +49,12 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
 
     @Override
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
-        var result = new Page<ConfiguredVO>();
         // 条件构建
         var wrapper = new LambdaQueryWrapper<Configured>()
                 .like(StrUtils.isNotBlank(params.getKey()), Configured::getKey, params.getKey());
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
-        BeanUtils.copyProperties(db, result);
-        result.setRecords(configuredConverter.toVOs(db.getRecords()));
-        return result;
+        return configuredConverter.toVOPage(db);
     }
 
     @Override
@@ -77,6 +75,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
                         current.put(k, child);
                         current = child;
                     } else if (next instanceof Map) {
+                        //noinspection unchecked
                         current = (Map<String, Object>) next;
                     } else {
                         throw new IllegalStateException("配置 key 冲突: " + cfg.getKey());

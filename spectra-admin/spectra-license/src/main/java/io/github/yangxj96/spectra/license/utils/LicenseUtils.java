@@ -30,13 +30,12 @@ public class LicenseUtils {
     }
 
     public static String toJsonWithoutSignature(License license, ObjectMapper om) {
-        var temp = License.builder()
-                .id(license.getId())
-                .productName(license.getProductName())
-                .issuedAt(license.getIssuedAt())
-                .expiresAt(license.getExpiresAt())
-                .hwid(license.getHwid())
-                .build();
+        var temp = new License();
+        temp.setId(license.getId());
+        temp.setProductName(license.getProductName());
+        temp.setIssuedAt(license.getIssuedAt());
+        temp.setExpiresAt(license.getExpiresAt());
+        temp.setHwid(license.getHwid());
         return om
                 .writerWithDefaultPrettyPrinter()
                 .writeValueAsString(temp);

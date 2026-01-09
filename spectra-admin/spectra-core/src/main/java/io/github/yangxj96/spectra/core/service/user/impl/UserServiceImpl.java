@@ -19,7 +19,6 @@ package io.github.yangxj96.spectra.core.service.user.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
@@ -50,11 +49,9 @@ import io.github.yangxj96.spectra.core.service.auth.AccountService;
 import io.github.yangxj96.spectra.core.service.system.OrganizationService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,32 +70,36 @@ import java.util.stream.Collectors;
 @EnableConfigurationProperties({UserProperties.class})
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
-    @Resource
-    private UserConverter userConverter;
+    private final UserConverter userConverter;
 
-    @Resource
-    private RoleConverter roleConverter;
+    private final RoleConverter roleConverter;
 
-    @Resource
-    private RelUserRoleService relUserRoleService;
+    private final RelUserRoleService relUserRoleService;
 
-    @Resource
-    private OrganizationService organizationService;
+    private final OrganizationService organizationService;
 
-    @Resource
-    private BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Resource
-    private UserProperties userProperties;
+    private final UserProperties userProperties;
 
-    @Resource
-    private AccountService accountService;
+    private final AccountService accountService;
 
-    @Resource
-    private UserDataScopeMapper dataScopeMapper;
+    private final UserDataScopeMapper dataScopeMapper;
 
-    @Resource
-    private UserDataScopeTargetMapper dataScopeTargetMapper;
+    private final UserDataScopeTargetMapper dataScopeTargetMapper;
+
+    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, OrganizationService organizationService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper) {
+        this.userConverter = userConverter;
+        this.roleConverter = roleConverter;
+        this.relUserRoleService = relUserRoleService;
+        this.organizationService = organizationService;
+        this.passwordEncoder = passwordEncoder;
+        this.userProperties = userProperties;
+        this.accountService = accountService;
+        this.dataScopeMapper = dataScopeMapper;
+        this.dataScopeTargetMapper = dataScopeTargetMapper;
+    }
+
 
     @Override
     @Transactional
@@ -111,15 +112,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataSaveException("保存用户信息异常");
         }
         // 创建一个默认的账号密码登录
-        var defaultAccount = Account
-                .builder()
-                .userId(entity.getId())
-                .type(LoginType.PASSWORD)
-                .loginName(entity.getEmail())
-                .password(passwordEncoder.encode(userProperties.getDefaultPassword()))
-                .provider("DEFAULT")
-                .status(Boolean.TRUE)
-                .build();
+        var defaultAccount = new Account();
+        defaultAccount.setUserId(entity.getId());
+        defaultAccount.setType(LoginType.PASSWORD);
+        defaultAccount.setLoginName(entity.getEmail());
+        defaultAccount.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
+        defaultAccount.setProvider("DEFAULT");
+        defaultAccount.setStatus(Boolean.TRUE);
         if (!accountService.save(defaultAccount)) {
             throw new DataSaveException("保存用户信息异常");
         }
@@ -127,21 +126,20 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 数据范围处理
         if (params.getDataScope() != null) {
             // 新增
-            var dataScopeEntity = UserDataScope.builder()
-                    .userId(entity.getId())
-                    .scopeType(params.getDataScope())
-                    .build();
+            var dataScopeEntity = new UserDataScope();
+            dataScopeEntity.setUserId(entity.getId());
+            dataScopeEntity.setScopeType(params.getDataScope());
             dataScopeMapper.insert(dataScopeEntity);
 
             // 如果是自定义的话,要插入自定义的数据
             if (params.getDataScope() == DataScopeType.CUSTOM) {
                 var targets = new ArrayList<UserDataScopeTarget>();
                 for (Long targetId : params.getTargetIds()) {
-                    targets.add(UserDataScopeTarget.builder()
-                            .userId(entity.getId())
-                            .targetId(targetId)
-                            .targetType(0)
-                            .build());
+                    var datum = new UserDataScopeTarget();
+                    datum.setUserId(entity.getId());
+                    datum.setTargetId(targetId);
+                    datum.setTargetType(0);
+                    targets.add(datum);
                 }
                 dataScopeTargetMapper.insert(targets);
             }
@@ -178,7 +176,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         // 默认账号是否需要修改
         boolean defaultAccountUpdateFlag = params.getEmail().equals(entity.getEmail());
-        userConverter.updateUserFrom(params, entity);
+        userConverter.updateUser(params, entity);
         if (this.baseMapper.updateById(entity) == 0) {
             throw new EntityUpdateException("更新用户发生错误");
         }
@@ -199,10 +197,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (params.getDataScope() != null) {
             if (dataScope == null) {
                 // 新增
-                var dataScopeEntity = UserDataScope.builder()
-                        .userId(entity.getId())
-                        .scopeType(params.getDataScope())
-                        .build();
+                var dataScopeEntity = new UserDataScope();
+                dataScopeEntity.setUserId(entity.getId());
+                dataScopeEntity.setScopeType(params.getDataScope());
                 dataScopeMapper.insert(dataScopeEntity);
             } else {
                 // 如果之前存的是CUSTOM,则需要清除一下
@@ -225,11 +222,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             if (params.getDataScope() == DataScopeType.CUSTOM) {
                 var targets = new ArrayList<UserDataScopeTarget>();
                 for (Long targetId : params.getTargetIds()) {
-                    targets.add(UserDataScopeTarget.builder()
-                            .userId(entity.getId())
-                            .targetId(targetId)
-                            .targetType(0)
-                            .build());
+                    var datum = new UserDataScopeTarget();
+                    datum.setUserId(entity.getId());
+                    datum.setTargetId(targetId);
+                    datum.setTargetType(0);
+                    targets.add(datum);
                 }
                 dataScopeTargetMapper.insert(targets);
             }
@@ -286,7 +283,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
-        var result = new Page<UserPageVO>();
         List<Long> organizationIds = new ArrayList<>();
         if (params.getOrganizationId() != null) {
             Organization organization = organizationService.getById(params.getOrganizationId());
@@ -308,8 +304,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);
-        BeanUtils.copyProperties(db, result);
-        result.setRecords(userConverter.toVOs(db.getRecords()));
+        var result = userConverter.toVOPage(db);
 
         // 获取所需内容
         var organizationNameMap = organizationService.list()
@@ -320,7 +315,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.getRecords().forEach(vo -> {
             var roles = relUserRoleService.getRoles(vo.getId());
             if (null != roles && !roles.isEmpty()) {
-                vo.setRoles(roleConverter.toVOs(roles));
+                vo.setRoles(
+                        roles.stream()
+                                .map(roleConverter::toVO)
+                                .toList()
+                );
             }
             vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
             // 数据范围

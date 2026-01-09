@@ -9,7 +9,6 @@ import io.github.yangxj96.spectra.core.mapper.user.RoleDataScopeMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeTargetMapper;
 import io.github.yangxj96.spectra.core.service.auth.DataScopeService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,14 +21,17 @@ import java.util.List;
 @Service
 public class DataScopeServiceImpl implements DataScopeService {
 
-    @Resource
-    private UserDataScopeMapper userDataScopeMapper;
+    private final UserDataScopeMapper userDataScopeMapper;
 
-    @Resource
-    private UserDataScopeTargetMapper userDataScopeTargetMapper;
+    private final UserDataScopeTargetMapper userDataScopeTargetMapper;
 
-    @Resource
-    private RoleDataScopeMapper roleDataScopeMapper;
+    private final RoleDataScopeMapper roleDataScopeMapper;
+
+    public DataScopeServiceImpl(UserDataScopeMapper userDataScopeMapper, UserDataScopeTargetMapper userDataScopeTargetMapper, RoleDataScopeMapper roleDataScopeMapper) {
+        this.userDataScopeMapper = userDataScopeMapper;
+        this.userDataScopeTargetMapper = userDataScopeTargetMapper;
+        this.roleDataScopeMapper = roleDataScopeMapper;
+    }
 
     @Override
     public DataScopeContext resolve(Long userId) {

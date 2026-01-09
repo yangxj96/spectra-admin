@@ -28,6 +28,6 @@
     <select id="getByRoleId" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM spectra.sys_rel_role_authority WHERE role_id = #{roleId}
+        FROM ${schema}.sys_rel_role_authority WHERE role_id = #{roleId}
     </select>
 </mapper>

@@ -26,7 +26,6 @@ import io.github.yangxj96.spectra.core.javabean.user.from.RoleMenuFrom;
 import io.github.yangxj96.spectra.core.mapper.user.RelRoleMenuMapper;
 import io.github.yangxj96.spectra.core.service.system.MenuService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
-import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +41,18 @@ import java.util.stream.Collectors;
 @Service
 public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
-    @Resource
-    private RelRoleMenuMapper relRoleMenuMapper;
+    private final MenuConverter menuConverter;
 
-    @Resource
-    private MenuService menuService;
+    private final RelRoleMenuMapper relRoleMenuMapper;
 
-    @Resource
-    private MenuConverter menuConverter;
+    private final MenuService menuService;
+
+    public RelRoleMenuServiceImpl(MenuConverter menuConverter, RelRoleMenuMapper relRoleMenuMapper, MenuService menuService) {
+        this.menuConverter = menuConverter;
+        this.relRoleMenuMapper = relRoleMenuMapper;
+        this.menuService = menuService;
+    }
+
 
     @Override
     @Transactional
@@ -75,10 +78,12 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         addIds.removeAll(currentIds);  // target - current = 新增
         if (CollUtils.isNotEmpty(addIds)) {
             List<RelRoleMenu> newMenu = addIds.stream()
-                    .map(addId -> RelRoleMenu.builder()
-                            .roleId(roleId)
-                            .menuId(addId)
-                            .build())
+                    .map(addId -> {
+                        var datum = new RelRoleMenu();
+                        datum.setRoleId(roleId);
+                        datum.setMenuId(addId);
+                        return datum;
+                    })
                     .collect(Collectors.toList());
             relRoleMenuMapper.insert(newMenu);
         }
@@ -95,7 +100,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     @Override
     public List<MenuVO> get(Long roleId) {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
-        return menuConverter.toVOS(menus);
+        return menuConverter.toVOList(menus);
     }
 
 }
