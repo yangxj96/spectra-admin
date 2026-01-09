@@ -25,13 +25,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/**
- * 字典(字典数据)业务层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-18
- */
+/// 字典(字典数据)业务层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-18
 @Service
 public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictItem> implements DictItemService {
 

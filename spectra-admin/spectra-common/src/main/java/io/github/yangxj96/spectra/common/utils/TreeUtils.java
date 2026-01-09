@@ -24,27 +24,23 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-/**
- * 树形工具类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 树形工具类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class TreeUtils {
 
     private TreeUtils() {
     }
 
-    /**
-     * 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点
-     *
-     * @param tree        树的根节点列表
-     * @param selectedIds 用户选中的节点ID集合
-     * @param idExtractor 提取节点ID的函数（如 AuthorityTreeVO::getId）
-     * @param <T>         实现 Tree<T> 的具体类型
-     * @return 压缩处理后的选中ID集合
-     */
+    /// 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点
+    ///
+    /// @param tree        树的根节点列表
+    /// @param selectedIds 用户选中的节点ID集合
+    /// @param idExtractor 提取节点ID的函数（如 AuthorityTreeVO::getId）
+    /// @param <T>         实现 Tree<T> 的具体类型
+    /// @return 压缩处理后的选中ID集合
     public static <T extends Tree<T>> Set<Long> compressSelectedNodes(List<T> tree, Set<Long> selectedIds, Function<T, Long> idExtractor) {
         var result = new HashSet<Long>();
         for (T node : tree) {
@@ -55,9 +51,7 @@ public class TreeUtils {
         return result;
     }
 
-    /**
-     * 递归收集压缩后的节点ID
-     */
+    /// 递归收集压缩后的节点ID
     private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<Long> selectedIds, Function<T, Long> idExtractor, Set<Long> result) {
 
         if (node == null) return false;

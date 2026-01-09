@@ -36,13 +36,11 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * Get请求参数下滑先转驼峰命名
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// Get请求参数下滑先转驼峰命名
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @Component
 public class RequestGetParamsFilter extends OncePerRequestFilter {

@@ -25,57 +25,43 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 
-/**
- * 用户service层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 用户service层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface UserService extends BaseService<User> {
 
-    /**
-     * 分页查询用户列表
-     *
-     * @param page   分页参数
-     * @param params 查询条件参数
-     * @return 分页结果
-     */
+    /// 分页查询用户列表
+    ///
+    /// @param page   分页参数
+    /// @param params 查询条件参数
+    /// @return 分页结果
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params);
 
-    /**
-     * 创建用户
-     *
-     * @param params 请求参数
-     */
+    /// 创建用户
+    ///
+    /// @param params 请求参数
     void create(UserSaveFrom params);
 
-    /**
-     * 根据用户ID更新用户
-     *
-     * @param params 请求参数
-     */
+    /// 根据用户ID更新用户
+    ///
+    /// @param params 请求参数
     void updateById(UserSaveFrom params);
 
-    /**
-     * 根据用户ID删除用户信息
-     *
-     * @param uid 用户ID
-     */
+    /// 根据用户ID删除用户信息
+    ///
+    /// @param uid 用户ID
     void deleteById(String uid);
 
-    /**
-     * 重置用户密码
-     *
-     * @param uid 用户ID
-     */
+    /// 重置用户密码
+    ///
+    /// @param uid 用户ID
     void passwordResetById(String uid);
 
-    /**
-     * 分页获取在线用户
-     *
-     * @return 获取到的数据
-     */
+    /// 分页获取在线用户
+    ///
+    /// @return 获取到的数据
     IPage<UserOnlineVO> online(PageFrom page);
 
 }

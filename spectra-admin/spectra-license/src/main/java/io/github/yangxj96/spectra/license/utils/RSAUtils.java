@@ -32,13 +32,11 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
-/**
- * RAS加解密
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// RAS加解密
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class RSAUtils {
 
     private RSAUtils() {
@@ -108,9 +106,7 @@ public class RSAUtils {
     public static PrivateKey loadPrivateKey(InputStream in) throws EncryptException {
         try {
             var content = new String(in.readAllBytes());
-            content = content.replace("-----BEGIN PRIVATE KEY-----", "")
-                    .replace("-----END PRIVATE KEY-----", "")
-                    .replaceAll("\\s", "");
+            content = content.replace("-----BEGIN PRIVATE KEY-----", "").replace("-----END PRIVATE KEY-----", "").replaceAll("\\s", "");
             var decoded = Base64.getDecoder().decode(content);
             var spec = new PKCS8EncodedKeySpec(decoded);
             var kf = KeyFactory.getInstance("RSA");
@@ -126,9 +122,7 @@ public class RSAUtils {
     public static PublicKey loadPublicKey(InputStream in) throws EncryptException {
         try {
             var content = new String(in.readAllBytes());
-            content = content.replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\\s", "");
+            content = content.replace("-----BEGIN PUBLIC KEY-----", "").replace("-----END PUBLIC KEY-----", "").replaceAll("\\s", "");
             var decoded = Base64.getDecoder().decode(content);
             var spec = new X509EncodedKeySpec(decoded);
             var kf = KeyFactory.getInstance("RSA");

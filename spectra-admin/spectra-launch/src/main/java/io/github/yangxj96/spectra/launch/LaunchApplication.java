@@ -23,13 +23,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 import java.util.TimeZone;
 
-/**
- * 启动类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/23
- */
+/// 启动类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/23
 @Slf4j
 @SpringBootApplication
 @ComponentScan("io.github.yangxj96.spectra")

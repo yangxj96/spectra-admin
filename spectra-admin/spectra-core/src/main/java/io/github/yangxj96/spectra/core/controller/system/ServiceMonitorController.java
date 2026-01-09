@@ -26,13 +26,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * 服务器信息监控
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 服务器信息监控
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @RestController
 @RequestMapping("/service/monitor")
 public class ServiceMonitorController {

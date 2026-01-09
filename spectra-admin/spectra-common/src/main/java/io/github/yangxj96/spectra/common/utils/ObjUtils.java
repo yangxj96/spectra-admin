@@ -9,13 +9,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Object 相关工具类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/26 10:49
- */
+/// Object 相关工具类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/26 10:49
 @NullMarked
 public final class ObjUtils {
 
@@ -23,14 +21,12 @@ public final class ObjUtils {
     }
 
 
-    /**
-     * obj转list
-     *
-     * @param obj   obj对象
-     * @param clazz 具体类型
-     * @param <T>   具体类型
-     * @return 转换后的结果
-     */
+    /// obj转list
+    ///
+    /// @param obj   obj对象
+    /// @param clazz 具体类型
+    /// @param <T>   具体类型
+    /// @return 转换后的结果
     public static <T> List<T> castList(Object obj, Class<T> clazz) {
         if (!(obj instanceof List<?> list)) {
             return Collections.emptyList();
@@ -43,16 +39,14 @@ public final class ObjUtils {
         return result;
     }
 
-    /**
-     * Object → Map<K, V>
-     *
-     * @param obj        对象
-     * @param keyClass   key类型
-     * @param valueClass value类型
-     * @param <K>        key类型
-     * @param <V>        value类型
-     * @return 转换后的map
-     */
+    /// Object → Map<K, V>
+    ///
+    /// @param obj        对象
+    /// @param keyClass   key类型
+    /// @param valueClass value类型
+    /// @param <K>        key类型
+    /// @param <V>        value类型
+    /// @return 转换后的map
     public static <K, V> Map<K, V> castMap(Object obj, Class<K> keyClass, Class<V> valueClass) {
         if (!(obj instanceof Map<?, ?> rawMap)) {
             return Collections.emptyMap();
@@ -75,16 +69,14 @@ public final class ObjUtils {
         return result;
     }
 
-    /**
-     * object转list map
-     *
-     * @param obj    对象
-     * @param kCalzz k类型
-     * @param vCalzz v类型
-     * @param <K>    kclass
-     * @param <V>    vclass
-     * @return 转换后的List Map
-     */
+    /// object转list map
+    ///
+    /// @param obj    对象
+    /// @param kCalzz k类型
+    /// @param vCalzz v类型
+    /// @param <K>    kclass
+    /// @param <V>    vclass
+    /// @return 转换后的List Map
     public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kCalzz, Class<V> vCalzz) {
         if (!(obj instanceof List<?> list)) {
             return Collections.emptyList();
@@ -100,12 +92,10 @@ public final class ObjUtils {
     }
 
 
-    /**
-     * Object 转换为 Map String Object
-     *
-     * @param obj 对象
-     * @return {@link Map } key为string,value为object
-     */
+    /// Object 转换为 Map String Object
+    ///
+    /// @param obj 对象
+    /// @return `Map<String,Object` key为string,value为object
     public static Map<String, Object> castStrObjMap(Object obj) {
         return castMap(obj, String.class, Object.class);
     }

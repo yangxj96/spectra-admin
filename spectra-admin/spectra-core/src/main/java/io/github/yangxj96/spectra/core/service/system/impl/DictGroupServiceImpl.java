@@ -24,13 +24,11 @@ import io.github.yangxj96.spectra.core.service.system.DictGroupService;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
-/**
- * 字典(字典类型)业务层实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-18
- */
+/// 字典(字典类型)业务层实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-18
 @Service
 public class DictGroupServiceImpl extends BaseServiceImpl<DictGroupMapper, DictGroup> implements DictGroupService {
 

@@ -34,29 +34,18 @@ import org.springframework.util.StringUtils;
 import java.sql.Connection;
 import java.util.stream.Collectors;
 
-/**
- * 数据拦截器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/23 14:04
- */
+/// 数据拦截器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/23 14:04
 @Slf4j
 @Component
 public class DataScopeInnerInterceptor implements InnerInterceptor {
 
-    /**
-     * 拦截SELECT
-     */
+    /// 拦截SELECT
     @Override
-    public void beforeQuery(
-            Executor executor,
-            MappedStatement ms,
-            Object parameter,
-            RowBounds rowBounds,
-            ResultHandler resultHandler,
-            BoundSql boundSql
-    ) {
+    public void beforeQuery(Executor executor, MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, BoundSql boundSql) {
         final var ctx = DataScopeHolder.get();
         if (ctx == null || ctx.isIgnore() || ctx.getScope() == DataScopeType.ALL) {
             return;
@@ -77,9 +66,7 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
     }
 
 
-    /**
-     * 拦截UPDATE和DELETE
-     */
+    /// 拦截UPDATE和DELETE
     @Override
     public void beforePrepare(StatementHandler sh, Connection connection, Integer transactionTimeout) {
         DataScopeContext ctx = DataScopeHolder.get();
@@ -105,14 +92,12 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
     }
 
-    /**
-     * 处理UPDATE和DELETE
-     *
-     * @param sql SQL
-     * @param ctx 数据范围上下文
-     * @return 处理后的SQL
-     * @throws Exception {@link Exception} e
-     */
+    /// 处理UPDATE和DELETE
+    ///
+    /// @param sql SQL
+    /// @param ctx 数据范围上下文
+    /// @return 处理后的SQL
+    /// @throws Exception 错误消息
     private @Nullable String processUpdateDeleteSql(String sql, DataScopeContext ctx) throws Exception {
 
         Statement stmt = CCJSqlParserUtil.parse(sql);
@@ -130,12 +115,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         return null;
     }
 
-    /**
-     * 处理UPDATE
-     *
-     * @param update UPDATE
-     * @param ctx    数据范围上下文
-     */
+    /// 处理UPDATE
+    ///
+    /// @param update UPDATE
+    /// @param ctx    数据范围上下文
     private void processUpdate(Update update, DataScopeContext ctx) {
 
         Table table = update.getTable();
@@ -159,12 +142,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         update.setWhere(new AndExpression(where, dataScopeExpr));
     }
 
-    /**
-     * 处理DELETE
-     *
-     * @param delete DELETE
-     * @param ctx    数据范围上下文
-     */
+    /// 处理DELETE
+    ///
+    /// @param delete DELETE
+    /// @param ctx    数据范围上下文
     private void processDelete(Delete delete, DataScopeContext ctx) {
 
         Table table = delete.getTable();
@@ -185,14 +166,12 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         delete.setWhere(new AndExpression(where, dataScopeExpr));
     }
 
-    /**
-     * SQL 处理入口
-     *
-     * @param sql 需要处理的SQL
-     * @param ctx 数据范围上下文
-     * @return 处理完成的SQL
-     * @throws Exception {@link Exception} 错误
-     */
+    /// SQL 处理入口
+    ///
+    /// @param sql 需要处理的SQL
+    /// @param ctx 数据范围上下文
+    /// @return 处理完成的SQL
+    /// @throws Exception 错误消息
     private String processSql(String sql, DataScopeContext ctx) throws Exception {
         Statement stmt = CCJSqlParserUtil.parse(sql);
         // 非SELECT SQL不处理
@@ -208,12 +187,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         return select.toString();
     }
 
-    /**
-     * 处理UNION / UNION ALL
-     *
-     * @param set {@link SetOperationList} 带UNION / UNION ALL的复杂SQL
-     * @param ctx 数据范围上下文
-     */
+    /// 处理UNION / UNION ALL
+    ///
+    /// @param set `SetOperationList` 带UNION / UNION ALL的复杂SQL
+    /// @param ctx 数据范围上下文
     private void processSetOperationList(SetOperationList set, DataScopeContext ctx) {
         for (var s : set.getSelects()) {
             if (s.getPlainSelect() != null) {
@@ -222,12 +199,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
     }
 
-    /**
-     * 处理普通 SELECT
-     *
-     * @param ps  {@link PlainSelect} 简单的SELECT SQL
-     * @param ctx 数据范围上下文
-     */
+    /// 处理普通 SELECT
+    ///
+    /// @param ps  `PlainSelect` 简单的SELECT SQL
+    /// @param ctx 数据范围上下文
     private void processPlainSelect(PlainSelect ps, DataScopeContext ctx) {
         // 处理 WITH (CTE)
         if (ps.getWithItemsList() != null) {
@@ -270,12 +245,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         ps.setWhere(where == null ? dataScopeExpr : new AndExpression(where, dataScopeExpr));
     }
 
-    /**
-     * FromItem & 子查询
-     *
-     * @param item {@link FromItem}
-     * @param ctx  数据范围上下文
-     */
+    /// FromItem & 子查询
+    ///
+    /// @param item `FromItem`
+    /// @param ctx  数据范围上下文
     private void processFromItem(FromItem item, DataScopeContext ctx) {
         if (item instanceof ParenthesedSelect ps) {
             var sub = ps.getSelect();
@@ -287,13 +260,11 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         }
     }
 
-    /**
-     * 构建数据范围表达式
-     *
-     * @param field 字段
-     * @param ctx   数据范围上下文
-     * @return 表达式
-     */
+    /// 构建数据范围表达式
+    ///
+    /// @param field 字段
+    /// @param ctx   数据范围上下文
+    /// @return 表达式
     private @Nullable Expression buildScopeExpression(String field, DataScopeContext ctx) {
         return switch (ctx.getScope()) {
             case SELF -> new EqualsTo(
@@ -319,12 +290,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
     }
 
 
-    /**
-     * 检查 select item 是否是 COUNT(*) / COUNT(x)
-     *
-     * @param ps {@link PlainSelect} 简单SELECT
-     * @return 是否
-     */
+    /// 检查 select item 是否是 COUNT(*) / COUNT(x)
+    ///
+    /// @param ps `PlainSelect`简单SELECT
+    /// @return 是否
     private boolean isCountSelect(PlainSelect ps) {
         if (ps.getSelectItems() == null || ps.getSelectItems().size() != 1) {
             return false;
@@ -339,14 +308,12 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         return false;
     }
 
-    /**
-     * 字段 & 表别名解析（非常关键）
-     * 推荐策略：字段优先，其次表别名
-     *
-     * @param ps  PlainSelect
-     * @param ctx DataScopeContext
-     * @return String
-     */
+    /// 字段 & 表别名解析（非常关键）
+    /// 推荐策略：字段优先，其次表别名
+    ///
+    /// @param ps  PlainSelect
+    /// @param ctx DataScopeContext
+    /// @return String
     private @Nullable String resolveScopeField(PlainSelect ps, DataScopeContext ctx) {
         // 注解显式指定（如 o.org_id）
         if (StringUtils.hasText(ctx.getScopeField())) {
@@ -356,13 +323,11 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         return null;
     }
 
-    /**
-     * 解析范围字段
-     *
-     * @param table table
-     * @param ctx   数据范围上下文
-     * @return 解析后
-     */
+    /// 解析范围字段
+    ///
+    /// @param table table
+    /// @param ctx   数据范围上下文
+    /// @return 解析后
     private String resolveScopeField(Table table, DataScopeContext ctx) {
 
         if (StringUtils.hasText(ctx.getScopeField())) {
@@ -376,12 +341,10 @@ public class DataScopeInnerInterceptor implements InnerInterceptor {
         return alias + ".org_id";
     }
 
-    /**
-     * 解析用户字段
-     *
-     * @param ps 简单SQL
-     * @return 用户字段
-     */
+    /// 解析用户字段
+    ///
+    /// @param ps 简单SQL
+    /// @return 用户字段
     private @Nullable String resolveUserField(PlainSelect ps) {
         FromItem from = ps.getFromItem();
         if (from instanceof Table table) {

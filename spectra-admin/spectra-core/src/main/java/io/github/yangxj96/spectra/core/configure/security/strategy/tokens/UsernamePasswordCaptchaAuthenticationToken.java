@@ -5,9 +5,11 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 import java.util.Collections;
 
-///
 /// 用户名密码+验证码登录
 ///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/29 10:55
 public class UsernamePasswordCaptchaAuthenticationToken extends AbstractAuthenticationToken {
 
     ///  用户名

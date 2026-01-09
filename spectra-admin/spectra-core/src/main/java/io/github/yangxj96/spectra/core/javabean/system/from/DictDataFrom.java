@@ -23,59 +23,41 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * <p>
- * 字典数据入参
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典数据入参
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DictDataFrom {
 
-    /**
-     * 主键ID
-     */
+    /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private Long id;
 
-    /**
-     * 字典类型ID
-     */
+    /// 字典类型ID
     @NotNull(message = "字典类型不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Long gid;
 
-    /**
-     * 标签
-     */
+    /// 标签
     @NotNull(message = "标签不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String label;
 
-    /**
-     * 值
-     */
+    /// 值
     @NotNull(message = "字典值不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String value;
 
-    /**
-     * 排序
-     */
+    /// 排序
     private Short sort;
 
-    /**
-     * 状态
-     */
+    /// 状态
     @NotNull(message = "字典状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Short state;
 
-    /**
-     * 备注
-     */
+    /// 备注
     private String remark;
 
 }

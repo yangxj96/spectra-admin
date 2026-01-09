@@ -14,13 +14,11 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-/**
- * 错误处理
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/8 14:45
- */
+/// 权限错误处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/8 14:45
 @Component
 @NullMarked
 public class RestAccessDeniedHandler implements AccessDeniedHandler {

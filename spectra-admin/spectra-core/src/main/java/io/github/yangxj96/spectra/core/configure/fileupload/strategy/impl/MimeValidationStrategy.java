@@ -22,15 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/**
- * <p>
- * 文件类型验证策略-根据文件mime方式验证
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 文件类型验证策略-根据文件mime方式验证
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/19
 public record MimeValidationStrategy(List<String> allowedMimes) implements FileTypeValidationStrategy {
 
     @Override

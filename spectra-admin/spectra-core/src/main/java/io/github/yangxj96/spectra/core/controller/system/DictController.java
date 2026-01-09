@@ -30,15 +30,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * <p>
- * 字典控制器
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @RestController
 @RequestMapping("/dict")
 public class DictController {

@@ -19,21 +19,17 @@ package io.github.yangxj96.spectra.common.constant;
 
 import org.jspecify.annotations.Nullable;
 
-/**
- * 通用常量
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 通用常量
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public final class Common {
 
     private Common() {
     }
 
-    /**
-     * 默认的PID
-     */
+    /// 默认的PID
     @Nullable
     public static final Long PID = null;
 

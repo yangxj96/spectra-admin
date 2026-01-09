@@ -18,13 +18,11 @@ package io.github.yangxj96.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/**
- * 任务完成请求参数
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 任务完成请求参数
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 public class TaskCompleteFrom {
 }

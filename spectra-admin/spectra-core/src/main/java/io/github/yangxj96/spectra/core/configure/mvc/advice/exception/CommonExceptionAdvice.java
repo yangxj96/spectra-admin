@@ -32,13 +32,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-/**
- * 通用异常处理
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 通用异常处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Slf4j
 @Order
 @NullMarked
@@ -47,13 +45,11 @@ public class CommonExceptionAdvice {
 
     private static final String PREFIX = "[GlobalException]:";
 
-    /**
-     * 未找到资源
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 未找到资源
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -62,13 +58,11 @@ public class CommonExceptionAdvice {
     }
 
 
-    /**
-     * 未进行功能实现异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 未进行功能实现异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -76,13 +70,11 @@ public class CommonExceptionAdvice {
         return R.failure();
     }
 
-    /**
-     * 数据已存在异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 数据已存在异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.CONFLICT.value());
@@ -90,13 +82,11 @@ public class CommonExceptionAdvice {
         return R.failure(HttpStatus.CONFLICT);
     }
 
-    /**
-     * 数据不存在异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 数据不存在异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.NOT_FOUND.value());
@@ -104,13 +94,11 @@ public class CommonExceptionAdvice {
         return R.failure(HttpStatus.NOT_FOUND);
     }
 
-    /**
-     * 参数验证异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 参数验证异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
         log.error(PREFIX + "参数验证异常,{} ", e.getMessage(), e);
@@ -128,13 +116,11 @@ public class CommonExceptionAdvice {
         }
     }
 
-    /**
-     * 运行时异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 运行时异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -142,13 +128,11 @@ public class CommonExceptionAdvice {
         return R.failure("请求数据格式错误，请检查JSON格式和字段类型");
     }
 
-    /**
-     * 运行时异常
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 运行时异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -156,13 +140,11 @@ public class CommonExceptionAdvice {
         return R.failure(e.getMessage());
     }
 
-    /**
-     * 兜底异常处理
-     *
-     * @param e        错误信息
-     * @param response 响应
-     * @return 格式化为正常响应返回
-     */
+    /// 兜底异常处理
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为正常响应返回
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

@@ -22,13 +22,11 @@ import io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper;
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
 import org.springframework.stereotype.Service;
 
-/**
- * 操作日志service层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 操作日志service层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Service
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
 }

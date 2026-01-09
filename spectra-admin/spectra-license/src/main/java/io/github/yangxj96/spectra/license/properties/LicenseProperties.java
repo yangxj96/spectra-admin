@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.license.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/**
- * 许可相关配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+// 许可相关配置
+//
+// @author Jack Young
+// @version 1.0
+// @since 2025-11-11
 @Data
 @ConfigurationProperties(prefix = "spectra.system.license")
 public class LicenseProperties {

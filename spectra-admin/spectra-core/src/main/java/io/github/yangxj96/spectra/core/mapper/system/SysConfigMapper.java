@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.core.mapper.system;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.javabean.system.entity.SysConfig;
 
-/**
- * 系统配置表-DTO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/9/18
- */
+/// 系统配置表-DTO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/9/18
 public interface SysConfigMapper extends BaseMapper<SysConfig> {
 
 }

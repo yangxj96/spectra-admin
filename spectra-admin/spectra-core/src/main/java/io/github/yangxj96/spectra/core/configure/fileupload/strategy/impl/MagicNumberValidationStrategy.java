@@ -27,13 +27,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * 文件类型验证策略-根据文件魔数验证
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-06-19
- */
+/// 文件类型验证策略-根据文件魔数验证
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-06-19
 public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
 
     @Override
@@ -54,13 +52,11 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
     }
 
 
-    /**
-     * 判断两个字节数组前 n 字节是否相等
-     *
-     * @param fileHeader 文件头字节
-     * @param magic      文件类型的魔数字节
-     * @return 是否相等
-     */
+    /// 判断两个字节数组前 n 字节是否相等
+    ///
+    /// @param fileHeader 文件头字节
+    /// @param magic      文件类型的魔数字节
+    /// @return 是否相等
     public static boolean matches(byte[] fileHeader, byte[] magic) {
         if ((fileHeader.length == 0 || magic.length == 0) || fileHeader.length < magic.length) {
             return false;
@@ -74,12 +70,10 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
     }
 
 
-    /**
-     * 从 MultipartFile 读取指定长度的文件头
-     *
-     * @param file 需要读取的文件
-     * @return 读取到的头部长度
-     */
+    /// 从 MultipartFile 读取指定长度的文件头
+    ///
+    /// @param file 需要读取的文件
+    /// @return 读取到的头部长度
     public static byte[] readHeader(MultipartFile file) throws IOException {
         var length = Arrays.stream(FileType.values())
                 .mapToInt(t -> t.getMagicNumber().length)

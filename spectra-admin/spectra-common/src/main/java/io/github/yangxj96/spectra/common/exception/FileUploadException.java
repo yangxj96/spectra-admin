@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 文件类型异常
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 文件类型异常
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class FileUploadException extends SpectraException {
 
     public FileUploadException() {

@@ -28,14 +28,12 @@ import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Collections;
 
-/**
- * 角色删除事件
- * <p>用户-角色关联处理</p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 角色删除事件
+/// >用户-角色关联处理
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Slf4j
 @Component
 @RequiredArgsConstructor

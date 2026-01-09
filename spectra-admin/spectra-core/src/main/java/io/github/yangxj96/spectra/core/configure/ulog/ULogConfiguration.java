@@ -24,13 +24,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
 
-/**
- * 操作日志相关配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/27
- */
+/// 操作日志相关配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/27
 @Slf4j
 @EnableAsync
 @Configuration
@@ -38,12 +36,10 @@ public class ULogConfiguration {
 
     private static final String PREFIX = "[ULogConfiguration]:";
 
-    /**
-     * 日志消息订阅发布者
-     *
-     * @param publisher 发布者
-     * @return {@link ULogEventPublisher}
-     */
+    /// 日志消息订阅发布者
+    ///
+    /// @param publisher 发布者
+    /// @return {@link ULogEventPublisher}
     @Bean
     public ULogEventPublisher uLogEventPublisher(ApplicationEventPublisher publisher) {
         log.debug(PREFIX + "载入日志消息订阅发布者");
@@ -55,6 +51,7 @@ public class ULogConfiguration {
      *
      * @return {@link ULogAspect}
      */
+    /// 日志切面
     @Bean
     public ULogAspect uLogAspect() {
         log.debug(PREFIX + "载入ULogAspect");

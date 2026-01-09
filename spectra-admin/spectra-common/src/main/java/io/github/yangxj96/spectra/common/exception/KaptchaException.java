@@ -16,13 +16,11 @@
 
 package io.github.yangxj96.spectra.common.exception;
 
-/**
- * 验证码相关异常
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/28
- */
+/// 验证码相关异常
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/28
 public class KaptchaException extends SpectraException {
 
     public KaptchaException() {

@@ -27,13 +27,11 @@ import oshi.hardware.PhysicalMemory;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
-/**
- * 服务器信息监控
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 服务器信息监控
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Service
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 

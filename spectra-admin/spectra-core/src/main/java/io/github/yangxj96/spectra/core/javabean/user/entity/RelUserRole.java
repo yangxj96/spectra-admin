@@ -28,13 +28,11 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 用户和角色中间表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 用户和角色中间表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -46,9 +44,11 @@ public class RelUserRole extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /// 用户ID
     @TableField("user_id")
     private Long userId;
 
+    /// 角色ID
     @TableField("role_id")
     private Long roleId;
 

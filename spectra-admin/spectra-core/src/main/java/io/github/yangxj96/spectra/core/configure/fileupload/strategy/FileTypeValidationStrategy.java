@@ -20,22 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-/**
- * <p>
- * 文件类型验证策略
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 文件类型验证策略
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/06/19
 public interface FileTypeValidationStrategy {
 
-    /**
-     * 验证文件类型
-     *
-     * @param file 文件
-     * @return 是否验证通过
-     */
+    /// 验证文件类型
+    ///
+    /// @param file 文件
+    /// @return 是否验证通过
     boolean isValid(MultipartFile file) throws IOException;
 }

@@ -23,27 +23,21 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * 权限service层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 权限service层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface AuthorityService extends BaseService<Authority> {
 
-    /**
-     * 根据角色ID获取角色关联的权限
-     *
-     * @param id 角色ID
-     * @return 关联的权限
-     */
+    /// 根据角色ID获取角色关联的权限
+    ///
+    /// @param id 角色ID
+    /// @return 关联的权限
     List<Authority> getByRelRoleId(long id);
 
-    /**
-     * 获取权限树
-     *
-     * @return 权限树列表
-     */
+    /// 获取权限树
+    ///
+    /// @return 权限树列表
     @Nullable List<AuthorityTreeVO> tree();
 }

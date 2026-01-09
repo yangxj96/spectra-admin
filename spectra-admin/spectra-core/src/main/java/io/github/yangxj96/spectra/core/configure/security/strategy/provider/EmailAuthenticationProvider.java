@@ -9,13 +9,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
-/**
- * 邮箱登录
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/29 10:46
- */
+/// 邮箱登录
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/29 10:46
 @Component
 @RequiredArgsConstructor
 public class EmailAuthenticationProvider implements AuthenticationProvider {

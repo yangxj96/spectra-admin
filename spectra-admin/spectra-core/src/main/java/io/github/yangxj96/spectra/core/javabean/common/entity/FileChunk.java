@@ -12,13 +12,11 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-/**
- * 文件分片信息实体
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/8 00:03
- */
+/// 文件分片信息实体
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/8 00:03
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
@@ -27,39 +25,27 @@ import java.io.Serializable;
 @TableName(value = "sys_file_chunk", schema = "domain_core")
 public class FileChunk extends BaseEntity implements Serializable {
 
-    /**
-     * 文件名
-     */
+    /// 文件名
     @TableField(value = "file_name")
     private String fileName;
 
-    /**
-     * 文件唯一标识（如 SHA256 或 UUID）
-     */
+    /// 文件唯一标识（如 SHA256 或 UUID）
     @TableField(value = "file_id")
     private String fileId;
 
-    /**
-     * 分片序号（从 0 开始）
-     */
+    /// 分片序号（从 0 开始）
     @TableField(value = "chunk_index")
     private Integer chunkIndex;
 
-    /**
-     * 总分片数（冗余，便于校验）
-     */
+    /// 总分片数（冗余，便于校验）
     @TableField(value = "total_chunks")
     private Integer totalChunks;
 
-    /**
-     * 分片在磁盘/OSS 的存储路径或 Key
-     */
+    /// 分片在磁盘/OSS 的存储路径或 Key
     @TableField(value = "chunk_path")
     private String chunkPath;
 
-    /**
-     * 当前分片字节数
-     */
+    /// 当前分片字节数
     @TableField(value = "chunk_size")
     private Long chunkSize;
 

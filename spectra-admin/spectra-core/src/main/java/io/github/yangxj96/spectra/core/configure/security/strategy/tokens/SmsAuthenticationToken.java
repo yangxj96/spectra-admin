@@ -7,13 +7,11 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.Collections;
 
-/**
- * 短信登录TOKEN
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/29 10:42
- */
+/// 短信登录TOKEN
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/29 10:42
 public class SmsAuthenticationToken extends AbstractAuthenticationToken {
 
     private final Object principal;

@@ -22,58 +22,40 @@ import lombok.NoArgsConstructor;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 
-/**
- * 菜单VO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 菜单VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuVO {
 
-    /**
-     * 数据id.
-     */
+    /// 数据id.
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 父级ID
-     */
+    /// 父级ID
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
-    /**
-     * 图标
-     */
+    /// 图标
     private String icon;
 
-    /**
-     * 名称
-     */
+    /// 名称
     private String name;
 
-    /**
-     * 请求路径
-     */
+    /// 请求路径
     private String path;
 
-    /**
-     * 组件路径,为空则使用布局组件
-     */
+    /// 组件路径,为空则使用布局组件
     private String component;
 
-    /**
-     * 布局
-     */
+    /// 布局
     private String layout;
 
-    /**
-     * 排序
-     */
+    /// 排序
     private Integer sort;
 
 }

@@ -32,13 +32,11 @@ import org.springframework.context.annotation.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 文件上传类型验证需要的相关配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-06-27
- */
+/// 文件上传类型验证需要的相关配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-06-27
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(FileUploadProperties.class)
@@ -52,11 +50,9 @@ public class FileUploadConfiguration {
         this.properties = properties;
     }
 
-    /**
-     * 文件类型验证策略管理器
-     *
-     * @return {@link FileTypeValidator}
-     */
+    /// 文件类型验证策略管理器
+    ///
+    /// @return 文件策略验证管理器
     @Bean
     public FileTypeValidator fileTypeValidator() {
         log.debug(PREFIX + "载入文件类型验证策略管理器");
@@ -81,12 +77,10 @@ public class FileUploadConfiguration {
     }
 
 
-    /**
-     * 获取可上传的文件的mimes列表
-     *
-     * @param allowedTypes 允许上传的列表
-     * @return mime列表
-     */
+    /// 获取可上传的文件的mimes列表
+    ///
+    /// @param allowedTypes 允许上传的列表
+    /// @return mime列表
     private List<String> mimes(List<FileType> allowedTypes) {
         var m = new ArrayList<String>();
         for (FileType allowedType : allowedTypes) {

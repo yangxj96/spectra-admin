@@ -19,12 +19,10 @@ package io.github.yangxj96.spectra.core.mapper.system;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
 
-/**
- * 菜单Mapper
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 菜单Mapper
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 public interface MenuMapper extends BaseMapper<Menu> {
 }

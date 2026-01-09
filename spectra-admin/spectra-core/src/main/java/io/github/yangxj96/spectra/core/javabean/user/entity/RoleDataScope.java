@@ -13,13 +13,11 @@ import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 
-/**
- * 角色数据范围
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/23 11:24
- */
+/// 角色数据范围
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/23 11:24
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -28,15 +26,11 @@ import java.io.Serializable;
 @TableName(value = "sys_role_data_scope", schema = "domain_core")
 public class RoleDataScope extends BaseEntity implements Serializable {
 
-    /**
-     * 角色ID
-     */
+    /// 角色ID
     @TableField(value = "role_id")
     private Long roleId;
 
-    /**
-     * 数据范围类型
-     */
+    /// 数据范围类型
     @TableField(value = "scope_type")
     private DataScopeType scopeType;
 

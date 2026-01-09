@@ -27,13 +27,11 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * 组织机构树形
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/14
- */
+/// 组织机构树形
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/14
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,54 +43,34 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 上级ID
-     */
+    /// 上级ID
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
-    /**
-     * 名称
-     */
+    /// 名称
     private String name;
 
-    /**
-     * 编码
-     */
+    /// 编码
     private String code;
 
-    /**
-     * 组织机构类型
-     */
+    /// 组织机构类型
     private Short type;
 
-    /**
-     * 路径
-     */
+    /// 路径
     private String path;
 
-    /**
-     * 组织机构所在地址
-     */
+    /// 组织机构所在地址
     private String address;
 
-    /**
-     * 负责人ID
-     */
+    /// 负责人ID
     private Long managerId;
 
-    /**
-     * 备注
-     */
+    /// 备注
     private String remark;
 
-    /**
-     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
-     */
+    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
     private Integer sort = 0;
 
-    /**
-     * 下级菜单
-     */
+    /// 下级菜单
     private List<OrganizationTreeVo> children;
 }

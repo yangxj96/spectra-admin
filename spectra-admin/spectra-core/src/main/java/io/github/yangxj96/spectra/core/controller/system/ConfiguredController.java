@@ -12,13 +12,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 系统配置控制器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 系统配置控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @RestController
 @RequestMapping("/configured")
 public class ConfiguredController {

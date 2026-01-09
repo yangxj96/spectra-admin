@@ -21,38 +21,33 @@ import io.github.yangxj96.spectra.core.javabean.user.vo.AuthorityVO;
 
 import java.util.List;
 
-/**
- * 关联服务-用户和权限
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 关联服务-用户和权限
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public interface RelRoleAuthorityService {
 
-    /**
-     * 授予角色权限
-     */
+    /// 授予角色权限
+    ///
+    /// @param roleId 角色ID
+    /// @param from   权限关联信息
     void grant(Long roleId, RoleAuthorityFrom from);
 
-    /**
-     * 撤销角色权限
-     */
+    /// 撤销角色权限
+    ///
+    /// @param roleId 角色ID
     void revoke(Long roleId);
 
-    /**
-     * 获取角色权限
-     *
-     * @param roleId 角色ID
-     * @return 权限列表
-     */
+    /// 获取角色权限
+    ///
+    /// @param roleId 角色ID
+    /// @return 权限列表
     List<AuthorityVO> get(Long roleId);
 
-    /**
-     * 获取角色权限
-     *
-     * @param ids 角色ID列表
-     * @return 权限列表,已去重
-     */
+    /// 获取角色权限
+    ///
+    /// @param ids 角色ID列表
+    /// @return 权限列表,已去重
     List<AuthorityVO> get(List<Long> ids);
 }

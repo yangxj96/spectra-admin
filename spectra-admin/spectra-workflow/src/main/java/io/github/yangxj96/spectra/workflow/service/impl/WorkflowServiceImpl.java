@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.workflow.service.impl;
 import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import org.springframework.stereotype.Service;
 
-/**
- * 工作流业务层实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 工作流业务层实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 

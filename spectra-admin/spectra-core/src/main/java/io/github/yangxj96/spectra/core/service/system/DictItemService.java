@@ -21,20 +21,16 @@ import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 
 import java.util.List;
 
-/**
- * 字典(字典数据)业务层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-18
- */
+/// 字典(字典数据)业务层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-18
 public interface DictItemService extends BaseService<DictItem> {
 
-    /**
-     * 根据字典组ID查询字典数据列表
-     *
-     * @param gid 字典组ID
-     * @return 字典数据列表
-     */
+    /// 根据字典组ID查询字典数据列表
+    ///
+    /// @param gid 字典组ID
+    /// @return 字典数据列表
     List<DictItem> listByGid(Long gid);
 }

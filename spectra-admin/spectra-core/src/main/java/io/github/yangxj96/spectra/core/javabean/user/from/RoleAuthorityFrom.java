@@ -24,27 +24,21 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/**
- * 角色关联权限入参
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 角色关联权限入参
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleAuthorityFrom {
 
-    /**
-     * 角色ID
-     */
+    /// 角色ID
     @NotNull(message = "角色ID不能为空")
     private Long roleId;
 
-    /**
-     * 权限ID列表
-     */
+    /// 权限ID列表
     @NotNull(message = "权限列表不能为空")
     @Size(min = 1, message = "权限列表至少需要一个权限ID")
     private List<Long> authorityIds;

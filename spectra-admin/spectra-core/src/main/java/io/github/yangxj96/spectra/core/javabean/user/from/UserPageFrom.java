@@ -20,35 +20,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 用户分页查询入参
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 用户分页查询入参
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserPageFrom {
 
-    /**
-     * 用户名称
-     */
+    /// 用户名称
     private String username;
 
-    /**
-     * 邮箱
-     */
+    /// 邮箱
     private String email;
 
-    /**
-     * 状态
-     */
+    /// 状态
     private Boolean status;
 
-    /**
-     * 组织机构ID
-     */
+    /// 组织机构ID
     private Long organizationId;
 }

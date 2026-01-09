@@ -19,15 +19,11 @@ package io.github.yangxj96.spectra.core.configure.fileupload.enums;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * <p>
- * 文件类型
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/19
- */
+/// 文件类型
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/06/19
 @Getter
 @AllArgsConstructor
 public enum FileType {
@@ -38,24 +34,16 @@ public enum FileType {
     PDF("PDF", ".pdf", "application/pdf", new byte[]{0x25, 0x50, 0x44, 0x46}),
     ZIP("ZIP", ".zip", "application/zip", new byte[]{0x50, 0x4B, 0x03, 0x04});
 
-    /**
-     * 文件名称
-     */
+    /// 文件名称
     private final String name;
 
-    /**
-     * 文件扩展后缀
-     */
+    /// 文件扩展后缀
     private final String extension;
 
-    /**
-     * 文件mime
-     */
+    /// 文件mime
     private final String mime;
 
-    /**
-     * 文件魔数
-     */
+    /// 文件魔数
     private final byte[] magicNumber;
 
 }

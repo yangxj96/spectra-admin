@@ -28,13 +28,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * 工作流-流程定义
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 工作流-流程定义
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-definitions")

@@ -25,13 +25,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-/**
- * 文件类型验证策略-根据文件扩展名验证
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-06-19
- */
+/// 文件类型验证策略-根据文件扩展名验证
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-06-19
 public record ExtensionValidationStrategy(List<FileType> allowed) implements FileTypeValidationStrategy {
 
     private static final Integer MIN = -1;
@@ -49,12 +47,10 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
         return false;
     }
 
-    /**
-     * 获取文件扩展名
-     *
-     * @param filename 文件名称
-     * @return 扩展名
-     */
+    /// 获取文件扩展名
+    ///
+    /// @param filename 文件名称
+    /// @return 扩展名
     @NullMarked
     private String getFileExtension(String filename) {
         var lastIndexOfDot = filename.lastIndexOf('.');

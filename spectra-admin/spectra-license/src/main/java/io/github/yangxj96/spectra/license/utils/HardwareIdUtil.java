@@ -25,13 +25,11 @@ import java.net.UnknownHostException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-/**
- * 硬件工具类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 硬件工具类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Slf4j
 public class HardwareIdUtil {
 

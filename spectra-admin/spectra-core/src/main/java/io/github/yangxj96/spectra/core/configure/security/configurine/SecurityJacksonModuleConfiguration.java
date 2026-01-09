@@ -17,13 +17,11 @@ import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
-/**
- * Security配置Jackson
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/15 14:42
- */
+/// Security配置Jackson
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/15 14:42
 @Slf4j
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnClass(SecurityJacksonModules.class)
@@ -52,12 +50,10 @@ public class SecurityJacksonModuleConfiguration {
                 .build();
     }
 
-    /**
-     * 自定义redisTemplate
-     *
-     * @param factory redis连接工程
-     * @return RedisTemplate<String, Object>
-     */
+    /// 自定义redisTemplate
+    ///
+    /// @param factory redis连接工程
+    /// @return RedisTemplate<String, Object>
     @Bean("securityRedisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, @Qualifier("securityObjectMapper") ObjectMapper om) {
         log.debug(PREFIX + "开始配置Security使用的RedisTemplate");

@@ -31,13 +31,11 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 菜单表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 菜单表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
@@ -50,47 +48,32 @@ public class Menu extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-
-    /**
-     * 父级ID
-     */
+    /// 父级ID
     @JsonSerialize(using = ToStringSerializer.class)
     @TableField(value = "pid")
     private Long pid;
 
-    /**
-     * 图标
-     */
+    /// 图标
     @TableField(value = "icon")
     private String icon;
 
-    /**
-     * 名称
-     */
+    /// 名称
     @TableField(value = "name")
     private String name;
 
-    /**
-     * 请求路径
-     */
+    /// 请求路径
     @TableField(value = "path")
     private String path;
 
-    /**
-     * 组件路径,为空则使用布局组件
-     */
+    /// 组件路径,为空则使用布局组件
     @TableField(value = "component")
     private String component;
 
-    /**
-     * 布局
-     */
+    /// 布局
     @TableField(value = "layout")
     private String layout;
 
-    /**
-     * 排序
-     */
+    /// 排序
     @TableField(value = "sort")
     private Integer sort;
 }

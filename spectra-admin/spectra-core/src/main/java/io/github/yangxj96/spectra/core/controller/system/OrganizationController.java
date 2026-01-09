@@ -29,13 +29,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 组织机构控制器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/14
- */
+/// 组织机构控制器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/14
 @RestController
 @RequestMapping("/organization")
 public class OrganizationController {

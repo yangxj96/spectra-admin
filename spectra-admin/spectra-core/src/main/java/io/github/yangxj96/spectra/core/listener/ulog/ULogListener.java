@@ -26,13 +26,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-/**
- * 日志消息监听器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/3
- */
+/// 日志消息监听器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/3
 @Slf4j
 @Component
 public class ULogListener {

@@ -21,13 +21,11 @@ import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import org.apache.ibatis.annotations.Param;
 
 
-/**
- * 组织机构Mapper
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-15
- */
+/// 组织机构Mapper
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-15
 public interface OrganizationMapper extends BaseMapper<Organization> {
 
     /**

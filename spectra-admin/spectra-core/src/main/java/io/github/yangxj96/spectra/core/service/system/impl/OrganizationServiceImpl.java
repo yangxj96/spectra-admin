@@ -38,13 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * 组织机构业务层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-15
- */
+/// 组织机构业务层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-15
 @Service
 public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Organization> implements OrganizationService {
 

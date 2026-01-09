@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.core.configure.ulog.publisher;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import org.springframework.context.ApplicationEventPublisher;
 
-/**
- * 日志消息发送器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/7/3
- */
+/// 日志消息发送器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/7/3
 public record ULogEventPublisher(ApplicationEventPublisher publisher) {
 
     public void save(ULogEntity entity) {

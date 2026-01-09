@@ -21,13 +21,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-/**
- * 日志类型
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 日志类型
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Getter
 @AllArgsConstructor
 public enum SysLogType implements IEnum<Integer> {

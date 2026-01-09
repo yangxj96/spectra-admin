@@ -28,15 +28,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * <p>
- * 字典类型树VO
- * </p>
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/6/18
- */
+/// 字典类型树VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/6/18
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -45,51 +41,33 @@ public class DictTypeTreeVO implements Tree<DictTypeTreeVO>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 数据id.
-     */
+    /// 数据id.
     @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
-    /**
-     * 父级ID
-     */
+    /// 父级ID
     @JsonSerialize(using = ToStringSerializer.class)
     private Long pid;
 
-    /**
-     * 字典名称
-     */
+    /// 字典名称
     private String name;
 
-    /**
-     * 字典编码
-     */
+    /// 字典编码
     private String code;
 
-    /**
-     * 字典状态
-     */
+    /// 字典状态
     private Boolean state;
 
-    /**
-     * 是否内置
-     */
+    /// 是否内置
     private Boolean builtin;
 
-    /**
-     * 备注
-     */
+    /// 备注
     private String remark;
 
-    /**
-     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
-     */
+    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
     private Integer sort = 0;
 
-    /**
-     * 子级
-     */
+    /// 子级
     private List<DictTypeTreeVO> children = new ArrayList<>();
 
 }

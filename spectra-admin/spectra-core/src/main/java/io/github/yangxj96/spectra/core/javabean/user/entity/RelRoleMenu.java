@@ -28,13 +28,11 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serial;
 import java.io.Serializable;
 
-/**
- * 角色关联菜单中间表
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 角色关联菜单中间表
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -46,10 +44,11 @@ public class RelRoleMenu extends BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /// 角色ID
     @TableField("role_id")
     private Long roleId;
 
-
+    /// 菜单ID
     @TableField("menu_id")
     private Long menuId;
 

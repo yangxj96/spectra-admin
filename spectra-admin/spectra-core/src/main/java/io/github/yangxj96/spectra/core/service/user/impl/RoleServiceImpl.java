@@ -42,13 +42,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-/**
- * 角色service层-实现
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 角色service层-实现
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Service
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 

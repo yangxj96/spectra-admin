@@ -21,13 +21,11 @@ import io.github.yangxj96.spectra.workflow.service.WorkflowService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 工作流-任务相关
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 工作流-任务相关
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 @RestController
 @RequestMapping("/workflow/tasks")
 public class WorkflowUserTasksController {

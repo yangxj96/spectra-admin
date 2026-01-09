@@ -28,13 +28,11 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Redis 方式存储 Token
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025/12/11 10:06
- */
+/// Redis 方式存储 Token
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025/12/11 10:06
 @Slf4j
 @NullMarked
 @Component("sec")
@@ -214,11 +212,9 @@ public class RedisSecHolder implements SecHolder {
     //--------------------------  辅助方法  --------------------------------//
 
 
-    /**
-     * 从 SpringSecurity 上下文获取用户信息
-     *
-     * @return 上下文对象,有可能为空
-     */
+    /// 从 SpringSecurity 上下文获取用户信息
+    ///
+    /// @return 上下文对象,有可能为空
     private @Nullable String getTokenFromSecurityContext() {
         var authentication = this.getSecurityContextAuthentication();
         if (authentication == null) {
@@ -231,11 +227,9 @@ public class RedisSecHolder implements SecHolder {
         return null;
     }
 
-    /**
-     * 从 HTTP 请求中获取 TOKEN
-     *
-     * @return Token,可能为null
-     */
+    /// 从 HTTP 请求中获取 TOKEN
+    ///
+    /// @return Token,可能为null
     private @Nullable String getTokenFromHttpRequest() {
         HttpServletRequest request = this.getHttpServletRequest();
         if (request == null) {
@@ -248,11 +242,9 @@ public class RedisSecHolder implements SecHolder {
         return bearerToken.substring(7);
     }
 
-    /**
-     * 从 SpringSecurity 上下文获取用户信息
-     *
-     * @return 上下文对象,有可能为空
-     */
+    /// 从 SpringSecurity 上下文获取用户信息
+    ///
+    /// @return 上下文对象,有可能为空
     private @Nullable SecurityUser getUserFromSecurityContext() {
         var authentication = this.getSecurityContextAuthentication();
         if (authentication == null) {
@@ -265,20 +257,16 @@ public class RedisSecHolder implements SecHolder {
         return null;
     }
 
-    /**
-     * 获取 SpringSecurity 的 Authentication 对象
-     *
-     * @return Authentication对象,有可能为null
-     */
+    /// 获取 SpringSecurity 的 Authentication 对象
+    ///
+    /// @return Authentication对象,有可能为null
     private @Nullable Authentication getSecurityContextAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
-    /**
-     * 获取 request
-     *
-     * @return {@link HttpServletRequest}
-     */
+    /// 获取 request
+    ///
+    /// @return 请求体
     private @Nullable HttpServletRequest getHttpServletRequest() {
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         if (attrs instanceof ServletRequestAttributes sra) {

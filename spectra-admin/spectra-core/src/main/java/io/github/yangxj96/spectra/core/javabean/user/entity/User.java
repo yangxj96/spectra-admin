@@ -28,13 +28,11 @@ import lombok.experimental.SuperBuilder;
 import java.io.Serializable;
 import java.time.Instant;
 
-/**
- * 用户信息
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-14
- */
+/// 用户信息
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-14
 @Data
 @SuperBuilder
 @NoArgsConstructor
@@ -43,81 +41,55 @@ import java.time.Instant;
 @TableName(value = "sys_user", schema = "domain_core")
 public class User extends BaseEntity implements Serializable {
 
-    /**
-     * 显示名称
-     */
+    /// 显示名称
     @TableField(value = "username")
     private String username;
 
-    /**
-     * 头像
-     */
+    /// 头像
     @TableField(value = "avatar")
     private String avatar;
 
-    /**
-     * 状态 (1:正常 0:禁用)
-     */
+    /// 状态 (1:正常 0:禁用)
     @TableField(value = "status")
     private Short status;
 
-    /**
-     * 真实姓名
-     */
+    /// 真实姓名
     @TableField(value = "real_name")
     private String realName;
 
-    /**
-     * 性别(0:保密,1-男,2-女)
-     */
+    /// 性别(0:保密,1-男,2-女)
     @TableField(value = "gender")
     private Integer gender;
 
-    /**
-     * 生日
-     */
+    /// 生日
     @TableField(value = "birthday")
     private Instant birthday;
 
-    /**
-     * 手机号
-     */
+    /// 手机号
     @TableField(value = "phone")
     private String phone;
 
-    /**
-     * 邮箱
-     */
+    /// 邮箱
     @TableField(value = "email")
     private String email;
 
-    /**
-     * 国家
-     */
+    /// 国家
     @TableField(value = "country")
     private String country;
 
-    /**
-     * 城市
-     */
+    /// 城市
     @TableField(value = "city")
     private String city;
 
-    /**
-     * 语言
-     */
+    /// 语言
     @TableField(value = "language")
     private String language;
 
-    /**
-     * 时区
-     */
+    /// 时区
     @TableField(value = "timezone")
     private String timezone;
 
-    /**
-     * 组织机构ID
-     */
+    /// 组织机构ID
     @TableField(value = "organization_id")
     private String organizationId;
 }

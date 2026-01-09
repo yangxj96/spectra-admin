@@ -20,20 +20,16 @@ import io.github.yangxj96.spectra.common.base.BaseService;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import org.jspecify.annotations.Nullable;
 
-/**
- * 字典(字典类型)业务层
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-6-18
- */
+/// 字典(字典类型)业务层
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-6-18
 public interface DictGroupService extends BaseService<DictGroup> {
 
-    /**
-     * 根据字典类型编码获取字典类型
-     *
-     * @param code 字典类型编码
-     * @return 字典类型
-     */
+    /// 根据字典类型编码获取字典类型
+    ///
+    /// @param code 字典类型编码
+    /// @return 字典类型
     @Nullable DictGroup getByCode(String code);
 }

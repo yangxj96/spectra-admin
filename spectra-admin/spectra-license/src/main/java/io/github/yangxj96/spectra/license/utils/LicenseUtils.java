@@ -19,13 +19,11 @@ package io.github.yangxj96.spectra.license.utils;
 import io.github.yangxj96.spectra.license.javabean.bean.License;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * 许可证工具类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11
- */
+/// 许可证工具类
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-11-11
 public class LicenseUtils {
 
     private LicenseUtils() {
