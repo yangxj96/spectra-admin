@@ -1,1 +1,85 @@
+# =========================================
+# Git Attributes
+# Purpose: Normalize line endings & file behavior
+# Platform: Windows + IDEA + CLI
+# =========================================
+
+# -----------------------------------------
+# 默认规则：所有文本文件统一 LF
+# -----------------------------------------
 * text=auto eol=lf
+
+# -----------------------------------------
+# Windows 脚本（必须 CRLF）
+# -----------------------------------------
+*.bat   text eol=crlf
+*.cmd   text eol=crlf
+*.ps1   text eol=crlf
+
+# -----------------------------------------
+# Shell / Unix 脚本（必须 LF）
+# -----------------------------------------
+*.sh    text eol=lf
+
+# -----------------------------------------
+# 常见开发语言（强制 LF）
+# -----------------------------------------
+*.java  text eol=lf
+*.kt    text eol=lf
+*.go    text eol=lf
+*.js    text eol=lf
+*.ts    text eol=lf
+*.jsx   text eol=lf
+*.tsx   text eol=lf
+*.vue   text eol=lf
+*.css   text eol=lf
+*.scss  text eol=lf
+*.less  text eol=lf
+*.html  text eol=lf
+*.xml   text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.sql   text eol=lf
+
+# -----------------------------------------
+# 配置 / 构建 / 容器
+# -----------------------------------------
+Dockerfile        text eol=lf
+*.dockerfile      text eol=lf
+*.env              text eol=lf
+*.properties      text eol=lf
+*.conf            text eol=lf
+*.ini             text eol=lf
+*.gradle          text eol=lf
+*.kts             text eol=lf
+*.pom             text eol=lf
+
+# -----------------------------------------
+# Git / CI 相关
+# -----------------------------------------
+.gitattributes    text eol=lf
+.gitignore        text eol=lf
+.github/*         text eol=lf
+.gitlab-ci.yml    text eol=lf
+
+# -----------------------------------------
+# 二进制文件（禁止行尾转换）
+# -----------------------------------------
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.svg   -text
+*.pdf   binary
+*.zip   binary
+*.tar   binary
+*.gz    binary
+*.7z    binary
+*.jar   binary
+*.war   binary
+*.exe   binary
+*.dll   binary
