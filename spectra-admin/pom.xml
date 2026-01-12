@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- 项目版本 -->
-        <revision>0.0.9</revision>
+        <revision>0.0.10</revision>
 
         <!-- 数据库 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
