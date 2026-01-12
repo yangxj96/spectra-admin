@@ -28,39 +28,39 @@ router.beforeEach(async (to, _, next) => {
 
     // 1. 白名单：直接放行
     if (whiteList.has(to.path)) {
-        console.log("[守卫] 白名单通过");
+        console.debug("[守卫] 白名单通过");
         showLoading();
         return next();
     }
 
     // 2. 无 token：跳转登录
     if (!token.access_token) {
-        console.log("[守卫] 无 token，跳转登录页");
+        console.debug("[守卫] 无 token，跳转登录页");
         hideLoading();
         return next({ path: "/login" });
     }
 
     // 3. 有 token 但访问登录页：重定向到主页
     if (to.path === "/login") {
-        console.log("[守卫] 有 token 但访问登录页，重定向到主页");
+        console.debug("[守卫] 有 token 但访问登录页，重定向到主页");
         return next({ path: "/" });
     }
 
     // 4. 需要加载菜单（首次进入或刷新）
     if (menus.length === 0 || sessionStorage.getItem("reloaded")) {
-        console.log("[守卫] 需要加载菜单");
+        console.debug("[守卫] 需要加载菜单");
         return await loadMenu(router, to, next);
     }
 
     // 5. 路由未匹配（404）
     if (to.matched.length === 0) {
-        console.log("[守卫] 路由未匹配，跳转 404");
+        console.debug("[守卫] 路由未匹配，跳转 404");
         hideLoading();
         return next({ path: "/404" });
     }
 
     // 6. 正常放行
-    console.log("[守卫] 正常跳转");
+    console.debug("[守卫] 正常跳转");
     showLoading();
     next();
 });

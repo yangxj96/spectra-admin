@@ -62,6 +62,7 @@
 
     <build>
         <plugins>
+            <!-- 编译器插件 -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -78,16 +79,27 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <!-- 启动类 -->
                     <mainClass>io.github.yangxj96.spectra.launch.LaunchApplication</mainClass>
+                    <!-- 排除lombok -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <!-- jvm参数 -->
                     <jvmArguments>
                         --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED
                     </jvmArguments>
+                    <!-- 镜像配置 -->
+                    <image>
+                        <builder>paketobuildpacks/builder-jammy-tiny</builder>
+                        <env>
+                            <BP_NATIVE_IMAGE>false</BP_NATIVE_IMAGE>
+                            <BP_IMAGE_FLATTEN>true</BP_IMAGE_FLATTEN>
+                        </env>
+                    </image>
                 </configuration>
             </plugin>
         </plugins>

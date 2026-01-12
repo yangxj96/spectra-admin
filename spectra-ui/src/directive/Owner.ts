@@ -19,16 +19,16 @@ export default {
 } as Directive;
 
 function checkPermission(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {
-    const userStore = useUserStore();
     const { value, modifiers } = binding;
     if (!value) {
         console.warn("[v-owner] 缺少绑定值");
         el.remove();
         return;
     }
+
     const requiredPerms: string[] = Array.isArray(value) ? value : [value];
-    let hasAccess: boolean;
-    hasAccess = modifiers.or
+    const userStore = useUserStore();
+    let hasAccess = modifiers.or
         ? requiredPerms.some(perm => userStore.hasPermission(perm))
         : requiredPerms.every(perm => userStore.hasPermission(perm));
     if (hasAccess) {

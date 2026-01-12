@@ -89,7 +89,7 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
             appStore.menus = res.data;
             const routes = convertMenuToRoutes(res.data);
 
-            // ✅ 优化：避免重复添加路由
+            // 避免重复添加路由
             for (const route of routes) {
                 if (!router.hasRoute(route.name!)) {
                     router.addRoute(route);
@@ -99,8 +99,7 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
 
             console.log(`[守卫] 动态添加 ${routes.length} 个路由`);
 
-            // ✅ vue-router 4.5.1：确保路由表已更新
-            // 虽然 still need hack，但更安全
+            // 确保路由表已更新 虽然 still need hack，但更安全
             return next({ ...to, replace: true });
         } else {
             ElMessage.error("获取菜单失败");

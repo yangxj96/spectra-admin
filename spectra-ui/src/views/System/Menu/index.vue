@@ -112,7 +112,7 @@ async function handleMenuSave() {
             row-key="id"
             class="loading-box">
             <el-table-column align="center" type="index" />
-            <el-table-column align="center" prop="name" label="名称" />
+            <el-table-column align="left" header-align="center" prop="name" label="名称" />
             <el-table-column align="center" prop="icon" label="图标">
                 <template #default="scope">
                     <icons :name="scope.row.icon" />
@@ -122,7 +122,7 @@ async function handleMenuSave() {
             <el-table-column align="center" prop="component" label="组件路径" />
             <el-table-column align="center" prop="layout" label="布局" />
             <el-table-column align="center" prop="sort" label="排序" />
-            <el-table-column align="center" label="操作">
+            <el-table-column align="center" label="操作" v-owner.or="['MENU:UPDATE', 'MENU:DELETE']">
                 <template #default="scope">
                     <el-button
                         v-owner="'MENU:UPDATE'"

@@ -8,6 +8,7 @@ const model = defineModel<string>();
 const safeModel = computed(() => model.value ?? "");
 
 const icons = shallowRef([
+    "icon-home",
     "icon-setting-role",
     "icon-module",
     "icon-qq",
