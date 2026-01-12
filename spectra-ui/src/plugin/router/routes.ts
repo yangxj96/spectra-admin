@@ -38,23 +38,23 @@ export default [
             title: "返回原来页面"
         }
     },
-    {
-        path: "",
-        name: "home",
-        component: layout,
-        redirect: "",
-        meta: {
-            title: "首页"
-        },
-        children: [
-            {
-                path: "",
-                name: "首页",
-                component: () => import("@/views/Home/index.vue"),
-                meta: {
-                    title: "首页"
-                }
-            }
-        ]
-    }
+    // {
+    //     path: "",
+    //     name: "home",
+    //     component: layout,
+    //     redirect: "",
+    //     meta: {
+    //         title: "首页"
+    //     },
+    //     children: [
+    //         {
+    //             path: "",
+    //             name: "首页",
+    //             component: () => import("@/views/Home/index.vue"),
+    //             meta: {
+    //                 title: "首页"
+    //             }
+    //         }
+    //     ]
+    // }
 ] as Array<RouteRecordRaw>;

@@ -1,0 +1,82 @@
+name: Build & Push Spring Boot Image to GHCR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      repository-projects: read
+
+    services:
+      docker:
+        image: docker:26.1.4-dind
+        options: --privileged
+        env:
+          DOCKER_TLS_CERTDIR: ""
+        ports:
+          - 2375:2375
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Verify Docker environment
+        run: |
+          echo "=== Set DOCKER_HOST First ==="
+          # 先写入环境变量，再打印
+          echo "DOCKER_HOST=tcp://127.0.01:2375" >> $GITHUB_ENV
+          echo "DOCKER_TLS_VERIFY=0" >> $GITHUB_ENV
+          # 刷新环境变量（让当前shell生效）
+          source $GITHUB_ENV
+          echo "=== DOCKER_HOST Value ==="
+          echo "DOCKER_HOST: $DOCKER_HOST"
+          echo "=== Test Docker Connection (Alternative Way) ==="
+          # 不用curl测试（主机解析不到docker别名），改用docker cli测试（cli会用DOCKER_HOST）
+          docker info || echo "Docker CLI connect failed"
+        shell: /usr/bin/bash -e {0}
+
+      - name: Build Image
+        run: |
+          cd spectra-admin
+          mvn -B clean install -DskipTests
+          
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          
+          cd spectra-launch
+          # 推版本号 tag
+          mvn -B spring-boot:build-image \
+          -DskipTests \
+          -Dspring-boot.build-image.publish=true \
+          -Dspring-boot.build-image.imageName=ghcr.io/${{ github.repository_owner }}/spectra-admin:${VERSION}
+          
+          # 推 latest tag
+          mvn -B spring-boot:build-image \
+          -DskipTests \
+          -Dspring-boot.build-image.publish=true \
+          -Dspring-boot.build-image.imageName=ghcr.io/${{ github.repository_owner }}/spectra-admin:latest
+        env:
+          DOCKER_HOST: tcp://127.0.0.1:2375
+          DOCKER_TLS_VERIFY: 0
+          DOCKER_CERT_PATH: ""

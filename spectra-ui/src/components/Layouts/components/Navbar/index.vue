@@ -11,25 +11,42 @@ import logo from "@/assets/images/logo.svg";
 import avatar from "@/assets/images/avatar.png";
 import usePropsStore from "@/plugin/store/modules/usePropsStore.ts";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
-
-// 定义菜单前缀映射
-const menuPrefixes = ["/", "/workbench", "/system", "/monitor", "/example"];
-
-const active = ref("/");
+import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 
 // 获取路由对象（useRoute 是响应式的）
 const route = useRoute();
+const appStore = useAppStore();
+const prefixes = ref<Menu[]>(appStore.menus);
+// 定义菜单前缀映射
+const menuPrefixes = ref(["/"]);
+const active = ref("/");
+
+for (let menu of appStore.menus) {
+    menuPrefixes.value.push(menu.path);
+}
 
 // 监听路由变化
 watch(
     () => route.path,
     path => {
-        const sortedPrefixes = [...menuPrefixes].sort((a, b) => b.length - a.length);
+        const sortedPrefixes = [...menuPrefixes.value].sort((a, b) => b.length - a.length);
+        // 获取到当前点击菜单,如果当前点击菜单的下级有值,则赋值
+        appStore.currentMenus = [];
+        for (let menu of prefixes.value) {
+            if (path.startsWith(menu.path) && menu.children) {
+                appStore.currentMenus = menu.children;
+                // appStore.currentMenuActive = menu.path + "/" + menu.children[0]?.path
+                appStore.currentMenuActive = menu.children[0]!!.path
+            }
+        }
+        // 匹配路径进行高亮
         for (const prefix of sortedPrefixes) {
+            // 首页
             if (prefix === "/" && path === "/") {
                 active.value = "/";
                 return;
             }
+            // 其他页
             if (prefix !== "/" && path.startsWith(prefix)) {
                 active.value = prefix;
                 return;
@@ -69,25 +86,9 @@ function handlePersonalPopup() {
 
         <el-col :span="20" style="padding-right: 40px">
             <el-menu :default-active="active" :router="true" mode="horizontal">
-                <el-menu-item index="/">
-                    <icons name="icon-home" class-name="icon-sidebar" />
-                    首页
-                </el-menu-item>
-                <el-menu-item index="/workbench">
-                    <icons name="icon-home" class-name="icon-sidebar" />
-                    工作台
-                </el-menu-item>
-                <el-menu-item index="/system">
-                    <icons name="icon-home" class-name="icon-sidebar" />
-                    系统管理
-                </el-menu-item>
-                <el-menu-item index="/monitor">
-                    <icons name="icon-home" class-name="icon-sidebar" />
-                    系统监控
-                </el-menu-item>
-                <el-menu-item index="/example">
-                    <icons name="icon-home" class-name="icon-sidebar" />
-                    组件示例
+                <el-menu-item v-for="o in prefixes" :key="o.path" :index="o.path" :route="{ path: o.path }">
+                    <icons :name="o.icon" class-name="icon-sidebar" />
+                    {{ o.name }}
                 </el-menu-item>
             </el-menu>
         </el-col>

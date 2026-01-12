@@ -7,6 +7,10 @@ declare global {
         lang: object;
         // 菜单列表
         menus: Menu[];
+        // 当前菜单子级.
+        currentMenus: Menu[];
+        // 默认激活页面
+        currentMenuActive: string;
         // 是否展开菜单
         unfold: boolean;
         // 防止重复请求

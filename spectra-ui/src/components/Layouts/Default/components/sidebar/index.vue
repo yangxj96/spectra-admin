@@ -1,24 +1,30 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { nextTick, onMounted, ref } from "vue";
 import { stopAllRequest } from "@/plugin/request";
 import icons from "@/components/Icons/index.vue";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 
-const route = useRoute();
+const appstore = useAppStore();
 const unfold = ref(true);
-const menus = ref([] as Menu[]);
+const menus = ref<Menu[]>([]);
+const active = ref("");
 
 // 监听
-useAppStore().$subscribe((_, state) => {
+appstore.$subscribe((_, state) => {
     unfold.value = state.unfold;
-    menus.value = state.menus;
+    loadMenus();
 });
 
 onMounted(() => {
-    unfold.value = useAppStore().unfold;
-    menus.value = useAppStore().menus;
+    unfold.value = appstore.unfold;
+    loadMenus();
 });
+
+const loadMenus = async () => {
+    menus.value = appstore.currentMenus;
+    await nextTick();
+    active.value = appstore.currentMenuActive;
+};
 
 function onMenuItemClick() {
     stopAllRequest();
@@ -29,16 +35,11 @@ function onMenuItemClick() {
     <el-menu
         class="box-menu"
         :router="true"
-        :default-active="route.path"
+        :default-active="active"
         :collapse="!unfold"
         :collapse-transition="true"
         :unique-opened="true"
         @select="onMenuItemClick">
-        <el-menu-item index="/">
-            <icons name="icon-home" class-name="icon-sidebar" />
-            <template #title>首页</template>
-        </el-menu-item>
-
         <!-- 动态菜单：根据是否有 children 决定渲染方式 -->
         <template v-for="item in menus" :key="item.path">
             <!-- 情况1：有子菜单，渲染为 el-sub-menu -->
@@ -59,10 +60,8 @@ function onMenuItemClick() {
 
             <!-- 情况2：无子菜单，直接渲染为 el-menu-item -->
             <el-menu-item v-else :index="item.path" :route="{ path: item.path }">
-                <template #title>
-                    <icons :name="item.icon" class-name="icon-sidebar" />
-                    <span>{{ item.name }}</span>
-                </template>
+                <icons :name="item.icon" class-name="icon-sidebar" />
+                <span>{{ item.name }}</span>
             </el-menu-item>
         </template>
     </el-menu>
