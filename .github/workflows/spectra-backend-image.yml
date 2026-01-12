@@ -80,6 +80,8 @@ jobs:
           DOCKER_HOST: tcp://127.0.0.1:2375
           DOCKER_TLS_VERIFY: 0
           DOCKER_CERT_PATH: ""
-          BP_JVM_MEMORY: 384m
-          BP_JVM_HEAP_PERCENT: 40
-          BP_JVM_STACK_SIZE: 128k
+          BP_JVM_MEMORY: 256m
+          BP_JVM_HEAP_PERCENT: 30
+          BP_JVM_STACK_SIZE: 64k
+          BP_JVM_METASPACE_SIZE: 64m
+          BP_JVM_CODE_CACHE_SIZE: 128m
