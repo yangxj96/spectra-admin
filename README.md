@@ -72,10 +72,10 @@
 
 ## 🔐 环境变量配置说明
 
-
 ```text
 ⚠️ 该文件不会提交至 Git，请自行创建。
 ⚠️ 项目使用mise管理环境.
+⚠️ 可重命名`.mise.local.toml.example`文件为`.mise.local.toml`,并把值设置为本地相关的值
 ```
 
 ### 后端 `.mise.local.toml` 文件（位于 [spectra-admin](spectra-admin) 目录下）
@@ -100,10 +100,10 @@
 
 ### 前端 `.env` 文件（位于 [spectra-ui](spectra-ui) 目录）
 
-| 环境变量             | 说明                  | 示例                                    |
-|------------------|---------------------|---------------------------------------|
-| `VITE_API_URL`   | 后端API基础地址（末尾需带 `/`） | `VITE_API_URL=http://localhost:8888/` |
-| `VITE_WEB_TITLE` | 网站名称                | `光谱平台`                                |
+| 环境变量             | 说明                  | 示例                                     |
+|------------------|---------------------|----------------------------------------|
+| `VITE_API_URL`   | 后端API基础地址（末尾需带 `/`） | `VITE_API_URL=https://localhost:8888/` |
+| `VITE_WEB_TITLE` | 网站名称                | `光谱平台`                                 |
 
 > 支持 `.env.development`、`.env.production` 多环境配置。
 
