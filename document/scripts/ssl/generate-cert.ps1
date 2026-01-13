@@ -21,9 +21,8 @@ if (!(Test-Path $CA_Cert) -or !(Test-Path $CA_Key)) {
 }
 
 # 检查 CA 是否已安装到系统信任库（通过 Thumbprint 匹配）
-$LocalCA = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
 try {
-    $LocalCA.Import($CA_Cert)
+    $LocalCA = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2($CA_Cert)
 } catch {
     Write-Host "❌ 无法读取本地 CA 证书: $($_.Exception.Message)" -ForegroundColor Red
     exit 1
