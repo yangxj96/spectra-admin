@@ -1,0 +1,14 @@
+BP_JVM_MEMORY_CALCULATOR_MIN_HEAP=128m
+BP_JVM_THREADS=50
+JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m -Xss256k -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:ReservedCodeCacheSize=64m"
+SPRING_CONFIG_LOCATION=file:/config/application.yml
+
+DEFAULT_PASSWORD=admin123
+DB_URL=jdbc:postgresql://spectra-postgres:5432/spectra_db?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=spectra-service
+DB_USERNAME=postgres
+DB_PASSWORD=QuVsKppcWvwwX2Vv
+REDIS_PORT=6379
+REDIS_HOST=spectra-redis
+REDIS_DB=0
+REDIS_PASSWORD=QuVsKppcWvwwX2Vv
+SERVER_PORT=8888

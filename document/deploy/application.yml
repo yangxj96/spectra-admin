@@ -9,7 +9,7 @@ spectra:
       upload-temp-dir: ${spectra.system.base-dir}/temp
   kaptcha:
     type: math
-    verify: false
+    verify: true
 server:
   port: 8888
   servlet:
