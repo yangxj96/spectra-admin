@@ -38,7 +38,7 @@ spring:
   main:
     banner-mode: off
   application:
-    name: spectra-framework-launch
+    name: spectra-admin
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
@@ -82,19 +82,9 @@ logging:
   group:
     spectra: >-
       io.github.yangxj96.spectra.core
-    other: >-
-      com.ulisesbocchio.jasyptspringboot.configuration,
-      io.github.yangxj96.spectra.core.configure.mvc.filter,
-      io.github.yangxj96.spectra.core.configure.mvc.advice,
-      io.github.yangxj96.spectra.core.configure,
-      io.github.yangxj96.spectra.core.listener.ulog
-    mp: >-
-      io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
-    other: error
-    spectra: debug
-    mp: error
+    spectra: error
   charset:
     console: utf-8
     file: UTF-8
