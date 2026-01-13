@@ -44,33 +44,33 @@ export default defineConfig(({ mode }) => {
             target: "es2018",
             minify: "terser",
             outDir: "build",
-            // rollupOptions: {
-            //     output: {
-            //         manualChunks: {
-            //             vue: ["vue", "vue-router", "pinia"]
-            //         },
-            //         assetFileNames: assetInfo => {
-            //             const ext = assetInfo.name?.split(".").pop();
-            //
-            //             if (/png|jpe?g|gif|svg|webp|avif/i.test(ext ?? "")) {
-            //                 return "assets/img/[name]-[hash][extname]";
-            //             }
-            //
-            //             if (/woff2?|ttf|otf|eot/i.test(ext ?? "")) {
-            //                 return "assets/fonts/[name]-[hash][extname]";
-            //             }
-            //
-            //             if (ext === "css") {
-            //                 return "css/[name]-[hash][extname]";
-            //             }
-            //
-            //             return "assets/other/[name]-[hash][extname]";
-            //         },
-            //
-            //         chunkFileNames: "assets/js/[name]-[hash].js",
-            //         entryFileNames: "assets/js/[name]-[hash].js"
-            //     }
-            // },
+            rollupOptions: {
+                output: {
+                    manualChunks: {
+                        vue: ["vue", "vue-router", "pinia"]
+                    },
+                    assetFileNames: assetInfo => {
+                        const ext = assetInfo.name?.split(".").pop();
+
+                        if (/png|jpe?g|gif|svg|webp|avif/i.test(ext ?? "")) {
+                            return "assets/img/[name]-[hash][extname]";
+                        }
+
+                        if (/woff2?|ttf|otf|eot/i.test(ext ?? "")) {
+                            return "assets/fonts/[name]-[hash][extname]";
+                        }
+
+                        if (ext === "css") {
+                            return "css/[name]-[hash][extname]";
+                        }
+
+                        return "assets/other/[name]-[hash][extname]";
+                    },
+
+                    chunkFileNames: "assets/js/[name]-[hash].js",
+                    entryFileNames: "assets/js/[name]-[hash].js"
+                }
+            },
             terserOptions: {
                 compress: {
                     // 移除所有的 console.* 调用
