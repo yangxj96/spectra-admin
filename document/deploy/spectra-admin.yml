@@ -1,0 +1,33 @@
+services:
+  spectra-postgres:
+    container_name: spectra-postgres
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: spectra_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: QuVsKppcWvwwX2Vv
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+  spectra-redis:
+    container_name: spectra-redis
+    image: redis:7
+    command: redis-server --requirepass QuVsKppcWvwwX2Vv
+    restart: unless-stopped
+  spectra-admin:
+    image: ghcr.io/yangxj96/spectra-admin:latest
+    container_name: spectra-admin
+    restart: unless-stopped
+    user: "0:0"
+    ports:
+      - "8888:8888"
+    env_file:
+      - /data/docker/spectra/.env
+    volumes:
+      - /data/docker/spectra/application.yml:/config/application.yml:ro
+      - /data/docker/spectra/files:/workspace/files
+    deploy:
+      resources:
+        limits:
+          memory: 1g

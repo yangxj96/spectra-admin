@@ -1,0 +1,20 @@
+[env]
+# 默认密码
+DEFAULT_PASSWORD = "xxx"
+# 许可密码
+LICENSE_PASSWORD = "xxx"
+# SSL配置
+SSL_PASSWORD = "xxx"
+SSL_TYPE = "PKCS12"
+SSL_ALIAS = "xxx"
+# 数据库相关配置
+DB_URL = "jdbc:postgresql://localhost:5432/spectra_db?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=spectra-service"
+DB_USERNAME = "postgres"
+DB_PASSWORD = "xxx"
+# Redis
+REDIS_PORT = "6379"
+REDIS_HOST = "127.0.0.1"
+REDIS_DB = "0"
+REDIS_PASSWORD = "XXX"
+# 服务配置
+SERVER_PORT = "8080"

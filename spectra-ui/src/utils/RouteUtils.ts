@@ -5,14 +5,29 @@ import MenuApi from "@/api/system/MenuApi.ts";
 import { ElMessage } from "element-plus";
 import { hideLoading } from "@/plugin/element/loading.ts";
 
+// 自动收集所有 views 下的 vue 文件（构建期完成）
+const viewModules = import.meta.glob("/src/views/**/*.vue");
+
 /**
  * 加载组件 在views文件夹下面,且扩展名需要是vue
  * @param componentPath 组件路径
  */
 const loadComponent = (componentPath?: string): ReturnType<typeof defineAsyncComponent> | undefined => {
     if (!componentPath) return undefined;
-    const normalizedPath = componentPath.startsWith("/") ? componentPath.slice(1) : componentPath;
-    return () => import(/* @vite-ignore */ `/src/views/${normalizedPath}.vue`);
+
+    // 统一路径格式
+    const normalizedPath = componentPath.replace(/^\/+/, "").replace(/\.vue$/, "");
+
+    const fullPath = `/src/views/${normalizedPath}.vue`;
+
+    const loader = viewModules[fullPath];
+
+    if (!loader) {
+        console.error(`[loadComponent] 组件未找到: ${fullPath}`, Object.keys(viewModules));
+        return undefined;
+    }
+
+    return defineAsyncComponent(loader as () => Promise<any>);
 };
 
 // 动态加载布局组件

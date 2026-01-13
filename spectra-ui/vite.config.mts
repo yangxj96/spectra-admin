@@ -6,20 +6,27 @@ import viteCompression from "vite-plugin-compression";
 import { resolve } from "path";
 
 export default defineConfig(({ mode }) => {
-    const root = process.cwd();
-    const env = loadEnv(mode, root);
-    console.log("环境变量:", env);
+    if (mode === "development") {
+        const root = process.cwd();
+        const env = loadEnv(mode, root);
+        console.log("环境变量:", env);
+    }
     // src路径，用于配置别名
     const srcPath = resolve(__dirname, "src");
     return {
-        base: "./",
+        base: "/",
         server: {
             open: false,
             watch: {
                 usePolling: true
             }
         },
-        plugins: [vue(), VueJsx(), viteCompression({}), VueDevTools()],
+        plugins: [
+            vue(),
+            VueJsx(),
+            mode === "production" && viteCompression({ threshold: 10240 }),
+            mode === "development" && VueDevTools()
+        ].filter(Boolean),
         resolve: {
             alias: {
                 "@": srcPath
@@ -33,32 +40,37 @@ export default defineConfig(({ mode }) => {
             }
         },
         build: {
+            sourcemap: false,
+            target: "es2018",
             minify: "terser",
             outDir: "build",
-            rollupOptions: {
-                output: {
-                    assetFileNames: chunkInfo => {
-                        // 使用 names[0] 获取文件名
-                        const fileName = chunkInfo.names.length > 0 ? chunkInfo.names[0] : "";
-
-                        let dir = "other";
-
-                        if (/\.(png|jpe?g|gif|svg|webp|avif)$/i.test(fileName)) {
-                            dir = "img";
-                        } else if (/\.(ttf|otf|woff2?|eot)$/i.test(fileName)) {
-                            dir = "fonts";
-                        } else if (/\.(mp4|webm|ogg|mp3|wav|flac|aac)$/i.test(fileName)) {
-                            dir = "media";
-                        } else if (/\.css$/i.test(fileName)) {
-                            return `css/[name]-[hash][extname]`;
-                        }
-
-                        return `assets/${dir}/[name]-[hash][extname]`;
-                    },
-                    chunkFileNames: "assets/js/[name]-[hash].js",
-                    entryFileNames: "assets/js/[name]-[hash].js"
-                }
-            },
+            // rollupOptions: {
+            //     output: {
+            //         manualChunks: {
+            //             vue: ["vue", "vue-router", "pinia"]
+            //         },
+            //         assetFileNames: assetInfo => {
+            //             const ext = assetInfo.name?.split(".").pop();
+            //
+            //             if (/png|jpe?g|gif|svg|webp|avif/i.test(ext ?? "")) {
+            //                 return "assets/img/[name]-[hash][extname]";
+            //             }
+            //
+            //             if (/woff2?|ttf|otf|eot/i.test(ext ?? "")) {
+            //                 return "assets/fonts/[name]-[hash][extname]";
+            //             }
+            //
+            //             if (ext === "css") {
+            //                 return "css/[name]-[hash][extname]";
+            //             }
+            //
+            //             return "assets/other/[name]-[hash][extname]";
+            //         },
+            //
+            //         chunkFileNames: "assets/js/[name]-[hash].js",
+            //         entryFileNames: "assets/js/[name]-[hash].js"
+            //     }
+            // },
             terserOptions: {
                 compress: {
                     // 移除所有的 console.* 调用
@@ -70,7 +82,7 @@ export default defineConfig(({ mode }) => {
                 },
                 format: {
                     // 移除注释
-                    comments: true
+                    comments: false
                 }
             }
         },

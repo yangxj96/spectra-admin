@@ -29,33 +29,77 @@ for (let menu of appStore.menus) {
 watch(
     () => route.path,
     path => {
-        const sortedPrefixes = [...menuPrefixes.value].sort((a, b) => b.length - a.length);
-        // 获取到当前点击菜单,如果当前点击菜单的下级有值,则赋值
-        appStore.currentMenus = [];
-        for (let menu of prefixes.value) {
-            if (path.startsWith(menu.path) && menu.children) {
-                appStore.currentMenus = menu.children;
-                // appStore.currentMenuActive = menu.path + "/" + menu.children[0]?.path
-                appStore.currentMenuActive = menu.children[0]!!.path
-            }
-        }
-        // 匹配路径进行高亮
-        for (const prefix of sortedPrefixes) {
-            // 首页
-            if (prefix === "/" && path === "/") {
-                active.value = "/";
-                return;
-            }
-            // 其他页
-            if (prefix !== "/" && path.startsWith(prefix)) {
-                active.value = prefix;
-                return;
-            }
-        }
-        active.value = "/";
+        console.log(`路由发生变化`, route.path);
+        resolveSideMenus(path);
+        resolveTopActive(path);
     },
     { immediate: true, flush: "pre" }
 );
+
+// 解析顶部菜单
+function resolveTopActive(path: string) {
+    const prefixes = ["/", ...appStore.menus.map(m => m.path)].filter(Boolean);
+
+    // 按长度降序（最长优先）
+    const sortedPrefixes = prefixes.sort((a, b) => b.length - a.length);
+
+    for (const prefix of sortedPrefixes) {
+        // 首页
+        if (prefix === "/" && path === "/") {
+            active.value = "/";
+            return;
+        }
+
+        // 其他页
+        if (prefix !== "/" && (path === prefix || path.startsWith(prefix + "/"))) {
+            active.value = prefix;
+            return;
+        }
+    }
+
+    active.value = "/";
+}
+
+/// 解析侧边栏
+function resolveSideMenus(path: string) {
+    console.log(`当前路径`, path);
+    // 首页单独处理
+    if (path === "/") {
+        appStore.currentMenus = [];
+        appStore.currentMenuActive = "/";
+        return;
+    }
+
+    let matchedMenu: Menu | null = null;
+    let maxMatchLength = -1;
+
+    for (const menu of appStore.menus) {
+        if (!menu.path || !Array.isArray(menu.children) || menu.children.length === 0) {
+            continue;
+        }
+
+        const isMatch = path === menu.path || path.startsWith(menu.path + "/");
+
+        if (!isMatch) continue;
+
+        if (menu.path.length > maxMatchLength) {
+            matchedMenu = menu;
+            maxMatchLength = menu.path.length;
+        }
+    }
+
+    console.log(matchedMenu);
+    if (matchedMenu) {
+        const children = matchedMenu.children ?? [];
+        appStore.currentMenus = children;
+
+        const firstChild = children.find(c => !!c.path);
+        appStore.currentMenuActive = firstChild?.path ?? "";
+    } else {
+        appStore.currentMenus = [];
+        appStore.currentMenuActive = "";
+    }
+}
 
 function handleUserLogout() {
     stopAllRequest();
