@@ -134,6 +134,50 @@
 
 ---
 
+## ⚠️ Docker 部署说明（验证码 & 字体相关）
+
+本项目的 **验证码功能依赖 Java AWT（`java.desktop` 模块）进行字体注册与图像绘制**。
+在使用 Spring Boot 官方 `build-image` 构建 Docker 镜像时，需要注意运行环境差异：
+
+#### 问题说明
+
+* Spring Boot `build-image` **默认使用精简（headless）JRE**
+* 该运行环境 **不包含 `java.desktop` 模块及字体渲染依赖**
+* 会导致以下异常（示例）：
+
+```text
+java.io.IOException: Problem reading font data
+```
+
+#### 解决方案（推荐）
+
+请使用 **完整 JDK 的 buildpack** 构建镜像，例如：
+
+```xml
+<plugin>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-maven-plugin</artifactId>
+  <configuration>
+    <image>
+      <builder>paketobuildpacks/builder-jammy-full</builder>
+    </image>
+  </configuration>
+</plugin>
+```
+
+该 builder 提供：
+
+* 完整的 `java.desktop` 模块
+* 字体渲染所需的系统依赖（fontconfig / freetype）
+* 支持 AWT 字体注册与验证码正常生成
+
+#### 说明
+
+* 本地开发环境（完整 JDK）通常不会出现该问题
+* 若后续切换为精简镜像或无 GUI 运行环境，请确保验证码功能已做兼容处理
+
+----
+
 ## 🤝 贡献与反馈
 
 欢迎提交 Issue 或 Pull Request！  
