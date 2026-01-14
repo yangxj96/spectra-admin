@@ -14,9 +14,9 @@ const redirect = ref<string>(route.query.redirect as string | "/");
 const login = reactive({
     form: {
         type: "PASSWORD",
-        username: "devops@devops00.com",
-        password: "admin123",
-        captcha: "1"
+        username: "",
+        password: "",
+        captcha: ""
     } as LoginFrom,
     rules: {
         username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
@@ -24,6 +24,13 @@ const login = reactive({
         captcha: [{ required: true, message: "请输入验证码", trigger: "blur" }]
     } as FormRules
 });
+
+// 开发环境添加个账号名密码,省的输入
+if (import.meta.env.DEV) {
+    login.form.username = "devops@devops00.com";
+    login.form.password = "admin123";
+    login.form.captcha = "1";
+}
 
 // 刷新验证码
 function refreshKaptcha() {

@@ -60,7 +60,7 @@ const handleEditConfigured = (row: Configured) => {
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <el-table :data="table_data" height="96%" stripe default-expand-all row-key="id">
+        <el-table :data="table_data" height="95%" stripe default-expand-all row-key="id">
             <el-table-column align="center" type="index" label="序号" width="100" />
             <el-table-column align="center" prop="id" label="主键" />
             <el-table-column align="center" prop="key" label="配置键" />

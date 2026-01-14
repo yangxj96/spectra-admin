@@ -99,106 +99,122 @@ initData();
 </script>
 
 <template>
-    <div style="padding-left: 1em; padding-right: 1em">
-        <!-- 过滤行 -->
-        <el-row>
-            <el-form :inline="true">
-                <el-form-item label="字典名称">
-                    <el-input placeholder="请输入字典名称" clearable />
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary">查询</el-button>
-                    <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictGroup')">
-                        <icons name="icon-edit" />
-                        新增字典组
-                    </el-button>
-                    <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictData')">
-                        <icons name="icon-edit" />
-                        新增字典数据
-                    </el-button>
-                </el-form-item>
-            </el-form>
-        </el-row>
-        <!-- 数据行 -->
-        <el-row>
-            <el-col :span="4">
-                <el-tree
-                    node-key="id"
-                    :data="dictGroupTableData"
-                    highlight-current
-                    default-expand-all
-                    :props="treeProps"
-                    @node-click="
-                        (node: DictTypeTree) => {
-                            currentGroup = node;
-                        }
-                    ">
-                    <template #default="{ node, data }">
-                        <p class="tree-node__label">
-                            {{ node.label }}
-                            <icons v-if="data.builtin" name="icon-builtin" class-name="icon-sidebar" />
-                            <el-button
-                                v-if="!data.builtin"
-                                v-owner="'DICT:UPDATE'"
-                                class="tree-node__label-btn"
-                                link
-                                type="primary"
-                                @click="handleDialogOpen('DictGroup', data)">
-                                编辑
-                            </el-button>
-                        </p>
+    <!-- 过滤行 -->
+    <el-row class="box-search">
+        <el-form :inline="true">
+            <el-form-item label="字典名称">
+                <el-input placeholder="请输入字典名称" clearable />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary">查询</el-button>
+                <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictGroup')">
+                    <icons name="icon-edit" />
+                    新增字典组
+                </el-button>
+                <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictData')">
+                    <icons name="icon-edit" />
+                    新增字典数据
+                </el-button>
+            </el-form-item>
+        </el-form>
+    </el-row>
+    <!-- 数据行 -->
+    <el-row class="box-body">
+        <el-col :span="4">
+            <el-tree
+                node-key="id"
+                :data="dictGroupTableData"
+                highlight-current
+                default-expand-all
+                :props="treeProps"
+                @node-click="
+                    (node: DictTypeTree) => {
+                        currentGroup = node;
+                    }
+                ">
+                <template #default="{ node, data }">
+                    <p class="tree-node__label">
+                        {{ node.label }}
+                        <icons v-if="data.builtin" name="icon-builtin" class-name="icon-sidebar" />
+                        <el-button
+                            v-if="!data.builtin"
+                            v-owner="'DICT:UPDATE'"
+                            class="tree-node__label-btn"
+                            link
+                            type="primary"
+                            @click="handleDialogOpen('DictGroup', data)">
+                            编辑
+                        </el-button>
+                    </p>
+                </template>
+            </el-tree>
+        </el-col>
+        <el-col :span="20">
+            <el-row>
+                <el-text size="large">编码: {{ currentGroup?.code }}</el-text>
+            </el-row>
+            <el-table :data="dictDataTableData" row-key="id" stripe height="75vh">
+                <template #empty>
+                    <p>无字典项</p>
+                </template>
+                <el-table-column align="center" type="index" />
+                <el-table-column align="center" label="标签" prop="label" />
+                <el-table-column align="center" label="值" prop="value" />
+                <el-table-column align="center" label="排序" prop="sort" />
+                <el-table-column align="center" label="状态" prop="state">
+                    <template #default="scope">
+                        <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_common_state" />
                     </template>
-                </el-tree>
-            </el-col>
-            <el-col :span="20">
-                <el-row>
-                    <el-text size="large">编码: {{ currentGroup?.code }}</el-text>
-                </el-row>
-                <el-table :data="dictDataTableData" row-key="id" stripe height="78vh">
-                    <template #empty>
-                        <p>无字典项</p>
+                </el-table-column>
+                <el-table-column align="center" label="备注" prop="remark" :show-overflow-tooltip="true" />
+                <el-table-column
+                    v-show="!currentGroup?.builtin"
+                    v-owner.or="['DICT:UPDATE', 'DICT:DELETE']"
+                    align="center"
+                    label="操作">
+                    <template #default="scope">
+                        <el-button
+                            v-owner="'DICT:UPDATE'"
+                            link
+                            type="primary"
+                            @click="handleDialogOpen('DictData', scope.row)">
+                            编辑
+                        </el-button>
+                        <el-button v-owner="'DICT:DELETE'" link type="primary">删除</el-button>
                     </template>
-                    <el-table-column align="center" type="index" />
-                    <el-table-column align="center" label="标签" prop="label" />
-                    <el-table-column align="center" label="值" prop="value" />
-                    <el-table-column align="center" label="排序" prop="sort" />
-                    <el-table-column align="center" label="状态" prop="state">
-                        <template #default="scope">
-                            <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_common_state" />
-                        </template>
-                    </el-table-column>
-                    <el-table-column align="center" label="备注" prop="remark" :show-overflow-tooltip="true" />
-                    <el-table-column
-                        v-show="!currentGroup?.builtin"
-                        v-owner.or="['DICT:UPDATE', 'DICT:DELETE']"
-                        align="center"
-                        label="操作">
-                        <template #default="scope">
-                            <el-button
-                                v-owner="'DICT:UPDATE'"
-                                link
-                                type="primary"
-                                @click="handleDialogOpen('DictData', scope.row)">
-                                编辑
-                            </el-button>
-                            <el-button v-owner="'DICT:DELETE'" link type="primary">删除</el-button>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-col>
-        </el-row>
+                </el-table-column>
+            </el-table>
+        </el-col>
+    </el-row>
 
-        <!-- 动态组件,字典组或者字典数据的编辑或新增弹框 -->
-        <component
-            :is="dynamic.component"
-            v-if="dynamic.show"
-            :row="dynamic.row"
-            :group="dynamic.group"
-            @close="handleDialogClose" />
-    </div>
+    <!-- 动态组件,字典组或者字典数据的编辑或新增弹框 -->
+    <component
+        :is="dynamic.component"
+        v-if="dynamic.show"
+        :row="dynamic.row"
+        :group="dynamic.group"
+        @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">
+.box-search {
+    height: 10%;
+    display: flex;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+
+    .el-form-item {
+        margin-bottom: 0;
+    }
+}
+
+.box-body {
+    padding-left: 1em;
+    padding-right: 1em;
+    height: 90%;
+}
+
 .icon-sidebar {
     width: 1.3em;
     height: 1.3em;
