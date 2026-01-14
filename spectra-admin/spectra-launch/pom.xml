@@ -94,7 +94,7 @@
                     </jvmArguments>
                     <!-- 镜像配置 -->
                     <image>
-                        <builder>paketobuildpacks/builder-jammy-tiny</builder>
+                        <builder>paketobuildpacks/builder-jammy-full</builder>
                         <env>
                             <BP_NATIVE_IMAGE>false</BP_NATIVE_IMAGE>
                             <BP_IMAGE_FLATTEN>true</BP_IMAGE_FLATTEN>
