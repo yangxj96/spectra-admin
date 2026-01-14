@@ -26,7 +26,14 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 
+import java.awt.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import static com.google.code.kaptcha.Constants.*;
@@ -50,7 +57,7 @@ public class KaptchaConfiguration {
     ///
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
-    public Producer kaptchaProducer() {
+    public Producer kaptchaProducer() throws Exception {
         log.debug("{}开始配置图片验证码,字符模式", PREFIX);
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
@@ -69,7 +76,7 @@ public class KaptchaConfiguration {
         // 验证码文本字符长度 默认为5
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_LENGTH, "4");
         // 验证码文本字体样式 默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "classpath:fonts/unifont-9.0.06.ttf");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Inter");
         // 图片样式
         // 水纹com.google.code.kaptcha.impl.WaterRipple
         // 鱼眼com.google.code.kaptcha.impl.FishEyeGimpy
@@ -87,7 +94,7 @@ public class KaptchaConfiguration {
     ///
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
-    public DefaultKaptcha getKaptchaBeanMath() {
+    public DefaultKaptcha getKaptchaBeanMath() throws Exception {
 
         log.debug("{}开始配置图片验证码,算术模式", PREFIX);
         var defaultKaptcha = new DefaultKaptcha();
@@ -103,7 +110,7 @@ public class KaptchaConfiguration {
         // 验证码图片高度 默认为50
         properties.setProperty(KAPTCHA_IMAGE_HEIGHT, "60");
         // 验证码文本字符大小 默认为40
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_SIZE, "35");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_SIZE, "45");
         // KAPTCHA_SESSION_KEY
         properties.setProperty(KAPTCHA_SESSION_CONFIG_KEY, "kaptchaCodeMath");
         // 验证码文本生成器
@@ -113,7 +120,7 @@ public class KaptchaConfiguration {
         // 验证码文本字符长度 默认为5
         properties.setProperty(KAPTCHA_TEXTPRODUCER_CHAR_LENGTH, "6");
         // 验证码文本字体样式 默认为new Font("Arial", 1, fontSize), new Font("Courier", 1, fontSize)
-        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "classpath:fonts/unifont-9.0.06.ttf");
+        properties.setProperty(KAPTCHA_TEXTPRODUCER_FONT_NAMES, "Inter");
         // 验证码噪点颜色 默认为Color.BLACK
         properties.setProperty(KAPTCHA_NOISE_COLOR, "white");
         // 干扰实现类
@@ -124,6 +131,5 @@ public class KaptchaConfiguration {
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
     }
-
 
 }
