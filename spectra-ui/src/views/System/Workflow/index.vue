@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const condition = ref({
     name: undefined,
     type: undefined
@@ -49,6 +51,10 @@ const table_data = [
         remark: "这是说明"
     }
 ];
+
+const handleFlowEdit = () => {
+    router.push({ path: "/pages/workflow/flow-edit" });
+};
 </script>
 
 <template>
@@ -68,7 +74,7 @@ const table_data = [
             <el-form-item>
                 <el-button type="primary">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button type="success">新增流程</el-button>
+                <el-button type="success" @click="handleFlowEdit">新增流程</el-button>
                 <el-button type="success">新增表单</el-button>
             </el-form-item>
         </el-form>

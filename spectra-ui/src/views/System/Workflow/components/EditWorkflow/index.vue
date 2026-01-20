@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import LogicFlow from "@logicflow/core";
 import "@logicflow/core/dist/index.css";
-import { Control, DndPanel, SelectionSelect } from "@logicflow/extension";
+import { Control, SelectionSelect } from "@logicflow/extension";
 import "@logicflow/extension/dist/index.css";
 import { onMounted, useTemplateRef } from "vue";
-import Flowable from "@yangxj96/logicflow-flowable";
+import Flowable, { type FlowablePluginOptions } from "@yangxj96/logicflow-flowable";
 
 const container = useTemplateRef<HTMLDivElement>("container");
-
+const graph = useTemplateRef<HTMLDivElement>("graph");
 const panel = useTemplateRef<HTMLDivElement>("panel");
 
 let logicFlow: LogicFlow;
@@ -18,15 +18,25 @@ onMounted(() => {
     logicFlow = new LogicFlow({
         container: container.value!,
         grid: true,
-        plugins: [Control, DndPanel, SelectionSelect, Flowable.Plugin],
+        plugins: [Control, SelectionSelect, Flowable.Plugin],
         pluginsOptions: {
             selectionSelect: {
                 exclusiveMode: false
-            }
+            },
+            flowable: {
+                propertyPanel: {
+                    enabled: true,
+                    container: panel.value!,
+                    defaultRenderers: true
+                },
+                dndPanel: {
+                    enabled: true,
+                    container: graph.value!
+                }
+            } as FlowablePluginOptions
         }
     });
 
-    (logicFlow.extension.dndPanel as DndPanel)?.setPatternItems(Flowable.getFlowableDndItems());
     (logicFlow.extension.control as Control)?.addItem({
         key: "export",
         title: "",
@@ -40,17 +50,15 @@ onMounted(() => {
     });
 
     logicFlow.render({});
-
-    Flowable.registerPropertyPanel({
-        container: panel.value!,
-        lf: logicFlow
-    });
 });
 </script>
 
 <template>
     <el-row style="height: 100%">
-        <el-col :span="18" style="height: 100%">
+        <el-col :span="4" class="col">
+            <div ref="graph" style="height: 100%; width: 100%" />
+        </el-col>
+        <el-col :span="14" style="height: 100%">
             <div ref="container" style="height: 100%; width: 100%" />
         </el-col>
         <el-col :span="6" style="height: 100%">

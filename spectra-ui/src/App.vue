@@ -22,10 +22,8 @@ watch(
     () => userStore.isLoggedIn,
     loggedIn => {
         if (loggedIn) {
-            console.log("登录后启动空闲监听");
             start();
         } else {
-            console.log("登出停止监听");
             stop();
         }
     },

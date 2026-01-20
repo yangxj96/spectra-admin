@@ -65,12 +65,6 @@ export default class CommonUtils {
         let lat = 25.526_473_000_000_014;
         let lon = 103.792_161_999_999_96;
         const now = new Date();
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(position => {
-                lat = position.coords.latitude;
-                lon = position.coords.longitude;
-            });
-        }
         //sunrise = 日出 sunset = 日落
         const { sunrise, sunset } = SunCalc.getTimes(now, lat, lon);
         // 日出前 或 日落后，开启深色模式

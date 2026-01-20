@@ -29,7 +29,6 @@ for (let menu of appStore.menus) {
 watch(
     () => route.path,
     path => {
-        console.log(`路由发生变化`, route.path);
         resolveSideMenus(path);
         resolveTopActive(path);
     },
@@ -62,7 +61,6 @@ function resolveTopActive(path: string) {
 
 /// 解析侧边栏
 function resolveSideMenus(path: string) {
-    console.log(`当前路径`, path);
     // 首页单独处理
     if (path === "/") {
         appStore.currentMenus = [];

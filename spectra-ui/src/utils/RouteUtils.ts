@@ -104,15 +104,22 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
             appStore.menus = res.data;
             const routes = convertMenuToRoutes(res.data);
 
+            for (let route of routes) {
+                if (route.name === "系统管理") {
+                    route.children?.push({
+                        path: "/system/workflow/flow-edit",
+                        name: "流程编辑",
+                        component: () => import("@/views/System/Workflow/components/EditWorkflow/index.vue")
+                    });
+                }
+            }
+
             // 避免重复添加路由
             for (const route of routes) {
                 if (!router.hasRoute(route.name!)) {
                     router.addRoute(route);
-                    console.log(`[守卫] 添加路由: ${String(route.name)}`);
                 }
             }
-
-            console.log(`[守卫] 动态添加 ${routes.length} 个路由`);
 
             // 确保路由表已更新 虽然 still need hack，但更安全
             return next({ ...to, replace: true });
