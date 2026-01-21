@@ -84,5 +84,5 @@ public class ULogEntity implements Serializable {
      * 当前用户 ID
      */
     @Nullable
-    private Long currentId;
+    private String currentId;
 }

@@ -19,7 +19,7 @@ public class DataScopeContext {
     private DataScopeType scope;
 
     /// 当前用户
-    private Long userId;
+    private String userId;
 
     /// 可访问组织/部门 ID
     private List<Long> targetIds;

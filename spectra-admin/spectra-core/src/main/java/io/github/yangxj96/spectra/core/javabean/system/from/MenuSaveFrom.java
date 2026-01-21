@@ -38,10 +38,10 @@ public class MenuSaveFrom {
     /// 数据id
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private Long id;
+    private String id;
 
     /// 父级ID
-    private Long pid;
+    private String pid;
 
     /// 图标
     @NotNull(message = "图标不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})

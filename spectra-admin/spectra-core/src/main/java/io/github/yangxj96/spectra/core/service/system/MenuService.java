@@ -50,5 +50,5 @@ public interface MenuService extends IService<Menu> {
     ///
     /// @param id 角色ID
     /// @return 关联的菜单
-    List<Menu> getByRelRoleId(long id);
+    List<Menu> getByRelRoleId(String id);
 }

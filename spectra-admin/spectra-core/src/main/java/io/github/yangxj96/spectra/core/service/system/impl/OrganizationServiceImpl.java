@@ -80,7 +80,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     }
 
     @Override
-    public String generatePath(Long id) {
+    public String generatePath(String id) {
         return baseMapper.generatePath(id);
     }
 
@@ -95,7 +95,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
     }
 
     @Override
-    public List<Organization> getAllChildrenById(Long organizationId) {
+    public List<Organization> getAllChildrenById(String organizationId) {
         var organizations = this.list();
         // 2. 构建父ID -> 子节点列表的映射
         var childrenMap = organizations.stream()
@@ -116,7 +116,7 @@ public class OrganizationServiceImpl extends ServiceImpl<OrganizationMapper, Org
      * @param childrenMap 父ID -> 子节点列表的映射
      * @param result      收集结果的列表
      */
-    private void collectAllChildren(Long parentId, Map<Long, List<Organization>> childrenMap, List<Organization> result) {
+    private void collectAllChildren(String parentId, Map<String, List<Organization>> childrenMap, List<Organization> result) {
         // 获取该父节点的所有直接子节点
         var directChildren = childrenMap.get(parentId);
         // 如果没有子节点，直接返回（递归终止条件）

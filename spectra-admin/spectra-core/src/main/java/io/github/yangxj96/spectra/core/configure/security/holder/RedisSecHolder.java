@@ -200,8 +200,8 @@ public class RedisSecHolder implements SecHolder {
     }
 
     @Override
-    public @Nullable Long getCurrentUserId() {
-        SecurityUser user = this.getCurrentUser();
+    public @Nullable String getCurrentUserId() {
+        var user = this.getCurrentUser();
         if (user == null) {
             return null;
         }

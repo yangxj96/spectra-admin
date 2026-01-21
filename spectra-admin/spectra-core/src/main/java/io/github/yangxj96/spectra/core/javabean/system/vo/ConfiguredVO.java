@@ -4,8 +4,6 @@ import io.github.yangxj96.spectra.common.constant.ConfiguredValueType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -24,8 +22,7 @@ public class ConfiguredVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 主键ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 配置key
     private String key;

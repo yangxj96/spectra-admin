@@ -51,7 +51,7 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
 
 
     @Override
-    public List<Authority> getByRelRoleId(long id) {
+    public List<Authority> getByRelRoleId(String id) {
         List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.getByRoleId(id);
         if (relRoleAuthorities.isEmpty()) {
             return Collections.emptyList();

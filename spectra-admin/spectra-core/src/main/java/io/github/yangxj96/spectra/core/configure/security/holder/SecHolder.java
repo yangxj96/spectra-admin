@@ -55,6 +55,6 @@ public interface SecHolder {
     /// 获取当前用户 ID
     ///
     /// @return 当前用户 ID, 可能为null
-    @Nullable Long getCurrentUserId();
+    @Nullable String getCurrentUserId();
 
 }

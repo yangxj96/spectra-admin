@@ -35,10 +35,10 @@ public class OrganizationFrom {
 
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private Long id;
+    private String id;
 
     /// 上级ID
-    private Long pid;
+    private String pid;
 
     /// 名称
     private String name;

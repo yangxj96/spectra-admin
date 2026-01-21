@@ -39,12 +39,12 @@ public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 数据id
-    @TableId(value = "id", type = IdType.ASSIGN_ID)
-    private Long id;
+    @TableId(value = "id", type = IdType.ASSIGN_UUID)
+    private String id;
 
     /// 创建人
     @TableField(value = "created_by", fill = FieldFill.INSERT)
-    private Long createdBy;
+    private String createdBy;
 
     /// 创建时间
     @TableField(value = "created_at", fill = FieldFill.INSERT)
@@ -52,7 +52,7 @@ public class BaseEntity implements Serializable {
 
     /// 更新人
     @TableField(value = "updated_by", fill = FieldFill.INSERT_UPDATE)
-    private Long updatedBy;
+    private String updatedBy;
 
     /// 更新时间
     @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)

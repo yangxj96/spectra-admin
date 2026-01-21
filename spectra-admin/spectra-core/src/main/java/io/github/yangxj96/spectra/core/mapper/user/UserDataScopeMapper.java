@@ -18,5 +18,5 @@ public interface UserDataScopeMapper extends BaseMapper<UserDataScope> {
      * @param userId 用户ID
      * @return 数据范围
      */
-    UserDataScope findByUserId(@Param("userId") Long userId);
+    UserDataScope findByUserId(@Param("userId") String userId);
 }

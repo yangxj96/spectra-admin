@@ -41,10 +41,10 @@ public class TreeUtils {
     /// @param idExtractor 提取节点ID的函数（如 AuthorityTreeVO::getId）
     /// @param <T>         实现 Tree<T> 的具体类型
     /// @return 压缩处理后的选中ID集合
-    public static <T extends Tree<T>> Set<Long> compressSelectedNodes(List<T> tree, Set<Long> selectedIds, Function<T, Long> idExtractor) {
-        var result = new HashSet<Long>();
+    public static <T extends Tree<T>> Set<String> compressSelectedNodes(List<T> tree, Set<String> selectedIds, Function<T, String> idExtractor) {
+        var result = new HashSet<String>();
         for (T node : tree) {
-            var nodeResult = new HashSet<Long>();
+            var nodeResult = new HashSet<String>();
             collectCompressedIds(node, selectedIds, idExtractor, nodeResult);
             result.addAll(nodeResult);
         }
@@ -52,7 +52,7 @@ public class TreeUtils {
     }
 
     /// 递归收集压缩后的节点ID
-    private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<Long> selectedIds, Function<T, Long> idExtractor, Set<Long> result) {
+    private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<String> selectedIds, Function<T, String> idExtractor, Set<String> result) {
 
         if (node == null) return false;
 
@@ -72,10 +72,10 @@ public class TreeUtils {
 
         // 非叶子节点：递归处理子节点
         var allChildrenSelected = true;
-        var childResults = new ArrayList<Set<Long>>();
+        var childResults = new ArrayList<Set<String>>();
 
         for (T child : children) {
-            var childResult = new HashSet<Long>();
+            var childResult = new HashSet<String>();
             var isSelected = collectCompressedIds(child, selectedIds, idExtractor, childResult);
             childResults.add(childResult);
             if (!isSelected) {

@@ -18,6 +18,6 @@ public interface UserDataScopeTargetMapper extends BaseMapper<UserDataScopeTarge
     ///
     /// @param userId 用户ID
     /// @return 数据范围目标列表
-    List<UserDataScopeTarget> findByUserId(@Param("userId") Long userId);
+    List<UserDataScopeTarget> findByUserId(@Param("userId") String userId);
 
 }

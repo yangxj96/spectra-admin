@@ -32,5 +32,5 @@ public interface DictItemService extends BaseService<DictItem> {
     ///
     /// @param gid 字典组ID
     /// @return 字典数据列表
-    List<DictItem> listByGid(Long gid);
+    List<DictItem> listByGid(String gid);
 }

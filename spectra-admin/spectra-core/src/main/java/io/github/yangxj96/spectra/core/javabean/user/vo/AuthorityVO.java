@@ -19,8 +19,6 @@ package io.github.yangxj96.spectra.core.javabean.user.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 /// 权限VO
 ///
@@ -33,12 +31,10 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 public class AuthorityVO {
 
     /// 数据id.
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
-    /// 父级ID,用于构建树形结构
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long pid;
+
+    private String pid;
 
     /// 权限名称
     private String name;

@@ -35,5 +35,5 @@ public interface OrganizationMapper extends BaseMapper<Organization> {
      * @param id 组织机构ID
      * @return 组织机构路径
      */
-    String generatePath(@Param("id") Long id);
+    String generatePath(@Param("id") String id);
 }

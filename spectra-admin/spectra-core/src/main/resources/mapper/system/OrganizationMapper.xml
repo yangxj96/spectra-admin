@@ -40,9 +40,8 @@
                    pid,
                    name,
                    name::TEXT AS path
-            FROM spectra.sys_organization
+            FROM ${schema}.sys_organization
             WHERE pid IS NULL
-               OR pid = 0
 
             UNION ALL
 
@@ -51,10 +50,9 @@
                    o.pid,
                    o.name,
                    ot.path || '/' || o.name AS path
-            FROM spectra.sys_organization o
+            FROM ${schema}.sys_organization o
                      JOIN org_tree ot ON o.pid = ot.id)
-        SELECT id,
-               path
+        SELECT path,id
         FROM org_tree
         WHERE id = #{id};
     </select>

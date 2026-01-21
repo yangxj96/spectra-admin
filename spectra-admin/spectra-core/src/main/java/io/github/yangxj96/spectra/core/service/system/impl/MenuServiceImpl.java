@@ -86,7 +86,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    public List<Menu> getByRelRoleId(long id) {
+    public List<Menu> getByRelRoleId(String id) {
         var relRoleMenus = roleMenuMapper.getByRoleId(id);
         if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();

@@ -44,7 +44,7 @@ public class DictItem extends BaseEntity implements Serializable {
 
     /// 字典类型ID
     @TableField(value = "gid")
-    private Long gid;
+    private String gid;
 
     /// 标签
     @TableField(value = "label")

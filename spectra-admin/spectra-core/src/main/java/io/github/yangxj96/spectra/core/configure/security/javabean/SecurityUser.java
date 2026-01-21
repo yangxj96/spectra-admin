@@ -28,7 +28,7 @@ import java.util.Map;
 public class SecurityUser implements UserDetails {
 
     ///  用户ID
-    private Long id;
+    private String id;
 
     /// 姓名
     private String name;
@@ -40,7 +40,7 @@ public class SecurityUser implements UserDetails {
     private String avatar;
 
     /// 所属组织机构ID
-    private Long organizationId;
+    private String organizationId;
 
     /// 用户密码
     private String password;

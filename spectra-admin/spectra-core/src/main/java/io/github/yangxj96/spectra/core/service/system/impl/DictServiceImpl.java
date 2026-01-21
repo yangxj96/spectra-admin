@@ -74,7 +74,7 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void deleteGroup(Long id) {
+    public void deleteGroup(String id) {
         var group = groupService.getById(id);
         if (null == group) {
             throw new DataNotExistException("字典组不存在");
@@ -109,7 +109,7 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void deleteData(Long id) {
+    public void deleteData(String id) {
         var dictData = dataService.getById(id);
         if (null == dictData) {
             throw new DataNotExistException("字典项不存在");

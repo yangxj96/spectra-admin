@@ -34,7 +34,7 @@ import java.util.List;
 public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictItem> implements DictItemService {
 
     @Override
-    public List<DictItem> listByGid(Long gid) {
+    public List<DictItem> listByGid(String gid) {
         var wrapper = new LambdaQueryWrapper<DictItem>()
                 .eq(DictItem::getGid, gid);
         return this.list(wrapper);

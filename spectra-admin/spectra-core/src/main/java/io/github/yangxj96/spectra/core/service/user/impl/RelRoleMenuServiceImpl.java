@@ -56,7 +56,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     @Override
     @Transactional
-    public void grant(Long roleId, RoleMenuFrom from) {
+    public void grant(String roleId, RoleMenuFrom from) {
         // 当前角色关联的菜单信息
         var currentIds = relRoleMenuMapper.getByRoleId(roleId)
                 .stream()
@@ -91,14 +91,14 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     @Override
     @Transactional
-    public void revoke(Long roleId) {
+    public void revoke(String roleId) {
         // 删除角色关联的菜单
         var wrapper = new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, roleId);
         relRoleMenuMapper.delete(wrapper);
     }
 
     @Override
-    public List<MenuVO> get(Long roleId) {
+    public List<MenuVO> get(String roleId) {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
         return menuConverter.toVOList(menus);
     }

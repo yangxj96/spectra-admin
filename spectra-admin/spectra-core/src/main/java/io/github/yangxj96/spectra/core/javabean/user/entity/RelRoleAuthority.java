@@ -42,10 +42,10 @@ public class RelRoleAuthority extends BaseEntity implements Serializable {
 
     /// 角色ID
     @TableField("role_id")
-    private Long roleId;
+    private String roleId;
 
     /// 权限ID
     @TableField("authority_id")
-    private Long authorityId;
+    private String authorityId;
 
 }

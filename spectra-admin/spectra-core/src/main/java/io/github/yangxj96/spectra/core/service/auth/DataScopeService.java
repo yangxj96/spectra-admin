@@ -10,17 +10,17 @@ public interface DataScopeService {
     ///
     /// @param userId 用户ID
     /// @return 数据范围
-    DataScopeContext resolve(Long userId);
+    DataScopeContext resolve(String userId);
 
     /// 根据用户ID获取用户权限范围
     ///
     /// @param userId 用户ID
     /// @return 数据范围
-    DataScopeContext resolveUser(Long userId);
+    DataScopeContext resolveUser(String userId);
 
     /// 根据用户ID获取用户角色,后根据角色获取权限范围
     ///
     /// @param userId 用户ID
     /// @return 数据范围
-    DataScopeContext resolveRole(Long userId);
+    DataScopeContext resolveRole(String userId);
 }

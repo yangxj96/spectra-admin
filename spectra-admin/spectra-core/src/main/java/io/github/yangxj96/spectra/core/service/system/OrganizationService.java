@@ -50,7 +50,7 @@ public interface OrganizationService extends IService<Organization> {
     ///
     /// @param id 组织机构ID
     /// @return 组织机构路径
-    String generatePath(Long id);
+    String generatePath(String id);
 
     /// 根据ID获取他的所有子级,包含孙级..曾孙级...等
     ///
@@ -58,7 +58,7 @@ public interface OrganizationService extends IService<Organization> {
     ///
     /// @param organizationId 组织机构ID
     /// @return 所有子级列表
-    List<Organization> getAllChildrenById(Long organizationId);
+    List<Organization> getAllChildrenById(String organizationId);
 
     /**
      * 组织机构树形结构

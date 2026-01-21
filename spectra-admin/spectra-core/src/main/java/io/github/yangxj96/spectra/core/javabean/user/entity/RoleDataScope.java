@@ -26,7 +26,7 @@ public class RoleDataScope extends BaseEntity implements Serializable {
 
     /// 角色ID
     @TableField(value = "role_id")
-    private Long roleId;
+    private String roleId;
 
     /// 数据范围类型
     @TableField(value = "scope_type")

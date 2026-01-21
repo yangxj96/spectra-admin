@@ -27,7 +27,7 @@ public class Account extends BaseEntity implements Serializable {
 
     /// 用户 ID
     @TableField(value = "user_id")
-    private Long userId;
+    private String userId;
 
     /// 登录类型
     @TableField(value = "type")
@@ -63,11 +63,11 @@ public class Account extends BaseEntity implements Serializable {
 
     /// 1:正常 2:禁用 3:未验证
     @TableField(value = "status")
-    private Boolean status;
+    private Short status;
 
     /// 0:未验证 1:已验证（如手机号/邮箱）
     @TableField(value = "verified")
-    private Boolean verified;
+    private Short verified;
 
     /// 用于临时账号（如扫码未确认）
     @TableField(value = "expires_at")

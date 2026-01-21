@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.launch.license.controller;
+package io.github.yangxj96.spectra.launch;
 
 
 import io.github.yangxj96.spectra.license.utils.HardwareIdUtil;

@@ -20,8 +20,6 @@ import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -40,12 +38,10 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 上级ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long pid;
+    private String pid;
 
     /// 名称
     private String name;

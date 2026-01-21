@@ -45,7 +45,7 @@ public class TokenVO implements Serializable {
 
     /// 用户ID
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 用户名
     private String username;

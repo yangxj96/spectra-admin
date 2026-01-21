@@ -1,6 +1,7 @@
-package io.github.yangxj96.spectra.launch.user.controller;
+package io.github.yangxj96.spectra.launch;
 
 
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.google.common.collect.Lists;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.service.user.UserService;
@@ -25,15 +26,15 @@ class UserControllerTest {
     private UserService userService;
 
     @Test
-    void created() {
+    void initAdminUser() {
         // 最小化新建用户
         UserSaveFrom from = new UserSaveFrom();
         from.setStatus((short) 0);
-        from.setEmail("yangxj96@gmail.com");
+        from.setEmail("admin@devops00.com");
         from.setCountry("China");
         from.setCity("Kunming");
-        from.setOrganizationId(1970016645676978177L);
-        from.setRoleIds(Lists.newArrayList(1932682189593350146L));
+        from.setOrganizationId(UuidCreator.getTimeOrderedEpoch().toString());
+        from.setRoleIds(Lists.newArrayList(UuidCreator.getTimeOrderedEpoch().toString()));
 
         userService.create(from);
 

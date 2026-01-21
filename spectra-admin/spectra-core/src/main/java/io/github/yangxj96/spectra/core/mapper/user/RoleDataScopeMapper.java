@@ -18,5 +18,5 @@ public interface RoleDataScopeMapper extends BaseMapper<RoleDataScope> {
      * @param roleId 角色ID
      * @return 数据范围信息
      */
-    RoleDataScope findByRoleId(@Param("roleID") Long roleId);
+    RoleDataScope findByRoleId(@Param("roleID") String roleId);
 }

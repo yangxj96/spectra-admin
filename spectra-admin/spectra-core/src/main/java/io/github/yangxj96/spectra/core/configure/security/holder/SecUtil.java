@@ -90,7 +90,7 @@ public class SecUtil {
     /// 获取当前用户 ID
     ///
     /// @return 用户 ID,可能为null
-    public static @Nullable Long getCurrentUserId() {
+    public static @Nullable String getCurrentUserId() {
         return getHolder().getCurrentUserId();
     }
 

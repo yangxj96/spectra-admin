@@ -66,7 +66,7 @@ public class RoleDeletionOnUserRoleCleanupListener {
         // 获取哪些用户有这个角色
         var userIds = relUserRoles.stream().map(RelUserRole::getUserId).distinct().toList();
         // 循环查询这个用户的角色进行处理
-        for (Long userId : userIds) {
+        for (String userId : userIds) {
             var roles = relUserRoleService.getRoles(userId);
             // 他只有一个角色的情况,取消了关联就要给他一个默认保底
             if (roles.size() <= 1) {

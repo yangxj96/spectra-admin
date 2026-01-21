@@ -30,7 +30,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     }
 
     @Override
-    public Account getDefaultByUserId(Long userId) {
+    public Account getDefaultByUserId(String userId) {
         var wrapper = new LambdaQueryWrapper<Account>()
                 .eq(Account::getUserId, userId)
                 .isNotNull(Account::getLoginName)
@@ -39,7 +39,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     }
 
     @Override
-    public void deleteByUserId(Long userId) {
+    public void deleteByUserId(String userId) {
         var wrapper = new LambdaQueryWrapper<Account>()
                 .eq(Account::getUserId, userId);
         this.remove(wrapper);

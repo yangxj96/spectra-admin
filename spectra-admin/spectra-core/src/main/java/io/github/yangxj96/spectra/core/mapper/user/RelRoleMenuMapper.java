@@ -35,7 +35,7 @@ public interface RelRoleMenuMapper extends BaseMapper<RelRoleMenu> {
      * @param roleId 角色ID
      * @return 关联信息
      */
-    List<RelRoleMenu> getByRoleId(@Param("roleId") Long roleId);
+    List<RelRoleMenu> getByRoleId(@Param("roleId") String roleId);
 
 
 }

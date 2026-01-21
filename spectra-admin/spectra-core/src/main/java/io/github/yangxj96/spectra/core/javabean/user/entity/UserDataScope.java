@@ -26,7 +26,7 @@ public class UserDataScope extends BaseEntity implements Serializable {
 
     /// 用户ID
     @TableField(value = "user_id")
-    private Long userId;
+    private String userId;
 
     /// 数据范围类型
     @TableField(value = "scope_type")

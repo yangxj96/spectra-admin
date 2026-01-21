@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.launch.auth.controller;
+package io.github.yangxj96.spectra.launch;
 
 import io.github.yangxj96.spectra.core.service.common.IpLocationService;
 import jakarta.annotation.Resource;

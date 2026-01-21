@@ -32,22 +32,22 @@ public interface RelRoleAuthorityService {
     ///
     /// @param roleId 角色ID
     /// @param from   权限关联信息
-    void grant(Long roleId, RoleAuthorityFrom from);
+    void grant(String roleId, RoleAuthorityFrom from);
 
     /// 撤销角色权限
     ///
     /// @param roleId 角色ID
-    void revoke(Long roleId);
+    void revoke(String roleId);
 
     /// 获取角色权限
     ///
     /// @param roleId 角色ID
     /// @return 权限列表
-    List<AuthorityVO> get(Long roleId);
+    List<AuthorityVO> get(String roleId);
 
     /// 获取角色权限
     ///
     /// @param ids 角色ID列表
     /// @return 权限列表,已去重
-    List<AuthorityVO> get(List<Long> ids);
+    List<AuthorityVO> get(List<String> ids);
 }

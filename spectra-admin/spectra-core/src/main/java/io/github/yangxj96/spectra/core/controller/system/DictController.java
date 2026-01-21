@@ -65,7 +65,7 @@ public class DictController {
     @DeleteMapping("/group/{id}")
     @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteGroup(@PathVariable String id) {
-        bindService.deleteGroup(Long.parseLong(id));
+        bindService.deleteGroup(id);
     }
 
     /**
@@ -101,7 +101,7 @@ public class DictController {
     @DeleteMapping("/data/{id}")
     @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteData(@PathVariable String id) {
-        bindService.deleteData(Long.parseLong(id));
+        bindService.deleteData(id);
     }
 
     /**

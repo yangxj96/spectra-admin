@@ -42,10 +42,10 @@ public class RelUserRole extends BaseEntity implements Serializable {
 
     /// 用户ID
     @TableField("user_id")
-    private Long userId;
+    private String userId;
 
     /// 角色ID
     @TableField("role_id")
-    private Long roleId;
+    private String roleId;
 
 }

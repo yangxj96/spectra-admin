@@ -19,8 +19,6 @@ package io.github.yangxj96.spectra.core.javabean.system.vo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 /// 菜单VO
 ///
@@ -33,12 +31,10 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 public class MenuVO {
 
     /// 数据id.
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 父级ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long pid;
+    private String pid;
 
     /// 图标
     private String icon;

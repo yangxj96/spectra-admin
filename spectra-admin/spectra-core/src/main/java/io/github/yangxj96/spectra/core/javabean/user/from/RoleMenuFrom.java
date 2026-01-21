@@ -36,11 +36,11 @@ public class RoleMenuFrom {
 
     /// 角色ID
     @NotNull(message = "角色ID不能为null")
-    private Long roleId;
+    private String roleId;
 
     /// 菜单ID列表
     @NotNull(message = "菜单列表不能为null")
     @Size(min = 1, message = "菜单列表至少需要一个权限ID")
-    private List<Long> menuIds;
+    private List<String> menuIds;
 
 }

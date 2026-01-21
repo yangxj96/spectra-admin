@@ -35,5 +35,5 @@ public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
      * @param roleId 角色ID
      * @return 关联权限信息
      */
-    List<RelRoleAuthority> getByRoleId(@Param("roleId") Long roleId);
+    List<RelRoleAuthority> getByRoleId(@Param("roleId") String roleId);
 }

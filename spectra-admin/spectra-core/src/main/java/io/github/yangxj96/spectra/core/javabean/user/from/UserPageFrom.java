@@ -40,5 +40,5 @@ public class UserPageFrom {
     private Boolean status;
 
     /// 组织机构ID
-    private Long organizationId;
+    private String organizationId;
 }

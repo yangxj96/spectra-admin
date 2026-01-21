@@ -44,8 +44,7 @@ public class UserPageVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 姓名
     private String username;
@@ -88,7 +87,7 @@ public class UserPageVO implements Serializable {
 
     /// 组织机构ID
     @JsonSerialize(using = ToStringSerializer.class)
-    private Long organizationId;
+    private String organizationId;
 
     /// 组织机构名称
     private String organizationName;

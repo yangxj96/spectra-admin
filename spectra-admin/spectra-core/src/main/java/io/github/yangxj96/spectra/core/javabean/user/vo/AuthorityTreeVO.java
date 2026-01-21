@@ -41,12 +41,10 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 权限ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long id;
+    private String id;
 
     /// 权限父级ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private Long pid;
+    private String pid;
 
     /// 权限说明
     private String name;

@@ -38,7 +38,7 @@ public class DataScopeAspect {
         }
 
         // 正常 DataScope
-        Long userId = SecUtil.getCurrentUserId();
+        String userId = SecUtil.getCurrentUserId();
         DataScopeContext context = dataScopeService.resolve(userId);
 
         try {

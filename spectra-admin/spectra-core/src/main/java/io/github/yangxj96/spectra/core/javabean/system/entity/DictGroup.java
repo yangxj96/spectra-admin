@@ -46,7 +46,7 @@ public class DictGroup extends BaseEntity implements Serializable {
     /// 父级ID
     @Nullable
     @TableField(value = "pid")
-    private Long pid;
+    private String pid;
 
     /// 字典名称
     @TableField(value = "name")

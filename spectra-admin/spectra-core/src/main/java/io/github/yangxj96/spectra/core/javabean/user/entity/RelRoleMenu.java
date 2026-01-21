@@ -44,10 +44,10 @@ public class RelRoleMenu extends BaseEntity implements Serializable {
 
     /// 角色ID
     @TableField("role_id")
-    private Long roleId;
+    private String roleId;
 
     /// 菜单ID
     @TableField("menu_id")
-    private Long menuId;
+    private String menuId;
 
 }

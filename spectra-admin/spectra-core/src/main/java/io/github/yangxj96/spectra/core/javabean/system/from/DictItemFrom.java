@@ -36,11 +36,11 @@ public class DictItemFrom {
     /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private Long id;
+    private String id;
 
     /// 字典类型ID
     @NotNull(message = "字典类型不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Long gid;
+    private String gid;
 
     /// 标签
     @NotNull(message = "标签不能为空", groups = {Verify.Insert.class, Verify.Update.class})

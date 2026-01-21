@@ -60,7 +60,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     @Transactional
-    public void grant(Long roleId, RoleAuthorityFrom from) {
+    public void grant(String roleId, RoleAuthorityFrom from) {
         // 压缩权限树
         from.setAuthorityIds(
                 TreeUtils.compressSelectedNodes(
@@ -99,20 +99,20 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     @Transactional
-    public void revoke(Long roleId) {
+    public void revoke(String roleId) {
         // 删除角色关联的权限
         var wrapper = new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getRoleId, roleId);
         relRoleAuthorityMapper.delete(wrapper);
     }
 
     @Override
-    public List<AuthorityVO> get(Long roleId) {
+    public List<AuthorityVO> get(String roleId) {
         var authority = authorityService.getByRelRoleId(roleId);
         return authorityConverter.toVOList(authority);
     }
 
     @Override
-    public List<AuthorityVO> get(List<Long> ids) {
+    public List<AuthorityVO> get(List<String> ids) {
         List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.selectList(
                 new LambdaQueryWrapper<RelRoleAuthority>()
                         .in(RelRoleAuthority::getRoleId, ids)
@@ -120,7 +120,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         if (CollUtils.isEmpty(relRoleAuthorities)) {
             return new ArrayList<>();
         }
-        List<Long> authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
+        var authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
         var coll = authorityService.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
         return authorityConverter.toVOList(coll);
     }

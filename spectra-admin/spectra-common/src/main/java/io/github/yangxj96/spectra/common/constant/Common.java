@@ -31,6 +31,6 @@ public final class Common {
 
     /// 默认的PID
     @Nullable
-    public static final Long PID = null;
+    public static final String PID = null;
 
 }

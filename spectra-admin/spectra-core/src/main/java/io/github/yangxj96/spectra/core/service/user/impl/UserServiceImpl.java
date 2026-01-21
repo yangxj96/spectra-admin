@@ -118,7 +118,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         defaultAccount.setLoginName(entity.getEmail());
         defaultAccount.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
         defaultAccount.setProvider("DEFAULT");
-        defaultAccount.setStatus(Boolean.TRUE);
+        defaultAccount.setStatus((short) 0);
         if (!accountService.save(defaultAccount)) {
             throw new DataSaveException("保存用户信息异常");
         }
@@ -243,7 +243,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         roleToDelete.removeAll(targetRoles);
 
         if (!roleToDelete.isEmpty()) {
-            List<Long> deleteList = List.copyOf(roleToDelete);
+            List<String> deleteList = List.copyOf(roleToDelete);
             try {
                 relUserRoleService.revoke(entity.getId(), deleteList);
             } catch (Exception e) {
@@ -257,7 +257,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         roleToInsert.removeAll(currentRoles);
 
         if (!roleToInsert.isEmpty()) {
-            List<Long> insertList = List.copyOf(roleToInsert);
+            List<String> insertList = List.copyOf(roleToInsert);
             try {
                 relUserRoleService.grant(entity.getId(), insertList);
             } catch (Exception e) {
@@ -283,7 +283,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
-        List<Long> organizationIds = new ArrayList<>();
+        List<String> organizationIds = new ArrayList<>();
         if (params.getOrganizationId() != null) {
             Organization organization = organizationService.getById(params.getOrganizationId());
             List<Organization> listed = organizationService.list(

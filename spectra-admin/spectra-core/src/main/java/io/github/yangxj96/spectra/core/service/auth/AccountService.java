@@ -28,12 +28,12 @@ public interface AccountService extends BaseService<Account> {
      * @param userId 用户ID
      * @return 账号信息
      */
-    Account getDefaultByUserId(Long userId);
+    Account getDefaultByUserId(String userId);
 
     /**
      * 根据用户ID删除用户的所有登录方式
      *
      * @param userId 用户ID
      */
-    void deleteByUserId(Long userId);
+    void deleteByUserId(String userId);
 }

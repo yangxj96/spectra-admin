@@ -47,7 +47,7 @@ public class Menu extends BaseEntity implements Serializable {
     /// 父级ID
     @JsonSerialize(using = ToStringSerializer.class)
     @TableField(value = "pid")
-    private Long pid;
+    private String pid;
 
     /// 图标
     @TableField(value = "icon")

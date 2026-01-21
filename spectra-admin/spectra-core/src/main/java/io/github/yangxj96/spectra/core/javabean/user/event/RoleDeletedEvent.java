@@ -21,5 +21,5 @@ package io.github.yangxj96.spectra.core.javabean.user.event;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-11-11
-public record RoleDeletedEvent(Long roleId) {
+public record RoleDeletedEvent(String roleId) {
 }

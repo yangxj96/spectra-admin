@@ -106,7 +106,7 @@ public class AuthServiceImpl implements AuthService {
     /// @param userId 用户 ID
     /// @return 角色列表,无角色则返回空数组
     ///
-    private List<Role> getUserRole(Long userId) {
+    private List<Role> getUserRole(String userId) {
         return relUserRoleService.getRoles(userId);
     }
 
@@ -116,7 +116,7 @@ public class AuthServiceImpl implements AuthService {
     /// @param roles 角色 ID 列表
     /// @return 权限列表
     ///
-    private List<AuthorityVO> getUserAuthority(List<Long> roles) {
+    private List<AuthorityVO> getUserAuthority(List<String> roles) {
         if (roles.isEmpty()) {
             return Collections.emptyList();
         }

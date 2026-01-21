@@ -35,9 +35,9 @@ public class UserRelevanceRolesFrom {
 
     /// 用户ID
     @NotNull(message = "用户ID不能为空")
-    private Long userId;
+    private String userId;
 
     /// 角色列表
     @NotNull(message = "需要关联的角色ID列表不能为空")
-    private List<Long> roleIds;
+    private List<String> roleIds;
 }

@@ -71,7 +71,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
     public void delete(@PathVariable String id) {
         try {
-            bindService.delete(Long.parseLong(id));
+            bindService.delete(id);
         } catch (NumberFormatException e) {
             log.error("ID转换异常", e);
         }
@@ -104,8 +104,7 @@ public class RoleController {
     @GetMapping("/{roleId}/authority")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
         try {
-            long id = Long.parseLong(roleId);
-            return relRoleAuthorityService.get(id);
+            return relRoleAuthorityService.get(roleId);
         } catch (Exception e) {
             log.error("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -116,8 +115,7 @@ public class RoleController {
     @GetMapping("/{roleId}/menu")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
         try {
-            long id = Long.parseLong(roleId);
-            return relRoleMenuService.get(id);
+            return relRoleMenuService.get(roleId);
         } catch (Exception e) {
             log.error("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -129,8 +127,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
-            long id = Long.parseLong(roleId);
-            relRoleAuthorityService.grant(id, from);
+            relRoleAuthorityService.grant(roleId, from);
         } catch (Exception e) {
             log.error("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -142,8 +139,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
-            long id = Long.parseLong(roleId);
-            relRoleMenuService.grant(id, from);
+            relRoleMenuService.grant(roleId, from);
         } catch (Exception e) {
             log.error("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");

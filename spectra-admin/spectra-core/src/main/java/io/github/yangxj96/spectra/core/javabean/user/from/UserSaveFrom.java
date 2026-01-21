@@ -39,10 +39,10 @@ import java.util.List;
 @NoArgsConstructor
 public class UserSaveFrom {
 
-    /// 姓名
+    /// 主键ID
     @Null(message = "新增用户时不能存在 ID", groups = Verify.Insert.class)
     @NotNull(message = "用户 ID 不能为空", groups = Verify.Update.class)
-    private Long id;
+    private String id;
 
     /// 姓名
     private String username;
@@ -82,11 +82,11 @@ public class UserSaveFrom {
 
     /// 所属组织机构ID
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Long organizationId;
+    private String organizationId;
 
     /// 角色ID列表
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
-    private List<Long> roleIds;
+    private List<String> roleIds;
 
     /// 数据范围
     private DataScopeType dataScope;

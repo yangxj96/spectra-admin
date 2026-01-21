@@ -34,7 +34,7 @@ public class DataScopeServiceImpl implements DataScopeService {
     }
 
     @Override
-    public DataScopeContext resolve(Long userId) {
+    public DataScopeContext resolve(String userId) {
         // 用户直授（最高优先级）
         DataScopeContext direct = resolveUser(userId);
         if (direct != null) {
@@ -54,7 +54,7 @@ public class DataScopeServiceImpl implements DataScopeService {
                 .build();
     }
 
-    public DataScopeContext resolveUser(Long userId) {
+    public DataScopeContext resolveUser(String userId) {
         // TODO 查询用户权限范围还没完善
         UserDataScope entity = userDataScopeMapper.findByUserId(userId);
         if (entity == null) {
@@ -70,7 +70,7 @@ public class DataScopeServiceImpl implements DataScopeService {
                 .build();
     }
 
-    public DataScopeContext resolveRole(Long userId) {
+    public DataScopeContext resolveRole(String userId) {
         // TODO 查询角色权限范围还没完善
         RoleDataScope scope = roleDataScopeMapper.findByRoleId(userId);
         if (scope == null) {

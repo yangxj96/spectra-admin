@@ -38,7 +38,7 @@ public class RoleFrom {
     /// 角色ID
     @Null(message = "新增不能指定角色ID", groups = Verify.Insert.class)
     @NotNull(message = "角色ID不能为空", groups = Verify.Update.class)
-    private Long id;
+    private String id;
 
     /// 角色名称
     @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})

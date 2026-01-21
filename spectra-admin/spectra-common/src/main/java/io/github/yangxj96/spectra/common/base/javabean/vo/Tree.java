@@ -30,17 +30,17 @@ import java.util.List;
 public interface Tree<T> {
 
     /// 获取ID
-    Long getId();
+    String getId();
 
     /// 设置ID
-    void setId(Long id);
+    void setId(String id);
 
     /// 获取父级ID
     @Nullable
-    Long getPid();
+    String getPid();
 
     /// 设置父级ID
-    void setPid(@Nullable Long pid);
+    void setPid(@Nullable String pid);
 
     /// 获取下级
     @Nullable

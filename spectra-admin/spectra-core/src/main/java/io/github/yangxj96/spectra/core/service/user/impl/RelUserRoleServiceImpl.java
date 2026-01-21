@@ -45,9 +45,9 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
 
     @Override
     @Transactional
-    public void grant(Long userId, List<Long> roleIds) {
+    public void grant(String userId, List<String> roleIds) {
         var coll = new ArrayList<RelUserRole>();
-        for (Long roleId : roleIds) {
+        for (String roleId : roleIds) {
             coll.add(RelUserRole.builder().userId(userId).roleId(roleId).build());
         }
         relUserRoleMapper.insert(coll);
@@ -55,14 +55,14 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
 
     @Override
     @Transactional
-    public void revoke(Long userId) {
+    public void revoke(String userId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getUserId, userId);
         relUserRoleMapper.delete(wrapper);
     }
 
     @Override
-    public void revoke(Long userId, List<Long> roleIds) {
+    public void revoke(String userId, List<String> roleIds) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getUserId, userId)
                 .in(RelUserRole::getRoleId, roleIds);
@@ -70,14 +70,14 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
     }
 
     @Override
-    public List<RelUserRole> getRelByRoleId(Long roleId) {
+    public List<RelUserRole> getRelByRoleId(String roleId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getRoleId, roleId);
         return relUserRoleMapper.selectList(wrapper);
     }
 
     @Override
-    public List<Role> getRoles(Long userId) {
+    public List<Role> getRoles(String userId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>();
         wrapper.eq(RelUserRole::getUserId, userId);
         List<RelUserRole> userRoles = relUserRoleMapper.selectList(wrapper);

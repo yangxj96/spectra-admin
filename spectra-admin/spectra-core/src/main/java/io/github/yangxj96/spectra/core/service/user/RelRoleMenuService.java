@@ -32,17 +32,17 @@ public interface RelRoleMenuService {
     ///
     /// @param roleId 角色ID
     /// @param from   角色关联菜单信息
-    void grant(Long roleId, RoleMenuFrom from);
+    void grant(String roleId, RoleMenuFrom from);
 
     /// 撤销角色菜单
     ///
     /// @param roleId 角色ID
-    void revoke(Long roleId);
+    void revoke(String roleId);
 
     /// 获取角色菜单
     ///
     /// @param roleId 角色ID
     /// @return 菜单列表
-    List<MenuVO> get(Long roleId);
+    List<MenuVO> get(String roleId);
 
 }

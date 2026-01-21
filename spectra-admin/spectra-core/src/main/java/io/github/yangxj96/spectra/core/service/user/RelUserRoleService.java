@@ -32,29 +32,29 @@ public interface RelUserRoleService {
     ///
     /// @param userId  用户ID
     /// @param roleIds 角色ID列表
-    void grant(Long userId, List<Long> roleIds);
+    void grant(String userId, List<String> roleIds);
 
     /// 撤销用户角色(全部)
     ///
     /// @param userId 用户ID
-    void revoke(Long userId);
+    void revoke(String userId);
 
     /// 撤销用户角色(指定的角色)
     ///
     /// @param userId  用户ID
     /// @param roleIds 需要撤销的角色列表
-    void revoke(Long userId, List<Long> roleIds);
+    void revoke(String userId, List<String> roleIds);
 
     /// 根据角色ID获取关联关系
     ///
     /// @param roleId 角色ID
     /// @return 这个角色有的关联关系
-    List<RelUserRole> getRelByRoleId(Long roleId);
+    List<RelUserRole> getRelByRoleId(String roleId);
 
     /// 获取用户角色
     ///
     /// @param userId 角色ID
     /// @return 用户角色列表
-    List<Role> getRoles(Long userId);
+    List<Role> getRoles(String userId);
 
 }

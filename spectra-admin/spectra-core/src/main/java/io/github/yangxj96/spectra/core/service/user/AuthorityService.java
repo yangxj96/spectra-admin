@@ -34,7 +34,7 @@ public interface AuthorityService extends BaseService<Authority> {
     ///
     /// @param id 角色ID
     /// @return 关联的权限
-    List<Authority> getByRelRoleId(long id);
+    List<Authority> getByRelRoleId(String id);
 
     /// 获取权限树
     ///

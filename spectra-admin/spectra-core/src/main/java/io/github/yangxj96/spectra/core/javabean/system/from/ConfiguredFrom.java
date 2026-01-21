@@ -18,7 +18,7 @@ public class ConfiguredFrom {
 
     /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
-    private Long id;
+    private String id;
 
     /// 配置VALUE
     @NotNull(message = "配置值不能为空")
