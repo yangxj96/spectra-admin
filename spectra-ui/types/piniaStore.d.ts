@@ -27,14 +27,6 @@ declare global {
         change_password: boolean;
     };
 
-    // useTabsStore()的state
-    type StoreTabs = {
-        // 选项卡存储的数组,不包含首页这个固定项
-        tabs: string[];
-        // 当前激活的选项卡
-        active: string | undefined;
-    };
-
     // useUserStore()的state
     type StoreUser = {
         // 用户登录的token

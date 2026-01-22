@@ -4,7 +4,7 @@ import UseTable from "@/hooks/use-table.ts";
 import { userApi } from "@/api/user/user.ts";
 import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
-import { treeDefaultProps } from "@/utils/config.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { organizationApi } from "@/api/user/organization.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";

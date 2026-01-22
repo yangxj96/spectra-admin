@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
-import { treeDefaultProps } from "@/utils/config.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import { organizationApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";

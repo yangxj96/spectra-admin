@@ -3,7 +3,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { ElTag } from "element-plus";
 import { createPinia, setActivePinia } from "pinia";
 import DictTag from "../src/components/DictTag/index.vue";
-import useDictStore from "../src/plugin/store/modules/use-dict-store";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 describe("DictTag.vue", () => {
     let pinia: ReturnType<typeof createPinia>;
@@ -16,8 +16,8 @@ describe("DictTag.vue", () => {
         const store = useDictStore();
         store.dicts = {
             sys_organization_type: [
-                { value: "0", label: "总部" },
-                { value: "1", label: "子公司" }
+                { id: "", gid: "", value: "0", label: "总部", sort: 0, state: 0, remark: "" },
+                { id: "", gid: "", value: "1", label: "子公司", sort: 0, state: 0, remark: "" }
             ]
         };
     });

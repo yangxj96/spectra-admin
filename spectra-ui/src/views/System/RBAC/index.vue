@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElTree } from "element-plus";
-import { treeDefaultProps } from "@/utils/config.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import RoleEdit from "./components/RoleEdit/index.vue";
 import UseTable from "@/hooks/use-table.ts";
 import { menuApi } from "@/api/system/menu.ts";

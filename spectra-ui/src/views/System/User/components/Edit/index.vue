@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { roleApi } from "@/api/auth/role.ts";
 import { userApi } from "@/api/user/user.ts";
-import { treeDefaultProps } from "@/utils/config.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import { onMounted, ref, useTemplateRef } from "vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
