@@ -18,7 +18,19 @@
         "import/order": "error",
         "import/noCycle": "error",
         "import/noUnresolved": "error",
-        "noVar": "error"
+        "noVar": "error",
+        "import/no-restricted-imports": [
+            "error",
+            {
+                "paths": [
+                    {
+                        "name": "element-plus",
+                        "importNames": ["ElMessage"],
+                        "message": "禁止直接使用 ElMessage,请使用utils/MessageHelp中的MessageHelp工具类"
+                    }
+                ]
+            }
+        ]
     },
     "overrides": [
         {

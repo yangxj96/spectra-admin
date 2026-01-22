@@ -2,7 +2,7 @@
 import FileUploadApi from "@/api/common/FileUploadApi.ts";
 import FileUtils from "@/utils/FileUtils.ts";
 import { ref, useTemplateRef } from "vue";
-import { ElMessage } from "element-plus";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 const fileList = ref<FileItem[]>([]);
 
@@ -48,7 +48,7 @@ const handleFileChange = (event: Event) => {
 // 文件上传被单击
 const handleFileUploadClick = async () => {
     if (fileList.value.length <= 0) {
-        ElMessage.warning("文件列表为空");
+        MessageHelp.warning("文件列表为空");
         return;
     }
     for (let file of fileList.value) {
@@ -60,12 +60,12 @@ const handleFileUploadClick = async () => {
 const handlePreFileUpload = async (file: File) => {
     let pre_params = await preprocess(file);
     if (!pre_params) {
-        ElMessage.error("预处理文件错误");
+        MessageHelp.error("预处理文件错误");
         return;
     }
     let pre_res = await FileUploadApi.preprocess(pre_params);
     if (pre_res.code !== 200) {
-        ElMessage.error(pre_res.msg);
+        MessageHelp.error(pre_res.msg);
         return;
     }
     // 已存在,跳过,应该还要处理下UI

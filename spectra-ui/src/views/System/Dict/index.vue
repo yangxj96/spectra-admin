@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { markRaw, reactive, ref, watch } from "vue";
 import { defineAsyncComponent } from "@vue/runtime-core";
-import { ElMessage } from "element-plus";
 import DictApi from "@/api/system/DictApi";
 import icons from "@/components/Icons/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // 树形props配置
 const treeProps = { children: "children", label: "name", value: "id" };
@@ -57,7 +57,7 @@ const handleGetDictData = () => {
         if (res.code === 200) {
             dictDataTableData.value = res.data!;
         } else {
-            ElMessage.error({ message: "获取字典数据失败", appendTo: ".box-content" });
+            MessageHelper.error("获取字典数据失败");
         }
     });
 };
@@ -74,7 +74,7 @@ const handleDialogOpen = (type: string, row: DictGroup | DictData | unknown = {}
             break;
         }
         default: {
-            ElMessage.error({ message: "组件加载失败,请检查", appendTo: ".box-content" });
+            MessageHelper.error("组件加载失败,请检查");
             return;
         }
     }

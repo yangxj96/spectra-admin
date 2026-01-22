@@ -2,8 +2,8 @@ import { defineAsyncComponent } from "@vue/runtime-core";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
 import MenuApi from "@/api/system/MenuApi.ts";
-import { ElMessage } from "element-plus";
 import { hideLoading } from "@/plugin/element/loading.ts";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 // 自动收集所有 views 下的 vue 文件（构建期完成）
 const viewModules = import.meta.glob("/src/views/**/*.vue");
@@ -124,14 +124,14 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
             // 确保路由表已更新 虽然 still need hack，但更安全
             return next({ ...to, replace: true });
         } else {
-            ElMessage.error("获取菜单失败");
+            MessageHelp.error("获取菜单失败");
             console.warn("[守卫] 获取菜单失败，跳转登录");
             hideLoading();
             return next({ path: "/login" });
         }
     } catch (error) {
         console.error("[守卫] 加载菜单时发生异常", error);
-        ElMessage.error("网络异常，获取菜单失败");
+        MessageHelp.error("网络异常，获取菜单失败");
         hideLoading();
         return next({ path: "/login" });
     } finally {

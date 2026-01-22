@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from "vue";
-import { type AutocompleteData, ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import * as VerifyRules from "@/utils/VerifyRules.ts";
 import UserApi from "@/api/user/UserApi.ts";
@@ -9,6 +9,7 @@ import RoleApi from "@/api/auth/RoleApi.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 import useDictStore from "@/plugin/store/modules/useDictStore.ts";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // 定义Model
 const form = defineModel("form", {
@@ -74,9 +75,8 @@ async function handleUserSave() {
         await formRef.value?.validate();
         let request = form.value.id ? UserApi.modify : UserApi.created;
         await request(form.value!);
-        ElMessage.success({
-            message: form.value.id ? "修改用户成功" : "新增用户成功",
-            onClose: handleCurrentDialogClose
+        MessageHelper.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
+            handleCurrentDialogClose();
         });
     } catch (error) {
         // 输出到控制台就好了,不需要进行提示

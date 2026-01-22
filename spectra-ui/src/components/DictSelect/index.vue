@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, type PropType, ref } from "vue";
-import { ElMessage } from "element-plus";
 import UseDictStore from "@/plugin/store/modules/useDictStore";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 const model = defineModel({
     type: [String, Number, null] as PropType<string | number | null | undefined>,
@@ -32,7 +32,7 @@ onMounted(async () => {
     try {
         options.value = (await dictStore.getDictData(dict_code.value)) || [];
     } catch {
-        ElMessage.error("获取字典数据失败");
+        MessageHelp.error("获取字典数据失败");
     }
 });
 </script>

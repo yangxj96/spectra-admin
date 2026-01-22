@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import DictApi from "@/api/system/DictApi";
-import { ElMessage, type FormInstance } from "element-plus";
+import { type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 const props = defineProps<{
     row?: DictData;
@@ -59,11 +60,11 @@ function handleInitData() {
             if (res.code === 200) {
                 gropus.value = res.data || [];
             } else {
-                ElMessage.error({ message: res.msg || "获取字典组列表失败", appendTo: ".box-content" });
+                MessageHelper.error(res.msg || "获取字典组列表失败");
             }
         })
         .catch(() => {
-            ElMessage.error({ message: "获取字典组列表失败", appendTo: ".box-content" });
+            MessageHelper.error("获取字典组列表失败");
         });
 }
 
@@ -72,22 +73,17 @@ function handleSaveDictGroup() {
     if (!editForm.value) return;
     editForm.value?.validate(valid => {
         if (!valid) {
-            ElMessage.error({ message: "请检查必填内容", appendTo: ".box-content" });
+            MessageHelper.error("请检查必填内容");
             return;
         }
         let request = has_edit ? DictApi.modifyData : DictApi.createData;
         request(edit.form).then((res: IResult) => {
             if (res.code === 200) {
-                ElMessage.success({
-                    message: "保存成功",
-                    duration: 1000,
-                    appendTo: ".box-content",
-                    onClose() {
-                        emit("close");
-                    }
+                MessageHelper.success("保存成功", () => {
+                    emit("close");
                 });
             } else {
-                ElMessage.error({ message: res.msg || "保存失败", appendTo: ".box-content" });
+                MessageHelper.error(res.msg || "保存失败");
             }
         });
     });

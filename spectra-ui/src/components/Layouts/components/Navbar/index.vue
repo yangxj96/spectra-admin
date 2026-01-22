@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { ElMessage } from "element-plus/es";
 import Icons from "@/components/Icons/index.vue";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import AuthApi from "@/api/auth/AuthApi.ts";
@@ -12,6 +11,7 @@ import avatar from "@/assets/images/avatar.png";
 import usePropsStore from "@/plugin/store/modules/usePropsStore.ts";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
 import useAppStore from "@/plugin/store/modules/useAppStore.ts";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 // 获取路由对象（useRoute 是响应式的）
 const route = useRoute();
@@ -102,11 +102,8 @@ function resolveSideMenus(path: string) {
 function handleUserLogout() {
     stopAllRequest();
     AuthApi.logout().then(() => {
-        ElMessage.success({
-            message: "退出成功",
-            onClose: () => {
-                GlobalUtils.exit();
-            }
+        MessageHelp.success("退出成功", () => {
+            GlobalUtils.exit();
         });
     });
 }

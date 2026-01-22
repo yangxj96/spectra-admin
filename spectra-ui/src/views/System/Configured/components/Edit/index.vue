@@ -2,8 +2,8 @@
 import Icons from "@/components/Icons/index.vue";
 import { useTemplateRef } from "vue";
 import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
-import { ElMessage } from "element-plus";
 import DictSelect from "@/components/DictSelect/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 // 是否显示
 const show = defineModel("show", {
     type: Boolean,
@@ -32,10 +32,7 @@ const handleConfiguredSave = async () => {
     try {
         await formRef.value.validate();
         await ConfiguredApi.modify(form.value!);
-        ElMessage.success({
-            message: "修改配置成功",
-            onClose: handleDrawerClose
-        });
+        MessageHelper.success("修改配置成功", () => handleDrawerClose());
     } catch (error) {
         console.error(error);
     }

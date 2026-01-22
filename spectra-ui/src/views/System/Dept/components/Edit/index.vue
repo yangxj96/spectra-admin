@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
-import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // model<
 const dialog = defineModel("show", {
@@ -47,18 +48,11 @@ async function handleOrganizationSave() {
         let request = modify.value ? OrganizationApi.modify : OrganizationApi.created;
         let res = await request(form.value);
         if (res.code === 200) {
-            ElMessage.success({
-                message: modify.value ? "修改组织机构成功" : "新增组织机构成功",
-                appendTo: ".box-content",
-                onClose() {
-                    handleCurrentDialogClose();
-                }
+            MessageHelper.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
+                handleCurrentDialogClose();
             });
         } else {
-            ElMessage.error({
-                message: res.msg,
-                appendTo: ".box-content"
-            });
+            MessageHelper.error(res.msg);
         }
     } catch (error) {
         console.log(error);

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from "element-plus";
+import { type FormInstance, type FormRules } from "element-plus";
 import MenuApi from "@/api/system/MenuApi.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
 import icons from "@/components/Icons/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
@@ -48,14 +49,9 @@ function handleTableItemModify(row: Menu) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Menu) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        appendTo: ".box-content",
-        type: "warning"
-    }).then(() => {
+    MessageHelper.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
         console.log(`确定删除`);
-        ElMessage.success({ message: "执行删除了", appendTo: ".box-content" });
+        MessageHelper.success("执行删除了");
     });
 }
 
@@ -73,13 +69,9 @@ async function handleMenuSave() {
         if (valid) {
             let request = menu.modify ? MenuApi.modify : MenuApi.created;
             request(menu.form).then(() => {
-                ElMessage.success({
-                    message: menu.modify ? "修改菜单成功" : "新增菜单成功",
-                    appendTo: ".box-content",
-                    onClose() {
-                        menu.dialog = false;
-                        handleCriteriaQuery();
-                    }
+                MessageHelper.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
+                    menu.dialog = false;
+                    handleCriteriaQuery();
                 });
             });
         }

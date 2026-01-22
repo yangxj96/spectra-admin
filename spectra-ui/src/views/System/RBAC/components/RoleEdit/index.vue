@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from "vue";
-import { ElMessage, type FormInstance, type FormRules } from "element-plus";
+import { type FormInstance, type FormRules } from "element-plus";
 import RoleApi from "@/api/auth/RoleApi.ts";
 import icons from "@/components/Icons/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // model
-const dialog = defineModel("show", {
+const open = defineModel("show", {
     required: true,
     default: false
 });
@@ -17,6 +18,9 @@ const form = defineModel("form", {
 
 // 定义响应方法
 const emits = defineEmits(["close"]);
+
+// refs
+const formRef = useTemplateRef<FormInstance>("formRef");
 
 // 获取是否为修改
 const modify = computed(() => {
@@ -33,47 +37,34 @@ const rules = {
     state: [{ required: true, message: "请选择角色状态", trigger: "change" }]
 } as FormRules;
 
-// refs
-const formRef = useTemplateRef<FormInstance>("formRef");
-
 // 处理关闭
-function handleCurrentDialogClose() {
-    dialog.value = false;
+const handleClose = () => {
+    open.value = false;
     emits("close");
-}
+};
 
 // 角色保存
-async function handleRoleSave() {
+const handleSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
         let request = modify.value ? RoleApi.modify : RoleApi.created;
         await request(form.value);
-        ElMessage.success({
-            message: modify.value ? "修改角色成功" : "新增角色成功",
-            appendTo: ".box-content",
-            onClose() {
-                handleCurrentDialogClose();
-            }
-        });
+        MessageHelper.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
     } catch (error) {
         console.error(error);
+        MessageHelper.error(error);
     }
-}
+};
 </script>
 
 <template>
-    <el-dialog
-        v-model="dialog"
-        width="30%"
-        class="loading-box"
-        :show-close="false"
-        :destroy-on-close="true"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false">
+    <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleClose">
         <template #header>
-            <icons name="icon-edit" />
-            {{ `${modify ? "编辑" : "新增"}角色` }}
+            <div>
+                <icons name="icon-edit" />
+                {{ `${modify ? "编辑" : "新增"}角色` }}
+            </div>
         </template>
         <template #default>
             <el-form ref="formRef" :model="form" :rules="rules" label-width="auto">
@@ -105,8 +96,8 @@ async function handleRoleSave() {
             </el-form>
         </template>
         <template #footer>
-            <el-button @click="() => (dialog = false)">关闭</el-button>
-            <el-button @click="handleRoleSave">提交</el-button>
+            <el-button @click="handleClose">关闭</el-button>
+            <el-button @click="handleSave">提交</el-button>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>

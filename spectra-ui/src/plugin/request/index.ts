@@ -3,7 +3,8 @@ import { hideLoading, showLoading } from "@/plugin/element/loading";
 import useUserStore from "@/plugin/store/modules/useUserStore";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
 import qs from "qs";
-import { ElMessage, ElNotification } from "element-plus";
+import MessageHelp from "@/utils/MessageHelper.ts";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // 常见内容类型
 // application/x-www-form-urlencoded
@@ -99,12 +100,8 @@ const responseRejected = (error: AxiosError) => {
         // 401 认证失败：跳转登录
         if (status === 401) {
             // "认证异常:"
-            ElMessage.error({
-                message: msg,
-                duration: 2000,
-                onClose: () => {
-                    GlobalUtils.toLogin();
-                }
+            MessageHelp.error(msg, () => {
+                GlobalUtils.toLogin();
             });
             return Promise.resolve(); // 阻止后续 then/catch，不 reject
         }
@@ -117,36 +114,23 @@ const responseRejected = (error: AxiosError) => {
 
         // 其他客户端错误 (400-499)
         if (isStatusCodeInRange(status, 400, 499)) {
-            ElMessage.error({
-                message: msg,
-                duration: 3000
-            });
+            MessageHelp.error(msg);
             return Promise.reject(error);
         }
 
         // 服务端错误 (500-599)
         if (isStatusCodeInRange(status, 500, 599)) {
-            ElNotification.error({
-                title: "服务器错误",
-                message: `服务暂时不可用：${msg}`
-            });
+            MessageHelper.notify.error(`服务暂时不可用：${msg}`, "服务器错误");
             return Promise.reject(error);
         }
 
         // 其他状态码（如 3xx 重定向错误等）
-        ElNotification.warning({
-            title: "请求异常",
-            message: msg
-        });
+        MessageHelper.notify.warning(msg, "请求异常");
         return Promise.reject(error);
     }
 
     // 情况2：无响应（网络断开、超时、DNS 失败等）
-    ElNotification.error({
-        title: "网络异常",
-        message: "无法连接到服务器，请检查网络连接"
-    });
-
+    MessageHelper.notify.error("无法连接到服务器，请检查网络连接", "网络异常");
     return Promise.reject(error);
 };
 

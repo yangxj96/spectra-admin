@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import { ElMessage, ElMessageBox, ElTree } from "element-plus";
+import { ElTree } from "element-plus";
 import { treeDefaultProps } from "@/utils/Config.ts";
 import RoleEdit from "./components/RoleEdit/index.vue";
 import UseTable from "@/hooks/UseTable.ts";
 import MenuApi from "@/api/system/MenuApi.ts";
 import RoleApi from "@/api/auth/RoleApi.ts";
 import AuthorityApi from "@/api/auth/AuthorityApi.ts";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
@@ -51,18 +52,12 @@ function handleRoleEditDialogOpen(row: Role) {
 
 // 角色删除
 function handleRoleDelete(row: Role) {
-    ElMessageBox.confirm(`是否要删除[${row.name}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(() => {
+    MessageHelper.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
         RoleApi.delete(row.id).then(res => {
             if (res.code === 200) {
-                ElMessage.success({
-                    message: "删除成功",
-                    appendTo: ".box-content"
-                });
+                MessageHelper.success("删除成功");
             } else {
-                ElMessage.error({
-                    message: res.msg,
-                    appendTo: ".box-content"
-                });
+                MessageHelper.error(res.msg);
             }
             handlerConditionQuery();
         });
@@ -116,7 +111,7 @@ async function handleRoleTableRowClick(row: Role) {
 // 角色-权限关联关系保存
 function handleSaveRoleAuthority() {
     if (!currentRow.value) {
-        ElMessage.warning({ message: "请先选中一个角色", appendTo: ".box-content" });
+        MessageHelper.warning("请先选中一个角色");
         return;
     }
     let params = {
@@ -125,9 +120,9 @@ function handleSaveRoleAuthority() {
     };
     RoleApi.saveRoleAuthority(params).then(res => {
         if (res.code === 200) {
-            ElMessage.success({ message: "保存成功", appendTo: ".box-content" });
+            MessageHelper.success("保存成功");
         } else {
-            ElMessage.error({ message: res.msg, appendTo: ".box-content" });
+            MessageHelper.error(res.msg);
         }
     });
 }
@@ -135,7 +130,7 @@ function handleSaveRoleAuthority() {
 // 角色-菜单 关联关系保存
 function handleSaveRoleMenu() {
     if (!currentRow.value) {
-        ElMessage.warning({ message: "请先选中一个角色", appendTo: ".box-content" });
+        MessageHelper.warning("请先选中一个角色");
         return;
     }
     let params = {
@@ -144,9 +139,9 @@ function handleSaveRoleMenu() {
     };
     RoleApi.saveRoleMenu(params).then(res => {
         if (res.code === 200) {
-            ElMessage.success({ message: "保存成功", appendTo: ".box-content" });
+            MessageHelper.success("保存成功");
         } else {
-            ElMessage.error({ message: res.msg, appendTo: ".box-content" });
+            MessageHelper.error(res.msg);
         }
     });
 }

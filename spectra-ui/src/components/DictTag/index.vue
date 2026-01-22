@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, type PropType } from "vue";
+import { computed, onMounted, type PropType, ref, watch } from "vue";
 import useDictStore from "@/plugin/store/modules/useDictStore";
 
 const model = defineModel({

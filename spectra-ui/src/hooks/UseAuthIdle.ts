@@ -2,8 +2,8 @@ import useUserStore from "@/plugin/store/modules/useUserStore.ts";
 import { ref, watch } from "vue";
 import { useDebounceFn, useIdle } from "@vueuse/core";
 import AuthApi from "@/api/auth/AuthApi.ts";
-import { ElMessage } from "element-plus";
 import GlobalUtils from "@/utils/GlobalUtils.ts";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 export function useAuthIdle({
     idleTime = 10 * 60 * 1000, // 10分钟空闲
@@ -39,11 +39,8 @@ export function useAuthIdle({
             if (idleValue && userStore.token?.access_token) {
                 // 用户空闲，自动登出
                 await AuthApi.logout();
-                ElMessage.success({
-                    message: "长时间未操作，已自动退出",
-                    onClose: () => {
-                        GlobalUtils.exit();
-                    }
+                MessageHelp.success("长时间未操作，已自动退出", () => {
+                    GlobalUtils.exit();
                 });
             } else if (!idleValue) {
                 // 用户活跃，延迟刷新 Token

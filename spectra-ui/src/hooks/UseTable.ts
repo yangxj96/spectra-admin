@@ -1,5 +1,5 @@
 import { onMounted, ref } from "vue";
-import { ElMessage } from "element-plus";
+import MessageHelp from "@/utils/MessageHelper.ts";
 
 export function useTable<T>(
     request: (parameters?: BasePageParams) => Promise<IResult<Page<T>>>,
@@ -58,9 +58,7 @@ export function useTable<T>(
      */
     function handleRequestResult(response: IResult<Page<T>>) {
         if (response.code !== 200) {
-            ElMessage.success({
-                message: response.msg
-            });
+            MessageHelp.success(response.msg);
             return;
         }
         if (response.data) {

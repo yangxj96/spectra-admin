@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
 import UserApi from "@/api/user/UserApi.ts";
 import OrganizationApi from "@/api/user/OrganizationApi.ts";
 import { treeDefaultProps } from "@/utils/Config.ts";
@@ -9,6 +8,7 @@ import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 import useDictStore from "@/plugin/store/modules/useDictStore.ts";
 import icons from "@/components/Icons/index.vue";
+import MessageHelper from "@/utils/MessageHelper.ts";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -35,7 +35,7 @@ const dictStore = useDictStore();
 function handleInitData() {
     OrganizationApi.tree().then(res => {
         if (res.code !== 200) {
-            ElMessage.error(res.msg);
+            MessageHelper.error(res.msg);
             return;
         }
         organizationTree.value = res.data!;
@@ -65,34 +65,22 @@ function handleUserEditDialog(row: User) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: User) {
-    ElMessageBox.confirm(`是否要删除[${row.username}]`, "提示", { type: "warning", appendTo: ".box-content" }).then(
-        () => {
-            UserApi.deleteById(row.id).then(() => {
-                ElMessage.success({
-                    message: "删除成功",
-                    onClose() {
-                        handlerConditionQuery();
-                    }
-                });
+    MessageHelper.box.confirm(`是否要删除[${row.username}]`, "提示").then(() => {
+        UserApi.deleteById(row.id).then(() => {
+            MessageHelper.success("删除成功", () => {
+                handlerConditionQuery();
             });
-        }
-    );
+        });
+    });
 }
 
 // 用户重置密码
 function handleTableItemResetPassword(row: User) {
     console.log(`重置密码:${JSON.stringify(row)}`);
-    ElMessageBox.confirm(`是否要重置[${row.username}]的密码`, "提示", {
-        type: "warning",
-        appendTo: ".box-content"
-    }).then(() => {
+    MessageHelper.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(() => {
         UserApi.passwordResetById(row.id).then(() => {
-            ElMessage.success({
-                message: "重置成功",
-                appendTo: ".box-content",
-                onClose() {
-                    handlerConditionQuery();
-                }
+            MessageHelper.success("重置成功", () => {
+                handlerConditionQuery();
             });
         });
     });
