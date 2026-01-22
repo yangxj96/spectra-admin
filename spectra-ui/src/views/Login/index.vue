@@ -2,11 +2,9 @@
 import { reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElForm, type FormRules } from "element-plus";
-import useUserStore from "@/plugin/store/modules/useUserStore";
-import AuthApi from "@/api/auth/AuthApi.ts";
-import icons from "@/components/Icons/index.vue";
-import MessageHelp from "@/utils/MessageHelper.ts";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
+import { authApi } from "@/api/auth/auth.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -49,15 +47,15 @@ async function handleLogin() {
     // 开始验证
     const valid = await loginRef.value?.validate();
     if (!valid) {
-        MessageHelp.error("请检查表单");
+        MessageUtils.error("请检查表单");
         console.log("验证未通过");
         return;
     }
 
     try {
-        const res = await AuthApi.login(login.form);
+        const res = await authApi.login(login.form);
         if (res && res.code === 200 && res.data) {
-            MessageHelper.success("登录成功", () => {
+            MessageUtils.success("登录成功", () => {
                 useUserStore().token = res.data!;
                 useUserStore().isLoggedIn = true;
                 const path = "/redirect" + (redirect.value ?? "");

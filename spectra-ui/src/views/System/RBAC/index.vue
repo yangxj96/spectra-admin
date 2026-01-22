@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElTree } from "element-plus";
-import { treeDefaultProps } from "@/utils/Config.ts";
+import { treeDefaultProps } from "@/utils/config.ts";
 import RoleEdit from "./components/RoleEdit/index.vue";
-import UseTable from "@/hooks/UseTable.ts";
-import MenuApi from "@/api/system/MenuApi.ts";
-import RoleApi from "@/api/auth/RoleApi.ts";
-import AuthorityApi from "@/api/auth/AuthorityApi.ts";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import UseTable from "@/hooks/use-table.ts";
+import { menuApi } from "@/api/system/menu.ts";
+import { roleApi } from "@/api/auth/role.ts";
+import { authorityApi } from "@/api/auth/authority.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
@@ -27,7 +27,7 @@ const edit = reactive({
 const currentRow = ref<Role>();
 
 const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination, table_data } = UseTable<Role>(
-    RoleApi.page,
+    roleApi.page,
     condition.value
 );
 
@@ -37,7 +37,7 @@ onMounted(() => {
 
 // 初始化数据
 function handleInitData() {
-    let requests = [MenuApi.tree(), AuthorityApi.tree()];
+    let requests = [menuApi.tree(), authorityApi.tree()];
     Promise.all(requests).then(([menuRes, authorityTreeRes]) => {
         menu_tree.value = menuRes!.data as Menu[];
         authority_tree.value = authorityTreeRes!.data as AuthorityTree[];
@@ -52,12 +52,12 @@ function handleRoleEditDialogOpen(row: Role) {
 
 // 角色删除
 function handleRoleDelete(row: Role) {
-    MessageHelper.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
-        RoleApi.delete(row.id).then(res => {
+    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
+        roleApi.delete(row.id).then(res => {
             if (res.code === 200) {
-                MessageHelper.success("删除成功");
+                MessageUtils.success("删除成功");
             } else {
-                MessageHelper.error(res.msg);
+                MessageUtils.error(res.msg);
             }
             handlerConditionQuery();
         });
@@ -90,7 +90,7 @@ async function handleRoleTableRowClick(row: Role) {
         currentRow.value = row;
         cleanTreeCheckState();
         // 权限部分
-        RoleApi.getRoleAuthority(row.id).then(res => {
+        roleApi.getRoleAuthority(row.id).then(res => {
             if (res.code === 200 && res.data && res.data.length > 0) {
                 let ids = res.data.map(i => i.id);
                 powerRef.value?.setCheckedKeys(ids);
@@ -98,7 +98,7 @@ async function handleRoleTableRowClick(row: Role) {
         });
 
         // 菜单部分
-        RoleApi.getRoleMenu(row.id).then(res => {
+        roleApi.getRoleMenu(row.id).then(res => {
             if (res.code === 200 && res.data && res.data.length > 0) {
                 menuRef.value?.setCheckedKeys(res.data.map(i => i.id));
             }
@@ -111,18 +111,18 @@ async function handleRoleTableRowClick(row: Role) {
 // 角色-权限关联关系保存
 function handleSaveRoleAuthority() {
     if (!currentRow.value) {
-        MessageHelper.warning("请先选中一个角色");
+        MessageUtils.warning("请先选中一个角色");
         return;
     }
     let params = {
         role_id: currentRow.value.id,
         authority_ids: powerRef.value?.getCheckedKeys()
     };
-    RoleApi.saveRoleAuthority(params).then(res => {
+    roleApi.saveRoleAuthority(params).then(res => {
         if (res.code === 200) {
-            MessageHelper.success("保存成功");
+            MessageUtils.success("保存成功");
         } else {
-            MessageHelper.error(res.msg);
+            MessageUtils.error(res.msg);
         }
     });
 }
@@ -130,18 +130,18 @@ function handleSaveRoleAuthority() {
 // 角色-菜单 关联关系保存
 function handleSaveRoleMenu() {
     if (!currentRow.value) {
-        MessageHelper.warning("请先选中一个角色");
+        MessageUtils.warning("请先选中一个角色");
         return;
     }
     let params = {
         role_id: currentRow.value.id,
         menu_ids: menuRef.value?.getCheckedKeys()
     };
-    RoleApi.saveRoleMenu(params).then(res => {
+    roleApi.saveRoleMenu(params).then(res => {
         if (res.code === 200) {
-            MessageHelper.success("保存成功");
+            MessageUtils.success("保存成功");
         } else {
-            MessageHelper.error(res.msg);
+            MessageUtils.error(res.msg);
         }
     });
 }

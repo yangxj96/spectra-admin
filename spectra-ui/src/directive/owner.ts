@@ -1,5 +1,5 @@
 import type { Directive, DirectiveBinding } from "vue";
-import useUserStore from "@/plugin/store/modules/useUserStore.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 
 /**
  * v-owner 指令
@@ -8,20 +8,20 @@ import useUserStore from "@/plugin/store/modules/useUserStore.ts";
  * - v-owner="['USER:INSERT', 'ROLE:ADMIN']"        → AND（默认）
  * - v-owner.or="['USER:INSERT', 'USER:UPDATE']"    → OR
  */
-export default {
+export const owner: Directive<HTMLElement, string | string[]> = {
     mounted(el, binding) {
         checkPermission(el, binding);
     },
-    // 可选
     updated(el, binding) {
         checkPermission(el, binding);
     }
-} as Directive;
+};
 
 function checkPermission(el: HTMLElement, binding: DirectiveBinding<string | string[]>) {
     const { value, modifiers } = binding;
     if (!value) {
         console.warn("[v-owner] 缺少绑定值");
+        el.style.display = "none";
         el.remove();
         return;
     }

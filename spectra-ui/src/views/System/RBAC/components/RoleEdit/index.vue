@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { computed, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
-import RoleApi from "@/api/auth/RoleApi.ts";
-import icons from "@/components/Icons/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { roleApi } from "@/api/auth/role.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model
 const open = defineModel("show", {
@@ -48,12 +47,12 @@ const handleSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = modify.value ? RoleApi.modify : RoleApi.created;
+        let request = modify.value ? roleApi.modify : roleApi.created;
         await request(form.value);
-        MessageHelper.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
+        MessageUtils.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
     } catch (error) {
         console.error(error);
-        MessageHelper.error(error);
+        MessageUtils.error(error);
     }
 };
 </script>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
-import UseTable from "@/hooks/UseTable.ts";
+import { configuredApi } from "@/api/system/configured.ts";
+import UseTable from "@/hooks/use-table.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
 import _ from "lodash";
 import DictTag from "@/components/DictTag/index.vue";
@@ -19,12 +19,12 @@ const condition = ref<ConfiguredPageParams>({
 
 // table分页请求
 const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<Configured>(
-    ConfiguredApi.page,
+    configuredApi.page,
     condition.value
 );
 
 onMounted(() => {
-    ConfiguredApi.json().then(res => console.log(res));
+    configuredApi.json().then(res => console.log(res));
 });
 
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭

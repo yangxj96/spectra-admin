@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import Icons from "@/components/Icons/index.vue";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
-import AuthApi from "@/api/auth/AuthApi.ts";
-import GlobalUtils from "@/utils/GlobalUtils";
+import { authApi } from "@/api/auth/auth.ts";
+import { GlobalUtils } from "@/utils/global-utils.ts";
 import { stopAllRequest } from "@/plugin/request";
 import logo from "@/assets/images/logo.svg";
 import avatar from "@/assets/images/avatar.png";
-import usePropsStore from "@/plugin/store/modules/usePropsStore.ts";
+import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
-import useAppStore from "@/plugin/store/modules/useAppStore.ts";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // 获取路由对象（useRoute 是响应式的）
 const route = useRoute();
@@ -101,8 +100,8 @@ function resolveSideMenus(path: string) {
 
 function handleUserLogout() {
     stopAllRequest();
-    AuthApi.logout().then(() => {
-        MessageHelp.success("退出成功", () => {
+    authApi.logout().then(() => {
+        MessageUtils.success("退出成功", () => {
             GlobalUtils.exit();
         });
     });

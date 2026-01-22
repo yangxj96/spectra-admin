@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // import FileUpload from "@/components/FileUplaod/index.vue";
 // import { ref } from "vue";
-// import AuthApi from "@/api/auth/AuthApi.ts";
+// import AuthApi from "@/api/auth/auth.ts";
 //
 // const fileUploadShow = ref(false);
 //

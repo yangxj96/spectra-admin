@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import Icons from "@/components/Icons/index.vue";
 import { useTemplateRef } from "vue";
-import ConfiguredApi from "@/api/system/ConfiguredApi.ts";
+import { configuredApi } from "@/api/system/configured.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import type { ElForm } from "element-plus";
+
 // 是否显示
 const show = defineModel("show", {
     type: Boolean,
@@ -31,8 +32,8 @@ const handleConfiguredSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value.validate();
-        await ConfiguredApi.modify(form.value!);
-        MessageHelper.success("修改配置成功", () => handleDrawerClose());
+        await configuredApi.modify(form.value!);
+        MessageUtils.success("修改配置成功", () => handleDrawerClose());
     } catch (error) {
         console.error(error);
     }

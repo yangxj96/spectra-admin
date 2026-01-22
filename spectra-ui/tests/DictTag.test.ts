@@ -3,7 +3,7 @@ import { flushPromises, mount } from "@vue/test-utils";
 import { ElTag } from "element-plus";
 import { createPinia, setActivePinia } from "pinia";
 import DictTag from "../src/components/DictTag/index.vue";
-import useDictStore from "../src/plugin/store/modules/useDictStore";
+import useDictStore from "../src/plugin/store/modules/use-dict-store";
 
 describe("DictTag.vue", () => {
     let pinia: ReturnType<typeof createPinia>;

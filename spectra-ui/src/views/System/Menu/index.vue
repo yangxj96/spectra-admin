@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
-import MenuApi from "@/api/system/MenuApi.ts";
+import { menuApi } from "@/api/system/menu.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
-import icons from "@/components/Icons/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
@@ -32,7 +31,7 @@ onMounted(() => {
 
 // 初始化数据
 function handleCriteriaQuery() {
-    MenuApi.tree().then((res: IResult<Menu[]>) => {
+    menuApi.tree().then((res: IResult<Menu[]>) => {
         if (res.code === 200 && res.data) {
             table_data.value = res.data;
         }
@@ -49,9 +48,9 @@ function handleTableItemModify(row: Menu) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Menu) {
-    MessageHelper.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
+    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
         console.log(`确定删除`);
-        MessageHelper.success("执行删除了");
+        MessageUtils.success("执行删除了");
     });
 }
 
@@ -67,9 +66,9 @@ async function handleMenuSave() {
     if (!menuForm.value) return;
     await menuForm.value?.validate((valid, _) => {
         if (valid) {
-            let request = menu.modify ? MenuApi.modify : MenuApi.created;
+            let request = menu.modify ? menuApi.modify : menuApi.created;
             request(menu.form).then(() => {
-                MessageHelper.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
+                MessageUtils.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
                     menu.dialog = false;
                     handleCriteriaQuery();
                 });

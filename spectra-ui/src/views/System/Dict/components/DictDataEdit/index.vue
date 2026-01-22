@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import DictApi from "@/api/system/DictApi";
+import { dictApi } from "@/api/system/dict.ts";
 import { type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import icons from "@/components/Icons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const props = defineProps<{
     row?: DictData;
@@ -55,16 +54,17 @@ onMounted(() => {
 
 // 初始化数据
 function handleInitData() {
-    DictApi.getTypesGroupTree()
+    dictApi
+        .getTypesGroupTree()
         .then((res: IResult<DictGroup[]>) => {
             if (res.code === 200) {
                 gropus.value = res.data || [];
             } else {
-                MessageHelper.error(res.msg || "获取字典组列表失败");
+                MessageUtils.error(res.msg || "获取字典组列表失败");
             }
         })
         .catch(() => {
-            MessageHelper.error("获取字典组列表失败");
+            MessageUtils.error("获取字典组列表失败");
         });
 }
 
@@ -73,17 +73,17 @@ function handleSaveDictGroup() {
     if (!editForm.value) return;
     editForm.value?.validate(valid => {
         if (!valid) {
-            MessageHelper.error("请检查必填内容");
+            MessageUtils.error("请检查必填内容");
             return;
         }
-        let request = has_edit ? DictApi.modifyData : DictApi.createData;
+        let request = has_edit ? dictApi.modifyData : dictApi.createData;
         request(edit.form).then((res: IResult) => {
             if (res.code === 200) {
-                MessageHelper.success("保存成功", () => {
+                MessageUtils.success("保存成功", () => {
                     emit("close");
                 });
             } else {
-                MessageHelper.error(res.msg || "保存失败");
+                MessageUtils.error(res.msg || "保存失败");
             }
         });
     });

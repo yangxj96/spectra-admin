@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, type PropType, ref } from "vue";
-import UseDictStore from "@/plugin/store/modules/useDictStore";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const model = defineModel({
     type: [String, Number, null] as PropType<string | number | null | undefined>,
@@ -14,7 +14,7 @@ const dict_code = defineModel("dict_code", {
     type: String as PropType<string>
 });
 
-const dictStore = UseDictStore();
+const dictStore = useDictStore();
 
 const options = ref<DictData[]>([]);
 
@@ -32,7 +32,7 @@ onMounted(async () => {
     try {
         options.value = (await dictStore.getDictData(dict_code.value)) || [];
     } catch {
-        MessageHelp.error("获取字典数据失败");
+        MessageUtils.error("获取字典数据失败");
     }
 });
 </script>

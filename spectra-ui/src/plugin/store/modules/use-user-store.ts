@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 
-const useUserStore = defineStore("user", {
+export const useUserStore = defineStore("user", {
     state: (): StoreUser => {
         return {
             token: {} as Token,
@@ -62,5 +62,3 @@ const useUserStore = defineStore("user", {
     },
     persist: true
 });
-
-export default useUserStore;

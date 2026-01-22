@@ -1,14 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import UserApi from "@/api/user/UserApi.ts";
-import OrganizationApi from "@/api/user/OrganizationApi.ts";
-import { treeDefaultProps } from "@/utils/Config.ts";
-import UseTable from "@/hooks/UseTable.ts";
+import UseTable from "@/hooks/use-table.ts";
+import { userApi } from "@/api/user/user.ts";
 import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
-import useDictStore from "@/plugin/store/modules/useDictStore.ts";
-import icons from "@/components/Icons/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { treeDefaultProps } from "@/utils/config.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import { organizationApi } from "@/api/user/organization.ts";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -24,7 +23,7 @@ const condition = ref<UserPageParams>({
 
 // table分页请求
 const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<User>(
-    UserApi.page,
+    userApi.page,
     condition.value
 );
 
@@ -33,9 +32,9 @@ const organizationTree = ref<OrganizationTree[]>([]);
 const dictStore = useDictStore();
 
 function handleInitData() {
-    OrganizationApi.tree().then(res => {
+    organizationApi.tree().then(res => {
         if (res.code !== 200) {
-            MessageHelper.error(res.msg);
+            MessageUtils.error(res.msg);
             return;
         }
         organizationTree.value = res.data!;
@@ -65,9 +64,9 @@ function handleUserEditDialog(row: User) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: User) {
-    MessageHelper.box.confirm(`是否要删除[${row.username}]`, "提示").then(() => {
-        UserApi.deleteById(row.id).then(() => {
-            MessageHelper.success("删除成功", () => {
+    MessageUtils.box.confirm(`是否要删除[${row.username}]`, "提示").then(() => {
+        userApi.deleteById(row.id).then(() => {
+            MessageUtils.success("删除成功", () => {
                 handlerConditionQuery();
             });
         });
@@ -77,9 +76,9 @@ function handleTableItemDelete(row: User) {
 // 用户重置密码
 function handleTableItemResetPassword(row: User) {
     console.log(`重置密码:${JSON.stringify(row)}`);
-    MessageHelper.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(() => {
-        UserApi.passwordResetById(row.id).then(() => {
-            MessageHelper.success("重置成功", () => {
+    MessageUtils.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(() => {
+        userApi.passwordResetById(row.id).then(() => {
+            MessageUtils.success("重置成功", () => {
                 handlerConditionQuery();
             });
         });

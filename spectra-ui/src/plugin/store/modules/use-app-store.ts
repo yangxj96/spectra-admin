@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
 
-const useAppStore = defineStore("app", {
+export const useAppStore = defineStore("app", {
     state: (): StoreApp => ({
         lang: zhCn,
         menus: [],
@@ -12,5 +12,3 @@ const useAppStore = defineStore("app", {
         watermark: false
     })
 });
-
-export default useAppStore;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import FileUploadApi from "@/api/common/FileUploadApi.ts";
-import FileUtils from "@/utils/FileUtils.ts";
 import { ref, useTemplateRef } from "vue";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { FileUtils } from "@/utils/file-utils.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import { fileUploadApi } from "@/api/common/file-upload.ts";
 
 const fileList = ref<FileItem[]>([]);
 
@@ -48,7 +48,7 @@ const handleFileChange = (event: Event) => {
 // 文件上传被单击
 const handleFileUploadClick = async () => {
     if (fileList.value.length <= 0) {
-        MessageHelp.warning("文件列表为空");
+        MessageUtils.warning("文件列表为空");
         return;
     }
     for (let file of fileList.value) {
@@ -60,12 +60,12 @@ const handleFileUploadClick = async () => {
 const handlePreFileUpload = async (file: File) => {
     let pre_params = await preprocess(file);
     if (!pre_params) {
-        MessageHelp.error("预处理文件错误");
+        MessageUtils.error("预处理文件错误");
         return;
     }
-    let pre_res = await FileUploadApi.preprocess(pre_params);
+    let pre_res = await fileUploadApi.preprocess(pre_params);
     if (pre_res.code !== 200) {
-        MessageHelp.error(pre_res.msg);
+        MessageUtils.error(pre_res.msg);
         return;
     }
     // 已存在,跳过,应该还要处理下UI
@@ -92,7 +92,7 @@ const handleSmallFileUpload = async (file: File, hash: string) => {
     upload_params.append("file", file);
     upload_params.append("hash", hash);
 
-    let upload_res = await FileUploadApi.upload(upload_params);
+    let upload_res = await fileUploadApi.upload(upload_params);
     console.log("直接上传", upload_res);
 };
 
@@ -108,7 +108,7 @@ const handleLargeFileUpload = async (file: File, hash: string, size: number) => 
         chunk_params.append("index", idx.toString());
         chunk_params.append("count", chunks.length.toString());
         idx++;
-        let chunk_res = await FileUploadApi.chunk(chunk_params);
+        let chunk_res = await fileUploadApi.chunk(chunk_params);
         console.log("分片上传", chunk_res);
     }
 };

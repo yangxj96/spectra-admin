@@ -1,10 +1,10 @@
-export default {
+export const FileUtils = {
     /**
      * 计算文件hash值
      * @param blob 文件
      */
     async hash(blob: Blob): Promise<string> {
-        // ✅ 使用现代 API: Blob.arrayBuffer()
+        // 使用现代 API: Blob.arrayBuffer()
         const buffer = await blob.arrayBuffer();
         // 计算 SHA-256
         const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);

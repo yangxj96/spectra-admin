@@ -1,9 +1,9 @@
 import { defineAsyncComponent } from "@vue/runtime-core";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
-import useAppStore from "@/plugin/store/modules/useAppStore.ts";
-import MenuApi from "@/api/system/MenuApi.ts";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
+import { menuApi } from "@/api/system/menu.ts";
 import { hideLoading } from "@/plugin/element/loading.ts";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // 自动收集所有 views 下的 vue 文件（构建期完成）
 const viewModules = import.meta.glob("/src/views/**/*.vue");
@@ -99,7 +99,7 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
     appStore.isFetchingMenus = true; // 设置加载状态
 
     try {
-        const res = await MenuApi.tree();
+        const res = await menuApi.tree();
         if (res.code === 200 && res.data) {
             appStore.menus = res.data;
             const routes = convertMenuToRoutes(res.data);
@@ -124,14 +124,14 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
             // 确保路由表已更新 虽然 still need hack，但更安全
             return next({ ...to, replace: true });
         } else {
-            MessageHelp.error("获取菜单失败");
+            MessageUtils.error("获取菜单失败");
             console.warn("[守卫] 获取菜单失败，跳转登录");
             hideLoading();
             return next({ path: "/login" });
         }
     } catch (error) {
         console.error("[守卫] 加载菜单时发生异常", error);
-        MessageHelp.error("网络异常，获取菜单失败");
+        MessageUtils.error("网络异常，获取菜单失败");
         hideLoading();
         return next({ path: "/login" });
     } finally {

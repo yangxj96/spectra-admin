@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
 import "echarts";
 import VChart from "vue-echarts";
-import ServiceMonitorApi from "@/api/system/ServiceMonitorApi.ts";
+import { onMounted, ref, useTemplateRef } from "vue";
+import { serviceMonitorApi } from "@/api/system/service-monitor.ts";
 
 // 相关信息
 const cpuInfo = ref<CPUInfo>();
@@ -56,8 +56,6 @@ const chartCPUOption = {
         }
     ]
 };
-const chartRAMOption = {};
-const chartJVMOption = {};
 
 // ref内容
 const cpuChart = useTemplateRef("cpuChart");
@@ -68,7 +66,7 @@ onMounted(() => {
 
 // 初始化所需数据
 function initData() {
-    let requests = [ServiceMonitorApi.getCPUInfo(), ServiceMonitorApi.getRAMInfo(), ServiceMonitorApi.getJVMInfo()];
+    let requests = [serviceMonitorApi.getCPUInfo(), serviceMonitorApi.getRAMInfo(), serviceMonitorApi.getJVMInfo()];
     Promise.all(requests).then(res => {
         cpuInfo.value = res[0].data as CPUInfo;
         ramInfo.value = res[1].data as RAMInfo;

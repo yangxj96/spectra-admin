@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import OrganizationApi from "@/api/user/OrganizationApi.ts";
+import { organizationApi } from "@/api/user/organization.ts";
 import OrganizationEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const table_data = ref<OrganizationTree[]>();
 
@@ -22,17 +22,17 @@ onMounted(() => {
 
 // 初始化数据
 function handleCriteriaQuery() {
-    OrganizationApi.tree().then(res => {
+    organizationApi.tree().then(res => {
         table_data.value = res.data;
     });
 }
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Organization) {
-    MessageHelper.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
+    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         try {
-            let { code, msg } = await OrganizationApi.deleteById(row.id);
-            MessageHelper.success(code === 200 ? "删除成功" : msg);
+            let { code, msg } = await organizationApi.deleteById(row.id);
+            MessageUtils.success(code === 200 ? "删除成功" : msg);
         } finally {
             handleCriteriaQuery();
         }

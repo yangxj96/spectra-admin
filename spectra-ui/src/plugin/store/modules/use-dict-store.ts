@@ -1,11 +1,11 @@
-import DictApi from "@/api/system/DictApi";
+import { dictApi } from "@/api/system/dict.ts";
 import { defineStore } from "pinia";
 import PQueue from "p-queue";
 
 // 创建一个串行队列（concurrency=1）
 const serialQueue = new PQueue({ concurrency: 1 });
 
-const useDictStore = defineStore("dict", {
+export const useDictStore = defineStore("dict", {
     state: (): StoreDict => ({
         dicts: {}
     }),
@@ -20,7 +20,7 @@ const useDictStore = defineStore("dict", {
                     return this.dicts[key];
                 }
                 try {
-                    const { code, data } = await DictApi.getDataByTypeCode(key);
+                    const { code, data } = await dictApi.getDataByTypeCode(key);
                     if (code === 200) {
                         this.dicts[key] = data ?? [];
                         return this.dicts[key];
@@ -60,5 +60,3 @@ const useDictStore = defineStore("dict", {
         }
     }
 });
-
-export default useDictStore;

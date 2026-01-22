@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import DictSelect from "@/components/DictSelect/index.vue";
 import { useRouter } from "vue-router";
+import DictSelect from "@/components/DictSelect/index.vue";
 
 const router = useRouter();
 const condition = ref({

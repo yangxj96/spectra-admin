@@ -1,27 +1,19 @@
 import * as SunCalc from "suncalc";
 
-/**
- * 通用工具类
- *
- * @author Jack Young
- * @version 1.0
- * @since 2025-11-11 15:00:00
- */
-export default class CommonUtils {
+export const CommonUtils = {
     /**
      * 获取随机数
      * @param min 最小数
      * @param max 最大数
      */
-    public static getRandom(min: number, max: number) {
+    getRandom(min: number, max: number) {
         return Math.floor(Math.random() * (max - min)) + min;
-    }
-
+    },
     /**
      * 生成UUID
      * @constructor
      */
-    public static UUID(): string {
+    UUID(): string {
         if (typeof crypto !== "undefined" && crypto.getRandomValues) {
             const randomBytes = new Uint8Array(16);
             crypto.getRandomValues(randomBytes);
@@ -40,28 +32,25 @@ export default class CommonUtils {
                 return v.toString(16);
             });
         }
-    }
-
+    },
     /**
      * 生成UUID(大写)
      * @constructor
      */
-    public static UUIDUpper() {
+    UUIDUpper() {
         return this.UUID().toUpperCase();
-    }
-
+    },
     /**
      * 生成UUID(小写)
      * @constructor
      */
-    public static UUIDLower() {
+    UUIDLower() {
         return this.UUID().toLowerCase();
-    }
-
+    },
     /**
      * 根据经纬度获取日出日落时间后进行判断是否需要进入深色模式
      */
-    public static shouldEnableDarkMode() {
+    shouldEnableDarkMode() {
         let lat = 25.526_473_000_000_014;
         let lon = 103.792_161_999_999_96;
         const now = new Date();
@@ -69,12 +58,11 @@ export default class CommonUtils {
         const { sunrise, sunset } = SunCalc.getTimes(now, lat, lon);
         // 日出前 或 日落后，开启深色模式
         return now < sunrise || now >= sunset;
-    }
-
+    },
     /**
      * 是否是刷新进入
      */
-    public static hasReload() {
+    hasReload() {
         // 判断是否是刷新进来的
         const navigationEntries = globalThis.performance?.getEntriesByType?.("navigation");
         const navigationEntry = navigationEntries?.[0] as PerformanceNavigationTiming | undefined;
@@ -82,4 +70,4 @@ export default class CommonUtils {
             sessionStorage.setItem("reloaded", "true");
         }
     }
-}
+};

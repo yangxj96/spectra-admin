@@ -1,10 +1,9 @@
-import axios, { type AxiosError, type AxiosResponse, type Canceler, type InternalAxiosRequestConfig } from "axios";
-import { hideLoading, showLoading } from "@/plugin/element/loading";
-import useUserStore from "@/plugin/store/modules/useUserStore";
-import GlobalUtils from "@/utils/GlobalUtils.ts";
 import qs from "qs";
-import MessageHelp from "@/utils/MessageHelper.ts";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { GlobalUtils } from "@/utils/global-utils.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import { hideLoading, showLoading } from "@/plugin/element/loading";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
+import axios, { type AxiosError, type AxiosResponse, type Canceler, type InternalAxiosRequestConfig } from "axios";
 
 // 常见内容类型
 // application/x-www-form-urlencoded
@@ -100,7 +99,7 @@ const responseRejected = (error: AxiosError) => {
         // 401 认证失败：跳转登录
         if (status === 401) {
             // "认证异常:"
-            MessageHelp.error(msg, () => {
+            MessageUtils.error(msg, () => {
                 GlobalUtils.toLogin();
             });
             return Promise.resolve(); // 阻止后续 then/catch，不 reject
@@ -114,23 +113,23 @@ const responseRejected = (error: AxiosError) => {
 
         // 其他客户端错误 (400-499)
         if (isStatusCodeInRange(status, 400, 499)) {
-            MessageHelp.error(msg);
+            MessageUtils.error(msg);
             return Promise.reject(error);
         }
 
         // 服务端错误 (500-599)
         if (isStatusCodeInRange(status, 500, 599)) {
-            MessageHelper.notify.error(`服务暂时不可用：${msg}`, "服务器错误");
+            MessageUtils.notify.error(`服务暂时不可用：${msg}`, "服务器错误");
             return Promise.reject(error);
         }
 
         // 其他状态码（如 3xx 重定向错误等）
-        MessageHelper.notify.warning(msg, "请求异常");
+        MessageUtils.notify.warning(msg, "请求异常");
         return Promise.reject(error);
     }
 
     // 情况2：无响应（网络断开、超时、DNS 失败等）
-    MessageHelper.notify.error("无法连接到服务器，请检查网络连接", "网络异常");
+    MessageUtils.notify.error("无法连接到服务器，请检查网络连接", "网络异常");
     return Promise.reject(error);
 };
 

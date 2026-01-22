@@ -1,13 +1,9 @@
 /// <reference types="vite/client" />
-
-import "vue-router";
+import "vue";
+import type { Directive } from "vue";
 
 interface ImportMetaEnvironment {
-    /** api请求地址 **/
     readonly VITE_API_URL: string;
-    /**
-     * 网站名称
-     */
     readonly VITE_WEB_TITLE: string;
 }
 
@@ -21,9 +17,16 @@ declare module "*.vue" {
     export default component;
 }
 
+declare module "vue" {
+    export interface GlobalDirectives {
+        owner: Directive<HTMLElement, string | string[]>;
+    }
+}
+
 declare module "vue-router" {
     interface RouteMeta {
-        /** 修改的标题 */
         title?: string | (() => string);
     }
 }
+
+export {};

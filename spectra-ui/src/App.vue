@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import useAppStore from "@/plugin/store/modules/useAppStore";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import type { Language } from "element-plus/es/locale";
-import useUserStore from "@/plugin/store/modules/useUserStore.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { reactive, ref, watch } from "vue";
-import { useAuthIdle } from "@/hooks/UseAuthIdle.ts";
+import { useAuthIdle } from "@/hooks/use-authIdle.ts";
 
 const { start, stop } = useAuthIdle({
     idleTime: 10 * 60 * 1000 // 10分钟

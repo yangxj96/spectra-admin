@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import UseAppStore from "@/plugin/store/modules/useAppStore.ts";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -33,13 +33,13 @@ onMounted(async () => {
 function waitForMenuLoad() {
     return new Promise<void>(resolve => {
         // 如果菜单已加载，直接返回
-        if (UseAppStore().menus.length > 0 && !UseAppStore().isFetchingMenus) {
+        if (useAppStore().menus.length > 0 && !useAppStore().isFetchingMenus) {
             return resolve();
         }
 
         // 否则监听变化
         const unwatch = watch(
-            () => [UseAppStore().menus.length, UseAppStore().isFetchingMenus],
+            () => [useAppStore().menus.length, useAppStore().isFetchingMenus],
             ([length, isFetching]) => {
                 if (typeof length === "number" && length > 0 && !isFetching) {
                     unwatch(); // 停止监听

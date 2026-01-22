@@ -1,15 +1,14 @@
 <script setup lang="ts">
+import { roleApi } from "@/api/auth/role.ts";
+import { userApi } from "@/api/user/user.ts";
+import { treeDefaultProps } from "@/utils/config.ts";
 import { onMounted, ref, useTemplateRef } from "vue";
-import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
-import { treeDefaultProps } from "@/utils/Config.ts";
-import * as VerifyRules from "@/utils/VerifyRules.ts";
-import UserApi from "@/api/user/UserApi.ts";
-import OrganizationApi from "@/api/user/OrganizationApi.ts";
-import RoleApi from "@/api/auth/RoleApi.ts";
-import icons from "@/components/Icons/index.vue";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import { email, mobile } from "@/utils/verify-rules.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
-import useDictStore from "@/plugin/store/modules/useDictStore.ts";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { organizationApi } from "@/api/user/organization.ts";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
+import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
 
 // 定义Model
 const form = defineModel("form", {
@@ -29,9 +28,9 @@ const rules = {
     name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
     email: [
         { required: true, message: "请输入邮箱", trigger: "blur" },
-        { validator: VerifyRules.email, trigger: "blur" }
+        { validator: email, trigger: "blur" }
     ],
-    phone: [{ validator: VerifyRules.mobile, trigger: "blur" }],
+    phone: [{ validator: mobile, trigger: "blur" }],
     status: [{ required: true, message: "请选择状态", trigger: "blur" }],
     timezone: [{ required: true, message: "请选择时区", trigger: "blur" }],
     organization_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
@@ -55,7 +54,7 @@ onMounted(() => {
             emailSuffixes.value = items.map(i => i.value);
         });
 
-    let request = [RoleApi.list(), OrganizationApi.tree()];
+    let request = [roleApi.list(), organizationApi.tree()];
     Promise.all(request).then(([role, org]) => {
         roles.value = role!.data as Role[];
         organization_tree.value = org!.data as OrganizationTree[];
@@ -73,9 +72,9 @@ async function handleUserSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = form.value.id ? UserApi.modify : UserApi.created;
+        let request = form.value.id ? userApi.modify : userApi.created;
         await request(form.value!);
-        MessageHelper.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
+        MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
             handleCurrentDialogClose();
         });
     } catch (error) {

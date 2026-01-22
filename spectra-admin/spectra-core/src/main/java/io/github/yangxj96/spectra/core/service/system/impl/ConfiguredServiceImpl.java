@@ -61,6 +61,9 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     public Object json() {
         var listed = list();
         Map<String, Object> result = new HashMap<>();
+        if (listed.isEmpty()) {
+            return result;
+        }
         for (var cfg : listed) {
             String[] keys = cfg.getKey().split("\\.");
             Map<String, Object> current = result;

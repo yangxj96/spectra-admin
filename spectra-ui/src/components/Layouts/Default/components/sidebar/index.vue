@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from "vue";
 import { stopAllRequest } from "@/plugin/request";
-import icons from "@/components/Icons/index.vue";
-import useAppStore from "@/plugin/store/modules/useAppStore.ts";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 const appstore = useAppStore();
 const unfold = ref(true);

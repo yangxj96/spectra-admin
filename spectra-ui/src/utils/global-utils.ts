@@ -7,7 +7,7 @@ import router from "@/plugin/router/index";
  * @version 1.0
  * @since 2025-11-11 15:00:00
  */
-export default {
+export const GlobalUtils = {
     /**
      * 退出程序需要的处理内容
      */

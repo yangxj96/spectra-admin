@@ -7,7 +7,7 @@ import http from "@/plugin/request/index.ts";
  * @version 1.0
  * @since 2025-11-11 15:00:00
  */
-export default {
+export const userApi = {
     /**
      * 分页获取用户列表
      * @param params 分页参数

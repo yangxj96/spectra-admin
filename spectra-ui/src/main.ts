@@ -9,11 +9,14 @@ import router from "@/plugin/router";
 import ElementPlus from "element-plus";
 import "@/plugin/element/index.scss";
 // 自定义指令
-import Owner from "@/directive/Owner.ts";
+import { registerDirectives } from "@/directive";
+// 全局组件
+import { registerComponent } from "@/components/index.ts";
+
 // 使用 vueuse 控制深色模式
 import { useDark, useToggle } from "@vueuse/core";
 // 工具类
-import CommonUtils from "@/utils/CommonUtils.ts";
+import { CommonUtils } from "@/utils/common-utils.ts";
 
 CommonUtils.hasReload();
 
@@ -24,4 +27,10 @@ toggleDark(CommonUtils.shouldEnableDarkMode());
 // 创建APP
 const app = createApp(App);
 
-app.use(createStore()).use(router).use(ElementPlus).directive("owner", Owner).mount("#app");
+// 注册自定义指令
+registerDirectives(app);
+
+// 全局组件
+registerComponent(app);
+
+app.use(createStore()).use(router).use(ElementPlus).mount("#app");

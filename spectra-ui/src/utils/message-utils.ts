@@ -47,9 +47,7 @@ function createMessage(type: MessageType) {
 function createNotification(type: MessageType) {
     return (message: unknown, title = "提示", options?: Partial<NotificationOptions>) => {
         ElNotification({
-            ...{
-                duration: 4000
-            },
+            duration: 4e3,
             ...options,
             type,
             title,
@@ -110,7 +108,7 @@ async function prompt(message: unknown, title = "输入", options?: Partial<Para
 /* ===================== 统一出口 ===================== */
 
 // 具体方法
-const MessageHelper = {
+export const MessageUtils = {
     /* ElMessage */
     success: createMessage("success"),
     error: createMessage("error"),
@@ -132,5 +130,3 @@ const MessageHelper = {
         prompt
     }
 };
-
-export default MessageHelper;

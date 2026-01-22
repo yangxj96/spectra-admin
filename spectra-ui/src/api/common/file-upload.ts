@@ -7,7 +7,7 @@ import http from "@/plugin/request";
  * @version 1.0
  * @since 2025-12-18 00:28:33
  */
-export default {
+export const fileUploadApi = {
     /**
      * 文件预处理
      * @param params 上传文件入参

@@ -8,7 +8,7 @@ import type { TreeKey } from "element-plus";
  * @version 1.0
  * @since 2025-11-11 15:00:00
  */
-export default {
+export const roleApi = {
     /**
      * 创建角色
      * @param params 角色入参

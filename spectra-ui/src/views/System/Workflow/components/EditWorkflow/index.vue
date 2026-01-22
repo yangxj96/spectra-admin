@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import LogicFlow from "@logicflow/core";
 import "@logicflow/core/dist/index.css";
-import { Control, SelectionSelect } from "@logicflow/extension";
 import "@logicflow/extension/dist/index.css";
 import { onMounted, useTemplateRef } from "vue";
+import { Control, SelectionSelect } from "@logicflow/extension";
 import Flowable, { type FlowablePluginOptions } from "@yangxj96/logicflow-flowable";
 
 const container = useTemplateRef<HTMLDivElement>("container");

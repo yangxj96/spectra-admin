@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
-import { treeDefaultProps } from "@/utils/Config.ts";
-import OrganizationApi from "@/api/user/OrganizationApi.ts";
-import icons from "@/components/Icons/index.vue";
+import { treeDefaultProps } from "@/utils/config.ts";
+import { organizationApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model<
 const dialog = defineModel("show", {
@@ -45,14 +44,14 @@ async function handleOrganizationSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = modify.value ? OrganizationApi.modify : OrganizationApi.created;
+        let request = modify.value ? organizationApi.modify : organizationApi.created;
         let res = await request(form.value);
         if (res.code === 200) {
-            MessageHelper.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
+            MessageUtils.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
                 handleCurrentDialogClose();
             });
         } else {
-            MessageHelper.error(res.msg);
+            MessageUtils.error(res.msg);
         }
     } catch (error) {
         console.log(error);

@@ -1,5 +1,5 @@
 import { onMounted, ref } from "vue";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 export function useTable<T>(
     request: (parameters?: BasePageParams) => Promise<IResult<Page<T>>>,
@@ -58,7 +58,7 @@ export function useTable<T>(
      */
     function handleRequestResult(response: IResult<Page<T>>) {
         if (response.code !== 200) {
-            MessageHelp.success(response.msg);
+            MessageUtils.success(response.msg);
             return;
         }
         if (response.data) {

@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { markRaw, reactive, ref, watch } from "vue";
 import { defineAsyncComponent } from "@vue/runtime-core";
-import DictApi from "@/api/system/DictApi";
-import icons from "@/components/Icons/index.vue";
+import { dictApi } from "@/api/system/dict.ts";
 import DictTag from "@/components/DictTag/index.vue";
-import MessageHelper from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // 树形props配置
 const treeProps = { children: "children", label: "name", value: "id" };
@@ -44,7 +43,7 @@ watch(
 
 // 初始化数据
 const initData = () => {
-    DictApi.getTypesGroupTree().then(res => {
+    dictApi.getTypesGroupTree().then(res => {
         if (res.code === 200) {
             dictGroupTableData.value = res.data!;
         }
@@ -53,11 +52,11 @@ const initData = () => {
 
 const handleGetDictData = () => {
     // 如果当前字典组有值，获取对应的字典数据
-    DictApi.getDataByTypeCode(currentGroup.value!.code).then(res => {
+    dictApi.getDataByTypeCode(currentGroup.value!.code).then(res => {
         if (res.code === 200) {
             dictDataTableData.value = res.data!;
         } else {
-            MessageHelper.error("获取字典数据失败");
+            MessageUtils.error("获取字典数据失败");
         }
     });
 };
@@ -74,7 +73,7 @@ const handleDialogOpen = (type: string, row: DictGroup | DictData | unknown = {}
             break;
         }
         default: {
-            MessageHelper.error("组件加载失败,请检查");
+            MessageUtils.error("组件加载失败,请检查");
             return;
         }
     }

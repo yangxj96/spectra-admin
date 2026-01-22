@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
-import Icons from "@/components/Icons/index.vue";
 
 const model = defineModel<string>();
 
 // 包装成一个非空 Ref<string>
 const safeModel = computed(() => model.value ?? "");
 
-const icons = shallowRef([
+const ico_list = shallowRef([
     "icon-home",
     "icon-setting-role",
     "icon-module",
@@ -46,7 +45,7 @@ const icons = shallowRef([
         filterable
         placeholder="请选择图标"
         clearable>
-        <el-option v-for="(icon, index) in icons" :key="index" :label="icon" :value="icon">
+        <el-option v-for="(icon, index) in ico_list" :key="index" :label="icon" :value="icon">
             <el-tooltip :content="icon">
                 <icons :name="icon" class-name="picker-icon-sidebar" />
             </el-tooltip>

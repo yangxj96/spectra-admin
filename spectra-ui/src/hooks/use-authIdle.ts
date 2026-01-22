@@ -1,9 +1,9 @@
-import useUserStore from "@/plugin/store/modules/useUserStore.ts";
 import { ref, watch } from "vue";
+import { authApi } from "@/api/auth/auth.ts";
+import { GlobalUtils } from "@/utils/global-utils.ts";
 import { useDebounceFn, useIdle } from "@vueuse/core";
-import AuthApi from "@/api/auth/AuthApi.ts";
-import GlobalUtils from "@/utils/GlobalUtils.ts";
-import MessageHelp from "@/utils/MessageHelper.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 
 export function useAuthIdle({
     idleTime = 10 * 60 * 1000, // 10分钟空闲
@@ -17,7 +17,7 @@ export function useAuthIdle({
     const refreshToken = useDebounceFn(async () => {
         if (userStore.token?.access_token) {
             try {
-                await AuthApi.check(); // 调用后端 /check 刷新 TTL
+                await authApi.check(); // 调用后端 /check 刷新 TTL
             } catch (err) {
                 console.error("Token刷新失败", err);
             }
@@ -38,8 +38,8 @@ export function useAuthIdle({
 
             if (idleValue && userStore.token?.access_token) {
                 // 用户空闲，自动登出
-                await AuthApi.logout();
-                MessageHelp.success("长时间未操作，已自动退出", () => {
+                await authApi.logout();
+                MessageUtils.success("长时间未操作，已自动退出", () => {
                     GlobalUtils.exit();
                 });
             } else if (!idleValue) {
