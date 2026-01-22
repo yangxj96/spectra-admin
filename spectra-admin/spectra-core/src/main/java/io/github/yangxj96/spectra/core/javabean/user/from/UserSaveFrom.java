@@ -92,5 +92,5 @@ public class UserSaveFrom {
     private DataScopeType dataScope;
 
     /// 当数据范围是 `DataScopeType#CUSTOM` 的时候这个不能为空
-    private List<Long> targetIds;
+    private List<String> targetIds;
 }

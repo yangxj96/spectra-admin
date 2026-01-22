@@ -134,7 +134,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             // 如果是自定义的话,要插入自定义的数据
             if (params.getDataScope() == DataScopeType.CUSTOM) {
                 var targets = new ArrayList<UserDataScopeTarget>();
-                for (Long targetId : params.getTargetIds()) {
+                for (String targetId : params.getTargetIds()) {
                     var datum = new UserDataScopeTarget();
                     datum.setUserId(entity.getId());
                     datum.setTargetId(targetId);
@@ -221,7 +221,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             // 如果现在修改成了自定义的话,要插入自定义的数据
             if (params.getDataScope() == DataScopeType.CUSTOM) {
                 var targets = new ArrayList<UserDataScopeTarget>();
-                for (Long targetId : params.getTargetIds()) {
+                for (String targetId : params.getTargetIds()) {
                     var datum = new UserDataScopeTarget();
                     datum.setUserId(entity.getId());
                     datum.setTargetId(targetId);

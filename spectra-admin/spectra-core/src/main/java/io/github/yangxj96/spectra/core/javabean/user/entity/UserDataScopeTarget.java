@@ -29,7 +29,7 @@ public class UserDataScopeTarget extends BaseEntity implements Serializable {
 
     /// 目标ID
     @TableField(value = "target_id")
-    private Long targetId;
+    private String targetId;
 
     /// 目标类型
     @TableField(value = "target_type")

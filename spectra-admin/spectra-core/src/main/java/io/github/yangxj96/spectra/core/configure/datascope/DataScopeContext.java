@@ -22,7 +22,7 @@ public class DataScopeContext {
     private String userId;
 
     /// 可访问组织/部门 ID
-    private List<Long> targetIds;
+    private List<String> targetIds;
 
     /// 表字段（可选，支持别名）
     private String scopeField;
