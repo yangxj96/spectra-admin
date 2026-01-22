@@ -48,8 +48,10 @@ spring:
       enabled: true
   main:
     banner-mode: off
+  # 应用名称
   application:
-    name: spectra-framework-launch
+    name: spectra-admin
+  # 数据库
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL}
@@ -74,14 +76,14 @@ spring:
         # 数据库读操作的Socket超时（秒）
         socketTimeout: 60
         # 应用名称
-        ApplicationName: spectra-service
+        ApplicationName: ${spring.application.name}
         # JDBC层面的登录超时（秒）
         loginTimeout: 10
         # 明确SSL行为，避免 Driver 自动探测浪费时间
         sslmode: disable
         # 控制Server-side Prepared Statement启用阈值
         prepareThreshold: 5
-
+  # redis
   data:
     redis:
       url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}

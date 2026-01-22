@@ -136,6 +136,12 @@
                 <artifactId>mica-core</artifactId>
                 <version>${mica.version}</version>
             </dependency>
+            <!-- UUIDv7生成器 -->
+            <dependency>
+                <groupId>com.github.f4b6a3</groupId>
+                <artifactId>uuid-creator</artifactId>
+                <version>6.1.1</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
