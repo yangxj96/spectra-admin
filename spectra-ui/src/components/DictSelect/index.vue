@@ -3,6 +3,10 @@ import { computed, onMounted, type PropType, ref } from "vue";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
+defineOptions({
+    name: "DictSelect"
+});
+
 const model = defineModel({
     type: [String, Number, null] as PropType<string | number | null | undefined>,
     required: true,

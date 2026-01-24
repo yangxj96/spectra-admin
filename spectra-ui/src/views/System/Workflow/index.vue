@@ -97,7 +97,7 @@ const handleFlowEdit = () => {
             </el-table-column>
             <el-table-column align="center" label="说明" prop="remark" show-overflow-tooltip />
             <el-table-column align="center" label="操作">
-                <template #default="scope">
+                <template #default>
                     <el-button link type="primary" size="small">编辑</el-button>
                     <el-button link type="primary" size="small">挂起</el-button>
                     <el-button link type="primary" size="small">删除</el-button>

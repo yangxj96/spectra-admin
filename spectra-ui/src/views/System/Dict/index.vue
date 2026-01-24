@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { markRaw, reactive, ref, watch } from "vue";
-import { defineAsyncComponent } from "@vue/runtime-core";
+import { defineAsyncComponent } from "vue";
 import { dictApi } from "@/api/system/dict.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -107,11 +107,11 @@ initData();
             <el-form-item>
                 <el-button type="primary">查询</el-button>
                 <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictGroup')">
-                    <icons name="icon-edit" />
+                    <components-icons name="icon-edit" />
                     新增字典组
                 </el-button>
                 <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictData')">
-                    <icons name="icon-edit" />
+                    <components-icons name="icon-edit" />
                     新增字典数据
                 </el-button>
             </el-form-item>
@@ -134,7 +134,7 @@ initData();
                 <template #default="{ node, data }">
                     <p class="tree-node__label">
                         {{ node.label }}
-                        <icons v-if="data.builtin" name="icon-builtin" class-name="icon-sidebar" />
+                        <components-icons v-if="data.builtin" name="icon-builtin" class-name="icon-sidebar" />
                         <el-button
                             v-if="!data.builtin"
                             v-owner="'DICT:UPDATE'"

@@ -1,4 +1,4 @@
-import { defineAsyncComponent } from "@vue/runtime-core";
+import { type Component, defineAsyncComponent } from "vue";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { menuApi } from "@/api/system/menu.ts";
@@ -27,7 +27,7 @@ const loadComponent = (componentPath?: string): ReturnType<typeof defineAsyncCom
         return undefined;
     }
 
-    return defineAsyncComponent(loader as () => Promise<any>);
+    return defineAsyncComponent(loader as () => Promise<{ default: Component }>);
 };
 
 // 动态加载布局组件
@@ -104,7 +104,7 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
             appStore.menus = res.data;
             const routes = convertMenuToRoutes(res.data);
 
-            for (let route of routes) {
+            for (const route of routes) {
                 if (route.name === "系统管理") {
                     route.children?.push({
                         path: "/system/workflow/flow-edit",

@@ -1,7 +1,7 @@
 import { ref, watch } from "vue";
+import { useDebounceFn, useIdle } from "@vueuse/core";
 import { authApi } from "@/api/auth/auth.ts";
 import { GlobalUtils } from "@/utils/global-utils.ts";
-import { useDebounceFn, useIdle } from "@vueuse/core";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 

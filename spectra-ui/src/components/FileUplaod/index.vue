@@ -4,6 +4,10 @@ import { FileUtils } from "@/utils/file-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { fileUploadApi } from "@/api/common/file-upload.ts";
 
+defineOptions({
+    name: "FileUpload"
+});
+
 const fileList = ref<FileItem[]>([]);
 
 /**
@@ -31,7 +35,7 @@ const handleFileChange = (event: Event) => {
     if (!target.files) {
         return;
     }
-    for (let file of target.files) {
+    for (const file of target.files) {
         if (!file) {
             continue;
         }
@@ -51,19 +55,19 @@ const handleFileUploadClick = async () => {
         MessageUtils.warning("文件列表为空");
         return;
     }
-    for (let file of fileList.value) {
+    for (const file of fileList.value) {
         await handlePreFileUpload(file.file);
     }
 };
 
 // 文件预处理
 const handlePreFileUpload = async (file: File) => {
-    let pre_params = await preprocess(file);
+    const pre_params = await preprocess(file);
     if (!pre_params) {
         MessageUtils.error("预处理文件错误");
         return;
     }
-    let pre_res = await fileUploadApi.preprocess(pre_params);
+    const pre_res = await fileUploadApi.preprocess(pre_params);
     if (pre_res.code !== 200) {
         MessageUtils.error(pre_res.msg);
         return;
@@ -88,27 +92,27 @@ const handleExistFile = (file: File) => {
 // 处理小文件上传
 const handleSmallFileUpload = async (file: File, hash: string) => {
     // 直接上传
-    let upload_params = new FormData();
+    const upload_params = new FormData();
     upload_params.append("file", file);
     upload_params.append("hash", hash);
 
-    let upload_res = await fileUploadApi.upload(upload_params);
+    const upload_res = await fileUploadApi.upload(upload_params);
     console.log("直接上传", upload_res);
 };
 
 // 处理大文件上传
 const handleLargeFileUpload = async (file: File, hash: string, size: number) => {
-    let chunks = createChunks(file, size);
+    const chunks = createChunks(file, size);
     let idx = 0;
-    for (let chunk of chunks) {
-        let chunk_params = new FormData();
+    for (const chunk of chunks) {
+        const chunk_params = new FormData();
         chunk_params.append("file", chunk);
         chunk_params.append("fileName", file.name);
         chunk_params.append("hash", hash);
         chunk_params.append("index", idx.toString());
         chunk_params.append("count", chunks.length.toString());
         idx++;
-        let chunk_res = await fileUploadApi.chunk(chunk_params);
+        const chunk_res = await fileUploadApi.chunk(chunk_params);
         console.log("分片上传", chunk_res);
     }
 };

@@ -3,6 +3,10 @@ import { nextTick, onMounted, ref } from "vue";
 import { stopAllRequest } from "@/plugin/request";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
+defineOptions({
+    name: "LayoutsSidebar"
+});
+
 const appstore = useAppStore();
 const unfold = ref(true);
 const menus = ref<Menu[]>([]);
@@ -44,7 +48,7 @@ function onMenuItemClick() {
             <!-- 情况1：有子菜单，渲染为 el-sub-menu -->
             <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
                 <template #title>
-                    <icons :name="item.icon" class-name="icon-sidebar" />
+                    <components-icons :name="item.icon" class-name="icon-sidebar" />
                     <span>{{ item.name }}</span>
                 </template>
                 <el-menu-item
@@ -52,14 +56,14 @@ function onMenuItemClick() {
                     :key="o.path"
                     :index="item.path + '/' + o.path"
                     :route="{ path: item.path + '/' + o.path }">
-                    <icons :name="o.icon" class-name="icon-sidebar" />
+                    <components-icons :name="o.icon" class-name="icon-sidebar" />
                     {{ o.name }}
                 </el-menu-item>
             </el-sub-menu>
 
             <!-- 情况2：无子菜单，直接渲染为 el-menu-item -->
             <el-menu-item v-else :index="item.path" :route="{ path: item.path }">
-                <icons :name="item.icon" class-name="icon-sidebar" />
+                <components-icons :name="item.icon" class-name="icon-sidebar" />
                 <span>{{ item.name }}</span>
             </el-menu-item>
         </template>

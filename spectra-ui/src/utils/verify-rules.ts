@@ -16,30 +16,33 @@ export const mobile: FormItemRule["validator"] = (rule, value, callback) => {
 };
 
 // 邮箱验证规则
-export const email = (_rule: any, value: string) => {
-    return new Promise<void>((resolve, reject) => {
-        if (!value) {
-            reject(new Error("请输入邮箱地址"));
-            return;
-        }
-        const reg = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/;
-        if (!reg.test(value)) {
-            reject(new Error("请输入有效的邮箱地址"));
-            return;
-        }
+export const email: FormItemRule["validator"] = (_rule, value, callback) => {
+    if (!value) {
+        return callback(new Error("请输入邮箱地址"));
+    }
 
-        const domain = value.split("@")[1];
-        useDictStore()
-            .getDictData("sys_email_suffix")
-            .catch(() => reject(new Error("逻辑执行错误")))
-            .then(res => {
-                let allowedSuffixes = (res ?? []).map(i => i.value);
-                if (!domain || !allowedSuffixes.includes(domain)) {
-                    console.log(`不支持的邮箱类型`);
-                    reject(new Error("不支持的邮箱类型"));
-                } else {
-                    resolve();
-                }
-            });
-    });
+    const reg = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+    if (!reg.test(String(value))) {
+        return callback(new Error("请输入有效的邮箱地址"));
+    }
+
+    const domain = String(value).split("@")[1];
+    if (!domain) {
+        return callback(new Error("请输入有效的邮箱地址"));
+    }
+
+    useDictStore()
+        .getDictData("sys_email_suffix")
+        .then(res => {
+            const allowedSuffixes = (res ?? []).map(i => i.value);
+            if (!allowedSuffixes.includes(domain)) {
+                callback(new Error("不支持的邮箱类型"));
+            } else {
+                callback(); // ✅ 通过
+            }
+        })
+        .catch(() => {
+            callback(new Error("逻辑执行错误"));
+        });
 };

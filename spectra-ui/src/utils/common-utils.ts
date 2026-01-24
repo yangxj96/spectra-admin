@@ -51,8 +51,8 @@ export const CommonUtils = {
      * 根据经纬度获取日出日落时间后进行判断是否需要进入深色模式
      */
     shouldEnableDarkMode() {
-        let lat = 25.526_473_000_000_014;
-        let lon = 103.792_161_999_999_96;
+        const lat = 25.526_473_000_000_014;
+        const lon = 103.792_161_999_999_96;
         const now = new Date();
         //sunrise = 日出 sunset = 日落
         const { sunrise, sunset } = SunCalc.getTimes(now, lat, lon);

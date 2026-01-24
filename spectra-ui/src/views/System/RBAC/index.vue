@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElTree } from "element-plus";
-import { treeDefaultProps } from "@/utils/default-config.ts";
 import RoleEdit from "./components/RoleEdit/index.vue";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import UseTable from "@/hooks/use-table.ts";
 import { menuApi } from "@/api/system/menu.ts";
 import { roleApi } from "@/api/auth/role.ts";
@@ -37,7 +37,7 @@ onMounted(() => {
 
 // 初始化数据
 function handleInitData() {
-    let requests = [menuApi.tree(), authorityApi.tree()];
+    const requests = [menuApi.tree(), authorityApi.tree()];
     Promise.all(requests).then(([menuRes, authorityTreeRes]) => {
         menu_tree.value = menuRes!.data as Menu[];
         authority_tree.value = authorityTreeRes!.data as AuthorityTree[];
@@ -92,7 +92,7 @@ async function handleRoleTableRowClick(row: Role) {
         // 权限部分
         roleApi.getRoleAuthority(row.id).then(res => {
             if (res.code === 200 && res.data && res.data.length > 0) {
-                let ids = res.data.map(i => i.id);
+                const ids = res.data.map(i => i.id);
                 powerRef.value?.setCheckedKeys(ids);
             }
         });
@@ -114,7 +114,7 @@ function handleSaveRoleAuthority() {
         MessageUtils.warning("请先选中一个角色");
         return;
     }
-    let params = {
+    const params = {
         role_id: currentRow.value.id,
         authority_ids: powerRef.value?.getCheckedKeys()
     };
@@ -133,7 +133,7 @@ function handleSaveRoleMenu() {
         MessageUtils.warning("请先选中一个角色");
         return;
     }
-    let params = {
+    const params = {
         role_id: currentRow.value.id,
         menu_ids: menuRef.value?.getCheckedKeys()
     };

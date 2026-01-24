@@ -28,7 +28,7 @@ function checkPermission(el: HTMLElement, binding: DirectiveBinding<string | str
 
     const requiredPerms: string[] = Array.isArray(value) ? value : [value];
     const userStore = useUserStore();
-    let hasAccess = modifiers.or
+    const hasAccess = modifiers.or
         ? requiredPerms.some(perm => userStore.hasPermission(perm))
         : requiredPerms.every(perm => userStore.hasPermission(perm));
     if (hasAccess) {

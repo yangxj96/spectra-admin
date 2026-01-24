@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { dictApi } from "@/api/system/dict.ts";
 import { type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
+import { dictApi } from "@/api/system/dict.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
@@ -76,7 +76,7 @@ function handleSaveDictGroup() {
             MessageUtils.error("请检查必填内容");
             return;
         }
-        let request = has_edit ? dictApi.modifyData : dictApi.createData;
+        const request = has_edit ? dictApi.modifyData : dictApi.createData;
         request(edit.form).then((res: IResult) => {
             if (res.code === 200) {
                 MessageUtils.success("保存成功", () => {
@@ -93,7 +93,7 @@ function handleSaveDictGroup() {
 <template>
     <el-dialog v-model="edit.visible" width="500" class="loading-box">
         <template #header>
-            <icons name="icon-edit" />
+            <components-icons name="icon-edit" />
             {{ edit.title }}
         </template>
         <template #default>

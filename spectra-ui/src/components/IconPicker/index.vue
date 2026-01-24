@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed, shallowRef } from "vue";
 
+defineOptions({
+    name: "IconPicker"
+});
+
 const model = defineModel<string>();
 
 // 包装成一个非空 Ref<string>
@@ -47,11 +51,11 @@ const ico_list = shallowRef([
         clearable>
         <el-option v-for="(icon, index) in ico_list" :key="index" :label="icon" :value="icon">
             <el-tooltip :content="icon">
-                <icons :name="icon" class-name="picker-icon-sidebar" />
+                <components-icons :name="icon" class-name="picker-icon-sidebar" />
             </el-tooltip>
         </el-option>
         <template #prefix>
-            <icons v-if="safeModel !== ''" :name="safeModel" class-name="picker-icon-sidebar" />
+            <components-icons v-if="safeModel !== ''" :name="safeModel" class-name="picker-icon-sidebar" />
         </template>
     </el-select>
 </template>

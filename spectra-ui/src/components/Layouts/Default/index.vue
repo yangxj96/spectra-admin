@@ -2,10 +2,14 @@
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 import { useDark, useFullscreen, useToggle } from "@vueuse/core";
+import Sidebar from "./components/sidebar/index.vue";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
-import Sidebar from "./components/sidebar/index.vue";
+
+defineOptions({
+    name: "LayoutsDefault"
+});
 
 const appStore = useAppStore();
 const router = useRouter();
@@ -66,8 +70,8 @@ function handleMenu() {
                 <el-row class="box-breadcrumb">
                     <el-col :span="21">
                         <i class="box-unfold-a" @click="handleMenu">
-                            <icons v-if="appStore.unfold" name="icon-fold-left" />
-                            <icons v-else name="icon-fold-right" />
+                            <components-icons v-if="appStore.unfold" name="icon-fold-left" />
+                            <components-icons v-else name="icon-fold-right" />
                         </i>
                         <!-- 面包屑 -->
                         <el-breadcrumb style="display: inline-block">
@@ -89,16 +93,16 @@ function handleMenu() {
                                     :size="'small'"
                                     @change="handleDarkSwitch">
                                     <template #active-action>
-                                        <icons name="icon-moon" />
+                                        <components-icons name="icon-moon" />
                                     </template>
                                     <template #inactive-action>
-                                        <icons name="icon-sun" />
+                                        <components-icons name="icon-sun" />
                                     </template>
                                 </el-switch>
                             </el-form-item>
                             <!-- 全屏切换 -->
                             <el-form-item class="form-item form-item-end">
-                                <icons
+                                <components-icons
                                     name="icon-fullScreen"
                                     class="box-unfold-a"
                                     style="width: 1.4em; height: 1.4em"

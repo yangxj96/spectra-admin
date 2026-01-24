@@ -44,7 +44,7 @@ onMounted(() => {
         iconClass: "export",
         onClick: lf => {
             console.log(lf);
-            let xml = Flowable.toBpmnXml(lf);
+            const xml = Flowable.toBpmnXml(lf);
             console.log(xml);
         }
     });

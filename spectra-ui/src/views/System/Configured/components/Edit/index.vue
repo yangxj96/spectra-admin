@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue";
+import type { ElForm } from "element-plus";
 import { configuredApi } from "@/api/system/configured.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import type { ElForm } from "element-plus";
 
 // 是否显示
 const show = defineModel("show", {
@@ -45,7 +45,7 @@ const handleConfiguredSave = async () => {
     <el-drawer v-model="show" :modal="true" modal-penetrable destroy-on-close @close="handleDrawerClose">
         <template #header>
             <div>
-                <icons name="icon-edit" />
+                <components-icons name="icon-edit" />
                 编辑配置
             </div>
         </template>

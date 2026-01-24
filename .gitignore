@@ -8,6 +8,8 @@ build/
 target
 
 ### custom        ###
+.eslintcache
+spectra-ui-react
 document/jar
 .env
 .env.*

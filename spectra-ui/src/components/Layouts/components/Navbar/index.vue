@@ -12,6 +12,10 @@ import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
+defineOptions({
+    name: "LayoutsNavbar"
+});
+
 // 获取路由对象（useRoute 是响应式的）
 const route = useRoute();
 const appStore = useAppStore();
@@ -20,7 +24,7 @@ const prefixes = ref<Menu[]>(appStore.menus);
 const menuPrefixes = ref(["/"]);
 const active = ref("/");
 
-for (let menu of appStore.menus) {
+for (const menu of appStore.menus) {
     menuPrefixes.value.push(menu.path);
 }
 
@@ -125,7 +129,7 @@ function handlePersonalPopup() {
         <el-col :span="20" style="padding-right: 40px">
             <el-menu :default-active="active" :router="true" mode="horizontal">
                 <el-menu-item v-for="o in prefixes" :key="o.path" :index="o.path" :route="{ path: o.path }">
-                    <icons :name="o.icon" class-name="icon-sidebar" />
+                    <components-icons :name="o.icon" class-name="icon-sidebar" />
                     {{ o.name }}
                 </el-menu-item>
             </el-menu>
@@ -141,15 +145,15 @@ function handlePersonalPopup() {
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item @click="handlePersonalPopup">
-                            <icons name="icon-user" class-name="icon-navbar" />
+                            <components-icons name="icon-user" class-name="icon-navbar" />
                             <span>个人信息</span>
                         </el-dropdown-item>
                         <el-dropdown-item @click="handleModifyPasswordPopup">
-                            <icons name="icon-change-password" class-name="icon-navbar" />
+                            <components-icons name="icon-change-password" class-name="icon-navbar" />
                             <span>修改密码</span>
                         </el-dropdown-item>
                         <el-dropdown-item @click="handleUserLogout">
-                            <icons name="icon-logout" class-name="icon-navbar" />
+                            <components-icons name="icon-logout" class-name="icon-navbar" />
                             <span>退出登录</span>
                         </el-dropdown-item>
                     </el-dropdown-menu>

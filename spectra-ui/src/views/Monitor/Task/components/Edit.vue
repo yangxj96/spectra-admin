@@ -22,7 +22,7 @@ const rules = {
         :destroy-on-close="true"
         width="35vw">
         <template #header>
-            <icons name="icon-edit" />
+            <components-icons name="icon-edit" />
             新增定时任务
         </template>
         <template #default>

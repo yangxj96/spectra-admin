@@ -1,9 +1,9 @@
 import qs from "qs";
+import axios, { type AxiosError, type AxiosResponse, type Canceler, type InternalAxiosRequestConfig } from "axios";
 import { GlobalUtils } from "@/utils/global-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { hideLoading, showLoading } from "@/plugin/element/loading";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
-import axios, { type AxiosError, type AxiosResponse, type Canceler, type InternalAxiosRequestConfig } from "axios";
 
 // 常见内容类型
 // application/x-www-form-urlencoded

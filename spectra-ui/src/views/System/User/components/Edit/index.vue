@@ -1,14 +1,14 @@
 <script setup lang="ts">
+import { onMounted, ref, useTemplateRef } from "vue";
+import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
 import { roleApi } from "@/api/auth/role.ts";
 import { userApi } from "@/api/user/user.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
-import { onMounted, ref, useTemplateRef } from "vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { organizationApi } from "@/api/user/organization.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
-import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
 
 // 定义Model
 const form = defineModel("form", {
@@ -50,11 +50,11 @@ onMounted(() => {
     useDictStore()
         .getDictData("sys_email_suffix")
         .then(res => {
-            let items = res || [];
+            const items = res || [];
             emailSuffixes.value = items.map(i => i.value);
         });
 
-    let request = [roleApi.list(), organizationApi.tree()];
+    const request = [roleApi.list(), organizationApi.tree()];
     Promise.all(request).then(([role, org]) => {
         roles.value = role!.data as Role[];
         organization_tree.value = org!.data as OrganizationTree[];
@@ -72,7 +72,7 @@ async function handleUserSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = form.value.id ? userApi.modify : userApi.created;
+        const request = form.value.id ? userApi.modify : userApi.created;
         await request(form.value!);
         MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
             handleCurrentDialogClose();
@@ -123,7 +123,7 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
     <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleCurrentDialogClose">
         <template #header>
             <div>
-                <icons name="icon-edit" />
+                <components-icons name="icon-edit" />
                 {{ (form.id ? "编辑" : "新增") + "用户" }}
             </div>
         </template>
@@ -161,7 +161,9 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                         placeholder="请输入邮箱">
                         <template #suffix>
                             <el-tooltip effect="dark" content="同时也作为默认登录账号" placement="right">
-                                <icons name="icon-hint" style="margin-left: 10px; width: 1.4em; height: 1.4em" />
+                                <components-icons
+                                    name="icon-hint"
+                                    style="margin-left: 10px; width: 1.4em; height: 1.4em" />
                             </el-tooltip>
                         </template>
                     </el-autocomplete>

@@ -47,7 +47,7 @@ const handleSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = modify.value ? roleApi.modify : roleApi.created;
+        const request = modify.value ? roleApi.modify : roleApi.created;
         await request(form.value);
         MessageUtils.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
     } catch (error) {
@@ -61,7 +61,7 @@ const handleSave = async () => {
     <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleClose">
         <template #header>
             <div>
-                <icons name="icon-edit" />
+                <components-icons name="icon-edit" />
                 {{ `${modify ? "编辑" : "新增"}角色` }}
             </div>
         </template>

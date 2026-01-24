@@ -45,7 +45,7 @@ export default defineComponent({
         width="30%">
         <template #header>
             <span>
-                <icons name="icon-user" />
+                <components-icons name="icon-user" />
                 个人信息
             </span>
         </template>

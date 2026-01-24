@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineOptions({
+    name: "LayoutsFooter"
+});
+</script>
 
 <template>
     <!-- 底部版权 -->

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import UserEdit from "./components/Edit/index.vue";
 import UseTable from "@/hooks/use-table.ts";
 import { userApi } from "@/api/user/user.ts";
-import UserEdit from "./components/Edit/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -43,21 +43,19 @@ function handleInitData() {
 
 // 用户新增或编辑dialog配置
 function handleUserEditDialog(row: User) {
-    let form;
-    let datum = JSON.parse(JSON.stringify(row));
+    const datum = JSON.parse(JSON.stringify(row));
     if (datum.roles && datum.roles.length > 0) {
         if (!datum.role_ids) {
             datum.role_ids = [] as string[];
         }
-        for (let role of datum.roles) {
+        for (const role of datum.roles) {
             datum.role_ids.push(role.id);
         }
         datum.roles = [];
     }
-    form = datum;
 
     dialog_edit.value = {
-        form: form,
+        form: datum,
         open: true
     };
 }
@@ -87,7 +85,7 @@ function handleTableItemResetPassword(row: User) {
 
 // 排序字段改变
 function handleTableSortChange(data: { column: User; prop: string; order: string }) {
-    let order: OrderItem = {
+    const order: OrderItem = {
         column: data.prop,
         asc: data.order === "ascending"
     };
@@ -143,7 +141,7 @@ onMounted(async () => {
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
                 <el-button @click="handleUserEditDialog({} as User)">
-                    <icons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
+                    <components-icons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
                     &nbsp;新增用户
                 </el-button>
             </el-form-item>
@@ -200,7 +198,11 @@ onMounted(async () => {
                     prop="organization_name" />
                 <el-table-column align="center" width="150" show-overflow-tooltip label="角色" prop="roles">
                     <template #default="scope">
-                        <el-tag v-for="(item, idx) in scope.row.roles" :index="idx" style="margin-right: 4px">
+                        <el-tag
+                            v-for="(item, idx) in scope.row.roles"
+                            :key="idx"
+                            :index="idx"
+                            style="margin-right: 4px">
                             {{ item.name }}
                         </el-tag>
                     </template>
@@ -209,17 +211,23 @@ onMounted(async () => {
                     <template #default="scope">
                         <el-tooltip content="重置密码" placement="top">
                             <el-button link type="primary" @click="handleTableItemResetPassword(scope.row)">
-                                <icons name="icon-reset-passwords" style="width: 1.4em; height: 1.4em"></icons>
+                                <components-icons
+                                    name="icon-reset-passwords"
+                                    style="width: 1.4em; height: 1.4em"></components-icons>
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="编辑用户" placement="top">
                             <el-button link type="primary" @click="handleUserEditDialog(scope.row)">
-                                <icons name="icon-user-edit" style="width: 1.4em; height: 1.4em"></icons>
+                                <components-icons
+                                    name="icon-user-edit"
+                                    style="width: 1.4em; height: 1.4em"></components-icons>
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="删除用户" placement="top">
                             <el-button link type="primary" @click="handleTableItemDelete(scope.row)">
-                                <icons name="icon-user-del" style="width: 1.4em; height: 1.4em"></icons>
+                                <components-icons
+                                    name="icon-user-del"
+                                    style="width: 1.4em; height: 1.4em"></components-icons>
                             </el-button>
                         </el-tooltip>
                     </template>

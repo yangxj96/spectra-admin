@@ -81,7 +81,7 @@ async function handleLogin() {
             width="20%">
             <template #header>
                 <p>
-                    <icons name="icon-login" style="color: #9b9b9b" />
+                    <components-icons name="icon-login" style="color: #9b9b9b" />
                     用户登录
                 </p>
             </template>
@@ -111,7 +111,7 @@ async function handleLogin() {
             </div>
             <template #footer>
                 <el-button type="primary" @click="handleLogin">
-                    <icons name="icon-login" />
+                    <components-icons name="icon-login" />
                     <span>&nbsp;登录</span>
                 </el-button>
             </template>

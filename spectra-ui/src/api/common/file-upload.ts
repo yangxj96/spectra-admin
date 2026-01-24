@@ -34,14 +34,14 @@ export const fileUploadApi = {
      * 文件上传(小文件)
      * @param params 上传文件入参
      */
-    async upload(params: {}): Promise<IResult> {
+    async upload(params: unknown): Promise<IResult> {
         return http.postForm("/api/file/upload", params).then(res => res.data);
     },
     /**
      * 上传文件(切片)
      * @param params 上传文件入参
      */
-    async chunk(params: {}): Promise<IResult> {
+    async chunk(params: unknown): Promise<IResult> {
         return http.postForm("/api/file/chunk", params).then(res => res.data);
     }
 };

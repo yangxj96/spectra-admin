@@ -56,7 +56,7 @@ userApi.online();
                             <el-table-column align="center" prop="address" label="登录地点" />
                             <el-table-column align="center" width="200" prop="create_time" label="登录时间" />
                             <el-table-column align="center" label="操作">
-                                <template #default="scope">
+                                <template #default>
                                     <el-button link type="primary">踢出此设备</el-button>
                                 </template>
                             </el-table-column>
@@ -68,7 +68,7 @@ userApi.online();
             <el-table-column align="center" prop="name" label="姓名" />
             <el-table-column align="center" width="200" prop="organization_name" label="部门" show-overflow-tooltip />
             <el-table-column align="center" label="操作">
-                <template #default="scope">
+                <template #default>
                     <el-button link type="primary">冻结</el-button>
                     <el-button link type="primary">踢出</el-button>
                 </template>

@@ -4,6 +4,10 @@ import { type RouteLocationMatched, useRouter } from "vue-router";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
 
+defineOptions({
+    name: "LayoutsBlank"
+});
+
 const router = useRouter();
 
 // 面包屑

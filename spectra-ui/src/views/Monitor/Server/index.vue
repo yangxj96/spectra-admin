@@ -66,7 +66,7 @@ onMounted(() => {
 
 // 初始化所需数据
 function initData() {
-    let requests = [serviceMonitorApi.getCPUInfo(), serviceMonitorApi.getRAMInfo(), serviceMonitorApi.getJVMInfo()];
+    const requests = [serviceMonitorApi.getCPUInfo(), serviceMonitorApi.getRAMInfo(), serviceMonitorApi.getJVMInfo()];
     Promise.all(requests).then(res => {
         cpuInfo.value = res[0].data as CPUInfo;
         ramInfo.value = res[1].data as RAMInfo;
@@ -163,6 +163,7 @@ setInterval(updateData, 2000);
                     <el-tabs model-value="1">
                         <el-tab-pane
                             v-for="(item, idx) in ramInfo?.slots"
+                            :key="idx"
                             :index="idx"
                             :name="item.slot + ''"
                             :label="'内存' + item.slot + '(' + item.memory_type + ')'">

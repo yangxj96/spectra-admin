@@ -44,8 +44,8 @@ async function handleOrganizationSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        let request = modify.value ? organizationApi.modify : organizationApi.created;
-        let res = await request(form.value);
+        const request = modify.value ? organizationApi.modify : organizationApi.created;
+        const res = await request(form.value);
         if (res.code === 200) {
             MessageUtils.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
                 handleCurrentDialogClose();
@@ -69,7 +69,7 @@ async function handleOrganizationSave() {
         :destroy-on-close="true"
         width="30vw">
         <template #header>
-            <icons name="icon-edit" />
+            <components-icons name="icon-edit" />
             {{ (modify ? "编辑" : "新增") + "部门" }}
         </template>
         <template #default>

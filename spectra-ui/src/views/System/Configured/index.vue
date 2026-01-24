@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+import _ from "lodash";
 import { configuredApi } from "@/api/system/configured.ts";
 import UseTable from "@/hooks/use-table.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
-import _ from "lodash";
 import DictTag from "@/components/DictTag/index.vue";
 
 const edit = ref({

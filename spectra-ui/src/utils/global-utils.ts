@@ -20,7 +20,7 @@ export const GlobalUtils = {
         let query = {};
         // 安全获取当前路径
         const currentRoute = router.currentRoute.value;
-        let fromPath = currentRoute.fullPath || "/";
+        const fromPath = currentRoute.fullPath || "/";
         if (!currentRoute.fullPath.includes("/login")) {
             query = {
                 redirect: fromPath

@@ -64,9 +64,9 @@ function handleMenuAddDialog() {
 // 新增或编辑
 async function handleMenuSave() {
     if (!menuForm.value) return;
-    await menuForm.value?.validate((valid, _) => {
+    await menuForm.value?.validate(valid => {
         if (valid) {
-            let request = menu.modify ? menuApi.modify : menuApi.created;
+            const request = menu.modify ? menuApi.modify : menuApi.created;
             request(menu.form).then(() => {
                 MessageUtils.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
                     menu.dialog = false;
@@ -106,7 +106,7 @@ async function handleMenuSave() {
             <el-table-column align="left" header-align="center" prop="name" label="名称" />
             <el-table-column align="center" prop="icon" label="图标">
                 <template #default="scope">
-                    <icons :name="scope.row.icon" />
+                    <components-icons :name="scope.row.icon" />
                 </template>
             </el-table-column>
             <el-table-column align="center" prop="path" label="请求路径" />
@@ -147,7 +147,7 @@ async function handleMenuSave() {
         :destroy-on-close="true"
         width="30vw">
         <template #header>
-            <icons name="icon-edit" />
+            <components-icons name="icon-edit" />
             {{ (menu.modify ? "编辑" : "新增") + "菜单" }}
         </template>
         <template #default>

@@ -43,7 +43,7 @@ export default defineComponent({
         width="30%">
         <template #header>
             <span>
-                <icons name="icon-reset-password" />
+                <components-icons name="icon-reset-password" />
                 修改密码
             </span>
         </template>

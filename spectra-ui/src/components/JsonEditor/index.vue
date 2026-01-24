@@ -4,6 +4,10 @@ import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.min.css";
 import lodash from "lodash";
 
+defineOptions({
+    name: "JsonEditor"
+});
+
 interface Props {
     modelValue: JsonValue;
     readOnly?: boolean;
