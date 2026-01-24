@@ -101,7 +101,10 @@ async function handleLogin() {
                             <el-col :span="12">
                                 <el-image :src="kaptchaUrl" class="v-code" @click="refreshKaptcha">
                                     <template v-slot:placeholder>
-                                        {{ "验证码加载中..." }}
+                                        <div class="el-image__error" style="">
+                                            <components-icons name="icon-loading" class-name="v-code-ico" />
+                                            加载中...
+                                        </div>
                                     </template>
                                 </el-image>
                             </el-col>
@@ -141,9 +144,24 @@ async function handleLogin() {
 .v-code {
     height: calc(var(--el-input-height, 32px) - 2px);
     width: 100%;
-    padding: 4px;
-    border-radius: 10px;
+    margin: 4px;
+    //border-radius: 10px;
     cursor: pointer;
+}
+
+.v-code-ico {
+    //color: var(--el-text-color-placeholder);
+    color: var(--el-text-color-placeholder);
+    animation: v-code-ico-rotate 2s linear infinite;
+}
+
+@keyframes v-code-ico-rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .v-code:hover {

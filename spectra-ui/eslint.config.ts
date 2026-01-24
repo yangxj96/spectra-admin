@@ -2,9 +2,20 @@ import { globalIgnores } from "eslint/config";
 import { defineConfigWithVueTs, vueTsConfigs } from "@vue/eslint-config-typescript";
 import pluginVue from "eslint-plugin-vue";
 import skipFormatting from "eslint-config-prettier/flat";
-import importPlugin from "eslint-plugin-import";
-
 export default defineConfigWithVueTs(
+    globalIgnores([
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/dist-ssr/**",
+        "**/coverage/**",
+        "**/.output/**",
+        "**/.vite/**",
+        "**/public/**",
+        "**/*.d.ts"
+    ]),
+    vueTsConfigs.recommended,
+    ...pluginVue.configs["flat/essential"],
+    skipFormatting,
     {
         name: "app/files-to-lint",
         files: ["**/*.{vue,ts,mts,tsx}"],
@@ -35,19 +46,6 @@ export default defineConfigWithVueTs(
             "import/no-unresolved": "error"
         }
     },
-    globalIgnores([
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/dist-ssr/**",
-        "**/coverage/**",
-        "**/.output/**",
-        "**/.vite/**",
-        "**/public/**",
-        "**/*.d.ts"
-    ]),
-    ...pluginVue.configs["flat/essential"],
-    vueTsConfigs.recommended,
-    skipFormatting,
     {
         name: "Vue Views",
         files: ["src/views/**/*.vue"],
@@ -56,3 +54,5 @@ export default defineConfigWithVueTs(
         }
     }
 );
+
+import importPlugin from "eslint-plugin-import";
