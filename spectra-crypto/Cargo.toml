@@ -1,0 +1,15 @@
+[package]
+name = "spectra-crypto"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "crypto"
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = "0.18"
+md5 = "0.7"
+hex = "0.4"
+wmi = "0.7"
+serde = { version = "1.0.228", features = ["derive"] }
