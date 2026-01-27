@@ -1,7 +1,14 @@
-package io.github.yangxj96.spectra.license.jni;
+package io.github.yangxj96.spectra.license.runner;
 
 
+import io.github.yangxj96.spectra.license.jni.CryptoJNI;
+import io.github.yangxj96.spectra.license.jni.HardwareJNI;
 import io.netty.util.internal.NativeLibraryLoader;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,17 +18,18 @@ import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 
 /**
- * JNI测试
+ * 监听模块启动执行
  *
  * @author Jack Young
  * @version 1.0
- * @since 2026/1/25 00:27
+ * @since 2026/1/27 11:46
  */
-public class JniDemo {
+@Slf4j
+@Component
+public class LicenseRunner implements ApplicationRunner {
 
     private static final String LIB_DIR = "libs";
 
-    // 静态加载 Rust 编译出的共享库
     static {
         load("spectra-tools");
     }
@@ -51,22 +59,22 @@ public class JniDemo {
         }
     }
 
-    static void main(String[] args) {
+
+    @Override
+    public void run(@NonNull ApplicationArguments args) throws Exception {
         // 测试加密解密功能
         var cryptoJNI = new CryptoJNI();
         var text = "Hello, Rust!";
-        System.out.println("元数据:" + Arrays.toString(text.getBytes()));
+        log.info("元数据:{}", Arrays.toString(text.getBytes()));
         var encrypted = cryptoJNI.encrypt(text.getBytes());
-        System.out.println("加密后: " + Arrays.toString(encrypted));
+        log.info("加密后: {}", Arrays.toString(encrypted));
         var decrypted = cryptoJNI.decrypt(encrypted);
-        System.out.println("解密后: " + Arrays.toString(decrypted));
+        log.info("解密后: {}", Arrays.toString(decrypted));
         // 释放内存
         cryptoJNI.freeBuffer(encrypted);
         cryptoJNI.freeBuffer(decrypted);
-
         // 获取硬件ID
         var hardwareJNI = new HardwareJNI();
-        System.out.println("生成的硬件ID:" + hardwareJNI.getId());
+        log.info("生成的硬件ID:{}", hardwareJNI.getId());
     }
-
 }

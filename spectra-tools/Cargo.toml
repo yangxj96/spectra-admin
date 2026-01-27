@@ -2,10 +2,15 @@
 name = "spectra-tools"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
 
 [lib]
-name = "crypto"
+name = "spectra_tools"
 crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "spectra-tools-cli"
+path = "src/main.rs"
 
 [dependencies]
 jni = "0.18"
