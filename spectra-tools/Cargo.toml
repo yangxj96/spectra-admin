@@ -1,11 +1,11 @@
 [package]
-name = "spectra-crypto"
+name = "spectra-tools"
 version = "0.1.0"
 edition = "2024"
 
 [lib]
 name = "crypto"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 jni = "0.18"
