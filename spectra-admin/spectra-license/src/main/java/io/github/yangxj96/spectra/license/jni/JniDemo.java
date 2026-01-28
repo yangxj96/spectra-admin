@@ -60,9 +60,6 @@ public class JniDemo {
         System.out.println("加密后: " + Arrays.toString(encrypted));
         var decrypted = cryptoJNI.decrypt(encrypted);
         System.out.println("解密后: " + Arrays.toString(decrypted));
-        // 释放内存
-        cryptoJNI.freeBuffer(encrypted);
-        cryptoJNI.freeBuffer(decrypted);
 
         // 获取硬件ID
         var hardwareJNI = new HardwareJNI();

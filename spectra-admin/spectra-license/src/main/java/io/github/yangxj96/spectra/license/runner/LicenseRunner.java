@@ -70,9 +70,6 @@ public class LicenseRunner implements ApplicationRunner {
         log.info("加密后: {}", Arrays.toString(encrypted));
         var decrypted = cryptoJNI.decrypt(encrypted);
         log.info("解密后: {}", Arrays.toString(decrypted));
-        // 释放内存
-        cryptoJNI.freeBuffer(encrypted);
-        cryptoJNI.freeBuffer(decrypted);
         // 获取硬件ID
         var hardwareJNI = new HardwareJNI();
         log.info("生成的硬件ID:{}", hardwareJNI.getId());

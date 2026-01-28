@@ -14,6 +14,4 @@ public class CryptoJNI {
 
     public native byte[] decrypt(byte[] input);
 
-    public native void freeBuffer(byte[] buffer);
-
 }

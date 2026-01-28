@@ -1,6 +1,6 @@
-use serde::Deserialize;
-use wmi::{COMLibrary, WMIConnection};
 use crate::platform::PlatformSpecific;
+use serde::Deserialize;
+use wmi::WMIConnection;
 
 pub struct Windows;
 
@@ -26,9 +26,8 @@ pub struct Motherboard {
 }
 
 impl PlatformSpecific for Windows {
-    fn platform_specific_function(&self)-> String {
-        let com_lib = COMLibrary::new().unwrap();
-        let wmi = WMIConnection::new(com_lib.into()).unwrap();
+    fn platform_specific_function(&self) -> String {
+        let wmi = WMIConnection::new().unwrap();
 
         // 查询CPU序列号
         let cpu_info: Vec<Processor> = wmi.query().unwrap();

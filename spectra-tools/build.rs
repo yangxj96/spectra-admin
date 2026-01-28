@@ -3,7 +3,6 @@ use std::{env, fs, path::PathBuf};
 fn main() {
     // 只在 release 构建时执行
     if env::var("PROFILE").as_deref() != Ok("release") {
-        println!("cargo:warning=build.rs skipped (not release)");
         return;
     }
 

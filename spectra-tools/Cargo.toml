@@ -13,8 +13,8 @@ name = "spectra-tools-cli"
 path = "src/main.rs"
 
 [dependencies]
-jni = "0.18"
-md5 = "0.7"
+jni = "0.21.1"
+md5 = "0.8.0"
 hex = "0.4"
-wmi = "0.7"
+wmi = "0.18.0"
 serde = { version = "1.0.228", features = ["derive"] }

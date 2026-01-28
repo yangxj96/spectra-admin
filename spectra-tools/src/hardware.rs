@@ -21,7 +21,8 @@ pub extern "C" fn Java_io_github_yangxj96_spectra_license_jni_HardwareJNI_getId(
 
     // 将 Rust 字符串转换为 Java 字符串
     let output = env.new_string(hash_string(&*hardware_id)).unwrap();
-    output.into_inner() // 返回 Java 字符串对象
+    // output.into_inner() // 返回 Java 字符串对象
+    output.into_raw()
 }
 
 // 哈希化硬件标识符
