@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import { type FormInstance, type FormRules } from "element-plus";
+import { ElTable, type FormInstance, type FormRules, type TableInstance } from "element-plus";
 import { menuApi } from "@/api/system/menu.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -76,6 +76,7 @@ async function handleMenuSave() {
         }
     });
 }
+
 </script>
 
 <template>
@@ -95,11 +96,11 @@ async function handleMenuSave() {
     <!-- 数据区 -->
     <el-row class="box-body">
         <el-table
+            ref="ref_table"
             v-if="table_data.length > 0"
             :data="table_data"
             height="100%"
             stripe
-            default-expand-all
             row-key="id"
             class="loading-box">
             <el-table-column align="center" type="index" />
@@ -112,6 +113,13 @@ async function handleMenuSave() {
             <el-table-column align="center" prop="path" label="请求路径" />
             <el-table-column align="center" prop="component" label="组件路径" />
             <el-table-column align="center" prop="layout" label="布局" />
+            <el-table-column align="center" prop="hide" label="隐藏">
+                <template v-slot:default="scope">
+                    <el-text :type="scope.row.hide ? 'success' : 'danger'">
+                        {{ scope.row.hide ? "是" : "否" }}
+                    </el-text>
+                </template>
+            </el-table-column>
             <el-table-column align="center" prop="sort" label="排序" />
             <el-table-column align="center" label="操作" v-owner.or="['MENU:UPDATE', 'MENU:DELETE']">
                 <template #default="scope">
@@ -178,6 +186,9 @@ async function handleMenuSave() {
                 </el-form-item>
                 <el-form-item label="图标" prop="icon">
                     <icon-picker v-model="menu.form.icon" />
+                </el-form-item>
+                <el-form-item label="是否隐藏" prop="hide">
+                    <el-switch v-model="menu.form.hide" />
                 </el-form-item>
                 <el-form-item label="路径" prop="path">
                     <el-input v-model="menu.form.path" clearable placeholder="请输入路径" />

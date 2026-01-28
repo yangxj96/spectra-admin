@@ -23,6 +23,8 @@ declare global {
         params?: never;
         //元数据
         meta?: never;
+        // 是否显示菜单
+        hide: boolean;
         //子级
         children?: Menu[];
     };

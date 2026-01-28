@@ -54,4 +54,6 @@ public class MenuVO {
     /// 排序
     private Integer sort;
 
+    /// 是否显示菜单
+    private Boolean hide;
 }

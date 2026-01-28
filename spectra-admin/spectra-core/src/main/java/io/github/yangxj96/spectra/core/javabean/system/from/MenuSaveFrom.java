@@ -61,6 +61,9 @@ public class MenuSaveFrom {
     /// 布局
     private String layout;
 
+    /// 是否显示菜单
+    private Boolean hide;
+
     /// 排序
     @NotNull(message = "排序不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private Integer sort;

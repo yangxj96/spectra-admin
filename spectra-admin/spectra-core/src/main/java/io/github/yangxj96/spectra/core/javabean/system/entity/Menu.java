@@ -72,4 +72,8 @@ public class Menu extends BaseEntity implements Serializable {
     /// 排序
     @TableField(value = "sort")
     private Integer sort;
+
+    /// 是否显示菜单
+    @TableField(value = "hide")
+    private Boolean hide;
 }

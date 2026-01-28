@@ -14,6 +14,7 @@
       <result column="component" property="component" />
       <result column="layout"    property="layout" />
       <result column="sort"      property="sort" />
+      <result column="hide"      property="hide" />
   </resultMap>
   <!-- @formatter:on -->
 
@@ -27,6 +28,7 @@
         component,
         layout,
         sort,
+        hide,
         created_by,
         created_at,
         updated_by,

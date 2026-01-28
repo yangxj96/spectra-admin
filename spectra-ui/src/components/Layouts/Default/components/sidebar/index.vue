@@ -46,7 +46,7 @@ function onMenuItemClick() {
         <!-- 动态菜单：根据是否有 children 决定渲染方式 -->
         <template v-for="item in menus" :key="item.path">
             <!-- 情况1：有子菜单，渲染为 el-sub-menu -->
-            <el-sub-menu v-if="item.children && item.children.length > 0" :index="item.path">
+            <el-sub-menu v-if="!item.hide && item.children && item.children.length > 0" :index="item.path">
                 <template #title>
                     <components-icons :name="item.icon" class-name="icon-sidebar" />
                     <span>{{ item.name }}</span>
@@ -62,7 +62,7 @@ function onMenuItemClick() {
             </el-sub-menu>
 
             <!-- 情况2：无子菜单，直接渲染为 el-menu-item -->
-            <el-menu-item v-else :index="item.path" :route="{ path: item.path }">
+            <el-menu-item v-else-if="!item.hide" :index="item.path" :route="{ path: item.path }">
                 <components-icons :name="item.icon" class-name="icon-sidebar" />
                 <span>{{ item.name }}</span>
             </el-menu-item>

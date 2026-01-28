@@ -63,6 +63,9 @@ public class MenuTreeVO implements Tree<MenuTreeVO>, Serializable {
     /// 排序
     private Integer sort;
 
+    /// 是否显示菜单
+    private Boolean hide;
+
     /// 子级
     private List<MenuTreeVO> children = new ArrayList<>();
 
