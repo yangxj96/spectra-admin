@@ -53,7 +53,7 @@
 | ECharts      | 6.0.0   | 数据可视化图表                |
 | vue-echarts  | 8.0.1   | 转为vue封装的echarts操作组件    |
 | Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
-| Oxlint       | 1.33.0  | 代码质量检查                 |
+| Eslint       | 9.39.2  | 代码质量检查                 |
 | Prettier     | 3.7.4   | 统一代码格式风格               |
 
 ---
@@ -154,14 +154,15 @@ java.io.IOException: Problem reading font data
 请使用 **完整 JDK 的 buildpack** 构建镜像，例如：
 
 ```xml
+
 <plugin>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-maven-plugin</artifactId>
-  <configuration>
-    <image>
-      <builder>paketobuildpacks/builder-jammy-full</builder>
-    </image>
-  </configuration>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-maven-plugin</artifactId>
+    <configuration>
+        <image>
+            <builder>paketobuildpacks/builder-jammy-full</builder>
+        </image>
+    </configuration>
 </plugin>
 ```
 

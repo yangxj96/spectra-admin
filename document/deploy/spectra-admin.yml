@@ -6,6 +6,10 @@ services:
       POSTGRES_DB: spectra_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: QuVsKppcWvwwX2Vv
+    networks:
+      - nginx-net
+    volumes:
+      - /data/docker/spectra/postgres-data:/var/lib/postgresql
     deploy:
       resources:
         limits:
@@ -15,6 +19,8 @@ services:
     image: redis:7
     command: redis-server --requirepass QuVsKppcWvwwX2Vv
     restart: unless-stopped
+    networks:
+      - nginx-net
   spectra-admin:
     image: ghcr.io/yangxj96/spectra-admin:latest
     container_name: spectra-admin
@@ -22,6 +28,8 @@ services:
     user: "0:0"
     ports:
       - "8888:8888"
+    networks:
+      - nginx-net
     env_file:
       - /data/docker/spectra/.env
     volumes:
@@ -31,3 +39,6 @@ services:
       resources:
         limits:
           memory: 1g
+networks:
+  nginx-net:
+    external: true
