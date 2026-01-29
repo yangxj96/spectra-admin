@@ -43,6 +43,19 @@ function handleDarkSwitch(val: unknown) {
 }
 
 function handlerRouter(r: RouteLocationMatched[] = []) {
+    const current = router.currentRoute.value;
+    console.log(`当前路由:`, current);
+    // ① 优先使用 meta.crumbs
+    const crumbs = current.meta?.crumbs;
+    if (Array.isArray(crumbs) && crumbs.length > 0) {
+        breadcrumb.value = crumbs.map((c, idx) => ({
+            path: c.path ?? current.path,
+            meta: { title: c.title }
+        })) as RouteLocationMatched[];
+        return;
+    }
+
+    // ② fallback：使用路由 matched
     if (r.length <= 0) {
         r = [...router.currentRoute.value.matched];
     }

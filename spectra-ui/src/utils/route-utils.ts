@@ -1,4 +1,4 @@
-import { type Component, defineAsyncComponent } from "vue";
+import { type AsyncComponentLoader, defineAsyncComponent, toRaw } from "vue";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { menuApi } from "@/api/system/menu.ts";
@@ -27,7 +27,8 @@ const loadComponent = (componentPath?: string): ReturnType<typeof defineAsyncCom
         return undefined;
     }
 
-    return defineAsyncComponent(loader as () => Promise<{ default: Component }>);
+    // return defineAsyncComponent(loader as () => Promise<{ default: Component }>);
+    return loader as AsyncComponentLoader;
 };
 
 // 动态加载布局组件
@@ -47,14 +48,16 @@ export const convertMenuToRoutes = (menus: Menu[]): RouteRecordRaw[] => {
     return menus.map(menu => {
         // 确保 menu.path 以 / 开头
         const path = menu.path.startsWith("/") ? menu.path : "/" + menu.path;
-
         const route: RouteRecordRaw = {
             path: menu.path,
             name: menu.name,
             component: menu.layout ? loadLayout(menu.layout.trim().toLowerCase()) : loadComponent(menu.component),
-            meta: {
-                title: menu.name
-            },
+            meta: Object.assign(
+                {
+                    title: menu.name
+                },
+                menu.metadata
+            ),
             children: []
         };
 
@@ -103,16 +106,6 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
         if (res.code === 200 && res.data) {
             appStore.menus = res.data;
             const routes = convertMenuToRoutes(res.data);
-
-            for (const route of routes) {
-                if (route.name === "系统管理") {
-                    route.children?.push({
-                        path: "/system/workflow/flow-edit",
-                        name: "流程编辑",
-                        component: () => import("@/views/System/Workflow/components/EditWorkflow/index.vue")
-                    });
-                }
-            }
 
             // 避免重复添加路由
             for (const route of routes) {

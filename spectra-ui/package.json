@@ -36,7 +36,7 @@
         "@logicflow/core": "2.2.0",
         "@logicflow/extension": "2.2.0",
         "@vueuse/core": "14.1.0",
-        "@yangxj96/logicflow-flowable": "0.0.1-dev.20260119.0",
+        "@yangxj96/logicflow-flowable": "0.0.2-dev.20260129.1",
         "axios": "1.13.2",
         "echarts": "6.0.0",
         "element-plus": "2.13.1",

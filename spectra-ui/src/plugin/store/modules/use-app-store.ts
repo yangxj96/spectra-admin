@@ -6,7 +6,7 @@ export const useAppStore = defineStore("app", {
         lang: zhCn,
         menus: [],
         currentMenus: [],
-        currentMenuActive: "",
+        currentMenusPrefix: "",
         isFetchingMenus: false,
         unfold: true,
         watermark: false

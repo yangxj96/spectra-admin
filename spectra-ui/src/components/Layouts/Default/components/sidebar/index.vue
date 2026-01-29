@@ -10,9 +10,8 @@ defineOptions({
 const appstore = useAppStore();
 const unfold = ref(true);
 const menus = ref<Menu[]>([]);
-const active = ref("");
 
-// 监听
+// 监听store
 appstore.$subscribe((_, state) => {
     unfold.value = state.unfold;
     loadMenus();
@@ -26,7 +25,6 @@ onMounted(() => {
 const loadMenus = async () => {
     menus.value = appstore.currentMenus;
     await nextTick();
-    active.value = appstore.currentMenuActive;
 };
 
 function onMenuItemClick() {
@@ -37,8 +35,8 @@ function onMenuItemClick() {
 <template>
     <el-menu
         class="box-menu"
-        :router="true"
-        :default-active="active"
+        router
+        :default-active="$route.path"
         :collapse="!unfold"
         :collapse-transition="true"
         :unique-opened="true"
@@ -54,15 +52,14 @@ function onMenuItemClick() {
                 <el-menu-item
                     v-for="o in item.children"
                     :key="o.path"
-                    :index="item.path + '/' + o.path"
-                    :route="{ path: item.path + '/' + o.path }">
+                    :index="appstore.currentMenusPrefix + '/' + item.path + '/' + o.path">
                     <components-icons :name="o.icon" class-name="icon-sidebar" />
                     {{ o.name }}
                 </el-menu-item>
             </el-sub-menu>
 
             <!-- 情况2：无子菜单，直接渲染为 el-menu-item -->
-            <el-menu-item v-else-if="!item.hide" :index="item.path" :route="{ path: item.path }">
+            <el-menu-item v-else-if="!item.hide" :index="appstore.currentMenusPrefix + '/' + item.path">
                 <components-icons :name="item.icon" class-name="icon-sidebar" />
                 <span>{{ item.name }}</span>
             </el-menu-item>

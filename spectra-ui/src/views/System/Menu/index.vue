@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
-import { ElTable, type FormInstance, type FormRules, type TableInstance } from "element-plus";
+import { ElTable, type FormInstance, type FormRules } from "element-plus";
 import { menuApi } from "@/api/system/menu.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
+import JsonEditor from "@/components/JsonEditor/index.vue";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
@@ -76,7 +77,6 @@ async function handleMenuSave() {
         }
     });
 }
-
 </script>
 
 <template>
@@ -201,6 +201,9 @@ async function handleMenuSave() {
                         <el-option label="默认布局" value="default" />
                         <el-option label="空白布局" value="blank" />
                     </el-select>
+                </el-form-item>
+                <el-form-item label="元数据" prop="metadata">
+                    <json-editor :read-only="false" :model-value="menu.form.metadata" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number

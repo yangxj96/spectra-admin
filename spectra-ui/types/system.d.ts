@@ -1,6 +1,13 @@
 export {};
 
 declare global {
+    type MenuMetadata = {
+        // 已知
+        title?: string;
+        // 字段兜底
+        [key: string]: unknown;
+    };
+
     // 菜单
     type Menu = BaseEntity & {
         //父级ID
@@ -25,6 +32,8 @@ declare global {
         meta?: never;
         // 是否显示菜单
         hide: boolean;
+        // 元数据
+        metadata: MenuMetadata | JsonValue;
         //子级
         children?: Menu[];
     };

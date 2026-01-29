@@ -25,6 +25,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 /// 菜单保存接口
 ///
 /// @author Jack Young
@@ -63,6 +65,9 @@ public class MenuSaveFrom {
 
     /// 是否显示菜单
     private Boolean hide;
+
+    /// 菜单元数据
+    private Map<String, Object> metadata;
 
     /// 排序
     @NotNull(message = "排序不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})

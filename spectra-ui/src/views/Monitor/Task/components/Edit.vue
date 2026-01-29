@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import JsonEditor from "@/components/JsonEditor/index.vue";
 
-const visible = ref(true);
+const visible = ref(false);
 
 const rules = {
     name: [{ required: true, message: "请输入用户名", trigger: "blur" }],

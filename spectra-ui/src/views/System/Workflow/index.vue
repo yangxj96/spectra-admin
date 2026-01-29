@@ -17,43 +17,15 @@ const table_data = [
         deploy_time: "2025-10-10 00:11:22",
         suspended: false,
         remark: "这是说明"
-    },
-    {
-        name: "员工请假审批2",
-        version: 100,
-        group: "人事类",
-        deploy_time: "2025-10-10 00:11:22",
-        suspended: true,
-        remark: "这是说明"
-    },
-    {
-        name: "员工请假审批3",
-        version: 100,
-        group: "财务类",
-        deploy_time: "2025-10-10 00:11:22",
-        suspended: true,
-        remark: "这是说明"
-    },
-    {
-        name: "员工请假审批4",
-        version: 100,
-        group: "财务类",
-        deploy_time: "2025-10-10 00:11:22",
-        suspended: true,
-        remark: "这是说明"
-    },
-    {
-        name: "员工请假审批5",
-        version: 100,
-        group: "人事类",
-        deploy_time: "2025-10-10 00:11:22",
-        suspended: true,
-        remark: "这是说明"
     }
 ];
 
 const handleFlowEdit = () => {
-    router.push({ path: "/pages/workflow/flow-edit" });
+    router.push({ path: "/system/flow-edit" });
+};
+
+const handleFormEdit = () => {
+    router.push({ path: "/system/form-edit" });
 };
 </script>
 
@@ -75,7 +47,7 @@ const handleFlowEdit = () => {
                 <el-button type="primary">查询</el-button>
                 <el-button>重置</el-button>
                 <el-button type="success" @click="handleFlowEdit">新增流程</el-button>
-                <el-button type="success">新增表单</el-button>
+                <el-button type="success" @click="handleFormEdit">新增表单</el-button>
             </el-form-item>
         </el-form>
     </el-row>

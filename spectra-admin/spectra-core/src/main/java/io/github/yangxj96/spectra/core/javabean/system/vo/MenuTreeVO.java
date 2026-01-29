@@ -25,6 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /// 菜单树形VO
 ///
@@ -65,6 +66,9 @@ public class MenuTreeVO implements Tree<MenuTreeVO>, Serializable {
 
     /// 是否显示菜单
     private Boolean hide;
+
+    /// 菜单元数据
+    private Map<String, Object> metadata;
 
     /// 子级
     private List<MenuTreeVO> children = new ArrayList<>();

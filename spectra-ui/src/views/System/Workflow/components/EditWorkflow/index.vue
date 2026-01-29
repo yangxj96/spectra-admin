@@ -2,6 +2,7 @@
 import LogicFlow from "@logicflow/core";
 import "@logicflow/core/dist/index.css";
 import "@logicflow/extension/dist/index.css";
+import "@yangxj96/logicflow-flowable/dist/index.css";
 import { onMounted, useTemplateRef } from "vue";
 import { Control, SelectionSelect } from "@logicflow/extension";
 import Flowable, { type FlowablePluginOptions } from "@yangxj96/logicflow-flowable";

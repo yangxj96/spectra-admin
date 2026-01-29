@@ -20,6 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Map;
+
 /// 菜单VO
 ///
 /// @author Jack Young
@@ -56,4 +58,7 @@ public class MenuVO {
 
     /// 是否显示菜单
     private Boolean hide;
+
+    /// 菜单元数据
+    private Map<String, Object> metadata;
 }

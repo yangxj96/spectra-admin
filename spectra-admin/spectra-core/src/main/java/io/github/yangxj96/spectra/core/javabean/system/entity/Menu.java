@@ -18,6 +18,8 @@ package io.github.yangxj96.spectra.core.javabean.system.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,6 +30,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
 /// 菜单表
 ///
@@ -38,7 +41,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_menu", schema = "domain_core")
+@TableName(value = "sys_menu", schema = "domain_core", autoResultMap = true)
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial
@@ -76,4 +79,8 @@ public class Menu extends BaseEntity implements Serializable {
     /// 是否显示菜单
     @TableField(value = "hide")
     private Boolean hide;
+
+    /// 菜单元数据
+    @TableField(value = "metadata", typeHandler = Jackson3TypeHandler.class)
+    private Map<String, Object> metadata;
 }

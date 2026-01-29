@@ -15,6 +15,7 @@
       <result column="layout"    property="layout" />
       <result column="sort"      property="sort" />
       <result column="hide"      property="hide" />
+      <result column="metadata"  property="metadata" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
   </resultMap>
   <!-- @formatter:on -->
 
@@ -29,6 +30,7 @@
         layout,
         sort,
         hide,
+        metadata,
         created_by,
         created_at,
         updated_by,

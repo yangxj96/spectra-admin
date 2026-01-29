@@ -62,12 +62,11 @@ function resolveTopActive(path: string) {
     active.value = "/";
 }
 
-/// 解析侧边栏
+// 解析侧边栏
 function resolveSideMenus(path: string) {
     // 首页单独处理
     if (path === "/") {
         appStore.currentMenus = [];
-        appStore.currentMenuActive = "/";
         return;
     }
 
@@ -89,16 +88,11 @@ function resolveSideMenus(path: string) {
         }
     }
 
-    console.log(matchedMenu);
     if (matchedMenu) {
-        const children = matchedMenu.children ?? [];
-        appStore.currentMenus = children;
-
-        const firstChild = children.find(c => !!c.path);
-        appStore.currentMenuActive = firstChild?.path ?? "";
+        appStore.currentMenus = matchedMenu.children ?? [];
+        appStore.currentMenusPrefix = matchedMenu.path;
     } else {
         appStore.currentMenus = [];
-        appStore.currentMenuActive = "";
     }
 }
 
