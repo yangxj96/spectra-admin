@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict C3ojqhx5efFaNfYY5cHcAQQ7YMwFOW7MUHipIHcuAu7TkTrC9T2OCrBvNXlbFVt
+\restrict Mb40bdRn1ZjjWpanZgbDbMqI3WpsfwISTfisoxRhG3MlAgtCbGhdnPMkmue4aCp
 
 -- Dumped from database version 18.0 (Ubuntu 18.0-1.pgdg24.04+3)
 -- Dumped by pg_dump version 18.0 (Ubuntu 18.0-1.pgdg24.04+3)
@@ -1056,7 +1056,9 @@ CREATE TABLE domain_core.sys_menu (
     updated_by uuid,
     updated_at timestamp(6) with time zone NOT NULL,
     deleted timestamp(6) with time zone,
-    version bigint DEFAULT 0
+    version bigint DEFAULT 0,
+    hide boolean DEFAULT false,
+    metadata jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -1163,6 +1165,20 @@ COMMENT ON COLUMN domain_core.sys_menu.deleted IS '是否删除';
 --
 
 COMMENT ON COLUMN domain_core.sys_menu.version IS '乐观锁';
+
+
+--
+-- Name: COLUMN sys_menu.hide; Type: COMMENT; Schema: domain_core; Owner: -
+--
+
+COMMENT ON COLUMN domain_core.sys_menu.hide IS '是否显示再菜单(默认不显示)';
+
+
+--
+-- Name: COLUMN sys_menu.metadata; Type: COMMENT; Schema: domain_core; Owner: -
+--
+
+COMMENT ON COLUMN domain_core.sys_menu.metadata IS '元数据';
 
 
 --
@@ -2360,32 +2376,34 @@ COPY domain_core.sys_log (id, type, explain, status, ip, method, url, args, resu
 -- Data for Name: sys_menu; Type: TABLE DATA; Schema: domain_core; Owner: -
 --
 
-COPY domain_core.sys_menu (id, name, pid, icon, path, component, layout, sort, created_by, created_at, updated_by, updated_at, deleted, version) FROM stdin;
-019bdfc5-b220-7bd9-80d1-1a1db193c151	首页	\N	icon-home	/	layout	blank	0	\N	2026-01-21 16:57:14.020461+08	\N	2026-01-21 16:57:14.02146+08	\N	0
-019bdfc5-b31f-7020-b678-35fae63c432c	工作台	\N	icon-setting	/workbench	layout	blank	1	\N	2026-01-21 16:57:14.272982+08	\N	2026-01-21 16:57:14.272982+08	\N	0
-019bdfc5-b370-70ca-a33c-25044878eeda	访问控制	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	RBAC	/System/RBAC/index	\N	1	\N	2026-01-21 16:57:14.353982+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:02.294811+08	\N	0
-019bdfc5-b32c-74e9-90ac-0540954c4e4a	系统管理	\N	icon-setting	/system	layout	default	2	\N	2026-01-21 16:57:14.284977+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:01:49.940919+08	\N	0
-019bdfc5-b328-7de0-9e8c-2ac0cc51969e	系统监控	\N	icon-setting	/monitor	layout	default	3	\N	2026-01-21 16:57:14.282559+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:01:56.864649+08	\N	0
-019bdfc5-b32a-7c31-bbff-3992be5fff64	组件示例	\N	icon-setting	/exampl	layout	default	4	\N	2026-01-21 16:57:14.283978+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:02:05.223473+08	\N	0
-019bdfc5-b347-75c0-bcac-98ed9e44cf93	首页默认	019bdfc5-b220-7bd9-80d1-1a1db193c151	icon-module		/Home/index	\N	999	\N	2026-01-21 16:57:14.312987+08	\N	2026-01-21 16:57:14.312987+08	\N	0
-019bdfc5-b34b-7619-8f37-b052e64e4e27	工作台默认页面	019bdfc5-b31f-7020-b678-35fae63c432c	icon-module		/Workbench/index	\N	999	\N	2026-01-21 16:57:14.316985+08	\N	2026-01-21 16:57:14.316985+08	\N	0
-019bdfc5-b35f-74b6-abe3-3816db511129	文件存储	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	storage	/System/Storage/index	\N	999	\N	2026-01-21 16:57:14.335987+08	\N	2026-01-21 16:57:14.335987+08	\N	0
-019bdfc5-b365-7a12-b646-3a5c922bd6f9	流程管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	workflow	/System/Workflow/index	\N	999	\N	2026-01-21 16:57:14.341991+08	\N	2026-01-21 16:57:14.342983+08	\N	0
-019bdfc5-b36d-72df-b7a7-6c82d9199988	许可管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	license	/System/License/index	\N	999	\N	2026-01-21 16:57:14.349983+08	\N	2026-01-21 16:57:14.349983+08	\N	0
-019bdfc5-b362-70a0-8cbd-53f96e96c64c	用户管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	user	/System/User/index	\N	0	\N	2026-01-21 16:57:14.338025+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:41:55.678661+08	\N	0
-019bdfc5-b367-7e26-9c50-620660e13019	部门管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	dept	/System/Dept/index	\N	3	\N	2026-01-21 16:57:14.343989+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:13.985663+08	\N	0
-019bdfc5-b363-750f-8cd2-010b659463a8	系统配置	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	configured	System/Configured/index	\N	4	\N	2026-01-21 16:57:14.339985+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:20.123378+08	\N	0
-019bdfc5-b36a-7700-b8c3-7c251f1f79a2	字典管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	dict	/System/Dict/index	\N	5	\N	2026-01-21 16:57:14.346984+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:31.154823+08	\N	0
-019bdfc5-b36f-7e70-a79d-09c5facdf296	菜单管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	menu	/System/Menu/index	\N	6	\N	2026-01-21 16:57:14.351982+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:35.344738+08	\N	0
-019bdfc5-b352-7d24-b5af-8d0a0042a4f9	定时任务	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	task	/Monitor/Task/index	\N	0	\N	2026-01-21 16:57:14.322981+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:09.60628+08	\N	0
-019bdfc5-b34d-74fd-8ad8-f2f7976634d1	服务监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	server	/Monitor/Server/index	\N	1	\N	2026-01-21 16:57:14.318993+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:14.070302+08	\N	0
-019bdfc5-b350-7168-84d6-ffaaf874b6fc	在线用户	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	online	/Monitor/Online/index	\N	2	\N	2026-01-21 16:57:14.320983+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:19.533978+08	\N	0
-019bdfc5-b355-701e-99f2-7012b17490de	缓存监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	cache	/Monitor/Cache/index	\N	3	\N	2026-01-21 16:57:14.326984+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:23.460981+08	\N	0
-019bdfc5-b358-7794-adf1-b5cc9a3d5883	数据监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	database	/Monitor/Database/index	\N	4	\N	2026-01-21 16:57:14.329987+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:27.022915+08	\N	0
-019bdfc5-b35d-7a55-b441-38f77a88036a	表单示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	form	/Example/Form/index	\N	0	\N	2026-01-21 16:57:14.333987+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:32.585188+08	\N	0
-019bdfc5-b35a-7d3d-bf74-f903a795d7cd	列表示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	table	/Example/Table/index	\N	1	\N	2026-01-21 16:57:14.33098+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:37.654173+08	\N	0
-019bdfc5-b35e-71a2-9b71-c5ab8900f08f	图表示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	echarts	/Example/Echarts/index	\N	2	\N	2026-01-21 16:57:14.334981+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:41.006238+08	\N	0
-019bdfc5-b35c-76f0-b622-34e11d75dd27	Markdown	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	markdown	/Example/Markdown/index	\N	3	\N	2026-01-21 16:57:14.33298+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:44.724826+08	\N	0
+COPY domain_core.sys_menu (id, name, pid, icon, path, component, layout, sort, created_by, created_at, updated_by, updated_at, deleted, version, hide, metadata) FROM stdin;
+019bdfc5-b220-7bd9-80d1-1a1db193c151	首页	\N	icon-home	/	layout	blank	0	\N	2026-01-21 16:57:14.020461+08	\N	2026-01-21 16:57:14.02146+08	\N	0	f	{}
+019bdfc5-b31f-7020-b678-35fae63c432c	工作台	\N	icon-setting	/workbench	layout	blank	1	\N	2026-01-21 16:57:14.272982+08	\N	2026-01-21 16:57:14.272982+08	\N	0	f	{}
+019bdfc5-b370-70ca-a33c-25044878eeda	访问控制	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	RBAC	/System/RBAC/index	\N	1	\N	2026-01-21 16:57:14.353982+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:02.294811+08	\N	0	f	{}
+019bdfc5-b32c-74e9-90ac-0540954c4e4a	系统管理	\N	icon-setting	/system	layout	default	2	\N	2026-01-21 16:57:14.284977+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:01:49.940919+08	\N	0	f	{}
+019bdfc5-b328-7de0-9e8c-2ac0cc51969e	系统监控	\N	icon-setting	/monitor	layout	default	3	\N	2026-01-21 16:57:14.282559+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:01:56.864649+08	\N	0	f	{}
+019bdfc5-b32a-7c31-bbff-3992be5fff64	组件示例	\N	icon-setting	/exampl	layout	default	4	\N	2026-01-21 16:57:14.283978+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:02:05.223473+08	\N	0	f	{}
+019bdfc5-b34b-7619-8f37-b052e64e4e27	工作台默认页面	019bdfc5-b31f-7020-b678-35fae63c432c	icon-module		/Workbench/index	\N	999	\N	2026-01-21 16:57:14.316985+08	\N	2026-01-21 16:57:14.316985+08	\N	0	f	{}
+019bdfc5-b35f-74b6-abe3-3816db511129	文件存储	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	storage	/System/Storage/index	\N	7	\N	2026-01-21 16:57:14.335987+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 14:07:02.947915+08	\N	0	f	{}
+019bdfc5-b365-7a12-b646-3a5c922bd6f9	流程管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	workflow	/System/Workflow/index	\N	8	\N	2026-01-21 16:57:14.341991+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 14:07:07.998376+08	\N	0	f	{}
+019bdfc5-b36d-72df-b7a7-6c82d9199988	许可管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	license	/System/License/index	\N	9	\N	2026-01-21 16:57:14.349983+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 14:07:12.311505+08	\N	0	f	{}
+019bdfc5-b347-75c0-bcac-98ed9e44cf93	首页默认	019bdfc5-b220-7bd9-80d1-1a1db193c151	icon-module		/Home/index	\N	999	\N	2026-01-21 16:57:14.312987+08	\N	2026-01-21 16:57:14.312987+08	\N	0	f	{"title": "test"}
+019c085c-9a02-7356-8326-91423a326b20	流程编辑	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-im-lessen	flow-edit	/System/Workflow/components/EditWorkflow/index	\N	999	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 14:06:52.418209+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 14:07:39.582299+08	\N	0	t	{"crumbs": [{"path": "/system", "title": "系统管理"}, {"path": "/system/workflow", "title": "流程管理"}, {"title": "流程编辑"}]}
+019bdfc5-b35d-7a55-b441-38f77a88036a	表单示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	form	/Example/Form/index	\N	0	\N	2026-01-21 16:57:14.333987+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:32.585188+08	\N	0	f	{}
+019c08c3-1ba7-786f-b868-91132643c6ac	表单编辑	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-im-lessen	form-edit	/System/Workflow/components/EditForm/index	\N	999	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 15:58:50.279527+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-29 15:58:50.279527+08	\N	0	t	{"crumbs": [{"path": "/system", "title": "系统管理"}, {"path": "/system/workflow", "title": "流程管理"}, {"title": "表单编辑"}]}
+019bdfc5-b362-70a0-8cbd-53f96e96c64c	用户管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	user	/System/User/index	\N	0	\N	2026-01-21 16:57:14.338025+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:41:55.678661+08	\N	0	f	{}
+019bdfc5-b367-7e26-9c50-620660e13019	部门管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	dept	/System/Dept/index	\N	3	\N	2026-01-21 16:57:14.343989+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:13.985663+08	\N	0	f	{}
+019bdfc5-b363-750f-8cd2-010b659463a8	系统配置	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	configured	System/Configured/index	\N	4	\N	2026-01-21 16:57:14.339985+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:20.123378+08	\N	0	f	{}
+019bdfc5-b36a-7700-b8c3-7c251f1f79a2	字典管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	dict	/System/Dict/index	\N	5	\N	2026-01-21 16:57:14.346984+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:31.154823+08	\N	0	f	{}
+019bdfc5-b36f-7e70-a79d-09c5facdf296	菜单管理	019bdfc5-b32c-74e9-90ac-0540954c4e4a	icon-module	menu	/System/Menu/index	\N	6	\N	2026-01-21 16:57:14.351982+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:42:35.344738+08	\N	0	f	{}
+019bdfc5-b352-7d24-b5af-8d0a0042a4f9	定时任务	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	task	/Monitor/Task/index	\N	0	\N	2026-01-21 16:57:14.322981+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:09.60628+08	\N	0	f	{}
+019bdfc5-b34d-74fd-8ad8-f2f7976634d1	服务监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	server	/Monitor/Server/index	\N	1	\N	2026-01-21 16:57:14.318993+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:14.070302+08	\N	0	f	{}
+019bdfc5-b350-7168-84d6-ffaaf874b6fc	在线用户	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	online	/Monitor/Online/index	\N	2	\N	2026-01-21 16:57:14.320983+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:19.533978+08	\N	0	f	{}
+019bdfc5-b355-701e-99f2-7012b17490de	缓存监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	cache	/Monitor/Cache/index	\N	3	\N	2026-01-21 16:57:14.326984+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:23.460981+08	\N	0	f	{}
+019bdfc5-b358-7794-adf1-b5cc9a3d5883	数据监控	019bdfc5-b328-7de0-9e8c-2ac0cc51969e	icon-module	database	/Monitor/Database/index	\N	4	\N	2026-01-21 16:57:14.329987+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:27.022915+08	\N	0	f	{}
+019bdfc5-b35a-7d3d-bf74-f903a795d7cd	列表示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	table	/Example/Table/index	\N	1	\N	2026-01-21 16:57:14.33098+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:37.654173+08	\N	0	f	{}
+019bdfc5-b35e-71a2-9b71-c5ab8900f08f	图表示例	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	echarts	/Example/Echarts/index	\N	2	\N	2026-01-21 16:57:14.334981+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:41.006238+08	\N	0	f	{}
+019bdfc5-b35c-76f0-b622-34e11d75dd27	Markdown	019bdfc5-b32a-7c31-bbff-3992be5fff64	icon-module	markdown	/Example/Markdown/index	\N	3	\N	2026-01-21 16:57:14.33298+08	019bdfa5-e3fc-7ec8-b49f-b2738e64ff21	2026-01-21 17:45:44.724826+08	\N	0	f	{}
 \.
 
 
@@ -2561,5 +2579,5 @@ COPY domain_core.sys_user_data_scope_target (id, user_id, target_id, target_type
 -- PostgreSQL database dump complete
 --
 
-\unrestrict C3ojqhx5efFaNfYY5cHcAQQ7YMwFOW7MUHipIHcuAu7TkTrC9T2OCrBvNXlbFVt
+\unrestrict Mb40bdRn1ZjjWpanZgbDbMqI3WpsfwISTfisoxRhG3MlAgtCbGhdnPMkmue4aCp
 
