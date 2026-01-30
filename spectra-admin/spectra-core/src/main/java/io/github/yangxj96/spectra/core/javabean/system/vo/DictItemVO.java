@@ -54,6 +54,9 @@ public class DictItemVO implements Serializable {
     /// 状态
     private Short state;
 
+    /// 是否默认
+    private Boolean defaultFlag;
+
     /// 备注
     private String remark;
 

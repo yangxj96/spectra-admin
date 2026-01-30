@@ -48,7 +48,7 @@ function handlerRouter(r: RouteLocationMatched[] = []) {
     // ① 优先使用 meta.crumbs
     const crumbs = current.meta?.crumbs;
     if (Array.isArray(crumbs) && crumbs.length > 0) {
-        breadcrumb.value = crumbs.map((c, idx) => ({
+        breadcrumb.value = crumbs.map(c => ({
             path: c.path ?? current.path,
             meta: { title: c.title }
         })) as RouteLocationMatched[];

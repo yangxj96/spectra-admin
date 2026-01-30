@@ -6,7 +6,7 @@ import { userApi } from "@/api/user/user.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { organizationApi } from "@/api/user/organization.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 // 编辑组件
@@ -27,12 +27,12 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     condition.value
 );
 
-const organizationTree = ref<OrganizationTree[]>([]);
+const organizationTree = ref<DepartmentTree[]>([]);
 
 const dictStore = useDictStore();
 
 function handleInitData() {
-    organizationApi.tree().then(res => {
+    departmentApi.tree().then(res => {
         if (res.code !== 200) {
             MessageUtils.error(res.msg);
             return;
@@ -94,7 +94,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
 }
 
 // 组织机构树节点被单击
-function handleOrganizationTreeNodeClick(row: OrganizationTree) {
+function handleOrganizationTreeNodeClick(row: DepartmentTree) {
     condition.value.organization_id = row.id;
     handlerConditionQuery();
 }

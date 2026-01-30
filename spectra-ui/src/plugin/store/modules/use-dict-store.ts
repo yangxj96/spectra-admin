@@ -14,7 +14,7 @@ export const useDictStore = defineStore("dict", {
          * 获取字典数据
          * @param key 字典组KEY
          */
-        async getDictData(key: string): Promise<void | DictData[]> {
+        async getDictData(key: string): Promise<void | DictItem[]> {
             return serialQueue.add(async () => {
                 if (this.dicts[key]) {
                     return this.dicts[key];
@@ -40,7 +40,7 @@ export const useDictStore = defineStore("dict", {
          * @param key 字典组的KEY
          * @param value 字典项的VALUE
          */
-        async getDictItem(key: string, value: string): Promise<DictData | undefined> {
+        async getDictItem(key: string, value: string): Promise<DictItem | undefined> {
             let dictItems = this.dicts[key];
 
             // 如果没有缓存，先尝试加载
@@ -55,7 +55,7 @@ export const useDictStore = defineStore("dict", {
          * @param key 字典组的KEY
          * @param value 字典项的VALUE
          */
-        getDictItemSync(key: string, value: string | number): DictData | undefined {
+        getDictItemSync(key: string, value: string | number): DictItem | undefined {
             return this.dicts[key]?.find(item => item.value.toString() === value.toString());
         }
     }

@@ -27,19 +27,19 @@ const dict_code = defineModel("dict_code", {
 
 const dictStore = useDictStore();
 
-const dict_data = ref<DictData>();
+const dict_data = ref<DictItem>();
 
 // 封装一个方法来加载并匹配字典数据
 const loadDictData = async () => {
     if (!dict_code.value) {
-        dict_data.value = {} as DictData;
+        dict_data.value = {} as DictItem;
         return;
     }
 
     const dictData = (await dictStore.getDictData(dict_code.value)) || [];
 
     if (dictData.length <= 0) {
-        dict_data.value = {} as DictData;
+        dict_data.value = {} as DictItem;
         return;
     }
 

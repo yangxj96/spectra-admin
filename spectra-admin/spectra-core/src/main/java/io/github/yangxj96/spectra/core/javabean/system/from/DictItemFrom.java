@@ -57,6 +57,9 @@ public class DictItemFrom {
     @NotNull(message = "字典状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Short state;
 
+    /// 是否默认
+    private Boolean defaultFlag;
+
     /// 备注
     private String remark;
 

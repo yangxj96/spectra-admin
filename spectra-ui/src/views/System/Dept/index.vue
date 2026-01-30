@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
 import OrganizationEdit from "./components/Edit/index.vue";
-import { organizationApi } from "@/api/user/organization.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
-const table_data = ref<OrganizationTree[]>();
+const table_data = ref<DepartmentTree[]>();
 
 // 新增或编辑
 const edit = reactive({
     dialog: false,
-    form: {} as Organization
+    form: {} as Department
 });
 
 const ready = ref(false);
@@ -22,16 +22,16 @@ onMounted(() => {
 
 // 初始化数据
 function handleCriteriaQuery() {
-    organizationApi.tree().then(res => {
+    departmentApi.tree().then(res => {
         table_data.value = res.data;
     });
 }
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: Organization) {
+function handleTableItemDelete(row: Department) {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         try {
-            const { code, msg } = await organizationApi.deleteById(row.id);
+            const { code, msg } = await departmentApi.deleteById(row.id);
             MessageUtils.success(code === 200 ? "删除成功" : msg);
         } finally {
             handleCriteriaQuery();
@@ -40,7 +40,7 @@ function handleTableItemDelete(row: Organization) {
 }
 
 // 处理菜单Dialog打开
-function handleDialogOpen(row: Organization) {
+function handleDialogOpen(row: Department) {
     edit.form = JSON.parse(JSON.stringify(row));
     edit.dialog = true;
 }
@@ -49,7 +49,7 @@ function handleDialogOpen(row: Organization) {
 function handleDialogClose() {
     if (edit.dialog) {
         edit.dialog = false;
-        edit.form = {} as Organization;
+        edit.form = {} as Department;
     }
     handleCriteriaQuery();
 }
@@ -65,7 +65,7 @@ function handleDialogClose() {
             <el-form-item>
                 <el-button type="primary" @click="handleCriteriaQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button v-owner="'DEPT:INSERT'" @click="handleDialogOpen({} as Organization)">新增</el-button>
+                <el-button v-owner="'DEPT:INSERT'" @click="handleDialogOpen({} as Department)">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -73,8 +73,11 @@ function handleDialogClose() {
     <el-row class="box-body">
         <el-table :data="table_data" height="100%" stripe default-expand-all row-key="id">
             <el-table-column align="center" width="060" type="index" label="序号" />
-            <el-table-column align="center" prop="name" label="名称" />
+            <el-table-column align="center" width="200" prop="name" label="名称" />
             <el-table-column align="center" width="300" prop="code" label="编码" />
+            <el-table-column align="center" width="150" prop="province_code" label="省编码" />
+            <el-table-column align="center" width="150" prop="city_code" label="市编码" />
+            <el-table-column align="center" width="150" prop="county_code" label="市编码" />
             <el-table-column align="center" width="150" prop="type" label="类型">
                 <template #default="scope">
                     <dict-tag v-model="scope.row.type" dict_code="sys_organization_type" />

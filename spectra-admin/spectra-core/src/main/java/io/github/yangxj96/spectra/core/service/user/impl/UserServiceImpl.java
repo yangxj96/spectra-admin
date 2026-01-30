@@ -31,7 +31,7 @@ import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
+import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
@@ -46,7 +46,7 @@ import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeTargetMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserMapper;
 import io.github.yangxj96.spectra.core.service.auth.AccountService;
-import io.github.yangxj96.spectra.core.service.system.OrganizationService;
+import io.github.yangxj96.spectra.core.service.system.DepartmentService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -76,7 +76,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final RelUserRoleService relUserRoleService;
 
-    private final OrganizationService organizationService;
+    private final DepartmentService departmentService;
 
     private final PasswordEncoder passwordEncoder;
 
@@ -88,11 +88,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final UserDataScopeTargetMapper dataScopeTargetMapper;
 
-    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, OrganizationService organizationService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper) {
+    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper) {
         this.userConverter = userConverter;
         this.roleConverter = roleConverter;
         this.relUserRoleService = relUserRoleService;
-        this.organizationService = organizationService;
+        this.departmentService = departmentService;
         this.passwordEncoder = passwordEncoder;
         this.userProperties = userProperties;
         this.accountService = accountService;
@@ -285,12 +285,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
         List<String> organizationIds = new ArrayList<>();
         if (params.getOrganizationId() != null) {
-            Organization organization = organizationService.getById(params.getOrganizationId());
-            List<Organization> listed = organizationService.list(
-                    new LambdaQueryWrapper<Organization>()
-                            .eq(Organization::getId, organization.getId())
+            Department department = departmentService.getById(params.getOrganizationId());
+            List<Department> listed = departmentService.list(
+                    new LambdaQueryWrapper<Department>()
+                            .eq(Department::getId, department.getId())
                             .or()
-                            .likeRight(Organization::getPath, organization.getPath())
+                            .likeRight(Department::getPath, department.getPath())
             );
             organizationIds = listed.stream().map(BaseEntity::getId).toList();
             log.info("organizationIds:{}", organizationIds);
@@ -307,9 +307,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var result = userConverter.toVOPage(db);
 
         // 获取所需内容
-        var organizationNameMap = organizationService.list()
+        var organizationNameMap = departmentService.list()
                 .stream()
-                .collect(Collectors.toMap(Organization::getId, Organization::getPath));
+                .collect(Collectors.toMap(Department::getId, Department::getPath));
 
         // 扩展字段补充
         result.getRecords().forEach(vo -> {

@@ -7,7 +7,7 @@ import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
-import { organizationApi } from "@/api/user/organization.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 // 定义Model
@@ -38,7 +38,7 @@ const rules = {
 
 // 数据
 const roles = ref<Role[]>();
-const organization_tree = ref<OrganizationTree[]>();
+const organization_tree = ref<DepartmentTree[]>();
 
 // 组件
 const formRef = useTemplateRef<FormInstance>("formRef");
@@ -54,10 +54,10 @@ onMounted(() => {
             emailSuffixes.value = items.map(i => i.value);
         });
 
-    const request = [roleApi.list(), organizationApi.tree()];
+    const request = [roleApi.list(), departmentApi.tree()];
     Promise.all(request).then(([role, org]) => {
         roles.value = role!.data as Role[];
-        organization_tree.value = org!.data as OrganizationTree[];
+        organization_tree.value = org!.data as DepartmentTree[];
     });
 });
 

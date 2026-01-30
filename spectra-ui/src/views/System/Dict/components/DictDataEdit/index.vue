@@ -6,7 +6,7 @@ import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 const props = defineProps<{
-    row?: DictData;
+    row?: DictItem;
     group?: DictGroup;
 }>();
 
@@ -41,12 +41,12 @@ const edit = reactive({
         sort: [{ required: true, message: "请输入排序值", trigger: "blur" }],
         state: [{ required: true, message: "请选择字典状态", trigger: "blur" }]
     },
-    form: {} as DictData
+    form: {} as DictItem
 });
 
 onMounted(() => {
     handleInitData();
-    edit.form = has_edit ? JSON.parse(JSON.stringify(props.row || edit.form)) : ({ state: 0, sort: 999 } as DictData);
+    edit.form = has_edit ? JSON.parse(JSON.stringify(props.row || edit.form)) : ({ state: 0, sort: 999 } as DictItem);
     if (!has_edit && props.group) {
         edit.form.gid = props.group.id;
     }

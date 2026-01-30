@@ -2,10 +2,10 @@ package io.github.yangxj96.spectra.launch;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
+import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictGroup;
 import io.github.yangxj96.spectra.core.javabean.system.entity.DictItem;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Menu;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Authority;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleAuthorityFrom;
@@ -44,7 +44,7 @@ class SystemControllerTest {
     private DictItemService dictItemService;
 
     @Resource
-    private OrganizationService organizationService;
+    private DepartmentService departmentService;
 
     @Resource
     private SysConfigService sysConfigService;
@@ -323,13 +323,13 @@ class SystemControllerTest {
 
     @Test
     void updateOrgPath() {
-        var organizations = organizationService.list();
-        for (Organization organization : organizations) {
-            var path = organizationService.generatePath(organization.getId());
+        var organizations = departmentService.list();
+        for (Department department : organizations) {
+            var path = departmentService.generatePath(department.getId());
             System.out.println("路由:" + path);
-            organization.setPath(path);
+            department.setPath(path);
         }
-        organizationService.updateBatchById(organizations);
+        departmentService.updateBatchById(organizations);
     }
 
     /**

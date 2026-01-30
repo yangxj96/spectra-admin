@@ -7,12 +7,13 @@
                type="io.github.yangxj96.spectra.core.javabean.system.entity.DictItem">
         <!--@mbg.generated-->
         <!--@Table domain_core.sys_dict_item-->
-        <result column="gid"    property="gid"/>
-        <result column="label"  property="label"/>
-        <result column="value"  property="value"/>
-        <result column="sort"   property="sort"/>
-        <result column="state"  property="state"/>
-        <result column="remark" property="remark"/>
+        <result column="gid"          property="gid"/>
+        <result column="label"        property="label"/>
+        <result column="value"        property="value"/>
+        <result column="sort"         property="sort"/>
+        <result column="state"        property="state"/>
+        <result column="default_flag" property="defaultFlag"/>
+        <result column="remark"       property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -24,6 +25,7 @@
         value,
         sort,
         state,
+        default_flag,
         remark,
         created_by,
         created_at,

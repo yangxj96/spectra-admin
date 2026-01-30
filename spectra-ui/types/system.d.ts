@@ -1,6 +1,7 @@
 export {};
 
 declare global {
+    // 菜单元数据
     type MenuMetadata = {
         // 已知
         title?: string;
@@ -31,15 +32,15 @@ declare global {
         //元数据
         meta?: never;
         // 是否显示菜单
-        hide: boolean;
+        hide?: boolean;
         // 元数据
-        metadata: MenuMetadata | JsonValue;
+        metadata?: MenuMetadata | JsonValue;
         //子级
         children?: Menu[];
     };
 
     // 部门
-    type Organization = BaseEntity & {
+    type Department = BaseEntity & {
         // 上级ID
         pid: string;
         // 名称
@@ -48,10 +49,6 @@ declare global {
         code: string;
         // 类型
         type: number;
-        // 地址
-        address: string;
-        // 负责人ID
-        manager_id: string;
         // 路径
         path: string;
         // 备注
@@ -59,9 +56,9 @@ declare global {
     };
 
     // 组织机构树形
-    type OrganizationTree = Organization & {
+    type DepartmentTree = Department & {
         // 子级
-        children?: OrganizationTree[];
+        children?: DepartmentTree[];
     };
 
     // 字典组
@@ -89,18 +86,20 @@ declare global {
     };
 
     // 字典数据
-    type DictData = BaseEntity & {
-        //字典组ID
+    type DictItem = BaseEntity & {
+        // 字典组ID
         gid: string;
-        //字典标签
+        // 字典标签
         label: string;
-        //字典值
+        // 字典值
         value: string;
-        //排序
+        // 排序
         sort: number;
-        //状态
+        // 状态
         state: number;
-        //备注
+        // 是否默认
+        default_flag: boolean;
+        // 备注
         remark?: string;
     };
 

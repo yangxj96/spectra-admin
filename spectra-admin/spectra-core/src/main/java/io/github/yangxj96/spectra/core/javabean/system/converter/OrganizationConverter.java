@@ -18,7 +18,7 @@ package io.github.yangxj96.spectra.core.javabean.system.converter;
 
 import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
 import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Organization;
+import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
 import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
 import org.mapstruct.Mapper;
@@ -37,19 +37,19 @@ public interface OrganizationConverter {
     ///
     /// @param source 实体
     /// @return 树形
-    OrganizationTreeVo toTreeVO(Organization source);
+    OrganizationTreeVo toTreeVO(Department source);
 
     /// 实体转树形(列表)
     ///
     /// @param source 实体
     /// @return 树形
-    List<OrganizationTreeVo> toTreeVOList(List<Organization> source);
+    List<OrganizationTreeVo> toTreeVOList(List<Department> source);
 
     /// 入参转实体
     ///
     /// @param source 入参
     /// @return 实体
-    Organization toEntity(OrganizationFrom source);
+    Department toEntity(OrganizationFrom source);
 
 }
 

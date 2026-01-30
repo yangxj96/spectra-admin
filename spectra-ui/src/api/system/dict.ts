@@ -41,7 +41,7 @@ export const dictApi = {
      * 创建字典项
      * @param params 字典项入参
      */
-    async createData(params: DictData): Promise<IResult> {
+    async createData(params: DictItem): Promise<IResult> {
         return await http.post<IResult>("/api/dict/data", params).then(res => res.data);
     },
     /**
@@ -55,14 +55,14 @@ export const dictApi = {
      * 修改字典项
      * @param params 字典项入参
      */
-    async modifyData(params: DictData): Promise<IResult> {
+    async modifyData(params: DictItem): Promise<IResult> {
         return await http.put<IResult>("/api/dict/data", params).then(res => res.data);
     },
     /**
      * 根据字典组CODE获取字典项列表
      * @param code 字典组CODE
      */
-    async getDataByTypeCode(code: string): Promise<IResult<DictData[]>> {
-        return await http.get<IResult<DictData[]>>(`/api/dict/data/${code}`).then(res => res.data);
+    async getDataByTypeCode(code: string): Promise<IResult<DictItem[]>> {
+        return await http.get<IResult<DictItem[]>>(`/api/dict/data/${code}`).then(res => res.data);
     }
 };

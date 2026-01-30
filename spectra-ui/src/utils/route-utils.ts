@@ -1,4 +1,4 @@
-import { type AsyncComponentLoader, defineAsyncComponent, toRaw } from "vue";
+import { type AsyncComponentLoader, defineAsyncComponent } from "vue";
 import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { menuApi } from "@/api/system/menu.ts";
@@ -27,7 +27,6 @@ const loadComponent = (componentPath?: string): ReturnType<typeof defineAsyncCom
         return undefined;
     }
 
-    // return defineAsyncComponent(loader as () => Promise<{ default: Component }>);
     return loader as AsyncComponentLoader;
 };
 
@@ -48,16 +47,19 @@ export const convertMenuToRoutes = (menus: Menu[]): RouteRecordRaw[] => {
     return menus.map(menu => {
         // 确保 menu.path 以 / 开头
         const path = menu.path.startsWith("/") ? menu.path : "/" + menu.path;
+        const meta = Object.assign(
+            {},
+            {
+                title: menu.name
+            },
+            menu.meta
+        );
+
         const route: RouteRecordRaw = {
             path: menu.path,
             name: menu.name,
             component: menu.layout ? loadLayout(menu.layout.trim().toLowerCase()) : loadComponent(menu.component),
-            meta: Object.assign(
-                {
-                    title: menu.name
-                },
-                menu.metadata
-            ),
+            meta,
             children: []
         };
 
@@ -104,7 +106,8 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
     try {
         const res = await menuApi.tree();
         if (res.code === 200 && res.data) {
-            appStore.menus = res.data;
+            // 不使用 as 会出现 TS2589,暂时没搞定
+            appStore.menus = res.data as never;
             const routes = convertMenuToRoutes(res.data);
 
             // 避免重复添加路由

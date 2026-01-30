@@ -38,6 +38,6 @@ declare global {
     // useDictStore()的state
     type StoreDict = {
         // 字典缓存数组
-        dicts: Record<string, DictData[]>;
+        dicts: Record<string, DictItem[]>;
     };
 }

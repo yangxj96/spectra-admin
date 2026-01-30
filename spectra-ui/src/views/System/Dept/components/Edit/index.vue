@@ -2,7 +2,7 @@
 import { computed, ref, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/default-config.ts";
-import { organizationApi } from "@/api/user/organization.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
@@ -13,11 +13,11 @@ const dialog = defineModel("show", {
 });
 const form = defineModel("form", {
     required: false,
-    default: {} as Organization
+    default: {} as Department
 });
 const tree = defineModel("tree", {
     required: true,
-    default: [] as OrganizationTree[]
+    default: [] as DepartmentTree[]
 });
 // 定义响应方法
 const emits = defineEmits(["close"]);
@@ -44,7 +44,7 @@ async function handleOrganizationSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        const request = modify.value ? organizationApi.modify : organizationApi.created;
+        const request = modify.value ? departmentApi.modify : departmentApi.created;
         const res = await request(form.value);
         if (res.code === 200) {
             MessageUtils.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {

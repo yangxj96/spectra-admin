@@ -62,6 +62,10 @@ public class DictItem extends BaseEntity implements Serializable {
     @TableField(value = "state")
     private Short state;
 
+    /// 是否默认
+    @TableField(value = "default_flag")
+    private Boolean defaultFlag;
+
     /// 备注
     @TableField(value = "remark")
     private String remark;

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { markRaw, reactive, ref, watch } from "vue";
-import { defineAsyncComponent } from "vue";
+import { defineAsyncComponent, markRaw, reactive, ref, watch } from "vue";
 import { dictApi } from "@/api/system/dict.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -20,7 +19,7 @@ const dynamic = reactive({
 const dictGroupTableData = ref<DictTypeTree[]>([]);
 
 // 字典数据表单数据
-const dictDataTableData = ref<DictData[]>([]);
+const dictDataTableData = ref<DictItem[]>([]);
 
 // 当前选中的字典组
 const currentGroup = ref<DictTypeTree>();
@@ -61,7 +60,7 @@ const handleGetDictData = () => {
     });
 };
 
-const handleDialogOpen = (type: string, row: DictGroup | DictData | unknown = {} as unknown) => {
+const handleDialogOpen = (type: string, row: DictGroup | DictItem | unknown = {} as unknown) => {
     let Component;
     switch (type) {
         case "DictGroup": {
@@ -163,6 +162,11 @@ initData();
                 <el-table-column align="center" label="状态" prop="state">
                     <template #default="scope">
                         <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_common_state" />
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="默认">
+                    <template #default="scope">
+                        <el-text v-if="scope.row.default_flag" type="primary">默认</el-text>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="备注" prop="remark" :show-overflow-tooltip="true" />
