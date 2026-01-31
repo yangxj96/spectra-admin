@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
-import { type FormInstance, type FormRules } from "element-plus";
+import { type FormInstance, type FormRules, type LoadFunction } from "element-plus";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { departmentApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
@@ -19,17 +19,21 @@ const tree = defineModel("tree", {
     required: true,
     default: [] as DepartmentTree[]
 });
+
 // 定义响应方法
 const emits = defineEmits(["close"]);
+
 // 获取是否为修改
 const modify = computed(() => {
     return !!form.value.id;
 });
+
 // 表单
 const rules = ref<FormRules>({
     name: [{ required: true, message: "请输入部门名称", trigger: "blur" }],
     type: [{ required: true, message: "请选择部门类型", trigger: "blur" }]
 });
+
 // refs
 const formRef = useTemplateRef<FormInstance>("formRef");
 
@@ -57,20 +61,34 @@ async function handleOrganizationSave() {
         console.log(error);
     }
 }
+
+// 懒加载行政区划
+const handleLoadRegion: LoadFunction = (node, resolve, reject) => {
+    console.log(`节点`, node);
+    if (node.level === 0) {
+        return resolve([{ id: "12333", code: "123", name: "region" }]);
+    }
+    // 构建参数
+    let params = {
+        level: node.level + 1,
+        id: node.data?.id
+    }
+};
 </script>
 
 <template>
-    <el-dialog
+    <el-drawer
         v-model="dialog"
+        :modal="true"
         class="loading-box"
-        :close-on-click-modal="false"
-        :close-on-press-escape="false"
-        :show-close="false"
-        :destroy-on-close="true"
-        width="30vw">
+        modal-penetrable
+        destroy-on-close
+        @close="handleCurrentDialogClose">
         <template #header>
-            <components-icons name="icon-edit" />
-            {{ (modify ? "编辑" : "新增") + "部门" }}
+            <div>
+                <components-icons name="icon-edit" />
+                {{ (modify ? "编辑" : "新增") + "部门" }}
+            </div>
         </template>
         <template #default>
             <el-form
@@ -99,6 +117,9 @@ async function handleOrganizationSave() {
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" clearable placeholder="请输入部门名称" />
                 </el-form-item>
+                <el-form-item label="区域" prop="area">
+                    <el-tree-select node-key="id" lazy :load="handleLoadRegion" clearable :props="treeDefaultProps" />
+                </el-form-item>
                 <el-form-item label="类型" prop="type">
                     <dict-select v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />
                 </el-form-item>
@@ -111,5 +132,5 @@ async function handleOrganizationSave() {
             <el-button @click="handleCurrentDialogClose">取消</el-button>
             <el-button type="primary" @click="handleOrganizationSave()">确定</el-button>
         </template>
-    </el-dialog>
+    </el-drawer>
 </template>
