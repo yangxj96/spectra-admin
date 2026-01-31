@@ -18,6 +18,7 @@ import java.util.Map;
 public final class ObjUtils {
 
     private ObjUtils() {
+        // 工具类禁止实例化
     }
 
 

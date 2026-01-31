@@ -1,7 +1,6 @@
 package io.github.yangxj96.spectra.core.javabean.system.vo;
 
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import io.github.yangxj96.spectra.common.constant.RegionLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,7 +18,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegionVO  implements Serializable {
+public class RegionVO implements Serializable {
 
     /// 区域名称
     private String name;
