@@ -102,6 +102,9 @@ spring:
     user:
       name:
       password:
+  # 缓存
+  cache:
+    type: redis
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml

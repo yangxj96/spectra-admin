@@ -42,7 +42,7 @@ declare global {
         username?: string;
         email?: string;
         status?: boolean;
-        organization_id?: string;
+        department_id?: string;
     };
 
     // 角色分页请求参数定义

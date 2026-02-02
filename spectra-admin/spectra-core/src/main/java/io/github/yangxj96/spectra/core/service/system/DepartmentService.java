@@ -22,6 +22,7 @@ import io.github.yangxj96.spectra.core.javabean.system.from.DepartmentFrom;
 import io.github.yangxj96.spectra.core.javabean.system.vo.DepartmentTreeVo;
 import org.jspecify.annotations.Nullable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -63,11 +64,11 @@ public interface DepartmentService extends IService<Department> {
     /// 获取自己包含下级的节点的ID
     ///
     /// @return id列表
-    Set<String> getSelfAndDescendantIds(String departmentId);
+    Collection<String> getSelfAndDescendantIds(String departmentId);
 
     /// 获取所有下级部门 ID（不包含自己）
     ///
     /// @return id列表
-    Set<String> getDescendantIds(String departmentId);
+    Collection<String> getDescendantIds(String departmentId);
 
 }

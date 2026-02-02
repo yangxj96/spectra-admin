@@ -34,6 +34,8 @@ import io.github.yangxj96.spectra.core.javabean.system.vo.DepartmentTreeVo;
 import io.github.yangxj96.spectra.core.mapper.system.DepartmentMapper;
 import io.github.yangxj96.spectra.core.service.system.DepartmentService;
 import org.jspecify.annotations.NonNull;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,7 @@ import java.util.stream.Collectors;
 /// @version 1.0
 /// @since 2025-6-15
 @Service
+@CacheConfig(cacheNames = "core:dept",keyGenerator = "standardCacheKeyGenerator")
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<String> {
 
     private final OrganizationConverter organizationConverter;
@@ -58,6 +61,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
+    @Cacheable
     public Map<String, String> getNameMap(Set<String> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
@@ -112,7 +116,8 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
-    public Set<String> getSelfAndDescendantIds(String departmentId) {
+    @Cacheable
+    public Collection<String> getSelfAndDescendantIds(String departmentId) {
         if (departmentId == null) {
             return Collections.emptySet();
         }
@@ -138,8 +143,9 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
-    public Set<String> getDescendantIds(String departmentId) {
-        Set<String> all = getSelfAndDescendantIds(departmentId);
+    @Cacheable
+    public Collection<String> getDescendantIds(String departmentId) {
+        Collection<String> all = getSelfAndDescendantIds(departmentId);
         all.remove(departmentId);
         return all;
     }
@@ -150,7 +156,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
         for (Department dept : list) {
             String parentId = dept.getPid();
-            map.computeIfAbsent(parentId, k -> new ArrayList<>())
+            map.computeIfAbsent(parentId, _ -> new ArrayList<>())
                     .add(dept.getId());
         }
 

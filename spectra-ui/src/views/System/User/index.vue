@@ -95,7 +95,7 @@ function handleTableSortChange(data: { column: User; prop: string; order: string
 
 // 组织机构树节点被单击
 function handleOrganizationTreeNodeClick(row: DepartmentTree) {
-    condition.value.organization_id = row.id;
+    condition.value.department_id = row.id;
     handlerConditionQuery();
 }
 
