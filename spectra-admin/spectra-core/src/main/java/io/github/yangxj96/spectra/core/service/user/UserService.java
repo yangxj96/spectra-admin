@@ -37,7 +37,7 @@ public interface UserService extends BaseService<User> {
     /// @param page   分页参数
     /// @param params 查询条件参数
     /// @return 分页结果
-    IPage<UserPageVO> page(PageFrom page, UserPageFrom params);
+    IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException;
 
     /// 创建用户
     ///

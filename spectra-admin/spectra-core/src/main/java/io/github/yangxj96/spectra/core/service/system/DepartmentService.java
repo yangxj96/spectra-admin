@@ -18,11 +18,12 @@ package io.github.yangxj96.spectra.core.service.system;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
-import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import io.github.yangxj96.spectra.core.javabean.system.from.DepartmentFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DepartmentTreeVo;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 /// 组织机构业务层
 ///
@@ -34,7 +35,7 @@ public interface DepartmentService extends IService<Department> {
     /// 新增组织机构
     ///
     /// @param from 请求入参
-    void created(OrganizationFrom from);
+    void created(DepartmentFrom from);
 
     /// 根据ID删除组织机构
     ///
@@ -44,7 +45,7 @@ public interface DepartmentService extends IService<Department> {
     /// 编辑组织机构
     ///
     /// @param from 请求入参
-    void modify(OrganizationFrom from);
+    void modify(DepartmentFrom from);
 
     /// 计算组织机构路径
     ///
@@ -52,18 +53,21 @@ public interface DepartmentService extends IService<Department> {
     /// @return 组织机构路径
     String generatePath(String id);
 
-    /// 根据ID获取他的所有子级,包含孙级..曾孙级...等
-    ///
-    /// 使用递归实现主要是为了后期如果适配其他数据库少点修改
-    ///
-    /// @param organizationId 组织机构ID
-    /// @return 所有子级列表
-    List<Department> getAllChildrenById(String organizationId);
-
     /**
      * 组织机构树形结构
      *
      * @return 组织机构树形结构数组
      */
-    @Nullable List<OrganizationTreeVo> tree();
+    @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException;
+
+    /// 获取自己包含下级的节点的ID
+    ///
+    /// @return id列表
+    Set<String> getSelfAndDescendantIds(String departmentId);
+
+    /// 获取所有下级部门 ID（不包含自己）
+    ///
+    /// @return id列表
+    Set<String> getDescendantIds(String departmentId);
+
 }

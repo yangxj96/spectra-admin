@@ -195,7 +195,7 @@ onMounted(async () => {
                     width="150"
                     show-overflow-tooltip
                     label="所属组织"
-                    prop="organization_name" />
+                    prop="department_name" />
                 <el-table-column align="center" width="150" show-overflow-tooltip label="角色" prop="roles">
                     <template #default="scope">
                         <el-tag

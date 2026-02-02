@@ -40,7 +40,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_organization", schema = "domain_core")
+@TableName(value = "sys_department", schema = "domain_core")
 public class Department extends BaseEntity implements Serializable {
 
     @Serial
@@ -65,6 +65,10 @@ public class Department extends BaseEntity implements Serializable {
     /// 对应字典组:sys_organization_type
     @TableField(value = "type")
     private String type;
+
+    /// 行政区划ID
+    @TableField("region_id")
+    private String regionId;
 
     /// 构建路径
     /// > 格式:比如总部/二级/三级/部门

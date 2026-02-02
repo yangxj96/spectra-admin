@@ -76,7 +76,7 @@ public class UserController {
 
     @ULog("分页查询用户列表")
     @GetMapping("/page")
-    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
+    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 

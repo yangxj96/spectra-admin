@@ -19,7 +19,7 @@
         <result column="city"      property="city"/>
         <result column="language"  property="language"/>
         <result column="timezone"  property="timezone"/>
-        <result column="organization_id" property="organizationId"/>
+        <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -38,7 +38,7 @@
         city,
         language,
         timezone,
-        organization_id,
+        department_id,
         created_by,
         created_at,
         updated_by,

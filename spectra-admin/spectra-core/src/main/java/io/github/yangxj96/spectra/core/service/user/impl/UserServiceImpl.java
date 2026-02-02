@@ -27,6 +27,7 @@ import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
+import io.github.yangxj96.spectra.core.configure.assembler.NameFillExecutor;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
@@ -88,7 +89,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final UserDataScopeTargetMapper dataScopeTargetMapper;
 
-    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper) {
+    private final NameFillExecutor fillExecutor;
+
+    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper, NameFillExecutor fillExecutor) {
         this.userConverter = userConverter;
         this.roleConverter = roleConverter;
         this.relUserRoleService = relUserRoleService;
@@ -98,6 +101,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         this.accountService = accountService;
         this.dataScopeMapper = dataScopeMapper;
         this.dataScopeTargetMapper = dataScopeTargetMapper;
+        this.fillExecutor = fillExecutor;
     }
 
 
@@ -282,34 +286,23 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
-    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) {
-        List<String> organizationIds = new ArrayList<>();
-        if (params.getOrganizationId() != null) {
-            Department department = departmentService.getById(params.getOrganizationId());
-            List<Department> listed = departmentService.list(
-                    new LambdaQueryWrapper<Department>()
-                            .eq(Department::getId, department.getId())
-                            .or()
-                            .likeRight(Department::getPath, department.getPath())
-            );
-            organizationIds = listed.stream().map(BaseEntity::getId).toList();
-            log.info("organizationIds:{}", organizationIds);
-        }
-
+    public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>()
                 .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                .in(CollUtils.isNotEmpty(organizationIds), User::getOrganizationId, organizationIds)
+                .in(StrUtils.isNotBlank(
+                        params.getOrganizationId()),
+                        User::getDepartmentId,
+                        departmentService.getSelfAndDescendantIds(params.getOrganizationId())
+                )
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);
         var result = userConverter.toVOPage(db);
 
-        // 获取所需内容
-        var organizationNameMap = departmentService.list()
-                .stream()
-                .collect(Collectors.toMap(Department::getId, Department::getPath));
+        // 字段填充
+        fillExecutor.fill(result.getRecords());
 
         // 扩展字段补充
         result.getRecords().forEach(vo -> {
@@ -321,7 +314,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                                 .toList()
                 );
             }
-            vo.setOrganizationName(organizationNameMap.getOrDefault(vo.getOrganizationId(), ""));
             // 数据范围
             UserDataScope dataScope = dataScopeMapper.findByUserId(vo.getId());
             if (dataScope != null) {

@@ -6,13 +6,14 @@
                extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
                type="io.github.yangxj96.spectra.core.javabean.system.entity.Department">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_organization -->
-        <result column="pid"    property="pid"/>
-        <result column="name"   property="name"/>
-        <result column="code"   property="code"/>
-        <result column="type"   property="type"/>
-        <result column="path"   property="path"/>
-        <result column="remark" property="remark"/>
+        <!--@Table domain_core.sys_department -->
+        <result column="pid"       property="pid"/>
+        <result column="name"      property="name"/>
+        <result column="code"      property="code"/>
+        <result column="type"      property="type"/>
+        <result column="region_id" property="regionId"/>
+        <result column="path"      property="path"/>
+        <result column="remark"    property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -23,6 +24,7 @@
         name,
         code,
         type,
+        region_id,
         path,
         remark,
         created_by,
@@ -40,7 +42,7 @@
                    pid,
                    name,
                    name::TEXT AS path
-            FROM ${schema}.sys_organization
+            FROM ${schema}.sys_department
             WHERE pid IS NULL
 
             UNION ALL
@@ -50,7 +52,7 @@
                    o.pid,
                    o.name,
                    ot.path || '/' || o.name AS path
-            FROM ${schema}.sys_organization o
+            FROM ${schema}.sys_department o
                      JOIN org_tree ot ON o.pid = ot.id)
         SELECT path,id
         FROM org_tree

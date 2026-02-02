@@ -18,8 +18,8 @@ package io.github.yangxj96.spectra.core.controller.system;
 
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
-import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import io.github.yangxj96.spectra.core.javabean.system.from.DepartmentFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DepartmentTreeVo;
 import io.github.yangxj96.spectra.core.service.system.DepartmentService;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,7 +51,7 @@ public class DepartmentController {
     @ULog("新增组织机构")
     @PostMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
-    public void created(@RequestBody @Validated(Verify.Insert.class) OrganizationFrom from) {
+    public void created(@RequestBody @Validated(Verify.Insert.class) DepartmentFrom from) {
         bindService.created(from);
     }
 
@@ -75,7 +75,7 @@ public class DepartmentController {
     @ULog("编辑组织机构")
     @PutMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
-    public void modify(@RequestBody @Validated(Verify.Update.class) OrganizationFrom from) {
+    public void modify(@RequestBody @Validated(Verify.Update.class) DepartmentFrom from) {
         bindService.modify(from);
     }
 
@@ -86,7 +86,7 @@ public class DepartmentController {
      */
     @ULog("获取组织机构树形列表")
     @GetMapping("/tree")
-    public @Nullable List<OrganizationTreeVo> tree() {
+    public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();
     }
 

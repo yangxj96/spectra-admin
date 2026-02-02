@@ -36,4 +36,17 @@ public enum RegionLevel implements IEnum<Integer> {
     public Integer getValue() {
         return this.level;
     }
+
+    public static RegionLevel of(Integer level) {
+        if (level == null) {
+            return null;
+        }
+        for (RegionLevel value : RegionLevel.values()) {
+            if (value.level.equals(level)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
 }

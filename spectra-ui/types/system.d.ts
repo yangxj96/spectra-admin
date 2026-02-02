@@ -49,6 +49,8 @@ declare global {
         code: string;
         // 类型
         type: number;
+        // 行政区划ID
+        region_id: string;
         // 路径
         path: string;
         // 备注

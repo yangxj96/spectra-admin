@@ -88,6 +88,6 @@ public class User extends BaseEntity implements Serializable {
     private String timezone;
 
     /// 组织机构ID
-    @TableField(value = "organization_id")
-    private String organizationId;
+    @TableField(value = "department_id")
+    private String departmentId;
 }

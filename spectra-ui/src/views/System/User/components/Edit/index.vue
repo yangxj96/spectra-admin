@@ -38,7 +38,7 @@ const rules = {
 
 // 数据
 const roles = ref<Role[]>();
-const organization_tree = ref<DepartmentTree[]>();
+const department_tree = ref<DepartmentTree[]>();
 
 // 组件
 const formRef = useTemplateRef<FormInstance>("formRef");
@@ -57,7 +57,7 @@ onMounted(() => {
     const request = [roleApi.list(), departmentApi.tree()];
     Promise.all(request).then(([role, org]) => {
         roles.value = role!.data as Role[];
-        organization_tree.value = org!.data as DepartmentTree[];
+        department_tree.value = org!.data as DepartmentTree[];
     });
 });
 
@@ -187,8 +187,8 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                 </el-form-item>
                 <el-form-item label="所属组织" prop="organization_id">
                     <el-tree-select
-                        v-model="form.organization_id"
-                        :data="organization_tree"
+                        v-model="form.department_id"
+                        :data="department_tree"
                         node-key="id"
                         clearable
                         check-strictly
@@ -207,7 +207,7 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                 <el-form-item v-if="form.data_scope === '自定义'" label="自定义数据范围">
                     <el-tree-select
                         v-model="form.target_ids"
-                        :data="organization_tree"
+                        :data="department_tree"
                         node-key="id"
                         clearable
                         check-strictly

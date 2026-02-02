@@ -20,6 +20,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class RegionVO implements Serializable {
 
+
+    /// 主键ID
+    private String id;
+
     /// 区域名称
     private String name;
 

@@ -17,25 +17,27 @@
 package io.github.yangxj96.spectra.core.service.system.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
+import io.github.yangxj96.spectra.core.configure.assembler.NameFillExecutor;
+import io.github.yangxj96.spectra.core.configure.assembler.NameLookup;
 import io.github.yangxj96.spectra.core.javabean.system.converter.OrganizationConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
-import io.github.yangxj96.spectra.core.javabean.system.from.OrganizationFrom;
-import io.github.yangxj96.spectra.core.javabean.system.vo.OrganizationTreeVo;
+import io.github.yangxj96.spectra.core.javabean.system.from.DepartmentFrom;
+import io.github.yangxj96.spectra.core.javabean.system.vo.DepartmentTreeVo;
 import io.github.yangxj96.spectra.core.mapper.system.DepartmentMapper;
 import io.github.yangxj96.spectra.core.service.system.DepartmentService;
+import org.jspecify.annotations.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /// 组织机构业务层-实现
@@ -44,18 +46,32 @@ import java.util.stream.Collectors;
 /// @version 1.0
 /// @since 2025-6-15
 @Service
-public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService {
+public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<String> {
 
     private final OrganizationConverter organizationConverter;
 
-    public DepartmentServiceImpl(OrganizationConverter organizationConverter) {
+    private final NameFillExecutor nameFillExecutor;
+
+    public DepartmentServiceImpl(OrganizationConverter organizationConverter, NameFillExecutor nameFillExecutor) {
         this.organizationConverter = organizationConverter;
+        this.nameFillExecutor = nameFillExecutor;
     }
 
+    @Override
+    public Map<String, String> getNameMap(Set<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return lambdaQuery()
+                .in(BaseEntity::getId, ids)
+                .list()
+                .stream()
+                .collect(Collectors.toMap(BaseEntity::getId, Department::getPath));
+    }
 
     @Override
     @Transactional
-    public void created(OrganizationFrom from) {
+    public void created(DepartmentFrom from) {
         var entity = organizationConverter.toEntity(from);
         entity.setCode(IdWorker.get32UUID().toUpperCase());
         this.save(entity);
@@ -70,7 +86,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     @Transactional
-    public void modify(OrganizationFrom from) {
+    public void modify(DepartmentFrom from) {
         var organization = this.getById(from.getId());
         if (null == organization) {
             throw new DataNotExistException("没找到组织机构信息");
@@ -85,49 +101,82 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
-    public List<OrganizationTreeVo> tree() {
+    public List<DepartmentTreeVo> tree() throws IllegalAccessException {
         var list = this.list();
         if (CollUtils.isEmpty(list)) {
             return Collections.emptyList();
         }
         var vos = organizationConverter.toTreeVOList(list);
+        nameFillExecutor.fill(vos);
         return new TreeBuilder<>(vos).buildTree(Common.PID);
     }
 
     @Override
-    public List<Department> getAllChildrenById(String organizationId) {
-        var organizations = this.list();
-        // 2. 构建父ID -> 子节点列表的映射
-        var childrenMap = organizations.stream()
-                .filter(org -> org.getPid() != null)
-                .collect(Collectors.groupingBy(Department::getPid));
-        // 3. 存放结果的集合
-        var result = new ArrayList<Department>();
-        // 4. 从指定ID开始递归收集所有子节点
-        collectAllChildren(organizationId, childrenMap, result);
+    public Set<String> getSelfAndDescendantIds(String departmentId) {
+        if (departmentId == null) {
+            return Collections.emptySet();
+        }
+
+        // 一次性查出所有部门（只查必要字段）
+        List<Department> allDepartments = list(
+                Wrappers.<Department>lambdaQuery()
+                        .select(Department::getId, Department::getPid)
+        );
+
+        if (allDepartments.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        // 构建 parentId -> childrenIds 映射
+        Map<String, List<String>> childrenMap = buildChildrenMap(allDepartments);
+
+        // DFS 递归获取结果
+        Set<String> result = new HashSet<>();
+        dfs(departmentId, childrenMap, result);
+
         return result;
     }
 
+    @Override
+    public Set<String> getDescendantIds(String departmentId) {
+        Set<String> all = getSelfAndDescendantIds(departmentId);
+        all.remove(departmentId);
+        return all;
+    }
 
-    /**
-     * 递归收集指定节点的所有子节点
-     *
-     * @param parentId    要查找子节点的父节点ID
-     * @param childrenMap 父ID -> 子节点列表的映射
-     * @param result      收集结果的列表
-     */
-    private void collectAllChildren(String parentId, Map<String, List<Department>> childrenMap, List<Department> result) {
-        // 获取该父节点的所有直接子节点
-        var directChildren = childrenMap.get(parentId);
-        // 如果没有子节点，直接返回（递归终止条件）
-        if (directChildren == null || directChildren.isEmpty()) {
+    /// 构建 parentId -> childrenId 列表
+    private @NonNull Map<String, List<String>> buildChildrenMap(@NonNull List<Department> list) {
+        Map<String, List<String>> map = new HashMap<>();
+
+        for (Department dept : list) {
+            String parentId = dept.getPid();
+            map.computeIfAbsent(parentId, k -> new ArrayList<>())
+                    .add(dept.getId());
+        }
+
+        return map;
+    }
+
+    /// 深度优先遍历（防止死循环）
+    ///
+    /// @param currentId   当前节点ID
+    /// @param childrenMap 子节点map
+    /// @param result      响应结果
+    private void dfs(String currentId, Map<String, List<String>> childrenMap, @NonNull Set<String> result) {
+
+        // 已访问过，直接返回（防止环）
+        if (!result.add(currentId)) {
             return;
         }
-        // 将所有直接子节点添加到结果中
-        result.addAll(directChildren);
-        // 递归处理每个直接子节点，查找它们的子节点
-        for (Department child : directChildren) {
-            collectAllChildren(child.getId(), childrenMap, result);
+
+        List<String> children = childrenMap.get(currentId);
+        if (children == null || children.isEmpty()) {
+            return;
+        }
+
+        for (String childId : children) {
+            dfs(childId, childrenMap, result);
         }
     }
+
 }

@@ -16,7 +16,9 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.vo;
 
+import io.github.yangxj96.spectra.core.configure.assembler.NameFill;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
+import io.github.yangxj96.spectra.core.service.system.impl.DepartmentServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -86,11 +88,11 @@ public class UserPageVO implements Serializable {
     private List<RoleVO> roles;
 
     /// 组织机构ID
-    @JsonSerialize(using = ToStringSerializer.class)
-    private String organizationId;
+    private String departmentId;
 
     /// 组织机构名称
-    private String organizationName;
+    @NameFill(lookup = DepartmentServiceImpl.class,sourceField = "departmentId")
+    private String departmentName;
 
     /// 数据范围
     private DataScopeType dataScope;

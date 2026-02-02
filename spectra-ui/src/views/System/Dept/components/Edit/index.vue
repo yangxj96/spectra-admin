@@ -5,6 +5,7 @@ import { treeDefaultProps } from "@/utils/default-config.ts";
 import { departmentApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
+import { regionApi } from "@/api/system/region.ts";
 
 // model<
 const dialog = defineModel("show", {
@@ -31,6 +32,7 @@ const modify = computed(() => {
 // 表单
 const rules = ref<FormRules>({
     name: [{ required: true, message: "请输入部门名称", trigger: "blur" }],
+    region_id: [{ required: true, message: "请选择所属行政区划", trigger: "blur" }],
     type: [{ required: true, message: "请选择部门类型", trigger: "blur" }]
 });
 
@@ -63,15 +65,20 @@ async function handleOrganizationSave() {
 }
 
 // 懒加载行政区划
-const handleLoadRegion: LoadFunction = (node, resolve, reject) => {
-    console.log(`节点`, node);
-    if (node.level === 0) {
-        return resolve([{ id: "12333", code: "123", name: "region" }]);
-    }
-    // 构建参数
-    let params = {
-        level: node.level + 1,
-        id: node.data?.id
+const handleLoadRegion: LoadFunction = async (node, resolve) => {
+    try {
+        // 构建参数
+        const { code, msg, data } = await regionApi.load({
+            level: node.level + 1,
+            id: node.data?.id
+        });
+        if (code !== 200) {
+            MessageUtils.error(msg);
+            return;
+        }
+        resolve(data ?? []);
+    } catch (e) {
+        MessageUtils.error("获取行政区划失败");
     }
 };
 </script>
@@ -117,8 +124,15 @@ const handleLoadRegion: LoadFunction = (node, resolve, reject) => {
                 <el-form-item label="名称" prop="name">
                     <el-input v-model="form.name" clearable placeholder="请输入部门名称" />
                 </el-form-item>
-                <el-form-item label="区域" prop="area">
-                    <el-tree-select node-key="id" lazy :load="handleLoadRegion" clearable :props="treeDefaultProps" />
+                <el-form-item label="区域" prop="region_id">
+                    <el-tree-select
+                        v-model="form.region_id"
+                        node-key="id"
+                        lazy
+                        :load="handleLoadRegion"
+                        check-strictly="true"
+                        clearable
+                        :props="treeDefaultProps" />
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
                     <dict-select v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />

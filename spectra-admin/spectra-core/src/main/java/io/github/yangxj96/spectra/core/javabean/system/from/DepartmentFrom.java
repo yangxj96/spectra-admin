@@ -14,18 +14,16 @@
  *  limitations under the License.
  */
 
-package io.github.yangxj96.spectra.core.javabean.system.vo;
+package io.github.yangxj96.spectra.core.javabean.system.from;
 
-import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
+import io.github.yangxj96.spectra.common.base.Verify;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.List;
-
-/// 组织机构树形
+/// 组织机构入参
 ///
 /// @author Jack Young
 /// @version 1.0
@@ -33,11 +31,10 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializable {
+public class DepartmentFrom {
 
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+    @NotNull(message = "ID不能为空", groups = Verify.Update.class)
+    @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private String id;
 
     /// 上级ID
@@ -47,26 +44,16 @@ public class OrganizationTreeVo implements Tree<OrganizationTreeVo>, Serializabl
     private String name;
 
     /// 编码
+    @Null(message = "组织机构编码只能自动生成", groups = Verify.Insert.class)
     private String code;
 
     /// 组织机构类型
     private Short type;
 
-    /// 路径
-    private String path;
-
-    /// 组织机构所在地址
-    private String address;
-
-    /// 负责人ID
-    private Long managerId;
+    /// 行政区划ID
+    private String regionId;
 
     /// 备注
     private String remark;
 
-    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
-    private Integer sort = 0;
-
-    /// 下级菜单
-    private List<OrganizationTreeVo> children;
 }
