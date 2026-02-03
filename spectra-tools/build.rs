@@ -30,11 +30,11 @@ fn main() {
 
     match to_dir.canonicalize() {
         Ok(abs) => {
-            println!("cargo:warning=to_dir absolute path: {:?}", abs);
+            println!("cargo:info=to_dir absolute path: {:?}", abs);
         }
         Err(_) => {
             // 目录还不存在时 canonicalize 会失败
-            println!("cargo:warning=to_dir (not exist yet): {:?}", to_dir);
+            println!("cargo:info=to_dir (not exist yet): {:?}", to_dir);
         }
     }
 
@@ -43,8 +43,8 @@ fn main() {
     // === 复制 + 重命名 ===
     if from.exists() {
         fs::copy(&from, &dest).unwrap();
-        println!("cargo:warning=Copied & Renamed {:?} -> {:?}", from, dest);
+        println!("cargo:info=Copied & Renamed {:?} -> {:?}", from, dest);
     } else {
-        println!("cargo:warning=Library not found, skip copy: {:?}", from);
+        println!("cargo:info=Library not found, skip copy: {:?}", from);
     }
 }

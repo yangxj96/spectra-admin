@@ -61,7 +61,7 @@ public class LicenseRunner implements ApplicationRunner {
 
 
     @Override
-    public void run(@NonNull ApplicationArguments args) throws Exception {
+    public void run(@NonNull ApplicationArguments args) {
         // 测试加密解密功能
         var cryptoJNI = new CryptoJNI();
         var text = "Hello, Rust!";

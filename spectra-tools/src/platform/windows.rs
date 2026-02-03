@@ -28,16 +28,12 @@ pub struct Motherboard {
 impl PlatformSpecific for Windows {
     fn platform_specific_function(&self) -> String {
         let wmi = WMIConnection::new().unwrap();
-
         // 查询CPU序列号
         let cpu_info: Vec<Processor> = wmi.query().unwrap();
         let cpu_serial = cpu_info
             .get(0)
             .and_then(|cpu| cpu.processor_id.clone())
             .unwrap_or_else(|| "Unknown CPU".to_string());
-
-        println!("CPU序列号: {}", cpu_serial);
-
         // 查询内存条序列号
         let memory_info: Vec<Memory> = wmi.query().unwrap();
         let memory_serials: Vec<String> = memory_info
@@ -49,19 +45,13 @@ impl PlatformSpecific for Windows {
         } else {
             memory_serials.join("_") // 如果有多个内存条，使用 `_` 连接
         };
-
-        println!("内存条序列号: {}", memory_serial);
-
         // 查询主板序列号
         let motherboard_info: Vec<Motherboard> = wmi.query().unwrap();
         let motherboard_serial = motherboard_info
             .get(0)
             .and_then(|board| board.serial_number.clone())
             .unwrap_or_else(|| "Unknown Motherboard".to_string());
-
-        println!("主板序列号: {}", motherboard_serial);
-
-        // 拼接硬件信息
+        // 拼接硬件信息且返回
         format!("{}{}{}", cpu_serial, memory_serial, motherboard_serial)
     }
 }
