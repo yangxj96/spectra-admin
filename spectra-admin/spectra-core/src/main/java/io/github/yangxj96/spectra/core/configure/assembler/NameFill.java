@@ -5,14 +5,48 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/// 字段名称填充注解
+///
+/// 用于 VO（View Object）层，在仅持有 ID 字段的情况下，
+/// 通过指定的 {@link NameLookup} 实现类，
+/// 在响应阶段自动填充对应的「名称 / 展示值」字段。
+///
+/// 设计目标：
+/// * 避免在实体或 VO 中引入多余的冗余字段
+/// * 避免在 SQL 层进行强耦合 JOIN
+/// * 将「ID → Name」的装配逻辑统一收敛到 Assembler 层
+///
+/// 使用约束：
+/// * 只能用于 VO 层字段
+/// * 仅用于<strong>展示型字段</strong>，不得参与业务判断
+/// * lookup 必须是 {@link NameLookup} 的具体实现类（而非 Service 接口）
+///
+/// 示例：
+/// <pre>
+/// {@code
+/// @NameFill(
+///     lookup = DeptNameLookup.class,
+///     sourceField = "deptId"
+/// )
+/// private String deptName;
+/// }
+/// </pre>
+///
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface NameFill {
 
-    /// 使用哪个NameLookup,只能是实现类,不能是service的接口
+    /// 指定用于执行「ID → Name」映射的 Lookup 实现类
+    ///
+    /// 必须是 {@link NameLookup} 的具体实现类，
+    /// 而不是 Service 接口或抽象类，
+    /// 以确保语义清晰、职责单一。
     Class<? extends NameLookup<?>> lookup();
 
-    /// VO 中的 id 字段名
+    /// VO 中用于取值的 ID 字段名
+    ///
+    /// 该字段必须存在于当前 VO 类中，
+    /// 且其类型需与 lookup.idType() 返回的类型一致。
     String sourceField();
 
 }
