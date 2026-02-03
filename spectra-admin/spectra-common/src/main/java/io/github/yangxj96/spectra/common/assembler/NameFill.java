@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.core.configure.assembler;
+package io.github.yangxj96.spectra.common.assembler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

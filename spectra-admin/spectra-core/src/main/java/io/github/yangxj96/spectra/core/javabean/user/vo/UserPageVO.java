@@ -16,15 +16,13 @@
 
 package io.github.yangxj96.spectra.core.javabean.user.vo;
 
-import io.github.yangxj96.spectra.core.configure.assembler.NameFill;
+import io.github.yangxj96.spectra.common.assembler.NameFill;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.service.system.impl.DepartmentServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;

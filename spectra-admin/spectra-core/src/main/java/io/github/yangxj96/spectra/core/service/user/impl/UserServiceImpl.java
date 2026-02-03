@@ -25,14 +25,12 @@ import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
-import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
-import io.github.yangxj96.spectra.core.configure.assembler.NameFillExecutor;
+import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
 import io.github.yangxj96.spectra.core.javabean.user.entity.Role;
@@ -59,7 +57,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /// 用户service层-实现
 ///
@@ -292,9 +289,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
                 .in(StrUtils.isNotBlank(
-                        params.getOrganizationId()),
+                        params.getDepartmentId()),
                         User::getDepartmentId,
-                        departmentService.getSelfAndDescendantIds(params.getOrganizationId())
+                        departmentService.getSelfAndDescendantIds(params.getDepartmentId())
                 )
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
 
