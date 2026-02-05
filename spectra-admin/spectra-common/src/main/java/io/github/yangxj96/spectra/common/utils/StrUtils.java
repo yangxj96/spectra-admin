@@ -4,6 +4,12 @@ package io.github.yangxj96.spectra.common.utils;
 import com.google.common.base.Strings;
 import org.jspecify.annotations.Nullable;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
+
 /// 字符串工具类，替代 Apache Commons Lang3 的 StringUtils。
 ///
 ///  * 兼容 JDK 8+（包括 JDK 25）
@@ -65,6 +71,82 @@ public final class StrUtils {
         }
 
         return str.substring(start, end);
+    }
+
+    /// 按「最大字节数」安全截取（方案一:逐字符计算）
+    ///
+    /// 适用场景：
+    /// - 数据库 VARCHAR(n) 按字节限制
+    /// - 中文 / 英文 / 数字混合
+    /// - 业务系统首选（稳定、可读性好）
+    ///
+    /// 特性：
+    /// - 不会截断半个中文字符
+    /// - 超出 maxBytes 自动停止
+    /// - str 为 null 时返回 null
+    public static @Nullable String substringByByte(@Nullable String str, int maxBytes, Charset charset) {
+        if (str == null) {
+            return null;
+        }
+        if (maxBytes <= 0) {
+            return "";
+        }
+
+        int usedBytes = 0;
+        int endIndex = 0;
+
+        for (int i = 0; i < str.length(); i++) {
+            char ch = str.charAt(i);
+            int byteLen = String.valueOf(ch).getBytes(charset).length;
+
+            if (usedBytes + byteLen > maxBytes) {
+                break;
+            }
+
+            usedBytes += byteLen;
+            endIndex = i + 1;
+        }
+
+        return str.substring(0, endIndex);
+    }
+
+    /// UTF-8 快捷方法（最常用）
+    public static @Nullable String substringByByteUtf8(@Nullable String str, int maxBytes) {
+        return substringByByte(str, maxBytes, StandardCharsets.UTF_8);
+    }
+
+    /// 按「最大字节数」安全截取（方案二:CharsetEncoder）
+    ///
+    /// 适用场景：
+    /// - 高并发 / 大文本
+    /// - 对编码行为要求极严格
+    /// - 通用基础组件
+    ///
+    /// 特性：
+    /// - 由 CharsetEncoder 保证字符完整性
+    /// - 性能略优于逐字符方式
+    /// - 实现更底层、更专业
+    public static @Nullable String substringByByteWithEncoder(@Nullable String str, int maxBytes, Charset charset) {
+        if (str == null) {
+            return null;
+        }
+        if (maxBytes <= 0) {
+            return "";
+        }
+
+        CharsetEncoder encoder = charset.newEncoder();
+        ByteBuffer byteBuffer = ByteBuffer.allocate(maxBytes);
+        CharBuffer charBuffer = CharBuffer.wrap(str);
+
+        encoder.encode(charBuffer, byteBuffer, true);
+        byteBuffer.flip();
+
+        return charset.decode(byteBuffer).toString();
+    }
+
+    /// UTF-8 Encoder 快捷方法
+    public static @Nullable String substringByByteUtf8WithEncoder(@Nullable String str, int maxBytes) {
+        return substringByByteWithEncoder(str, maxBytes, StandardCharsets.UTF_8);
     }
 
     /// 将字符串转换为 camelCase 或 PascalCase 格式
