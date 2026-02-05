@@ -7,10 +7,9 @@ defineOptions({
     name: "DictSelect"
 });
 
-const model = defineModel({
-    type: [String, Number, null] as PropType<string | number | null | undefined>,
+const model = defineModel<string | number | null>({
     required: true,
-    default: undefined
+    default: null
 });
 
 const dict_code = defineModel("dict_code", {
@@ -31,7 +30,7 @@ const localComputed = computed({
         return localValue.value ?? "";
     },
     set(val: string | number) {
-        localValue.value = val === "" ? undefined : Number.isNaN(Number(val)) ? val : Number(val);
+        localValue.value = val ?? undefined;
         model.value = localValue.value;
     }
 });

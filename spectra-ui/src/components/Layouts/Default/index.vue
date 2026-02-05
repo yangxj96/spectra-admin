@@ -44,7 +44,6 @@ function handleDarkSwitch(val: unknown) {
 
 function handlerRouter(r: RouteLocationMatched[] = []) {
     const current = router.currentRoute.value;
-    console.log(`当前路由:`, current);
     // ① 优先使用 meta.crumbs
     const crumbs = current.meta?.crumbs;
     if (Array.isArray(crumbs) && crumbs.length > 0) {

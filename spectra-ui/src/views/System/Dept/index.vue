@@ -71,7 +71,7 @@ function handleDialogClose() {
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <el-table :data="table_data" height="100%" stripe default-expand-all row-key="id">
+        <el-table :data="table_data" height="100%" border stripe default-expand-all row-key="id">
             <el-table-column align="center" width="060" type="index" label="序号" />
             <el-table-column align="center" width="200" prop="name" label="名称" />
             <el-table-column align="center" width="300" prop="code" label="编码" />
@@ -124,6 +124,8 @@ function handleDialogClose() {
 }
 
 .box-body {
+    padding-left: 1vw;
+    padding-right: 1vw;
     height: 90%;
 }
 </style>

@@ -65,7 +65,7 @@ public class LicenseRunner implements ApplicationRunner {
         // 测试加密解密功能
         var cryptoJNI = new CryptoJNI();
         var text = "Hello, Rust!";
-        log.info("元数据:{}", Arrays.toString(text.getBytes()));
+        log.info("元数据: {}", Arrays.toString(text.getBytes()));
         var encrypted = cryptoJNI.encrypt(text.getBytes());
         log.info("加密后: {}", Arrays.toString(encrypted));
         var decrypted = cryptoJNI.decrypt(encrypted);

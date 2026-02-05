@@ -78,7 +78,7 @@ const handleLoadRegion: LoadFunction = async (node, resolve) => {
         }
         resolve(data ?? []);
     } catch (e) {
-        MessageUtils.error("获取行政区划失败");
+        MessageUtils.error(`获取行政区划失败:${(e as Error).message}`);
     }
 };
 </script>
@@ -130,7 +130,7 @@ const handleLoadRegion: LoadFunction = async (node, resolve) => {
                         node-key="id"
                         lazy
                         :load="handleLoadRegion"
-                        check-strictly="true"
+                        check-strictly
                         clearable
                         :props="treeDefaultProps" />
                 </el-form-item>
