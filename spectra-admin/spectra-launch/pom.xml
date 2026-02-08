@@ -33,6 +33,12 @@
             <version>${project.version}</version>
         </dependency>
         <!-- 核心 不可移除 End -->
+        <!-- 自定义security,完整引入,认证生效 -->
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-security-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- 工作流 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
