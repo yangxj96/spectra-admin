@@ -25,6 +25,8 @@ import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 
+import java.util.List;
+
 /// 用户service层
 ///
 /// @author Jack Young
@@ -62,6 +64,6 @@ public interface UserService extends BaseService<User> {
     /// 分页获取在线用户
     ///
     /// @return 获取到的数据
-    IPage<UserOnlineVO> online(PageFrom page);
+    List<UserOnlineVO> online(PageFrom page);
 
 }

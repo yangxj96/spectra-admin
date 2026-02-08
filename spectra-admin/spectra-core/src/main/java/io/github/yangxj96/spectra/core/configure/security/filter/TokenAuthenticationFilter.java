@@ -4,6 +4,7 @@ package io.github.yangxj96.spectra.core.configure.security.filter;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
+import io.github.yangxj96.spectra.core.configure.security.renew.SessionRenewService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,12 @@ import java.io.IOException;
 @NullMarked
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private final SessionRenewService sessionRenewService;
+
+    public TokenAuthenticationFilter(SessionRenewService sessionRenewService) {
+        this.sessionRenewService = sessionRenewService;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String token = SecUtil.getCurrentToken();
@@ -35,6 +42,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 // token 无效
                 throw new InsufficientAuthenticationException("Token 无效或已过期");
             }
+            // 🔑 认证成功后，尝试续期（不关心结果）
+            sessionRenewService.tryRenew(token);
             // 构建 Authentication 对象
             var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
             // 绑定到 SecurityContext

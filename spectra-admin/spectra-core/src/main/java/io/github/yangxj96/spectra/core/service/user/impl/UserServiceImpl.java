@@ -29,7 +29,10 @@ import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
+import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
+import io.github.yangxj96.spectra.core.configure.security.javabean.AuthRedisKey;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
+import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
@@ -48,15 +51,16 @@ import io.github.yangxj96.spectra.core.service.auth.AccountService;
 import io.github.yangxj96.spectra.core.service.system.DepartmentService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.time.Instant;
+import java.util.*;
 
 /// 用户service层-实现
 ///
@@ -87,6 +91,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final UserDataScopeTargetMapper dataScopeTargetMapper;
 
     private final NameFillExecutor fillExecutor;
+
+    @Resource(name = "securityRedisTemplate")
+    private RedisTemplate<String, Object> redis;
 
     public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper, NameFillExecutor fillExecutor) {
         this.userConverter = userConverter;
@@ -158,8 +165,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == user) {
             throw new DataNotExistException("用户不存在");
         }
-        // TODO 根据用户强制注销账号登录信息
-        //SecUtil.kick(user.getId());
+        // 根据用户强制注销账号登录信息
+        SecUtil.kick(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 删除账号信息
@@ -331,7 +338,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
-    public IPage<UserOnlineVO> online(PageFrom page) {
-        return null;
+    public List<UserOnlineVO> online(PageFrom page) {
+        return SecUtil.online();
     }
 }

@@ -25,7 +25,8 @@ public class SecurityProperties {
             "/actuator/**"
     ));
 
-    ///  token有效期时长
+    /// token有效期时长(秒)
+    /// 暂时未启用
     private Long tokenExpire = 7200L;
 
     /// 超管角色名称

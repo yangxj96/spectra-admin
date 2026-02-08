@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.PatternTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.security.jackson.SecurityJacksonModules;
 import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
@@ -37,7 +39,7 @@ public class SecurityJacksonModuleConfiguration {
         return om.rebuild()
                 .addModules(SecurityJacksonModules.getModules(getClass().getClassLoader(),
                         BasicPolymorphicTypeValidator.builder()
-                                .allowIfSubType("io.github.yangxj96.spectra")
+                                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
                                 .allowIfSubType("java.util")))
                 .activateDefaultTyping(
                         BasicPolymorphicTypeValidator.builder()
@@ -59,5 +61,18 @@ public class SecurityJacksonModuleConfiguration {
         log.debug(PREFIX + "开始配置Security使用的RedisTemplate");
         return RedisTemplateFactory.build(factory, om);
     }
+
+    /// Redis消息监听bean
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory,SecurityRedisKeyExpirationListener listener) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(factory);
+        container.addMessageListener(
+                listener,
+                new PatternTopic("__keyevent@*__:expired")
+        );
+        return container;
+    }
+
 
 }

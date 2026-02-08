@@ -3,17 +3,19 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
-import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
+import io.github.yangxj96.spectra.core.configure.security.javabean.AuthRedisKey;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
+import io.github.yangxj96.spectra.core.configure.security.renew.DefaultTokenTtlStrategy;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
+import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.service.common.IpLocationService;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +27,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -38,19 +41,28 @@ import java.util.concurrent.TimeUnit;
 @Component("sec")
 public class RedisSecHolder implements SecHolder {
 
-    @Resource(name = "securityObjectMapper")
-    private ObjectMapper om;
+    private final ObjectMapper om;
 
-    @Resource(name = "securityRedisTemplate")
-    private RedisTemplate<String, Object> redis;
+    private final RedisTemplate<String, Object> redis;
 
-    @Resource
-    private IpLocationService ipLocationService;
+    private final IpLocationService ipLocationService;
 
-    @Resource
-    private SecurityProperties properties;
+    private final SecurityProperties properties;
 
-    public RedisSecHolder() {
+    private final DefaultTokenTtlStrategy tokenTtlStrategy;
+
+    public RedisSecHolder(@Qualifier("securityObjectMapper")
+                          ObjectMapper om,
+                          @Qualifier("securityRedisTemplate")
+                          RedisTemplate<String, Object> redis,
+                          IpLocationService ipLocationService,
+                          SecurityProperties properties,
+                          DefaultTokenTtlStrategy tokenTtlStrategy) {
+        this.om = om;
+        this.redis = redis;
+        this.ipLocationService = ipLocationService;
+        this.properties = properties;
+        this.tokenTtlStrategy = tokenTtlStrategy;
         SecUtil.setHolder(this);
     }
 
@@ -66,9 +78,14 @@ public class RedisSecHolder implements SecHolder {
 
     @Override
     public TokenVO createToken(SecurityUser user, LoginType loginType) {
-        // token 生成
+        // =======================
+        // 1. 生成 token
+        // =======================
         String token = UUID.randomUUID().toString().toUpperCase();
-        // 扩展内容
+
+        // =======================
+        // 2. 扩展信息
+        // =======================
         if (user.getExtraData() == null) {
             user.setExtraData(new HashMap<>());
         }
@@ -76,11 +93,14 @@ public class RedisSecHolder implements SecHolder {
         extra.put("ip", IpUtils.getClientIP(this.getHttpServletRequest()));
         extra.put("address", ipLocationService.getCityEn(extra.get("ip").toString()));
 
+        // =======================
+        // 3. 权限拆分
+        // =======================
         // 安全获取权限列表，防止 user.getAuthorities() 本身为 null
-        Collection<? extends GrantedAuthority> authoritiesList = user.getAuthorities();
+        var authoritiesList = user.getAuthorities();
 
-        List<String> roles = new ArrayList<>();
-        List<String> authorities = new ArrayList<>();
+        var roles = new ArrayList<String>();
+        var authorities = new ArrayList<String>();
 
         for (GrantedAuthority ga : authoritiesList) {
             // 显式检查 getAuthority() 是否为 null
@@ -96,7 +116,9 @@ public class RedisSecHolder implements SecHolder {
             }
         }
 
-        // 构造响应对象
+        // =======================
+        // 4. 构造 TokenVO（返回用）
+        // =======================
         var tokenInfo = TokenVO.builder()
                 .id(user.getId())
                 .loginType(loginType)
@@ -106,58 +128,208 @@ public class RedisSecHolder implements SecHolder {
                 .roles(roles)
                 .build();
 
+        // =======================
+        // 5. 写入 SecurityContext（保留）
+        // =======================
+
         // 确保所有流程都结束且没发生错误,才进行 security 上下文设置
         // 把当前用户信息放到上下文中,主要是为了日志记录的时候登录接口无法获取到当前用户信息
         var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        // KEY 格式化
-        // 默认用户名密码
-        var redisLoginType = RedisCacheKey.AUTH_LOGIN_TYPE.formatted(loginType.getName(), user.getId());
-        var redisToken = RedisCacheKey.AUTH_TOKEN.formatted(tokenInfo.getAccessToken());
-        var redisSecurity = RedisCacheKey.AUTH_SECURITY.formatted(tokenInfo.getAccessToken());
-        var redisTokenUser = RedisCacheKey.AUTH_TOKEN_USER.formatted(tokenInfo.getAccessToken());
-        var redisUserLoginTypes = RedisCacheKey.AUTH_USER_LOGIN_TYPES.formatted(user.getId());
-        //存储
-        var ops = redis.opsForValue();
-        ops.set(redisLoginType, tokenInfo.getAccessToken(), properties.getTokenExpire(), TimeUnit.SECONDS);
-        ops.set(redisToken, tokenInfo, properties.getTokenExpire(), TimeUnit.SECONDS);
-        ops.set(redisSecurity, user, properties.getTokenExpire(), TimeUnit.SECONDS);
-        ops.set(redisTokenUser, user.getId(), properties.getTokenExpire(), TimeUnit.SECONDS);
-        redis.opsForSet().add(redisUserLoginTypes, loginType.getName());
+        // =======================
+        // 6. Redis Key 准备
+        // =======================
+        var sessionKey = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
+        var tokenUserKey = AuthRedisKey.TOKEN_USER.format(token);
+        var userTokensKey = AuthRedisKey.USER_TOKENS.format(user.getId());
+        var userClientTokensKey = AuthRedisKey.USER_CLIENT_TOKENS.format(
+                user.getId(), loginType.getName()
+        );
+        var userDetailsKey = AuthRedisKey.USER_DETAIL.format(user.getId());
+        var onlineUsersKey = AuthRedisKey.ONLINE_USER_IDS.getPattern();
+
+        long ttl = tokenTtlStrategy.resolveTtlSeconds(loginType, "BROWSER");
+
+        // =======================
+        // 7. 构造 Session 数据（事实源）
+        // =======================
+        var sessionData = new HashMap<String, Object>();
+        sessionData.put("userId", user.getId());
+        sessionData.put("username", user.getEmail());
+        sessionData.put("loginType", loginType.getName());
+        // 如果区分 clientType，建议单独字段
+        sessionData.put("clientType", "browser");
+        sessionData.put("ip", extra.get("ip"));
+        sessionData.put("address", extra.get("address"));
+        sessionData.put("loginTime", System.currentTimeMillis());
+        sessionData.put("lastActiveTime", System.currentTimeMillis());
+        // 动态续期使用
+        sessionData.put("ttlSeconds", ttl);
+        sessionData.put("lastActiveAt", System.currentTimeMillis());
+
+        // =======================
+        // 8. 写入 Redis（核心）
+        // =======================
+        redis.opsForHash().putAll(sessionKey, sessionData);
+        redis.expire(sessionKey, ttl, TimeUnit.SECONDS);
+
+        redis.opsForValue().set(tokenUserKey, user.getId());
+        redis.opsForSet().add(userTokensKey, token);
+        redis.opsForSet().add(userClientTokensKey, token);
+
+        // 用户详情
+        // TODO 暂时不设置时长,但是后期要改成短时间,超时需要从db中读取
+        redis.opsForValue().set(userDetailsKey, user);
+
+        redis.opsForSet().add(onlineUsersKey, user.getId());
+        redis.opsForSet().add(AuthRedisKey.SESSION_ONLINE.getPattern(), token);
 
         return tokenInfo;
     }
 
     @Override
     public void deleteToken(String token) {
-        // 先获取 token 的详细信息（包含 userId 和 loginType）
-        var tokenKey = RedisCacheKey.AUTH_TOKEN.formatted(token);
-        var tokenInfoObj = redis.opsForValue().get(tokenKey);
+        // =======================
+        // 1. session 事实源 key
+        // =======================
+        String sessionKey = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
 
-        if (!(tokenInfoObj instanceof TokenVO tokenInfo)) {
-            // Token 不存在或已过期，可视为已登出
+        // session 不存在，说明已过期或已删除
+        if (!Boolean.TRUE.equals(redis.hasKey(sessionKey))) {
             return;
         }
 
-        var userId = tokenInfo.getId();
-        var loginType = tokenInfo.getLoginType().getName();
+        // =======================
+        // 2. 从 session 中读取必要字段
+        // =======================
+        Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
+        Object clientTypeObj = redis.opsForHash().get(sessionKey, "clientType");
 
-        // 2. 删除 token 相关的所有 key
-        redis.delete(RedisCacheKey.AUTH_TOKEN.formatted(token));
-        redis.delete(RedisCacheKey.AUTH_SECURITY.formatted(token));
-        redis.delete(RedisCacheKey.AUTH_TOKEN_USER.formatted(token));
-
-        // 检查并清除 "当前活跃 Token"（防止顶号后旧 token 仍被误认为有效）
-        var currentLoginTypeKey = RedisCacheKey.AUTH_LOGIN_TYPE.formatted(loginType, userId);
-        var currentToken = redis.opsForValue().get(currentLoginTypeKey);
-        if (token.equals(currentToken)) {
-            // 只有当前 token 是活跃 token 时才删除，避免误删新登录的 token
-            redis.delete(currentLoginTypeKey);
+        if (userIdObj == null || clientTypeObj == null) {
+            // session 数据不完整，直接清理 session
+            redis.delete(sessionKey);
+            return;
         }
 
-        // 从用户登录方式集合中移除该 loginType
-        redis.opsForSet().remove(RedisCacheKey.AUTH_USER_LOGIN_TYPES.formatted(userId), loginType);
+        String userId = userIdObj.toString();
+        String clientType = clientTypeObj.toString();
+
+        // =======================
+        // 3. 构造关联 key
+        // =======================
+        String tokenUserKey = AuthRedisKey.TOKEN_USER.format(token);
+        String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
+        String userClientTokensKey = AuthRedisKey.USER_CLIENT_TOKENS.format(userId, clientType);
+        String onlineUsersKey = AuthRedisKey.ONLINE_USER_IDS.getPattern();
+        String userDetailsKey = AuthRedisKey.USER_DETAIL.format(userId);
+
+        // =======================
+        // 4. 删除 token 相关数据
+        // =======================
+        redis.delete(sessionKey);
+        redis.delete(tokenUserKey);
+
+        redis.opsForSet().remove(userTokensKey, token);
+        redis.opsForSet().remove(userClientTokensKey, token);
+        redis.opsForSet().remove(AuthRedisKey.SESSION_ONLINE.getPattern(), token);
+
+
+        // =======================
+        // 5. 如果用户已无任何 token，移出在线用户
+        // =======================
+        Long remain = redis.opsForSet().size(userTokensKey);
+        if (remain == null || remain == 0) {
+            redis.opsForSet().remove(onlineUsersKey, userId);
+            // 同时移除用户详情
+            redis.delete(userDetailsKey);
+        }
+    }
+
+    @Override
+    public void deleteByUserId(String userId) {
+        String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
+
+        Set<Object> tokens = redis.opsForSet().members(userTokensKey);
+        if (tokens == null || tokens.isEmpty()) {
+            return;
+        }
+
+        for (Object tokenObj : tokens) {
+            deleteToken(tokenObj.toString());
+        }
+    }
+
+    @Override
+    public void deleteByUserIdAndClient(String userId, LoginType clientType) {
+        String userClientTokensKey =
+                AuthRedisKey.USER_CLIENT_TOKENS.format(userId, clientType.getName());
+
+        Set<Object> tokens = redis.opsForSet().members(userClientTokensKey);
+        if (tokens == null || tokens.isEmpty()) {
+            return;
+        }
+
+        for (Object tokenObj : tokens) {
+            deleteToken(tokenObj.toString());
+        }
+    }
+
+    @Override
+    public List<UserOnlineVO> listOnlineUsers() {
+        Set<Object> tokens = redis.opsForSet()
+                .members(AuthRedisKey.SESSION_ONLINE.getPattern());
+
+        if (tokens == null || tokens.isEmpty()) {
+            return List.of();
+        }
+
+        List<UserOnlineVO> result = new ArrayList<>();
+
+        for (Object tokenObj : tokens) {
+            String token = tokenObj.toString();
+
+            String sessionKey = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
+
+            Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
+
+            if (session == null || session.isEmpty()) {
+                // session 已过期，顺手清理脏 token
+                redis.opsForSet().remove(AuthRedisKey.SESSION_ONLINE.getPattern(), token);
+                continue;
+            }
+
+            String userId = Objects.toString(session.get("userId"), null);
+            if (userId == null) {
+                continue;
+            }
+
+            // 从 USER_DETAIL 取用户信息
+            Object userObj = redis.opsForValue()
+                    .get(AuthRedisKey.USER_DETAIL.format(userId));
+
+            if (userObj == null) {
+                continue;
+            }
+
+            SecurityUser user = om.convertValue(userObj, SecurityUser.class);
+
+            result.add(
+                    UserOnlineVO.builder()
+                            .token(token)
+                            .userId(userId)
+                            .username(user.getUsername())
+                            .loginType(Objects.toString(session.get("loginType"), null))
+                            .ip(Objects.toString(session.get("ip"), null))
+                            .address(Objects.toString(session.get("address"), null))
+                            .loginTime(Instant.ofEpochMilli(
+                                    Long.parseLong(session.get("loginTime").toString())
+                            ))
+                            .build()
+            );
+        }
+
+        return result;
     }
 
     @Override
@@ -178,14 +350,25 @@ public class RedisSecHolder implements SecHolder {
 
     @Override
     public @Nullable SecurityUser getCurrentUser(String token) {
-        // 否则尝试从 redis 获取
-        var ops = redis.opsForValue();
-        var securityKey = RedisCacheKey.AUTH_SECURITY.formatted(token);
-        Object o = ops.get(securityKey);
-        if (o == null) {
+        // 1. 校验 session 是否存在（事实源）
+        String sessionKey = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
+
+        Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
+        if (userIdObj == null) {
+            return null; // token 无效 / 过期
+        }
+
+        String userId = userIdObj.toString();
+
+        // 2. 直接从 USER_DETAIL 取 SecurityUser
+        String userKey = AuthRedisKey.USER_DETAIL.format(userId);
+
+        Object cachedUser = redis.opsForValue().get(userKey);
+        if (cachedUser == null) {
             return null;
         }
-        return om.convertValue(o, SecurityUser.class);
+
+        return om.convertValue(cachedUser, SecurityUser.class);
     }
 
     @Override
@@ -210,7 +393,6 @@ public class RedisSecHolder implements SecHolder {
 
 
     //--------------------------  辅助方法  --------------------------------//
-
 
     /// 从 SpringSecurity 上下文获取用户信息
     ///

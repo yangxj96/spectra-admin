@@ -1,11 +1,15 @@
 package io.github.yangxj96.spectra.core.configure.security.holder;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.exception.SpectraException;
 import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
+import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /// Security 静态工具类
 ///
@@ -63,6 +67,18 @@ public class SecUtil {
             throw new SpectraException("无Token/Token无效");
         }
         logout(token);
+    }
+
+    /// 根据用户ID踢出用户
+    ///
+    /// @param id 用户ID
+    public static void kick(String id) {
+        getHolder().deleteByUserId(id);
+    }
+
+    /// 获取在线用户列表
+    public static List<UserOnlineVO> online() {
+        return getHolder().listOnlineUsers();
     }
 
     /// 根据用户 token 获取用户信息

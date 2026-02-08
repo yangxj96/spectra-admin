@@ -30,6 +30,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /// 用户控制器
 ///
 /// @author Jack Young
@@ -82,7 +84,7 @@ public class UserController {
 
     @ULog("获取在线用户")
     @GetMapping("/online")
-    public IPage<UserOnlineVO> online(PageFrom page) {
+    public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }
 }

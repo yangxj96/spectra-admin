@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from "vue";
-import { type FormInstance, type FormRules, type LoadFunction } from "element-plus";
+import { type FormInstance, type FormRules } from "element-plus";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { departmentApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { regionApi } from "@/api/system/region.ts";
+import RegionSelectLazy from "@/components/RegionSelectLazy/index.vue";
 
 // model<
 const dialog = defineModel("show", {
@@ -63,24 +63,6 @@ async function handleOrganizationSave() {
         console.log(error);
     }
 }
-
-// 懒加载行政区划
-const handleLoadRegion: LoadFunction = async (node, resolve) => {
-    try {
-        // 构建参数
-        const { code, msg, data } = await regionApi.load({
-            level: node.level + 1,
-            id: node.data?.id
-        });
-        if (code !== 200) {
-            MessageUtils.error(msg);
-            return;
-        }
-        resolve(data ?? []);
-    } catch (e) {
-        MessageUtils.error(`获取行政区划失败:${(e as Error).message}`);
-    }
-};
 </script>
 
 <template>
@@ -125,14 +107,7 @@ const handleLoadRegion: LoadFunction = async (node, resolve) => {
                     <el-input v-model="form.name" clearable placeholder="请输入部门名称" />
                 </el-form-item>
                 <el-form-item label="区域" prop="region_id">
-                    <el-tree-select
-                        v-model="form.region_id"
-                        node-key="id"
-                        lazy
-                        :load="handleLoadRegion"
-                        check-strictly
-                        clearable
-                        :props="treeDefaultProps" />
+                    <region-select-lazy v-model="form.region_id" :name="form.region_name" />
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
                     <dict-select v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />

@@ -27,7 +27,7 @@ const localValue = ref<string | number | undefined>(undefined);
 // 计算绑定，保证双向绑定
 const localComputed = computed({
     get() {
-        return localValue.value ?? "";
+        return localValue.value ?? undefined;
     },
     set(val: string | number) {
         localValue.value = val ?? undefined;

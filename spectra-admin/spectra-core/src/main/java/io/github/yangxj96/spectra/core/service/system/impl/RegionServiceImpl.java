@@ -33,14 +33,6 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         this.converter = converter;
     }
 
-    @Override
-    public List<RegionVO> lazyTree(Integer level, String id) {
-        List<Region> regions = lambdaQuery()
-                .eq(Region::getLevel, RegionLevel.of(level))
-                .eq(StrUtils.isNotBlank(id), Region::getPid, id)
-                .list();
-        return converter.toVOList(regions);
-    }
 
     @Override
     public Map<String, String> getNameMap(Set<String> ids) {
@@ -51,6 +43,15 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
                 .in(BaseEntity::getId, ids)
                 .list()
                 .stream()
-                .collect(Collectors.toMap(BaseEntity::getId, Region::getName));
+                .collect(Collectors.toMap(BaseEntity::getId, Region::getFullName));
+    }
+
+    @Override
+    public List<RegionVO> lazyTree(Integer level, String id) {
+        List<Region> regions = lambdaQuery()
+                .eq(Region::getLevel, RegionLevel.of(level))
+                .eq(StrUtils.isNotBlank(id), Region::getPid, id)
+                .list();
+        return converter.toVOList(regions);
     }
 }

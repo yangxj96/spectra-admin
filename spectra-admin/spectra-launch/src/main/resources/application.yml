@@ -139,7 +139,7 @@ logging:
       io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
-    other: error
+    other: debug
     spectra: debug
     mp: error
   charset:

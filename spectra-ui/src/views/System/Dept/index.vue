@@ -83,7 +83,7 @@ function handleDialogClose() {
                     <dict-tag v-model="scope.row.type" dict_code="sys_organization_type" />
                 </template>
             </el-table-column>
-            <el-table-column align="center" width="150" prop="region_name" label="所在区域" />
+            <el-table-column align="center" width="150" prop="region_name" label="所在区域" show-overflow-tooltip />
             <el-table-column align="center" prop="remark" label="说明" show-overflow-tooltip />
             <el-table-column align="center" width="180" label="操作">
                 <template #default="scope">

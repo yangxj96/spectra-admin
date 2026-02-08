@@ -55,6 +55,8 @@ declare global {
         path: string;
         // 备注
         remark?: string;
+        // VO扩展字段,行政区划名称
+        region_name: string;
     };
 
     // 组织机构树形

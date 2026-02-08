@@ -17,10 +17,10 @@
 package io.github.yangxj96.spectra.core.service.common.impl;
 
 import com.google.code.kaptcha.Producer;
-import io.github.yangxj96.spectra.common.constant.RedisKey;
 import io.github.yangxj96.spectra.common.exception.KaptchaExpiresException;
 import io.github.yangxj96.spectra.common.exception.ReadPropertiesException;
 import io.github.yangxj96.spectra.core.configure.kaptcha.properties.KaptchaProperties;
+import io.github.yangxj96.spectra.core.configure.redis.RedisCacheKey;
 import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -90,7 +90,7 @@ public class KaptchaServiceImpl implements KaptchaService {
 
         // 存储到缓存中
         redisTemplate.opsForValue().set(
-                RedisKey.KAPTCHA + request.getSession().getId(),
+                RedisCacheKey.KAPTCHA + request.getSession().getId(),
                 code,
                 properties.getDuration()
         );
@@ -109,7 +109,7 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     @Override
     public String getKaptchaCode() {
-        var key = RedisKey.KAPTCHA + request.getSession().getId();
+        var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
         var val = redisTemplate.opsForValue().get(key);
         if (val == null) {
             throw new KaptchaExpiresException("验证码过期");
@@ -120,7 +120,7 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     @Override
     public void deleteBySessionId() {
-        var key = RedisKey.KAPTCHA + request.getSession().getId();
+        var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
         redisTemplate.delete(key);
     }
 }

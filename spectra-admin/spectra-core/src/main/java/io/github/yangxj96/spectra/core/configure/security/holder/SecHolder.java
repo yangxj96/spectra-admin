@@ -4,7 +4,10 @@ package io.github.yangxj96.spectra.core.configure.security.holder;
 import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
 import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.vo.TokenVO;
+import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import org.jspecify.annotations.Nullable;
+
+import java.util.List;
 
 /// Token存储相关
 ///
@@ -35,6 +38,20 @@ public interface SecHolder {
     ///
     /// @param token token
     void deleteToken(String token);
+
+    /// 根据用户id删除他的所有登录信息
+    ///
+    /// @param userId 用户ID
+    void deleteByUserId(String userId);
+
+    /// 根据用户id删除指定客户端类型的登录信息
+    ///
+    /// @param userId     用户ID
+    /// @param clientType 客户端类型
+    void deleteByUserIdAndClient(String userId, LoginType clientType);
+
+    /// 获取在线用户
+    List<UserOnlineVO> listOnlineUsers();
 
     /// 获取当前用户信息
     ///
