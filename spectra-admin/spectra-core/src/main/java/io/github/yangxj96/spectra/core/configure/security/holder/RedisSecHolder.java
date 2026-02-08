@@ -205,6 +205,7 @@ public class RedisSecHolder implements SecHolder {
         // =======================
         Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
         Object clientTypeObj = redis.opsForHash().get(sessionKey, "clientType");
+        Object loginTypeObj = redis.opsForHash().get(sessionKey, "loginType");
 
         if (userIdObj == null || clientTypeObj == null) {
             // session 数据不完整，直接清理 session
@@ -214,6 +215,7 @@ public class RedisSecHolder implements SecHolder {
 
         String userId = userIdObj.toString();
         String clientType = clientTypeObj.toString();
+        String loginType = loginTypeObj.toString();
 
         // =======================
         // 3. 构造关联 key
@@ -233,6 +235,7 @@ public class RedisSecHolder implements SecHolder {
         redis.opsForSet().remove(userTokensKey, token);
         redis.opsForSet().remove(userClientTokensKey, token);
         redis.opsForSet().remove(AuthRedisKey.SESSION_ONLINE.getPattern(), token);
+        redis.opsForSet().remove(AuthRedisKey.USER_CLIENT_TOKENS.format(userId, loginType), token);
 
 
         // =======================

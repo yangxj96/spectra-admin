@@ -71,5 +71,8 @@ public class SecurityRedisKeyExpirationListener implements MessageListener {
             redis.opsForSet()
                     .remove(AuthRedisKey.ONLINE_USER_IDS.getPattern(), userId);
         }
+
+        // 清理用户的 client token
+        redis.opsForSet().remove(AuthRedisKey.USER_CLIENT_TOKENS.format(userId, token), token);
     }
 }
