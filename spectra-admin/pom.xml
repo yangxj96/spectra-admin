@@ -48,11 +48,7 @@
         <module>./spectra-modules/spectra-workflow</module>
         <module>./spectra-modules/spectra-license</module>
 
-        <!-- security starter包 -->
-        <module>./spectra-starter/spectra-security-api</module>
-        <module>./spectra-starter/spectra-security-method-starter</module>
-        <module>./spectra-starter/spectra-security-web-starter</module>
-        <module>./spectra-starter/spectra-security-auth-starter</module>
+        <!-- starter包 -->
         <module>./spectra-starter/spectra-security-starter</module>
     </modules>
 

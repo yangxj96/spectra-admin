@@ -23,26 +23,14 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-api</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-method-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-web-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-auth-starter</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aspectj</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

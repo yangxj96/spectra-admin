@@ -22,11 +22,10 @@
 
     <dependencies>
 
-        <!-- 自定义security，保底引入，可以使用注解，但是无效 -->
+        <!-- 只引入security的核心包,不会自动配置启用,但是能使用他的相关注解 -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-api</artifactId>
-            <version>${project.version}</version>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
         </dependency>
 
         <!-- 通用工具包 Begin -->
