@@ -1,8 +1,6 @@
 package io.github.yangxj96.spectra.core.controller.system;
 
 
-import io.github.yangxj96.spectra.common.constant.RegionLevel;
-import io.github.yangxj96.spectra.core.javabean.system.entity.Region;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RegionVO;
 import io.github.yangxj96.spectra.core.service.system.RegionService;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -19,14 +19,14 @@ package io.github.yangxj96.spectra.core.service.system.impl;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
+import io.github.yangxj96.spectra.common.assembler.NameLookup;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.constant.Common;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.TreeBuilder;
-import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
-import io.github.yangxj96.spectra.common.assembler.NameLookup;
 import io.github.yangxj96.spectra.core.javabean.system.converter.OrganizationConverter;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Department;
 import io.github.yangxj96.spectra.core.javabean.system.from.DepartmentFrom;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 /// @version 1.0
 /// @since 2025-6-15
 @Service
-@CacheConfig(cacheNames = "core:dept",keyGenerator = "standardCacheKeyGenerator")
+@CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<String> {
 
     private final OrganizationConverter organizationConverter;

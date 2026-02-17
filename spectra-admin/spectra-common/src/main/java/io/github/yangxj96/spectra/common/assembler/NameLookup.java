@@ -39,6 +39,7 @@ public interface NameLookup<ID> {
     /// 返回 Map 中:
     /// * Key:ID
     /// * Value:对应的展示名称
+    ///
     /// @param ids ID 集合（不为空）
     /// @return ID → Name 的映射关系
     Map<ID, String> getNameMap(Set<ID> ids);

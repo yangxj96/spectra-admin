@@ -26,11 +26,11 @@ import org.jspecify.annotations.Nullable;
 /// @since 2025-6-14
 public final class Common {
 
-    private Common() {
-    }
-
     /// 默认的PID
     @Nullable
     public static final String PID = null;
+
+    private Common() {
+    }
 
 }

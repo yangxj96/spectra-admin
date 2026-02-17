@@ -16,8 +16,8 @@
 
 package io.github.yangxj96.spectra.core.javabean.system.vo;
 
-import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 import io.github.yangxj96.spectra.common.assembler.NameFill;
+import io.github.yangxj96.spectra.common.base.javabean.vo.Tree;
 import io.github.yangxj96.spectra.core.service.system.impl.RegionServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.Data;

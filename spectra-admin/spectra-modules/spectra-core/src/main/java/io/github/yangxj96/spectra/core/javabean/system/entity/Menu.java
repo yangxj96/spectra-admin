@@ -19,7 +19,6 @@ package io.github.yangxj96.spectra.core.javabean.system.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;

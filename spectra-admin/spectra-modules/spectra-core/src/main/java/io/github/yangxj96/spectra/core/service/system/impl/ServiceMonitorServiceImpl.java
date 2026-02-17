@@ -37,6 +37,37 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     private static final String UNKNOWN = "Unknown";
 
+    /**
+     * 过滤敏感属性,只保留常见属性,防止泄露
+     *
+     * @return 属性 map
+     */
+    private static Map<String, String> getFilteredProps() {
+        var systemProps = System.getProperties();
+        var filteredProps = new HashMap<String, String>();
+        // 只保留常见的、非敏感的系统属性
+        List<String> includedKeys = Arrays.asList(
+                "os.name",
+                "os.version",
+                "os.arch",
+                "user.name",
+                "user.home",
+                "user.dir",
+                "file.separator",
+                "path.separator",
+                "line.separator",
+                "java.class.version",
+                "java.io.tmpdir"
+        );
+        for (String key : includedKeys) {
+            String value = systemProps.getProperty(key);
+            if (value != null) {
+                filteredProps.put(key, value);
+            }
+        }
+        return filteredProps;
+    }
+
     @Override
     public CPUInfoVO getCPUInfo() {
         var systemInfo = new SystemInfo();
@@ -138,36 +169,5 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .classPath(runtimeMXBean.getClassPath())
                 .libraryPath(runtimeMXBean.getLibraryPath())
                 .build();
-    }
-
-    /**
-     * 过滤敏感属性,只保留常见属性,防止泄露
-     *
-     * @return 属性 map
-     */
-    private static Map<String, String> getFilteredProps() {
-        var systemProps = System.getProperties();
-        var filteredProps = new HashMap<String, String>();
-        // 只保留常见的、非敏感的系统属性
-        List<String> includedKeys = Arrays.asList(
-                "os.name",
-                "os.version",
-                "os.arch",
-                "user.name",
-                "user.home",
-                "user.dir",
-                "file.separator",
-                "path.separator",
-                "line.separator",
-                "java.class.version",
-                "java.io.tmpdir"
-        );
-        for (String key : includedKeys) {
-            String value = systemProps.getProperty(key);
-            if (value != null) {
-                filteredProps.put(key, value);
-            }
-        }
-        return filteredProps;
     }
 }

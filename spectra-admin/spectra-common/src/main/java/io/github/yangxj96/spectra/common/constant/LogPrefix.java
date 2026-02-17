@@ -5,6 +5,7 @@ import org.jspecify.annotations.NullMarked;
 /// 统一日志前缀定义
 ///
 /// 用于规范不同模块日志输出格式
+///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2026/2/17 23:14

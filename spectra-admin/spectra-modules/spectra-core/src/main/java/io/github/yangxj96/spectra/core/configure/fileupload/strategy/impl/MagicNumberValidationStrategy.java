@@ -34,24 +34,6 @@ import java.util.List;
 /// @since 2025-06-19
 public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
 
-    @Override
-    public boolean isValid(@Nullable MultipartFile file) throws IOException {
-        if (file == null || file.isEmpty()) {
-            return false;
-        }
-
-        var fileHeader = readHeader(file);
-
-        for (var type : allowedTypes) {
-            var magic = type.getMagicNumber();
-            if (matches(fileHeader, magic)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     /// 判断两个字节数组前 n 字节是否相等
     ///
     /// @param fileHeader 文件头字节
@@ -68,7 +50,6 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
         }
         return true;
     }
-
 
     /// 从 MultipartFile 读取指定长度的文件头
     ///
@@ -92,6 +73,23 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
             }
             return header;
         }
+    }
+
+    @Override
+    public boolean isValid(@Nullable MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return false;
+        }
+
+        var fileHeader = readHeader(file);
+
+        for (var type : allowedTypes) {
+            var magic = type.getMagicNumber();
+            if (matches(fileHeader, magic)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

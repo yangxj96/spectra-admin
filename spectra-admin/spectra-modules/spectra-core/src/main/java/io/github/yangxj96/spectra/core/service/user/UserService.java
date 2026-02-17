@@ -22,8 +22,8 @@ import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
-import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
+import io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO;
 
 import java.util.List;
 

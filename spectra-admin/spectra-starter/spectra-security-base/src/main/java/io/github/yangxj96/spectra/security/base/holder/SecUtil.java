@@ -28,11 +28,6 @@ public class SecUtil {
     private SecUtil() {
     }
 
-    public static void setHolder(SecHolder holder) {
-        SecUtil.holder = holder;
-        initialized = true;
-    }
-
     /// 内部调用获取 Holder
     ///
     /// @return {@link SecHolder} holder,为null会直接报错
@@ -41,6 +36,11 @@ public class SecUtil {
             throw new IllegalStateException("SecUtil 尚未初始化，请确保 SecAutoConfiguration 已加载");
         }
         return holder;
+    }
+
+    public static void setHolder(SecHolder holder) {
+        SecUtil.holder = holder;
+        initialized = true;
     }
 
     /// 根据用户信息进行登录操作

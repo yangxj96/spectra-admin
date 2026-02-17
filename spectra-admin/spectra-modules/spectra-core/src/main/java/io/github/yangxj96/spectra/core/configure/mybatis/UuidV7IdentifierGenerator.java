@@ -4,8 +4,6 @@ package io.github.yangxj96.spectra.core.configure.mybatis;
 import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.github.f4b6a3.uuid.UuidCreator;
 
-import java.util.UUID;
-
 /// UUIDv7版本ID生成器
 ///
 /// @author Jack Young

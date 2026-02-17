@@ -89,7 +89,7 @@ public class UserPageVO implements Serializable {
     private String departmentId;
 
     /// 组织机构名称
-    @NameFill(lookup = DepartmentServiceImpl.class,sourceField = "departmentId")
+    @NameFill(lookup = DepartmentServiceImpl.class, sourceField = "departmentId")
     private String departmentName;
 
     /// 数据范围

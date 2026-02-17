@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.service.system.impl;
 
 
+import io.github.yangxj96.spectra.common.assembler.NameLookup;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.constant.RegionLevel;
@@ -9,7 +10,6 @@ import io.github.yangxj96.spectra.core.javabean.system.converter.RegionConverter
 import io.github.yangxj96.spectra.core.javabean.system.entity.Region;
 import io.github.yangxj96.spectra.core.javabean.system.vo.RegionVO;
 import io.github.yangxj96.spectra.core.mapper.system.RegionMapper;
-import io.github.yangxj96.spectra.common.assembler.NameLookup;
 import io.github.yangxj96.spectra.core.service.system.RegionService;
 import org.springframework.stereotype.Service;
 

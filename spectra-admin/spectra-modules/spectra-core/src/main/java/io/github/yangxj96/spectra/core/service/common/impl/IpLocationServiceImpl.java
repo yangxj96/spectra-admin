@@ -58,6 +58,58 @@ public class IpLocationServiceImpl implements IpLocationService {
         }
     }
 
+    /**
+     * 格式化 IP 查询结果，按精度截断
+     *
+     * @param fields IP 数据字段数组，顺序：国家|省份|城市|运营商|...
+     * @param level  精度级别
+     * @return 格式化后的位置字符串
+     */
+    @NullMarked
+    private static String formatRegion(String[] fields, int level) {
+        var sb = new StringBuilder();
+
+        // 国家
+        if (fields.length > 0 && isValidField(fields[0])) {
+            sb.append(fields[0]);
+        }
+
+        // 省份
+        if (level >= 1 && fields.length > 1 && isValidField(fields[1])) {
+            append(sb, fields[1]);
+        }
+
+        // 城市
+        if (level >= 2 && fields.length > 2 && isValidField(fields[2])) {
+            append(sb, fields[2]);
+        }
+
+        // 运营商
+        if (level >= 3 && fields.length > 3 && isValidField(fields[3])) {
+            append(sb, fields[3]);
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * 判断字段是否有效（非空、非"0"、非"内网IP"）
+     */
+    private static boolean isValidField(String field) {
+        return StrUtils.isNotBlank(field) && !"0".equals(field) && !"内网IP".equals(field);
+    }
+
+    /**
+     * 向 StringBuilder 添加内容，自动处理空格分隔
+     */
+    @NullMarked
+    private static void append(StringBuilder sb, String part) {
+        if (!sb.isEmpty()) {
+            sb.append(' ');
+        }
+        sb.append(part);
+    }
+
     @Override
     public String getCityEn(String ip, int level) {
         if (isPrivateIp(ip)) {
@@ -144,59 +196,6 @@ public class IpLocationServiceImpl implements IpLocationService {
                 log.error("{}关闭 IP 数据库失败", PREFIX, e);
             }
         }
-    }
-
-
-    /**
-     * 格式化 IP 查询结果，按精度截断
-     *
-     * @param fields IP 数据字段数组，顺序：国家|省份|城市|运营商|...
-     * @param level  精度级别
-     * @return 格式化后的位置字符串
-     */
-    @NullMarked
-    private static String formatRegion(String[] fields, int level) {
-        var sb = new StringBuilder();
-
-        // 国家
-        if (fields.length > 0 && isValidField(fields[0])) {
-            sb.append(fields[0]);
-        }
-
-        // 省份
-        if (level >= 1 && fields.length > 1 && isValidField(fields[1])) {
-            append(sb, fields[1]);
-        }
-
-        // 城市
-        if (level >= 2 && fields.length > 2 && isValidField(fields[2])) {
-            append(sb, fields[2]);
-        }
-
-        // 运营商
-        if (level >= 3 && fields.length > 3 && isValidField(fields[3])) {
-            append(sb, fields[3]);
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * 判断字段是否有效（非空、非"0"、非"内网IP"）
-     */
-    private static boolean isValidField(String field) {
-        return StrUtils.isNotBlank(field) && !"0".equals(field) && !"内网IP".equals(field);
-    }
-
-    /**
-     * 向 StringBuilder 添加内容，自动处理空格分隔
-     */
-    @NullMarked
-    private static void append(StringBuilder sb, String part) {
-        if (!sb.isEmpty()) {
-            sb.append(' ');
-        }
-        sb.append(part);
     }
 
 }

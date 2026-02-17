@@ -1,8 +1,8 @@
 package io.github.yangxj96.spectra.security.starter.configuration;
 
 
-import io.github.yangxj96.spectra.security.base.javabean.from.LoginFrom;
 import io.github.yangxj96.spectra.security.base.constant.LoginType;
+import io.github.yangxj96.spectra.security.base.javabean.from.LoginFrom;
 import io.github.yangxj96.spectra.security.base.strategy.tokens.EmailAuthenticationToken;
 import io.github.yangxj96.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
 import io.github.yangxj96.spectra.security.base.strategy.tokens.UsernamePasswordCaptchaAuthenticationToken;

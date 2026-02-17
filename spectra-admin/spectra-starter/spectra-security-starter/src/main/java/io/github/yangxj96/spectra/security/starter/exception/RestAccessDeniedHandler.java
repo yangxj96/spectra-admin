@@ -2,7 +2,6 @@ package io.github.yangxj96.spectra.security.starter.exception;
 
 
 import io.github.yangxj96.spectra.common.response.R;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;

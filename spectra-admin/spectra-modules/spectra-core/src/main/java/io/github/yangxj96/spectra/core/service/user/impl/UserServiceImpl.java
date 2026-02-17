@@ -38,7 +38,6 @@ import io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope;
 import io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScopeTarget;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserPageFrom;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
-import io.github.yangxj96.spectra.core.javabean.user.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeMapper;
 import io.github.yangxj96.spectra.core.mapper.user.UserDataScopeTargetMapper;
@@ -47,6 +46,9 @@ import io.github.yangxj96.spectra.core.service.auth.AccountService;
 import io.github.yangxj96.spectra.core.service.system.DepartmentService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
+import io.github.yangxj96.spectra.security.base.constant.LoginType;
+import io.github.yangxj96.spectra.security.base.holder.SecUtil;
+import io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -56,7 +58,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -120,8 +121,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 创建一个默认的账号密码登录
         var defaultAccount = new Account();
         defaultAccount.setUserId(entity.getId());
-        // TODO defaultAccount.setType(LoginType.PASSWORD);
-        defaultAccount.setType("PASSWORD");
+        defaultAccount.setType(LoginType.PASSWORD);
         defaultAccount.setLoginName(entity.getEmail());
         defaultAccount.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
         defaultAccount.setProvider("DEFAULT");
@@ -165,7 +165,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         // 根据用户强制注销账号登录信息
-        // TODO SecUtil.kick(user.getId());
+        SecUtil.kick(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 删除账号信息
@@ -338,7 +338,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public List<UserOnlineVO> online(PageFrom page) {
-        // TODO return SecUtil.online();
-        return Collections.emptyList();
+        return SecUtil.online();
     }
 }

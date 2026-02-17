@@ -54,7 +54,7 @@
                    ot.path || '/' || o.name AS path
             FROM ${schema}.sys_department o
                      JOIN org_tree ot ON o.pid = ot.id)
-        SELECT path,id
+        SELECT path, id
         FROM org_tree
         WHERE id = #{id};
     </select>

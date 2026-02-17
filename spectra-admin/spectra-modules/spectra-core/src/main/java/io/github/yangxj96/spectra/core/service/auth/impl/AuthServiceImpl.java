@@ -24,11 +24,11 @@
 //import java.util.Collections;
 //import java.util.List;
 //
-///// 认证服务实现
-/////
-///// @author Jack Young
-///// @version 1.0
-///// @since 2025/12/29 11:28
+/// // 认证服务实现
+/// //
+/// // @author Jack Young
+/// // @version 1.0
+/// // @since 2025/12/29 11:28
 //@Service
 //@NullMarked
 //public class AuthServiceImpl implements AuthService {

@@ -22,6 +22,8 @@ import java.util.Date;
 @SuppressWarnings("unused")
 public class TimeMapper {
 
+    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
+
     /**
      * 当前用户时区
      *
@@ -30,7 +32,6 @@ public class TimeMapper {
     public ZoneId getUserZoneId() {
         return ZoneId.of("UTC");
     }
-
 
     /**
      * Instant 转 LocalDateTime
@@ -145,7 +146,6 @@ public class TimeMapper {
                 offsetDateTime.toInstant();
     }
 
-
     /**
      * Instant 转 Date
      *
@@ -165,7 +165,6 @@ public class TimeMapper {
     public @Nullable Instant toInstant(@Nullable Date date) {
         return date == null ? null : date.toInstant();
     }
-
 
     /**
      * Instant 转 Timestamp
@@ -187,7 +186,6 @@ public class TimeMapper {
         return timestamp == null ? null : timestamp.toInstant();
     }
 
-
     /**
      * Instant 转时间戳
      *
@@ -207,9 +205,6 @@ public class TimeMapper {
     public @Nullable Instant toInstant(@Nullable Long epochMilli) {
         return epochMilli == null ? null : Instant.ofEpochMilli(epochMilli);
     }
-
-
-    private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
     /**
      * Instant转换为 ISO 8601 格式字符串

@@ -32,11 +32,6 @@ public enum RegionLevel implements IEnum<Integer> {
         this.name = name;
     }
 
-    @Override
-    public Integer getValue() {
-        return this.level;
-    }
-
     public static RegionLevel of(Integer level) {
         if (level == null) {
             return null;
@@ -47,6 +42,11 @@ public enum RegionLevel implements IEnum<Integer> {
             }
         }
         return null;
+    }
+
+    @Override
+    public Integer getValue() {
+        return this.level;
     }
 
 }

@@ -21,6 +21,7 @@ import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.configure.ulog.publisher.ULogEventPublisher;
+import io.github.yangxj96.spectra.security.base.holder.SecUtil;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -45,15 +46,12 @@ import tools.jackson.databind.ObjectMapper;
 public class ULogAspect {
 
     private static final String PREFIX = "[ULogAspect]:";
-
-    @Resource
-    private ULogEventPublisher publisher;
-
-    @Resource
-    private ObjectMapper om;
-
     /// 计算操作消耗时间
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
+    @Resource
+    private ULogEventPublisher publisher;
+    @Resource
+    private ObjectMapper om;
 
     /// 请求前
     @Before("@annotation(annotation)")
@@ -105,8 +103,8 @@ public class ULogAspect {
             datum.setStatus(getHttpResponseStatus(response));
             datum.setResult(safeWriteValueAsString(jsonResult));
             datum.setTimeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get());
-            // TODO 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
-            //datum.setCurrentId(SecUtil.getCurrentUserId());
+            // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
+            datum.setCurrentId(SecUtil.getCurrentUserId());
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {

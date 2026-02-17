@@ -28,13 +28,12 @@ import java.util.Objects;
 /// @since 2025/7/23
 public final class IpUtils {
 
-    private IpUtils() {
-        // 工具类禁止实例化
-    }
-
     private static final String UNKNOWN = "unknown";
     private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
     private static final String LOCALHOST_IPV4 = "127.0.0.1";
+    private IpUtils() {
+        // 工具类禁止实例化
+    }
 
     /// 获取客户端真实 IP 地址（支持多级代理）
     ///

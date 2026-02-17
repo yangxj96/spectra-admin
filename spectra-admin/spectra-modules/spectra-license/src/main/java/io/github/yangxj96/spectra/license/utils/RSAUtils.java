@@ -39,11 +39,11 @@ import java.util.Base64;
 /// @since 2025-11-11
 public class RSAUtils {
 
-    private RSAUtils() {
-    }
-
     static {
         Security.addProvider(new BouncyCastleProvider());
+    }
+
+    private RSAUtils() {
     }
 
     public static KeyPair generateKeyPair() throws EncryptException {
