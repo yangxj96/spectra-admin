@@ -2,8 +2,8 @@ package io.github.yangxj96.spectra.core.javabean.auth.converter;
 
 import io.github.yangxj96.spectra.core.configure.mapstruct.GlobalMapperConfig;
 import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
-import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.user.entity.User;
+import io.github.yangxj96.spectra.security.base.javabean.entity.SecurityUser;
 import org.mapstruct.Mapper;
 
 /// 用户认证和登录相关的转换器

@@ -21,13 +21,14 @@
     </properties>
 
     <dependencies>
+        <!-- === 项目模块 === -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
 
-        <!-- flowable -->
+        <!-- === flowable === -->
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter</artifactId>

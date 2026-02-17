@@ -22,12 +22,7 @@
 
     <dependencies>
 
-        <!-- 只引入security的核心包,不会自动配置启用,但是能使用他的相关注解 -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-        </dependency>
-
+        <!-- === 工具 === -->
         <!-- 通用工具包 Begin -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -62,9 +57,8 @@
             <groupId>com.github.f4b6a3</groupId>
             <artifactId>uuid-creator</artifactId>
         </dependency>
-        <!-- 通用工具包 End -->
 
-        <!-- 数据库 Begin -->
+        <!-- === 数据库 === -->
         <!-- pgsql -->
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -90,7 +84,6 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-pool2</artifactId>
         </dependency>
-        <!-- 数据库 End -->
 
     </dependencies>
 

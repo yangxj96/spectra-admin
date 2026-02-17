@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -23,8 +24,11 @@ import java.io.IOException;
 @NullMarked
 public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
-    @Resource
-    private ObjectMapper om;
+    private final ObjectMapper om;
+
+    public RestAccessDeniedHandler(@Qualifier("securityObjectMapper") ObjectMapper om) {
+        this.om = om;
+    }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,

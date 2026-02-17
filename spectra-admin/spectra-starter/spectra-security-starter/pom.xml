@@ -22,15 +22,44 @@
     </properties>
 
     <dependencies>
+
+        <!-- === 项目模块 === -->
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- === Spring Boot === -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-actuator-autoconfigure</artifactId>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aspectj</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

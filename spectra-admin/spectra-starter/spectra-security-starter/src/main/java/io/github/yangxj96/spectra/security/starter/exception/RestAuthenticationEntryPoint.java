@@ -2,10 +2,10 @@ package io.github.yangxj96.spectra.security.starter.exception;
 
 
 import io.github.yangxj96.spectra.common.response.R;
-import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -23,8 +23,11 @@ import java.io.IOException;
 @NullMarked
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    @Resource
-    private ObjectMapper om;
+    private final ObjectMapper om;
+
+    public RestAuthenticationEntryPoint(@Qualifier("securityObjectMapper") ObjectMapper om) {
+        this.om = om;
+    }
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,

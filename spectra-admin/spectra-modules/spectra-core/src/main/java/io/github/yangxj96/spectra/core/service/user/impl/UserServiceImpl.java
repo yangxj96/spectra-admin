@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.service.user.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
 import io.github.yangxj96.spectra.common.base.BaseEntity;
 import io.github.yangxj96.spectra.common.base.BaseServiceImpl;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
@@ -26,13 +27,8 @@ import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.DataSaveException;
 import io.github.yangxj96.spectra.common.exception.EntityUpdateException;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
-import io.github.yangxj96.spectra.common.assembler.NameFillExecutor;
 import io.github.yangxj96.spectra.core.configure.datascope.DataScopeType;
 import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
-import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
-import io.github.yangxj96.spectra.core.configure.security.javabean.AuthRedisKey;
-import io.github.yangxj96.spectra.core.configure.security.javabean.LoginType;
-import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
 import io.github.yangxj96.spectra.core.javabean.auth.entity.Account;
 import io.github.yangxj96.spectra.core.javabean.user.converter.RoleConverter;
 import io.github.yangxj96.spectra.core.javabean.user.converter.UserConverter;
@@ -59,8 +55,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /// 用户service层-实现
 ///
@@ -122,7 +120,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 创建一个默认的账号密码登录
         var defaultAccount = new Account();
         defaultAccount.setUserId(entity.getId());
-        defaultAccount.setType(LoginType.PASSWORD);
+        // TODO defaultAccount.setType(LoginType.PASSWORD);
+        defaultAccount.setType("PASSWORD");
         defaultAccount.setLoginName(entity.getEmail());
         defaultAccount.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
         defaultAccount.setProvider("DEFAULT");
@@ -166,7 +165,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         // 根据用户强制注销账号登录信息
-        SecUtil.kick(user.getId());
+        // TODO SecUtil.kick(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 删除账号信息
@@ -296,7 +295,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
                 .in(StrUtils.isNotBlank(
-                        params.getDepartmentId()),
+                                params.getDepartmentId()),
                         User::getDepartmentId,
                         departmentService.getSelfAndDescendantIds(params.getDepartmentId())
                 )
@@ -339,6 +338,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public List<UserOnlineVO> online(PageFrom page) {
-        return SecUtil.online();
+        // TODO return SecUtil.online();
+        return Collections.emptyList();
     }
 }

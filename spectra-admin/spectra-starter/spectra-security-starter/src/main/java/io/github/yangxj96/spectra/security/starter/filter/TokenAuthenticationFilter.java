@@ -2,9 +2,9 @@ package io.github.yangxj96.spectra.security.starter.filter;
 
 
 import io.github.yangxj96.spectra.common.utils.StrUtils;
-import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
-import io.github.yangxj96.spectra.core.configure.security.javabean.SecurityUser;
-import io.github.yangxj96.spectra.core.configure.security.renew.SessionRenewService;
+import io.github.yangxj96.spectra.security.base.holder.SecUtil;
+import io.github.yangxj96.spectra.security.base.javabean.entity.SecurityUser;
+import io.github.yangxj96.spectra.security.starter.renew.SessionRenewService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

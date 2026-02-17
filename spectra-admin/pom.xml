@@ -49,6 +49,7 @@
         <module>./spectra-modules/spectra-license</module>
 
         <!-- starter包 -->
+        <module>./spectra-starter/spectra-security-base</module>
         <module>./spectra-starter/spectra-security-starter</module>
     </modules>
 

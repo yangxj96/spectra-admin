@@ -1,7 +1,7 @@
 package io.github.yangxj96.spectra.security.starter.eval;
 
 
-import io.github.yangxj96.spectra.core.configure.security.properties.SecurityProperties;
+import io.github.yangxj96.spectra.security.base.properties.SecurityProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -123,8 +123,8 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /// * ADMINISTRATORS（即 ROLE_DEV_OPS）
     /// * 或权限字符串为 "*"（全权限）
     private boolean hasAbsolutePrivilege(Authentication authentication) {
-        for (GrantedAuthority ga : authentication.getAuthorities()) {
-            String authority = ga.getAuthority();
+        for (var ga : authentication.getAuthorities()) {
+            var authority = ga.getAuthority();
             if (securityProperties.getAdministrators().equals(authority) || "*".equals(authority)) {
                 return true;
             }
@@ -138,7 +138,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     ///
     /// 否则 → fallback 为 regex
     private static CompiledPermissionPattern compilePattern(String expr) {
-        CompiledPermissionPattern cached = CACHE.get(expr);
+        var cached = CACHE.get(expr);
         if (cached != null) {
             return cached;
         }
@@ -184,7 +184,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /// ```
     private static boolean matchSegments(String[] patternSegs, boolean hasDoubleStar, String userPerm) {
         // userPerm 在 NullMarked 下保证非 null
-        String[] userSegs = userPerm.split(":");
+        var userSegs = userPerm.split(":");
 
         // 若不包含 **，则长度必须一致
         if (!hasDoubleStar && patternSegs.length != userSegs.length) {
@@ -193,7 +193,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
         int p = 0;
         int u = 0;
         while (p < patternSegs.length && u < userSegs.length) {
-            String seg = patternSegs[p];
+            var seg = patternSegs[p];
             // ** → 多级通配，剩余全部匹配
             if (seg.equals("**")) {
                 return true;

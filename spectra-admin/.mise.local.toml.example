@@ -1,14 +1,14 @@
 [env]
 # 默认密码
-DEFAULT_PASSWORD = "xxx"
+DEFAULT_PASSWORD = "admin123"
 # 许可密码
-LICENSE_PASSWORD = "xxx"
+LICENSE_PASSWORD = "admin123"
 # SSL配置
 SSL_PASSWORD = "xxx"
 SSL_TYPE = "PKCS12"
-SSL_ALIAS = "xxx"
+SSL_ALIAS = "tomcat"
 # 数据库相关配置
-DB_URL = "jdbc:postgresql://localhost:5432/spectra_db?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=spectra-service"
+DB_URL = "jdbc:postgresql://localhost:5432/spectra_db"
 DB_USERNAME = "postgres"
 DB_PASSWORD = "xxx"
 # Redis

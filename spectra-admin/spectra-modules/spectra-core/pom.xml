@@ -21,13 +21,20 @@
     </properties>
 
     <dependencies>
+
+        <!-- === 项目模块 === -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
-        <!-- Spring Boot Begin -->
+        <!-- === Spring Boot === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aspectj</artifactId>
@@ -46,25 +53,13 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- Spring Boot End -->
-
-        <!-- Spring Security Begin -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-crypto</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Spring Security End -->
 
-        <!-- 工具 Begin -->
+
+        <!-- === 工具 === -->
         <!-- 获取系统信息 -->
         <dependency>
             <groupId>com.github.oshi</groupId>
@@ -75,7 +70,6 @@
             <groupId>org.lionsoul</groupId>
             <artifactId>ip2region</artifactId>
         </dependency>
-        <!-- 工具 End -->
 
     </dependencies>
 

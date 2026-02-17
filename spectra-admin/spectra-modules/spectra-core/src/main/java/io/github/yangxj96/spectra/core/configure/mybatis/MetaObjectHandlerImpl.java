@@ -18,7 +18,6 @@ package io.github.yangxj96.spectra.core.configure.mybatis;
 
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -50,14 +49,15 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         log.debug("{}insertFill", PREFIX);
+        // TODO 安全修改
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
-            setFieldValByName(CREATED_BY, SecUtil.getCurrentUserId(), metaObject);
+            //setFieldValByName(CREATED_BY, SecUtil.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(CREATED_AT, metaObject) == null) {
             setFieldValByName(CREATED_AT, Instant.now(), metaObject);
         }
         if (getFieldValByName(UPDATED_BY, metaObject) == null) {
-            setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
+            //setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
             setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
@@ -67,7 +67,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         log.debug("{}updateFill", PREFIX);
-        setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
+        //setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
     }
 

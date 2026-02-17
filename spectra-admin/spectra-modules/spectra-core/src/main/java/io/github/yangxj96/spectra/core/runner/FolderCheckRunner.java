@@ -16,7 +16,7 @@
 
 package io.github.yangxj96.spectra.core.runner;
 
-import io.github.yangxj96.spectra.core.configure.mvc.properties.SpectraSystemProperties;
+import io.github.yangxj96.spectra.common.properties.SpectraSystemProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.ApplicationArguments;

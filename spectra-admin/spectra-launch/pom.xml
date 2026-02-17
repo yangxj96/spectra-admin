@@ -20,19 +20,19 @@
     </properties>
 
     <dependencies>
-        <!-- 项目模块 Begin -->
-        <!-- 核心 不可移除 Begin -->
+        <!-- === 项目模块 === -->
+        <!-- 公用 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 核心 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-core</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 核心 不可移除 End -->
         <!-- 自定义security,完整引入,认证生效 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
@@ -51,8 +51,8 @@
             <artifactId>spectra-license</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 项目模块 End -->
 
+        <!-- === 工具 === -->
         <!-- XSS攻击防范 -->
         <dependency>
             <groupId>net.dreamlu</groupId>

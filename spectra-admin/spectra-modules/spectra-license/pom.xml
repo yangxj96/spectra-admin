@@ -19,6 +19,7 @@
     </properties>
 
     <dependencies>
+        <!-- === 项目模块 === -->
         <!-- 共用包 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>

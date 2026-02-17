@@ -18,7 +18,6 @@ package io.github.yangxj96.spectra.core.configure.ulog.aspect;
 
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
-import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.configure.ulog.publisher.ULogEventPublisher;
@@ -106,8 +105,8 @@ public class ULogAspect {
             datum.setStatus(getHttpResponseStatus(response));
             datum.setResult(safeWriteValueAsString(jsonResult));
             datum.setTimeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get());
-            // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
-            datum.setCurrentId(SecUtil.getCurrentUserId());
+            // TODO 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
+            //datum.setCurrentId(SecUtil.getCurrentUserId());
             publisher.save(datum);
             log.debug(PREFIX + "操作日志-记录结束");
         } catch (Exception ex) {

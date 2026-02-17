@@ -1,7 +1,6 @@
 package io.github.yangxj96.spectra.core.configure.datascope;
 
 
-import io.github.yangxj96.spectra.core.configure.security.holder.SecUtil;
 import io.github.yangxj96.spectra.core.service.auth.DataScopeService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -37,8 +36,9 @@ public class DataScopeAspect {
             return pjp.proceed();
         }
 
-        // 正常 DataScope
-        String userId = SecUtil.getCurrentUserId();
+        // TODO 正常 DataScope
+        //String userId = SecUtil.getCurrentUserId();
+        String userId = "";
         DataScopeContext context = dataScopeService.resolve(userId);
 
         try {
