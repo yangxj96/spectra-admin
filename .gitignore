@@ -10,7 +10,6 @@ target
 ### custom        ###
 .eslintcache
 document/jar
-.env
 .env.*
 files
 spectra-files
