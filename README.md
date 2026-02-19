@@ -3,8 +3,8 @@
 > 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.1-brightgreen)
-![Vue](https://img.shields.io/badge/Vue-3.5.26-green)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.2-brightgreen)
+![Vue](https://img.shields.io/badge/Vue-3.5.28-green)
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
@@ -29,11 +29,11 @@
 |-----------------|--------|----------------|
 | Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.12 | 构建工具           |
-| Spring Boot     | 4.0.1  | 核心框架           |
-| Spring Security | 7.0.0  | 权限认证框架         |
+| Spring Boot     | 4.0.2  | 核心框架           |
+| Spring Security | 7.0.2  | 权限认证框架         |
 | MyBatis-Plus    | 3.5.15 | 增强ORM，简化CRUD   |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
-| PostgreSQL      | 18     | 知名关系型数据库       |
+| PostgreSQL      | 18.2     | 知名关系型数据库       |
 
 > ✅ 所有依赖均采用当前稳定最新版，并将持续跟进生态更新。
 
@@ -43,18 +43,18 @@
 
 | 包名           | 版本      | 用途                     |
 |--------------|---------|------------------------|
-| Vue          | 3.5.26  | 渐进式前端框架                |
-| Vue Router   | 4.6.4   | 路由管理                   |
+| Vue          | 3.5.28  | 渐进式前端框架                |
+| Vue Router   | 5.0.2   | 路由管理                   |
 | Pinia        | 3.0.4   | 状态管理（Vuex替代）           |
-| @vueuse/core | 14.1.0  | 实用 Composition API 工具库 |
-| Vite         | 7.3.0   | 构建工具，极速启动              |
-| Element Plus | 2.12.0  | UI 组件库                 |
-| Axios        | 1.13.2  | HTTP 请求客户端             |
+| @vueuse/core | 14.2.0  | 实用 Composition API 工具库 |
+| Vite         | 7.3.1   | 构建工具，极速启动              |
+| Element Plus | 2.13.1  | UI 组件库                 |
+| Axios        | 1.13.5  | HTTP 请求客户端             |
 | ECharts      | 6.0.0   | 数据可视化图表                |
 | vue-echarts  | 8.0.1   | 转为vue封装的echarts操作组件    |
-| Lodash       | 4.17.21 | 工具函数库，简化数据操作           |
+| Lodash       | 4.17.23 | 工具函数库，简化数据操作           |
 | Eslint       | 9.39.2  | 代码质量检查                 |
-| Prettier     | 3.7.4   | 统一代码格式风格               |
+| Prettier     | 3.8.1   | 统一代码格式风格               |
 
 ---
 
@@ -114,8 +114,8 @@
 | 模块                 | 路径                                                 | 说明                               |
 |--------------------|----------------------------------------------------|----------------------------------|
 | `spectra-common`   | [spectra-common](spectra-admin/spectra-common)     | 通用工具类、注解、常量、DTO等共享内容             |
-| `spectra-core`     | [spectra-core](spectra-admin/spectra-core)         | 核心接口定义、领域模型、服务契约                 |
-| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-workflow) | 工作流模块,选用的flowable流程框架            |
+| `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)        | 核心接口定义、领域模型、服务契约                 |
+| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块,选用的flowable流程框架            |
 | `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
 | `spectra-ui`       | [spectra-ui](spectra-ui)                           | 前端 Vue 项目，基于 Vite + Element Plus |
 
