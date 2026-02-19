@@ -5,7 +5,7 @@
 ![Java](https://img.shields.io/badge/Java-25-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.2-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.28-green)
-![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18-blue)
+![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18.2-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
 ---
