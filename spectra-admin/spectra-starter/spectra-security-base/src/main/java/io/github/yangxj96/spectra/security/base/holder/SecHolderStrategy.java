@@ -14,7 +14,7 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/12/11 10:06
-public interface SecHolder {
+public interface SecHolderStrategy {
 
     /// 获取定义的超管角色
     ///

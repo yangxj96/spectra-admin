@@ -40,7 +40,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             SecurityUser user = SecUtil.getCurrentUser(token);
             if (user == null) {
                 // token 无效
-                throw new InsufficientAuthenticationException("Token 无效或已过期");
+                throw new InsufficientAuthenticationException("Token无效或已过期");
             }
             // 🔑 认证成功后，尝试续期（不关心结果）
             sessionRenewService.tryRenew(token);

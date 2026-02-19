@@ -3,11 +3,9 @@ package io.github.yangxj96.spectra.security.starter.autoconfiguration;
 
 import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.security.base.properties.SecurityProperties;
-import io.github.yangxj96.spectra.security.starter.configuration.SecurityJacksonModuleConfiguration;
-import io.github.yangxj96.spectra.security.starter.configuration.SecurityRedisKeyExpirationListener;
 import io.github.yangxj96.spectra.security.starter.eval.SpectraPermissionEvaluator;
-import io.github.yangxj96.spectra.security.starter.exception.RestAccessDeniedHandler;
-import io.github.yangxj96.spectra.security.starter.exception.RestAuthenticationEntryPoint;
+import io.github.yangxj96.spectra.security.starter.advice.RestAccessDeniedHandler;
+import io.github.yangxj96.spectra.security.starter.advice.RestAuthenticationEntryPoint;
 import io.github.yangxj96.spectra.security.starter.filter.TokenAuthenticationFilter;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -43,10 +40,6 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @EnableConfigurationProperties(SecurityProperties.class)
-@Import({
-        SecurityJacksonModuleConfiguration.class,
-        SecurityRedisKeyExpirationListener.class
-})
 @AutoConfiguration
 @ConditionalOnClass(name = "org.springframework.web.servlet.DispatcherServlet")
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
@@ -131,5 +124,6 @@ public class SecurityAutoConfiguration {
 
         return http.build();
     }
+
 
 }

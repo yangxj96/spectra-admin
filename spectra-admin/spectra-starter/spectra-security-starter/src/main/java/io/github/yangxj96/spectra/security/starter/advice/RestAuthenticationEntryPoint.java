@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.security.starter.exception;
+package io.github.yangxj96.spectra.security.starter.advice;
 
 
 import io.github.yangxj96.spectra.common.response.R;
@@ -7,6 +7,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -34,8 +37,15 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException e) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
-        // 按你项目的统一异常格式写出
-        var body = om.writeValueAsString(R.failure(HttpStatus.UNAUTHORIZED, "用户未登录/登录失效"));
+
+        String message = switch (e) {
+            case BadCredentialsException _ -> "账号或密码错误";
+            case CredentialsExpiredException _ -> "登录已过期";
+            case InsufficientAuthenticationException _ -> "用户未登录";
+            default -> "认证失败";
+        };
+
+        var body = om.writeValueAsString(R.failure(HttpStatus.UNAUTHORIZED, message));
         response.getWriter().write(body);
     }
 

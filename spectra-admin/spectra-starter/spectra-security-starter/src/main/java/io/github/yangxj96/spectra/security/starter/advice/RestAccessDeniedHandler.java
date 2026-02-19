@@ -1,4 +1,4 @@
-package io.github.yangxj96.spectra.security.starter.exception;
+package io.github.yangxj96.spectra.security.starter.advice;
 
 
 import io.github.yangxj96.spectra.common.response.R;

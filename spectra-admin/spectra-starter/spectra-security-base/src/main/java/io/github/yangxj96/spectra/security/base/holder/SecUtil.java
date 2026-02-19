@@ -20,27 +20,37 @@ public class SecUtil {
 
     /// 具体业务持有者
     @Nullable
-    private static SecHolder holder;
+    private static volatile SecHolderStrategy strategy;
 
-    /// 是否初始化
-    private static boolean initialized = false;
 
     private SecUtil() {
     }
 
-    /// 内部调用获取 Holder
-    ///
-    /// @return {@link SecHolder} holder,为null会直接报错
-    private static SecHolder getHolder() {
-        if (!initialized || holder == null) {
-            throw new IllegalStateException("SecUtil 尚未初始化，请确保 SecAutoConfiguration 已加载");
+
+    public static void setStrategy(SecHolderStrategy s) {
+        if (strategy != null) {
+            throw new IllegalStateException(
+                    "SecHolderStrategy already initialized"
+            );
         }
-        return holder;
+        strategy = s;
     }
 
-    public static void setHolder(SecHolder holder) {
-        SecUtil.holder = holder;
-        initialized = true;
+    /// 内部调用获取 Holder
+    ///
+    /// @return {@link SecHolderStrategy} holder,为null会直接报错
+    private static SecHolderStrategy getStrategy() {
+        SecHolderStrategy s = strategy;
+        if (s == null) {
+            throw new IllegalStateException(
+                    "SecUtil尚未初始化，请确保已加载对应的Security策略"
+            );
+        }
+        return s;
+    }
+
+    public static void setHolder(SecHolderStrategy holder) {
+        SecUtil.strategy = holder;
     }
 
     /// 根据用户信息进行登录操作
@@ -49,19 +59,19 @@ public class SecUtil {
     /// @return 登录后的 token 信息
     public static TokenVO login(SecurityUser su) {
         // 默认创建的就是密码,后面添加多个登录方式就要调整下
-        return getHolder().createToken(su);
+        return getStrategy().createToken(su);
     }
 
     /// 根据用户信息登出
     ///
     /// @param token 用户 token
     public static void logout(String token) {
-        getHolder().deleteToken(token);
+        getStrategy().deleteToken(token);
     }
 
     /// 登出当前用户
     public static void logout() {
-        var token = getHolder().getCurrentToken();
+        var token = getStrategy().getCurrentToken();
         if (token == null) {
             throw new SpectraException("无Token/Token无效");
         }
@@ -72,12 +82,12 @@ public class SecUtil {
     ///
     /// @param id 用户ID
     public static void kick(String id) {
-        getHolder().deleteByUserId(id);
+        getStrategy().deleteByUserId(id);
     }
 
     /// 获取在线用户列表
     public static List<UserOnlineVO> online() {
-        return getHolder().listOnlineUsers();
+        return getStrategy().listOnlineUsers();
     }
 
     /// 根据用户 token 获取用户信息
@@ -85,28 +95,28 @@ public class SecUtil {
     /// @param token token
     /// @return 当前用户信息,可能为null
     public static @Nullable SecurityUser getCurrentUser(String token) {
-        return getHolder().getCurrentUser(token);
+        return getStrategy().getCurrentUser(token);
     }
 
     /// 获取当前请求的用户信息
     ///
     /// @return 当前用户信息,可能为null
     public static @Nullable SecurityUser getCurrentUser() {
-        return getHolder().getCurrentUser();
+        return getStrategy().getCurrentUser();
     }
 
     /// 获取当前用户的 token
     ///
     /// @return 当前用户的 token,可能为null
     public static @Nullable String getCurrentToken() {
-        return getHolder().getCurrentToken();
+        return getStrategy().getCurrentToken();
     }
 
     /// 获取当前用户 ID
     ///
     /// @return 用户 ID,可能为null
     public static @Nullable String getCurrentUserId() {
-        return getHolder().getCurrentUserId();
+        return getStrategy().getCurrentUserId();
     }
 
 }

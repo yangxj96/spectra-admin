@@ -39,18 +39,18 @@
             <artifactId>spectra-security-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 工作流 -->
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-workflow</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- 许可配置,私单用来防止客户白嫖 -->
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-license</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+        <!--&lt;!&ndash; 工作流 &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>io.github.yangxj96.spectra</groupId>-->
+        <!--    <artifactId>spectra-workflow</artifactId>-->
+        <!--    <version>${project.version}</version>-->
+        <!--</dependency>-->
+        <!--&lt;!&ndash; 许可配置,私单用来防止客户白嫖 &ndash;&gt;-->
+        <!--<dependency>-->
+        <!--    <groupId>io.github.yangxj96.spectra</groupId>-->
+        <!--    <artifactId>spectra-license</artifactId>-->
+        <!--    <version>${project.version}</version>-->
+        <!--</dependency>-->
 
         <!-- === 工具 === -->
         <!-- XSS攻击防范 -->

@@ -1,7 +1,6 @@
 package io.github.yangxj96.spectra.core.service.auth.impl;
 
 
-import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.ObjUtils;
@@ -14,10 +13,10 @@ import io.github.yangxj96.spectra.core.service.common.KaptchaService;
 import io.github.yangxj96.spectra.core.service.user.RelRoleAuthorityService;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
 import io.github.yangxj96.spectra.core.service.user.UserService;
+import io.github.yangxj96.spectra.security.base.exception.LoginException;
 import io.github.yangxj96.spectra.security.base.javabean.entity.SecurityUser;
 import io.github.yangxj96.spectra.security.base.strategy.provider.UsernamePasswordAuthenticationProvider;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -67,11 +66,11 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
         // 查询账户信息
         var account = accountService.getByLoginName(username);
         if (account == null || !passwordEncoder.matches(password, account.getPassword())) {
-            throw new BadCredentialsException("账号或密码错误");
+            throw new LoginException("账号或密码错误");
         }
         var user = userService.getById(account.getUserId());
         if (user == null) {
-            throw new DataNotExistException("用户不存在");
+            throw new LoginException("用户不存在");
         }
         // 验证通过,封装返回
         var su = toSecurityUser(user);
@@ -101,7 +100,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     ///
     public SecurityUser toSecurityUser(Object user) {
         if (!(user instanceof User u)) {
-            throw new RuntimeException("用户信息不正常");
+            throw new LoginException("用户信息不正常");
         }
 
         var securityUser = authConverter.toSecurityUser(u);

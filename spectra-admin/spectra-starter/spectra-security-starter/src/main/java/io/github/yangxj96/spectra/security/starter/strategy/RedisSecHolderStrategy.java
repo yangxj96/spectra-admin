@@ -1,12 +1,14 @@
-package io.github.yangxj96.spectra.security.starter.holder;
+package io.github.yangxj96.spectra.security.starter.strategy;
 
 
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.security.base.constant.AuthRedisKey;
-import io.github.yangxj96.spectra.security.base.holder.SecHolder;
+import io.github.yangxj96.spectra.security.base.constant.LoginType;
+import io.github.yangxj96.spectra.security.base.holder.SecHolderStrategy;
 import io.github.yangxj96.spectra.security.base.javabean.entity.SecurityUser;
 import io.github.yangxj96.spectra.security.base.javabean.vo.TokenVO;
+import io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO;
 import io.github.yangxj96.spectra.security.base.properties.SecurityProperties;
 import io.github.yangxj96.spectra.security.starter.renew.DefaultTokenTtlStrategy;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -36,32 +37,26 @@ import java.util.concurrent.TimeUnit;
 /// @since 2025/12/11 10:06
 @Slf4j
 @NullMarked
-@Component("sec")
-public class RedisSecHolder implements SecHolder {
+public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     private final ObjectMapper om;
 
     private final RedisTemplate<String, Object> redis;
 
-    //private final IpLocationService ipLocationService;
-
     private final SecurityProperties properties;
 
     private final DefaultTokenTtlStrategy tokenTtlStrategy;
 
-    public RedisSecHolder(@Qualifier("securityObjectMapper")
-                          ObjectMapper om,
-                          @Qualifier("securityRedisTemplate")
-                          RedisTemplate<String, Object> redis,
-                          //IpLocationService ipLocationService,
-                          SecurityProperties properties,
-                          DefaultTokenTtlStrategy tokenTtlStrategy) {
+    public RedisSecHolderStrategy(
+            @Qualifier("securityObjectMapper") ObjectMapper om,
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+            SecurityProperties properties,
+            DefaultTokenTtlStrategy tokenTtlStrategy
+    ) {
         this.om = om;
         this.redis = redis;
-        //this.ipLocationService = ipLocationService;
         this.properties = properties;
         this.tokenTtlStrategy = tokenTtlStrategy;
-        io.github.yangxj96.spectra.security.base.holder.SecUtil.setHolder(this);
     }
 
     @Override
@@ -71,11 +66,11 @@ public class RedisSecHolder implements SecHolder {
 
     @Override
     public TokenVO createToken(SecurityUser user) {
-        return this.createToken(user, io.github.yangxj96.spectra.security.base.constant.LoginType.PASSWORD);
+        return this.createToken(user, LoginType.PASSWORD);
     }
 
     @Override
-    public TokenVO createToken(SecurityUser user, io.github.yangxj96.spectra.security.base.constant.LoginType loginType) {
+    public TokenVO createToken(SecurityUser user, LoginType loginType) {
         // =======================
         // 1. 生成 token
         // =======================
@@ -89,7 +84,6 @@ public class RedisSecHolder implements SecHolder {
         }
         var extra = user.getExtraData();
         extra.put("ip", IpUtils.getClientIP(this.getHttpServletRequest()));
-        //extra.put("address", ipLocationService.getCityEn(extra.get("ip").toString()));
 
         // =======================
         // 3. 权限拆分
@@ -262,7 +256,7 @@ public class RedisSecHolder implements SecHolder {
     }
 
     @Override
-    public void deleteByUserIdAndClient(String userId, io.github.yangxj96.spectra.security.base.constant.LoginType clientType) {
+    public void deleteByUserIdAndClient(String userId, LoginType clientType) {
         String userClientTokensKey =
                 AuthRedisKey.USER_CLIENT_TOKENS.format(userId, clientType.getName());
 
@@ -277,7 +271,7 @@ public class RedisSecHolder implements SecHolder {
     }
 
     @Override
-    public List<io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO> listOnlineUsers() {
+    public List<UserOnlineVO> listOnlineUsers() {
         Set<Object> tokens = redis.opsForSet()
                 .members(AuthRedisKey.SESSION_ONLINE.getPattern());
 
@@ -285,7 +279,7 @@ public class RedisSecHolder implements SecHolder {
             return List.of();
         }
 
-        List<io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO> result = new ArrayList<>();
+        List<UserOnlineVO> result = new ArrayList<>();
 
         for (Object tokenObj : tokens) {
             String token = tokenObj.toString();
@@ -316,7 +310,7 @@ public class RedisSecHolder implements SecHolder {
             SecurityUser user = om.convertValue(userObj, SecurityUser.class);
 
             result.add(
-                    io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO.builder()
+                    UserOnlineVO.builder()
                             .token(token)
                             .userId(userId)
                             .username(user.getUsername())

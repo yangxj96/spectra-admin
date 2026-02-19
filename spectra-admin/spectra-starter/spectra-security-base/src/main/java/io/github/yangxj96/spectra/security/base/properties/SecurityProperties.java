@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.security.base.properties;
 
 
+import io.github.yangxj96.spectra.security.base.enums.SecMode;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -31,5 +32,8 @@ public class SecurityProperties {
 
     /// 超管角色名称
     private String administrators = "ROLE_DEV_OPS";
+
+    /// SecUtil工具当前类型
+    private SecMode secMode = SecMode.REDIS;
 
 }
