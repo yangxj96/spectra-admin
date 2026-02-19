@@ -121,25 +121,21 @@ mybatis-plus:
       # logic-delete-field: deleted
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
-      schema: SPECTRA
+      # schema: SPECTRA
   configuration-properties:
     schema: domain_core
 # 日志配置
 logging:
   group:
     spectra: >-
-      io.github.yangxj96.spectra.core
+      io.github.yangxj96.spectra
     other: >-
-      com.ulisesbocchio.jasyptspringboot.configuration,
-      io.github.yangxj96.spectra.core.configure.mvc.filter,
-      io.github.yangxj96.spectra.core.configure.mvc.advice,
-      io.github.yangxj96.spectra.core.configure,
-      io.github.yangxj96.spectra.core.listener.ulog
+      com.ulisesbocchio.jasyptspringboot.configuration
     mp: >-
       io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
-    other: debug
+    other: error
     spectra: debug
     mp: error
   charset:

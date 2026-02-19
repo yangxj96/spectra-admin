@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.redis;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -33,8 +34,6 @@ import tools.jackson.databind.ObjectMapper;
 @Configuration
 public class RedisConfiguration {
 
-    private static final String PREFIX = "[Redis配置]:";
-
     @Resource
     private ObjectMapper om;
 
@@ -44,7 +43,7 @@ public class RedisConfiguration {
     /// @return RedisTemplate<String, Object>
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        log.debug(PREFIX + "开始配置Redis");
+        log.debug(LogPrefix.REDIS.f("开始配置Redis"));
         return RedisTemplateFactory.build(factory, om);
     }
 

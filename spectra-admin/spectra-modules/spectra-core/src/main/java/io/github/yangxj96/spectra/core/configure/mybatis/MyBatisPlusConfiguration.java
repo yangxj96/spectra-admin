@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerIntercep
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
@@ -48,8 +49,6 @@ import java.util.List;
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 
-    private static final String PREFIX = "[MyBatisPlus]:";
-
     /// 使用ObjectProvider自动收集所有InnerInterceptor类型的Bean
     @Resource
     private ObjectProvider<InnerInterceptor> innerInterceptors;
@@ -57,19 +56,19 @@ public class MyBatisPlusConfiguration {
 
     @Bean
     public MetaObjectHandler metaObjectHandler() {
-        log.debug(PREFIX + "载入元数据处理器");
+        log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));
         return new MetaObjectHandlerImpl();
     }
 
     @Bean
     public IdentifierGenerator identifierGenerator() {
-        log.debug(PREFIX + "UUIDv7版本的ID生成器");
+        log.debug(LogPrefix.PERSISTENCE.f("UUIDv7版本的ID生成器"));
         return new UuidV7IdentifierGenerator();
     }
 
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
-        log.debug("{}载入MybatisPlusInterceptor", PREFIX);
+        log.debug(LogPrefix.PERSISTENCE.f("载入MybatisPlusInterceptor"));
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);
@@ -83,7 +82,7 @@ public class MyBatisPlusConfiguration {
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         // 收集的bean进行注册
         List<InnerInterceptor> interceptors = innerInterceptors.stream().toList();
-        log.debug("{}额外的Interceptor数量{}", PREFIX, interceptors.size());
+        log.debug("{}额外的Interceptor数量{}", LogPrefix.PERSISTENCE.p(), interceptors.size());
         interceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }

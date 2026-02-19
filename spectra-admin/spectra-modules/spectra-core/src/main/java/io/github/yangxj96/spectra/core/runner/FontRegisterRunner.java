@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.runner;
 
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.ApplicationArguments;
@@ -20,7 +21,7 @@ import java.io.InputStream;
 public class FontRegisterRunner implements ApplicationRunner {
 
     @Override
-    public void run(@Nullable ApplicationArguments args) throws Exception {
+    public void run(@Nullable ApplicationArguments args) {
         try (InputStream in =
                      FontRegisterRunner.class
                              .getResourceAsStream("/fonts/Inter-Regular.ttf")) {
@@ -36,7 +37,7 @@ public class FontRegisterRunner implements ApplicationRunner {
 
             boolean success = ge.registerFont(font);
 
-            log.debug("[FontRegistrar] register {} => {}", font.getFontName(), success);
+            log.debug("{}注册字体{}=>{}", LogPrefix.CORE.p(), font.getFontName(), success);
 
         } catch (Exception e) {
             throw new IllegalStateException("Font register failed", e);

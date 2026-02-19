@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc.advice.exception;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.exception.DataExistException;
 import io.github.yangxj96.spectra.common.exception.DataNotExistException;
 import io.github.yangxj96.spectra.common.exception.NotImplementedException;
@@ -43,8 +44,6 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @RestControllerAdvice
 public class CommonExceptionAdvice {
 
-    private static final String PREFIX = "[GlobalException]:";
-
     /// 未找到资源
     ///
     /// @param e        错误信息
@@ -53,7 +52,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(NoResourceFoundException.class)
     public R<Object> noResourceFoundException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "未找到资源,{}", e.getMessage(), e);
+        log.error("{}未找到资源,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure("未找到资源");
     }
 
@@ -66,7 +65,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(NotImplementedException.class)
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "未进行功能实现异常,{}", e.getMessage(), e);
+        log.error("{}未进行功能实现异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure();
     }
 
@@ -78,7 +77,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(DataExistException.class)
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.CONFLICT.value());
-        log.error(PREFIX + "数据已存在异常,{}", e.getMessage(), e);
+        log.error("{}数据已存在异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure(HttpStatus.CONFLICT);
     }
 
@@ -90,7 +89,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(DataNotExistException.class)
     public R<Object> dataNotExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.NOT_FOUND.value());
-        log.error(PREFIX + "数据不存在异常,{} ", e.getMessage(), e);
+        log.error("{}数据不存在异常,{} ", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure(HttpStatus.NOT_FOUND);
     }
 
@@ -101,7 +100,7 @@ public class CommonExceptionAdvice {
     /// @return 格式化为正常响应返回
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public R<Object> methodArgumentNotValidException(MethodArgumentNotValidException e, HttpServletResponse response) {
-        log.error(PREFIX + "参数验证异常,{} ", e.getMessage(), e);
+        log.error("{}参数验证异常,{} ", LogPrefix.WEB.p(), e.getMessage(), e);
         response.setStatus(HttpStatus.BAD_REQUEST.value());
 
         var errors = e.getBindingResult().getAllErrors();
@@ -124,7 +123,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public R<Object> httpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "JSON 反序列化失败: {}", e.getMessage(), e);
+        log.error("{}JSON 反序列化失败: {}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure("请求数据格式错误，请检查JSON格式和字段类型");
     }
 
@@ -136,7 +135,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(RuntimeException.class)
     public R<Object> runtimeException(RuntimeException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "运行时异常,{}", e.getMessage(), e);
+        log.error("{}运行时异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure(e.getMessage());
     }
 
@@ -148,7 +147,7 @@ public class CommonExceptionAdvice {
     @ExceptionHandler(Exception.class)
     public R<Object> handleException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "兜底异常处理,{}", e.getMessage(), e);
+        log.error("{}兜底异常处理,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure("系统内部错误,请联系管理员");
     }
 

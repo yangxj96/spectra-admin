@@ -3,17 +3,17 @@ package io.github.yangxj96.spectra.security.starter.autoconfiguration;
 
 import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.security.base.properties.SecurityProperties;
-import io.github.yangxj96.spectra.security.starter.eval.SpectraPermissionEvaluator;
 import io.github.yangxj96.spectra.security.starter.advice.RestAccessDeniedHandler;
 import io.github.yangxj96.spectra.security.starter.advice.RestAuthenticationEntryPoint;
+import io.github.yangxj96.spectra.security.starter.eval.SpectraPermissionEvaluator;
 import io.github.yangxj96.spectra.security.starter.filter.TokenAuthenticationFilter;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -45,28 +45,29 @@ import java.util.List;
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityAutoConfiguration {
 
-    @Resource
-    private SecurityProperties properties;
+    private final SecurityProperties properties;
 
-    @Resource
-    private TokenAuthenticationFilter tokenAuthenticationFilter;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
-    @Resource
-    private SpectraPermissionEvaluator spectraPermissionEvaluator;
+    private final SpectraPermissionEvaluator spectraPermissionEvaluator;
 
-    @Resource
-    private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
 
-    @Resource
-    private RestAccessDeniedHandler restAccessDeniedHandler;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
 
-    @Resource
-    private List<AuthenticationProvider> providers;
+    public SecurityAutoConfiguration(SecurityProperties properties, TokenAuthenticationFilter tokenAuthenticationFilter, SpectraPermissionEvaluator spectraPermissionEvaluator, RestAuthenticationEntryPoint restAuthenticationEntryPoint, RestAccessDeniedHandler restAccessDeniedHandler) {
+        this.properties = properties;
+        this.tokenAuthenticationFilter = tokenAuthenticationFilter;
+        this.spectraPermissionEvaluator = spectraPermissionEvaluator;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
+    }
 
 
     @Bean
-    public AuthenticationManager authenticationManager() {
-        log.debug(LogPrefix.SECURITY.f("配置AuthenticationManager"));
+    @Primary
+    public AuthenticationManager authenticationManager(List<AuthenticationProvider> providers) {
+        log.debug("{}配置AuthenticationManager,providers: {}", LogPrefix.SECURITY.p(), providers.size());
         return new ProviderManager(providers);
     }
 
@@ -83,14 +84,16 @@ public class SecurityAutoConfiguration {
     /// @param http `HttpSecurity`
     /// @return Security过滤器链
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) {
         log.debug(LogPrefix.SECURITY.f("配置核心过滤器"));
+
         // 白名单
         var whitelistPaths = properties.getWhitelists().toArray(new String[0]);
-
         log.debug("{}白名单:{}", LogPrefix.SECURITY.p(), whitelistPaths);
         log.debug(LogPrefix.SECURITY.f("关闭所有自带的认证方式,开放OPTIONS预检请求,开放白名单,其他接口全认证"));
+        log.debug(LogPrefix.SECURITY.f("使用自定义的AuthenticationManager"));
         http
+                .authenticationManager(authenticationManager)
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 // 安全起见关闭所有自带登录和退出方案

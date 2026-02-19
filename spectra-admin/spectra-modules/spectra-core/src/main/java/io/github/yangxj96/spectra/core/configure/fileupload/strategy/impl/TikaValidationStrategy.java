@@ -16,7 +16,9 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-06-19
+@Slf4j
 public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
     private final List<String> allowedMimes;
@@ -41,6 +44,7 @@ public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) throws IOException {
+        log.debug(LogPrefix.STORAGE.f("文件Tika验证"));
         if (file == null || file.isEmpty()) {
             return false;
         }

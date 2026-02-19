@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.service.common.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.exception.FileUploadException;
 import io.github.yangxj96.spectra.common.utils.CollUtils;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
@@ -195,7 +196,7 @@ public class FileServiceLocalImpl extends AbstractFileService {
             return;
         }
         // 开始合并
-        chunks.forEach(i -> log.debug("合并,文件ID:{},分片:{}", i.getFileId(), i.getChunkIndex()));
+        chunks.forEach(i -> log.debug("{}合并,文件ID:{},分片:{}", LogPrefix.STORAGE.p(), i.getFileId(), i.getChunkIndex()));
 
     }
 }

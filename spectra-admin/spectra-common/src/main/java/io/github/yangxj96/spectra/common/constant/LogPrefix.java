@@ -12,11 +12,16 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public enum LogPrefix {
 
-    CORE("CORE"),
-    SECURITY("SECURITY"),
-    AUTH("AUTH"),
+    CORE("核心"),
+    SECURITY("安全"),
+    STORAGE("文件存储"),
+    SERIALIZATION("序列化"),
+    KAPTCHA("验证码"),
     WEB("WEB"),
-    DB("DB");
+    PERSISTENCE("持久化"),
+    REDIS("Redis"),
+    CACHE("缓存"),
+    LOG("日志");
 
     private final String value;
 

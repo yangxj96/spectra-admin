@@ -16,7 +16,9 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.properties.SpectraSystemProperties;
+import io.github.yangxj96.spectra.core.configure.mvc.properties.UserProperties;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,17 +34,18 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /// @since 2025-6-14
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({SpectraSystemProperties.class})
+@EnableConfigurationProperties({
+        SpectraSystemProperties.class,
+        UserProperties.class
+})
 public class MvcConfiguration implements WebMvcConfigurer {
-
-    private static final String PREFIX = "[SpringMVC]:";
 
     @Resource
     private SpectraSystemProperties spectraProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        log.debug(PREFIX + "载入Cors");
+        log.debug(LogPrefix.WEB.f("载入Cors"));
         registry
                 // 匹配所有路径
                 .addMapping(spectraProperties.getCors().getMapping())
@@ -67,7 +70,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
     public void configureApiVersioning(ApiVersionConfigurer configurer) {
         log.debug(
                 "{}配置API版本号,默认请求头为{},默认版本号为{}",
-                PREFIX,
+                LogPrefix.WEB.p(),
                 spectraProperties.getMvc().getApiHeader(),
                 spectraProperties.getMvc().getApiVersion()
         );

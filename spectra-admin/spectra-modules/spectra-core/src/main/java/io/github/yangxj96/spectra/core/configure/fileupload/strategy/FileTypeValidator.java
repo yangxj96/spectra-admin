@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +43,7 @@ public record FileTypeValidator(List<FileTypeValidationStrategy> strategies) {
                 }
             } catch (IOException e) {
                 // 可以根据需要记录日志或抛出异常
-                log.error("验证策略失败:{}", e.getMessage(), e);
+                log.error("{}验证策略失败:{}", LogPrefix.STORAGE.p(), e.getMessage(), e);
                 return false;
             }
         }

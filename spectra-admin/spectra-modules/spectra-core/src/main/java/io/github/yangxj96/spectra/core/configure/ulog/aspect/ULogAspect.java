@@ -17,6 +17,7 @@
 package io.github.yangxj96.spectra.core.configure.ulog.aspect;
 
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.utils.IpUtils;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
@@ -45,11 +46,12 @@ import tools.jackson.databind.ObjectMapper;
 @Aspect
 public class ULogAspect {
 
-    private static final String PREFIX = "[ULogAspect]:";
     /// 计算操作消耗时间
     private static final ThreadLocal<Long> TIME_THREADLOCAL = new NamedThreadLocal<>("Cost Time");
+
     @Resource
     private ULogEventPublisher publisher;
+
     @Resource
     private ObjectMapper om;
 
@@ -84,14 +86,14 @@ public class ULogAspect {
             // 获取请求上下文
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes == null) {
-                log.warn(PREFIX + "非 Web 请求上下文，跳过日志记录");
+                log.warn(LogPrefix.LOG.f("非 Web 请求上下文，跳过日志记录"));
                 return;
             }
 
             var request = attributes.getRequest();
             var response = attributes.getResponse();
 
-            log.debug("{}操作日志-开始记录,请求方法:{}", PREFIX, request.getMethod());
+            log.debug("{}操作日志-开始记录,请求方法:{}", LogPrefix.LOG.p(), request.getMethod());
 
             // 初始化记录实体
             var datum = new ULogEntity();
@@ -106,13 +108,13 @@ public class ULogAspect {
             // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
             datum.setCurrentId(SecUtil.getCurrentUserId());
             publisher.save(datum);
-            log.debug(PREFIX + "操作日志-记录结束");
+            log.debug(LogPrefix.LOG.f("操作日志-记录结束"));
         } catch (Exception ex) {
             log.error("记录日志异常:{}", ex.getMessage(), ex);
         } finally {
             TIME_THREADLOCAL.remove();
         }
-        log.debug(PREFIX + "操作日志-记录结束");
+        log.debug(LogPrefix.LOG.f("操作日志-记录结束"));
     }
 
 
@@ -127,7 +129,8 @@ public class ULogAspect {
         try {
             return om.writeValueAsString(obj);
         } catch (Exception e) {
-            log.error(PREFIX + "JSON 序列化失败: {}", obj.getClass(), e);
+            log.error("{}JSON 序列化失败: {}", LogPrefix.LOG.p(), obj.getClass(), e);
+
             return null;
         }
     }
@@ -144,7 +147,7 @@ public class ULogAspect {
         try {
             status = (short) response.getStatus();
         } catch (IllegalStateException e) {
-            log.error("无法获取响应状态码", e);
+            log.error(LogPrefix.LOG.f("无法获取响应状态码"), e);
         }
         return status;
     }

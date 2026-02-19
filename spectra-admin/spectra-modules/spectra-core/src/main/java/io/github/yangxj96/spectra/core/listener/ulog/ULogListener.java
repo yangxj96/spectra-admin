@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.listener.ulog;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.ulog.entity.ULogEntity;
 import io.github.yangxj96.spectra.core.javabean.system.entity.OperationLog;
 import io.github.yangxj96.spectra.core.service.system.OperationLogService;
@@ -34,8 +35,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class ULogListener {
 
-    private static final String PREFIX = "[ULogListener]: ";
-
     private final OperationLogService logService;
 
     public ULogListener(OperationLogService logService) {
@@ -45,7 +44,7 @@ public class ULogListener {
     @Async
     @EventListener
     public void handleLogEvent(ULogEntity entity) {
-        log.debug(PREFIX + "开始记录,{}", entity);
+        log.debug("{}开始记录,{}", LogPrefix.LOG.p(), entity);
         var datum = new OperationLog();
         BeanUtils.copyProperties(entity, datum);
         datum.setCreatedBy(entity.getCurrentId());

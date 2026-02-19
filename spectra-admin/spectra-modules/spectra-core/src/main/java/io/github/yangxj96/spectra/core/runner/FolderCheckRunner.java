@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.runner;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.properties.SpectraSystemProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -46,12 +47,12 @@ public class FolderCheckRunner implements ApplicationRunner {
         if (!folder.exists()) {
             var created = folder.mkdirs();
             if (created) {
-                log.debug("已创建文件夹: {}", folder.getAbsolutePath());
+                log.debug("{}已创建文件夹: {}", LogPrefix.CORE.p(), folder.getAbsolutePath());
             } else {
-                log.debug("无法创建文件夹: {}", folder.getAbsolutePath());
+                log.debug("{}无法创建文件夹: {}", LogPrefix.CORE.p(), folder.getAbsolutePath());
             }
         } else {
-            log.debug("文件夹已存在: {}", folder.getAbsolutePath());
+            log.debug("{}文件夹已存在: {}", LogPrefix.CORE.p(), folder.getAbsolutePath());
         }
     }
 }

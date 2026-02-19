@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.listener.user;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.javabean.user.event.RoleDeletedEvent;
 import io.github.yangxj96.spectra.core.service.user.RelRoleMenuService;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class RoleDeletionOnRoleMenuCleanupListener {
 
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
-        log.debug("角色删除事件监听-角色菜单关联关系:{}", event.roleId());
+        log.debug("{}角色删除事件监听-角色菜单关联关系:{}", LogPrefix.CORE.p(), event.roleId());
         relRoleMenuService.revoke(event.roleId());
     }
 

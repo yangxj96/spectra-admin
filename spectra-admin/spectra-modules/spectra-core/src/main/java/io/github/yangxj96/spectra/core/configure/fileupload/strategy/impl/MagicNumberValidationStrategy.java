@@ -16,9 +16,11 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.exception.FileTypeException;
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,6 +34,7 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-06-19
+@Slf4j
 public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
 
     /// 判断两个字节数组前 n 字节是否相等
@@ -40,6 +43,7 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
     /// @param magic      文件类型的魔数字节
     /// @return 是否相等
     public static boolean matches(byte[] fileHeader, byte[] magic) {
+        log.debug(LogPrefix.STORAGE.f("文件魔数验证"));
         if ((fileHeader.length == 0 || magic.length == 0) || fileHeader.length < magic.length) {
             return false;
         }

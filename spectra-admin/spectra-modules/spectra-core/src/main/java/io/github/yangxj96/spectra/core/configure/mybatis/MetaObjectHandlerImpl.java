@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.configure.mybatis;
 
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.security.base.holder.SecUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
@@ -31,8 +32,6 @@ import java.time.Instant;
 /// @since 2025-6-14
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
-
-    private static final String PREFIX = "[MetaObjectHandler]:";
 
     /// 创建人
     private static final String CREATED_BY = "createdBy";
@@ -49,7 +48,8 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void insertFill(MetaObject metaObject) {
-        log.debug("{}insertFill", PREFIX);
+        log.debug(LogPrefix.PERSISTENCE.f("insertFill"));
+
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
             setFieldValByName(CREATED_BY, SecUtil.getCurrentUserId(), metaObject);
         }
@@ -66,7 +66,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     @Override
     public void updateFill(MetaObject metaObject) {
-        log.debug("{}updateFill", PREFIX);
+        log.debug(LogPrefix.PERSISTENCE.f("updateFill"));
         setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
     }

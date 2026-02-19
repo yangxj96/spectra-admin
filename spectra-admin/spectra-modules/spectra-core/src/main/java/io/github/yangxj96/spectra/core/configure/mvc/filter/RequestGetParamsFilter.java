@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc.filter;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -45,14 +46,12 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 public class RequestGetParamsFilter extends OncePerRequestFilter {
 
-    private static final String PREFIX = "[Get请求参数下滑先转驼峰命名]:";
-
     @Override
     @NullMarked
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.debug(PREFIX + "开始处理请求参数下划线转小驼峰命名");
+        log.debug(LogPrefix.WEB.f("开始处理请求参数下划线转小驼峰命名"));
         if (!request.getMethod().toUpperCase(Locale.getDefault()).equals("GET")) {
-            log.debug(PREFIX + "非GET方法,跳过");
+            log.debug(LogPrefix.WEB.f("非GET方法,跳过"));
             filterChain.doFilter(request, response);
             return;
         }
@@ -66,7 +65,7 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
             }
             formatted.put(k, request.getParameterValues(param));
         }
-        log.debug(PREFIX + "转换成功,继续往下执行");
+        log.debug(LogPrefix.WEB.f("转换成功,继续往下执行"));
         filterChain.doFilter(new ParamsModifyHttpServletRequestWrapper(request, formatted), response);
     }
 

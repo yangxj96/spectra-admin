@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.controller.user;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.github.yangxj96.spectra.common.base.Verify;
 import io.github.yangxj96.spectra.common.base.javabean.from.PageFrom;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.ulog.annotation.ULog;
 import io.github.yangxj96.spectra.core.javabean.system.vo.MenuVO;
 import io.github.yangxj96.spectra.core.javabean.user.from.RoleAuthorityFrom;
@@ -106,7 +107,7 @@ public class RoleController {
         try {
             return relRoleAuthorityService.get(roleId);
         } catch (Exception e) {
-            log.error("获取角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            log.error("{}获取角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -117,7 +118,7 @@ public class RoleController {
         try {
             return relRoleMenuService.get(roleId);
         } catch (Exception e) {
-            log.error("获取角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -129,7 +130,7 @@ public class RoleController {
         try {
             relRoleAuthorityService.grant(roleId, from);
         } catch (Exception e) {
-            log.error("保存角色关联的权限列表出现错误,{}", e.getMessage(), e);
+            log.error("{}保存角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }
@@ -141,7 +142,7 @@ public class RoleController {
         try {
             relRoleMenuService.grant(roleId, from);
         } catch (Exception e) {
-            log.error("保存角色关联的菜单列表出现错误,{}", e.getMessage(), e);
+            log.error("{}保存角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
         }
     }

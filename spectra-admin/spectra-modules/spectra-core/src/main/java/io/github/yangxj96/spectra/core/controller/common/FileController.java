@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.controller.common;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileChunkFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FilePreprocessFrom;
 import io.github.yangxj96.spectra.core.javabean.common.from.FileUploadFrom;
@@ -79,7 +80,7 @@ public class FileController {
     @GetMapping("/progress")
     public void progress(String md5) {
         // 暂时未实现
-        log.debug("入参:{}", md5);
+        log.debug("{}入参:{}", LogPrefix.STORAGE, md5);
     }
 
 }

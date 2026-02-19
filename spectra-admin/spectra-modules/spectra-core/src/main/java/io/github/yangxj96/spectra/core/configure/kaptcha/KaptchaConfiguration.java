@@ -19,6 +19,7 @@ package io.github.yangxj96.spectra.core.configure.kaptcha;
 import com.google.code.kaptcha.Producer;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.kaptcha.creator.KaptchaTextCreator;
 import io.github.yangxj96.spectra.core.configure.kaptcha.properties.KaptchaProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +42,6 @@ import static com.google.code.kaptcha.Constants.*;
 @EnableConfigurationProperties(KaptchaProperties.class)
 public class KaptchaConfiguration {
 
-    private static final String PREFIX = "[kaptcha]:";
-
     ///
     /// 图片验证码
     ///
@@ -51,7 +50,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() throws Exception {
-        log.debug("{}开始配置图片验证码,字符模式", PREFIX);
+        log.debug(LogPrefix.KAPTCHA.f("开始配置图片验证码,字符模式"));
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no
@@ -88,8 +87,7 @@ public class KaptchaConfiguration {
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() throws Exception {
-
-        log.debug("{}开始配置图片验证码,算术模式", PREFIX);
+        log.debug(LogPrefix.KAPTCHA.f("开始配置图片验证码,算术模式"));
         var defaultKaptcha = new DefaultKaptcha();
         var properties = new Properties();
         // 是否有边框 默认为true 我们可以自己设置yes，no

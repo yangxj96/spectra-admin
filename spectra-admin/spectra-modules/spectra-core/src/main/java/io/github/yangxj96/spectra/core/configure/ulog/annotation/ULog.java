@@ -29,18 +29,10 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ULog {
-    /**
-     * 操作说明
-     *
-     * @return 操作说明
-     */
+
     ///  默认值
     String value() default "未填写操作说明";
-    /**
-     * 日志类型
-     *
-     * @return 默认为一般日志
-     */
+
     /// 日志类型
     SysLogType type() default SysLogType.GENERAL;
 

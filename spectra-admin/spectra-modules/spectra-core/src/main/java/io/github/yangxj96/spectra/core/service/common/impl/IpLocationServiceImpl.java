@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.service.common.impl;
 
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.service.common.IpLocationService;
 import jakarta.annotation.PreDestroy;
@@ -30,8 +31,6 @@ import java.nio.file.StandardCopyOption;
 @Service
 public class IpLocationServiceImpl implements IpLocationService {
 
-    private static final String PREFIX = "[IP2REGION]";
-
     @Nullable
     private Searcher searcher;
 
@@ -44,17 +43,17 @@ public class IpLocationServiceImpl implements IpLocationService {
             // 创建内存搜索器
             this.searcher = Searcher.newWithBuffer(Version.IPv4, buffer);
             // 输出成功日志
-            log.info("{}IP 地理位置数据库加载成功", PREFIX);
-            log.info("{}IP版本: {}", PREFIX, this.searcher.getIPVersion());
-            log.info("{}总记录数: {}", PREFIX, this.searcher.getIOCount());
+            log.info("{}IP地理位置数据库加载成功", LogPrefix.CORE.p());
+            log.info("{}IP版本:{}", LogPrefix.CORE.p(), this.searcher.getIPVersion());
+            log.info("{}总记录数:{}", LogPrefix.CORE.p(), this.searcher.getIOCount());
         } catch (FileNotFoundException e) {
-            log.error("{}未找到 IP 数据库文件，请检查 resources/ip2region/ 目录下是否存在 ip2region_v4.xdb", PREFIX, e);
+            log.error("{}未找到IP数据库文件，请检查resources/ip2region/目录下是否存在ip2region_v4.xdb", LogPrefix.CORE.p(), e);
         } catch (XdbException e) {
-            log.error("{}IP 数据库文件校验失败，请检查文件完整性: ip2region/ip2region_v4.xdb", PREFIX, e);
+            log.error("{}IP 数据库文件校验失败，请检查文件完整性:ip2region/ip2region_v4.xdb", LogPrefix.CORE.p(), e);
         } catch (IOException e) {
-            log.error("{}读取 IP 数据库文件时发生 I/O 错误", PREFIX, e);
+            log.error("{}读取IP数据库文件时发生I/O错误", LogPrefix.CORE.p(), e);
         } catch (Exception e) {
-            log.error("{}初始化 IP 定位服务失败", PREFIX, e);
+            log.error("{}初始化IP定位服务失败", LogPrefix.CORE.p(), e);
         }
     }
 
@@ -117,7 +116,7 @@ public class IpLocationServiceImpl implements IpLocationService {
         }
 
         if (searcher == null) {
-            log.warn("{}IP 数据库未加载，无法查询 IP: {}", PREFIX, ip);
+            log.warn("{}IP数据库未加载，无法查询IP:{}", LogPrefix.CORE.p(), ip);
             return "未知";
         }
 
@@ -128,7 +127,7 @@ public class IpLocationServiceImpl implements IpLocationService {
                 return formatRegion(fields, level);
             }
         } catch (Exception e) {
-            log.warn("{}查询 IP 位置失败，IP: {}, 错误: {}", PREFIX, ip, e.getMessage());
+            log.warn("{}查询IP位置失败IP:{},错误:{}", LogPrefix.CORE.p(), ip, e.getMessage());
         }
 
         return "未知";
@@ -167,7 +166,7 @@ public class IpLocationServiceImpl implements IpLocationService {
     public RandomAccessFile createRandomAccessFileForResource() throws IOException {
         var resource = new ClassPathResource("ip2region/ip2region_v4.xdb");
         if (!resource.exists()) {
-            throw new FileNotFoundException(PREFIX + "IP数据库文件不存在: ip2region/ip2region_v4.xdb");
+            throw new FileNotFoundException(LogPrefix.CORE.p() + "IP数据库文件不存在: ip2region/ip2region_v4.xdb");
         }
 
         // 创建临时文件
@@ -191,9 +190,9 @@ public class IpLocationServiceImpl implements IpLocationService {
         if (searcher != null) {
             try {
                 searcher.close();
-                log.info("{}IP 地理位置数据库已关闭", PREFIX);
+                log.info("{}IP地理位置数据库已关闭", LogPrefix.CORE.p());
             } catch (IOException e) {
-                log.error("{}关闭 IP 数据库失败", PREFIX, e);
+                log.error("{}关闭IP数据库失败", LogPrefix.CORE.p(), e);
             }
         }
     }

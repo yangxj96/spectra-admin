@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.ulog;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.ulog.aspect.ULogAspect;
 import io.github.yangxj96.spectra.core.configure.ulog.publisher.ULogEventPublisher;
 import lombok.extern.slf4j.Slf4j;
@@ -34,27 +35,20 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @Configuration
 public class ULogConfiguration {
 
-    private static final String PREFIX = "[ULogConfiguration]:";
-
     /// 日志消息订阅发布者
     ///
     /// @param publisher 发布者
     /// @return {@link ULogEventPublisher}
     @Bean
     public ULogEventPublisher uLogEventPublisher(ApplicationEventPublisher publisher) {
-        log.debug(PREFIX + "载入日志消息订阅发布者");
+        log.debug(LogPrefix.LOG.f("载入日志消息订阅发布者"));
         return new ULogEventPublisher(publisher);
     }
 
-    /**
-     * 日志AOP切面
-     *
-     * @return {@link ULogAspect}
-     */
     /// 日志切面
     @Bean
     public ULogAspect uLogAspect() {
-        log.debug(PREFIX + "载入ULogAspect");
+        log.debug(LogPrefix.LOG.f("载入ULogAspect"));
         return new ULogAspect();
     }
 

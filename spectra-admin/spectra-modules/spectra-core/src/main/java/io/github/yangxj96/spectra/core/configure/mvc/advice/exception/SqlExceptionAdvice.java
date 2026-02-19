@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc.advice.exception;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,6 @@ import java.util.regex.Pattern;
 @RestControllerAdvice
 public class SqlExceptionAdvice {
 
-    private static final String PREFIX = "[SQL相关错误处理]:";
-
-
     /// 处理唯一键冲突异常
     ///
     /// @param e        错误信息
@@ -66,7 +64,7 @@ public class SqlExceptionAdvice {
             return R.failure("\"%s\"已存在,请更换名称".formatted(value));
         }
         // 记录日志（这里假设你有 log 对象）
-        log.error(PREFIX + "{}, detail: {}", errorMessage, message, e);
+        log.error("{}{}, detail: {}", LogPrefix.PERSISTENCE.p(), errorMessage, message, e);
         return R.failure(errorMessage);
     }
 
@@ -78,7 +76,7 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(BadSqlGrammarException.class)
     public R<Object> handleBadSqlGrammarException(BadSqlGrammarException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "SQL语法错误: SQL=[{}], 错误=[{}]", e.getSql(), e.getMessage(), e);
+        log.error("{}SQL语法错误: SQL=[{}], 错误=[{}]", LogPrefix.PERSISTENCE.p(), e.getSql(), e.getMessage(), e);
         return R.failure("请求的数据查询异常,请联系管理员");
     }
 
@@ -86,7 +84,7 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public R<Object> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(PREFIX + "数据完整性违规: {}", e.getMessage(), e);
+        log.error("{}数据完整性违规: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
         return R.failure("数据不符合规则,请检查输入内容");
     }
 
@@ -94,10 +92,14 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(UncategorizedSQLException.class)
     public R<Object> handleUncategorizedSQLException(UncategorizedSQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(PREFIX + "未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]",
+        log.error(
+                "{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]",
+                LogPrefix.PERSISTENCE.p(),
                 Objects.requireNonNull(e.getSQLException()).getSQLState(),
                 e.getSQLException().getErrorCode(),
-                e.getSQLException().getMessage(), e);
+                e.getSQLException().getMessage(),
+                e
+        );
         return R.failure("数据库操作异常,请稍后重试");
     }
 
@@ -106,7 +108,7 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(DataAccessException.class)
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(PREFIX + "数据访问异常（兜底）: {}", e.getMessage(), e);
+        log.error("{}数据访问异常（兜底）: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
         return R.failure("系统内部错误,请联系管理员");
     }
 
@@ -116,8 +118,13 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(SQLException.class)
     public R<Object> handleSQLException(SQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(PREFIX + "原始SQLException: SQL状态=[{}], 错误码=[{}], 信息=[{}]",
-                e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
+        log.error(
+                "{}原始SQLException: SQL状态=[{}], 错误码=[{}], 信息=[{}]",
+                LogPrefix.PERSISTENCE.p(),
+                e.getSQLState(),
+                e.getErrorCode(),
+                e.getMessage(), e
+        );
         return R.failure("数据库操作失败,请稍后重试");
     }
 

@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.mvc.advice.exception;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.exception.KaptchaExpiresException;
 import io.github.yangxj96.spectra.common.exception.KaptchaNotMatchException;
 import io.github.yangxj96.spectra.common.response.R;
@@ -38,8 +39,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class KaptchaExceptionAdvice {
 
-    private static final String PREFIX = "[验证码错误处理]:";
-
     /// 验证码不匹配
     ///
     /// @param e        错误信息
@@ -48,7 +47,7 @@ public class KaptchaExceptionAdvice {
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "验证码不匹配,{}", e.getMessage(), e);
+        log.error("{}验证码不匹配,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
         return R.failure("验证码不匹配");
     }
 
@@ -61,7 +60,7 @@ public class KaptchaExceptionAdvice {
     @ExceptionHandler(KaptchaExpiresException.class)
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        log.error(PREFIX + "验证码过期,{}", e.getMessage(), e);
+        log.error("{}验证码过期,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
         return R.failure("验证码过期");
     }
 

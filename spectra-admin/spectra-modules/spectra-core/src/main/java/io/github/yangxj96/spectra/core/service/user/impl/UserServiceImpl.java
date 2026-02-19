@@ -49,10 +49,7 @@ import io.github.yangxj96.spectra.core.service.user.UserService;
 import io.github.yangxj96.spectra.security.base.constant.LoginType;
 import io.github.yangxj96.spectra.security.base.holder.SecUtil;
 import io.github.yangxj96.spectra.security.base.javabean.vo.UserOnlineVO;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +65,6 @@ import java.util.List;
 /// @since 2025-6-14
 @Slf4j
 @Service
-@EnableConfigurationProperties({UserProperties.class})
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
     private final UserConverter userConverter;
@@ -90,9 +86,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final UserDataScopeTargetMapper dataScopeTargetMapper;
 
     private final NameFillExecutor fillExecutor;
-
-    @Resource(name = "securityRedisTemplate")
-    private RedisTemplate<String, Object> redis;
 
     public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper, NameFillExecutor fillExecutor) {
         this.userConverter = userConverter;

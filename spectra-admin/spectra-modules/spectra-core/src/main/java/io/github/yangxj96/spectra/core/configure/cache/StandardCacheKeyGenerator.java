@@ -15,7 +15,11 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/// 标准key生成器,Bean名称不能修改,使用这个名称能让cache默认使用他
+/// 标准key生成器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/2/2 17:17
 @NullMarked
 @Component
 public class StandardCacheKeyGenerator implements KeyGenerator {

@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.listener.user;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.javabean.user.entity.RelUserRole;
 import io.github.yangxj96.spectra.core.javabean.user.event.RoleDeletedEvent;
 import io.github.yangxj96.spectra.core.service.user.RelUserRoleService;
@@ -53,7 +54,7 @@ public class RoleDeletionOnUserRoleCleanupListener {
      */
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
-        log.debug("角色删除事件监听-用户角色关联关系:{}", event.roleId());
+        log.debug("{}角色删除事件监听-用户角色关联关系:{}", LogPrefix.CORE.p(), event.roleId());
         // 获取保底角色
         var defaultRole = roleService.getSystemDefaultUserRole();
         // 查询所有有这个角色的用户,

@@ -16,9 +16,11 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload.strategy.impl;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.common.utils.StrUtils;
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,12 +32,14 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-06-19
+@Slf4j
 public record ExtensionValidationStrategy(List<FileType> allowed) implements FileTypeValidationStrategy {
 
     private static final Integer MIN = -1;
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) {
+        log.debug(LogPrefix.STORAGE.f("文件扩展名验证"));
         if (file == null || file.isEmpty()) {
             return false;
         }

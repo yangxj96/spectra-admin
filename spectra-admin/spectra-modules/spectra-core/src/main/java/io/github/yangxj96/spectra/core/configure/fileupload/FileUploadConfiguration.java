@@ -16,6 +16,7 @@
 
 package io.github.yangxj96.spectra.core.configure.fileupload;
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.fileupload.enums.FileType;
 import io.github.yangxj96.spectra.core.configure.fileupload.properties.FileUploadProperties;
 import io.github.yangxj96.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
@@ -42,8 +43,6 @@ import java.util.List;
 @EnableConfigurationProperties(FileUploadProperties.class)
 public class FileUploadConfiguration {
 
-    private static final String PREFIX = "[FileUpload]:";
-
     private final FileUploadProperties properties;
 
     public FileUploadConfiguration(FileUploadProperties properties) {
@@ -55,7 +54,7 @@ public class FileUploadConfiguration {
     /// @return 文件策略验证管理器
     @Bean
     public FileTypeValidator fileTypeValidator() {
-        log.debug(PREFIX + "载入文件类型验证策略管理器");
+        log.debug(LogPrefix.STORAGE.f("载入文件类型验证策略管理器"));
         var strategies = new ArrayList<FileTypeValidationStrategy>();
         List<FileType> allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器

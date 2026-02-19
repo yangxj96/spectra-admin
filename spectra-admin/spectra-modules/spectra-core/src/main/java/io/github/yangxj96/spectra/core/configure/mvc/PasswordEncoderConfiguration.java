@@ -1,6 +1,7 @@
 package io.github.yangxj96.spectra.core.configure.mvc;
 
 
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class PasswordEncoderConfiguration {
 
-    private static final String PREFIX = "[Security]:";
-
     @Bean
     public PasswordEncoder passwordEncoder() {
-        log.debug("{}配置PasswordEncoder", PREFIX);
+        log.debug(LogPrefix.WEB.f("配置PasswordEncoder"));
         return new BCryptPasswordEncoder();
     }
 

@@ -18,6 +18,7 @@ package io.github.yangxj96.spectra.core.configure.json;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.github.yangxj96.spectra.common.constant.LogPrefix;
 import io.github.yangxj96.spectra.core.configure.json.properties.JacksonProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -51,8 +52,6 @@ import java.util.TimeZone;
 @EnableConfigurationProperties(JacksonProperties.class)
 public class JacksonConfiguration {
 
-    private static final String PREFIX = "[Jackson]:";
-
     private final JacksonProperties properties;
 
     public JacksonConfiguration(JacksonProperties properties) {
@@ -61,10 +60,10 @@ public class JacksonConfiguration {
 
     @Bean
     public JsonMapperBuilderCustomizer jsonMapperBuilderCustomizer() {
-        log.debug("{}配置JsonMapper", PREFIX);
+        log.debug(LogPrefix.SERIALIZATION.f("配置JsonMapper"));
         return builder -> {
 
-            log.debug("{}新时间序列化", PREFIX);
+            log.debug(LogPrefix.SERIALIZATION.f("新时间序列化"));
             // 新时间的序列化 module
             var javaTimeModule = new SimpleModule();
 
@@ -86,11 +85,11 @@ public class JacksonConfiguration {
 
             // 旧时间的序列化
             // 理论上是非线程安全的,如果用不到传统time类,可以注释掉
-            log.debug("{}传统time进行处理", PREFIX);
+            log.debug(LogPrefix.SERIALIZATION.f("传统time进行处理"));
             var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-            log.debug("{}NON_NULL,SNAKE_CASE,MixIn", PREFIX);
+            log.debug(LogPrefix.SERIALIZATION.f("NON_NULL,SNAKE_CASE,MixIn"));
             // 构建详情
             builder.configureForJackson2();
             builder.changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(
