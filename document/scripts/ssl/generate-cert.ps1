@@ -3,9 +3,13 @@
 # 保存脚本执行前的当前目录
 $OriginalLocation = Get-Location
 
-$WorkDir = Join-Path $env:USERPROFILE "dev-https"
+$WorkDir = "D:\Devops\Platform\LocalHttps"
 $CA_Cert = Join-Path $WorkDir "SpectraRootCA.crt"
 $CA_Key  = Join-Path $WorkDir "SpectraRootCA.key"
+
+if (-not (Test-Path $WorkDir)) {
+    New-Item -ItemType Directory -Path $WorkDir | Out-Null
+}
 
 if (!(Test-Path $WorkDir)) {
     Write-Host "❌ 工作目录不存在: $WorkDir" -ForegroundColor Red

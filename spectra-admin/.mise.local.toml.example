@@ -1,3 +1,6 @@
+[tools]
+java = "temurin-25.0.2+10.0.LTS"
+
 [env]
 # 默认密码
 DEFAULT_PASSWORD = "admin123"

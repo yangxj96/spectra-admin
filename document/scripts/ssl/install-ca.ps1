@@ -3,13 +3,17 @@
 # 保存脚本执行前的当前目录
 $OriginalLocation = Get-Location
 
-$WorkDir = Join-Path $env:USERPROFILE "dev-https"
+$WorkDir = "D:\Devops\Platform\LocalHttps"
 $CA_Name = "Spectra CA"
 $Org = "Spectra"
 $Country = "CN"
 $State = "Kunming"
 $City = "Kunming"
 $ValidDays = 3650  # 10年
+
+if (-not (Test-Path $WorkDir)) {
+    New-Item -ItemType Directory -Path $WorkDir | Out-Null
+}
 
 # ==================== 检查管理员权限 ====================
 try {

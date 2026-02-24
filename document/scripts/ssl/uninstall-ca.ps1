@@ -4,7 +4,11 @@
 $OriginalLocation = Get-Location
 
 $CA_Name = "Spectra CA"
-$WorkDir = Join-Path $env:USERPROFILE "dev-https"
+$WorkDir = "D:\Devops\Platform\LocalHttps"
+
+if (-not (Test-Path $WorkDir)) {
+    New-Item -ItemType Directory -Path $WorkDir | Out-Null
+}
 
 # ==================== 检查管理员权限 ====================
 try {
