@@ -16,9 +16,6 @@ import io.github.yangxj96.spectra.core.service.system.ConfiguredService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-
 
 /// 系统配置Service层默认实现
 ///
@@ -55,61 +52,6 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         return configuredConverter.toVOPage(db);
-    }
-
-    @Override
-    public Object json() {
-        var listed = list();
-        Map<String, Object> result = new HashMap<>();
-        if (listed.isEmpty()) {
-            return result;
-        }
-        for (var cfg : listed) {
-            String[] keys = cfg.getKey().split("\\.");
-            Map<String, Object> current = result;
-            for (int i = 0; i < keys.length; i++) {
-                String k = keys[i];
-                if (i == keys.length - 1) {
-                    current.put(k, parseValue(cfg.getValue()));
-                } else {
-                    Object next = current.get(k);
-                    if (next == null) {
-                        Map<String, Object> child = new HashMap<>();
-                        current.put(k, child);
-                        current = child;
-                    } else if (next instanceof Map) {
-                        //noinspection unchecked
-                        current = (Map<String, Object>) next;
-                    } else {
-                        throw new IllegalStateException("配置 key 冲突: " + cfg.getKey());
-                    }
-                }
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 转换值
-     *
-     * @param value 值
-     * @return 转换后的结果
-     */
-    private Object parseValue(String value) {
-        if (value == null) return null;
-
-        if ("true".equalsIgnoreCase(value)) return true;
-        if ("false".equalsIgnoreCase(value)) return false;
-
-        if (value.matches("-?\\d+")) {
-            return Long.parseLong(value);
-        }
-
-        if (value.matches("-?\\d+\\.\\d+")) {
-            return Double.parseDouble(value);
-        }
-
-        return value;
     }
 
 }

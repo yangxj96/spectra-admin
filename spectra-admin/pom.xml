@@ -13,7 +13,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.2</version>
+        <version>4.0.3</version>
         <relativePath/>
     </parent>
 
@@ -38,6 +38,7 @@
         <bcprov.version>1.83</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
         <mica.version>4.0.0</mica.version>
+        <lombok.version>1.18.42</lombok.version>
 
     </properties>
 
@@ -52,7 +53,6 @@
         <module>./spectra-starter/spectra-security-base</module>
         <module>./spectra-starter/spectra-security-starter</module>
     </modules>
-
 
     <dependencyManagement>
         <dependencies>
@@ -194,17 +194,6 @@
     </dependencies>
 
     <build>
-        <!--<pluginManagement>-->
-        <!--    <plugins>-->
-        <!--        <plugin>-->
-        <!--            <groupId>org.springframework.boot</groupId>-->
-        <!--            <artifactId>spring-boot-maven-plugin</artifactId>-->
-        <!--            <configuration>-->
-        <!--                <skip>true</skip>-->
-        <!--            </configuration>-->
-        <!--        </plugin>-->
-        <!--    </plugins>-->
-        <!--</pluginManagement>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -213,6 +202,7 @@
                     <parameters>true</parameters>
                     <source>25</source>
                     <target>25</target>
+                    <encoding>utf-8</encoding>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

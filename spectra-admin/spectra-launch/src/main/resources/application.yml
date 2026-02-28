@@ -46,8 +46,8 @@ spring:
   threads:
     virtual:
       enabled: true
-  main:
-    banner-mode: off
+  # main:
+  #   banner-mode: off
   # 应用名称
   application:
     name: spectra-admin

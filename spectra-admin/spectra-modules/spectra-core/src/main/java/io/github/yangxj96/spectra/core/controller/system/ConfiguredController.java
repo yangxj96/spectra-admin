@@ -46,14 +46,4 @@ public class ConfiguredController {
         return bindService.page(page, params);
     }
 
-    /**
-     * 获取json形式的数据
-     *
-     * @return 转换后的数据
-     */
-    @GetMapping("/json")
-    public Object json() {
-        return bindService.json();
-    }
-
 }

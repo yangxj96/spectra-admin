@@ -7,6 +7,7 @@ import io.github.yangxj96.spectra.core.configure.mapstruct.TimeMapper;
 import io.github.yangxj96.spectra.core.javabean.system.entity.Configured;
 import io.github.yangxj96.spectra.core.javabean.system.vo.ConfiguredVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 /// 系统配置Mapstruct
 ///
@@ -26,6 +27,7 @@ public interface ConfiguredConverter {
     ///
     /// @param source 分页信息
     /// @return IPAGE
+    @Mapping(target = "pages", ignore = true)
     Page<ConfiguredVO> toVOPage(Page<Configured> source);
 
 }

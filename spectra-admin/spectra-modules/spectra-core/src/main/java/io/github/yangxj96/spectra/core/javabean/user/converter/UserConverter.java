@@ -23,6 +23,7 @@ import io.github.yangxj96.spectra.core.javabean.user.entity.User;
 import io.github.yangxj96.spectra.core.javabean.user.from.UserSaveFrom;
 import io.github.yangxj96.spectra.core.javabean.user.vo.UserPageVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 /// 用户mapstruct
@@ -51,6 +52,7 @@ public interface UserConverter {
      * @param source 入参
      * @return 分页的VO
      */
+    @Mapping(target = "pages", ignore = true)
     Page<UserPageVO> toVOPage(Page<User> source);
 
     /// 使用params更新现有的user实体
