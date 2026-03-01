@@ -10,8 +10,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-security-base</artifactId>
-    <description>封装SpringSecurity的基础包</description>
+    <artifactId>spectra-datascope-base</artifactId>
+    <description>数据范围基础信息包</description>
 
     <properties>
         <java.version>25</java.version>
@@ -24,18 +24,10 @@
     <dependencies>
 
         <!-- === 项目模块 === -->
-        <!-- 公用 -->
         <dependency>
             <groupId>io.github.yangxj96.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
-        </dependency>
-
-        <!-- === Spring Boot === -->
-        <!-- 基础security -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
         </dependency>
 
     </dependencies>

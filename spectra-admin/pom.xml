@@ -52,6 +52,8 @@
         <!-- starter包 -->
         <module>./spectra-starter/spectra-security-base</module>
         <module>./spectra-starter/spectra-security-starter</module>
+        <module>./spectra-starter/spectra-datascope-base</module>
+        <module>./spectra-starter/spectra-datascope-starter</module>
     </modules>
 
     <dependencyManagement>

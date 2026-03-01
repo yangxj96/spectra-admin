@@ -10,8 +10,8 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-security-starter</artifactId>
-    <description>封装的SpringSecurity框架的自动配置包</description>
+    <artifactId>spectra-datascope-starter</artifactId>
+    <description>数据权限数据范围</description>
 
     <properties>
         <java.version>25</java.version>
@@ -29,11 +29,6 @@
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
-            <artifactId>spectra-security-base</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <!-- === Spring Boot === -->
         <dependency>
@@ -45,15 +40,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security-test</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
