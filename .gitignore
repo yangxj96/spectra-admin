@@ -12,7 +12,6 @@ target
 document/jar
 .env.*
 files
-spectra-files
 .mise.local.toml
 
 # 忽略特定测试文件
