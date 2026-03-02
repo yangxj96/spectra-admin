@@ -37,9 +37,9 @@
         <jetcache.version>2.7.8</jetcache.version>
         <bcprov.version>1.83</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
-        <mica.version>4.0.0</mica.version>
+        <mica.version>4.0.2</mica.version>
         <lombok.version>1.18.42</lombok.version>
-
+        <jackson.version.core>3.1.0</jackson.version.core>
     </properties>
 
     <modules>
@@ -47,7 +47,6 @@
         <module>spectra-launch</module>
         <module>./spectra-modules/spectra-core</module>
         <module>./spectra-modules/spectra-workflow</module>
-        <module>./spectra-modules/spectra-license</module>
 
         <!-- starter包 -->
         <module>./spectra-starter/spectra-security-base</module>
@@ -193,6 +192,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- GHSA-72hv-8253-57qq修复版本漏洞 -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version.core}</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -245,5 +251,8 @@
             </plugin>
         </plugins>
     </build>
+
+
+
 
 </project>

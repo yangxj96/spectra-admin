@@ -96,6 +96,10 @@ public class JacksonConfiguration {
                     JsonInclude.Include.NON_NULL,
                     JsonInclude.Include.ALWAYS
             ));
+
+            // 限制数字最大长度，防止 GHSA-72hv-8253-57qq
+            // .configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, false)
+
             builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
             builder.defaultDateFormat(sdf);
             builder.addModule(javaTimeModule);

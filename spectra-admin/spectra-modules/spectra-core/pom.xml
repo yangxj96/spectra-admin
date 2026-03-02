@@ -33,6 +33,11 @@
             <artifactId>spectra-security-base</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.yangxj96.spectra</groupId>
+            <artifactId>spectra-datascope-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- === Spring Boot === -->
         <dependency>

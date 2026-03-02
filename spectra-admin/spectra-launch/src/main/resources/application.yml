@@ -46,8 +46,6 @@ spring:
   threads:
     virtual:
       enabled: true
-  # main:
-  #   banner-mode: off
   # 应用名称
   application:
     name: spectra-admin
@@ -111,7 +109,6 @@ mybatis-plus:
   type-aliases-package: com.yangxj96.spectra.**.entity.dto
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
-    # log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
     local-cache-scope: statement
   global-config:
     banner: false
@@ -131,13 +128,10 @@ logging:
       io.github.yangxj96.spectra
     other: >-
       com.ulisesbocchio.jasyptspringboot.configuration
-    mp: >-
-      io.github.yangxj96.spectra.core.mapper.system.OperationLogMapper
   level:
     root: info
     other: error
     spectra: debug
-    mp: error
   charset:
     console: utf-8
     file: UTF-8
