@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.yangxj96.spectra</groupId>
+    <groupId>com.devops00.spectra</groupId>
     <artifactId>spectra-admin</artifactId>
     <name>spectra-admin</name>
     <version>${revision}</version>
@@ -141,7 +141,7 @@
                 <artifactId>mica-core</artifactId>
                 <version>${mica.version}</version>
             </dependency>
-            <!-- UUIDv7生成器 -->
+            <!-- UUID v7生成器 -->
             <dependency>
                 <groupId>com.github.f4b6a3</groupId>
                 <artifactId>uuid-creator</artifactId>

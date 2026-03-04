@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileInfoMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.common.FileInfoMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
-               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.common.entity.FileInfo">
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.javabean.common.entity.FileInfo">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_file_info-->
+        <!--@Table spectra_core.sys_file_info-->
         <result column="file_name"    property="fileName"/>
         <result column="origin_name"  property="originName"/>
         <result column="suffix"       property="suffix"/>

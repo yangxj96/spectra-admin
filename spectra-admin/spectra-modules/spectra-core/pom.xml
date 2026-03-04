@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.yangxj96.spectra</groupId>
+        <groupId>com.devops00.spectra</groupId>
         <artifactId>spectra-admin</artifactId>
         <version>${revision}</version>
         <relativePath>../../pom.xml</relativePath>
@@ -24,17 +24,17 @@
 
         <!-- === 项目模块 === -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-security-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-datascope-base</artifactId>
             <version>${project.version}</version>
         </dependency>

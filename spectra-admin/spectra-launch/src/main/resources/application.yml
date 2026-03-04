@@ -106,7 +106,7 @@ spring:
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.yangxj96.spectra.**.entity.dto
+  type-aliases-package: com.devops00.**.entity.dto
   configuration:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
     local-cache-scope: statement
@@ -119,13 +119,16 @@ mybatis-plus:
       # logic-not-delete-value: "null"
       # logic-delete-value: "now()"
       # schema: SPECTRA
+      # mp相关代码会用到
+      schema: spectra_core
+  # 注入到xml的变量
   configuration-properties:
-    schema: domain_core
+    schema: spectra_core
 # 日志配置
 logging:
   group:
     spectra: >-
-      io.github.yangxj96.spectra
+      com.devops00.spectra
     other: >-
       com.ulisesbocchio.jasyptspringboot.configuration
   level:
@@ -147,7 +150,7 @@ management:
 # 工作流配置
 flowable:
   # 数据库确定
-  database-schema: domain_workflow
+  database-schema: spectra_workflow
   database-schema-update: true
   jpa-enabled: false
   # 流程定义

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.common.FileChunkMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.common.FileChunkMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
-               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.common.entity.FileChunk">
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.javabean.common.entity.FileChunk">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_file_chunk-->
+        <!--@Table spectra_core.sys_file_chunk-->
         <result column="file_id"      property="fileId"/>
         <result column="total_chunks" property="totalChunks"/>
         <result column="chunk_index"  property="chunkIndex"/>

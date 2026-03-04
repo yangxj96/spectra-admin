@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.user.RoleDataScopeTargetMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.user.RoleDataScopeTargetMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
-               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.user.entity.RoleDataScopeTarget">
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.javabean.user.entity.RoleDataScopeTarget">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_role_data_scope_target-->
+        <!--@Table spectra_core.sys_role_data_scope_target-->
         <result column="role_id"     property="roleId"/>
         <result column="target_id"   property="targetId"/>
         <result column="target_type" property="targetType"/>

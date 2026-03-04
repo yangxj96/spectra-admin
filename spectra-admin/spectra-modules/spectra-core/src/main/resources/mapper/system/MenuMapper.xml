@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.system.MenuMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.system.MenuMapper">
     <!-- @formatter:off -->
   <resultMap id="BaseResultMap"
-             extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-             type="io.github.yangxj96.spectra.core.javabean.system.entity.Menu">
+             extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+             type="com.devops00.spectra.core.javabean.system.entity.Menu">
       <!--@mbg.generated-->
-      <!--@Table domain_core.sys_menu-->
+      <!--@Table spectra_core.sys_menu-->
       <result column="pid"       property="pid" />
       <result column="icon"      property="icon" />
       <result column="name"      property="name" />

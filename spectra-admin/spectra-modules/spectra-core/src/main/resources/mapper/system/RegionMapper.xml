@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.system.RegionMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.system.RegionMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
-               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.system.entity.Region">
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.javabean.system.entity.Region">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_region-->
+        <!--@Table spectra_core.sys_region-->
         <result column="name"       property="name" />
         <result column="full_name"  property="fullName" />
         <result column="short_name" property="shortName" />

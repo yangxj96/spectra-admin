@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>io.github.yangxj96.spectra</groupId>
+        <groupId>com.devops00.spectra</groupId>
         <artifactId>spectra-admin</artifactId>
         <version>${revision}</version>
     </parent>
@@ -23,25 +23,25 @@
         <!-- === 项目模块 === -->
         <!-- 公用 -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 核心 -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 自定义security,完整引入,认证生效 -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-security-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 工作流 -->
         <dependency>
-            <groupId>io.github.yangxj96.spectra</groupId>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -92,7 +92,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- 启动类 -->
-                    <mainClass>io.github.yangxj96.spectra.launch.LaunchApplication</mainClass>
+                    <mainClass>com.devops00.spectra.launch.LaunchApplication</mainClass>
                     <!-- 排除lombok -->
                     <excludes>
                         <exclude>

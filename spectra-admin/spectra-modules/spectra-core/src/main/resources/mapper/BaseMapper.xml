@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.common.base.BaseMapper">
+<mapper namespace="com.devops00.spectra.common.base.BaseMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseAuditMap" type="io.github.yangxj96.spectra.common.base.BaseEntity">
+    <resultMap id="BaseAuditMap" type="com.devops00.spectra.common.base.BaseEntity">
         <id column="id"             property="id"/>
         <result column="created_by" property="createdBy"/>
         <result column="created_at" property="createdAt"/>

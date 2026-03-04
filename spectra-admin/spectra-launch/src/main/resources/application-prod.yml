@@ -81,12 +81,13 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-not-delete-value: "null"
       logic-delete-value: "now()"
+      schema: spectra_core
   configuration-properties:
-    schema: domain_core
+    schema: spectra_core
 logging:
   group:
     spectra: >-
-      io.github.yangxj96.spectra
+      com.devops00.spectra
     other: >-
       com.ulisesbocchio.jasyptspringboot.configuration
   level:

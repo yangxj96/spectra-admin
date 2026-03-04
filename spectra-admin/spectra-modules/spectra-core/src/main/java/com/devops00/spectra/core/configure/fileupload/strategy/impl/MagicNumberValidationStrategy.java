@@ -1,0 +1,99 @@
+/*
+ *  Copyright 2018-2025 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.core.configure.fileupload.strategy.impl;
+
+import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.FileTypeException;
+import com.devops00.spectra.core.configure.fileupload.enums.FileType;
+import com.devops00.spectra.core.configure.fileupload.strategy.FileTypeValidationStrategy;
+import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.Nullable;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+/// 文件类型验证策略-根据文件魔数验证
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2025-06-19
+@Slf4j
+public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
+
+    /// 判断两个字节数组前 n 字节是否相等
+    ///
+    /// @param fileHeader 文件头字节
+    /// @param magic      文件类型的魔数字节
+    /// @return 是否相等
+    public static boolean matches(byte[] fileHeader, byte[] magic) {
+        log.debug(LogPrefix.STORAGE.f("文件魔数验证"));
+        if ((fileHeader.length == 0 || magic.length == 0) || fileHeader.length < magic.length) {
+            return false;
+        }
+        for (int i = 0; i < magic.length; i++) {
+            if (fileHeader[i] != magic[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /// 从 MultipartFile 读取指定长度的文件头
+    ///
+    /// @param file 需要读取的文件
+    /// @return 读取到的头部长度
+    public static byte[] readHeader(MultipartFile file) throws IOException {
+        var length = Arrays.stream(FileType.values())
+                .mapToInt(t -> t.getMagicNumber().length)
+                .max()
+                .orElse(0);
+
+        if (length <= 0) {
+            throw new FileTypeException("不允许的文件类型");
+        }
+
+        try (var is = new ByteArrayInputStream(file.getBytes())) {
+            var header = new byte[length];
+            var bytesRead = is.read(header);
+            if (bytesRead < 1) {
+                throw new IOException("空文件");
+            }
+            return header;
+        }
+    }
+
+    @Override
+    public boolean isValid(@Nullable MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            return false;
+        }
+
+        var fileHeader = readHeader(file);
+
+        for (var type : allowedTypes) {
+            var magic = type.getMagicNumber();
+            if (matches(fileHeader, magic)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+}

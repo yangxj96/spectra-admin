@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="io.github.yangxj96.spectra.core.mapper.user.UserDataScopeMapper">
+<mapper namespace="com.devops00.spectra.core.mapper.user.UserDataScopeMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
-               extends="io.github.yangxj96.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope">
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.javabean.user.entity.UserDataScope">
         <!--@mbg.generated-->
-        <!--@Table domain_core.sys_user_data_scope-->
+        <!--@Table spectra_core.sys_user_data_scope-->
         <result column="user_id"    property="userId"/>
         <result column="scope_type" property="scopeType"/>
     </resultMap>
@@ -17,7 +17,7 @@
         id, user_id, scope_type, created_by, created_at, updated_by, updated_at, deleted, version
     </sql>
 
-    <select id="findByUserId" resultType="io.github.yangxj96.spectra.core.javabean.user.entity.UserDataScope">
+    <select id="findByUserId" resultType="com.devops00.spectra.core.javabean.user.entity.UserDataScope">
         SELECT
         <include refid="Base_Column_List"/>
         FROM ${schema}.sys_user_data_scope
