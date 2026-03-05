@@ -30,8 +30,10 @@ export default defineConfigWithVueTs(
         settings: {
             "import/resolver": {
                 typescript: {
-                    project: ["./tsconfig.json", "./tsconfig.app.json", "./tsconfig.node.json"]
-                }
+                    alwaysTryTypes: true,
+                    project: ["./tsconfig.app.json"]
+                },
+                node: true
             }
         },
         plugins: {

@@ -35,6 +35,8 @@
         "@form-create/element-ui": "3.2.33",
         "@logicflow/core": "2.2.0",
         "@logicflow/extension": "2.2.0",
+        "@tsparticles/slim": "3.9.1",
+        "@tsparticles/vue3": "3.0.1",
         "@vueuse/core": "14.2.0",
         "@yangxj96/logicflow-flowable": "0.0.3",
         "axios": "1.13.5",

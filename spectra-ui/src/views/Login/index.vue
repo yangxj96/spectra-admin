@@ -5,6 +5,7 @@ import { ElForm, type FormRules } from "element-plus";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { authApi } from "@/api/auth/auth.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
+import { loginParticlesOptions } from "@/views/Login/config/login-particles.ts";
 
 const route = useRoute();
 const router = useRouter();
@@ -72,6 +73,8 @@ async function handleLogin() {
 
 <template>
     <div class="box">
+        <vue-particles id="particles" :options="loginParticlesOptions" />
+
         <el-dialog
             :model-value="true"
             :close-on-click-modal="false"
@@ -125,12 +128,24 @@ async function handleLogin() {
 <style scoped lang="scss">
 .box {
     height: 100vh;
-    background-color: white;
+    background:
+        radial-gradient(circle at 20% 80%, #1e293b 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, #1e3a8a 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, #020617 0%, #000000 100%);
 }
 
 :deep(.dialog-login) {
     left: 30%;
     top: 30vh;
+
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.85);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px rgba(255, 255, 255, 0.4);
 }
 
 :deep(.el-dialog__body) {
@@ -168,5 +183,14 @@ async function handleLogin() {
     opacity: 0.8;
     transform: scale(1.02);
     transition: all 0.2s ease;
+}
+
+#particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
 }
 </style>
