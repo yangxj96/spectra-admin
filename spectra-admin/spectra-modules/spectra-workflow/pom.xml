@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.devops00.spectra</groupId>
-        <artifactId>spectra-admin</artifactId>
+        <artifactId>spectra-modules</artifactId>
         <version>${revision}</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>spectra-workflow</artifactId>

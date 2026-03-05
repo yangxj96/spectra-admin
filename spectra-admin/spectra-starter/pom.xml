@@ -5,13 +5,21 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.devops00.spectra</groupId>
-        <artifactId>spectra-starter</artifactId>
+        <artifactId>spectra-admin</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-security-base</artifactId>
-    <description>封装SpringSecurity的基础包</description>
+    <artifactId>spectra-starter</artifactId>
+    <description>所有starter的父级</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>spectra-security-base</module>
+        <module>spectra-security-starter</module>
+        <module>spectra-datascope-base</module>
+        <module>spectra-datascope-starter</module>
+    </modules>
 
     <properties>
         <java.version>25</java.version>
@@ -23,20 +31,6 @@
 
     <dependencies>
 
-        <!-- === 项目模块 === -->
-        <!-- 公用 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <!-- === Spring Boot === -->
-        <!-- 基础security -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-        </dependency>
 
     </dependencies>
 

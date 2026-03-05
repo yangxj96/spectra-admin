@@ -5,13 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.devops00.spectra</groupId>
-        <artifactId>spectra-starter</artifactId>
+        <artifactId>spectra-modules</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-security-base</artifactId>
-    <description>封装SpringSecurity的基础包</description>
+    <artifactId>spectra-oa</artifactId>
+    <description>OA功能集合</description>
 
     <properties>
         <java.version>25</java.version>
@@ -24,19 +24,24 @@
     <dependencies>
 
         <!-- === 项目模块 === -->
-        <!-- 公用 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-datascope-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- === Spring Boot === -->
-        <!-- 基础security -->
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-core</artifactId>
-        </dependency>
+
 
     </dependencies>
 
