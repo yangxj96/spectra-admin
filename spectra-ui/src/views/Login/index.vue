@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { reactive, ref, useTemplateRef } from "vue";
+import { computed, reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { ElForm, type FormRules } from "element-plus";
+import { useDark } from "@vueuse/core";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { authApi } from "@/api/auth/auth.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { loginParticlesOptions } from "@/views/Login/config/login-particles.ts";
+import { loginParticlesLight, loginParticlesDark } from "@/views/Login/config/login-particles.ts";
 
+const isDark = useDark();
+
+const particlesOptions = computed(() => (isDark.value ? loginParticlesDark : loginParticlesLight));
 const route = useRoute();
 const router = useRouter();
 const loginRef = useTemplateRef<InstanceType<typeof ElForm>>("loginForm");
@@ -73,7 +77,7 @@ async function handleLogin() {
 
 <template>
     <div class="box">
-        <vue-particles id="particles" :options="loginParticlesOptions" />
+        <vue-particles id="particles" :options="particlesOptions" />
 
         <el-dialog
             :model-value="true"
@@ -129,23 +133,14 @@ async function handleLogin() {
 .box {
     height: 100vh;
     background:
-        radial-gradient(circle at 20% 80%, #1e293b 0%, transparent 40%),
-        radial-gradient(circle at 80% 20%, #1e3a8a 0%, transparent 40%),
+        radial-gradient(circle at 20% 80%, var(--el-color-page-background) 0%, transparent 40%),
+        radial-gradient(circle at 80% 20%, var(--el-color-page-background) 0%, transparent 40%),
         radial-gradient(circle at 50% 50%, #020617 0%, #000000 100%);
 }
 
 :deep(.dialog-login) {
     left: 30%;
     top: 30vh;
-
-    backdrop-filter: blur(16px);
-    background: rgba(255, 255, 255, 0.85);
-
-    border-radius: 14px;
-
-    box-shadow:
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        inset 0 1px rgba(255, 255, 255, 0.4);
 }
 
 :deep(.el-dialog__body) {

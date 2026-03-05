@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>spectra-security-base</artifactId>
+
     <description>封装SpringSecurity的基础包</description>
 
     <properties>

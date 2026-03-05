@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>spectra-datascope-starter</artifactId>
+
     <description>数据权限数据范围</description>
 
     <properties>

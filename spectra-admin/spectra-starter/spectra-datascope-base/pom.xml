@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>spectra-datascope-base</artifactId>
+
     <description>数据范围基础信息包</description>
 
     <properties>

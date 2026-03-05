@@ -12,6 +12,8 @@
 
     <artifactId>spectra-core</artifactId>
 
+    <description>平台核心接口</description>
+
     <properties>
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>

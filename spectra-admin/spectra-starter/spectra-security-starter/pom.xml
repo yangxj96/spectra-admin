@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>spectra-security-starter</artifactId>
+
     <description>封装的SpringSecurity框架的自动配置包</description>
 
     <properties>

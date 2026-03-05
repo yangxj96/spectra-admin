@@ -11,7 +11,8 @@
     </parent>
 
     <artifactId>spectra-oa</artifactId>
-    <description>OA功能集合</description>
+
+    <description>OA功能模块</description>
 
     <properties>
         <java.version>25</java.version>

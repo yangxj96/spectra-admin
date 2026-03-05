@@ -11,8 +11,9 @@
     </parent>
 
     <artifactId>spectra-modules</artifactId>
-    <description>所有模块的父级</description>
     <packaging>pom</packaging>
+
+    <description>所有平台业务模块的父级</description>
 
     <properties>
         <java.version>25</java.version>

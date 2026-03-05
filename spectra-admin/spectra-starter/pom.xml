@@ -11,8 +11,9 @@
     </parent>
 
     <artifactId>spectra-starter</artifactId>
-    <description>所有starter的父级</description>
     <packaging>pom</packaging>
+
+    <description>所有starter的父级</description>
 
     <modules>
         <module>spectra-security-base</module>
@@ -31,7 +32,13 @@
 
     <dependencies>
 
-
+        <!-- === 工具 === -->
+        <!-- lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
 </project>

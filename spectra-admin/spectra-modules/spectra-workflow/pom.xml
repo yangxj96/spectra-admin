@@ -12,6 +12,8 @@
 
     <artifactId>spectra-workflow</artifactId>
 
+    <description>工作流抽象模块</description>
+
     <properties>
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>

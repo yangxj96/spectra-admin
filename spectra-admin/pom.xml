@@ -7,8 +7,10 @@
     <artifactId>spectra-admin</artifactId>
     <name>spectra-admin</name>
     <version>${revision}</version>
-    <description>光谱后端平台基础</description>
     <packaging>pom</packaging>
+
+    <description>光谱后端平台基础</description>
+    <url>https://github.com/yangxj96/spectra-admin</url>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

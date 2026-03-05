@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>spectra-common</artifactId>
+
     <description>公用模块</description>
 
     <properties>
@@ -21,9 +22,13 @@
     </properties>
 
     <dependencies>
+        <!-- === Spring Boot === -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
 
         <!-- === 工具 === -->
-        <!-- 通用工具包 Begin -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
