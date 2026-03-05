@@ -19,7 +19,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
         pid,
         name,
         code,
@@ -27,12 +26,7 @@
         region_id,
         path,
         remark,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted,
-        version
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
     <select id="generatePath" resultType="java.lang.String">

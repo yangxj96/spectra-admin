@@ -13,4 +13,14 @@
         <result column="deleted"    property="deleted"/>
     </resultMap>
     <!-- @formatter:on -->
+
+    <sql id="BaseAuditColumns">
+        id,
+        created_by,
+        created_at,
+        updated_by,
+        updated_at,
+        version,
+        deleted
+    </sql>
 </mapper>

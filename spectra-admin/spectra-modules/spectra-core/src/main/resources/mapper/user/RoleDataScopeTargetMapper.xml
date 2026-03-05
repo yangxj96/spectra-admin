@@ -15,6 +15,7 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, role_id, target_id, target_type, created_by, created_at, updated_by, updated_at, deleted, version
+        role_id, target_id, target_type,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

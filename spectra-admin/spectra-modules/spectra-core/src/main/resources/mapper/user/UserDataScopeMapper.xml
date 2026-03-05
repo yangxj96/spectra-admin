@@ -14,7 +14,8 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, user_id, scope_type, created_by, created_at, updated_by, updated_at, deleted, version
+        user_id, scope_type,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
     <select id="findByUserId" resultType="com.devops00.spectra.core.javabean.user.entity.UserDataScope">

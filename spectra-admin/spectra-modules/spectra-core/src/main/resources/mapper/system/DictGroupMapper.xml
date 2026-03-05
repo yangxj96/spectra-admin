@@ -19,7 +19,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
         pid,
         name,
         code,
@@ -27,11 +26,6 @@
         remark,
         builtin,
         hide,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted,
-        version
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

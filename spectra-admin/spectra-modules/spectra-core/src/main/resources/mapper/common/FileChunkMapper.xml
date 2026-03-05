@@ -17,18 +17,12 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id,
         file_id,
         chunk_index,
         total_chunks,
         chunk_path,
         chunk_size,
-        created_by,
-        created_at,
-        updated_by,
-        updated_at,
-        deleted,
-        version
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
     <select id="getByFileId" resultMap="BaseResultMap">
