@@ -10,6 +10,7 @@
     </parent>
 
     <artifactId>spectra-launch</artifactId>
+    <description>启动模块,使用者的业务也应该在这个包中进行扩展</description>
 
     <properties>
         <java.version>25</java.version>
