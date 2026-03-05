@@ -30,7 +30,6 @@ export default defineConfig(({ mode }) => {
         resolve: {
             alias: {
                 "@": srcPath
-                // "@yangxj96/logicflow-flowable": resolve(__dirname, "../../logicflow-flowable/src")
             }
         },
         css: {
