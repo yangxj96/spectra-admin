@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.upload.mapper.FileInfoMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.upload.javabean.entity.FileInfo">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.sys_file_info-->
+        <result column="file_name"    property="fileName"/>
+        <result column="origin_name"  property="originName"/>
+        <result column="suffix"       property="suffix"/>
+        <result column="path"         property="path"/>
+        <result column="size"         property="size"/>
+        <result column="hash"         property="hash"/>
+        <result column="storage_type" property="storageType"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        file_name,
+        origin_name,
+        suffix,
+        path,
+        "size",
+        hash,
+        storage_type,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+
+    <select id="getByHash" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM spectra.sys_file_info WHERE hash = #{hash}
+    </select>
+</mapper>
