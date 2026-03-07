@@ -1,11 +1,11 @@
-package com.devops00.spectra.security.starter.controller;
+package com.devops00.spectra.security.starter.web.controller;
 
 
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
-import com.devops00.spectra.security.starter.configuration.LoginDispatcher;
+import com.devops00.spectra.security.starter.web.dispatcher.LoginDispatcher;
 import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

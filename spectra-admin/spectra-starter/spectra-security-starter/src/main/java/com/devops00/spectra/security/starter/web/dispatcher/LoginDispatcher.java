@@ -1,4 +1,4 @@
-package com.devops00.spectra.security.starter.configuration;
+package com.devops00.spectra.security.starter.web.dispatcher;
 
 
 import com.devops00.spectra.security.base.constant.LoginType;

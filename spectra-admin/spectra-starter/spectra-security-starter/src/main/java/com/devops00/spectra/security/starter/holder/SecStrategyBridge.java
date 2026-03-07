@@ -1,4 +1,4 @@
-package com.devops00.spectra.security.starter.configuration;
+package com.devops00.spectra.security.starter.holder;
 
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.holder.SecUtil;

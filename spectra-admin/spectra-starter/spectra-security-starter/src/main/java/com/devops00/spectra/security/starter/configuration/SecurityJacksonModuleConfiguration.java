@@ -3,6 +3,7 @@ package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SpectraSystemProperties;
+import com.devops00.spectra.security.starter.listener.SecurityRedisKeyExpirationListener;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

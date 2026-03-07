@@ -1,4 +1,4 @@
-package com.devops00.spectra.security.starter.advice;
+package com.devops00.spectra.security.starter.web.advice;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.response.R;
