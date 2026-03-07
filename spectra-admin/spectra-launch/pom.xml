@@ -55,6 +55,12 @@
             <artifactId>spectra-upload</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- OA -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-oa</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- === 工具 === -->
         <!-- XSS攻击防范 -->

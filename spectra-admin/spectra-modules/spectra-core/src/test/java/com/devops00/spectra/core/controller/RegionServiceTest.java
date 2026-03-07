@@ -1,4 +1,4 @@
-package com.devops00.spectra.launch;
+package com.devops00.spectra.core.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

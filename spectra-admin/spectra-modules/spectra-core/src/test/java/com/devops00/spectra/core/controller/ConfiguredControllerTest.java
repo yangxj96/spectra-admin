@@ -1,4 +1,4 @@
-package com.devops00.spectra.launch;
+package com.devops00.spectra.core.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

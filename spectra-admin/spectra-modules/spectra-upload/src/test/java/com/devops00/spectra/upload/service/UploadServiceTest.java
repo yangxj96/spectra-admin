@@ -1,29 +1,24 @@
-package com.devops00.spectra.launch;
+package com.devops00.spectra.upload.service;
 
 
+import com.devops00.spectra.upload.UploadTestApplication;
 import com.devops00.spectra.upload.javabean.entity.FileType;
-import com.devops00.spectra.upload.service.FileTypeService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 文件上传相关测试
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/3/6 15:44
- */
+/// 上传service测试
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/3/8 00:53
 @Slf4j
-@SpringBootTest
-@ExtendWith(SpringExtension.class)
-public class UploadControllerTest {
+@SpringBootTest(classes = UploadTestApplication.class)
+public class UploadServiceTest {
 
     @Resource
     private FileTypeService fileTypeService;
@@ -116,7 +111,6 @@ public class UploadControllerTest {
         fileTypeService.saveBatch(types);
     }
 
-
     /// 尝试读取文件类型
     @Test
     void getFileType() {
@@ -124,7 +118,6 @@ public class UploadControllerTest {
         for (FileType fileType : fileTypes) {
             log.debug(fileType.toString());
         }
-
     }
 
 }

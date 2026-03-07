@@ -1,4 +1,4 @@
-package com.devops00.spectra.launch;
+package com.devops00.spectra.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.javabean.system.entity.Department;
@@ -14,7 +14,6 @@ import com.devops00.spectra.core.service.user.AuthorityService;
 import com.devops00.spectra.core.service.user.RelRoleAuthorityService;
 import com.devops00.spectra.core.service.user.RelRoleMenuService;
 import com.devops00.spectra.core.service.user.RoleService;
-import com.devops00.spectra.datascope.base.constant.DataScopeType;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
