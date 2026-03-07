@@ -17,7 +17,6 @@
 package com.devops00.spectra.upload.configure;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.upload.enums.FileType;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import com.devops00.spectra.upload.strategy.FileTypeValidator;
@@ -25,13 +24,14 @@ import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MimeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.TikaValidationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /// 文件上传类型验证需要的相关配置
 ///
@@ -39,15 +39,13 @@ import java.util.List;
 /// @version 1.0
 /// @since 2025-06-27
 @Slf4j
+@NullMarked
 @Configuration
 @EnableConfigurationProperties(FileUploadProperties.class)
+@RequiredArgsConstructor
 public class FileUploadConfiguration {
 
     private final FileUploadProperties properties;
-
-    public FileUploadConfiguration(FileUploadProperties properties) {
-        this.properties = properties;
-    }
 
     /// 文件类型验证策略管理器
     ///
@@ -56,36 +54,22 @@ public class FileUploadConfiguration {
     public FileTypeValidator fileTypeValidator() {
         log.debug(LogPrefix.STORAGE.f("载入文件类型验证策略管理器"));
         var strategies = new ArrayList<FileTypeValidationStrategy>();
-        List<FileType> allowedTypes = properties.getAllowedTypes();
         // 根据配置添加策略处理器
         for (var strategy : properties.getStrategies()) {
             if (strategy.isAssignableFrom(MimeValidationStrategy.class)) {
-                strategies.add(new MimeValidationStrategy(mimes(allowedTypes)));
+                strategies.add(new MimeValidationStrategy());
             }
             if (strategy.isAssignableFrom(ExtensionValidationStrategy.class)) {
-                strategies.add(new ExtensionValidationStrategy(allowedTypes));
+                strategies.add(new ExtensionValidationStrategy());
             }
             if (strategy.isAssignableFrom(MagicNumberValidationStrategy.class)) {
-                strategies.add(new MagicNumberValidationStrategy(allowedTypes));
+                strategies.add(new MagicNumberValidationStrategy());
             }
             if (strategy.isAssignableFrom(TikaValidationStrategy.class)) {
-                strategies.add(new TikaValidationStrategy(mimes(allowedTypes)));
+                strategies.add(new TikaValidationStrategy());
             }
         }
         return new FileTypeValidator(strategies);
-    }
-
-
-    /// 获取可上传的文件的mimes列表
-    ///
-    /// @param allowedTypes 允许上传的列表
-    /// @return mime列表
-    private List<String> mimes(List<FileType> allowedTypes) {
-        var m = new ArrayList<String>();
-        for (FileType allowedType : allowedTypes) {
-            m.add(allowedType.getMime());
-        }
-        return m;
     }
 
 }

@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.javabean.user.from;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.core.configure.datascope.DataScopeType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -89,7 +88,7 @@ public class UserSaveFrom {
     private List<String> roleIds;
 
     /// 数据范围
-    private DataScopeType dataScope;
+    private Integer dataScope;
 
     /// 当数据范围是 `DataScopeType#CUSTOM` 的时候这个不能为空
     private List<String> targetIds;

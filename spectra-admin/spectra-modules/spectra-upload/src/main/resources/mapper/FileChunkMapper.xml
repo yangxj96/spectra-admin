@@ -6,7 +6,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileChunk">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.sys_file_chunk-->
+        <!--@Table spectra_core.file_chunk-->
         <result column="file_id"      property="fileId"/>
         <result column="total_chunks" property="totalChunks"/>
         <result column="chunk_index"  property="chunkIndex"/>

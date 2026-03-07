@@ -17,16 +17,14 @@
 package com.devops00.spectra.upload.strategy.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.exception.FileTypeException;
-import com.devops00.spectra.upload.enums.FileType;
+import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /// 文件类型验证策略-根据文件魔数验证
@@ -35,7 +33,9 @@ import java.util.List;
 /// @version 1.0
 /// @since 2025-06-19
 @Slf4j
-public record MagicNumberValidationStrategy(List<FileType> allowedTypes) implements FileTypeValidationStrategy {
+public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
+
+    private final List<FileType> allowedTypes = new ArrayList<>();
 
     /// 判断两个字节数组前 n 字节是否相等
     ///
@@ -60,23 +60,24 @@ public record MagicNumberValidationStrategy(List<FileType> allowedTypes) impleme
     /// @param file 需要读取的文件
     /// @return 读取到的头部长度
     public static byte[] readHeader(MultipartFile file) throws IOException {
-        var length = Arrays.stream(FileType.values())
-                .mapToInt(t -> t.getMagicNumber().length)
-                .max()
-                .orElse(0);
-
-        if (length <= 0) {
-            throw new FileTypeException("不允许的文件类型");
-        }
-
-        try (var is = new ByteArrayInputStream(file.getBytes())) {
-            var header = new byte[length];
-            var bytesRead = is.read(header);
-            if (bytesRead < 1) {
-                throw new IOException("空文件");
-            }
-            return header;
-        }
+        return file.getBytes();
+        //var length = Arrays.stream(FileType.values())
+        //        .mapToInt(t -> t.getMagicNumber().length)
+        //        .max()
+        //        .orElse(0);
+        //
+        //if (length <= 0) {
+        //    throw new FileTypeException("不允许的文件类型");
+        //}
+        //
+        //try (var is = new ByteArrayInputStream(file.getBytes())) {
+        //    var header = new byte[length];
+        //    var bytesRead = is.read(header);
+        //    if (bytesRead < 1) {
+        //        throw new IOException("空文件");
+        //    }
+        //    return header;
+        //}
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /// 文件类型验证策略-使用apache的Tika包进行验证
@@ -34,13 +35,9 @@ import java.util.List;
 @Slf4j
 public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
-    private final List<String> allowedMimes;
+    private final List<String> allowedMimes = new ArrayList<>();
 
     private final Tika tika = new Tika();
-
-    public TikaValidationStrategy(List<String> allowedMimes) {
-        this.allowedMimes = allowedMimes;
-    }
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) throws IOException {

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.javabean.user.vo;
 
-import com.devops00.spectra.core.configure.datascope.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,7 +48,7 @@ public class RoleVO implements Serializable {
     private String code;
 
     /// 范围
-    private DataScopeType scope;
+    private Integer scope;
 
     /// 是否内置
     private Boolean builtin;

@@ -49,6 +49,12 @@
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- 文件上传 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-upload</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- === 工具 === -->
         <!-- XSS攻击防范 -->

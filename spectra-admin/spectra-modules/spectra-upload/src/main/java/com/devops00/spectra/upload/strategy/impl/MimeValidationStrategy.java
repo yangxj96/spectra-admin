@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /// 文件类型验证策略-根据文件mime方式验证
@@ -30,7 +31,9 @@ import java.util.List;
 /// @version 1.0
 /// @since 2025/6/19
 @Slf4j
-public record MimeValidationStrategy(List<String> allowedMimes) implements FileTypeValidationStrategy {
+public class MimeValidationStrategy implements FileTypeValidationStrategy {
+
+    private final List<String> allowedMimes = new ArrayList<>();
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) {

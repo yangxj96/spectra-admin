@@ -6,7 +6,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileInfo">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.sys_file_info-->
+        <!--@Table spectra_core.file_info-->
         <result column="file_name"    property="fileName"/>
         <result column="origin_name"  property="originName"/>
         <result column="suffix"       property="suffix"/>

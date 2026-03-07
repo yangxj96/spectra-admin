@@ -18,13 +18,14 @@ package com.devops00.spectra.upload.strategy.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.upload.enums.FileType;
+import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /// 文件类型验证策略-根据文件扩展名验证
@@ -33,7 +34,9 @@ import java.util.List;
 /// @version 1.0
 /// @since 2025-06-19
 @Slf4j
-public record ExtensionValidationStrategy(List<FileType> allowed) implements FileTypeValidationStrategy {
+public class ExtensionValidationStrategy implements FileTypeValidationStrategy {
+
+    private static final List<FileType> allowed = new ArrayList<>();
 
     private static final Integer MIN = -1;
 
@@ -46,7 +49,8 @@ public record ExtensionValidationStrategy(List<FileType> allowed) implements Fil
         var filename = file.getOriginalFilename();
         if (StrUtils.isNotBlank(filename)) {
             var fileExtension = getFileExtension(filename);
-            return allowed.stream().anyMatch(ext -> ext.getExtension().equalsIgnoreCase(fileExtension));
+            // return allowed.stream().anyMatch(ext -> ext.getExtension().equalsIgnoreCase(fileExtension));
+            return true;
         }
         return false;
     }

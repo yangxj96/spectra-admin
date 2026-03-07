@@ -20,14 +20,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.assembler.NameFillExecutor;
-import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.core.configure.datascope.DataScopeType;
 import com.devops00.spectra.core.configure.mvc.properties.UserProperties;
 import com.devops00.spectra.core.javabean.auth.entity.Account;
 import com.devops00.spectra.core.javabean.user.converter.RoleConverter;
@@ -35,7 +33,6 @@ import com.devops00.spectra.core.javabean.user.converter.UserConverter;
 import com.devops00.spectra.core.javabean.user.entity.Role;
 import com.devops00.spectra.core.javabean.user.entity.User;
 import com.devops00.spectra.core.javabean.user.entity.UserDataScope;
-import com.devops00.spectra.core.javabean.user.entity.UserDataScopeTarget;
 import com.devops00.spectra.core.javabean.user.from.UserPageFrom;
 import com.devops00.spectra.core.javabean.user.from.UserSaveFrom;
 import com.devops00.spectra.core.javabean.user.vo.UserPageVO;
@@ -54,7 +51,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -131,18 +127,18 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             dataScopeEntity.setScopeType(params.getDataScope());
             dataScopeMapper.insert(dataScopeEntity);
 
-            // 如果是自定义的话,要插入自定义的数据
-            if (params.getDataScope() == DataScopeType.CUSTOM) {
-                var targets = new ArrayList<UserDataScopeTarget>();
-                for (String targetId : params.getTargetIds()) {
-                    var datum = new UserDataScopeTarget();
-                    datum.setUserId(entity.getId());
-                    datum.setTargetId(targetId);
-                    datum.setTargetType(0);
-                    targets.add(datum);
-                }
-                dataScopeTargetMapper.insert(targets);
-            }
+            // TODO 如果是自定义的话,要插入自定义的数据
+            //if (params.getDataScope() == DataScopeType.CUSTOM) {
+            //    var targets = new ArrayList<UserDataScopeTarget>();
+            //    for (String targetId : params.getTargetIds()) {
+            //        var datum = new UserDataScopeTarget();
+            //        datum.setUserId(entity.getId());
+            //        datum.setTargetId(targetId);
+            //        datum.setTargetType(0);
+            //        targets.add(datum);
+            //    }
+            //    dataScopeTargetMapper.insert(targets);
+            //}
         }
 
 
@@ -194,43 +190,43 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             // 请求参数不存在数据范围,但是数据范围数据存在,则删除数据范围数据
             dataScopeMapper.deleteById(dataScope.getId());
         }
-        if (params.getDataScope() != null) {
-            if (dataScope == null) {
-                // 新增
-                var dataScopeEntity = new UserDataScope();
-                dataScopeEntity.setUserId(entity.getId());
-                dataScopeEntity.setScopeType(params.getDataScope());
-                dataScopeMapper.insert(dataScopeEntity);
-            } else {
-                // 如果之前存的是CUSTOM,则需要清除一下
-                if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
-                    List<UserDataScopeTarget> userDataScopeTargets = dataScopeTargetMapper.selectList(
-                            new LambdaQueryWrapper<UserDataScopeTarget>()
-                                    .eq(UserDataScopeTarget::getUserId, entity.getId())
-                    );
-                    dataScopeTargetMapper.deleteByIds(
-                            userDataScopeTargets.stream()
-                                    .map(BaseEntity::getId)
-                                    .toList()
-                    );
-                }
-                dataScope.setScopeType(params.getDataScope());
-                dataScopeMapper.updateById(dataScope);
-            }
-
-            // 如果现在修改成了自定义的话,要插入自定义的数据
-            if (params.getDataScope() == DataScopeType.CUSTOM) {
-                var targets = new ArrayList<UserDataScopeTarget>();
-                for (String targetId : params.getTargetIds()) {
-                    var datum = new UserDataScopeTarget();
-                    datum.setUserId(entity.getId());
-                    datum.setTargetId(targetId);
-                    datum.setTargetType(0);
-                    targets.add(datum);
-                }
-                dataScopeTargetMapper.insert(targets);
-            }
-        }
+        //if (params.getDataScope() != null) {
+        //    if (dataScope == null) {
+        //        // 新增
+        //        var dataScopeEntity = new UserDataScope();
+        //        dataScopeEntity.setUserId(entity.getId());
+        //        dataScopeEntity.setScopeType(params.getDataScope());
+        //        dataScopeMapper.insert(dataScopeEntity);
+        //    } else {
+        //        // 如果之前存的是CUSTOM,则需要清除一下
+        //        if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
+        //            List<UserDataScopeTarget> userDataScopeTargets = dataScopeTargetMapper.selectList(
+        //                    new LambdaQueryWrapper<UserDataScopeTarget>()
+        //                            .eq(UserDataScopeTarget::getUserId, entity.getId())
+        //            );
+        //            dataScopeTargetMapper.deleteByIds(
+        //                    userDataScopeTargets.stream()
+        //                            .map(BaseEntity::getId)
+        //                            .toList()
+        //            );
+        //        }
+        //        dataScope.setScopeType(params.getDataScope());
+        //        dataScopeMapper.updateById(dataScope);
+        //    }
+        //
+        //    // 如果现在修改成了自定义的话,要插入自定义的数据
+        //    if (params.getDataScope() == DataScopeType.CUSTOM) {
+        //        var targets = new ArrayList<UserDataScopeTarget>();
+        //        for (String targetId : params.getTargetIds()) {
+        //            var datum = new UserDataScopeTarget();
+        //            datum.setUserId(entity.getId());
+        //            datum.setTargetId(targetId);
+        //            datum.setTargetType(0);
+        //            targets.add(datum);
+        //        }
+        //        dataScopeTargetMapper.insert(targets);
+        //    }
+        //}
 
 
         // 角色处理
@@ -311,19 +307,19 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 );
             }
             // 数据范围
-            UserDataScope dataScope = dataScopeMapper.findByUserId(vo.getId());
-            if (dataScope != null) {
-                vo.setDataScope(dataScope.getScopeType());
-                if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
-                    List<UserDataScopeTarget> targets = dataScopeTargetMapper.findByUserId(vo.getId());
-                    vo.setTargetIds(
-                            targets.stream()
-                                    .map(UserDataScopeTarget::getTargetId)
-                                    .map(Object::toString)
-                                    .toList()
-                    );
-                }
-            }
+            //UserDataScope dataScope = dataScopeMapper.findByUserId(vo.getId());
+            //if (dataScope != null) {
+            //    vo.setDataScope(dataScope.getScopeType());
+            //    if (dataScope.getScopeType().equals(1)) {
+            //        List<UserDataScopeTarget> targets = dataScopeTargetMapper.findByUserId(vo.getId());
+            //        vo.setTargetIds(
+            //                targets.stream()
+            //                        .map(UserDataScopeTarget::getTargetId)
+            //                        .map(Object::toString)
+            //                        .toList()
+            //        );
+            //    }
+            //}
         });
         // 响应
         return result;

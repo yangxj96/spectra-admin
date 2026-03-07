@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.upload.mapper.FileTypeMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.upload.javabean.entity.FileType">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.file_type-->
+        <result column="name"           property="name"/>
+        <result column="extension"      property="extension" typeHandler="com.devops00.spectra.common.mybatis.handler.StringArrayTypeHandler"/>
+        <result column="mime"           property="mime" typeHandler="com.devops00.spectra.common.mybatis.handler.StringArrayTypeHandler"/>
+        <result column="magic_number"   property="magicNumber"/>
+        <result column="magic_offset"   property="magicOffset"/>
+        <result column="max_size"       property="maxSize"/>
+        <result column="previewable"    property="previewable"/>
+        <result column="allowed_upload" property="allowedUpload"/>
+        <result column="dangerous"      property="dangerous"/>
+        <result column="remark"         property="remark"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        name,
+        extension,
+        mime,
+        magic_number,
+        magic_offset,
+        max_size,
+        previewable,
+        allowed_upload,
+        dangerous,
+        remark
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

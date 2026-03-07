@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.properties;
 
-import com.devops00.spectra.upload.enums.FileType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
@@ -44,14 +43,6 @@ public class FileUploadProperties {
     /// 上传文件的时候临时文件路径
     private String uploadTempDir = "temp";
 
-    /// 允许的类型
-    private List<FileType> allowedTypes = new ArrayList<>(Arrays.asList(
-            FileType.JPEG,
-            FileType.PNG,
-            FileType.GIF,
-            FileType.PDF,
-            FileType.ZIP
-    ));
 
     /// 文件类型验证策略
     private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(

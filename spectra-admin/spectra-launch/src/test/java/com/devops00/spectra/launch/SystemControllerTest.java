@@ -1,7 +1,6 @@
 package com.devops00.spectra.launch;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.configure.datascope.DataScopeType;
 import com.devops00.spectra.core.javabean.system.entity.Department;
 import com.devops00.spectra.core.javabean.system.entity.DictGroup;
 import com.devops00.spectra.core.javabean.system.entity.DictItem;
@@ -15,6 +14,7 @@ import com.devops00.spectra.core.service.user.AuthorityService;
 import com.devops00.spectra.core.service.user.RelRoleAuthorityService;
 import com.devops00.spectra.core.service.user.RelRoleMenuService;
 import com.devops00.spectra.core.service.user.RoleService;
+import com.devops00.spectra.datascope.base.constant.DataScopeType;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -391,7 +391,7 @@ class SystemControllerTest {
         role.setName(name);
         role.setCode(code);
         role.setState(Boolean.TRUE);
-        role.setScope(DataScopeType.ALL);
+        //role.setScope(DataScopeType.ALL);
         role.setBuiltin(Boolean.TRUE);
         return role;
     }
