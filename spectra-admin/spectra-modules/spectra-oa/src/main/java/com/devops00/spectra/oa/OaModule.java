@@ -12,7 +12,8 @@ import com.devops00.spectra.kernel.lifecycle.SpectraModuleLifecycle;
 @SpectraModule(
         name = "oa",
         scanPackages = "com.devops00.spectra.oa",
-        dependsOn = {"upload", "workflow"},
+        mapperPackages = "com.devops00.spectra.oa.*.mapper",
+        dependsOn = {"upload", "workflow", "core"},
         order = 1001
 )
 public class OaModule implements SpectraModuleLifecycle {

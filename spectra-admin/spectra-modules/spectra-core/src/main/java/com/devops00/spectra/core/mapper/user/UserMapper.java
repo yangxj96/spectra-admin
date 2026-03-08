@@ -18,12 +18,14 @@ package com.devops00.spectra.core.mapper.user;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.user.entity.User;
+import org.apache.ibatis.annotations.Mapper;
 
 /// 用户mapper层
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-6-14
+@Mapper
 public interface UserMapper extends BaseMapper<User> {
 
 }

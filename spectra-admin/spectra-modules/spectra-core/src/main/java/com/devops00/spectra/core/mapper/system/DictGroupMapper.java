@@ -18,11 +18,13 @@ package com.devops00.spectra.core.mapper.system;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.system.entity.DictGroup;
+import org.apache.ibatis.annotations.Mapper;
 
 /// 字典(字典类型)mapper层
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-6-18
+@Mapper
 public interface DictGroupMapper extends BaseMapper<DictGroup> {
 }

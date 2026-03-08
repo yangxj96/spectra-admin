@@ -18,11 +18,13 @@ package com.devops00.spectra.core.mapper.system;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.system.entity.OperationLog;
+import org.apache.ibatis.annotations.Mapper;
 
 /// 操作日志mapper层
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-6-14
+@Mapper
 public interface OperationLogMapper extends BaseMapper<OperationLog> {
 }

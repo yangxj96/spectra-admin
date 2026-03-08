@@ -18,12 +18,14 @@ package com.devops00.spectra.core.mapper.system;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.system.entity.SysConfig;
+import org.apache.ibatis.annotations.Mapper;
 
 /// 系统配置表-DTO
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/9/18
+@Mapper
 public interface SysConfigMapper extends BaseMapper<SysConfig> {
 
 }

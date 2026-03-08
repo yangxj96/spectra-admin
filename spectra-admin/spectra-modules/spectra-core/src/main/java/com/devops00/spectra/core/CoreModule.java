@@ -11,7 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 /// @version 1.0
 /// @since 2026/3/8 23:30
 @Slf4j
-@SpectraModule(name = "core", scanPackages = "com.devops00.spectra.core", order = 1000)
+@SpectraModule(
+        name = "core",
+        scanPackages = "com.devops00.spectra.core",
+        mapperPackages = "com.devops00.spectra.core.mapper",
+        order = 1000
+)
 public class CoreModule implements SpectraModuleLifecycle {
 
 }

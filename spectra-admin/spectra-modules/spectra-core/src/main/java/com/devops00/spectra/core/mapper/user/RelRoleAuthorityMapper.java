@@ -18,6 +18,7 @@ package com.devops00.spectra.core.mapper.user;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.user.entity.RelRoleAuthority;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -27,6 +28,7 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-11-11
+@Mapper
 public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
 
     /**

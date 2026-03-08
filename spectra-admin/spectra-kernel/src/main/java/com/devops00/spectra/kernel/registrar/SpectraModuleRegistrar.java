@@ -32,21 +32,15 @@ public class SpectraModuleRegistrar implements ImportBeanDefinitionRegistrar {
 
         for (var module : modules) {
 
-            // 条件模块加载
-            //if (!manager.shouldLoadModule(module, registry)) {
-            //    log.info("Skipping module {} due to condition", module.getName());
-            //    continue;
-            //}
-
             // 扫描模块包
             for (String pkg : module.getScanPackages()) {
                 scanner.scan(pkg);
             }
 
             // 注册 Mapper
-            //for (String mapperPkg : module.getMapperPackages()) {
-            //    manager.registerMapperScan(registry, mapperPkg);
-            //}
+            for (String mapperPkg : module.getMapperPackages()) {
+                manager.registerMapperScan(registry, mapperPkg);
+            }
         }
 
         // 执行生命周期

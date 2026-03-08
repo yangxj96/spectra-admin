@@ -3,7 +3,9 @@ package com.devops00.spectra.oa.asset.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 /// OA-资产表主表实体
 ///

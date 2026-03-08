@@ -18,6 +18,7 @@ package com.devops00.spectra.core.mapper.system;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.javabean.system.entity.Department;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 
@@ -26,6 +27,7 @@ import org.apache.ibatis.annotations.Param;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-6-15
+@Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {
 
     /**

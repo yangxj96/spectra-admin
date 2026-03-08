@@ -2,7 +2,7 @@
 //
 //import com.devops00.spectra.core.configure.datascope.DataScopeContext;
 //
-///// 数据范围获取
+/// // 数据范围获取
 //public interface DataScopeService {
 //
 //    /// 根据用户ID获取数据范围
