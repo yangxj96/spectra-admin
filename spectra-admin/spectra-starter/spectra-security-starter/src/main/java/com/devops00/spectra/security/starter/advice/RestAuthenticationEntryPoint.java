@@ -5,7 +5,6 @@ import com.devops00.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
@@ -28,7 +27,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private final ObjectMapper om;
 
-    public RestAuthenticationEntryPoint(@Qualifier("securityObjectMapper") ObjectMapper om) {
+    public RestAuthenticationEntryPoint(ObjectMapper om) {
         this.om = om;
     }
 

@@ -19,10 +19,15 @@ package com.devops00.spectra.core.configure.redis;
 import com.devops00.spectra.common.constant.LogPrefix;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
 
 /// Redis配置类
@@ -32,6 +37,7 @@ import tools.jackson.databind.ObjectMapper;
 /// @since 2025/7/28
 @Slf4j
 @Configuration
+@Import(DataRedisAutoConfiguration.class)
 public class RedisConfiguration {
 
     @Resource
@@ -42,9 +48,23 @@ public class RedisConfiguration {
     /// @param factory redis连接工程
     /// @return RedisTemplate<String, Object>
     @Bean
+    @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         log.debug(LogPrefix.REDIS.f("开始配置Redis"));
-        return RedisTemplateFactory.build(factory, om);
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(factory);
+
+        StringRedisSerializer keySerializer = new StringRedisSerializer();
+        template.setKeySerializer(keySerializer);
+        template.setHashKeySerializer(keySerializer);
+
+        JacksonJsonRedisSerializer<Object> valueSerializer =
+                new JacksonJsonRedisSerializer<>(om, Object.class);
+        template.setValueSerializer(valueSerializer);
+        template.setHashValueSerializer(valueSerializer);
+
+        template.afterPropertiesSet();
+        return template;
     }
 
 }

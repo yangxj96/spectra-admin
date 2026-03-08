@@ -4,14 +4,12 @@ package com.devops00.spectra.security.starter.configuration;
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecStrategyBridge;
-import com.devops00.spectra.security.starter.renew.DefaultTokenTtlStrategy;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
 
 /// SecuUtil工具相关配置
@@ -20,7 +18,6 @@ import tools.jackson.databind.ObjectMapper;
 /// @version 1.0
 /// @since 2026/2/19 22:37
 @Slf4j
-@Component
 public class SecUtilConfiguration {
 
 
@@ -43,10 +40,9 @@ public class SecUtilConfiguration {
     public RedisSecHolderStrategy redisSecHolderStrategy(
             @Qualifier("securityObjectMapper") ObjectMapper om,
             @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties,
-            DefaultTokenTtlStrategy tokenTtlStrategy
+            SecurityProperties properties
     ) {
-        return new RedisSecHolderStrategy(om, redis, properties, tokenTtlStrategy);
+        return new RedisSecHolderStrategy(om, redis, properties);
     }
 
 }

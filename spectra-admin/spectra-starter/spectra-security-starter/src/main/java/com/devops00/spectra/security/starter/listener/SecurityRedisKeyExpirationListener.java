@@ -2,7 +2,6 @@ package com.devops00.spectra.security.starter.listener;
 
 import com.devops00.spectra.security.base.constant.AuthRedisKey;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -21,9 +20,7 @@ public class SecurityRedisKeyExpirationListener implements MessageListener {
 
     private final RedisTemplate<String, Object> redis;
 
-    public SecurityRedisKeyExpirationListener(
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis
-    ) {
+    public SecurityRedisKeyExpirationListener(RedisTemplate<String, Object> redis) {
         this.redis = redis;
     }
 

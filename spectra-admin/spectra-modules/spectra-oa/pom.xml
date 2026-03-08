@@ -27,6 +27,11 @@
         <!-- === 项目模块 === -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>

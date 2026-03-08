@@ -19,7 +19,6 @@ package com.devops00.spectra.launch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
 import java.util.TimeZone;
 
@@ -30,7 +29,6 @@ import java.util.TimeZone;
 /// @since 2025/7/23
 @Slf4j
 @SpringBootApplication
-@ComponentScan("com.devops00.spectra")
 public class LaunchApplication {
 
     private LaunchApplication() {

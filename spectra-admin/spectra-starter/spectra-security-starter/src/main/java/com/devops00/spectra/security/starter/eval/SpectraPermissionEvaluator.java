@@ -9,7 +9,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import java.util.regex.Pattern;
 /// @version 1.0
 /// @since 2025/12/3 11:52
 @Slf4j
-@Component
 @NullMarked
 public class SpectraPermissionEvaluator implements PermissionEvaluator {
 

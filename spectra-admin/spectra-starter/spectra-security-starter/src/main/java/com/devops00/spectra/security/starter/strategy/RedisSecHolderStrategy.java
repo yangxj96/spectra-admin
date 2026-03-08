@@ -10,7 +10,6 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.starter.renew.DefaultTokenTtlStrategy;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -45,18 +44,15 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     private final SecurityProperties properties;
 
-    private final DefaultTokenTtlStrategy tokenTtlStrategy;
 
     public RedisSecHolderStrategy(
             @Qualifier("securityObjectMapper") ObjectMapper om,
             @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties,
-            DefaultTokenTtlStrategy tokenTtlStrategy
+            SecurityProperties properties
     ) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
-        this.tokenTtlStrategy = tokenTtlStrategy;
     }
 
     @Override
@@ -141,7 +137,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         var userDetailsKey = AuthRedisKey.USER_DETAIL.format(user.getId());
         var onlineUsersKey = AuthRedisKey.ONLINE_USER_IDS.getPattern();
 
-        long ttl = tokenTtlStrategy.resolveTtlSeconds(loginType, "BROWSER");
+        long ttl = TimeUnit.DAYS.toSeconds(7);
 
         // =======================
         // 7. 构造 Session 数据（事实源）

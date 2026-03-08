@@ -24,23 +24,23 @@
     </properties>
 
     <dependencies>
-        <!-- === 项目模块 === -->
+        <!-- === 项目模块-基础功能 === -->
+        <!-- 内核 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-kernel</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- 公用 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 核心 -->
+        <!-- 文件上传 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- 自定义security,完整引入,认证生效 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-security-starter</artifactId>
+            <artifactId>spectra-upload</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- 工作流 -->
@@ -49,10 +49,20 @@
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- 文件上传 -->
+
+        <!-- === 项目模块-starter === -->
+        <!-- Security -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-upload</artifactId>
+            <artifactId>spectra-security-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- === 项目模块-功能模块 === -->
+        <!-- 基础模块 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-core</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- OA -->

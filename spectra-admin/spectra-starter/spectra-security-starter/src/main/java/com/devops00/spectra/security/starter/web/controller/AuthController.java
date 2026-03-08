@@ -15,13 +15,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/**
- * 认证处理器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/2/17 23:28
- */
+/// 认证处理器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/2/17 23:28
 @Slf4j
 @RestController
 @RequestMapping("/auth")

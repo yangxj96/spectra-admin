@@ -2,57 +2,27 @@ package com.devops00.spectra.security.starter.configuration;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SpectraSystemProperties;
 import com.devops00.spectra.security.starter.listener.SecurityRedisKeyExpirationListener;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import org.springframework.security.jackson.SecurityJacksonModules;
-import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
-/// Security配置Jackson
-///
-/// @author Jack Young
-/// @version 1.0
-/// @since 2025/12/15 14:42
+/**
+ * Security专用Redis配置
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2026/3/9 00:39
+ */
 @Slf4j
-@Configuration(proxyBeanMethods = false)
-@ConditionalOnClass(SecurityJacksonModules.class)
-public class SecurityJacksonModuleConfiguration {
-
-    @Resource
-    private SpectraSystemProperties spectraSystemProperties;
-
-    @Bean("securityObjectMapper")
-    public ObjectMapper redisObjectMapper(ObjectMapper om) {
-        log.debug(LogPrefix.SECURITY.f("开始配置Security使用的ObjectMapper"));
-        return om.rebuild()
-                .addModules(SecurityJacksonModules.getModules(getClass().getClassLoader(),
-                        BasicPolymorphicTypeValidator.builder()
-                                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
-                                .allowIfSubType("java.util")))
-                .activateDefaultTyping(
-                        BasicPolymorphicTypeValidator.builder()
-                                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
-                                .allowIfSubType("java.util")
-                                .build(),
-                        DefaultTyping.NON_FINAL,
-                        JsonTypeInfo.As.PROPERTY
-                )
-                .build();
-    }
+public class SecRedisConfiguration {
 
     /// 自定义redisTemplate
     ///
@@ -75,6 +45,11 @@ public class SecurityJacksonModuleConfiguration {
 
         template.afterPropertiesSet();
         return template;
+    }
+
+    @Bean
+    public SecurityRedisKeyExpirationListener securityRedisKeyExpirationListener(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis) {
+        return new SecurityRedisKeyExpirationListener(redis);
     }
 
     /// Redis消息监听bean
