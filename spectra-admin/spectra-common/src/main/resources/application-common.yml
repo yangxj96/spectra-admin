@@ -29,8 +29,8 @@ spring:
   threads:
     virtual:
       enabled: true
-  main:
-    allow-bean-definition-overriding: true
+#  main:
+#    allow-bean-definition-overriding: true
   # 应用名称
   application:
     name: spectra-admin
