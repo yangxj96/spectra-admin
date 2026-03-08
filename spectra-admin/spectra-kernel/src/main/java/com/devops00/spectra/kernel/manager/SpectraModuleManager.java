@@ -111,21 +111,21 @@ public class SpectraModuleManager {
         for (var module : modules) {
             var instance = module.getModuleInstance();
             if (instance instanceof SpectraModuleLifecycle lifecycle) {
-                log.debug("模块[{}]初始化之前", module.getName());
+                log.trace("模块[{}]初始化之前", module.getName());
                 lifecycle.beforeInitialize();
             }
         }
         for (var module : modules) {
             var instance = module.getModuleInstance();
             if (instance instanceof SpectraModuleLifecycle lifecycle) {
-                log.debug("模块[{}]初始化之后", module.getName());
+                log.trace("模块[{}]初始化之后", module.getName());
                 lifecycle.afterInitialize();
             }
         }
         for (var module : modules) {
             var instance = module.getModuleInstance();
             if (instance instanceof SpectraModuleLifecycle lifecycle) {
-                log.debug("模块[{}]启动", module.getName());
+                log.trace("模块[{}]启动", module.getName());
                 lifecycle.onStart();
             }
         }
