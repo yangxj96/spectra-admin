@@ -267,7 +267,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Transactional
     public void passwordResetById(String uid) {
         try {
-            var user = this.getById(Long.parseLong(uid));
+            var user = this.getById(uid);
             Account account = accountService.getDefaultByUserId(user.getId());
             account.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
             accountService.updateById(account);
