@@ -16,8 +16,8 @@ describe("DictTag.vue", () => {
         const store = useDictStore();
         store.dicts = {
             sys_organization_type: [
-                { id: "", gid: "", value: "0", label: "总部", sort: 0, state: 0, remark: "" },
-                { id: "", gid: "", value: "1", label: "子公司", sort: 0, state: 0, remark: "" }
+                { id: "", gid: "", value: "0", label: "总部", sort: 0, state: 0, remark: "", default_flag: false },
+                { id: "", gid: "", value: "1", label: "子公司", sort: 0, state: 0, remark: "", default_flag: false }
             ]
         };
     });
