@@ -1,20 +1,15 @@
 package com.devops00.spectra.oa;
 
 
-import com.devops00.spectra.kernel.annotation.SpectraModule;
-import com.devops00.spectra.kernel.lifecycle.SpectraModuleLifecycle;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.ComponentScan;
 
 /// 文件上传模块
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2026/3/8 23:41
-@SpectraModule(
-        name = "oa",
-        scanPackages = "com.devops00.spectra.oa",
-        mapperPackages = "com.devops00.spectra.oa.*.mapper",
-        dependsOn = {"upload", "workflow", "core"},
-        order = 1001
-)
-public class OaModule implements SpectraModuleLifecycle {
+@ComponentScan("com.devops00.spectra.oa")
+@MapperScan("com.devops00.spectra.oa.*.mapper")
+public class OaModule {
 }

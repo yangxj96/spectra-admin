@@ -31,7 +31,24 @@
     </modules>
 
     <dependencies>
-        <!-- Spring Boot Begin -->
+        <!-- === 项目模块 === -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-datascope-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- === Spring Boot === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -50,8 +67,8 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Spring Boot End -->
 
+        <!-- === 工具 === -->
         <!-- MapStruct -->
         <!-- 这三个的顺序不能调整,不然生成的mapstruct实现类会出问题 -->
         <dependency>

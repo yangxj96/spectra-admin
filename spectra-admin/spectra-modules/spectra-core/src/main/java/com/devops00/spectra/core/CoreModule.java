@@ -1,22 +1,16 @@
 package com.devops00.spectra.core;
 
 
-import com.devops00.spectra.kernel.annotation.SpectraModule;
-import com.devops00.spectra.kernel.lifecycle.SpectraModuleLifecycle;
-import lombok.extern.slf4j.Slf4j;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.context.annotation.ComponentScan;
 
 /// 基础设施模块
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2026/3/8 23:30
-@Slf4j
-@SpectraModule(
-        name = "core",
-        scanPackages = "com.devops00.spectra.core",
-        mapperPackages = "com.devops00.spectra.core.mapper",
-        order = 1000
-)
-public class CoreModule implements SpectraModuleLifecycle {
+@ComponentScan("com.devops00.spectra.core")
+@MapperScan("com.devops00.spectra.core.mapper")
+public class CoreModule {
 
 }

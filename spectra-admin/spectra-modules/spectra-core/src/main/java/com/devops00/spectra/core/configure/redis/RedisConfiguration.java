@@ -40,12 +40,13 @@ public class RedisConfiguration {
 
     private final ObjectMapper om;
 
+
     /// 自定义redisTemplate
     ///
     /// @param factory redis连接工程
     /// @return RedisTemplate<String, Object>
+    @Bean
     @Primary
-    @Bean("spectraRedisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         log.debug(LogPrefix.REDIS.f("开始配置Redis"));
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -63,5 +64,4 @@ public class RedisConfiguration {
         template.afterPropertiesSet();
         return template;
     }
-
 }

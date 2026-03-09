@@ -46,7 +46,6 @@
 
     <modules>
         <module>spectra-common</module>
-        <module>spectra-kernel</module>
         <module>spectra-launch</module>
         <module>spectra-starter</module>
         <module>spectra-modules</module>

@@ -25,18 +25,6 @@
 
     <dependencies>
         <!-- === 项目模块-基础功能 === -->
-        <!-- 内核 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-kernel</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <!-- 公用 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-common</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- 文件上传 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
