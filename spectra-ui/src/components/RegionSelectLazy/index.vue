@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import type { LoadFunction } from "element-plus";
-import { MessageUtils } from "@/utils/message-utils.ts";
+
 import { regionApi } from "@/api/system/region.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
+
+import type { LoadFunction } from "element-plus";
 
 defineOptions({
     name: "RegionSelectLazy"

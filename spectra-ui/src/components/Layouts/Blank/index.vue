@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
-import Navbar from "@/components/Layouts/components/Navbar/index.vue";
+
 import Footer from "@/components/Layouts/components/Footer/index.vue";
+import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 
 defineOptions({
     name: "LayoutsBlank"

@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from "vue";
-import OrganizationEdit from "./components/Edit/index.vue";
+
 import { departmentApi } from "@/api/user/organization.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
+
+import OrganizationEdit from "./components/Edit/index.vue";
 
 const table_data = ref<DepartmentTree[]>();
 
@@ -80,7 +82,7 @@ function handleDialogClose() {
             <el-table-column align="center" width="150" prop="county_code" label="市编码" />
             <el-table-column align="center" width="150" prop="type" label="类型">
                 <template #default="scope">
-                    <dict-tag v-model="scope.row.type" dict_code="sys_organization_type" />
+                    <DictTag v-model="scope.row.type" dict_code="sys_organization_type" />
                 </template>
             </el-table-column>
             <el-table-column align="center" width="150" prop="region_name" label="所在区域" show-overflow-tooltip />
@@ -108,7 +110,7 @@ function handleDialogClose() {
         </el-table>
     </el-row>
     <!-- 新增或编辑 -->
-    <organization-edit :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
+    <OrganizationEdit :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

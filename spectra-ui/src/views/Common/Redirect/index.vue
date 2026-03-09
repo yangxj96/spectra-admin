@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 const route = useRoute();

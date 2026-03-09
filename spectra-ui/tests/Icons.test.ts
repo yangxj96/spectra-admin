@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
+
 import Icons from "@/components/Icons/index.vue";
 
 describe("component icons test", () => {

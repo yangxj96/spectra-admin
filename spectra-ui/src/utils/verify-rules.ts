@@ -1,5 +1,6 @@
-import type { FormItemRule } from "element-plus";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
+
+import type { FormItemRule } from "element-plus";
 
 // 手机号码验证规则
 export const mobile: FormItemRule["validator"] = (rule, value, callback) => {

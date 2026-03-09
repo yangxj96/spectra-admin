@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
 import zhCn from "element-plus/es/locale/lang/zh-cn";
+import { defineStore } from "pinia";
 
 export const useAppStore = defineStore("app", {
     state: (): StoreApp => ({

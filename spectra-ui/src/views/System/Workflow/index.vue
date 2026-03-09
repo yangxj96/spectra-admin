@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+
 import DictSelect from "@/components/DictSelect/index.vue";
 
 const router = useRouter();
@@ -37,7 +38,7 @@ const handleFormEdit = () => {
                 <el-input v-model="condition.name" placeholder="请输入流程名称" clearable style="width: 10vw" />
             </el-form-item>
             <el-form-item label="相关分类" prop="type">
-                <dict-select
+                <DictSelect
                     v-model="condition.type"
                     placeholder="请选择相关类型"
                     dict_code="dict_workflow_type"

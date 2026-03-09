@@ -63,7 +63,7 @@ for (let i = 0; i < 21; i++) {
             style="padding: 10px; margin-left: auto" />
     </el-row>
     <!-- 编辑框 -->
-    <task-edit />
+    <TaskEdit />
 </template>
 
 <style scoped lang="scss">

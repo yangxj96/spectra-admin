@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElTree } from "element-plus";
-import RoleEdit from "./components/RoleEdit/index.vue";
-import { treeDefaultProps } from "@/utils/default-config.ts";
-import UseTable from "@/hooks/use-table.ts";
-import { menuApi } from "@/api/system/menu.ts";
-import { roleApi } from "@/api/auth/role.ts";
+import { onMounted, reactive, ref, useTemplateRef } from "vue";
+
 import { authorityApi } from "@/api/auth/authority.ts";
+import { roleApi } from "@/api/auth/role.ts";
+import { menuApi } from "@/api/system/menu.ts";
+import UseTable from "@/hooks/use-table.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
+
+import RoleEdit from "./components/RoleEdit/index.vue";
 
 // refs
 const powerRef = useTemplateRef<InstanceType<typeof ElTree>>("powerRef");
@@ -232,7 +234,7 @@ function handleSaveRoleMenu() {
             <el-text type="primary">角色权限</el-text>
             <el-divider class="divider-box" />
             <el-button link type="primary" @click="handleSaveRoleAuthority">保存角色权限</el-button>
-            <el-tree
+            <ElTree
                 ref="powerRef"
                 :data="authority_tree"
                 :props="treeDefaultProps"
@@ -246,7 +248,7 @@ function handleSaveRoleMenu() {
             <el-text type="primary">角色菜单</el-text>
             <el-divider class="divider-box" />
             <el-button link type="primary" @click="handleSaveRoleMenu">保存角色菜单</el-button>
-            <el-tree
+            <ElTree
                 ref="menuRef"
                 :data="menu_tree"
                 :props="treeDefaultProps"
@@ -257,7 +259,7 @@ function handleSaveRoleMenu() {
         </el-col>
     </el-row>
     <!-- 角色编辑框 -->
-    <role-edit v-model:show="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
+    <RoleEdit v-model:show="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
 </template>
 
 <style scoped lang="scss">

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+
 import JsonEditor from "@/components/JsonEditor/index.vue";
 
 const visible = ref(false);
@@ -37,7 +38,7 @@ const rules = {
                     <el-input />
                 </el-form-item>
                 <el-form-item label="参数" prop="args">
-                    <json-editor :read-only="false" :model-value="{}" style="width: 100%" />
+                    <JsonEditor :read-only="false" :model-value="{}" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="cron" prop="cron">
                     <el-input />

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
+import { computed, useTemplateRef } from "vue";
+
 import { roleApi } from "@/api/auth/role.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 

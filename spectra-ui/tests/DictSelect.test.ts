@@ -1,7 +1,8 @@
-import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
 import { createTestingPinia } from "@pinia/testing";
+import { mount } from "@vue/test-utils";
 import { ElOption, ElSelect } from "element-plus";
+import { describe, expect, it, vi } from "vitest";
+
 import DictSelect from "../src/components/DictSelect/index.vue";
 
 // 在文件顶部（vitest 会自动 hoist vi.mock）

@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from "vue";
 import { type FormInstance, type FormRules } from "element-plus";
-import { treeDefaultProps } from "@/utils/default-config.ts";
+import { computed, ref, useTemplateRef } from "vue";
+
 import { departmentApi } from "@/api/user/organization.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
-import { MessageUtils } from "@/utils/message-utils.ts";
 import RegionSelectLazy from "@/components/RegionSelectLazy/index.vue";
+import { treeDefaultProps } from "@/utils/default-config.ts";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model<
 const dialog = defineModel("show", {
@@ -107,10 +108,10 @@ async function handleOrganizationSave() {
                     <el-input v-model="form.name" clearable placeholder="请输入部门名称" />
                 </el-form-item>
                 <el-form-item label="区域" prop="region_id">
-                    <region-select-lazy v-model="form.region_id" :name="form.region_name" />
+                    <RegionSelectLazy v-model="form.region_id" :name="form.region_name" />
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
-                    <dict-select v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />
+                    <DictSelect v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" :rows="5" clearable placeholder="请输入相关备注" />

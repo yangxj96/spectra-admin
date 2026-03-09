@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import ChangePassword from "@/components/Props/ChangePassword/index.vue";
+
 import { authApi } from "@/api/auth/auth.ts";
-import { GlobalUtils } from "@/utils/global-utils.ts";
-import { stopAllRequest } from "@/plugin/request";
-import logo from "@/assets/images/logo.svg";
 import avatar from "@/assets/images/avatar.png";
-import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
+import logo from "@/assets/images/logo.svg";
+import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
+import { stopAllRequest } from "@/plugin/request";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
+import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
+import { GlobalUtils } from "@/utils/global-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 defineOptions({
@@ -155,8 +156,8 @@ function handlePersonalPopup() {
             </el-dropdown>
         </el-col>
     </el-row>
-    <personal-details />
-    <change-password />
+    <PersonalDetails />
+    <ChangePassword />
 </template>
 
 <style scoped lang="scss">

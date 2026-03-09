@@ -1,5 +1,6 @@
-import type { Directive, DirectiveBinding } from "vue";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
+
+import type { Directive, DirectiveBinding } from "vue";
 
 /**
  * v-owner 指令

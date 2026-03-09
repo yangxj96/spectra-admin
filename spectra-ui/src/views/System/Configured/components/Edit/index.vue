@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue";
-import type { ElForm } from "element-plus";
+
 import { configuredApi } from "@/api/system/configured.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
+
+import type { ElForm } from "element-plus";
 
 // 是否显示
 const show = defineModel("show", {
@@ -64,7 +66,7 @@ const handleConfiguredSave = async () => {
                         v-model="form.value"
                         active-value="true"
                         inactive-value="false" />
-                    <dict-select v-else-if="form.type === 'SELECT'" v-model="form.value" :dict_code="form.dict_code" />
+                    <DictSelect v-else-if="form.type === 'SELECT'" v-model="form.value" :dict_code="form.dict_code" />
                     <el-input v-else v-model="form.value" placeholder="请输入配置值" />
                 </el-form-item>
                 <el-form-item label="备注" prop="remarks">

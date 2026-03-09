@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
+
 import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
 
 export default defineComponent({

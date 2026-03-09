@@ -1,9 +1,10 @@
-import { ref, watch } from "vue";
 import { useDebounceFn, useIdle } from "@vueuse/core";
+import { ref, watch } from "vue";
+
 import { authApi } from "@/api/auth/auth.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { GlobalUtils } from "@/utils/global-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 
 export function useAuthIdle({
     idleTime = 10 * 60 * 1000, // 10分钟空闲

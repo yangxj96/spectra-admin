@@ -1,19 +1,20 @@
 // ====================
 // external
 // ====================
-import { createApp } from "vue";
-import ElementPlus from "element-plus";
 import { useDark, useToggle } from "@vueuse/core";
+import ElementPlus from "element-plus";
+import { createApp } from "vue";
 
 // ====================
 // internal (@/)
 // ====================
-import App from "./App.vue";
-import createStore from "@/plugin/store";
-import router from "@/plugin/router";
-import { registerDirectives } from "@/directive";
 import { registerComponent } from "@/components";
+import { registerDirectives } from "@/directive";
+import router from "@/plugin/router";
+import createStore from "@/plugin/store";
 import { CommonUtils } from "@/utils/common-utils";
+
+import App from "./App.vue";
 
 // ====================
 // sibling / relative

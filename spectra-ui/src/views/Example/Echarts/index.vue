@@ -48,7 +48,7 @@ const option = ref({
 </script>
 
 <template>
-    <v-chart ref="charts" :option="option" autoresize class="chart" />
+    <VChart ref="charts" :option="option" autoresize class="chart" />
 </template>
 
 <style lang="scss" scoped>

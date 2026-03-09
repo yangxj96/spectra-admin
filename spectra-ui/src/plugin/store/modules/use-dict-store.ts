@@ -1,5 +1,6 @@
-import { defineStore } from "pinia";
 import PQueue from "p-queue";
+import { defineStore } from "pinia";
+
 import { dictApi } from "@/api/system/dict.ts";
 
 // 创建一个串行队列（concurrency=1）

@@ -1,9 +1,11 @@
-import { type AsyncComponentLoader, defineAsyncComponent } from "vue";
-import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
-import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
+import { type AsyncComponentLoader, type defineAsyncComponent } from "vue";
+
 import { menuApi } from "@/api/system/menu.ts";
 import { hideLoading } from "@/plugin/element/loading.ts";
+import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
+
+import type { NavigationGuardNext, RouteLocationNormalizedLoadedGeneric, Router, RouteRecordRaw } from "vue-router";
 
 // 自动收集所有 views 下的 vue 文件（构建期完成）
 const viewModules = import.meta.glob("/src/views/**/*.vue");

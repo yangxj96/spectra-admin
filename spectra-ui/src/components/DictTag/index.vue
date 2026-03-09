@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, type PropType, ref, watch } from "vue";
+
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 defineOptions({

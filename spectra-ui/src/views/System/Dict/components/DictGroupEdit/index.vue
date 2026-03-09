@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
+
 import { dictApi } from "@/api/system/dict.ts";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -113,7 +114,7 @@ function handleSaveDictGroup() {
                     <el-input v-model="edit.form.code" clearable placeholder="请输入字典编码" />
                 </el-form-item>
                 <el-form-item label="字典状态" prop="state">
-                    <dict-select v-model="edit.form.state" dict_code="sys_common_state" placeholder="请选择字典状态" />
+                    <DictSelect v-model="edit.form.state" dict_code="sys_common_state" placeholder="请选择字典状态" />
                 </el-form-item>
                 <el-form-item label="字典描述">
                     <el-input v-model="edit.form.remark" clearable type="textarea" placeholder="请输入字典描述" />

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef } from "vue";
 import FcDesigner, { type Config } from "@form-create/designer";
+import { onMounted, useTemplateRef } from "vue";
 
 const config = {
     switchType: false,
@@ -29,7 +29,7 @@ onMounted(() => {
 
 <template>
     <el-row style="width: 100%; height: 85vh">
-        <fc-designer ref="designer" class="designer" :config="config" @save="handleSave" />
+        <FcDesigner ref="designer" class="designer" :config="config" @save="handleSave" />
     </el-row>
 </template>
 

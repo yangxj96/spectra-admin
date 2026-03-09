@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineAsyncComponent, markRaw, reactive, ref, watch } from "vue";
+
 import { dictApi } from "@/api/system/dict.ts";
 import DictTag from "@/components/DictTag/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -161,7 +162,7 @@ initData();
                 <el-table-column align="center" label="排序" prop="sort" />
                 <el-table-column align="center" label="状态" prop="state">
                     <template #default="scope">
-                        <dict-tag v-model="scope.row.state" primary_value="0" dict_code="sys_common_state" />
+                        <DictTag v-model="scope.row.state" primary_value="0" dict_code="sys_common_state" />
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="默认">

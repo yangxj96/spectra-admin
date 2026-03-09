@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, type PropType, ref, watch } from "vue";
+
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
@@ -7,7 +8,7 @@ defineOptions({
     name: "DictSelect"
 });
 
-const model = defineModel<string | number | null>({
+const model = defineModel<string | number | null | undefined>({
     required: true,
     default: null
 });

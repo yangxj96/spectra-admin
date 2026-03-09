@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, useTemplateRef, watch } from "vue";
 import JSONEditor from "jsoneditor";
-import "jsoneditor/dist/jsoneditor.min.css";
 import lodash from "lodash";
+import { onMounted, useTemplateRef, watch } from "vue";
+import "jsoneditor/dist/jsoneditor.min.css";
 
 defineOptions({
     name: "JsonEditor"

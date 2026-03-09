@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { ElTable, type FormInstance, type FormRules } from "element-plus";
+import { onMounted, reactive, ref, useTemplateRef } from "vue";
+
 import { menuApi } from "@/api/system/menu.ts";
 import IconPicker from "@/components/IconPicker/index.vue";
-import { MessageUtils } from "@/utils/message-utils.ts";
 import JsonEditor from "@/components/JsonEditor/index.vue";
+import { MessageUtils } from "@/utils/message-utils.ts";
 
 const menuForm = useTemplateRef<FormInstance>("ruleFormRef");
 const table_data = ref<Menu[]>([]);
@@ -95,7 +96,7 @@ async function handleMenuSave() {
     </el-row>
     <!-- 数据区 -->
     <el-row class="box-body">
-        <el-table
+        <ElTable
             ref="ref_table"
             v-if="table_data.length > 0"
             :data="table_data"
@@ -141,7 +142,7 @@ async function handleMenuSave() {
                     </el-button>
                 </template>
             </el-table-column>
-        </el-table>
+        </ElTable>
     </el-row>
     <!-- 新增或编辑 -->
     <el-dialog
@@ -185,7 +186,7 @@ async function handleMenuSave() {
                     <el-input v-model="menu.form.name" clearable placeholder="请输入菜单名称" />
                 </el-form-item>
                 <el-form-item label="图标" prop="icon">
-                    <icon-picker v-model="menu.form.icon" />
+                    <IconPicker v-model="menu.form.icon" />
                 </el-form-item>
                 <el-form-item label="是否隐藏" prop="hide">
                     <el-switch v-model="menu.form.hide" />
@@ -203,7 +204,7 @@ async function handleMenuSave() {
                     </el-select>
                 </el-form-item>
                 <el-form-item label="元数据" prop="metadata">
-                    <json-editor :read-only="false" :model-value="menu.form.metadata" style="width: 100%" />
+                    <JsonEditor :read-only="false" :model-value="menu.form.metadata" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number

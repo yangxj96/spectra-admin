@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { Language } from "element-plus/es/locale";
 import { reactive, ref, watch } from "vue";
+
+import { useAuthIdle } from "@/hooks/use-authIdle.ts";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
-import { useAuthIdle } from "@/hooks/use-authIdle.ts";
+
+import type { Language } from "element-plus/es/locale";
 
 const { start, stop } = useAuthIdle({
     idleTime: 10 * 60 * 1000 // 10分钟

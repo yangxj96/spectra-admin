@@ -1,10 +1,11 @@
 <script setup lang="ts">
+import { useDark } from "@vueuse/core";
+import { ElForm, type FormRules } from "element-plus";
 import { computed, reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ElForm, type FormRules } from "element-plus";
-import { useDark } from "@vueuse/core";
-import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
+
 import { authApi } from "@/api/auth/auth.ts";
+import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { loginParticlesLight, loginParticlesDark } from "@/views/Login/config/login-particles.ts";
 
@@ -93,7 +94,7 @@ async function handleLogin() {
                 </p>
             </template>
             <div>
-                <el-form ref="loginForm" label-width="70px" :model="login.form" :rules="login.rules">
+                <ElForm ref="loginForm" label-width="70px" :model="login.form" :rules="login.rules">
                     <el-form-item label="账号" prop="username">
                         <el-input v-model="login.form.username" placeholder="请输入账号" />
                     </el-form-item>
@@ -117,7 +118,7 @@ async function handleLogin() {
                             </el-col>
                         </el-row>
                     </el-form-item>
-                </el-form>
+                </ElForm>
             </div>
             <template #footer>
                 <el-button type="primary" @click="handleLogin">

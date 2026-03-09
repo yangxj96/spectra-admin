@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import "echarts";
-import VChart from "vue-echarts";
 import { onMounted, ref, useTemplateRef } from "vue";
+import VChart from "vue-echarts";
+
 import { serviceMonitorApi } from "@/api/system/service-monitor.ts";
 
 // 相关信息
@@ -200,7 +201,7 @@ setInterval(updateData, 2000);
             </el-col>
             <el-col :span="12">
                 <el-card class="card" header="CPU使用率">
-                    <v-chart ref="cpuChart" :option="chartCPUOption" autoresize style="width: 100%; height: 24vh" />
+                    <VChart ref="cpuChart" :option="chartCPUOption" autoresize style="width: 100%; height: 24vh" />
                 </el-card>
             </el-col>
         </el-row>

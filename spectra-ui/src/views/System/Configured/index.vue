@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
 import _ from "lodash";
+import { onMounted, ref } from "vue";
+
 import { configuredApi } from "@/api/system/configured.ts";
+import DictTag from "@/components/DictTag/index.vue";
 import UseTable from "@/hooks/use-table.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
-import DictTag from "@/components/DictTag/index.vue";
 
 const edit = ref({
     show: false,
@@ -71,7 +72,7 @@ const handleEditConfigured = (row: Configured) => {
                         {{ scope.row.value === "true" ? "启用" : "禁用" }}
                     </el-tag>
                     <!-- 下拉选择的类型 -->
-                    <dict-tag
+                    <DictTag
                         v-else-if="scope.row.type === 'SELECT'"
                         v-model="scope.row.value"
                         :dict_code="scope.row.dict_code" />
@@ -106,7 +107,7 @@ const handleEditConfigured = (row: Configured) => {
             @current-change="handleCurrentChange" />
     </el-row>
     <!-- 用户组件区 -->
-    <configured-edit :show="edit.show" :form="edit.form" @close="handleDialogClose" />
+    <ConfiguredEdit :show="edit.show" :form="edit.form" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

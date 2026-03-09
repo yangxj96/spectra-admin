@@ -1,9 +1,11 @@
-import { beforeEach, describe, expect, it } from "vitest";
 import { flushPromises, mount } from "@vue/test-utils";
 import { ElTag } from "element-plus";
 import { createPinia, setActivePinia } from "pinia";
-import DictTag from "../src/components/DictTag/index.vue";
+import { beforeEach, describe, expect, it } from "vitest";
+
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
+
+import DictTag from "../src/components/DictTag/index.vue";
 
 describe("DictTag.vue", () => {
     let pinia: ReturnType<typeof createPinia>;

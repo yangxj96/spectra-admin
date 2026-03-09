@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { onMounted, ref, useTemplateRef } from "vue";
 import { type AutocompleteData, type FormInstance, type FormRules } from "element-plus";
+import { onMounted, ref, useTemplateRef } from "vue";
+
 import { roleApi } from "@/api/auth/role.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import { userApi } from "@/api/user/user.ts";
+import DictSelect from "@/components/DictSelect/index.vue";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
-import DictSelect from "@/components/DictSelect/index.vue";
-import { departmentApi } from "@/api/user/organization.ts";
-import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 
 // 定义Model
 const form = defineModel("form", {
@@ -137,10 +138,10 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                     <el-input v-model="form.real_name" clearable placeholder="请输入真实名称" />
                 </el-form-item>
                 <el-form-item label="状态" prop="status">
-                    <dict-select v-model="form.status" dict_code="sys_user_state" placeholder="请选择状态" />
+                    <DictSelect v-model="form.status" dict_code="sys_user_state" placeholder="请选择状态" />
                 </el-form-item>
                 <el-form-item label="性别" prop="gender">
-                    <dict-select v-model="form.gender" dict_code="sys_user_gender" placeholder="请选择性别" />
+                    <DictSelect v-model="form.gender" dict_code="sys_user_gender" placeholder="请选择性别" />
                 </el-form-item>
                 <el-form-item label="生日" prop="birthday">
                     <el-date-picker
@@ -175,10 +176,10 @@ const handleEmailSuggestions = async (query: string, callback: (results: Autocom
                     <el-input v-model="form.city" clearable placeholder="请输入城市" />
                 </el-form-item>
                 <el-form-item label="语言" prop="language">
-                    <dict-select v-model="form.language" dict_code="sys_language" placeholder="请选择语言" />
+                    <DictSelect v-model="form.language" dict_code="sys_language" placeholder="请选择语言" />
                 </el-form-item>
                 <el-form-item label="时区" prop="timezone">
-                    <dict-select v-model="form.timezone" dict_code="sys_timezone" placeholder="请选择时区" />
+                    <DictSelect v-model="form.timezone" dict_code="sys_timezone" placeholder="请选择时区" />
                 </el-form-item>
                 <el-form-item label="角色" prop="role_ids">
                     <el-select v-model="form.role_ids" value-key="id" multiple placeholder="请选择角色" clearable>

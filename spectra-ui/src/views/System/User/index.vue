@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import UserEdit from "./components/Edit/index.vue";
-import UseTable from "@/hooks/use-table.ts";
+
+import { departmentApi } from "@/api/user/organization.ts";
 import { userApi } from "@/api/user/user.ts";
 import DictTag from "@/components/DictTag/index.vue";
+import UseTable from "@/hooks/use-table.ts";
+import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { departmentApi } from "@/api/user/organization.ts";
-import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
+
+import UserEdit from "./components/Edit/index.vue";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -187,7 +189,7 @@ onMounted(async () => {
                 </el-table-column>
                 <el-table-column align="center" width="150" show-overflow-tooltip label="状态" prop="state">
                     <template #default="scope">
-                        <dict-tag v-model="scope.row.status" primary_value="0" dict_code="sys_user_state" />
+                        <DictTag v-model="scope.row.status" primary_value="0" dict_code="sys_user_state" />
                     </template>
                 </el-table-column>
                 <el-table-column
@@ -245,7 +247,7 @@ onMounted(async () => {
         </el-col>
     </el-row>
     <!-- 用户组件区 -->
-    <user-edit :open="dialog_edit.open" :form="dialog_edit.form" @close="handleDialogClose" />
+    <UserEdit :open="dialog_edit.open" :form="dialog_edit.form" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

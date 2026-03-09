@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from "vue";
+
+import { fileUploadApi } from "@/api/common/file-upload.ts";
 import { FileUtils } from "@/utils/file-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { fileUploadApi } from "@/api/common/file-upload.ts";
 
 defineOptions({
     name: "FileUpload"
