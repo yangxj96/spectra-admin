@@ -24,9 +24,7 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     condition.value
 );
 
-onMounted(() => {
-    configuredApi.json().then(res => console.log(res));
-});
+onMounted(() => {});
 
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
 function handleDialogClose() {

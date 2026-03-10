@@ -53,11 +53,9 @@ public interface DepartmentService extends IService<Department> {
     /// @return 组织机构路径
     String generatePath(String id);
 
-    /**
-     * 组织机构树形结构
-     *
-     * @return 组织机构树形结构数组
-     */
+    /// 组织机构树形结构
+    ///
+    /// @return 组织机构树形结构数组
     @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException;
 
     /// 获取自己包含下级的节点的ID

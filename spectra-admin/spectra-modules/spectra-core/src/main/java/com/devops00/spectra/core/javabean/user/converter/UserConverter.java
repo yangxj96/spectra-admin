@@ -46,12 +46,10 @@ public interface UserConverter {
     /// @return 实体
     User toEntity(UserSaveFrom source);
 
-    /**
-     * 转换为分页VO
-     *
-     * @param source 入参
-     * @return 分页的VO
-     */
+    /// 转换为分页VO
+    ///
+    /// @param source 入参
+    /// @return 分页的VO
     @Mapping(target = "pages", ignore = true)
     Page<UserPageVO> toVOPage(Page<User> source);
 

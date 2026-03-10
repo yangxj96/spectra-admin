@@ -43,11 +43,9 @@ public class WorkflowProcessDefinitionsController {
         this.repositoryService = repositoryService;
     }
 
-    /**
-     * 获取所有的流程定义
-     *
-     * @return 流程定义列表
-     */
+    /// 获取所有的流程定义
+    ///
+    /// @return 流程定义列表
     @GetMapping("/definitions")
     public List<Map<String, Object>> definitions() {
         var definitions = repositoryService

@@ -30,12 +30,10 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {
 
-    /**
-     * 根据ID生成组织机构路径
-     * <p>如:光谱平台/云南分公司/保山分公司/测试小组</p>
-     *
-     * @param id 组织机构ID
-     * @return 组织机构路径
-     */
+    /// 根据ID生成组织机构路径
+    /// <p>如:光谱平台/云南分公司/保山分公司/测试小组</p>
+    ///
+    /// @param id 组织机构ID
+    /// @return 组织机构路径
     String generatePath(@Param("id") String id);
 }

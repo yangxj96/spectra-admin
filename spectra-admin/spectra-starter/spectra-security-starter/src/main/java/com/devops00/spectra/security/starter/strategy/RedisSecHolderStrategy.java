@@ -80,6 +80,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         }
         var extra = user.getExtraData();
         extra.put("ip", IpUtils.getClientIP(this.getHttpServletRequest()));
+        extra.put("timezone",user.getTimezone());
 
         // =======================
         // 3. 权限拆分
@@ -128,14 +129,14 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         // =======================
         // 6. Redis Key 准备
         // =======================
-        var sessionKey = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
-        var tokenUserKey = AuthRedisKey.TOKEN_USER.format(token);
-        var userTokensKey = AuthRedisKey.USER_TOKENS.format(user.getId());
-        var userClientTokensKey = AuthRedisKey.USER_CLIENT_TOKENS.format(
-                user.getId(), loginType.getName()
-        );
-        var userDetailsKey = AuthRedisKey.USER_DETAIL.format(user.getId());
-        var onlineUsersKey = AuthRedisKey.ONLINE_USER_IDS.getPattern();
+        // @formatter:off
+        var sessionKey          = AuthRedisKey.SESSION_TOKEN_DETAIL.format(token);
+        var tokenUserKey        = AuthRedisKey.TOKEN_USER.format(token);
+        var userTokensKey       = AuthRedisKey.USER_TOKENS.format(user.getId());
+        var userClientTokensKey = AuthRedisKey.USER_CLIENT_TOKENS.format(user.getId(), loginType.getName());
+        var userDetailsKey      = AuthRedisKey.USER_DETAIL.format(user.getId());
+        var onlineUsersKey      = AuthRedisKey.ONLINE_USER_IDS.getPattern();
+        // @formatter:on
 
         long ttl = TimeUnit.DAYS.toSeconds(7);
 
@@ -150,11 +151,9 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         sessionData.put("clientType", "browser");
         sessionData.put("ip", extra.get("ip"));
         sessionData.put("address", extra.get("address"));
+        sessionData.put("timezone", extra.get("timezone"));
         sessionData.put("loginTime", System.currentTimeMillis());
         sessionData.put("lastActiveTime", System.currentTimeMillis());
-        // 动态续期使用
-        sessionData.put("ttlSeconds", ttl);
-        sessionData.put("lastActiveAt", System.currentTimeMillis());
 
         // =======================
         // 8. 写入 Redis（核心）
@@ -382,6 +381,14 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         return user.getId();
     }
 
+    @Override
+    public String getCurrentUserZoneId() {
+        SecurityUser user = this.getCurrentUser();
+        if (user == null) {
+            return "UTC";
+        }
+        return user.getTimezone();
+    }
 
     //--------------------------  辅助方法  --------------------------------//
 

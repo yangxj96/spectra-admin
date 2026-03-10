@@ -48,6 +48,9 @@ public class SecurityUser implements UserDetails {
     /// 用户状态
     private Short state;
 
+    /// 时区
+    private String timezone;
+
     private boolean enabled = true;
 
     private boolean accountNonExpired = true;

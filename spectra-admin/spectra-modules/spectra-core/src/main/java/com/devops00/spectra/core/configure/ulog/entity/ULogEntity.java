@@ -34,55 +34,35 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class ULogEntity implements Serializable {
 
-    /**
-     * 日志类型
-     */
+    /// 日志类型
     private SysLogType type;
 
-    /**
-     * 操作说明
-     */
+    /// 操作说明
     private String explain;
 
-    /**
-     * 请求参数
-     */
+    /// 请求参数
     private String args;
 
-    /**
-     * 请求IP
-     */
+    /// 请求IP
     private String ip;
 
-    /**
-     * 请求方法
-     */
+    /// 请求方法
     private String method;
 
-    /**
-     * 请求URL
-     */
+    /// 请求URL
     private String url;
 
-    /**
-     * 响应状态
-     */
+    /// 响应状态
     private Short status;
 
-    /**
-     * 响应内容
-     */
+    /// 响应内容
     @Nullable
     private String result;
 
-    /**
-     * 耗时
-     */
+    /// 耗时
     private Long timeCost;
 
-    /**
-     * 当前用户 ID
-     */
+    /// 当前用户ID
     @Nullable
     private String currentId;
 }

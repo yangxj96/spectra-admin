@@ -25,6 +25,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -96,4 +97,7 @@ public class UserPageVO implements Serializable {
 
     /// 自定义时的目标ID列表
     private List<String> targetIds;
+
+    /// 创建时间
+    private String createdAt;
 }

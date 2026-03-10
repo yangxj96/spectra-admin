@@ -74,4 +74,9 @@ public interface SecHolderStrategy {
     /// @return 当前用户 ID, 可能为null
     @Nullable String getCurrentUserId();
 
+    /// 获取当前用户时区ID
+    ///
+    /// @return 时区ID
+    String getCurrentUserZoneId();
+
 }

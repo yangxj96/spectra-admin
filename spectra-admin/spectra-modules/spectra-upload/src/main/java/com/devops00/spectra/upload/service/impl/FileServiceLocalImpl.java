@@ -54,14 +54,10 @@ import java.util.List;
 @NullMarked
 public class FileServiceLocalImpl extends AbstractFileService {
 
-    /**
-     * 本地文件管理的根文件路径
-     */
+    /// 本地文件管理的根文件路径
     private final Path root;
 
-    /**
-     * 本地文件管理的临时文件路径
-     */
+    /// 本地文件管理的临时文件路径
     private final Path temp;
 
     @Resource

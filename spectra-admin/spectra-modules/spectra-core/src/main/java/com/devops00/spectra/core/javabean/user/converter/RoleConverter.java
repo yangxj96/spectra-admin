@@ -30,12 +30,10 @@ import org.mapstruct.Mapper;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface RoleConverter {
 
-    /**
-     * 实体转分页VO
-     *
-     * @param source 实体
-     * @return 分页实体
-     */
+    /// 实体转分页VO
+    ///
+    /// @param source 实体
+    /// @return 分页实体
     RoleVO toVO(Role source);
 
 }

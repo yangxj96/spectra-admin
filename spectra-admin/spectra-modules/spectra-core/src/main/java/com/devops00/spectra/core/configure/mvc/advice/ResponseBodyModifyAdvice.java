@@ -82,13 +82,11 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
         return R.success(body);
     }
 
-    /**
-     * 空body处理
-     *
-     * @param request  请求
-     * @param response 响应
-     * @return 结果
-     */
+    /// 空body处理
+    ///
+    /// @param request  请求
+    /// @param response 响应
+    /// @return 结果
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
         R<Object> r;
         // 如果能获取到响应则直接响应

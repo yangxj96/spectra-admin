@@ -14,11 +14,9 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserDataScopeMapper extends BaseMapper<UserDataScope> {
 
-    /**
-     * 根据用户ID查询数据范围
-     *
-     * @param userId 用户ID
-     * @return 数据范围
-     */
+    /// 根据用户ID查询数据范围
+    ///
+    /// @param userId 用户ID
+    /// @return 数据范围
     UserDataScope findByUserId(@Param("userId") String userId);
 }

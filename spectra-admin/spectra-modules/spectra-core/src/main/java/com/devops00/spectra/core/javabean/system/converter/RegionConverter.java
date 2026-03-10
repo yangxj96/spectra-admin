@@ -9,13 +9,11 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/**
- * 行政区划转换器
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/2/2 15:50
- */
+/// 行政区划转换器
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/2/2 15:50
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface RegionConverter {
 

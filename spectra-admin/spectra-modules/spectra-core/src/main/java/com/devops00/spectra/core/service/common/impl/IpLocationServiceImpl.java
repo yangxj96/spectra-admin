@@ -57,13 +57,11 @@ public class IpLocationServiceImpl implements IpLocationService {
         }
     }
 
-    /**
-     * 格式化 IP 查询结果，按精度截断
-     *
-     * @param fields IP 数据字段数组，顺序：国家|省份|城市|运营商|...
-     * @param level  精度级别
-     * @return 格式化后的位置字符串
-     */
+    /// 格式化 IP 查询结果，按精度截断
+    ///
+    /// @param fields IP 数据字段数组，顺序：国家|省份|城市|运营商|...
+    /// @param level  精度级别
+    /// @return 格式化后的位置字符串
     @NullMarked
     private static String formatRegion(String[] fields, int level) {
         var sb = new StringBuilder();
@@ -91,16 +89,12 @@ public class IpLocationServiceImpl implements IpLocationService {
         return sb.toString();
     }
 
-    /**
-     * 判断字段是否有效（非空、非"0"、非"内网IP"）
-     */
+    /// 判断字段是否有效（非空、非"0"、非"内网IP"）
     private static boolean isValidField(String field) {
         return StrUtils.isNotBlank(field) && !"0".equals(field) && !"内网IP".equals(field);
     }
 
-    /**
-     * 向 StringBuilder 添加内容，自动处理空格分隔
-     */
+    /// 向 StringBuilder 添加内容，自动处理空格分隔
     @NullMarked
     private static void append(StringBuilder sb, String part) {
         if (!sb.isEmpty()) {
@@ -182,9 +176,7 @@ public class IpLocationServiceImpl implements IpLocationService {
         return new RandomAccessFile(tempFile.toFile(), "r");
     }
 
-    /**
-     * 释放资源 关闭 Searcher 实例，释放内存映射资源。
-     */
+    /// 释放资源 关闭 Searcher 实例，释放内存映射资源。
     @PreDestroy
     public void destroy() {
         if (searcher != null) {

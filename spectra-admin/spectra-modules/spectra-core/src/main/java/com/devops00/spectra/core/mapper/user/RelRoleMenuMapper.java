@@ -31,12 +31,10 @@ import java.util.List;
 @Mapper
 public interface RelRoleMenuMapper extends BaseMapper<RelRoleMenu> {
 
-    /**
-     * 根据角色ID获取角色的菜单关联信息
-     *
-     * @param roleId 角色ID
-     * @return 关联信息
-     */
+    /// 根据角色ID获取角色的菜单关联信息
+    ///
+    /// @param roleId 角色ID
+    /// @return 关联信息
     List<RelRoleMenu> getByRoleId(@Param("roleId") String roleId);
 
 

@@ -14,26 +14,20 @@ import org.jspecify.annotations.Nullable;
 @NullMarked
 public interface AccountService extends BaseService<Account> {
 
-    /**
-     * 根据 LoginName 字段查询账号信息
-     *
-     * @param loginName 登录用户名
-     * @return 账号信息，可能为null
-     */
+    /// 根据 LoginName 字段查询账号信息
+    ///
+    /// @param loginName 登录用户名
+    /// @return 账号信息，可能为null
     @Nullable Account getByLoginName(String loginName);
 
-    /**
-     * 根据用户ID获取用户的默认账号
-     *
-     * @param userId 用户ID
-     * @return 账号信息
-     */
+    /// 根据用户ID获取用户的默认账号
+    ///
+    /// @param userId 用户ID
+    /// @return 账号信息
     Account getDefaultByUserId(String userId);
 
-    /**
-     * 根据用户ID删除用户的所有登录方式
-     *
-     * @param userId 用户ID
-     */
+    /// 根据用户ID删除用户的所有登录方式
+    ///
+    /// @param userId 用户ID
     void deleteByUserId(String userId);
 }

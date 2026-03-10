@@ -28,9 +28,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "spectra.user")
 public class UserProperties {
 
-    /**
-     * 默认密码
-     */
+    /// 默认密码
     private String defaultPassword;
 
 }

@@ -15,11 +15,9 @@ import org.jspecify.annotations.Nullable;
 @Mapper
 public interface FileInfoMapper extends BaseMapper<FileInfo> {
 
-    /**
-     * 根据hash查找文件
-     *
-     * @param hash hash
-     * @return 如果文件存在则返回文件,否则返回null
-     */
+    /// 根据hash查找文件
+    ///
+    /// @param hash hash
+    /// @return 如果文件存在则返回文件,否则返回null
     @Nullable FileInfo getByHash(@Param("hash") String hash);
 }

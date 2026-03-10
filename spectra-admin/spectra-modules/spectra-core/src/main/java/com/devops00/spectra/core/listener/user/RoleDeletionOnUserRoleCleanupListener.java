@@ -46,12 +46,10 @@ public class RoleDeletionOnUserRoleCleanupListener {
         this.relUserRoleService = relUserRoleService;
     }
 
-    /**
-     * 角色删除事件监听器
-     * <p>撤销关联的用户</p>
-     *
-     * @param event 角色删除事件实体
-     */
+    /// 角色删除事件监听器
+    /// <p>撤销关联的用户</p>
+    ///
+    /// @param event 角色删除事件实体
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
         log.debug("{}角色删除事件监听-用户角色关联关系:{}", LogPrefix.CORE.p(), event.roleId());

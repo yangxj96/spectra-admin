@@ -8,4 +8,4 @@
    \|_________|
 
 
-Spring Boot: ${spring-boot.version} 应用版本: ${application.version}
+Spring Boot Version: ${spring-boot.version} Application Version: ${application.version}

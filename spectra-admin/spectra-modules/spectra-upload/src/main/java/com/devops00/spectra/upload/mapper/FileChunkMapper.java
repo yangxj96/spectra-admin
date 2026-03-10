@@ -16,12 +16,10 @@ import java.util.List;
 @Mapper
 public interface FileChunkMapper extends BaseMapper<FileChunk> {
 
-    /**
-     * 根据hash检查之前是否有上传过分片信息
-     *
-     * @param fileId 文件ID,当前以文件hash值作为文件ID
-     * @return 分片信息,可能为null
-     */
+    /// 根据hash检查之前是否有上传过分片信息
+    ///
+    /// @param fileId 文件ID,当前以文件hash值作为文件ID
+    /// @return 分片信息,可能为null
     @Nullable List<FileChunk> getByFileId(String fileId);
 
 }

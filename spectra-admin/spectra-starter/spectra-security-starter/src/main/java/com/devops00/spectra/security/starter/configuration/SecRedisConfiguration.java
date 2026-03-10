@@ -14,13 +14,11 @@ import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * Security专用Redis配置
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/3/9 00:39
- */
+/// Security专用Redis配置
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/3/9 00:39
 @Slf4j
 public class SecRedisConfiguration {
 
@@ -47,6 +45,7 @@ public class SecRedisConfiguration {
         return template;
     }
 
+    /// Security自定义Redis监听KEY事件
     @Bean
     public SecurityRedisKeyExpirationListener securityRedisKeyExpirationListener(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis) {
         return new SecurityRedisKeyExpirationListener(redis);

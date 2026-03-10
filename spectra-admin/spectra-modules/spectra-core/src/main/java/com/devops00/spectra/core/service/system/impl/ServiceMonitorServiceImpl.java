@@ -37,11 +37,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     private static final String UNKNOWN = "Unknown";
 
-    /**
-     * 过滤敏感属性,只保留常见属性,防止泄露
-     *
-     * @return 属性 map
-     */
+    /// 过滤敏感属性,只保留常见属性,防止泄露
+    ///
+    /// @return 属性 map
     private static Map<String, String> getFilteredProps() {
         var systemProps = System.getProperties();
         var filteredProps = new HashMap<String, String>();

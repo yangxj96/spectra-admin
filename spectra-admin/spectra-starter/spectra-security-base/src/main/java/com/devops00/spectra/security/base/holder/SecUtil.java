@@ -119,4 +119,10 @@ public class SecUtil {
         return getStrategy().getCurrentUserId();
     }
 
+    /// 获取当前用户时区ID
+    ///
+    /// @return 时区ID
+    public static String getCurrentUserZoneId() {
+        return getStrategy().getCurrentUserZoneId();
+    }
 }

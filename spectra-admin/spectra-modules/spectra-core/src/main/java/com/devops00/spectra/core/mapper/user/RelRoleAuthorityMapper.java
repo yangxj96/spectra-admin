@@ -31,11 +31,9 @@ import java.util.List;
 @Mapper
 public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
 
-    /**
-     * 根据角色ID获取关联权限信息
-     *
-     * @param roleId 角色ID
-     * @return 关联权限信息
-     */
+    /// 根据角色ID获取关联权限信息
+    ///
+    /// @param roleId 角色ID
+    /// @return 关联权限信息
     List<RelRoleAuthority> getByRoleId(@Param("roleId") String roleId);
 }

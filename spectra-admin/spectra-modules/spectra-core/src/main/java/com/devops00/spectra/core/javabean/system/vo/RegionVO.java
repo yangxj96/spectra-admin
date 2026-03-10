@@ -8,13 +8,11 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-/**
- * 行政区域响应VO
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/1/30 15:55
- */
+/// 行政区域响应VO
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/1/30 15:55
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
