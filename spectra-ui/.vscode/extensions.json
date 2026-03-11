@@ -1,0 +1,10 @@
+{
+    "recommendations": [
+        "Vue.volar", // 官方 Vue 3 插件
+        "esbenp.prettier-vscode", // Prettier 格式化
+        "dbaeumer.vscode-eslint", // ESLint 支持
+        "christian-kohler.path-intellisense", // 路径智能补全
+        "formulahendry.auto-close-tag", // 自动闭合 HTML / Vue 标签
+        "formulahendry.auto-rename-tag" // 标签同步重命名
+    ]
+}
