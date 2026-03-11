@@ -111,21 +111,19 @@
 
     <!-- ================= PROD 环境 ================= -->
     <springProfile name="prod">
-        <!-- console 不打印堆栈 -->
-        <appender name="PROD_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 不打印异常 -->
+        <appender name="PROD_CONSOLE"
+                  class="ch.qos.logback.core.ConsoleAppender">
             <encoder>
-                <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+                <pattern>%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint}%clr(${LOG_LEVEL_PATTERN:-%5p}){}%clr(${PID:-}){magenta}%clr(--- %esb(){APPLICATION_NAME}%esb{APPLICATION_GROUP}[%15.15t] ${LOG_CORRELATION_PATTERN:-}){faint}%clr(%-40.40logger{39}){cyan}%clr(:){faint}%m%n</pattern>
                 <charset>UTF-8</charset>
             </encoder>
         </appender>
         <root level="INFO">
             <appender-ref ref="PROD_CONSOLE"/>
-
             <appender-ref ref="ASYNC_INFO"/>
             <appender-ref ref="ASYNC_DEBUG"/>
             <appender-ref ref="ASYNC_ERROR"/>
         </root>
-
     </springProfile>
-
 </configuration>
