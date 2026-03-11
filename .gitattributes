@@ -10,14 +10,14 @@
 * text=auto eol=lf
 
 # -----------------------------------------
-# Windows 脚本（必须 CRLF）
+# Windows脚本（必须 CRLF）
 # -----------------------------------------
 *.bat   text eol=crlf
 *.cmd   text eol=crlf
 *.ps1   text eol=crlf
 
 # -----------------------------------------
-# Shell / Unix 脚本（必须 LF）
+# Shell/Unix脚本（必须 LF）
 # -----------------------------------------
 *.sh    text eol=lf
 
@@ -44,7 +44,7 @@
 *.sql   text eol=lf
 
 # -----------------------------------------
-# 配置 / 构建 / 容器
+# 配置/构建/容器
 # -----------------------------------------
 Dockerfile        text eol=lf
 *.dockerfile      text eol=lf
@@ -57,12 +57,40 @@ Dockerfile        text eol=lf
 *.pom             text eol=lf
 
 # -----------------------------------------
-# Git / CI 相关
+# Git/CI相关
 # -----------------------------------------
 .gitattributes    text eol=lf
 .gitignore        text eol=lf
 .github/*         text eol=lf
 .gitlab-ci.yml    text eol=lf
+
+#----------------------------------------
+# Node/包管理器 Lock 文件
+#----------------------------------------
+
+package-lock.json text eol=lf
+yarn.lock text eol=lf
+pnpm-lock.yaml text eol=lf
+bun.lockb binary
+
+#----------------------------------------
+# Diff优化（让 git diff 更清晰）
+#-----------------------------------------
+
+*.md diff=markdown
+*.java diff=java
+*.ts diff=typescript
+*.tsx diff=typescript
+*.js diff=javascript
+*.jsx diff=javascript
+*.css diff=css
+*.scss diff=css
+*.html diff=html
+*.xml diff=xml
+*.json diff=json
+*.yml diff=yaml
+*.yaml diff=yaml
+
 
 # -----------------------------------------
 # 二进制文件（禁止行尾转换）
