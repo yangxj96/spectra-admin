@@ -94,9 +94,6 @@ logging:
     root: info
     other: error
     spectra: error
-  charset:
-    console: utf-8
-    file: UTF-8
 management:
   endpoints:
     web:
