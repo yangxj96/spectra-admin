@@ -106,7 +106,7 @@ management:
     health:
       show-details: when-authorized
 flowable:
-  database-schema: domain_workflow
+  database-schema: spectra_workflow
   database-schema-update: true
   jpa-enabled: false
   process-definition-location-prefix: classpath*:/processes/
