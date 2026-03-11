@@ -1,7 +1,7 @@
 import { flushPromises, mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
-import Icons from "@/components/Icons/index.vue";
+import Icons from "@/components/ComponentsIcons/index.vue";
 
 describe("component icons test", () => {
     // 测试渲染图标

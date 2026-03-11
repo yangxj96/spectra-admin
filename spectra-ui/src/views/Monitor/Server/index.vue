@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import "echarts";
-import { onMounted, ref, useTemplateRef } from "vue";
-import VChart from "vue-echarts";
+import { LineChart } from "echarts/charts";
+import { GridComponent, TooltipComponent, TitleComponent, LegendComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { defineAsyncComponent, onMounted, ref, useTemplateRef } from "vue";
 
 import { serviceMonitorApi } from "@/api/system/service-monitor.ts";
+
+const VChart = defineAsyncComponent(() => import("vue-echarts"));
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, TitleComponent, LegendComponent]);
 
 // 相关信息
 const cpuInfo = ref<CPUInfo>();
@@ -69,9 +74,9 @@ onMounted(() => {
 function initData() {
     const requests = [serviceMonitorApi.getCPUInfo(), serviceMonitorApi.getRAMInfo(), serviceMonitorApi.getJVMInfo()];
     Promise.all(requests).then(res => {
-        cpuInfo.value = res[0].data as CPUInfo;
-        ramInfo.value = res[1].data as RAMInfo;
-        jvmInfo.value = res[2].data as JVMInfo;
+        cpuInfo.value = res[0]!.data as CPUInfo;
+        ramInfo.value = res[1]!.data as RAMInfo;
+        jvmInfo.value = res[2]!.data as JVMInfo;
     });
 }
 

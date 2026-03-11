@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import FcDesigner, { type Config } from "@form-create/designer";
+import { type Config } from "@form-create/designer";
 import { onMounted, useTemplateRef } from "vue";
+
+const FcDesigner = defineAsyncComponent({
+    loader: () => import("@form-create/designer"),
+    delay: 200,
+    timeout: 30000
+});
 
 const config = {
     switchType: false,
@@ -11,7 +17,7 @@ const config = {
     showLanguage: false
 } as Config;
 
-const designer = useTemplateRef("designer");
+const designer = useTemplateRef<InstanceType<typeof FcDesigner>>("designer");
 
 function handleSave(data: { rule: string; options: string }) {
     console.log(`保存数据`);

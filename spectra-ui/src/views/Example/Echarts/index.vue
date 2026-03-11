@@ -1,16 +1,25 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue";
-import "echarts";
-import VChart from "vue-echarts";
+import { ScatterChart } from "echarts/charts";
+import { TitleComponent, GridComponent, TooltipComponent } from "echarts/components";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { ref, defineAsyncComponent } from "vue";
 
-const charts = useTemplateRef<HTMLDivElement>("charts");
+/* 动态加载 vue-echarts 组件 */
+const VChart = defineAsyncComponent(() => import("vue-echarts"));
+
+/* 注册需要的组件 */
+use([ScatterChart, TitleComponent, GridComponent, TooltipComponent, CanvasRenderer]);
 
 const grid = {
     left: 80,
     right: 50
 };
+
 const width = 1000 - grid.left - grid.right;
-const data = [];
+
+const data: unknown[] = [];
+
 for (let day = 0; day < 7; ++day) {
     for (let i = 0; i < 1000; ++i) {
         const y = Math.tan(i) / 2 + 7;
@@ -48,10 +57,10 @@ const option = ref({
 </script>
 
 <template>
-    <VChart ref="charts" :option="option" autoresize class="chart" />
+    <VChart :option="option" autoresize class="chart" />
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .chart {
     width: 100%;
     height: 100%;

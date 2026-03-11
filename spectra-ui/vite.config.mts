@@ -1,18 +1,19 @@
 import { resolve } from "path";
 
 import vue from "@vitejs/plugin-vue";
-import VueJsx from "@vitejs/plugin-vue-jsx";
+import vueJsx from "@vitejs/plugin-vue-jsx";
+import AutoImport from "unplugin-auto-import/vite";
+import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
+import Components from "unplugin-vue-components/vite";
 import { defineConfig, loadEnv } from "vite";
-import viteCompression from "vite-plugin-compression";
-import VueDevTools from "vite-plugin-vue-devtools";
+import viteCompression from "vite-plugin-compression2";
 
 export default defineConfig(({ mode }) => {
+    const root = process.cwd();
+    const env = loadEnv(mode, root);
     if (mode === "development") {
-        const root = process.cwd();
-        const env = loadEnv(mode, root);
         console.log("环境变量:", env);
     }
-    // src路径，用于配置别名
     const srcPath = resolve(__dirname, "src");
     return {
         base: "/",
@@ -24,9 +25,29 @@ export default defineConfig(({ mode }) => {
         },
         plugins: [
             vue(),
-            VueJsx(),
-            mode === "production" && viteCompression({ threshold: 10240 }),
-            mode === "development" && VueDevTools()
+            vueJsx(),
+            // 自动导入 Vue API
+            AutoImport({
+                imports: ["vue", "vue-router", "pinia"],
+                dts: "src/auto-imports.d.ts",
+                eslintrc: {
+                    enabled: true
+                }
+            }),
+            // 自动注册组件
+            Components({
+                dirs: ["src/components"],
+                extensions: ["vue"],
+                deep: true,
+                resolvers: [ElementPlusResolver()],
+                dts: "src/components.d.ts"
+            }),
+            // 生产环境压缩
+            mode === "production" &&
+                viteCompression({
+                    threshold: 10240,
+                    algorithms: ["gzip", "brotliCompress"]
+                })
         ].filter(Boolean),
         resolve: {
             alias: {
@@ -41,70 +62,67 @@ export default defineConfig(({ mode }) => {
             }
         },
         build: {
-            sourcemap: false,
-            target: "es2018",
-            minify: "terser",
+            target: "esnext",
             outDir: "build",
+            sourcemap: false,
+            minify: "esbuild",
+            cssCodeSplit: true,
+            chunkSizeWarningLimit: 1500,
+            esbuild: {
+                drop: ["console", "debugger"]
+            },
             rollupOptions: {
                 output: {
-                    manualChunks: {
-                        vue: ["vue", "vue-router", "pinia"]
+                    manualChunks(id) {
+                        if (!id.includes("node_modules")) return;
+                        if (id.includes("vue")) return "vue";
+                        if (id.includes("element-plus")) return "element";
+                        if (id.includes("@form-create")) return "form-create";
+                        if (id.includes("echarts")) return "echarts";
+                        if (id.includes("@logicflow")) return "logicflow";
+                        if (id.includes("jsoneditor")) return "jsoneditor";
+                        return "vendor";
                     },
-                    assetFileNames: assetInfo => {
-                        const ext = assetInfo.name?.split(".").pop();
+                    entryFileNames: "js/[name]-[hash].js",
+                    chunkFileNames: "js/[name]-[hash].js",
+                    assetFileNames(assetInfo) {
+                        const ext = assetInfo.name?.split(".").pop()?.toLowerCase() ?? "";
+                        const map: Record<string, string> = {
+                            css: "css",
 
-                        if (/png|jpe?g|gif|svg|webp|avif/i.test(ext ?? "")) {
-                            return "assets/img/[name]-[hash][extname]";
-                        }
+                            png: "img",
+                            jpg: "img",
+                            jpeg: "img",
+                            gif: "img",
+                            svg: "img",
+                            webp: "img",
+                            avif: "img",
 
-                        if (/woff2?|ttf|otf|eot/i.test(ext ?? "")) {
-                            return "assets/fonts/[name]-[hash][extname]";
-                        }
-
-                        if (ext === "css") {
-                            return "css/[name]-[hash][extname]";
-                        }
-
-                        return "assets/other/[name]-[hash][extname]";
-                    },
-
-                    chunkFileNames: "assets/js/[name]-[hash].js",
-                    entryFileNames: "assets/js/[name]-[hash].js"
-                }
-            },
-            terserOptions: {
-                compress: {
-                    // 移除所有的 console.* 调用
-                    drop_console: true,
-                    // 移除 debugger 语句
-                    drop_debugger: true,
-                    // 更细粒度控制
-                    pure_funcs: ["console.log", "console.info", "console.warn", "console.error"]
-                },
-                format: {
-                    // 移除注释
-                    comments: false
+                            woff: "fonts",
+                            woff2: "fonts",
+                            ttf: "fonts",
+                            otf: "fonts",
+                            eot: "fonts"
+                        };
+                        const dir = map[ext] || "other";
+                        return `${dir}/[name]-[hash][extname]`;
+                    }
                 }
             }
         },
+
         test: {
-            // 使用 happy-dom 或 jsdom
-            environment: "happy-dom", // 或 'jsdom'
-            // 打印日志输出
+            environment: "happy-dom",
             silent: false,
             reporters: "default",
-            // 匹配测试文件
             include: ["tests/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
-            // 全局注册 Vue Test Utils 的 API（可选）
             globals: true,
-            // 支持 setup 文件
             setupFiles: "./tests/setup.ts",
             alias: {
                 "@": srcPath
             },
-            // 覆盖率（可选）
             coverage: {
-                provider: "v8", // or 'istanbul'
+                provider: "v8",
                 reporter: ["text", "json", "html"]
             }
         }

@@ -1,14 +1,11 @@
-// ====================
-// external
-// ====================
+import formCreate from "@form-create/element-ui";
+import install from "@form-create/element-ui/auto-import";
+import { loadSlim } from "@tsparticles/slim";
+import Particles from "@tsparticles/vue3";
 import { useDark, useToggle } from "@vueuse/core";
 import ElementPlus from "element-plus";
 import { createApp } from "vue";
 
-// ====================
-// internal (@/)
-// ====================
-import { registerComponent } from "@/components";
 import { registerDirectives } from "@/directive";
 import router from "@/plugin/router";
 import createStore from "@/plugin/store";
@@ -16,12 +13,6 @@ import { CommonUtils } from "@/utils/common-utils";
 
 import App from "./App.vue";
 
-// ====================
-// sibling / relative
-// ====================
-// ====================
-// styles
-// ====================
 import "@/plugin/element/index.scss";
 
 CommonUtils.hasReload();
@@ -33,10 +24,23 @@ toggleDark(CommonUtils.shouldEnableDarkMode());
 // 创建APP
 const app = createApp(App);
 
+// 注册 form-create auto import
+formCreate.use(install);
+app.use(formCreate);
+app.use(ElementPlus);
+
+app.use(Particles, {
+    init: async engine => {
+        await loadSlim(engine);
+    }
+});
+
 // 注册自定义指令
 registerDirectives(app);
 
-// 全局组件
-registerComponent(app);
+// 注册 store + router
+app.use(createStore());
+app.use(router);
 
-app.use(createStore()).use(router).use(ElementPlus).mount("#app");
+// 挂载
+app.mount("#app");

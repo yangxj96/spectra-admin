@@ -4,11 +4,14 @@ import skipFormatting from "eslint-config-prettier/flat";
 import importPlugin from "eslint-plugin-import";
 import pluginVue from "eslint-plugin-vue";
 
+import autoImport from "./.eslintrc-auto-import.json";
+
 // 定义VueTs版本的配置, 靠后的规则覆盖靠前的规则
 export default defineConfigWithVueTs(
     // 全局忽略
     globalIgnores([
         "**/node_modules/**",
+        "**/build/**",
         "**/dist/**",
         "**/dist-ssr/**",
         "**/coverage/**",
@@ -23,6 +26,12 @@ export default defineConfigWithVueTs(
     ...pluginVue.configs["flat/essential"],
     // 跳过格式化,格式化交给prettier
     skipFormatting,
+    // 让 ESLint 识别自动导入变量
+    {
+        languageOptions: {
+            globals: autoImport.globals
+        }
+    },
     // vue,ts,mts,tsx文件的规则
     {
         name: "app/files-to-lint",
