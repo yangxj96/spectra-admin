@@ -1,6 +1,6 @@
 spectra:
   system:
-    base-dir: "spectra-files"
+    base-dir: "files"
   user:
     default-password: ${DEFAULT_PASSWORD}
   file:
