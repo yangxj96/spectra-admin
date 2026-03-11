@@ -93,7 +93,7 @@ logging:
   level:
     root: info
     other: error
-    spectra: debug
+    spectra: error
   charset:
     console: utf-8
     file: UTF-8
