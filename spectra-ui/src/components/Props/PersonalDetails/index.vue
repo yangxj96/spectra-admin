@@ -69,7 +69,7 @@ export default defineComponent({
                         <el-input placeholder="请输入手机号码" />
                     </el-form-item>
                     <el-form-item label="个人说明">
-                        <el-input placeholder="请输入个人说明" type="textarea" rows="5" />
+                        <el-input placeholder="请输入个人说明" type="textarea" :rows="5" />
                     </el-form-item>
                 </el-form>
             </el-col>
