@@ -7,7 +7,7 @@ import { useRoute, useRouter } from "vue-router";
 import { authApi } from "@/api/auth/auth.ts";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
-import { loginParticlesLight, loginParticlesDark } from "@/views/Login/config/login-particles.ts";
+import { loginParticlesDark, loginParticlesLight } from "@/views/Login/config/login-particles.ts";
 
 const isDark = useDark();
 
@@ -60,6 +60,7 @@ async function handleLogin() {
 
     try {
         const res = await authApi.login(login.form);
+        console.log(res);
         if (res && res.code === 200 && res.data) {
             MessageUtils.success("登录成功", () => {
                 useUserStore().token = res.data!;

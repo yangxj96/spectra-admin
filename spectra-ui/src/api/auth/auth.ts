@@ -1,4 +1,5 @@
 import http from "@/plugin/request";
+import { post } from "@/plugin/request/api";
 
 /**
  * 认证授权相关接口
@@ -11,8 +12,11 @@ export const authApi = {
     /**
      * 用户登录
      */
-    async login(form: LoginFrom) {
-        return await http.post<IResult<Token>>("/api/auth/login", form).then(response => response.data);
+    login(form: LoginFrom): Promise<IResult<Token>> {
+        return post<IResult<Token>>("/api/auth/login", form, {
+            priority: "high",
+            fetchPriority: "high"
+        });
     },
     /**
      * 退出登录

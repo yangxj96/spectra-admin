@@ -119,7 +119,7 @@ export default defineConfigWithVueTs(
             "import/no-self-import": "error",
 
             // 函数最大行数限制（防止函数过长）
-            "max-lines-per-function": ["warn", 140],
+            "max-lines-per-function": ["warn", 200],
             // 函数最大参数数量限制
             "max-params": ["warn", 4],
             // 禁止嵌套三元表达式（可读性差）

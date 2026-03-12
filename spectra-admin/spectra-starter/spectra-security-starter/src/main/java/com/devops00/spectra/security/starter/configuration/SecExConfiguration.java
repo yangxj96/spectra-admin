@@ -3,7 +3,6 @@ package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler;
 import com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
@@ -18,12 +17,12 @@ public class SecExConfiguration {
 
 
     @Bean
-    public AuthenticationEntryPoint restAuthenticationEntryPoint(@Qualifier("securityObjectMapper") ObjectMapper om) {
+    public AuthenticationEntryPoint restAuthenticationEntryPoint(ObjectMapper om) {
         return new RestAuthenticationEntryPoint(om);
     }
 
     @Bean
-    public AccessDeniedHandler restAccessDeniedHandler(@Qualifier("securityObjectMapper") ObjectMapper om) {
+    public AccessDeniedHandler restAccessDeniedHandler(ObjectMapper om) {
         return new RestAccessDeniedHandler(om);
     }
 

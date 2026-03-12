@@ -1,6 +1,7 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
 import { hideLoading, showLoading } from "@/plugin/element/loading";
+import { cancelAllRequests } from "@/plugin/request/http.ts";
 import routes from "@/plugin/router/routes";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
@@ -20,6 +21,9 @@ const whiteList = new Set(["/login"]);
 
 // 路由前置守卫
 router.beforeEach(async (to, _, next) => {
+    // 路由切换时取消所有未完成请求
+    cancelAllRequests();
+
     const userStore = useUserStore();
     const appStore = useAppStore();
     const token = userStore.token;
