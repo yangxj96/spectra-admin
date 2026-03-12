@@ -93,7 +93,7 @@ logging:
   level:
     root: info
     other: error
-    spectra: error
+    spectra: debug
 management:
   endpoints:
     web:
