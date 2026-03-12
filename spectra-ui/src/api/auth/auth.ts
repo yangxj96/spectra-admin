@@ -12,8 +12,8 @@ export const authApi = {
     /**
      * 用户登录
      */
-    login(form: LoginFrom): Promise<IResult<Token>> {
-        return post<IResult<Token>>("/api/auth/login", form, {
+    login(form: LoginFrom): Promise<Token> {
+        return post<Token>("/api/auth/login", form, {
             priority: "high",
             fetchPriority: "high"
         });

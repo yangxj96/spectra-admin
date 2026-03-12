@@ -33,14 +33,9 @@ const organizationTree = ref<DepartmentTree[]>([]);
 
 const dictStore = useDictStore();
 
-function handleInitData() {
-    departmentApi.tree().then(res => {
-        if (res.code !== 200) {
-            MessageUtils.error(res.msg);
-            return;
-        }
-        organizationTree.value = res.data!;
-    });
+async function handleInitData() {
+    const departmentTree = await departmentApi.tree();
+    organizationTree.value = departmentTree;
 }
 
 // 用户新增或编辑dialog配置
@@ -64,11 +59,10 @@ function handleUserEditDialog(row: User) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: User) {
-    MessageUtils.box.confirm(`是否要删除[${row.username}]`, "提示").then(() => {
-        userApi.deleteById(row.id).then(() => {
-            MessageUtils.success("删除成功", () => {
-                handlerConditionQuery();
-            });
+    MessageUtils.box.confirm(`是否要删除[${row.username}]`, "提示").then(async () => {
+        await userApi.deleteById(row.id);
+        MessageUtils.success("删除成功", () => {
+            handlerConditionQuery();
         });
     });
 }
@@ -76,11 +70,10 @@ function handleTableItemDelete(row: User) {
 // 用户重置密码
 function handleTableItemResetPassword(row: User) {
     console.log(`重置密码:${JSON.stringify(row)}`);
-    MessageUtils.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(() => {
-        userApi.passwordResetById(row.id).then(() => {
-            MessageUtils.success("重置成功", () => {
-                handlerConditionQuery();
-            });
+    MessageUtils.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(async () => {
+        await userApi.passwordResetById(row.id);
+        MessageUtils.success("重置成功", () => {
+            handlerConditionQuery();
         });
     });
 }

@@ -51,15 +51,14 @@ async function handleOrganizationSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        const request = modify.value ? departmentApi.modify : departmentApi.created;
-        const res = await request(form.value);
-        if (res.code === 200) {
-            MessageUtils.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
-                handleCurrentDialogClose();
-            });
+        if (modify.value) {
+            await departmentApi.update(form.value);
         } else {
-            MessageUtils.error(res.msg);
+            await departmentApi.create(form.value);
         }
+        MessageUtils.success(modify.value ? "修改组织机构成功" : "新增组织机构成功", () => {
+            handleCurrentDialogClose();
+        });
     } catch (error) {
         console.log(error);
     }

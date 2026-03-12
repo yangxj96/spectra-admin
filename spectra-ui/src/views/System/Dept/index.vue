@@ -23,18 +23,17 @@ onMounted(() => {
 });
 
 // 初始化数据
-function handleCriteriaQuery() {
-    departmentApi.tree().then(res => {
-        table_data.value = res.data;
-    });
+async function handleCriteriaQuery() {
+    const departmentTree = await departmentApi.tree();
+    table_data.value = departmentTree;
 }
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Department) {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         try {
-            const { code, msg } = await departmentApi.deleteById(row.id);
-            MessageUtils.success(code === 200 ? "删除成功" : msg);
+            await departmentApi.deleteById(row.id);
+            MessageUtils.success("删除成功");
         } finally {
             handleCriteriaQuery();
         }

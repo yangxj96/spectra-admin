@@ -20,24 +20,13 @@
         "source.fixAll.eslint": "explicit"
     },
     // 如果使用 TypeScript，确保 Volar 接管 TS 功能 (新版 Vue - Official 通常自动处理，但可显式声明)
-    "vue.server.includeLanguages": [
-        "vue"
-    ],
-    "eslint.validate": [
-        "javascript",
-        "typescript",
-        "vue"
-    ],
+    "vue.server.includeLanguages": ["vue"],
+    "eslint.validate": ["javascript", "typescript", "vue"],
     // 确保 Vue 文件使用 Vue - Official 插件处理 (防止被其他插件抢占)
     "files.associations": {
         "*.vue": "vue"
     },
     // 词汇
-    "cSpell.words": [
-        "iconfont",
-        "VITE"
-    ],
-    "conventionalCommits.scopes": [
-        "request"
-    ]
+    "cSpell.words": ["autoresize", "echarts", "gropus", "iconfont", "VITE"],
+    "conventionalCommits.scopes": ["request"]
 }

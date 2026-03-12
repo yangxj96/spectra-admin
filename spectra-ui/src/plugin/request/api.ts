@@ -3,8 +3,12 @@ import { request } from "./http";
 /**
  * GET
  */
-export function get<T>(url: string, params?: Record<string, unknown>, options?: RequestOptions) {
-    return request<T>(url, {
+export function get<T, U extends string = string>(
+    url: U,
+    params?: Record<string, unknown>,
+    options?: RequestOptions<U>
+) {
+    return request<T, U>(url, {
         method: "GET",
         params,
         ...options
@@ -14,8 +18,8 @@ export function get<T>(url: string, params?: Record<string, unknown>, options?: 
 /**
  * POST
  */
-export function post<T>(url: string, data?: unknown, options?: RequestOptions) {
-    return request<T>(url, {
+export function post<T, U extends string = string>(url: U, data?: unknown, options?: RequestOptions<U>) {
+    return request<T, U>(url, {
         method: "POST",
         body: JSON.stringify(data),
         ...options
@@ -25,8 +29,8 @@ export function post<T>(url: string, data?: unknown, options?: RequestOptions) {
 /**
  * PUT
  */
-export function put<T>(url: string, data?: unknown, options?: RequestOptions) {
-    return request<T>(url, {
+export function put<T, U extends string = string>(url: U, data?: unknown, options?: RequestOptions<U>) {
+    return request<T, U>(url, {
         method: "PUT",
         body: JSON.stringify(data),
         ...options
@@ -36,8 +40,12 @@ export function put<T>(url: string, data?: unknown, options?: RequestOptions) {
 /**
  * DELETE
  */
-export function del<T>(url: string, params?: Record<string, unknown>, options?: RequestOptions) {
-    return request<T>(url, {
+export function del<T, U extends string = string>(
+    url: U,
+    params?: Record<string, unknown>,
+    options?: RequestOptions<U>
+) {
+    return request<T, U>(url, {
         method: "DELETE",
         params,
         ...options
@@ -47,12 +55,10 @@ export function del<T>(url: string, params?: Record<string, unknown>, options?: 
 /**
  * 上传文件
  */
-export function upload<T>(url: string, file: File, field = "file", options?: RequestOptions) {
+export function upload<T, U extends string = string>(url: U, file: File, field = "file", options?: RequestOptions<U>) {
     const form = new FormData();
-
     form.append(field, file);
-
-    return request<T>(url, {
+    return request<T, U>(url, {
         method: "POST",
         body: form,
         ...options
@@ -62,10 +68,10 @@ export function upload<T>(url: string, file: File, field = "file", options?: Req
 /**
  * 下载文件
  */
-export async function download(url: string, params?: Record<string, unknown>, options?: RequestOptions) {
-    const blob = await request<Blob>(url, {
+
+export async function download<U extends string = string>(url: U, options?: RequestOptions<U>) {
+    const blob = await request<Blob, U>(url, {
         method: "GET",
-        params,
         ...options
     });
 

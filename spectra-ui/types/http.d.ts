@@ -1,12 +1,19 @@
 export {};
 
 declare global {
+    type ExtractPathParams<T extends string> = T extends `${string}{${infer Param}}${infer Rest}`
+        ? Param | ExtractPathParams<Rest>
+        : never;
+
+    type PathParams<T extends string> =
+        ExtractPathParams<T> extends never ? undefined : Record<ExtractPathParams<T>, string | number>;
+
     /**
      * 请求优先级
      */
     export type HttpPriority = "high" | "normal" | "low";
 
-    export interface RequestOptions extends RequestInit {
+    export interface RequestOptions<T extends string> extends RequestInit {
         /**
          * 请求参数
          */
@@ -41,6 +48,11 @@ declare global {
          * 浏览器网络优先级
          */
         fetchPriority?: RequestPriority;
+
+        /**
+         * 路径参数
+         */
+        pathParams?: PathParams<T>;
 
         /**
          * 内部字段：token 刷新标记

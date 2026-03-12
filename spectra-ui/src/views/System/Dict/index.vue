@@ -42,23 +42,13 @@ watch(
 );
 
 // 初始化数据
-const initData = () => {
-    dictApi.getTypesGroupTree().then(res => {
-        if (res.code === 200) {
-            dictGroupTableData.value = res.data!;
-        }
-    });
+const initData = async () => {
+    dictGroupTableData.value = await dictApi.getTypesGroupTree();
 };
 
-const handleGetDictData = () => {
+const handleGetDictData = async () => {
     // 如果当前字典组有值，获取对应的字典数据
-    dictApi.getDataByTypeCode(currentGroup.value!.code).then(res => {
-        if (res.code === 200) {
-            dictDataTableData.value = res.data!;
-        } else {
-            MessageUtils.error("获取字典数据失败");
-        }
-    });
+    dictDataTableData.value = await dictApi.getDataByTypeCode(currentGroup.value!.code);
 };
 
 const handleDialogOpen = (type: string, row: DictGroup | DictItem | unknown = {} as unknown) => {

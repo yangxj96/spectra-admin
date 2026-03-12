@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { userApi } from "@/api/user/user.ts";
-
 const tableData = [] as unknown[];
 
 for (let i = 0; i < 25; i++) {
@@ -19,8 +17,6 @@ for (let i = 0; i < 25; i++) {
         ]
     });
 }
-
-userApi.online();
 </script>
 
 <template>

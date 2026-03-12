@@ -159,9 +159,26 @@ function stableStringify(value: unknown): string {
 }
 
 /**
+ * 路径替换
+ */
+function resolvePathParams(url: string, pathParams?: Record<string, unknown>) {
+    if (!pathParams) return url;
+
+    return url.replace(/\{(\w+)\}/g, (_, key) => {
+        const value = pathParams[key];
+
+        if (value === undefined || value === null) {
+            throw new Error(`Missing path param: ${key}`);
+        }
+
+        return encodeURIComponent(String(value));
+    });
+}
+
+/**
  * 核心请求方法
  */
-export async function request<T>(url: string, options: RequestOptions = {}): Promise<T> {
+export async function request<T, U extends string>(url: U, options: RequestOptions<U> = {}): Promise<T> {
     // 参数定义
     const {
         params,
@@ -176,8 +193,10 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
         ...rest
     } = options;
 
+    const resolvedUrl = resolvePathParams(url, options.pathParams);
+
     // 拼接 URL
-    let finalUrl = joinUrl(BASE_URL, url);
+    let finalUrl = joinUrl(BASE_URL, resolvedUrl);
 
     // 处理 query 参数
     if (params) {
@@ -194,7 +213,7 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
     const method = (rest.method || "GET").toUpperCase();
 
     // 生成请求 key
-    const key = createKey(finalUrl, method, rest.body, params);
+    const key = createKey(finalUrl, method, rest.body, { params, pathParams: options.pathParams });
 
     // cache 命中
     if (cache) {
@@ -242,14 +261,13 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
                 credentials: "include",
                 signal: controller.signal
             });
-            console.log(res);
             // Token 过期自动刷新
             if (res.status === 401 && !_retry) {
                 console.log("自动刷新token");
                 const newToken = await refreshToken();
 
                 if (newToken) {
-                    return request<T>(url, {
+                    return request<T, U>(url, {
                         ...options,
                         retry: 0,
                         _retry: true
@@ -293,12 +311,18 @@ export async function request<T>(url: string, options: RequestOptions = {}): Pro
             // JSON 响应
             const result: IResult<T> = await res.json();
 
+            // 业务错误处理
+            if (result.code !== 200) {
+                MessageUtils.error(result.msg || "请求失败");
+                throw new Error(result.msg || "Business Error");
+            }
+
             // 写入缓存
             if (cache) {
                 setCache(key, result.data);
             }
 
-            return result as T;
+            return result.data as T;
         } catch (err) {
             // 自动重试
             if (retry > 0) {

@@ -32,17 +32,12 @@ onMounted(() => {
 });
 
 // 初始化数据
-function handleCriteriaQuery() {
-    menuApi.tree().then((res: IResult<Menu[]>) => {
-        if (res.code === 200 && res.data) {
-            table_data.value = res.data;
-        }
-    });
+async function handleCriteriaQuery() {
+    table_data.value = await menuApi.tree();
 }
 
 // 表行修改按钮被单击
 function handleTableItemModify(row: Menu) {
-    console.log(`菜单`, row);
     menu.modify = true;
     menu.form = JSON.parse(JSON.stringify(row));
     menu.dialog = true;
@@ -66,14 +61,16 @@ function handleMenuAddDialog() {
 // 新增或编辑
 async function handleMenuSave() {
     if (!menuForm.value) return;
-    await menuForm.value?.validate(valid => {
+    await menuForm.value?.validate(async valid => {
         if (valid) {
-            const request = menu.modify ? menuApi.modify : menuApi.created;
-            request(menu.form).then(() => {
-                MessageUtils.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
-                    menu.dialog = false;
-                    handleCriteriaQuery();
-                });
+            if (menu.modify) {
+                await menuApi.update(menu.form);
+            } else {
+                await menuApi.create(menu.form);
+            }
+            MessageUtils.success(menu.modify ? "修改菜单成功" : "新增菜单成功", () => {
+                menu.dialog = false;
+                handleCriteriaQuery();
             });
         }
     });

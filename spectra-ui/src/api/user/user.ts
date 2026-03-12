@@ -12,41 +12,35 @@ export const userApi = {
      * 分页获取用户列表
      * @param params 分页参数
      */
-    async page(params?: UserPageParams): Promise<IResult<Page<User>>> {
-        return get<IResult<Page<User>>>("/api/user/page", params);
+    async page(params?: UserPageParams): Promise<Page<User>> {
+        return get<Page<User>>("/api/user/page", params);
     },
     /**
      * 新增用户
      * @param params 角色入参
      */
-    async created(params: User) {
-        return post<IResult>("/api/user", params);
+    async create(params: User): Promise<void> {
+        return post<void>("/api/user", params);
     },
     /**
      * 修改用户
      * @param params 角色入参
      */
-    async modify(params: User) {
-        return put<IResult>("/api/user", params);
+    async update(params: User): Promise<void> {
+        return put<void>("/api/user", params);
     },
     /**
      * 删除用户
      * @param id 角色ID
      */
-    async deleteById(id: string) {
-        return del<IResult>(`/api/user/${id}`);
+    async deleteById(id: string): Promise<void> {
+        return del<void>(`/api/user/${id}`);
     },
     /**
      * 重置用户密码
      * @param id 角色ID
      */
-    async passwordResetById(id: string) {
-        return put<IResult>(`/api/user/password/reset/${id}`);
-    },
-    /**
-     * 获取所有在线用户
-     */
-    async online(): Promise<IResult> {
-        return get<IResult>("/api/user/online");
+    async passwordResetById(id: string): Promise<void> {
+        return put<void>(`/api/user/password/reset/${id}`);
     }
 };

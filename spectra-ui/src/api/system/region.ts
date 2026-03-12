@@ -1,5 +1,4 @@
-import http from "@/plugin/request";
-
+import { get } from "@/plugin/request/api.ts";
 /**
  * 行政区域相关接口
  */
@@ -9,11 +8,7 @@ export const regionApi = {
      *
      * @param params 查询条件
      */
-    async load(params: { level: number; id?: string }): Promise<IResult<Region[]>> {
-        return http
-            .get<IResult<Region[]>>("/api/region", {
-                params
-            })
-            .then(res => res.data);
+    load(params: { level: number; id?: string }): Promise<Region[]> {
+        return get<Region[]>("/api/region", params);
     }
 };

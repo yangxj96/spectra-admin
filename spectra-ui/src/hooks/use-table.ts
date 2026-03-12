@@ -1,11 +1,6 @@
 import { onMounted, ref } from "vue";
 
-import { MessageUtils } from "@/utils/message-utils.ts";
-
-export function useTable<T>(
-    request: (parameters?: BasePageParams) => Promise<IResult<Page<T>>>,
-    parameters: BasePageParams
-) {
+export function useTable<T>(request: (parameters?: BasePageParams) => Promise<Page<T>>, parameters: BasePageParams) {
     // 分页实体
     const pagination = ref<Pagination>({
         size: 10,
@@ -28,46 +23,43 @@ export function useTable<T>(
      * 处理页码改变
      * @param value 页码
      */
-    function handleCurrentChange(value: number) {
+    async function handleCurrentChange(value: number) {
         parameters.page_num = value;
         parameters.page_size = pagination.value.size;
-        request(parameters).then(handleRequestResult);
+        const result = await request(parameters);
+        handleRequestResult(result);
     }
 
     /**
      * 处理每页数量改变
      * @param value 每页数量
      */
-    function handleSizeChange(value: number) {
+    async function handleSizeChange(value: number) {
         parameters.page_num = pagination.value.page;
         parameters.page_size = value;
-        request(parameters).then(handleRequestResult);
+        const result = await request(parameters);
+        handleRequestResult(result);
     }
 
     /**
      * 进行一次请求
      */
-    function handlerConditionQuery() {
+    async function handlerConditionQuery() {
         parameters.page_num = pagination.value.page;
         parameters.page_size = pagination.value.size;
-        request(parameters).then(handleRequestResult);
+        const result = await request(parameters);
+        handleRequestResult(result);
     }
 
     /**
      * 处理请求结果
      * @param response 响应内容
      */
-    function handleRequestResult(response: IResult<Page<T>>) {
-        if (response.code !== 200) {
-            MessageUtils.success(response.msg);
-            return;
-        }
-        if (response.data) {
-            table_data.value = response.data.records ?? [];
-            pagination.value.total = response.data.total ?? 0;
-            pagination.value.size = response.data.size ?? 10;
-            pagination.value.page = response.data.current ?? 1;
-        }
+    function handleRequestResult(response: Page<T>) {
+        table_data.value = response.records ?? [];
+        pagination.value.total = response.total ?? 0;
+        pagination.value.size = response.size ?? 10;
+        pagination.value.page = response.current ?? 1;
     }
 
     return {

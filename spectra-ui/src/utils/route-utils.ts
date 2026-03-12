@@ -106,27 +106,27 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
     appStore.isFetchingMenus = true; // 设置加载状态
 
     try {
-        const res = await menuApi.tree();
-        if (res.code === 200 && res.data) {
-            // 不使用 as 会出现 TS2589,暂时没搞定
-            appStore.menus = res.data as never;
-            const routes = convertMenuToRoutes(res.data);
+        const menus = await menuApi.tree();
+        // if (res.code === 200 && res.data) {
+        // 不使用 as 会出现 TS2589,暂时没搞定
+        appStore.menus = menus as never;
+        const routes = convertMenuToRoutes(menus);
 
-            // 避免重复添加路由
-            for (const route of routes) {
-                if (!router.hasRoute(route.name!)) {
-                    router.addRoute(route);
-                }
+        // 避免重复添加路由
+        for (const route of routes) {
+            if (!router.hasRoute(route.name!)) {
+                router.addRoute(route);
             }
-
-            // 确保路由表已更新 虽然 still need hack，但更安全
-            return next({ ...to, replace: true });
-        } else {
-            MessageUtils.error("获取菜单失败");
-            console.warn("[守卫] 获取菜单失败，跳转登录");
-            hideLoading();
-            return next({ path: "/login" });
         }
+
+        // 确保路由表已更新 虽然 still need hack，但更安全
+        return next({ ...to, replace: true });
+        // } else {
+        //     MessageUtils.error("获取菜单失败");
+        //     console.warn("[守卫] 获取菜单失败，跳转登录");
+        //     hideLoading();
+        //     return next({ path: "/login" });
+        // }
     } catch (error) {
         console.error("[守卫] 加载菜单时发生异常", error);
         MessageUtils.error("网络异常，获取菜单失败");

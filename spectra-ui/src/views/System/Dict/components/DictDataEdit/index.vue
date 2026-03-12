@@ -54,38 +54,25 @@ onMounted(() => {
 });
 
 // 初始化数据
-function handleInitData() {
-    dictApi
-        .getTypesGroupTree()
-        .then((res: IResult<DictGroup[]>) => {
-            if (res.code === 200) {
-                gropus.value = res.data || [];
-            } else {
-                MessageUtils.error(res.msg || "获取字典组列表失败");
-            }
-        })
-        .catch(() => {
-            MessageUtils.error("获取字典组列表失败");
-        });
+async function handleInitData() {
+    gropus.value = (await dictApi.getTypesGroupTree()) || [];
 }
 
 // 保存
 function handleSaveDictGroup() {
     if (!editForm.value) return;
-    editForm.value?.validate(valid => {
+    editForm.value?.validate(async valid => {
         if (!valid) {
             MessageUtils.error("请检查必填内容");
             return;
         }
-        const request = has_edit ? dictApi.modifyData : dictApi.createData;
-        request(edit.form).then((res: IResult) => {
-            if (res.code === 200) {
-                MessageUtils.success("保存成功", () => {
-                    emit("close");
-                });
-            } else {
-                MessageUtils.error(res.msg || "保存失败");
-            }
+        if (has_edit) {
+            await dictApi.updateData(edit.form);
+        } else {
+            await dictApi.createData(edit.form);
+        }
+        MessageUtils.success("保存成功", () => {
+            emit("close");
         });
     });
 }

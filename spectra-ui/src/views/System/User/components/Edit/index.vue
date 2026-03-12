@@ -47,7 +47,7 @@ const formRef = useTemplateRef<FormInstance>("formRef");
 // 缓存 suffix 列表
 const emailSuffixes = ref<string[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
     useDictStore()
         .getDictData("sys_email_suffix")
         .then(res => {
@@ -55,11 +55,8 @@ onMounted(() => {
             emailSuffixes.value = items.map(i => i.value);
         });
 
-    const request = [roleApi.list(), departmentApi.tree()];
-    Promise.all(request).then(([role, org]) => {
-        roles.value = role!.data as Role[];
-        department_tree.value = org!.data as DepartmentTree[];
-    });
+    roles.value = await roleApi.list();
+    department_tree.value = await departmentApi.tree();
 });
 
 // 处理关闭
@@ -73,8 +70,11 @@ async function handleUserSave() {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        const request = form.value.id ? userApi.modify : userApi.created;
-        await request(form.value!);
+        if (form.value.id) {
+            await userApi.update(form.value);
+        } else {
+            await userApi.create(form.value);
+        }
         MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
             handleCurrentDialogClose();
         });
@@ -85,7 +85,7 @@ async function handleUserSave() {
 }
 
 // 处理自动提示补全组件的补全过程
-const handleEmailSuggestions = async (query: string, callback: (results: AutocompleteData) => void) => {
+const handleEmailSuggestions = (query: string, callback: (results: AutocompleteData) => void) => {
     if (!query) {
         callback([]);
         return;

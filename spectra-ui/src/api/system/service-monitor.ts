@@ -1,4 +1,4 @@
-import http from "@/plugin/request/index.ts";
+import { get } from "@/plugin/request/api.ts";
 
 /**
  * 服务器信息相关接口
@@ -11,19 +11,19 @@ export const serviceMonitorApi = {
     /**
      * 获取CPU信息
      */
-    async getCPUInfo(): Promise<IResult<CPUInfo>> {
-        return await http.get<IResult<CPUInfo>>("/api/service/monitor/getCPUInfo").then(res => res.data);
+    getCPUInfo(): Promise<CPUInfo> {
+        return get<CPUInfo>("/api/service/monitor/getCPUInfo");
     },
     /**
      * 获取内存信息
      */
-    async getRAMInfo(): Promise<IResult<RAMInfo>> {
-        return await http.get<IResult<RAMInfo>>("/api/service/monitor/getRAMInfo").then(res => res.data);
+    getRAMInfo(): Promise<RAMInfo> {
+        return get<RAMInfo>("/api/service/monitor/getRAMInfo");
     },
     /**
      * 获取JVM信息
      */
-    async getJVMInfo(): Promise<IResult<JVMInfo>> {
-        return await http.get<IResult<JVMInfo>>("/api/service/monitor/getJVMInfo").then(res => res.data);
+    getJVMInfo(): Promise<JVMInfo> {
+        return get<JVMInfo>("/api/service/monitor/getJVMInfo");
     }
 };

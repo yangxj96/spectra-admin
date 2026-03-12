@@ -59,16 +59,13 @@ async function handleLogin() {
     }
 
     try {
-        const res = await authApi.login(login.form);
-        console.log(res);
-        if (res && res.code === 200 && res.data) {
-            MessageUtils.success("登录成功", () => {
-                useUserStore().token = res.data!;
-                useUserStore().isLoggedIn = true;
-                const path = "/redirect" + (redirect.value ?? "");
-                router.push({ path });
-            });
-        }
+        const token = await authApi.login(login.form);
+        MessageUtils.success("登录成功", () => {
+            useUserStore().token = token;
+            useUserStore().isLoggedIn = true;
+            const path = "/redirect" + (redirect.value ?? "");
+            router.push({ path });
+        });
     } catch (error) {
         // 登录失败，刷新验证码
         refreshKaptcha();

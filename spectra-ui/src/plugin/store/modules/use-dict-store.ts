@@ -21,14 +21,9 @@ export const useDictStore = defineStore("dict", {
                     return this.dicts[key];
                 }
                 try {
-                    const { code, data } = await dictApi.getDataByTypeCode(key);
-                    if (code === 200) {
-                        this.dicts[key] = data ?? [];
-                        return this.dicts[key];
-                    } else {
-                        console.log(`获取字典失败,${key}`);
-                        return [];
-                    }
+                    const data = await dictApi.getDataByTypeCode(key);
+                    this.dicts[key] = data ?? [];
+                    return this.dicts[key];
                 } catch (error) {
                     console.log("发生异常", error);
                     return [];

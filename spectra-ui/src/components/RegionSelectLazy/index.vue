@@ -31,15 +31,11 @@ const name = defineModel<string>("name", {
 const handleLoadRegion: LoadFunction = async (node, resolve) => {
     try {
         // 构建参数
-        const { code, msg, data } = await regionApi.load({
+        const regions = await regionApi.load({
             level: node.level + 1,
             id: node.data?.id
         });
-        if (code !== 200) {
-            MessageUtils.error(msg);
-            return;
-        }
-        resolve(data ?? []);
+        resolve(regions ?? []);
     } catch (e) {
         MessageUtils.error(`获取行政区划失败:${(e as Error).message}`);
     }

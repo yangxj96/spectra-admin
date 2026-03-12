@@ -38,12 +38,9 @@ onMounted(() => {
 });
 
 // 初始化数据
-function handleInitData() {
-    const requests = [menuApi.tree(), authorityApi.tree()];
-    Promise.all(requests).then(([menuRes, authorityTreeRes]) => {
-        menu_tree.value = menuRes!.data as Menu[];
-        authority_tree.value = authorityTreeRes!.data as AuthorityTree[];
-    });
+async function handleInitData() {
+    menu_tree.value = await menuApi.tree();
+    authority_tree.value = await authorityApi.tree();
 }
 
 // 角色编辑框Dialog
@@ -54,15 +51,10 @@ function handleRoleEditDialogOpen(row: Role) {
 
 // 角色删除
 function handleRoleDelete(row: Role) {
-    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
-        roleApi.delete(row.id).then(res => {
-            if (res.code === 200) {
-                MessageUtils.success("删除成功");
-            } else {
-                MessageUtils.error(res.msg);
-            }
-            handlerConditionQuery();
-        });
+    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
+        await roleApi.delete(row.id);
+        MessageUtils.success("删除成功");
+        handlerConditionQuery();
     });
 }
 
@@ -92,26 +84,20 @@ async function handleRoleTableRowClick(row: Role) {
         currentRow.value = row;
         cleanTreeCheckState();
         // 权限部分
-        roleApi.getRoleAuthority(row.id).then(res => {
-            if (res.code === 200 && res.data && res.data.length > 0) {
-                const ids = res.data.map(i => i.id);
-                powerRef.value?.setCheckedKeys(ids);
-            }
-        });
+        const roleAuthority = await roleApi.getRoleAuthority(row.id);
+        const roleAuthorityIds = roleAuthority.map(i => i.id);
+        powerRef.value?.setCheckedKeys(roleAuthorityIds);
 
         // 菜单部分
-        roleApi.getRoleMenu(row.id).then(res => {
-            if (res.code === 200 && res.data && res.data.length > 0) {
-                menuRef.value?.setCheckedKeys(res.data.map(i => i.id));
-            }
-        });
+        const roleMenu = await roleApi.getRoleMenu(row.id);
+        menuRef.value?.setCheckedKeys(roleMenu.map(i => i.id));
     } catch (error: unknown) {
         console.error("未知错误", error);
     }
 }
 
 // 角色-权限关联关系保存
-function handleSaveRoleAuthority() {
+async function handleSaveRoleAuthority() {
     if (!currentRow.value) {
         MessageUtils.warning("请先选中一个角色");
         return;
@@ -120,17 +106,12 @@ function handleSaveRoleAuthority() {
         role_id: currentRow.value.id,
         authority_ids: powerRef.value?.getCheckedKeys()
     };
-    roleApi.saveRoleAuthority(params).then(res => {
-        if (res.code === 200) {
-            MessageUtils.success("保存成功");
-        } else {
-            MessageUtils.error(res.msg);
-        }
-    });
+    await roleApi.saveRoleAuthority(params);
+    MessageUtils.success("保存成功");
 }
 
 // 角色-菜单 关联关系保存
-function handleSaveRoleMenu() {
+async function handleSaveRoleMenu() {
     if (!currentRow.value) {
         MessageUtils.warning("请先选中一个角色");
         return;
@@ -139,13 +120,8 @@ function handleSaveRoleMenu() {
         role_id: currentRow.value.id,
         menu_ids: menuRef.value?.getCheckedKeys()
     };
-    roleApi.saveRoleMenu(params).then(res => {
-        if (res.code === 200) {
-            MessageUtils.success("保存成功");
-        } else {
-            MessageUtils.error(res.msg);
-        }
-    });
+    await roleApi.saveRoleMenu(params);
+    MessageUtils.success("保存成功");
 }
 </script>
 

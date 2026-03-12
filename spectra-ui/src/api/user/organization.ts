@@ -1,4 +1,4 @@
-import http from "@/plugin/request";
+import { del, get, post, put } from "@/plugin/request/api.ts";
 
 /**
  * 组织机构相关接口
@@ -11,28 +11,28 @@ export const departmentApi = {
     /**
      * 获取组织机构树形列表
      */
-    async tree() {
-        return await http.get<IResult<DepartmentTree[]>>("/api/department/tree").then(res => res.data);
+    tree(): Promise<DepartmentTree[]> {
+        return get<DepartmentTree[]>("/api/department/tree");
     },
     /**
      * 新增组织机构
      * @param params 组织机构入参
      */
-    async created(params: Department): Promise<IResult> {
-        return await http.post<IResult>("/api/department", params).then(res => res.data);
+    create(params: Department): Promise<void> {
+        return post<void>("/api/department", params);
     },
     /**
      * 根据ID删除组织机构
      * @param id 组织机构ID
      */
-    async deleteById(id: string): Promise<IResult> {
-        return await http.delete<IResult>(`/api/department/${id}`).then(res => res.data);
+    deleteById(id: string): Promise<void> {
+        return del<void>(`/api/department/${id}`);
     },
     /**
      * 修改组织机构
      * @param params 组织机构入参
      */
-    async modify(params: Department): Promise<IResult> {
-        return http.put<IResult>("/api/department", params).then(res => res.data);
+    update(params: Department): Promise<void> {
+        return put<void>("/api/department", params);
     }
 };

@@ -48,8 +48,11 @@ const handleSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
-        const request = modify.value ? roleApi.modify : roleApi.created;
-        await request(form.value);
+        if (modify.value) {
+            await roleApi.update(form.value);
+        } else {
+            await roleApi.create(form.value);
+        }
         MessageUtils.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
     } catch (error) {
         console.error(error);

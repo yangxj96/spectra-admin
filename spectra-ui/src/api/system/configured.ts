@@ -1,12 +1,12 @@
-import http from "@/plugin/request";
+import { get, put } from "@/plugin/request/api.ts";
 
 export const configuredApi = {
     // 分页查询系统配置信息
-    async page() {
-        return http.get("/api/configured/page").then(res => res.data);
+    page(): Promise<Page<Configured>> {
+        return get<Page<Configured>>("/api/configured/page");
     },
     // 修改系统配置
-    async modify(params: Configured) {
-        return await http.put<IResult>("/api/configured", params).then(res => res.data);
+    modify(params: Configured): Promise<void> {
+        return put<void>("/api/configured", params);
     }
 };
