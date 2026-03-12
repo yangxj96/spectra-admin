@@ -34,7 +34,7 @@ const handleConfiguredSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value.validate();
-        await configuredApi.modify(form.value!);
+        await configuredApi.upload(form.value!);
         MessageUtils.success("修改配置成功", () => handleDrawerClose());
     } catch (error) {
         console.error(error);

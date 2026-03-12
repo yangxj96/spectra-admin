@@ -1,4 +1,4 @@
-import http from "@/plugin/request";
+import { get, upload } from "@/plugin/request/api.ts";
 
 /**
  * 文件上传相关接口
@@ -12,36 +12,28 @@ export const fileUploadApi = {
      * 文件预处理
      * @param params 上传文件入参
      */
-    async preprocess(params: FilePreprocessFrom): Promise<IResult<FilePreprocessVO>> {
-        return await http
-            .get<IResult<FilePreprocessVO>>("/api/file/preprocess", {
-                params: params
-            })
-            .then(res => res.data);
+    preprocess(params: FilePreprocessFrom): Promise<FilePreprocessVO> {
+        return get<FilePreprocessVO>("/api/file/preprocess", params);
     },
     /**
      * 查询上传信息
      * @param hash 文件hash值
      */
-    async progress(hash: string): Promise<IResult> {
-        return await http
-            .get<IResult>("/api/file/progress", {
-                data: { hash }
-            })
-            .then(res => res.data);
+    async progress(hash: string): Promise<void> {
+        return get<void>("/api/file/progress", { hash });
     },
     /**
      * 文件上传(小文件)
      * @param params 上传文件入参
      */
-    async upload(params: unknown): Promise<IResult> {
-        return http.postForm("/api/file/upload", params).then(res => res.data);
+    async upload(params: FormData): Promise<void> {
+        return upload<void>("/api/file/upload", params);
     },
     /**
      * 上传文件(切片)
      * @param params 上传文件入参
      */
-    async chunk(params: unknown): Promise<IResult> {
-        return http.postForm("/api/file/chunk", params).then(res => res.data);
+    async chunk(params: FormData): Promise<void> {
+        return upload<void>("/api/file/chunk", params);
     }
 };

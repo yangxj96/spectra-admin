@@ -1,5 +1,4 @@
 import formCreate from "@form-create/element-ui";
-import install from "@form-create/element-ui/auto-import";
 import { loadSlim } from "@tsparticles/slim";
 import Particles from "@tsparticles/vue3";
 import { useDark, useToggle } from "@vueuse/core";
@@ -24,8 +23,6 @@ toggleDark(CommonUtils.shouldEnableDarkMode());
 // 创建APP
 const app = createApp(App);
 
-// 注册 form-create auto import
-formCreate.use(install);
 app.use(formCreate);
 app.use(ElementPlus);
 

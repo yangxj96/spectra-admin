@@ -327,7 +327,7 @@ export async function request<T, U extends string>(url: U, options: RequestOptio
             // 自动重试
             if (retry > 0) {
                 await new Promise(r => setTimeout(r, 300));
-                return request<T>(url, {
+                return request<T, U>(url, {
                     ...options,
                     retry: retry - 1
                 });

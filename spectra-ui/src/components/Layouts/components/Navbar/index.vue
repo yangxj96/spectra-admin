@@ -7,7 +7,7 @@ import avatar from "@/assets/images/avatar.png";
 import logo from "@/assets/images/logo.svg";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
-import { stopAllRequest } from "@/plugin/request";
+import { cancelAllRequests } from "@/plugin/request/http.ts";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
 import { GlobalUtils } from "@/utils/global-utils.ts";
@@ -98,11 +98,10 @@ function resolveSideMenus(path: string) {
 }
 
 function handleUserLogout() {
-    stopAllRequest();
-    authApi.logout().then(() => {
-        MessageUtils.success("退出成功", () => {
-            GlobalUtils.exit();
-        });
+    cancelAllRequests();
+    authApi.logout();
+    MessageUtils.success("退出成功", () => {
+        GlobalUtils.exit();
     });
 }
 

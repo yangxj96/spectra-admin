@@ -6,7 +6,7 @@ export const configuredApi = {
         return get<Page<Configured>>("/api/configured/page");
     },
     // 修改系统配置
-    modify(params: Configured): Promise<void> {
+    upload(params: Configured): Promise<void> {
         return put<void>("/api/configured", params);
     }
 };

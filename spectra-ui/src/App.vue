@@ -1,16 +1,10 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from "vue";
+import { reactive, ref } from "vue";
 
-import { useAuthIdle } from "@/hooks/use-authIdle.ts";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
-import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 
 import type { Language } from "element-plus/es/locale";
 
-const { start, stop } = useAuthIdle({
-    idleTime: 10 * 60 * 1000 // 10分钟
-});
-const userStore = useUserStore();
 const locale = ref(useAppStore().lang as Language);
 const message = reactive({
     max: 3,
@@ -18,19 +12,6 @@ const message = reactive({
     plain: true,
     appendTo: ".box-content"
 });
-
-// 登录状态监听
-watch(
-    () => userStore.isLoggedIn,
-    loggedIn => {
-        if (loggedIn) {
-            start();
-        } else {
-            stop();
-        }
-    },
-    { immediate: true }
-);
 </script>
 
 <template>

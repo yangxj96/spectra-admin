@@ -69,17 +69,13 @@ const handlePreFileUpload = async (file: File) => {
         return;
     }
     const pre_res = await fileUploadApi.preprocess(pre_params);
-    if (pre_res.code !== 200) {
-        MessageUtils.error(pre_res.msg);
-        return;
-    }
     // 已存在,跳过,应该还要处理下UI
-    if (pre_res.data?.has_exist) {
+    if (pre_res?.has_exist) {
         handleExistFile(file);
     }
     // 是否要进行分片上传
-    if (pre_res.data?.has_chunked) {
-        await handleLargeFileUpload(file, pre_params.hash, pre_res.data.size);
+    if (pre_res?.has_chunked) {
+        await handleLargeFileUpload(file, pre_params.hash, pre_res.size);
     } else {
         await handleSmallFileUpload(file, pre_params.hash);
     }

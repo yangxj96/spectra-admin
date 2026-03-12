@@ -1,4 +1,3 @@
-import http from "@/plugin/request";
 import { post } from "@/plugin/request/api";
 
 /**
@@ -21,13 +20,13 @@ export const authApi = {
     /**
      * 退出登录
      */
-    async logout() {
-        return await http.post("/api/auth/logout").then(response => response.data);
+    logout(): Promise<void> {
+        return post<void>("/api/auth/logout");
     },
     /**
      * 检查token是否还能用
      */
-    async check() {
-        return await http.post("/api/auth/check").then(response => response.data);
+    check(): Promise<void> {
+        return post<void>("/api/auth/logout");
     }
 };

@@ -55,9 +55,7 @@ export function del<T, U extends string = string>(
 /**
  * 上传文件
  */
-export function upload<T, U extends string = string>(url: U, file: File, field = "file", options?: RequestOptions<U>) {
-    const form = new FormData();
-    form.append(field, file);
+export function upload<T, U extends string = string>(url: U, form: FormData, options?: RequestOptions<U>) {
     return request<T, U>(url, {
         method: "POST",
         body: form,
@@ -70,10 +68,8 @@ export function upload<T, U extends string = string>(url: U, file: File, field =
  */
 
 export async function download<U extends string = string>(url: U, options?: RequestOptions<U>) {
-    const blob = await request<Blob, U>(url, {
+    return await request<Blob, U>(url, {
         method: "GET",
         ...options
     });
-
-    return blob;
 }

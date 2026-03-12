@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from "vue";
 
-import { stopAllRequest } from "@/plugin/request";
+import { cancelAllRequests } from "@/plugin/request/http.ts";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 defineOptions({
@@ -29,7 +29,7 @@ const loadMenus = async () => {
 };
 
 function onMenuItemClick() {
-    stopAllRequest();
+    cancelAllRequests();
 }
 </script>
 
