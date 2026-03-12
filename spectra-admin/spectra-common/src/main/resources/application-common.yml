@@ -18,7 +18,7 @@ spectra:
   # 验证码相关
   kaptcha:
     type: math
-    verify: false
+    verify: true
 # spring 配置
 spring:
   servlet:
