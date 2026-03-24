@@ -15,7 +15,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.0.3</version>
+        <version>4.0.4</version>
         <relativePath/>
     </parent>
 
@@ -41,7 +41,6 @@
         <ip2region.version>3.2.1</ip2region.version>
         <mica.version>4.0.2</mica.version>
         <lombok.version>1.18.42</lombok.version>
-        <jackson.version.core>3.1.0</jackson.version.core>
     </properties>
 
     <modules>
@@ -145,16 +144,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!-- GHSA-72hv-8253-57qq修复版本漏洞 -->
-        <dependency>
-            <groupId>tools.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version.core}</version>
-        </dependency>
-
-    </dependencies>
 
     <build>
         <plugins>
