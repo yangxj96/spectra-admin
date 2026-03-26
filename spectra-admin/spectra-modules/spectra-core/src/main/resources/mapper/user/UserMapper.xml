@@ -35,7 +35,7 @@
         email,
         country,
         city,
-        language,
+        "language",
         timezone,
         department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>

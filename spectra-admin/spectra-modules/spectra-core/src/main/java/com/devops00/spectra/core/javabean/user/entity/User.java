@@ -80,7 +80,7 @@ public class User extends BaseEntity implements Serializable {
     private String city;
 
     /// 语言
-    @TableField(value = "language")
+    @TableField(value = "\"language\"")
     private String language;
 
     /// 时区
