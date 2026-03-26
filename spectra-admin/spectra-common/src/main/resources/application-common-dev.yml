@@ -1,0 +1,147 @@
+# 自己项目的配置
+spectra:
+  # 系统配置
+  system:
+    # 基础文件夹位置,后续日志;文件上传保存等位置都要以这个位置为基础
+    base-dir: files
+  # 用户相关(admin123)
+  user:
+    default-password: ${DEFAULT_PASSWORD}
+  # 验证码相关
+  kaptcha:
+    type: math
+    verify: false
+# 服务器配置
+server:
+  port: ${SERVER_PORT:80}
+  ssl:
+    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+    key-store-password: ${SSL_PASSWORD}
+    key-store-type: ${SSL_TYPE}
+    key-alias: ${SSL_ALIAS}
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        name: JSESSIONID
+        path: /
+        same-site: none
+        secure: true
+        http-only: true
+# spring 配置
+spring:
+  # servlet
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+  # 虚拟线程
+  threads:
+    virtual:
+      enabled: true
+  # 应用名称
+  application:
+    name: spectra-admin
+  # 数据配置
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=${spring.application.name}&loginTimeout=10&sslmode=disable&prepareThreshold=5
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      # ===== 基础连接池配置 =====
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      # ===== 连接校验 =====
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      # ===== 空闲连接回收 =====
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      # ===== PSCache（PostgreSQL建议关闭）=====
+      pool-prepared-statements: false
+      # ===== 监控统计 =====
+      filters: stat,wall,slf4j
+      # ===== 开启监控页面 =====
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        # login-username: admin
+        # login-password: admin
+        # allow: 127.0.0.1
+        # deny:
+      # ===== 开启 Web 监控（SQL统计用）=====
+      web-stat-filter:
+        enabled: true
+        url-pattern: /*
+        exclusions: "*.js,*.css,*.png,*.jpg,*.gif,*.ico,/druid/*"
+  # redis
+  data:
+    redis:
+      url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}
+      timeout: 10s
+      connect-timeout: 5s
+      lettuce:
+        pool:
+          enabled: true
+          max-idle: 10
+          min-idle: 2
+          max-active: 20
+          max-wait: 5000ms
+        shutdown-timeout: 100ms
+  # 关闭他自带的用户
+  security:
+    user:
+      name:
+      password:
+  # 缓存
+  cache:
+    type: redis
+# mybatis plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.devops00.**.entity
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    local-cache-scope: statement
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+      # 开发过程中,不使用逻辑删除
+      # logic-delete-field: deleted
+      # logic-not-delete-value: "null"
+      # logic-delete-value: "now()"
+      # schema: SPECTRA
+      # mp相关代码会用到
+      schema: spectra_core
+  # 注入到xml的变量
+  configuration-properties:
+    schema: spectra_core
+# 日志配置
+logging:
+  group:
+    spectra: >-
+      com.devops00.spectra
+    other: >-
+      com.ulisesbocchio.jasyptspringboot.configuration
+  level:
+    root: info
+    other: error
+    spectra: debug
+# 健康检查
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+

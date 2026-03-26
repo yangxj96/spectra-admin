@@ -60,17 +60,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- === 工具 === -->
-        <!-- XSS攻击防范 -->
-        <dependency>
-            <groupId>net.dreamlu</groupId>
-            <artifactId>mica-xss</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.dreamlu</groupId>
-            <artifactId>mica-core</artifactId>
-        </dependency>
-
     </dependencies>
 
 

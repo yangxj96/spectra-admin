@@ -1,6 +1,7 @@
 spring:
   config:
     import:
+      - classpath:application-common-prod.yml
       - classpath:application-core-prod.yml
       - classpath:application-oa-prod.yml
       - classpath:application-upload-prod.yml
