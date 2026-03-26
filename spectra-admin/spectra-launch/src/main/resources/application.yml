@@ -1,9 +1,0 @@
-spring:
-  profiles:
-    active: prod
-  config:
-    import:
-      - classpath:application-core.yml
-      - classpath:application-oa.yml
-      - classpath:application-upload.yml
-      - classpath:application-workflow.yml

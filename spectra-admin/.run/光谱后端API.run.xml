@@ -1,11 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="光谱后端API" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="dev" />
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-25.0.2+10.0.LTS (mise)" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <module name="spectra-launch" />
-    <selectedOptions>
-      <option name="spring.boot.profiles" visible="false" />
-    </selectedOptions>
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.devops00.spectra.launch.LaunchApplication" />
     <extension name="com.github.l34130.mise.core.run.MiseRunConfigurationSettingsEditor" myConfigEnvironmentStrategy="use_project_settings" myMiseDirEnvCb="true" myMiseConfigEnvironmentTf="" />
     <method v="2">

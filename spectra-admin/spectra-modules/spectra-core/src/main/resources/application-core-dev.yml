@@ -7,18 +7,10 @@ spectra:
   # 用户相关(admin123)
   user:
     default-password: ${DEFAULT_PASSWORD}
-  # 文件相关
-  file:
-    # 文件上传配置
-    upload:
-      # 上传文件的位置
-      upload-dir: ${spectra.system.base-dir}/uploads
-      # 上传文件的位置(临时存储位置)
-      upload-temp-dir: ${spectra.system.base-dir}/temp
   # 验证码相关
   kaptcha:
     type: math
-    verify: true
+    verify: false
 # 服务器配置
 server:
   port: ${SERVER_PORT:80}
@@ -38,11 +30,13 @@ server:
         http-only: true
 # spring 配置
 spring:
+  # servlet
   servlet:
     multipart:
       enabled: true
       max-file-size: 5MB
       max-request-size: 10MB
+  # 虚拟线程
   threads:
     virtual:
       enabled: true
@@ -150,32 +144,6 @@ management:
   endpoint:
     health:
       show-details: always
-# 工作流配置
-flowable:
-  # 数据库确定
-  database-schema: spectra_workflow
-  database-schema-update: true
-  jpa-enabled: false
-  # 流程定义
-  process-definition-location-prefix: classpath*:/processes/
-  async-executor-activate: true
-  history-level: full
-  # 下面是所有可选模块,都用不到
-  # 事件注册模块
-  eventregistry:
-    enabled: false
-  # 身份管理引擎
-  idm:
-    enabled: false
-  # Flowable 的“应用元模型”
-  app:
-    enabled: false
-  # 决策模型引擎
-  dmn:
-    enabled: false
-  # 案例管理引擎
-  cmmn:
-    enabled: false
 # XSS防范
 mica:
   xss:
@@ -185,5 +153,3 @@ mica:
     path-patterns: /**
     # 放行的
     path-exclude-patterns:
-
-
