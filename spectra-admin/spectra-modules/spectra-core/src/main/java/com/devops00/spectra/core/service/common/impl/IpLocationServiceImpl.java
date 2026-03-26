@@ -11,7 +11,6 @@ import org.jspecify.annotations.Nullable;
 import org.lionsoul.ip2region.xdb.LongByteArray;
 import org.lionsoul.ip2region.xdb.Searcher;
 import org.lionsoul.ip2region.xdb.Version;
-import org.lionsoul.ip2region.xdb.XdbException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -35,21 +34,22 @@ public class IpLocationServiceImpl implements IpLocationService {
     private Searcher searcher;
 
     public IpLocationServiceImpl() {
-        try (var raf = createRandomAccessFileForResource()) {
-            // 校验数据库完整性
-            Searcher.verify(raf);
-            // 加载内容到 LongByteArray
-            LongByteArray buffer = Searcher.loadContent(raf);
-            // 创建内存搜索器
-            this.searcher = Searcher.newWithBuffer(Version.IPv4, buffer);
+        // try (var raf = createRandomAccessFileForResource()) {
+        try {
+            // 指定资源
+            var resource = new ClassPathResource("ip2region/ip2region_v4.xdb");
+            // 获取输入流
+            try (var is = resource.getInputStream()) {
+                byte[] bytes = is.readAllBytes();
+                LongByteArray buffer = new LongByteArray(bytes);
+                // 载入
+                this.searcher = Searcher.newWithBuffer(Version.IPv4, buffer);
+            }
+
             // 输出成功日志
-            log.debug("{}IP地理位置数据库加载成功", LogPrefix.CORE.p());
-            log.debug("{}IP版本:{}", LogPrefix.CORE.p(), this.searcher.getIPVersion());
-            log.debug("{}总记录数:{}", LogPrefix.CORE.p(), this.searcher.getIOCount());
+            log.debug("{}IP地理位置数据库加载成功,IP版本:{}", LogPrefix.CORE.p(), this.searcher.getIPVersion());
         } catch (FileNotFoundException e) {
             log.error("{}未找到IP数据库文件，请检查resources/ip2region/目录下是否存在ip2region_v4.xdb", LogPrefix.CORE.p(), e);
-        } catch (XdbException e) {
-            log.error("{}IP 数据库文件校验失败，请检查文件完整性:ip2region/ip2region_v4.xdb", LogPrefix.CORE.p(), e);
         } catch (IOException e) {
             log.error("{}读取IP数据库文件时发生I/O错误", LogPrefix.CORE.p(), e);
         } catch (Exception e) {

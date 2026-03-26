@@ -1,4 +1,4 @@
 # 导入公共模块
 spring:
   config:
-    import: "classpath:/application-common.yml"
+    import: "classpath:/application-dev.yml"
