@@ -58,7 +58,7 @@ public class SecurityConfiguration {
     /// SpringSecurity 自定义的权限评估器
     @Bean
     public SpectraPermissionEvaluator spectraPermissionEvaluator() {
-        return new SpectraPermissionEvaluator();
+        return new SpectraPermissionEvaluator(properties);
     }
 
     /// SpringSecurity Token 过滤器

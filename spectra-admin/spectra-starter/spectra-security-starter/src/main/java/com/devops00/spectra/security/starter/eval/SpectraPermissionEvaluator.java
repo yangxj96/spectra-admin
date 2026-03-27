@@ -27,8 +27,10 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /// 前缀为 ROLE_ 的权限属于“角色”，不参与细粒度权限匹配
     private static final String ROLE_PREFIX = "ROLE_";
+
     /// LRU 缓存：用于缓存编译后的权限表达式结构，提高匹配性能
     private static final int MAX_CACHE = 500;
+
     /// 权限表达式缓存（线程安全 LRU）
     ///
     /// key: 原始权限表达式，如 "order:*:read"
@@ -41,8 +43,13 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
                     return size() > MAX_CACHE;
                 }
             });
-    @Resource
-    private SecurityProperties securityProperties;
+
+    /// Security自定义配置
+    private final SecurityProperties securityProperties;
+
+    public SpectraPermissionEvaluator(SecurityProperties securityProperties) {
+        this.securityProperties = securityProperties;
+    }
 
     /// 编译权限表达式。
     ///

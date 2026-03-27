@@ -1,11 +1,15 @@
 package com.devops00.spectra.core.javabean.system.converter;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.core.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.core.javabean.system.entity.Configured;
 import com.devops00.spectra.core.javabean.system.entity.Region;
+import com.devops00.spectra.core.javabean.system.vo.ConfiguredVO;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -22,5 +26,12 @@ public interface RegionConverter {
 
 
     List<RegionVO> toVOList(List<Region> source);
+
+    /// 转换到分页的VO信息
+    ///
+    /// @param source 分页信息
+    /// @return IPAGE
+    @Mapping(target = "pages", ignore = true)
+    Page<RegionVO> toVOPage(Page<Region> source);
 
 }

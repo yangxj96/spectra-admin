@@ -1,13 +1,17 @@
 package com.devops00.spectra.core.service.system.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.assembler.NameLookup;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.javabean.system.converter.RegionConverter;
 import com.devops00.spectra.core.javabean.system.entity.Region;
+import com.devops00.spectra.core.javabean.system.from.RegionPageFrom;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 import com.devops00.spectra.core.mapper.system.RegionMapper;
 import com.devops00.spectra.core.service.system.RegionService;
@@ -33,7 +37,6 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         this.converter = converter;
     }
 
-
     @Override
     public Map<String, String> getNameMap(Set<String> ids) {
         if (ids == null || ids.isEmpty()) {
@@ -53,5 +56,15 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
                 .eq(StrUtils.isNotBlank(id), Region::getPid, id)
                 .list();
         return converter.toVOList(regions);
+    }
+
+    @Override
+    public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
+        // 条件构建
+        var wrapper = new LambdaQueryWrapper<Region>()
+                .orderByAsc(Region::getCode);
+        // 查询并转换相关内容
+        var db = this.page(page.toPage(), wrapper);
+        return converter.toVOPage(db);
     }
 }

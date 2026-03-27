@@ -1,8 +1,13 @@
 package com.devops00.spectra.core.service.system;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.javabean.system.entity.Region;
+import com.devops00.spectra.core.javabean.system.from.ConfiguredPageFrom;
+import com.devops00.spectra.core.javabean.system.from.RegionPageFrom;
+import com.devops00.spectra.core.javabean.system.vo.ConfiguredVO;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 
 import java.util.List;
@@ -20,5 +25,12 @@ public interface RegionService extends BaseService<Region> {
     /// @param id    父级ID
     /// @return 根据条件获取的下级的列表
     List<RegionVO> lazyTree(Integer level, String id);
+
+    /// 分页查询行政区划
+    ///
+    /// @param page   分页信息
+    /// @param params 过滤参数
+    /// @return 分页响应信息
+    IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
 }

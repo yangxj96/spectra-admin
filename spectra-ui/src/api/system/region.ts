@@ -10,5 +10,9 @@ export const regionApi = {
      */
     load(params: { level: number; id?: string }): Promise<Region[]> {
         return get<Region[]>("/api/region", params);
+    },
+    // 分页查询系统配置信息
+    page(params?: RegionPageParams): Promise<Page<Region>> {
+        return get<Page<Region>>("/api/region/page", params);
     }
 };

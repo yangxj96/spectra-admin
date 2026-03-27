@@ -44,43 +44,70 @@ spring:
   application:
     name: spectra-admin
   # 数据配置
+#  datasource:
+#    driver-class-name: org.postgresql.Driver
+#    url: ${DB_URL}?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=${spring.application.name}&loginTimeout=10&sslmode=disable&prepareThreshold=5
+#    username: ${DB_USERNAME}
+#    password: ${DB_PASSWORD}
+#    type: com.alibaba.druid.pool.DruidDataSource
+#    druid:
+#      # ===== 基础连接池配置 =====
+#      initial-size: 5
+#      min-idle: 5
+#      max-active: 20
+#      max-wait: 60000
+#      # ===== 连接校验 =====
+#      validation-query: SELECT 1
+#      test-while-idle: true
+#      test-on-borrow: false
+#      test-on-return: false
+#      # ===== 空闲连接回收 =====
+#      time-between-eviction-runs-millis: 60000
+#      min-evictable-idle-time-millis: 300000
+#      # ===== PSCache（PostgreSQL建议关闭）=====
+#      pool-prepared-statements: false
+#      # ===== 监控统计 =====
+#      filters: stat,wall,slf4j
+#      # ===== 开启监控页面 =====
+#      stat-view-servlet:
+#        enabled: true
+#        url-pattern: /druid/*
+#      # ===== 开启 Web 监控（SQL统计用）=====
+#      web-stat-filter:
+#        enabled: true
+#        url-pattern: /*
+#        exclusions: "*.js,*.css,*.png,*.jpg,*.gif,*.ico,/druid/*"
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=${spring.application.name}&loginTimeout=10&sslmode=disable&prepareThreshold=5
+    url: ${DB_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-    type: com.alibaba.druid.pool.DruidDataSource
-    druid:
-      # ===== 基础连接池配置 =====
-      initial-size: 5
-      min-idle: 5
-      max-active: 20
-      max-wait: 60000
-      # ===== 连接校验 =====
-      validation-query: SELECT 1
-      test-while-idle: true
-      test-on-borrow: false
-      test-on-return: false
-      # ===== 空闲连接回收 =====
-      time-between-eviction-runs-millis: 60000
-      min-evictable-idle-time-millis: 300000
-      # ===== PSCache（PostgreSQL建议关闭）=====
-      pool-prepared-statements: false
-      # ===== 监控统计 =====
-      filters: stat,wall,slf4j
-      # ===== 开启监控页面 =====
-      stat-view-servlet:
-        enabled: true
-        url-pattern: /druid/*
-        # login-username: admin
-        # login-password: admin
-        # allow: 127.0.0.1
-        # deny:
-      # ===== 开启 Web 监控（SQL统计用）=====
-      web-stat-filter:
-        enabled: true
-        url-pattern: /*
-        exclusions: "*.js,*.css,*.png,*.jpg,*.gif,*.ico,/druid/*"
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      # 这部分为URL?后面的参数. 会自动拼接上去
+      data-source-properties:
+        # 当前SCHEMA
+        currentSchema: public
+        # 控制Java String参数在SQL中的绑定类型 unspecified=让 PostgreSQL 自行推断类型
+        stringtype: unspecified
+        # 启用 批量 INSERT 重写优化
+        reWriteBatchedInserts: true
+        # 允许 JDBC Driver 使用 二进制协议 传输数据
+        binaryTransfer: true
+        # 开启TCP层KeepAlive探测
+        tcpKeepAlive: true
+        # 数据库建立TCP连接的超时时间（秒）
+        connectTimeout: 10
+        # 数据库读操作的Socket超时（秒）
+        socketTimeout: 60
+        # 应用名称
+        ApplicationName: ${spring.application.name}
+        # JDBC层面的登录超时（秒）
+        loginTimeout: 10
+        # 明确SSL行为，避免 Driver 自动探测浪费时间
+        sslmode: disable
+        # 控制Server-side Prepared Statement启用阈值
+        prepareThreshold: 5
   # redis
   data:
     redis:
