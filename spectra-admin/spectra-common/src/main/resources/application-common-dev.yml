@@ -44,39 +44,6 @@ spring:
   application:
     name: spectra-admin
   # 数据配置
-#  datasource:
-#    driver-class-name: org.postgresql.Driver
-#    url: ${DB_URL}?currentSchema=public&stringtype=unspecified&reWriteBatchedInserts=true&binaryTransfer=true&tcpKeepAlive=true&connectTimeout=10&socketTimeout=60&ApplicationName=${spring.application.name}&loginTimeout=10&sslmode=disable&prepareThreshold=5
-#    username: ${DB_USERNAME}
-#    password: ${DB_PASSWORD}
-#    type: com.alibaba.druid.pool.DruidDataSource
-#    druid:
-#      # ===== 基础连接池配置 =====
-#      initial-size: 5
-#      min-idle: 5
-#      max-active: 20
-#      max-wait: 60000
-#      # ===== 连接校验 =====
-#      validation-query: SELECT 1
-#      test-while-idle: true
-#      test-on-borrow: false
-#      test-on-return: false
-#      # ===== 空闲连接回收 =====
-#      time-between-eviction-runs-millis: 60000
-#      min-evictable-idle-time-millis: 300000
-#      # ===== PSCache（PostgreSQL建议关闭）=====
-#      pool-prepared-statements: false
-#      # ===== 监控统计 =====
-#      filters: stat,wall,slf4j
-#      # ===== 开启监控页面 =====
-#      stat-view-servlet:
-#        enabled: true
-#        url-pattern: /druid/*
-#      # ===== 开启 Web 监控（SQL统计用）=====
-#      web-stat-filter:
-#        enabled: true
-#        url-pattern: /*
-#        exclusions: "*.js,*.css,*.png,*.jpg,*.gif,*.ico,/druid/*"
   datasource:
     driver-class-name: org.postgresql.Driver
     url: ${DB_URL}

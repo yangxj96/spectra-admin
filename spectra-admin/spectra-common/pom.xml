@@ -72,12 +72,6 @@
         </dependency>
 
         <!-- === 数据库 === -->
-        <!-- druid -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>druid-spring-boot-4-starter</artifactId>
-            <version>1.2.28</version>
-        </dependency>
         <!-- postgresql -->
         <dependency>
             <groupId>org.postgresql</groupId>
