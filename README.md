@@ -3,7 +3,7 @@
 > 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.4-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.5-brightgreen)
 ![Vue](https://img.shields.io/badge/Vue-3.5.28-green)
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18.2-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
@@ -29,7 +29,7 @@
 |-----------------|--------|----------------|
 | Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.12 | 构建工具           |
-| Spring Boot     | 4.0.4  | 核心框架           |
+| Spring Boot     | 4.0.5  | 核心框架           |
 | Spring Security | 7.0.4  | 权限认证框架         |
 | MyBatis-Plus    | 3.5.15 | 增强ORM，简化CRUD   |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
@@ -47,9 +47,8 @@
 | Vue Router   | 5.0.2   | 路由管理                   |
 | Pinia        | 3.0.4   | 状态管理（Vuex替代）           |
 | @vueuse/core | 14.2.0  | 实用 Composition API 工具库 |
-| Vite         | 7.3.1   | 构建工具，极速启动              |
-| Element Plus | 2.13.1  | UI 组件库                 |
-| Axios        | 1.13.5  | HTTP 请求客户端             |
+| Vite         | 8.0.2   | 构建工具，极速启动              |
+| Element Plus | 2.13.2  | UI 组件库                 |
 | ECharts      | 6.0.0   | 数据可视化图表                |
 | vue-echarts  | 8.0.1   | 转为vue封装的echarts操作组件    |
 | Lodash       | 4.17.23 | 工具函数库，简化数据操作           |
@@ -82,11 +81,10 @@
 
 | 环境变量               | 说明                | 示例                                                   |
 |--------------------|-------------------|------------------------------------------------------|
-| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:postgresql://127.0.0.1:5237/spectra_db` |
+| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:postgresql://127.0.0.1:5237/devops00_spectra_db` |
 | `DB_USERNAME`      | 数据库用户名            | `DB_USERNAME=XXX`                                    |
 | `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                    |
 | `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                          |
-| `LICENSE_PASSWORD` | 许可模式,使用的密钥密码(临时用) | `LICENSE_PASSWORD=XXX`                               |
 | `SSL_PASSWORD`     | SSL的密码            | `SSL_PASSWORD=xxx`                                   |
 | `SSL_TYPE`         | SSL的类型            | `SSL_TYPE=PKCS12`                                    |
 | `SSL_ALIAS`        | SSL的别名            | `SSL_ALIAS=xxx`                                      |
@@ -94,7 +92,6 @@
 > 用于数据库密码等敏感配置的加密保护。
 
 1. SSL 开头的几个配置根据实际需要进行配置即可
-2. LICENSE 开头的如果没用到 LICENSE 模块则无效
 
 ---
 
