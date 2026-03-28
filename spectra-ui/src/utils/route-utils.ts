@@ -49,14 +49,12 @@ export const convertMenuToRoutes = (menus: Menu[]): RouteRecordRaw[] => {
     return menus.map(menu => {
         // 确保 menu.path 以 / 开头
         const path = menu.path.startsWith("/") ? menu.path : "/" + menu.path;
-        const meta = Object.assign(
-            {},
-            {
-                title: menu.name
-            },
-            menu.meta
-        );
-
+        const meta = {
+            title: menu.name,
+            ...(typeof menu.metadata === "object" && menu.metadata !== null
+                ? (menu.metadata as Record<string, JsonValue>)
+                : {})
+        };
         const route: RouteRecordRaw = {
             path: menu.path,
             name: menu.name,
@@ -121,12 +119,6 @@ export const loadMenu = async (router: Router, to: RouteLocationNormalizedLoaded
 
         // 确保路由表已更新 虽然 still need hack，但更安全
         return next({ ...to, replace: true });
-        // } else {
-        //     MessageUtils.error("获取菜单失败");
-        //     console.warn("[守卫] 获取菜单失败，跳转登录");
-        //     hideLoading();
-        //     return next({ path: "/login" });
-        // }
     } catch (error) {
         console.error("[守卫] 加载菜单时发生异常", error);
         MessageUtils.error("网络异常，获取菜单失败");

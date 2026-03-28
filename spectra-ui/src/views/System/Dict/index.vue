@@ -91,11 +91,7 @@ initData();
     <!-- 过滤行 -->
     <el-row class="box-search">
         <el-form :inline="true">
-            <el-form-item label="字典名称">
-                <el-input placeholder="请输入字典名称" clearable />
-            </el-form-item>
             <el-form-item>
-                <el-button type="primary">查询</el-button>
                 <el-button v-owner="'DICT:INSERT'" @click="handleDialogOpen('DictGroup')">
                     <components-icons name="icon-edit" />
                     新增字典组

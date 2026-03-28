@@ -366,7 +366,7 @@ async function handleHttpError(res: Response) {
         throw new Error(msg);
     }
     if (status >= 500) {
-        MessageUtils.notify.error(`服务暂时不可用：${msg}`, "服务器错误");
+        MessageUtils.notify.error(`${msg}`, "服务器错误");
         throw new Error(msg);
     }
 }

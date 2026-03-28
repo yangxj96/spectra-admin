@@ -22,7 +22,6 @@ public class SecurityProperties {
     private List<String> whitelists = new ArrayList<>(Arrays.asList(
             "/common/kaptcha",
             "/auth/login",
-            "/druid/**",
             "/actuator/**"
     ));
 

@@ -66,7 +66,7 @@ public class CommonExceptionAdvice {
     public R<Object> notImplementedException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         log.error("{}未进行功能实现异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure();
+        return R.failure("功能暂未实现");
     }
 
     /// 数据已存在异常

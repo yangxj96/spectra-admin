@@ -112,7 +112,7 @@ async function handleMenuSave() {
                 </template>
             </el-table-column>
             <el-table-column align="center" prop="path" label="请求路径" />
-            <el-table-column align="center" prop="component" label="组件路径" />
+            <el-table-column align="center" prop="component" label="组件路径" :show-overflow-tooltip="true" />
             <el-table-column align="center" prop="layout" label="布局" />
             <el-table-column align="center" prop="hide" label="隐藏">
                 <template v-slot:default="scope">
@@ -204,7 +204,7 @@ async function handleMenuSave() {
                     </el-select>
                 </el-form-item>
                 <el-form-item label="元数据" prop="metadata">
-                    <JsonEditor :read-only="false" :model-value="menu.form.metadata" style="width: 100%" />
+                    <JsonEditor :read-only="false" :model-value="menu.form.metadata ?? {}" style="width: 100%" />
                 </el-form-item>
                 <el-form-item label="排序" prop="sort">
                     <el-input-number

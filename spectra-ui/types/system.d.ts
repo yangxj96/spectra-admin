@@ -6,7 +6,7 @@ declare global {
         // 已知
         title?: string;
         // 字段兜底
-        [key: string]: unknown;
+        [key: string]: JsonValue;
     };
 
     // 菜单
@@ -34,7 +34,7 @@ declare global {
         // 是否显示菜单
         hide?: boolean;
         // 元数据
-        metadata?: MenuMetadata | JsonValue;
+        metadata?: MenuMetadata;
         //子级
         children?: Menu[];
     };

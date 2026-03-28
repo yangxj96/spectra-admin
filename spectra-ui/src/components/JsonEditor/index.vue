@@ -1,21 +1,23 @@
 <script setup lang="ts">
 import JSONEditor from "jsoneditor";
+import "jsoneditor/dist/jsoneditor.min.css";
 import lodash from "lodash";
 import { onMounted, useTemplateRef, watch } from "vue";
-import "jsoneditor/dist/jsoneditor.min.css";
 
 defineOptions({
     name: "JsonEditor"
 });
 
 interface Props {
-    modelValue: JsonValue;
+    modelValue?: JsonValue;
     readOnly?: boolean;
 }
 
 const props = defineProps<Props>();
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits<{
+    (e: "update:modelValue", value: JsonValue): void;
+}>();
 
 const editor = useTemplateRef<HTMLElement>("editor");
 let instance: JSONEditor | undefined;
@@ -24,12 +26,23 @@ let isUserTyping = false;
 const handleChangeText = lodash.debounce(newValue => {
     isUserTyping = true;
     try {
-        const parsed = newValue ? JSON.parse(newValue) : ({} as JsonValue);
+        const parsed = newValue ? JSON.parse(newValue) : {};
         emit("update:modelValue", parsed);
     } catch (error) {
         console.error("JSON 解析错误:", error);
     }
 }, 300);
+
+/**
+ * 安全 stringify
+ */
+function safeStringify(value: JsonValue | undefined) {
+    try {
+        return JSON.stringify(value ?? {}, null, 2);
+    } catch {
+        return "{}";
+    }
+}
 
 onMounted(() => {
     if (editor.value) {
@@ -44,7 +57,7 @@ onMounted(() => {
 
         // 初始化时设置值
         if (props.modelValue) {
-            instance.setText(JSON.stringify(props.modelValue, undefined, 2));
+            instance.setText(safeStringify(props.modelValue));
         }
     }
 
@@ -57,8 +70,13 @@ onMounted(() => {
 watch(
     () => props.modelValue,
     newVal => {
-        if (instance && newVal && editor.value?.contains(document.activeElement) === false && !isUserTyping) {
-            instance.setText(JSON.stringify(newVal, undefined, 2));
+        if (!instance) return;
+
+        // 避免用户正在输入时覆盖
+        const isFocused = editor.value?.contains(document.activeElement);
+
+        if (!isFocused && !isUserTyping) {
+            instance.setText(safeStringify(newVal));
         }
         isUserTyping = false;
     },
