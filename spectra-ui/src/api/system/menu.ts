@@ -1,4 +1,4 @@
-import { get, post, put } from "@/plugin/request/api.ts";
+import { del, get, post, put } from "@/plugin/request/api.ts";
 
 /**
  * 菜单相关接口
@@ -27,5 +27,12 @@ export const menuApi = {
      */
     update(params: Menu): Promise<void> {
         return put<void>("/api/menu/modify", params);
+    },
+    /**
+     * 删除菜单
+     * @param id 菜单ID
+     */
+    deleteById(id: string): Promise<void> {
+        return del<void>(`/api/menu/${id}`);
     }
 };

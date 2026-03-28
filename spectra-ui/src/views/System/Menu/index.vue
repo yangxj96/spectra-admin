@@ -45,9 +45,12 @@ function handleTableItemModify(row: Menu) {
 
 // 表行删除按钮被单击
 function handleTableItemDelete(row: Menu) {
-    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(() => {
+    MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         console.log(`确定删除`);
-        MessageUtils.success("执行删除了");
+        await menuApi.deleteById(row.id);
+        MessageUtils.success("删除菜单成功", () => {
+            handleCriteriaQuery();
+        });
     });
 }
 

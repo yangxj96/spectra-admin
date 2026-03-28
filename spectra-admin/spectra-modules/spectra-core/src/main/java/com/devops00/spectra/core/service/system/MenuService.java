@@ -51,4 +51,9 @@ public interface MenuService extends IService<Menu> {
     /// @param id 角色ID
     /// @return 关联的菜单
     List<Menu> getByRelRoleId(String id);
+
+    /// 根据ID删除菜单
+    ///
+    /// @param id 菜单ID
+    void deleteById(String id);
 }

@@ -60,7 +60,7 @@ public class MenuController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasPermission(null ,'MENU:DELETE')")
     public void deleteById(@PathVariable String id) {
-        throw new NotImplementedException("暂未实现,ID:" + id);
+        bindService.deleteById(id);
     }
 
     /**

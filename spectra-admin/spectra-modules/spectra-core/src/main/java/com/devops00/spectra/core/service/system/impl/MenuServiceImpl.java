@@ -93,4 +93,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         }
         return this.listByIds(relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList());
     }
+
+    @Override
+    public void deleteById(String id) {
+        Menu menu = this.getById(id);
+        if (menu == null) {
+            throw new DataNotExistException("[" + id + "]不存在");
+        }
+        this.removeById(menu);
+    }
 }
