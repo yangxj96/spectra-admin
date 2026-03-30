@@ -17,6 +17,7 @@
 package com.devops00.spectra.workflow.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,7 +29,27 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-instances")
-public class WorkflowProcessInstancesController {
+public class ProcessInstanceController {
 
+    /*
+    职责
+    启动流程
+    查询实例
+    终止流程
+    查看流程图状态
+    接口示例
+    POST /process-instances/start
+    GET  /process-instances/{id}
+    GET  /process-instances
+
+    POST /process-instances/{id}/terminate
+    GET  /process-instances/{id}/diagram
+     */
+
+    /// 启动流程
+    @PostMapping("/start")
+    public void start() {
+
+    }
 
 }

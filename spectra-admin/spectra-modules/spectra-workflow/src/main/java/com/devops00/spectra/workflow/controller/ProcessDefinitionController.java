@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,19 +30,37 @@ import java.util.Map;
 
 /// 工作流-流程定义
 ///
+/// 面向“设计器 + 运维”
+///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-11-11
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-definitions")
-public class WorkflowProcessDefinitionsController {
+@RequiredArgsConstructor
+public class ProcessDefinitionController {
 
     private final RepositoryService repositoryService;
 
-    public WorkflowProcessDefinitionsController(RepositoryService repositoryService) {
-        this.repositoryService = repositoryService;
-    }
+
+    /*
+    职责
+    流程定义 CRUD
+    发布 / 版本管理
+    导入导出（BPMN / JSON）
+    激活 / 挂起
+    典型接口
+    POST   /process-definitions
+    PUT    /process-definitions/{id}
+    GET    /process-definitions/{id}
+    GET    /process-definitions
+    DELETE /process-definitions/{id}
+
+    POST   /process-definitions/{id}/deploy
+    POST   /process-definitions/{id}/activate
+    POST   /process-definitions/{id}/suspend
+     */
 
     /// 获取所有的流程定义
     ///
