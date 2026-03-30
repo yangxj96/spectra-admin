@@ -1,8 +1,13 @@
 package com.devops00.spectra.oa.notice.controller;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.configure.ulog.annotation.ULog;
+import com.devops00.spectra.oa.notice.javabean.entity.Notice;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,5 +22,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class NoticeController {
 
     private final NoticeService bindService;
+
+    @ULog("分页查询公告")
+    @GetMapping("/page")
+    public IPage<Notice> page(PageFrom page) {
+        return bindService.page(page.toPage());
+    }
 
 }

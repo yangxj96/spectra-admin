@@ -20,7 +20,7 @@
         created_at,
         updated_by,
         updated_at,
-        version,
+        "version",
         deleted
     </sql>
 </mapper>
