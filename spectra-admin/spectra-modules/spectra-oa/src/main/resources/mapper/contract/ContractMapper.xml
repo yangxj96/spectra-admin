@@ -6,7 +6,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.contract.javabean.entity.Contract">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_notice-->
+        <!--@Table spectra_core.oa_contract-->
     </resultMap>
     <!-- @formatter:on -->
 
