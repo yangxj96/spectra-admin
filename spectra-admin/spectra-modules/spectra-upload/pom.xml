@@ -30,6 +30,13 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- === 功能模块 === -->
+        <!-- S3协议连接rustfs -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.42.23</version>
+        </dependency>
 
     </dependencies>
 
