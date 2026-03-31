@@ -21,8 +21,14 @@ import com.devops00.spectra.upload.javabean.from.FileChunkFrom;
 import com.devops00.spectra.upload.javabean.from.FilePreprocessFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
 import com.devops00.spectra.upload.javabean.vo.FilePreprocessVO;
-import com.devops00.spectra.upload.service.FileService;
+import com.devops00.spectra.upload.properties.FileUploadProperties;
+import com.devops00.spectra.upload.service.FileUploadService;
+import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+import com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,51 +42,38 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/file")
+@RequiredArgsConstructor
 public class FileController {
 
-    private final FileService bindService;
+    private final FileUploadFacade bindService;
 
-    public FileController(FileService bindService) {
-        this.bindService = bindService;
-    }
-
-    /**
-     * 预处理文件
-     */
+    /// 预处理文件
     @GetMapping("/preprocess")
     public FilePreprocessVO preprocess(FilePreprocessFrom from) {
         return bindService.preprocess(from);
     }
 
-    /**
-     * 小文件直接保存
-     *
-     * @param from 文件直接保存的参数
-     */
+    /// 小文件直接保存
+    ///
+    /// @param from 文件直接保存的参数
     @PostMapping("/upload")
     public void upload(FileUploadFrom from) {
         bindService.upload(from);
     }
 
-    /**
-     * 上传切片
-     *
-     * @param from 文件分片上传参数
-     */
+    /// 上传切片
+    ///
+    /// @param from 文件分片上传参数
     @PostMapping("/chunk")
     public void chunk(FileChunkFrom from) {
         bindService.chunk(from);
     }
 
-    /**
-     * 查询文件上传进度
-     *
-     * @param md5 文件MD5
-     */
+    /// 查询文件上传进度
+    ///
+    /// @param md5 文件MD5
     @GetMapping("/progress")
     public void progress(String md5) {
-        // 暂时未实现
-        log.debug("{}入参:{}", LogPrefix.STORAGE, md5);
     }
 
 }

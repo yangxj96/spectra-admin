@@ -1,6 +1,10 @@
 package com.devops00.spectra.oa.meeting.javabean.from;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /**
  * 会议-参会人-入参
  *
@@ -8,6 +12,9 @@ package com.devops00.spectra.oa.meeting.javabean.from;
  * @version 1.0
  * @since 2026/3/30 15:27
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MeetingParticipantFrom {
 
     /// 会议ID

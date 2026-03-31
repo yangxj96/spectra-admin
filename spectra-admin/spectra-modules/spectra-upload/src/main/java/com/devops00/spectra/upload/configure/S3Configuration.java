@@ -9,7 +9,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
@@ -17,7 +16,7 @@ import java.net.URI;
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(S3Properties.class)
-public class S3Config {
+public class S3Configuration {
 
     private final S3Properties properties;
 
@@ -34,7 +33,7 @@ public class S3Config {
                         )
                 )
                 .serviceConfiguration(
-                        S3Configuration.builder()
+                        software.amazon.awssdk.services.s3.S3Configuration.builder()
                                 .pathStyleAccessEnabled(true)
                                 .build()
                 )
@@ -50,7 +49,7 @@ public class S3Config {
                         .create(AwsBasicCredentials
                                 .create(properties.getAccessKey(), properties.getSecretKey())))
                 .serviceConfiguration(
-                        S3Configuration.builder()
+                        software.amazon.awssdk.services.s3.S3Configuration.builder()
                                 .pathStyleAccessEnabled(true)
                                 .build()
                 )

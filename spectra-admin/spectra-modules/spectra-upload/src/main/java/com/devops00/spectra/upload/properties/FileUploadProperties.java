@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.upload.properties;
 
+import com.devops00.spectra.upload.service.FileUploadService;
+import com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
@@ -37,12 +39,8 @@ import java.util.List;
 @ConfigurationProperties(prefix = "spectra.file.upload")
 public class FileUploadProperties {
 
-    /// 上传的文件夹位置
-    private String uploadDir = "uploads";
-
-    /// 上传文件的时候临时文件路径
-    private String uploadTempDir = "temp";
-
+    /// 文件上传默认实现
+    private Class<? extends FileUploadService> impl = FileUploadServiceLocalImpl.class;
 
     /// 文件类型验证策略
     private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(
@@ -55,6 +53,4 @@ public class FileUploadProperties {
     /// 分片大小,默认5M
     private Long chunkSize = 5242880L;
 
-    /// 清理间隔天数
-    private Integer cleanupAfterDays = 1;
 }

@@ -27,7 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/6/19
-public interface FileService {
+public interface FileUploadService {
 
     /**
      * 验证文件是否能上传

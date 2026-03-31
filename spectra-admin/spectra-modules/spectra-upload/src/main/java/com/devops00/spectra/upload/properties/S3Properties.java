@@ -2,7 +2,6 @@ package com.devops00.spectra.upload.properties;
 
 
 import lombok.Data;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /// S3协议配置

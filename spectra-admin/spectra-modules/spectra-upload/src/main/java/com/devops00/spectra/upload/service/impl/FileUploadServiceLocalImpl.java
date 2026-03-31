@@ -18,6 +18,7 @@ package com.devops00.spectra.upload.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.FileTypeException;
 import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -30,12 +31,17 @@ import com.devops00.spectra.upload.javabean.vo.FilePreprocessVO;
 import com.devops00.spectra.upload.mapper.FileChunkMapper;
 import com.devops00.spectra.upload.mapper.FileInfoMapper;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
+import com.devops00.spectra.upload.properties.LocalProperties;
+import com.devops00.spectra.upload.service.FileUploadService;
 import com.devops00.spectra.upload.strategy.FileTypeValidator;
-import jakarta.annotation.Resource;
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -50,33 +56,64 @@ import java.util.List;
 /// @version 1.0
 /// @since 2025/6/19
 @Slf4j
-@Service
 @NullMarked
-public class FileServiceLocalImpl extends AbstractFileService {
+@RequiredArgsConstructor
+@Service("fileUploadServiceLocalImpl")
+public class FileUploadServiceLocalImpl implements FileUploadService {
 
     /// 本地文件管理的根文件路径
-    private final Path root;
+    @Nullable
+    private Path root;
 
     /// 本地文件管理的临时文件路径
-    private final Path temp;
+    @Nullable
+    private Path temp;
 
-    @Resource
-    private FileInfoMapper fileInfoMapper;
+    private final FileInfoMapper fileInfoMapper;
 
-    @Resource
-    private FileChunkMapper fileChunkMapper;
+    private final FileChunkMapper fileChunkMapper;
 
-    public FileServiceLocalImpl(FileTypeValidator validator, FileUploadProperties properties) throws IOException {
-        this.validator = validator;
-        this.properties = properties;
+    private final FileTypeValidator validator;
 
-        this.root = Paths.get(properties.getUploadDir());
-        if (!Files.exists(root)) {
-            Files.createDirectories(root);
+    private final LocalProperties localProperties;
+
+    private final FileUploadProperties fileUploadProperties;
+
+    @PostConstruct
+    public void init() {
+        try {
+            log.debug(
+                    "{}初始化本地存储位置,存储位置:{},临时文件位置:{}",
+                    LogPrefix.STORAGE.p(),
+                    localProperties.getUploadDir(),
+                    localProperties.getUploadTempDir()
+            );
+            this.root = Paths.get(localProperties.getUploadDir());
+            if (!Files.exists(root)) {
+                Files.createDirectories(root);
+            }
+            this.temp = Paths.get(localProperties.getUploadTempDir());
+            if (!Files.exists(temp)) {
+                Files.createDirectories(temp);
+            }
+        } catch (IOException e) {
+            log.error(LogPrefix.STORAGE.f("初始化本地存储位置失败"), e);
         }
-        this.temp = Paths.get(properties.getUploadTempDir());
-        if (!Files.exists(temp)) {
-            Files.createDirectories(temp);
+    }
+
+    @Override
+    public void verify(@Nullable MultipartFile file) {
+        // 检查文件是否为空
+        if (file == null || file.isEmpty()) {
+            throw new FileTypeException("上传的文件不能为空");
+        }
+        // 使用策略模式进行文件类型验证
+        if (!validator.validate(file)) {
+            throw new FileTypeException("此类文件不允许上传");
+        }
+        // 文件大小
+        if (file.getSize() > fileUploadProperties.getChunkSize()) {
+            throw new FileTypeException("文件大小超过阈值");
         }
     }
 
@@ -88,15 +125,15 @@ public class FileServiceLocalImpl extends AbstractFileService {
             return FilePreprocessVO.exist();
         }
         // 小文件不用计算分片了
-        if (properties == null || from.size() <= properties.getChunkSize()) {
+        if (from.size() <= fileUploadProperties.getChunkSize()) {
             return FilePreprocessVO.ofFalse();
         }
         // 计算分片信息后响应
-        int count = Math.toIntExact(from.size() / properties.getChunkSize());
-        if (from.size() % properties.getChunkSize() != 0) {
+        int count = Math.toIntExact(from.size() / fileUploadProperties.getChunkSize());
+        if (from.size() % fileUploadProperties.getChunkSize() != 0) {
             count++;
         }
-        return FilePreprocessVO.chunk(Math.toIntExact(properties.getChunkSize()), count);
+        return FilePreprocessVO.chunk(Math.toIntExact(fileUploadProperties.getChunkSize()), count);
     }
 
     @Override
@@ -108,7 +145,10 @@ public class FileServiceLocalImpl extends AbstractFileService {
             return;
         }
         // 先检查文件是否符合上传要求
-        super.verify(from.file());
+        this.verify(from.file());
+        if (root == null) {
+            throw new FileUploadException("存储目录配置错误");
+        }
         // 保存文件
         try (var is = from.file().getInputStream()) {
             // 构建文件保存目录
@@ -161,6 +201,9 @@ public class FileServiceLocalImpl extends AbstractFileService {
             // 如果是第一个分片则检查分片信息
             if (from.index() == 1) {
                 this.verify(from.file());
+            }
+            if (temp == null) {
+                throw new FileUploadException("存储目录配置错误");
             }
             // 构建临时文件上传目录
             Path fileDir = temp.resolve(from.hash()).normalize();

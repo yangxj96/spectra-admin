@@ -17,7 +17,6 @@ import org.mapstruct.Mapping;
 public interface MeetingConverter {
 
     /// 入参转实体
-    @Mapping(target = "participants", ignore = true)
     Meeting toEntity(MeetingCreateFrom source);
 
 }

@@ -1,6 +1,10 @@
 package com.devops00.spectra.oa.meeting.javabean.from;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
 /// 会议创建
@@ -8,6 +12,9 @@ import java.util.List;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2026/3/30 15:24
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MeetingCreateFrom {
 
     /// 会议标题
