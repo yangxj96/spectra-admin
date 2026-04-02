@@ -1,74 +1,69 @@
 package com.devops00.spectra.upload.service.impl;
 
-
-import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.upload.javabean.from.FileChunkFrom;
-import com.devops00.spectra.upload.javabean.from.FilePreprocessFrom;
+import com.devops00.spectra.upload.configure.FileUploadServiceRegistry;
+import com.devops00.spectra.upload.javabean.constant.UploadType;
+import com.devops00.spectra.upload.javabean.entity.FileUploadTask;
+import com.devops00.spectra.upload.javabean.from.FileUploadChunkFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
-import com.devops00.spectra.upload.javabean.vo.FilePreprocessVO;
+import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;
+import com.devops00.spectra.upload.javabean.vo.FileUploadChunkVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadStatusVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
-import com.devops00.spectra.upload.service.FileUploadService;
-import jakarta.annotation.PostConstruct;
+import com.devops00.spectra.upload.service.FileUploadTaskService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
-/// 文件上传工厂层
+/// 对外门面
 ///
 /// @author Jack Young
 /// @version 1.0
-/// @since 2026/3/31 14:34
-@Slf4j
+/// @since 2026/4/2 10:59
 @Service
 @RequiredArgsConstructor
 public class FileUploadFacade {
 
-    /// Spring 应用上下文，用于按类型动态获取 Bean
-    private final ApplicationContext applicationContext;
+    private final FileUploadServiceRegistry registry;
 
-    /// 文件上传配置（用于指定具体实现类）
     private final FileUploadProperties properties;
 
-    /// 实际绑定的文件上传实现（策略实现），在初始化阶段确定，后续直接复用
-    private FileUploadService delegate;
+    private final FileUploadTaskService fileUploadTaskService;
 
-    /// 初始化文件上传实现
-    ///
-    /// <p>逻辑说明：
-    /// <ul>
-    ///     <li>优先使用配置中指定的实现类（properties.impl）</li>
-    ///     <li>如果未配置，则默认使用本地实现（FileUploadServiceLocalImpl）</li>
-    ///     <li>通过 Spring 容器获取对应 Bean，保证生命周期与依赖注入正常</li>
-    /// </ul>
-    ///
-    /// <p>异常处理：
-    /// <ul>
-    ///     <li>如果指定的实现类未注册为 Bean，会在此处初始化失败</li>
-    /// </ul>
-    @PostConstruct
-    public void init() {
-        Class<? extends FileUploadService> clazz = properties.getImpl();
+    /// 预处理
+    public FileUploadPreVO pre(FileUploadPreFrom from) {
+        return registry.getByType(properties.getDefaultStorage()).pre(from);
+    }
 
-        try {
-            Class<? extends FileUploadService> targetClass =
-                    (clazz != null) ? clazz : FileUploadServiceLocalImpl.class;
-            delegate = applicationContext.getBean(targetClass);
-            log.info("{}FileUploadService 使用实现: {}", LogPrefix.STORAGE.p(), delegate.getClass().getSimpleName());
-        } catch (Exception e) {
-            throw new IllegalStateException("初始化 FileUploadService 失败", e);
+    /// 直接上传
+    public FileUploadVO upload(FileUploadFrom from) {
+        return registry.getByType(properties.getDefaultStorage()).upload(from);
+    }
+
+    /// 分片上传
+    public FileUploadChunkVO chunk(FileUploadChunkFrom from) {
+        // 分片任务没存储上传类型，因为上传都是用默认，只有下载才寻要根据数据库选择
+        return registry.getByType(properties.getDefaultStorage()).chunk(from);
+    }
+
+    /// 合并
+    public FileUploadVO merge(String uploadId) {
+        UploadType type = getTypeFromTask(uploadId);
+        return registry.getByType(type).merge(uploadId);
+    }
+
+    /// 状态查询
+    public FileUploadStatusVO getStatus(String uploadId) {
+        return registry.getByType(properties.getDefaultStorage()).getStatus(uploadId);
+    }
+
+    /// 从任务表获取类型
+    private UploadType getTypeFromTask(String uploadId) {
+        FileUploadTask task = fileUploadTaskService.findByUploadId(uploadId);
+        if (task == null) {
+            throw new IllegalArgumentException("上传任务不存在");
         }
+        return task.getStorageType();
     }
 
-    public FilePreprocessVO preprocess(FilePreprocessFrom from) {
-        return delegate.preprocess(from);
-    }
-
-    public void upload(FileUploadFrom from) {
-        delegate.upload(from);
-    }
-
-    public void chunk(FileChunkFrom from) {
-        delegate.chunk(from);
-    }
 }

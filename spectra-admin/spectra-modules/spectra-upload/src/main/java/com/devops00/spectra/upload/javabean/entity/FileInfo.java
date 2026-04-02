@@ -4,9 +4,8 @@ package com.devops00.spectra.upload.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.upload.javabean.constant.UploadType;
 import lombok.*;
-
-import java.io.Serializable;
 
 /// 文件信息实体
 ///
@@ -19,34 +18,42 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "file_info")
-public class FileInfo extends BaseEntity implements Serializable {
+public class FileInfo extends BaseEntity {
 
-    /// 生成的32位的文件名称
-    @TableField(value = "file_name")
-    private String fileName;
+    /// 存储文件名(系统生成)
+    @TableField(value = "filename")
+    private String filename;
 
-    /// 文件源名称
-    @TableField(value = "origin_name")
-    private String originName;
+    /// 原始文件名
+    @TableField(value = "original_name")
+    private String originalName;
 
-    /// 文件后缀
-    @TableField(value = "suffix")
-    private String suffix;
+    /// 文件类型(MIME)
+    @TableField(value = "content_type")
+    private String contentType;
 
-    /// 文件存储位置
-    @TableField(value = "path")
-    private String path;
-
-    /// 文件大小
+    /// 文件大小(字节)
     @TableField(value = "size")
     private Long size;
 
-    /// 文件hash值
+    /// 文件哈希(MD5/SHA256，用于秒传)
     @TableField(value = "hash")
     private String hash;
 
-    /// 文件存储类型
+    /// 文件访问地址
+    @TableField(value = "url")
+    private String url;
+
+    /// 存储类型(LOCAL/S3/OSS)
     @TableField(value = "storage_type")
-    private Short storageType;
+    private UploadType storageType;
+
+    /// 文件状态(ACTIVE/DELETED)
+    @TableField(value = "status")
+    private String status;
+
+    /// 引用计数(用于秒传共享文件)
+    @TableField(value = "ref_count")
+    private Integer refCount;
 
 }

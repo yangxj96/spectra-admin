@@ -1,5 +1,7 @@
 package com.devops00.spectra.upload.javabean.from;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 /// 文件保存参数
@@ -9,8 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/12/7 23:29
-public record FileUploadFrom(
-        MultipartFile file,
-        String hash
-) {
+@Getter
+@Setter
+public class FileUploadFrom {
+
+    private MultipartFile file;
+
+    private String hash;
+
 }

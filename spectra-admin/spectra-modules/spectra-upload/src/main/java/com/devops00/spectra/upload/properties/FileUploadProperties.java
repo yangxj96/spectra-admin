@@ -16,8 +16,7 @@
 
 package com.devops00.spectra.upload.properties;
 
-import com.devops00.spectra.upload.service.FileUploadService;
-import com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl;
+import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
@@ -40,7 +39,7 @@ import java.util.List;
 public class FileUploadProperties {
 
     /// 文件上传默认实现
-    private Class<? extends FileUploadService> impl = FileUploadServiceLocalImpl.class;
+    private UploadType defaultStorage = UploadType.LOCAL;
 
     /// 文件类型验证策略
     private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(

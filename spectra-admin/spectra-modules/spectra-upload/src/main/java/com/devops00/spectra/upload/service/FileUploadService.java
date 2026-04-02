@@ -16,11 +16,14 @@
 
 package com.devops00.spectra.upload.service;
 
-import com.devops00.spectra.upload.javabean.from.FileChunkFrom;
-import com.devops00.spectra.upload.javabean.from.FilePreprocessFrom;
+import com.devops00.spectra.upload.javabean.constant.UploadType;
+import com.devops00.spectra.upload.javabean.from.FileUploadChunkFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
-import com.devops00.spectra.upload.javabean.vo.FilePreprocessVO;
-import org.springframework.web.multipart.MultipartFile;
+import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;
+import com.devops00.spectra.upload.javabean.vo.FileUploadChunkVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadStatusVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 
 /// 文件业务层
 ///
@@ -29,37 +32,33 @@ import org.springframework.web.multipart.MultipartFile;
 /// @since 2025/6/19
 public interface FileUploadService {
 
-    /**
-     * 验证文件是否能上传
-     *
-     * @param file 文件
-     */
-    void verify(MultipartFile file);
+    /// 当前实现类型
+    UploadType getType();
 
-    /**
-     * 文件预处理
-     *
-     * @param from 文件信息
-     * @return 预处理结果
-     */
-    FilePreprocessVO preprocess(FilePreprocessFrom from);
+    /// 文件预处理
+    ///
+    /// @param from 文件信息
+    /// @return 预处理结果
+    FileUploadPreVO pre(FileUploadPreFrom from);
 
-    /**
-     * 文件保存
-     *
-     * @param from 文件直接保存的参数
-     */
-    void upload(FileUploadFrom from);
+    /// 文件保存
+    ///
+    /// @param from 文件直接保存的参数
+    FileUploadVO upload(FileUploadFrom from);
 
-    /**
-     * 保存分片
-     *
-     * @param from 文件分片参数
-     */
-    void chunk(FileChunkFrom from);
+    /// 保存分片
+    ///
+    /// @param from 文件分片参数
+    FileUploadChunkVO chunk(FileUploadChunkFrom from);
 
-    /**
-     * 文件合并
-     */
-    void merge(String md5);
+    /// 文件合并
+    ///
+    /// @param uploadId 上传ID
+    FileUploadVO merge(String uploadId);
+
+    /// 获取文件上传扎ungtai
+    ///
+    /// @param uploadId 上传ID
+    /// @return 文件上传状态
+    FileUploadStatusVO getStatus(String uploadId);
 }

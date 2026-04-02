@@ -7,31 +7,29 @@
                type="com.devops00.spectra.upload.javabean.entity.FileInfo">
         <!--@mbg.generated-->
         <!--@Table spectra_core.file_info-->
-        <result column="file_name"    property="fileName"/>
-        <result column="origin_name"  property="originName"/>
-        <result column="suffix"       property="suffix"/>
-        <result column="path"         property="path"/>
-        <result column="size"         property="size"/>
-        <result column="hash"         property="hash"/>
-        <result column="storage_type" property="storageType"/>
+        <result column="filename"      property="filename"/>
+        <result column="original_name" property="originalName"/>
+        <result column="content_type"  property="contentType"/>
+        <result column="size"          property="size"/>
+        <result column="hash"          property="hash"/>
+        <result column="url"           property="url"/>
+        <result column="storage_type"  property="storageType"/>
+        <result column="status"        property="status"/>
+        <result column="ref_count"     property="refCount"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        file_name,
-        origin_name,
-        suffix,
-        path,
-        "size",
-        hash,
+        filename,
+        original_name,
+        content_type,
+        size,
+        "hash",
+        url,
         storage_type,
+        status,
+        ref_count,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
-
-    <select id="getByHash" resultMap="BaseResultMap">
-        SELECT
-        <include refid="Base_Column_List"/>
-        FROM spectra.sys_file_info WHERE hash = #{hash}
-    </select>
 </mapper>

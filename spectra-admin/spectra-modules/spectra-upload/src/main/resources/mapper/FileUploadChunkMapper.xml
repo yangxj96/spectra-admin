@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.upload.mapper.FileUploadChunkMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.upload.javabean.entity.FileUploadChunk">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.file_upload_chunk-->
+        <result column="upload_id"    property="uploadId"/>
+        <result column="chunk_number" property="chunkNumber"/>
+        <result column="etag"         property="etag"/>
+        <result column="size"         property="size"/>
+        <result column="status"       property="status"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        upload_id,
+        chunk_number,
+        etag,
+        size,
+        status,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>
