@@ -128,7 +128,7 @@ logging:
   level:
     root: info
     other: error
-    spectra: debug
+    spectra: info
 # 健康检查
 management:
   endpoints:

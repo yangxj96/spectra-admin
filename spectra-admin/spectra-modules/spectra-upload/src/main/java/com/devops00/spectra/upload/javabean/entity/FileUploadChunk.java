@@ -35,8 +35,4 @@ public class FileUploadChunk extends BaseEntity {
     @TableField(value = "size")
     private Long size;
 
-    /// 分片状态(UPLOADED(已上传)/FAILED(上传失败)
-    @TableField(value = "status")
-    private String status;
-
 }

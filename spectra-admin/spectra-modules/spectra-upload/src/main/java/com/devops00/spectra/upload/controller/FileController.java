@@ -17,14 +17,18 @@
 package com.devops00.spectra.upload.controller;
 
 import com.devops00.spectra.core.configure.ulog.annotation.ULog;
+import com.devops00.spectra.upload.javabean.from.FileUploadChunkFrom;
+import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
+import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;
+import com.devops00.spectra.upload.javabean.vo.FileUploadChunkVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
+import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /// 文件操作相关控制器
 ///
@@ -42,26 +46,36 @@ public class FileController {
 
     /// 文件上传预处理
     @ULog("文件上传预处理")
-    @GetMapping("/pre")
-    public void pre() {
-
+    @PostMapping("/pre")
+    public FileUploadPreVO pre(@RequestBody FileUploadPreFrom from) {
+        return bindService.pre(from);
     }
 
     /// 小文件直接保存
     ///
     /// @param from 文件直接保存的参数
     @ULog("普通上传")
-
-    @PostMapping("/upload")
-    public void upload() {
+    @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public FileUploadVO uploadSingle(@ModelAttribute FileUploadFrom from) {
+        return bindService.upload(from);
     }
 
     /// 上传切片
     ///
     /// @param from 文件分片上传参数
     @ULog("分片上传")
-    @PostMapping("/chunk")
-    public void chunk() {
+    @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public FileUploadChunkVO uploadChunk(@ModelAttribute FileUploadChunkFrom from) {
+        return bindService.chunk(from);
+    }
+
+    /// 请求合并
+    ///
+    /// @param uploadId 上传id
+    @ULog("分片上传")
+    @PostMapping("/merge/{uploadId}")
+    public FileUploadVO merge(@PathVariable String uploadId) {
+        return bindService.merge(uploadId);
     }
 
 }

@@ -24,18 +24,15 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.UUID;
 
 /// 文件上传服务-本地上传
 ///
@@ -124,7 +121,6 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         task.setSize(from.getSize());
         task.setChunkSize(chunkSize);
         task.setTotalChunks(totalChunks);
-        task.setUploadedChunks(0);
         task.setStorageType(UploadType.LOCAL);
         task.setStatus("INIT");
 
@@ -140,21 +136,21 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     }
 
     @Override
+    @Transactional
     public FileUploadVO upload(FileUploadFrom from) {
         MultipartFile file = from.getFile();
-
-        String filename = UuidCreator.getTimeOrderedEpoch().toString() + "_" + file.getOriginalFilename();
-
+        // 拼装存储文件名
+        String filename = UuidCreator.getTimeOrderedEpoch().toString() + getSuffix(file);
+        // 构建存储路径
         Path path = buildFilePath(filename);
-
+        // 尝试保存
         try {
             file.transferTo(path);
         } catch (IOException e) {
             throw new RuntimeException("文件保存失败", e);
         }
-
+        // 成功了存入数据库记录且构建响应vo
         String url = "/file/" + filename;
-
         // 保存 file_info
         var fileInfo = new FileInfo();
         fileInfo.setFilename(filename);
@@ -167,6 +163,11 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         infoService.save(fileInfo);
 
+        // 把task表对应的记录结果修改下
+        FileUploadTask task = taskService.findByUploadId(from.getUploadId());
+        task.setStatus("DON");
+        taskService.updateById(task);
+
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
 
@@ -174,13 +175,14 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     }
 
     @Override
+    @Transactional
     public FileUploadChunkVO chunk(FileUploadChunkFrom from) {
         var task = taskService.findByUploadId(from.getUploadId());
         if (task == null) {
             throw new IllegalArgumentException("上传任务不存在");
         }
 
-        int chunkNumber = from.getCount();
+        int chunkNumber = from.getIndex();
 
         Path dir = buildTempDir(from.getUploadId());
         try {
@@ -201,21 +203,19 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         chunk.setUploadId(from.getUploadId());
         chunk.setChunkNumber(chunkNumber);
         chunk.setSize(from.getFile().getSize());
-        chunk.setStatus("UPLOADED");
 
         try {
             chunkService.save(chunk);
-            taskService.incrUploadedChunks(task.getId());
         } catch (Exception e) {
             log.debug("分片已存在: {}", chunkNumber);
         }
-
         return buildChunkVO(chunkNumber);
     }
 
     @Override
+    @Transactional
     public FileUploadVO merge(String uploadId) {
-        synchronized (uploadId.intern()) { // ⭐并发保护
+        synchronized (uploadId.intern()) {
 
             var task = taskService.findByUploadId(uploadId);
             if (task == null) {
@@ -229,7 +229,9 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             }
 
             Path tempDir = buildTempDir(uploadId);
-            String filename = UUID.randomUUID() + "_" + task.getFilename();
+            // 拼装存储文件名
+            String filename = UuidCreator.getTimeOrderedEpoch().toString() + getSuffix(task.getFilename());
+
             Path dest = buildFilePath(filename);
 
             try (OutputStream out = Files.newOutputStream(dest)) {
@@ -259,7 +261,11 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             taskService.updateById(task);
 
             // 清理临时文件
-            FileSystemUtils.deleteRecursively(tempDir);
+            try {
+                FileSystemUtils.deleteRecursively(tempDir);
+            } catch (Exception e) {
+                log.warn("清理临时目录失败: {}", tempDir, e);
+            }
 
             return buildUploadVO(url);
         }
@@ -301,5 +307,20 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         FileUploadChunkVO vo = new FileUploadChunkVO();
         vo.setChunkNumber(chunkNumber);
         return vo;
+    }
+
+    public static String getSuffix(MultipartFile file) {
+        if (file == null) return "";
+        String filename = file.getOriginalFilename();
+        return getSuffix(filename);
+    }
+
+    public static String getSuffix(String filename) {
+        if (filename == null) return "";
+        int index = filename.lastIndexOf(".");
+        if (index == -1 || index == filename.length() - 1) {
+            return "";
+        }
+        return filename.substring(index);
     }
 }

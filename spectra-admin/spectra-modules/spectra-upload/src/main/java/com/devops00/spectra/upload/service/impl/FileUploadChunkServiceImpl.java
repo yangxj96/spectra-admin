@@ -28,6 +28,8 @@ public class FileUploadChunkServiceImpl extends BaseServiceImpl<FileUploadChunkM
 
     @Override
     public int countByUploadId(String uploadId) {
-        return 0;
+        return Math.toIntExact(lambdaQuery()
+                .eq(FileUploadChunk::getUploadId, uploadId)
+                .count());
     }
 }

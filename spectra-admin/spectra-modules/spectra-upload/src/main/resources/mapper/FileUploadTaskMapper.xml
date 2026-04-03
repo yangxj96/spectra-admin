@@ -13,7 +13,6 @@
         <result column="size"            property="size"/>
         <result column="chunk_size"      property="chunkSize"/>
         <result column="total_chunks"    property="totalChunks"/>
-        <result column="uploaded_chunks" property="uploadedChunks"/>
         <result column="storage_type"    property="storageType"/>
         <result column="status"          property="status"/>
         <result column="file_id"         property="fileId"/>
@@ -28,7 +27,6 @@
         size,
         chunk_size,
         total_chunks,
-        uploaded_chunks,
         storage_type,
         status,
         file_id,

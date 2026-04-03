@@ -18,8 +18,4 @@ public interface FileUploadTaskService extends BaseService<FileUploadTask> {
     /// @return 任务信息
     FileUploadTask findByUploadId(String uploadId);
 
-    /// 根据任务ID增加分片上传计数
-    ///
-    /// @param taskId 任务id
-    void incrUploadedChunks(String taskId);
 }

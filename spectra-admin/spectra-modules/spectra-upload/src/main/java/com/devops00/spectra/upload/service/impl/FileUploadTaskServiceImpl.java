@@ -1,8 +1,8 @@
 package com.devops00.spectra.upload.service.impl;
 
 
+import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileUploadTask;
 import com.devops00.spectra.upload.mapper.FileUploadTaskMapper;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
@@ -22,13 +22,8 @@ public class FileUploadTaskServiceImpl extends BaseServiceImpl<FileUploadTaskMap
     public FileUploadTask findByUploadId(String uploadId) {
         return lambdaQuery()
                 .eq(FileUploadTask::getUploadId, uploadId)
-                .select(FileUploadTask::getStorageType)
                 .oneOpt()
                 .orElseThrow(() -> new IllegalArgumentException("上传任务不存在"));
     }
 
-    @Override
-    public void incrUploadedChunks(String taskId) {
-
-    }
 }

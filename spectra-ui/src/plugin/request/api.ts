@@ -56,9 +56,11 @@ export function del<T, U extends string = string>(
  * 上传文件
  */
 export function upload<T, U extends string = string>(url: U, form: FormData, options?: RequestOptions<U>) {
+    // 参数合规转换
+    const newForm = transformFormData(form);
     return request<T, U>(url, {
         method: "POST",
-        body: form,
+        body: newForm,
         ...options
     });
 }
@@ -72,4 +74,19 @@ export async function download<U extends string = string>(url: U, options?: Requ
         method: "GET",
         ...options
     });
+}
+
+function snakeToCamel(str: string) {
+    return str.replace(/_([a-z])/g, (_, c) => c.toUpperCase());
+}
+
+function transformFormData(form: FormData) {
+    const newForm = new FormData();
+
+    form.forEach((value, key) => {
+        const newKey = snakeToCamel(key);
+        newForm.append(newKey, value);
+    });
+
+    return newForm;
 }

@@ -59,7 +59,6 @@ CREATE TABLE "spectra_core"."file_upload_task"
     "size"            int8,
     "chunk_size"      int8,
     "total_chunks"    int4,
-    "uploaded_chunks" int4 DEFAULT 0,
     "storage_type"    VARCHAR(20)    NOT NULL,
     "status"          VARCHAR(20)    NOT NULL,
     "file_id"         uuid,
@@ -93,7 +92,6 @@ COMMENT ON COLUMN "spectra_core"."file_upload_task"."hash" IS '文件哈希(用�
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."size" IS '文件总大小(字节)';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."chunk_size" IS '分片大小(字节)';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."total_chunks" IS '总分片数';
-COMMENT ON COLUMN "spectra_core"."file_upload_task"."uploaded_chunks" IS '已上传分片数量';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."storage_type" IS '存储类型(LOCAL/S3/OSS)';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."status" IS '上传状态(INIT(初始化)/UPLOADING(上传中)/MERGING(合并中)/DONE(完成)/FAILED(失败))';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."file_id" IS '关联文件ID(上传完成后生成)';
@@ -111,7 +109,6 @@ CREATE TABLE "spectra_core"."file_upload_chunk"
     "chunk_number" int4           NOT NULL,
     "etag"         VARCHAR(128),            -- S3 / OSS 必须
     "size"         int8,
-    "status"       VARCHAR(20)    NOT NULL, -- UPLOADED / FAILED
     ------------- 审计字段
     "created_by"   uuid,
     "created_at"   timestamptz(6) NOT NULL,
@@ -127,19 +124,18 @@ ALTER TABLE "spectra_core"."file_upload_chunk"
 CREATE UNIQUE INDEX "uk_upload_chunk"
     ON "spectra_core"."file_upload_chunk" ("upload_id", "chunk_number");
 ------------- 主键字段
-COMMENT ON COLUMN "spectra_core"."file_info"."id" IS '主键ID';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."id" IS '主键ID';
 ------------- 审计字段
-COMMENT ON COLUMN "spectra_core"."file_info"."created_by" IS '创建人';
-COMMENT ON COLUMN "spectra_core"."file_info"."created_at" IS '创建时间';
-COMMENT ON COLUMN "spectra_core"."file_info"."updated_by" IS '最后更新人';
-COMMENT ON COLUMN "spectra_core"."file_info"."updated_at" IS '最后更新时间';
-COMMENT ON COLUMN "spectra_core"."file_info"."deleted" IS '删除标识';
-COMMENT ON COLUMN "spectra_core"."file_info"."version" IS '乐观锁';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."created_by" IS '创建人';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."created_at" IS '创建时间';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."updated_by" IS '最后更新人';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."updated_at" IS '最后更新时间';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."deleted" IS '删除标识';
+COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."version" IS '乐观锁';
 ------------- 业务字段
 COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."upload_id" IS '上传任务ID';
 COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."chunk_number" IS '分片序号(从1开始)';
 COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."etag" IS '分片标识(用于S3/OSS合并)';
 COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."size" IS '分片大小(字节)';
-COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."status" IS '分片状态(UPLOADED(已上传)/FAILED(上传失败)';
 ------------- 索引说明
 COMMENT ON INDEX "spectra_core"."uk_upload_chunk" IS '上传任务ID+分片序号唯一索引(保证幂等)';

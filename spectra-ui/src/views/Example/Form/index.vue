@@ -1,4 +1,5 @@
 <script setup lang="ts"></script>
 <template>
-    <div>表单展示</div>
+    <div>文件上传</div>
+    <file-uplaod />
 </template>

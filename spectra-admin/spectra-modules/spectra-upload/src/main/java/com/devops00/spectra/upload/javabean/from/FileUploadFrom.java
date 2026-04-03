@@ -19,4 +19,6 @@ public class FileUploadFrom {
 
     private String hash;
 
+    private String uploadId;
+
 }

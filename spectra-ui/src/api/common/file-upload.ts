@@ -1,4 +1,4 @@
-import { get, upload } from "@/plugin/request/api.ts";
+import { post, upload } from "@/plugin/request/api.ts";
 
 /**
  * 文件上传相关接口
@@ -12,28 +12,28 @@ export const fileUploadApi = {
      * 文件预处理
      * @param params 上传文件入参
      */
-    preprocess(params: FilePreprocessFrom): Promise<FilePreprocessVO> {
-        return get<FilePreprocessVO>("/api/file/preprocess", params);
-    },
-    /**
-     * 查询上传信息
-     * @param hash 文件hash值
-     */
-    async progress(hash: string): Promise<void> {
-        return get<void>("/api/file/progress", { hash });
+    pre(params: FilePreprocessFrom): Promise<FilePreprocessVO> {
+        return post<FilePreprocessVO>("/api/file/pre", params, { loading: false });
     },
     /**
      * 文件上传(小文件)
      * @param params 上传文件入参
      */
-    async upload(params: FormData): Promise<void> {
-        return upload<void>("/api/file/upload", params);
+    async uploadSingle(params: FormData): Promise<void> {
+        return upload<void>("/api/file/uploadSingle", params, { loading: false });
     },
     /**
      * 上传文件(切片)
      * @param params 上传文件入参
      */
-    async chunk(params: FormData): Promise<void> {
-        return upload<void>("/api/file/chunk", params);
+    async uploadChunk(params: FormData): Promise<void> {
+        return upload<void>("/api/file/uploadChunk", params, { loading: false, dedupe: false });
+    },
+    /**
+     * 等待文件合并
+     * @param upload_id 上传ID
+     */
+    async merge(upload_id: string): Promise<void> {
+        return post<void>(`/api/file/merge/${upload_id}`, undefined, { loading: false, dedupe: false });
     }
 };

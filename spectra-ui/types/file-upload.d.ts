@@ -18,9 +18,15 @@ declare global {
 
     // 预处理请求参数
     type FilePreprocessVO = {
-        has_exist: boolean;
-        has_chunked: boolean;
-        size: number;
-        count: number;
+        // 是否存在
+        exists: boolean;
+        // 请求地址
+        url: string;
+        // 是否需要分片上传
+        multipart: boolean;
+        // 上传ID
+        upload_id: string;
+        // 分片大小
+        chunk_size: number;
     };
 }

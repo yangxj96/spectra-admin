@@ -1,175 +1,94 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue";
-
 import { fileUploadApi } from "@/api/common/file-upload.ts";
-import { FileUtils } from "@/utils/file-utils.ts";
+import { CommonUtils } from "@/utils/common-utils.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
+
+import type { UploadRequestOptions } from "element-plus";
 
 defineOptions({
     name: "FileUpload"
 });
 
-const fileList = ref<FileItem[]>([]);
+/**
+ * 处理文件上传
+ */
+const handleUpload = async (options: UploadRequestOptions) => {
+    console.log(options);
+    const hash = CommonUtils.UUIDUpper();
+    // 先进行预处理
+    const { exists, url, multipart, upload_id, chunk_size } = await fileUploadApi.pre({
+        filename: options.file.name,
+        hash: hash,
+        size: options.file.size
+    });
+    console.log(`存在:${exists},地址:${url},是否需要分片:${multipart},上传id:${upload_id},分片大小:${chunk_size}`);
+    // 存在则秒传,提示成功
+    if (exists) {
+        MessageUtils.success("上传成功");
+        return;
+    }
+    if (multipart) {
+        uploadChunk(options.file, options.file.name, hash, upload_id, chunk_size);
+    } else {
+        await uploadSingle(options.file, hash, upload_id);
+    }
+};
+
+//////////// 辅助方法
 
 /**
- * 是否展示model
+ * 普通上传
  */
-const model = defineModel({
-    type: Boolean,
-    required: true
-});
-
-// 隐藏的文件选择
-const fileInputRef = useTemplateRef("fileInputRef");
-
-// 选择文件
-const handleSelectFile = () => {
-    if (fileInputRef.value) {
-        fileInputRef.value.value = "";
-        fileInputRef.value.click();
-    }
+const uploadSingle = async (file: File, hash: string, upload_id: string) => {
+    const params = new FormData();
+    params.append("file", file);
+    params.append("hash", hash);
+    params.append("upload_id", upload_id);
+    await fileUploadApi.uploadSingle(params);
 };
 
-// 文件选中的时候修改文件
-const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    if (!target.files) {
-        return;
-    }
-    for (const file of target.files) {
-        if (!file) {
-            continue;
-        }
+/**
+ * 分片上传
+ */
+const uploadChunk = async (file: File, filename: string, hash: string, upload_id: string, chunk_size: number) => {
+    const chunks = createChunks(file, chunk_size);
+    const tasks = chunks.map((chunk, index) => {
+        const params = new FormData();
+        params.append("file", chunk!);
+        params.append("upload_id", upload_id);
+        params.append("file_name", filename);
+        params.append("hash", hash);
+        params.append("count", chunks.length.toString());
+        params.append("index", (index + 1).toString());
 
-        fileList.value.push({
-            name: file.name,
-            size: file.size,
-            status: 0,
-            file: file
-        });
-    }
+        return fileUploadApi.uploadChunk(params);
+    });
+
+    // ✅ 等所有成功
+    await Promise.all(tasks);
+
+    // ✅ 再 merge
+    await fileUploadApi.merge(upload_id);
 };
 
-// 文件上传被单击
-const handleFileUploadClick = async () => {
-    if (fileList.value.length <= 0) {
-        MessageUtils.warning("文件列表为空");
-        return;
+/**
+ * 创建分片
+ * @param file
+ * @param size
+ */
+const createChunks = (file: File, size: number): Blob[] => {
+    const result: Blob[] = [];
+    let cur = 0;
+    while (cur < file.size) {
+        result.push(file.slice(cur, cur + size));
+        cur += size;
     }
-    for (const file of fileList.value) {
-        await handlePreFileUpload(file.file);
-    }
-};
-
-// 文件预处理
-const handlePreFileUpload = async (file: File) => {
-    const pre_params = await preprocess(file);
-    if (!pre_params) {
-        MessageUtils.error("预处理文件错误");
-        return;
-    }
-    const pre_res = await fileUploadApi.preprocess(pre_params);
-    // 已存在,跳过,应该还要处理下UI
-    if (pre_res?.has_exist) {
-        handleExistFile(file);
-    }
-    // 是否要进行分片上传
-    if (pre_res?.has_chunked) {
-        await handleLargeFileUpload(file, pre_params.hash, pre_res.size);
-    } else {
-        await handleSmallFileUpload(file, pre_params.hash);
-    }
-};
-
-// 处理文件已存在
-const handleExistFile = (file: File) => {
-    console.log("已存在了", file);
-};
-
-// 处理小文件上传
-const handleSmallFileUpload = async (file: File, hash: string) => {
-    // 直接上传
-    const upload_params = new FormData();
-    upload_params.append("file", file);
-    upload_params.append("hash", hash);
-
-    const upload_res = await fileUploadApi.upload(upload_params);
-    console.log("直接上传", upload_res);
-};
-
-// 处理大文件上传
-const handleLargeFileUpload = async (file: File, hash: string, size: number) => {
-    const chunks = createChunks(file, size);
-    let idx = 0;
-    for (const chunk of chunks) {
-        const chunk_params = new FormData();
-        chunk_params.append("file", chunk);
-        chunk_params.append("fileName", file.name);
-        chunk_params.append("hash", hash);
-        chunk_params.append("index", idx.toString());
-        chunk_params.append("count", chunks.length.toString());
-        idx++;
-        const chunk_res = await fileUploadApi.chunk(chunk_params);
-        console.log("分片上传", chunk_res);
-    }
-};
-
-// 创建分片
-const createChunks = (file: File, chunkSize: number) => {
-    const chunks: Blob[] = [];
-    let start = 0;
-    while (start < file.size) {
-        const end = Math.min(start + chunkSize, file.size);
-        chunks.push(file.slice(start, end));
-        start = end;
-    }
-    return chunks;
-};
-
-// 计算文件预处理结果
-const preprocess = async (file: File) => {
-    if (file) {
-        return {
-            filename: file.name,
-            size: file.size,
-            hash: await FileUtils.hash(file)
-        } as FilePreprocessFrom;
-    } else {
-        return {} as FilePreprocessFrom;
-    }
+    return result;
 };
 </script>
 
 <template>
-    <el-dialog v-model="model" width="30%" style="min-height: 40vh">
-        <el-row>
-            <el-button type="primary" @click="handleSelectFile">选择文件</el-button>
-            <el-button type="primary" @click="handleFileUploadClick" :disabled="fileList.length <= 0">
-                开始上传
-            </el-button>
-            <input
-                ref="fileInputRef"
-                type="file"
-                multiple
-                style="display: none"
-                @change="handleFileChange"
-                accept=".jpg,.png,.pdf,.docx" />
-        </el-row>
-        <el-row style="min-height: 35vh">
-            <el-table :data="fileList" height="35vh" style="width: 100%" class="loading-box">
-                <el-table-column align="center" width="060" type="index" label="序号" />
-                <el-table-column align="center" label="文件名称" prop="name" />
-                <el-table-column align="center" width="150" label="文件大小" prop="size">
-                    <template #default="scope">{{ scope.row.size }} Byte</template>
-                </el-table-column>
-                <el-table-column align="center" width="100" label="上传状态" prop="status">
-                    <template #default="scope">
-                        <el-tag v-if="scope.row.status === 0" type="warning">等待上传</el-tag>
-                        <el-tag v-if="scope.row.status === 1" type="primary">上传中...</el-tag>
-                        <el-tag v-if="scope.row.status === 2" type="success">上传完成</el-tag>
-                    </template>
-                </el-table-column>
-            </el-table>
-        </el-row>
-    </el-dialog>
+    <el-upload action="#" :http-request="handleUpload" :auto-upload="true" :multiple="true">
+        <el-button type="primary">上传</el-button>
+    </el-upload>
 </template>

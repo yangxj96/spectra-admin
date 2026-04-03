@@ -44,10 +44,6 @@ public class FileUploadTask extends BaseEntity {
     @TableField(value = "total_chunks")
     private Integer totalChunks;
 
-    /// 已上传分片数量
-    @TableField(value = "uploaded_chunks")
-    private Integer uploadedChunks;
-
     /// 存储类型（LOCAL/S3/OSS）
     @TableField(value = "storage_type")
     private UploadType storageType;
