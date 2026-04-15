@@ -1,4 +1,4 @@
-import * as SunCalc from "suncalc";
+import * as SunCalc from "suncalc-ts";
 
 export const CommonUtils = {
     /**
