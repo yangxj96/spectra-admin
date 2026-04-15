@@ -145,6 +145,16 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <!-- 修复漏洞 -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>3.1.2</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
