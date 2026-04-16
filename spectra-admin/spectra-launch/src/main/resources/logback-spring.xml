@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-
-
     <!-- ================= 基础配置 ================= -->
     <contextName>spectra-admin</contextName>
 

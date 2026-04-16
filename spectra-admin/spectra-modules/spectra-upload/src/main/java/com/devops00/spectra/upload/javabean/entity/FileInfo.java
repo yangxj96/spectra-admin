@@ -40,10 +40,6 @@ public class FileInfo extends BaseEntity {
     @TableField(value = "hash")
     private String hash;
 
-    /// 文件访问地址
-    @TableField(value = "url")
-    private String url;
-
     /// 存储类型(LOCAL/S3/OSS)
     @TableField(value = "storage_type")
     private UploadType storageType;

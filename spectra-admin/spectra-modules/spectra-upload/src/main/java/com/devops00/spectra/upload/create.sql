@@ -10,7 +10,6 @@ CREATE TABLE "spectra_core"."file_info"
     "content_type"  VARCHAR(100),
     "size"          int8           NOT NULL,
     "hash"          VARCHAR(64)    NOT NULL,
-    "url"           TEXT           NOT NULL,
     "storage_type"  VARCHAR(20)    NOT NULL,
     "status"        VARCHAR(20)    NOT NULL,
     "ref_count"     int4 DEFAULT 1,
@@ -41,7 +40,6 @@ COMMENT ON COLUMN "spectra_core"."file_info"."original_name" IS '原始文件名
 COMMENT ON COLUMN "spectra_core"."file_info"."content_type" IS '文件类型(MIME)';
 COMMENT ON COLUMN "spectra_core"."file_info"."size" IS '文件大小(字节)';
 COMMENT ON COLUMN "spectra_core"."file_info"."hash" IS '文件哈希(MD5/SHA256，用于秒传)';
-COMMENT ON COLUMN "spectra_core"."file_info"."url" IS '文件访问地址';
 COMMENT ON COLUMN "spectra_core"."file_info"."storage_type" IS '存储类型(LOCAL/S3/OSS)';
 COMMENT ON COLUMN "spectra_core"."file_info"."status" IS '文件状态(ACTIVE/DELETED)';
 COMMENT ON COLUMN "spectra_core"."file_info"."ref_count" IS '引用计数(用于秒传共享文件)';

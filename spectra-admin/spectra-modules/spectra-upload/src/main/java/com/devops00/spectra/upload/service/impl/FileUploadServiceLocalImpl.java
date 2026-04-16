@@ -96,9 +96,8 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         if (file != null) {
             infoService.incrRefCount(file.getId());
-
+            // TODO 存在的情况下,应该要响应一个一个ID之类的用作下载
             vo.setExists(true);
-            vo.setUrl(file.getUrl());
             return vo;
         }
 
@@ -157,7 +156,6 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         fileInfo.setOriginalName(file.getOriginalFilename());
         fileInfo.setSize(file.getSize());
         fileInfo.setHash(from.getHash());
-        fileInfo.setUrl(url);
         fileInfo.setStorageType(UploadType.LOCAL);
         fileInfo.setStatus("ACTIVE");
 
@@ -250,7 +248,6 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             fileInfo.setOriginalName(task.getFilename());
             fileInfo.setSize(task.getSize());
             fileInfo.setHash(task.getHash());
-            fileInfo.setUrl(url);
             fileInfo.setStorageType(UploadType.LOCAL);
             fileInfo.setStatus("ACTIVE");
 
