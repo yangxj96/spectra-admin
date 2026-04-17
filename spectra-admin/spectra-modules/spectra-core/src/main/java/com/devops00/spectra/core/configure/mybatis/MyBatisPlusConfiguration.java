@@ -18,7 +18,6 @@ package com.devops00.spectra.core.configure.mybatis;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
-import com.baomidou.mybatisplus.core.incrementer.IdentifierGenerator;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
@@ -52,16 +51,11 @@ public class MyBatisPlusConfiguration {
     private ObjectProvider<InnerInterceptor> innerInterceptors;
 
 
+    /// 添加注释
     @Bean
     public MetaObjectHandler metaObjectHandler() {
         log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));
         return new MetaObjectHandlerImpl();
-    }
-
-    @Bean
-    public IdentifierGenerator identifierGenerator() {
-        log.debug(LogPrefix.PERSISTENCE.f("UUIDv7版本的ID生成器"));
-        return new UuidV7IdentifierGenerator();
     }
 
     @Bean
