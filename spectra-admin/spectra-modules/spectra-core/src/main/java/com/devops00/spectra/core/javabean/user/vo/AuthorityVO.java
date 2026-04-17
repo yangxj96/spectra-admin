@@ -20,6 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /// 权限VO
 ///
 /// @author Jack Young
@@ -31,10 +33,10 @@ import lombok.NoArgsConstructor;
 public class AuthorityVO {
 
     /// 数据id.
-    private String id;
+    private UUID id;
 
 
-    private String pid;
+    private UUID pid;
 
     /// 权限名称
     private String name;

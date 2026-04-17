@@ -237,7 +237,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     }
 
     @Override
-    public void deleteByUserId(String userId) {
+    public void deleteByUserId(UUID userId) {
         String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
 
         Set<Object> tokens = redis.opsForSet().members(userTokensKey);
@@ -373,7 +373,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     }
 
     @Override
-    public @Nullable String getCurrentUserId() {
+    public @Nullable UUID getCurrentUserId() {
         var user = this.getCurrentUser();
         if (user == null) {
             return null;

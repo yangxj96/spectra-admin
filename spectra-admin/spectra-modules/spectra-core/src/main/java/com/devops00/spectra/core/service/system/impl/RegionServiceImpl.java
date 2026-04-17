@@ -17,10 +17,7 @@ import com.devops00.spectra.core.mapper.system.RegionMapper;
 import com.devops00.spectra.core.service.system.RegionService;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /// 行政区域实现Service
@@ -29,7 +26,7 @@ import java.util.stream.Collectors;
 /// @version 1.0
 /// @since 2026/1/30 13:57
 @Service
-public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<String> {
+public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<UUID> {
 
     private final RegionConverter converter;
 
@@ -38,7 +35,7 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
     }
 
     @Override
-    public Map<String, String> getNameMap(Set<String> ids) {
+    public Map<UUID, String> getNameMap(Set<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
         }

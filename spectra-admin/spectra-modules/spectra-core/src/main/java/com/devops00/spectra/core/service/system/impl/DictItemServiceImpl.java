@@ -24,6 +24,7 @@ import com.devops00.spectra.core.service.system.DictItemService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 字典(字典数据)业务层-实现
 ///
@@ -34,7 +35,7 @@ import java.util.List;
 public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictItem> implements DictItemService {
 
     @Override
-    public List<DictItem> listByGid(String gid) {
+    public List<DictItem> listByGid(UUID gid) {
         var wrapper = new LambdaQueryWrapper<DictItem>()
                 .eq(DictItem::getGid, gid);
         return this.list(wrapper);

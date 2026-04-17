@@ -9,6 +9,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// Security 静态工具类
 ///
@@ -81,7 +82,7 @@ public class SecUtil {
     /// 根据用户ID踢出用户
     ///
     /// @param id 用户ID
-    public static void kick(String id) {
+    public static void kick(UUID id) {
         getStrategy().deleteByUserId(id);
     }
 
@@ -115,7 +116,7 @@ public class SecUtil {
     /// 获取当前用户 ID
     ///
     /// @return 用户 ID,可能为null
-    public static @Nullable String getCurrentUserId() {
+    public static @Nullable UUID getCurrentUserId() {
         return getStrategy().getCurrentUserId();
     }
 

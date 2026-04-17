@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 角色关联菜单中间表mapper
 ///
@@ -35,7 +36,7 @@ public interface RelRoleMenuMapper extends BaseMapper<RelRoleMenu> {
     ///
     /// @param roleId 角色ID
     /// @return 关联信息
-    List<RelRoleMenu> getByRoleId(@Param("roleId") String roleId);
+    List<RelRoleMenu> getByRoleId(@Param("roleId") UUID roleId);
 
 
 }

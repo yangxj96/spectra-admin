@@ -3,6 +3,8 @@ package com.devops00.spectra.upload.service;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 
+import java.util.UUID;
+
 /// 文件信息服务
 ///
 /// @author Jack Young
@@ -17,5 +19,5 @@ public interface FileInfoService extends BaseService<FileInfo> {
     FileInfo findByHash(String hash);
 
     /// 增加引用计数
-    void incrRefCount(String id);
+    void incrRefCount(UUID id);
 }

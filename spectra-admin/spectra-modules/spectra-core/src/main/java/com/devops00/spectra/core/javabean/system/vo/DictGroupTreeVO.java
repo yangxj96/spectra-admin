@@ -25,6 +25,7 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /// 字典类型树VO
 ///
@@ -40,10 +41,10 @@ public class DictGroupTreeVO implements Tree<DictGroupTreeVO>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 数据id.
-    private String id;
+    private UUID id;
 
     /// 父级ID
-    private String pid;
+    private UUID pid;
 
     /// 字典名称
     private String name;

@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 用户关联角色
 ///
@@ -35,9 +36,9 @@ public class UserRelevanceRolesFrom {
 
     /// 用户ID
     @NotNull(message = "用户ID不能为空")
-    private String userId;
+    private UUID userId;
 
     /// 角色列表
     @NotNull(message = "需要关联的角色ID列表不能为空")
-    private List<String> roleIds;
+    private List<UUID> roleIds;
 }

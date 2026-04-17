@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.UUID;
+
 /// OA-会议-会议纪要
 ///
 /// @author Jack Young
@@ -20,8 +22,8 @@ import lombok.ToString;
 public class MeetingRecord extends BaseEntity {
 
     /// 会议ID
-    @TableField("meeting_id")
-    private String meetingId;
+    @TableField(value = "meeting_id")
+    private UUID meetingId;
 
     /// 参会人ID
     @TableField("content")

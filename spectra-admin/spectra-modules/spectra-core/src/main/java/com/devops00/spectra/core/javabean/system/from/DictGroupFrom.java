@@ -23,6 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /// 字典类型入参
 ///
 /// @author Jack Young
@@ -36,10 +38,10 @@ public class DictGroupFrom {
     /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private String id;
+    private UUID id;
 
     /// 父级ID
-    private String pid;
+    private UUID pid;
 
     /// 字典名称
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})

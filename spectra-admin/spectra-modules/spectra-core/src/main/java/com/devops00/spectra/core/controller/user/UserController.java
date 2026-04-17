@@ -31,6 +31,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 用户控制器
 ///
@@ -59,7 +60,7 @@ public class UserController {
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasPermission(null ,'USER:DELETE')")
     public void deleteById(@PathVariable String uid) {
-        bindService.deleteById(uid);
+        bindService.deleteById(UUID.fromString(uid));
     }
 
     @ULog("根据ID更新用户信息")
@@ -73,7 +74,7 @@ public class UserController {
     @PutMapping("/password/reset/{uid}")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void passwordResetById(@PathVariable String uid) {
-        bindService.passwordResetById(uid);
+        bindService.passwordResetById(UUID.fromString(uid));
     }
 
     @ULog("分页查询用户列表")

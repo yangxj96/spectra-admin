@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 系统配置分页响应
 ///
@@ -22,7 +23,7 @@ public class ConfiguredVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 主键ID
-    private String id;
+    private UUID id;
 
     /// 配置key
     private String key;

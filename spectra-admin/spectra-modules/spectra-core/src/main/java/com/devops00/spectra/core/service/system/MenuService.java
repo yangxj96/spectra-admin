@@ -23,6 +23,7 @@ import com.devops00.spectra.core.javabean.system.vo.MenuTreeVO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 菜单service层
 ///
@@ -50,7 +51,7 @@ public interface MenuService extends IService<Menu> {
     ///
     /// @param id 角色ID
     /// @return 关联的菜单
-    List<Menu> getByRelRoleId(String id);
+    List<Menu> getByRelRoleId(UUID id);
 
     /// 根据ID删除菜单
     ///

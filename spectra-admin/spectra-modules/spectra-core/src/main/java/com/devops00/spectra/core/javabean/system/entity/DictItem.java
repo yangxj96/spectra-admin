@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 字典-字典数据
 ///
@@ -44,7 +45,7 @@ public class DictItem extends BaseEntity implements Serializable {
 
     /// 字典类型ID
     @TableField(value = "gid")
-    private String gid;
+    private UUID gid;
 
     /// 标签
     @TableField(value = "label")

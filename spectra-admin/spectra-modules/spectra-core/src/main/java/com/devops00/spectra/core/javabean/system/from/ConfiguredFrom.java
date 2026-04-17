@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /// 系统配置入参
 ///
 /// @author Jack Young
@@ -18,7 +20,7 @@ public class ConfiguredFrom {
 
     /// 主键ID
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
-    private String id;
+    private UUID id;
 
     /// 配置VALUE
     @NotNull(message = "配置值不能为空")

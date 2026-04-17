@@ -23,6 +23,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 角色关联权限中间表
 ///
@@ -41,11 +42,11 @@ public class RelRoleAuthority extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 角色ID
-    @TableField("role_id")
-    private String roleId;
+    @TableField(value = "role_id")
+    private UUID roleId;
 
     /// 权限ID
-    @TableField("authority_id")
-    private String authorityId;
+    @TableField(value = "authority_id")
+    private UUID authorityId;
 
 }

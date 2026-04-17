@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /// 菜单保存接口
 ///
@@ -40,10 +41,10 @@ public class MenuSaveFrom {
     /// 数据id
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private String id;
+    private UUID id;
 
     /// 父级ID
-    private String pid;
+    private UUID pid;
 
     /// 图标
     @NotNull(message = "图标不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})

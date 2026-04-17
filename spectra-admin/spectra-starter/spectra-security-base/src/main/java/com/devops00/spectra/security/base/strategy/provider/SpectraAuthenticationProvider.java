@@ -5,6 +5,7 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import org.springframework.security.authentication.AuthenticationProvider;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 基础的认证适配器
@@ -25,11 +26,11 @@ public interface SpectraAuthenticationProvider extends AuthenticationProvider {
     ///
     /// @param userId 用户ID
     /// @return 角色列表
-    List<Object> getUserRole(String userId);
+    List<Object> getUserRole(UUID userId);
 
     /// 根据角色ID列表获取权限列表
     ///
     /// @param roles 角色ID列表
     /// @return 权限列表
-    List<Object> getUserAuthority(List<String> roles);
+    List<Object> getUserAuthority(List<UUID> roles);
 }

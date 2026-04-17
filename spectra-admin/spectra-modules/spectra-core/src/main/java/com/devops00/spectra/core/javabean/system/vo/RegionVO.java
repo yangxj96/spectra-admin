@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 行政区域响应VO
 ///
@@ -20,7 +21,7 @@ public class RegionVO implements Serializable {
 
 
     /// 主键ID
-    private String id;
+    private UUID id;
 
     /// 区域名称
     private String name;
@@ -38,7 +39,7 @@ public class RegionVO implements Serializable {
     private String path;
 
     /// 上级ID
-    private String pid;
+    private UUID pid;
 
     /// 行政区划层级:1省 2地级市 3县级 4乡级 5村级
     private RegionLevel level;

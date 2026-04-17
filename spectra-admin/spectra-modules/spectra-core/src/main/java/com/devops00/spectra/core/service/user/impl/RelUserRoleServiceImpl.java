@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /// 关联服务-用户和角色
 ///
@@ -45,9 +46,9 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
 
     @Override
     @Transactional
-    public void grant(String userId, List<String> roleIds) {
+    public void grant(UUID userId, List<UUID> roleIds) {
         var coll = new ArrayList<RelUserRole>();
-        for (String roleId : roleIds) {
+        for (UUID roleId : roleIds) {
             coll.add(RelUserRole.builder().userId(userId).roleId(roleId).build());
         }
         relUserRoleMapper.insert(coll);
@@ -55,14 +56,14 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
 
     @Override
     @Transactional
-    public void revoke(String userId) {
+    public void revoke(UUID userId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getUserId, userId);
         relUserRoleMapper.delete(wrapper);
     }
 
     @Override
-    public void revoke(String userId, List<String> roleIds) {
+    public void revoke(UUID userId, List<UUID> roleIds) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getUserId, userId)
                 .in(RelUserRole::getRoleId, roleIds);
@@ -70,14 +71,14 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
     }
 
     @Override
-    public List<RelUserRole> getRelByRoleId(String roleId) {
+    public List<RelUserRole> getRelByRoleId(UUID roleId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>()
                 .eq(RelUserRole::getRoleId, roleId);
         return relUserRoleMapper.selectList(wrapper);
     }
 
     @Override
-    public List<Role> getRoles(String userId) {
+    public List<Role> getRoles(UUID userId) {
         var wrapper = new LambdaQueryWrapper<RelUserRole>();
         wrapper.eq(RelUserRole::getUserId, userId);
         List<RelUserRole> userRoles = relUserRoleMapper.selectList(wrapper);

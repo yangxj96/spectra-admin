@@ -11,6 +11,8 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /// 账号服务默认实现
 ///
 /// @author Jack Young
@@ -30,7 +32,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     }
 
     @Override
-    public Account getDefaultByUserId(String userId) {
+    public Account getDefaultByUserId(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Account>()
                 .eq(Account::getUserId, userId)
                 .isNotNull(Account::getLoginName)
@@ -39,7 +41,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     }
 
     @Override
-    public void deleteByUserId(String userId) {
+    public void deleteByUserId(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Account>()
                 .eq(Account::getUserId, userId);
         this.remove(wrapper);

@@ -18,10 +18,7 @@ package com.devops00.spectra.common.utils;
 
 import com.devops00.spectra.common.base.javabean.vo.Tree;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /// 树形工具类
@@ -42,10 +39,10 @@ public class TreeUtils {
     /// @param idExtractor 提取节点ID的函数（如 AuthorityTreeVO::getId）
     /// @param <T>         实现 Tree<T> 的具体类型
     /// @return 压缩处理后的选中ID集合
-    public static <T extends Tree<T>> Set<String> compressSelectedNodes(List<T> tree, Set<String> selectedIds, Function<T, String> idExtractor) {
-        var result = new HashSet<String>();
+    public static <T extends Tree<T>> Set<UUID> compressSelectedNodes(List<T> tree, Set<UUID> selectedIds, Function<T, UUID> idExtractor) {
+        var result = new HashSet<UUID>();
         for (T node : tree) {
-            var nodeResult = new HashSet<String>();
+            var nodeResult = new HashSet<UUID>();
             collectCompressedIds(node, selectedIds, idExtractor, nodeResult);
             result.addAll(nodeResult);
         }
@@ -53,7 +50,7 @@ public class TreeUtils {
     }
 
     /// 递归收集压缩后的节点ID
-    private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<String> selectedIds, Function<T, String> idExtractor, Set<String> result) {
+    private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<UUID> selectedIds, Function<T, UUID> idExtractor, Set<UUID> result) {
 
         if (node == null) return false;
 
@@ -73,10 +70,10 @@ public class TreeUtils {
 
         // 非叶子节点：递归处理子节点
         var allChildrenSelected = true;
-        var childResults = new ArrayList<Set<String>>();
+        var childResults = new ArrayList<Set<UUID>>();
 
         for (T child : children) {
-            var childResult = new HashSet<String>();
+            var childResult = new HashSet<UUID>();
             var isSelected = collectCompressedIds(child, selectedIds, idExtractor, childResult);
             childResults.add(childResult);
             if (!isSelected) {

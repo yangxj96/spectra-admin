@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /// 组织机构树形
 ///
@@ -40,10 +41,10 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    private UUID id;
 
     /// 上级ID
-    private String pid;
+    private UUID pid;
 
     /// 名称
     private String name;
@@ -55,7 +56,7 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     private Short type;
 
     /// 行政区划ID
-    private String regionId;
+    private UUID regionId;
 
     /// 行政区划名称
     @NameFill(lookup = RegionServiceImpl.class, sourceField = "regionId")

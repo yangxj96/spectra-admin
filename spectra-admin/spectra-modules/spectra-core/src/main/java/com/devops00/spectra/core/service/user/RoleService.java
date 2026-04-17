@@ -25,6 +25,7 @@ import com.devops00.spectra.core.javabean.user.from.RolePageFrom;
 import com.devops00.spectra.core.javabean.user.vo.RoleVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 角色service层
 ///
@@ -41,7 +42,7 @@ public interface RoleService extends BaseService<Role> {
     /// 删除角色
     ///
     /// @param id 角色ID
-    void delete(String id);
+    void delete(UUID id);
 
     /// 修改角色
     ///

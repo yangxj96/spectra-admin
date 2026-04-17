@@ -4,13 +4,11 @@ package com.devops00.spectra.upload.javabean.constant;
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
-/**
- * 上传方式枚举
- *
- * @author Jack Young
- * @version 1.0
- * @since 2026/4/2 11:04
- */
+/// 上传方式枚举
+///
+/// @author Jack Young
+/// @version 1.0
+/// @since 2026/4/2 11:04
 @Getter
 public enum UploadType implements IEnum<String> {
     /// 本地上传

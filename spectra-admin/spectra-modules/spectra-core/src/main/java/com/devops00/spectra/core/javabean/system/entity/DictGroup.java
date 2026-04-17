@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 字典-字典类型
 ///
@@ -46,7 +47,7 @@ public class DictGroup extends BaseEntity implements Serializable {
     /// 父级ID
     @Nullable
     @TableField(value = "pid")
-    private String pid;
+    private UUID pid;
 
     /// 字典名称
     @TableField(value = "name")

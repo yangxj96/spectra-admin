@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 
 /// 用户分页的VO
@@ -44,7 +45,7 @@ public class UserPageVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    private UUID id;
 
     /// 姓名
     private String username;
@@ -86,7 +87,7 @@ public class UserPageVO implements Serializable {
     private List<RoleVO> roles;
 
     /// 组织机构ID
-    private String departmentId;
+    private UUID departmentId;
 
     /// 组织机构名称
     @NameFill(lookup = DepartmentServiceImpl.class, sourceField = "departmentId")

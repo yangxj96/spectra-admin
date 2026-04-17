@@ -21,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
+import java.util.UUID;
 
 /// 菜单VO
 ///
@@ -33,10 +34,10 @@ import java.util.Map;
 public class MenuVO {
 
     /// 数据id.
-    private String id;
+    private UUID id;
 
     /// 父级ID
-    private String pid;
+    private UUID pid;
 
     /// 图标
     private String icon;

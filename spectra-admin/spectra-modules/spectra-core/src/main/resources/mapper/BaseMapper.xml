@@ -4,10 +4,10 @@
 <mapper namespace="com.devops00.spectra.common.base.BaseMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseAuditMap" type="com.devops00.spectra.common.base.BaseEntity">
-        <id column="id"             property="id"/>
-        <result column="created_by" property="createdBy"/>
+        <id column="id"             property="id"  typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+        <result column="created_by" property="createdBy"  typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
         <result column="created_at" property="createdAt"/>
-        <result column="updated_by" property="updatedBy"/>
+        <result column="updated_by" property="updatedBy"  typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
         <result column="updated_at" property="updatedAt"/>
         <result column="version"    property="version"/>
         <result column="deleted"    property="deleted"/>

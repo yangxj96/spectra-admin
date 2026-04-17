@@ -35,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /// 关联服务-用户和权限
@@ -60,7 +61,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     @Transactional
-    public void grant(String roleId, RoleAuthorityFrom from) {
+    public void grant(UUID roleId, RoleAuthorityFrom from) {
         // 压缩权限树
         from.setAuthorityIds(
                 TreeUtils.compressSelectedNodes(
@@ -99,20 +100,20 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     @Transactional
-    public void revoke(String roleId) {
+    public void revoke(UUID roleId) {
         // 删除角色关联的权限
         var wrapper = new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getRoleId, roleId);
         relRoleAuthorityMapper.delete(wrapper);
     }
 
     @Override
-    public List<AuthorityVO> get(String roleId) {
+    public List<AuthorityVO> get(UUID roleId) {
         var authority = authorityService.getByRelRoleId(roleId);
         return authorityConverter.toVOList(authority);
     }
 
     @Override
-    public List<AuthorityVO> get(List<String> ids) {
+    public List<AuthorityVO> get(List<UUID> ids) {
         List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.selectList(
                 new LambdaQueryWrapper<RelRoleAuthority>()
                         .in(RelRoleAuthority::getRoleId, ids)

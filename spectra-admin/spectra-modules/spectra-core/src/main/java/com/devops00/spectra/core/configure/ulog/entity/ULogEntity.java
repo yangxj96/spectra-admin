@@ -23,6 +23,7 @@ import lombok.NoArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 切面中存储的数据的实体
 ///
@@ -57,12 +58,12 @@ public class ULogEntity implements Serializable {
 
     /// 响应内容
     @Nullable
-    private String result;
+    private Object result;
 
     /// 耗时
     private Long timeCost;
 
     /// 当前用户ID
     @Nullable
-    private String currentId;
+    private UUID currentId;
 }

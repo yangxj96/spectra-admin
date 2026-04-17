@@ -6,6 +6,8 @@ import com.devops00.spectra.core.javabean.user.entity.UserDataScope;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.UUID;
+
 /// 用户数据范围Mapper
 ///
 /// @author Jack Young
@@ -18,5 +20,5 @@ public interface UserDataScopeMapper extends BaseMapper<UserDataScope> {
     ///
     /// @param userId 用户ID
     /// @return 数据范围
-    UserDataScope findByUserId(@Param("userId") String userId);
+    UserDataScope findByUserId(@Param("userId") UUID userId);
 }

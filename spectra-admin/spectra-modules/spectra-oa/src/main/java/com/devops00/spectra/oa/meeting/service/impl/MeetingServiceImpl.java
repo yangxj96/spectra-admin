@@ -32,7 +32,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         this.save(entity);
         // 启动流程
         // TODO 流程定义KEY
-        String processId = processInstanceService.start("", entity.getId());
+        String processId = processInstanceService.start("", String.valueOf(entity.getId()));
         // 补充流程信息后更新
         entity.setProcessInstanceId(processId);
         this.updateById(entity);

@@ -49,24 +49,24 @@ DROP TABLE IF EXISTS "spectra_core"."file_upload_task";
 CREATE TABLE "spectra_core"."file_upload_task"
 (
     ------------- 主键
-    "id"              uuid           NOT NULL,
+    "id"           uuid           NOT NULL,
     ------------- 业务字段
-    "upload_id"       VARCHAR(64)    NOT NULL, -- 给前端的ID
-    "filename"        VARCHAR(255),
-    "hash"            VARCHAR(64),
-    "size"            int8,
-    "chunk_size"      int8,
-    "total_chunks"    int4,
-    "storage_type"    VARCHAR(20)    NOT NULL,
-    "status"          VARCHAR(20)    NOT NULL,
-    "file_id"         uuid,
+    "upload_id"    VARCHAR(64)    NOT NULL, -- 给前端的ID
+    "filename"     VARCHAR(255),
+    "hash"         VARCHAR(64),
+    "size"         int8,
+    "chunk_size"   int8,
+    "total_chunks" int4,
+    "storage_type" VARCHAR(20)    NOT NULL,
+    "status"       VARCHAR(20)    NOT NULL,
+    "file_id"      uuid,
     ------------- 审计字段
-    "created_by"      uuid,
-    "created_at"      timestamptz(6) NOT NULL,
-    "updated_by"      uuid,
-    "updated_at"      timestamptz(6) NOT NULL,
-    "deleted"         timestamptz(6),
-    "version"         int8 DEFAULT 0
+    "created_by"   uuid,
+    "created_at"   timestamptz(6) NOT NULL,
+    "updated_by"   uuid,
+    "updated_at"   timestamptz(6) NOT NULL,
+    "deleted"      timestamptz(6),
+    "version"      int8 DEFAULT 0
 );
 COMMENT ON TABLE "spectra_core"."file_upload_task" IS '文件上传-上传任务表';
 ------------- 约束
@@ -105,7 +105,7 @@ CREATE TABLE "spectra_core"."file_upload_chunk"
     ------------- 业务字段
     "upload_id"    VARCHAR(64)    NOT NULL,
     "chunk_number" int4           NOT NULL,
-    "etag"         VARCHAR(128),            -- S3 / OSS 必须
+    "etag"         VARCHAR(128), -- S3 / OSS 必须
     "size"         int8,
     ------------- 审计字段
     "created_by"   uuid,
@@ -137,3 +137,45 @@ COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."etag" IS '分片标识(用
 COMMENT ON COLUMN "spectra_core"."file_upload_chunk"."size" IS '分片大小(字节)';
 ------------- 索引说明
 COMMENT ON INDEX "spectra_core"."uk_upload_chunk" IS '上传任务ID+分片序号唯一索引(保证幂等)';
+
+-- 文件类型表
+DROP TABLE IF EXISTS "spectra_core"."file_type";
+CREATE TABLE "spectra_core"."file_type"
+(
+    id             UUID PRIMARY KEY            NOT NULL,               -- 主键ID
+    name           CHARACTER VARYING(100)      NOT NULL,               -- 文件类型名称
+    extension      jsonb                       NOT NULL,               -- 文件后缀(带.)
+    mime           jsonb                       NOT NULL,               -- 文件mime
+    magic_rules    jsonb,                                              -- 文件魔数规则
+    max_size       BIGINT                      NOT NULL,               -- 最大文件大小(单位:bytes)
+    previewable    BOOLEAN                     NOT NULL DEFAULT FALSE, -- 是否允许预览
+    allowed_upload BOOLEAN                     NOT NULL DEFAULT TRUE,  -- 允许上传
+    dangerous      BOOLEAN                     NOT NULL DEFAULT FALSE, -- 是否危险类型
+    remark         TEXT,                                               -- 备注
+    created_by     UUID,                                               -- 创建人
+    created_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,               -- 创建时间
+    updated_by     UUID,                                               -- 最后更新人
+    updated_at     TIMESTAMP(6) WITH TIME ZONE NOT NULL,               -- 最后更新时间
+    deleted        TIMESTAMP(6) WITH TIME ZONE,                        -- 删除标识
+    version        BIGINT                               DEFAULT 0      -- 乐观锁
+);
+CREATE INDEX "idx_file_type_extension" ON "spectra_core"."file_type" USING GIN (extension);
+CREATE INDEX "idx_file_type_mime" ON "spectra_core"."file_type" USING GIN (mime);
+CREATE INDEX "idx_file_type_not_deleted" ON "spectra_core"."file_type" USING BTREE (deleted) WHERE (deleted IS NULL);
+COMMENT ON TABLE "spectra_core"."file_type" IS '文件-文件类型';
+COMMENT ON COLUMN "spectra_core"."file_type".id IS '主键ID';
+COMMENT ON COLUMN "spectra_core"."file_type".name IS '文件类型名称';
+COMMENT ON COLUMN "spectra_core"."file_type".extension IS '文件后缀(带.)';
+COMMENT ON COLUMN "spectra_core"."file_type".mime IS '文件mime';
+COMMENT ON COLUMN "spectra_core"."file_type".magic_rules IS '文件魔数规则';
+COMMENT ON COLUMN "spectra_core"."file_type".max_size IS '最大文件大小(单位:bytes)';
+COMMENT ON COLUMN "spectra_core"."file_type".previewable IS '是否允许预览';
+COMMENT ON COLUMN "spectra_core"."file_type".allowed_upload IS '允许上传';
+COMMENT ON COLUMN "spectra_core"."file_type".dangerous IS '是否危险类型';
+COMMENT ON COLUMN "spectra_core"."file_type".remark IS '备注';
+COMMENT ON COLUMN "spectra_core"."file_type".created_by IS '创建人';
+COMMENT ON COLUMN "spectra_core"."file_type".created_at IS '创建时间';
+COMMENT ON COLUMN "spectra_core"."file_type".updated_by IS '最后更新人';
+COMMENT ON COLUMN "spectra_core"."file_type".updated_at IS '最后更新时间';
+COMMENT ON COLUMN "spectra_core"."file_type".deleted IS '删除标识';
+COMMENT ON COLUMN "spectra_core"."file_type".version IS '乐观锁';

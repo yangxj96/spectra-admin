@@ -20,6 +20,7 @@ import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.javabean.system.entity.DictItem;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 字典(字典数据)业务层
 ///
@@ -32,5 +33,5 @@ public interface DictItemService extends BaseService<DictItem> {
     ///
     /// @param gid 字典组ID
     /// @return 字典数据列表
-    List<DictItem> listByGid(String gid);
+    List<DictItem> listByGid(UUID gid);
 }

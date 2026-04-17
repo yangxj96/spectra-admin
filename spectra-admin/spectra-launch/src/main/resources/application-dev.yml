@@ -6,3 +6,20 @@ spring:
       - classpath:application-oa-dev.yml
       - classpath:application-upload-dev.yml
       - classpath:application-workflow-dev.yml
+  # 关闭他自带的用户
+  security:
+    user:
+      name:
+      password:
+  # 缓存
+  cache:
+    type: redis
+# 健康检查
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

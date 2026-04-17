@@ -8,10 +8,9 @@
         <!--@mbg.generated-->
         <!--@Table spectra_core.file_type-->
         <result column="name"           property="name"/>
-        <result column="extension"      property="extension" typeHandler="com.devops00.spectra.common.mybatis.handler.StringArrayTypeHandler"/>
-        <result column="mime"           property="mime" typeHandler="com.devops00.spectra.common.mybatis.handler.StringArrayTypeHandler"/>
-        <result column="magic_number"   property="magicNumber"/>
-        <result column="magic_offset"   property="magicOffset"/>
+        <result column="extension"      property="extension" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
+        <result column="mime"           property="mime" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
+        <result column="magic_rules"    property="magicRules" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
         <result column="max_size"       property="maxSize"/>
         <result column="previewable"    property="previewable"/>
         <result column="allowed_upload" property="allowedUpload"/>
@@ -25,8 +24,7 @@
         name,
         extension,
         mime,
-        magic_number,
-        magic_offset,
+        magic_rules,
         max_size,
         previewable,
         allowed_upload,

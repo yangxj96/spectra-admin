@@ -36,12 +36,12 @@ public record TreeBuilder<T extends Tree<T>>(@Nullable List<T> dataList) {
     ///
     /// @param rootPid 根节点的 pid 值（例如 -1L、0L）
     /// @return 树形结构列表
-    public @Nullable List<T> buildTree(@Nullable String rootPid) {
+    public @Nullable List<T> buildTree(@Nullable UUID rootPid) {
         if (dataList == null || dataList.isEmpty()) {
             return Collections.emptyList();
         }
 
-        var nodeMap = new HashMap<String, T>();
+        var nodeMap = new HashMap<UUID, T>();
         var rootNodes = new ArrayList<T>();
 
         // 第一步：放入 map

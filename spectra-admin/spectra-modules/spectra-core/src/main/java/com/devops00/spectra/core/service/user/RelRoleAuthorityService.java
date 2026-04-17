@@ -20,6 +20,7 @@ import com.devops00.spectra.core.javabean.user.from.RoleAuthorityFrom;
 import com.devops00.spectra.core.javabean.user.vo.AuthorityVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 关联服务-用户和权限
 ///
@@ -32,22 +33,22 @@ public interface RelRoleAuthorityService {
     ///
     /// @param roleId 角色ID
     /// @param from   权限关联信息
-    void grant(String roleId, RoleAuthorityFrom from);
+    void grant(UUID roleId, RoleAuthorityFrom from);
 
     /// 撤销角色权限
     ///
     /// @param roleId 角色ID
-    void revoke(String roleId);
+    void revoke(UUID roleId);
 
     /// 获取角色权限
     ///
     /// @param roleId 角色ID
     /// @return 权限列表
-    List<AuthorityVO> get(String roleId);
+    List<AuthorityVO> get(UUID roleId);
 
     /// 获取角色权限
     ///
     /// @param ids 角色ID列表
     /// @return 权限列表,已去重
-    List<AuthorityVO> get(List<String> ids);
+    List<AuthorityVO> get(List<UUID> ids);
 }

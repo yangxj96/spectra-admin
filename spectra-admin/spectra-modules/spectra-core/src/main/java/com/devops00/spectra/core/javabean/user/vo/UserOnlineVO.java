@@ -20,13 +20,14 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.UUID;
 
 /// 在线用户VO
 @Data
 @Builder
 public class UserOnlineVO {
 
-    private String userId;
+    private UUID userId;
 
     private String username;
 

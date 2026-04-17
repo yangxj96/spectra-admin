@@ -21,6 +21,7 @@ import org.springframework.util.StopWatch;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -118,9 +119,9 @@ class SystemControllerTest {
     @Test
     void initRelRoleAuthority() {
         var p = new RoleAuthorityFrom();
-        p.setRoleId("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d");
-        p.setAuthorityIds(List.of("019bdf8f-6542-7b9b-8fc7-2eae5b1a4c94"));
-        relRoleAuthorityService.grant("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d", p);
+        p.setRoleId(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"));
+        p.setAuthorityIds(List.of(UUID.fromString("019bdf8f-6542-7b9b-8fc7-2eae5b1a4c94")));
+        relRoleAuthorityService.grant(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"), p);
     }
 
     /**
@@ -174,36 +175,36 @@ class SystemControllerTest {
     @Test
     void initRelRoleMenu() {
         var p = new RoleMenuFrom();
-        p.setRoleId("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d");
+        p.setRoleId(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"));
         p.setMenuIds(List.of(
-                "019bdfc5-b220-7bd9-80d1-1a1db193c151",
-                "019bdfc5-b31f-7020-b678-35fae63c432c",
-                "019bdfc5-b328-7de0-9e8c-2ac0cc51969e",
-                "019bdfc5-b32a-7c31-bbff-3992be5fff64",
-                "019bdfc5-b32c-74e9-90ac-0540954c4e4a",
-                "019bdfc5-b347-75c0-bcac-98ed9e44cf93",
-                "019bdfc5-b34b-7619-8f37-b052e64e4e27",
-                "019bdfc5-b34d-74fd-8ad8-f2f7976634d1",
-                "019bdfc5-b350-7168-84d6-ffaaf874b6fc",
-                "019bdfc5-b352-7d24-b5af-8d0a0042a4f9",
-                "019bdfc5-b355-701e-99f2-7012b17490de",
-                "019bdfc5-b358-7794-adf1-b5cc9a3d5883",
-                "019bdfc5-b35a-7d3d-bf74-f903a795d7cd",
-                "019bdfc5-b35c-76f0-b622-34e11d75dd27",
-                "019bdfc5-b35d-7a55-b441-38f77a88036a",
-                "019bdfc5-b35e-71a2-9b71-c5ab8900f08f",
-                "019bdfc5-b35f-74b6-abe3-3816db511129",
-                "019bdfc5-b362-70a0-8cbd-53f96e96c64c",
-                "019bdfc5-b363-750f-8cd2-010b659463a8",
-                "019bdfc5-b365-7a12-b646-3a5c922bd6f9",
-                "019bdfc5-b367-7e26-9c50-620660e13019",
-                "019bdfc5-b36a-7700-b8c3-7c251f1f79a2",
-                "019bdfc5-b36d-72df-b7a7-6c82d9199988",
-                "019bdfc5-b36f-7e70-a79d-09c5facdf296",
-                "019bdfc5-b370-70ca-a33c-25044878eeda"
+                UUID.fromString("019bdfc5-b220-7bd9-80d1-1a1db193c151"),
+                UUID.fromString("019bdfc5-b31f-7020-b678-35fae63c432c"),
+                UUID.fromString("019bdfc5-b328-7de0-9e8c-2ac0cc51969e"),
+                UUID.fromString("019bdfc5-b32a-7c31-bbff-3992be5fff64"),
+                UUID.fromString("019bdfc5-b32c-74e9-90ac-0540954c4e4a"),
+                UUID.fromString("019bdfc5-b347-75c0-bcac-98ed9e44cf93"),
+                UUID.fromString("019bdfc5-b34b-7619-8f37-b052e64e4e27"),
+                UUID.fromString("019bdfc5-b34d-74fd-8ad8-f2f7976634d1"),
+                UUID.fromString("019bdfc5-b350-7168-84d6-ffaaf874b6fc"),
+                UUID.fromString("019bdfc5-b352-7d24-b5af-8d0a0042a4f9"),
+                UUID.fromString("019bdfc5-b355-701e-99f2-7012b17490de"),
+                UUID.fromString("019bdfc5-b358-7794-adf1-b5cc9a3d5883"),
+                UUID.fromString("019bdfc5-b35a-7d3d-bf74-f903a795d7cd"),
+                UUID.fromString("019bdfc5-b35c-76f0-b622-34e11d75dd27"),
+                UUID.fromString("019bdfc5-b35d-7a55-b441-38f77a88036a"),
+                UUID.fromString("019bdfc5-b35e-71a2-9b71-c5ab8900f08f"),
+                UUID.fromString("019bdfc5-b35f-74b6-abe3-3816db511129"),
+                UUID.fromString("019bdfc5-b362-70a0-8cbd-53f96e96c64c"),
+                UUID.fromString("019bdfc5-b363-750f-8cd2-010b659463a8"),
+                UUID.fromString("019bdfc5-b365-7a12-b646-3a5c922bd6f9"),
+                UUID.fromString("019bdfc5-b367-7e26-9c50-620660e13019"),
+                UUID.fromString("019bdfc5-b36a-7700-b8c3-7c251f1f79a2"),
+                UUID.fromString("019bdfc5-b36d-72df-b7a7-6c82d9199988"),
+                UUID.fromString("019bdfc5-b36f-7e70-a79d-09c5facdf296"),
+                UUID.fromString("019bdfc5-b370-70ca-a33c-25044878eeda")
 
         ));
-        relRoleMenuService.grant("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d", p);
+        relRoleMenuService.grant(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"), p);
     }
 
     @Test
@@ -310,8 +311,8 @@ class SystemControllerTest {
         );
 
         for (DictItem op : ops) {
-            if (op.getGid().isEmpty()) {
-                System.out.println(op.toString());
+            if (op.getGid() != null) {
+                System.out.println(op);
                 throw new NullPointerException("找不到");
             }
         }
@@ -354,7 +355,7 @@ class SystemControllerTest {
         System.out.println(watch.prettyPrint());
     }
 
-    private DictItem newDictItem(String gid, String label, String value) {
+    private DictItem newDictItem(UUID gid, String label, String value) {
         var datum = new DictItem();
         datum.setGid(gid);
         datum.setLabel(label);
@@ -364,7 +365,7 @@ class SystemControllerTest {
         return datum;
     }
 
-    private DictGroup newDictGroup(String pid, String name, String code) {
+    private DictGroup newDictGroup(UUID pid, String name, String code) {
         var datum = new DictGroup();
         datum.setPid(pid);
         datum.setName(name);
@@ -373,7 +374,7 @@ class SystemControllerTest {
         return datum;
     }
 
-    private Menu newMenu(String pid, String name, String icon, String path, String component, String layout, Integer sort) {
+    private Menu newMenu(UUID pid, String name, String icon, String path, String component, String layout, Integer sort) {
         var menu = new Menu();
         menu.setPid(pid);
         menu.setName(name);
@@ -395,7 +396,7 @@ class SystemControllerTest {
         return role;
     }
 
-    private Authority newAuthority(String name, String code, String pid) {
+    private Authority newAuthority(String name, String code, UUID pid) {
         Authority auth = new Authority();
         auth.setName(name);
         auth.setCode(code);

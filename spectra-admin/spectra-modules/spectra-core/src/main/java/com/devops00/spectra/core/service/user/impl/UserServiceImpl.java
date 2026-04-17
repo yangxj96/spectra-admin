@@ -46,6 +46,7 @@ import com.devops00.spectra.core.service.user.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -53,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 /// 用户service层-实现
 ///
@@ -61,6 +63,7 @@ import java.util.List;
 /// @since 2025-6-14
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
 
     private final UserConverter userConverter;
@@ -82,19 +85,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final UserDataScopeTargetMapper dataScopeTargetMapper;
 
     private final NameFillExecutor fillExecutor;
-
-    public UserServiceImpl(UserConverter userConverter, RoleConverter roleConverter, RelUserRoleService relUserRoleService, DepartmentService departmentService, PasswordEncoder passwordEncoder, UserProperties userProperties, AccountService accountService, UserDataScopeMapper dataScopeMapper, UserDataScopeTargetMapper dataScopeTargetMapper, NameFillExecutor fillExecutor) {
-        this.userConverter = userConverter;
-        this.roleConverter = roleConverter;
-        this.relUserRoleService = relUserRoleService;
-        this.departmentService = departmentService;
-        this.passwordEncoder = passwordEncoder;
-        this.userProperties = userProperties;
-        this.accountService = accountService;
-        this.dataScopeMapper = dataScopeMapper;
-        this.dataScopeTargetMapper = dataScopeTargetMapper;
-        this.fillExecutor = fillExecutor;
-    }
 
 
     @Override
@@ -148,7 +138,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void deleteById(String uid) {
+    public void deleteById(UUID uid) {
         var user = this.getById(uid);
         if (null == user) {
             throw new DataNotExistException("用户不存在");
@@ -239,7 +229,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         roleToDelete.removeAll(targetRoles);
 
         if (!roleToDelete.isEmpty()) {
-            List<String> deleteList = List.copyOf(roleToDelete);
+            List<UUID> deleteList = List.copyOf(roleToDelete);
             try {
                 relUserRoleService.revoke(entity.getId(), deleteList);
             } catch (Exception e) {
@@ -253,7 +243,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         roleToInsert.removeAll(currentRoles);
 
         if (!roleToInsert.isEmpty()) {
-            List<String> insertList = List.copyOf(roleToInsert);
+            List<UUID> insertList = List.copyOf(roleToInsert);
             try {
                 relUserRoleService.grant(entity.getId(), insertList);
             } catch (Exception e) {
@@ -265,7 +255,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void passwordResetById(String uid) {
+    public void passwordResetById(UUID uid) {
         try {
             var user = this.getById(uid);
             Account account = accountService.getDefaultByUserId(user.getId());
@@ -283,8 +273,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var wrapper = new LambdaQueryWrapper<User>()
                 .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                .in(StrUtils.isNotBlank(
-                                params.getDepartmentId()),
+                .in(params.getDepartmentId() != null,
                         User::getDepartmentId,
                         departmentService.getSelfAndDescendantIds(params.getDepartmentId())
                 )

@@ -20,6 +20,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /// 用户分页查询入参
 ///
 /// @author Jack Young
@@ -40,5 +42,5 @@ public class UserPageFrom {
     private Boolean status;
 
     /// 组织机构ID
-    private String departmentId;
+    private UUID departmentId;
 }

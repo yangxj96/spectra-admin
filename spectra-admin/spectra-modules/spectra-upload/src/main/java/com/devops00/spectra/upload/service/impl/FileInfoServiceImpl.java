@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 /// 文件信息服务默认实现
 ///
 /// @author Jack Young
@@ -27,7 +29,7 @@ public class FileInfoServiceImpl extends BaseServiceImpl<FileInfoMapper, FileInf
 
     @Override
     @Transactional
-    public void incrRefCount(String id) {
+    public void incrRefCount(UUID id) {
         FileInfo info = this.getById(id);
         info.setRefCount(info.getRefCount() + 1);
         this.updateById(info);

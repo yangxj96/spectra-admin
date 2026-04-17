@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /// 用户名密码登录
 ///
@@ -119,7 +120,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
                             .toList()
             );
 
-            List<String> roleIds = roles.stream()
+            List<UUID> roleIds = roles.stream()
                     .map(Role::getId)
                     .toList();
 
@@ -147,7 +148,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     /// @param userId 用户 ID
     /// @return 角色列表,无角色则返回空数组
     ///
-    public List<Object> getUserRole(String userId) {
+    public List<Object> getUserRole(UUID userId) {
         var roles = relUserRoleService.getRoles(userId);
         return roles == null
                 ? Collections.emptyList()
@@ -160,7 +161,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     /// @param roles 角色 ID 列表
     /// @return 权限列表
     ///
-    public List<Object> getUserAuthority(List<String> roles) {
+    public List<Object> getUserAuthority(List<UUID> roles) {
         if (roles.isEmpty()) {
             return Collections.emptyList();
         }

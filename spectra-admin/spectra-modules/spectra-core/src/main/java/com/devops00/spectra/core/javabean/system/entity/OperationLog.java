@@ -18,6 +18,7 @@ package com.devops00.spectra.core.javabean.system.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.core.configure.ulog.enums.SysLogType;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Map;
 
 /// 菜单表
 ///
@@ -37,7 +39,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_log")
+@TableName(value = "sys_log", autoResultMap = true)
 public class OperationLog extends BaseEntity implements Serializable {
 
     @Serial
@@ -72,8 +74,8 @@ public class OperationLog extends BaseEntity implements Serializable {
     private String args;
 
     /// 请求响应
-    @TableField(value = "result")
-    private String result;
+    @TableField(value = "result", typeHandler = Jackson3TypeHandler.class)
+    private Map<String, Object> result;
 
     /// 耗时
     @TableField(value = "time_cost")

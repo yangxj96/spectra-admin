@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 用户数据范围(自定义数据范围的时候使用)
 ///
@@ -25,7 +26,7 @@ public class UserDataScopeTarget extends BaseEntity implements Serializable {
 
     /// 用户ID
     @TableField(value = "user_id")
-    private String userId;
+    private UUID userId;
 
     /// 目标ID
     @TableField(value = "target_id")

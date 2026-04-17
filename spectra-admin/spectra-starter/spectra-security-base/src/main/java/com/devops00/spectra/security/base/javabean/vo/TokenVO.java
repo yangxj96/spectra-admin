@@ -24,6 +24,7 @@ import tools.jackson.databind.ser.std.ToStringSerializer;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /// 登录认证token响应
 ///
@@ -45,7 +46,7 @@ public class TokenVO implements Serializable {
 
     /// 用户ID
     @JsonSerialize(using = ToStringSerializer.class)
-    private String id;
+    private UUID id;
 
     /// 用户名
     private String username;

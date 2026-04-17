@@ -8,6 +8,7 @@ import com.devops00.spectra.common.constant.RegionLevel;
 import lombok.*;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /// GB/T 2260的行政区域数据表
 ///
@@ -44,7 +45,7 @@ public class Region extends BaseEntity implements Serializable {
 
     /// 上级ID
     @TableField(value = "pid")
-    private String pid;
+    private UUID pid;
 
     /// 行政区划层级:1省 2地级市 3县级 4乡级 5村级
     @TableField(value = "level")

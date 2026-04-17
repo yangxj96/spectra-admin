@@ -27,6 +27,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 /// 用户新增/编辑操作入参
 ///
@@ -41,7 +42,7 @@ public class UserSaveFrom {
     /// 主键ID
     @Null(message = "新增用户时不能存在 ID", groups = Verify.Insert.class)
     @NotNull(message = "用户 ID 不能为空", groups = Verify.Update.class)
-    private String id;
+    private UUID id;
 
     /// 姓名
     private String username;
@@ -85,7 +86,7 @@ public class UserSaveFrom {
 
     /// 角色ID列表
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
-    private List<String> roleIds;
+    private List<UUID> roleIds;
 
     /// 数据范围
     private Integer dataScope;

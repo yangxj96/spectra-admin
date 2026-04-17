@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 /// 权限树形VO
 ///
@@ -39,10 +40,10 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 权限ID
-    private String id;
+    private UUID id;
 
     /// 权限父级ID
-    private String pid;
+    private UUID pid;
 
     /// 权限说明
     private String name;

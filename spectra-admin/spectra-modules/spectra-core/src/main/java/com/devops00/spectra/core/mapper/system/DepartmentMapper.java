@@ -21,6 +21,8 @@ import com.devops00.spectra.core.javabean.system.entity.Department;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.UUID;
+
 
 /// 组织机构Mapper
 ///
@@ -35,5 +37,5 @@ public interface DepartmentMapper extends BaseMapper<Department> {
     ///
     /// @param id 组织机构ID
     /// @return 组织机构路径
-    String generatePath(@Param("id") String id);
+    String generatePath(@Param("id") UUID id);
 }

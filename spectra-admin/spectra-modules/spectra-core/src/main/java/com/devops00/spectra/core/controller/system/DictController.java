@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 字典控制器
 ///
@@ -65,7 +66,7 @@ public class DictController {
     @DeleteMapping("/group/{id}")
     @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
     public void deleteGroup(@PathVariable String id) {
-        bindService.deleteGroup(id);
+        bindService.deleteGroup(UUID.fromString(id));
     }
 
     /**

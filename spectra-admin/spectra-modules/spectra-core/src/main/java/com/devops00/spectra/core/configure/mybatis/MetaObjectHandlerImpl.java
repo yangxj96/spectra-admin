@@ -20,6 +20,7 @@ package com.devops00.spectra.core.configure.mybatis;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.holder.SecUtil;
+import com.github.f4b6a3.uuid.UuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 
@@ -33,6 +34,8 @@ import java.time.Instant;
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
+    /// 主键ID
+    private static final String ID = "id";
     /// 创建人
     private static final String CREATED_BY = "createdBy";
 
@@ -49,7 +52,9 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         log.debug(LogPrefix.PERSISTENCE.f("insertFill"));
-
+        if (getFieldValByName(ID, metaObject) == null) {
+            setFieldValByName(ID, UuidCreator.getTimeOrderedEpoch(), metaObject);
+        }
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
             setFieldValByName(CREATED_BY, SecUtil.getCurrentUserId(), metaObject);
         }

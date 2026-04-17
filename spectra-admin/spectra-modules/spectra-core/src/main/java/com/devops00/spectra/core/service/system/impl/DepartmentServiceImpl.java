@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 /// @since 2025-6-15
 @Service
 @CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
-public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<String> {
+public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<UUID> {
 
     private final OrganizationConverter organizationConverter;
 
@@ -62,7 +62,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     @Cacheable
-    public Map<String, String> getNameMap(Set<String> ids) {
+    public Map<UUID, String> getNameMap(Set<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -100,7 +100,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     }
 
     @Override
-    public String generatePath(String id) {
+    public String generatePath(UUID id) {
         return baseMapper.generatePath(id);
     }
 
@@ -117,7 +117,7 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     @Cacheable
-    public Collection<String> getSelfAndDescendantIds(String departmentId) {
+    public Collection<UUID> getSelfAndDescendantIds(UUID departmentId) {
         if (departmentId == null) {
             return Collections.emptySet();
         }
@@ -133,10 +133,10 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
         }
 
         // 构建 parentId -> childrenIds 映射
-        Map<String, List<String>> childrenMap = buildChildrenMap(allDepartments);
+        Map<UUID, List<UUID>> childrenMap = buildChildrenMap(allDepartments);
 
         // DFS 递归获取结果
-        Set<String> result = new HashSet<>();
+        Set<UUID> result = new HashSet<>();
         dfs(departmentId, childrenMap, result);
 
         return result;
@@ -144,18 +144,18 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
 
     @Override
     @Cacheable
-    public Collection<String> getDescendantIds(String departmentId) {
-        Collection<String> all = getSelfAndDescendantIds(departmentId);
+    public Collection<UUID> getDescendantIds(UUID departmentId) {
+        Collection<UUID> all = getSelfAndDescendantIds(departmentId);
         all.remove(departmentId);
         return all;
     }
 
     /// 构建 parentId -> childrenId 列表
-    private @NonNull Map<String, List<String>> buildChildrenMap(@NonNull List<Department> list) {
-        Map<String, List<String>> map = new HashMap<>();
+    private @NonNull Map<UUID, List<UUID>> buildChildrenMap(@NonNull List<Department> list) {
+        Map<UUID, List<UUID>> map = new HashMap<>();
 
         for (Department dept : list) {
-            String parentId = dept.getPid();
+            UUID parentId = dept.getPid();
             map.computeIfAbsent(parentId, _ -> new ArrayList<>())
                     .add(dept.getId());
         }
@@ -168,19 +168,19 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     /// @param currentId   当前节点ID
     /// @param childrenMap 子节点map
     /// @param result      响应结果
-    private void dfs(String currentId, Map<String, List<String>> childrenMap, @NonNull Set<String> result) {
+    private void dfs(UUID currentId, Map<UUID, List<UUID>> childrenMap, @NonNull Set<UUID> result) {
 
         // 已访问过，直接返回（防止环）
         if (!result.add(currentId)) {
             return;
         }
 
-        List<String> children = childrenMap.get(currentId);
+        List<UUID> children = childrenMap.get(currentId);
         if (children == null || children.isEmpty()) {
             return;
         }
 
-        for (String childId : children) {
+        for (UUID childId : children) {
             dfs(childId, childrenMap, result);
         }
     }

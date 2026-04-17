@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /// 权限service层-实现
 ///
@@ -51,7 +52,7 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
 
 
     @Override
-    public List<Authority> getByRelRoleId(String id) {
+    public List<Authority> getByRelRoleId(UUID id) {
         List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.getByRoleId(id);
         if (relRoleAuthorities.isEmpty()) {
             return Collections.emptyList();

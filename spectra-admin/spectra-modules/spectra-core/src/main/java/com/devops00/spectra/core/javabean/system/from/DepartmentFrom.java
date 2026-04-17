@@ -23,6 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 /// 组织机构入参
 ///
 /// @author Jack Young
@@ -35,10 +37,10 @@ public class DepartmentFrom {
 
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
-    private String id;
+    private UUID id;
 
     /// 上级ID
-    private String pid;
+    private UUID pid;
 
     /// 名称
     private String name;
@@ -51,7 +53,7 @@ public class DepartmentFrom {
     private Short type;
 
     /// 行政区划ID
-    private String regionId;
+    private UUID regionId;
 
     /// 备注
     private String remark;

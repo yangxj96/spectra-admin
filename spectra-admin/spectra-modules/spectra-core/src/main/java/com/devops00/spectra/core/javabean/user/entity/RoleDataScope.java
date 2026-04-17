@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 角色数据范围
 ///
@@ -25,7 +26,7 @@ public class RoleDataScope extends BaseEntity implements Serializable {
 
     /// 角色ID
     @TableField(value = "role_id")
-    private String roleId;
+    private UUID roleId;
 
     /// 数据范围类型
     @TableField(value = "scope_type")

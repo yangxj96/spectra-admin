@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /// 关联服务-角色和菜单
@@ -56,7 +57,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     @Override
     @Transactional
-    public void grant(String roleId, RoleMenuFrom from) {
+    public void grant(UUID roleId, RoleMenuFrom from) {
         // 当前角色关联的菜单信息
         var currentIds = relRoleMenuMapper.getByRoleId(roleId)
                 .stream()
@@ -91,14 +92,14 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     @Override
     @Transactional
-    public void revoke(String roleId) {
+    public void revoke(UUID roleId) {
         // 删除角色关联的菜单
         var wrapper = new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, roleId);
         relRoleMenuMapper.delete(wrapper);
     }
 
     @Override
-    public List<MenuVO> get(String roleId) {
+    public List<MenuVO> get(UUID roleId) {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
         return menuConverter.toVOList(menus);
     }

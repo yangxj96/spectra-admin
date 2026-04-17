@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 字典数据VO
 ///
@@ -37,10 +38,10 @@ public class DictItemVO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 数据id.
-    private String id;
+    private UUID id;
 
     /// 字典类型ID
-    private String gid;
+    private UUID gid;
 
     /// 标签
     private String label;

@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 /// 基础实体类
 ///
@@ -39,12 +40,12 @@ public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 数据id
-    @TableId(value = "id", type = IdType.ASSIGN_UUID)
-    private String id;
+    @TableId(value = "id", type = IdType.INPUT)
+    private UUID id;
 
     /// 创建人
     @TableField(value = "created_by", fill = FieldFill.INSERT)
-    private String createdBy;
+    private UUID createdBy;
 
     /// 创建时间
     @TableField(value = "created_at", fill = FieldFill.INSERT)
@@ -52,7 +53,7 @@ public class BaseEntity implements Serializable {
 
     /// 更新人
     @TableField(value = "updated_by", fill = FieldFill.INSERT_UPDATE)
-    private String updatedBy;
+    private UUID updatedBy;
 
     /// 更新时间
     @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)

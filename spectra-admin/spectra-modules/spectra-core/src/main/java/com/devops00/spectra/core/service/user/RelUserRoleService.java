@@ -20,6 +20,7 @@ import com.devops00.spectra.core.javabean.user.entity.RelUserRole;
 import com.devops00.spectra.core.javabean.user.entity.Role;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 关联服务-用户和角色
 ///
@@ -32,29 +33,29 @@ public interface RelUserRoleService {
     ///
     /// @param userId  用户ID
     /// @param roleIds 角色ID列表
-    void grant(String userId, List<String> roleIds);
+    void grant(UUID userId, List<UUID> roleIds);
 
     /// 撤销用户角色(全部)
     ///
     /// @param userId 用户ID
-    void revoke(String userId);
+    void revoke(UUID userId);
 
     /// 撤销用户角色(指定的角色)
     ///
     /// @param userId  用户ID
     /// @param roleIds 需要撤销的角色列表
-    void revoke(String userId, List<String> roleIds);
+    void revoke(UUID userId, List<UUID> roleIds);
 
     /// 根据角色ID获取关联关系
     ///
     /// @param roleId 角色ID
     /// @return 这个角色有的关联关系
-    List<RelUserRole> getRelByRoleId(String roleId);
+    List<RelUserRole> getRelByRoleId(UUID roleId);
 
     /// 获取用户角色
     ///
     /// @param userId 角色ID
     /// @return 用户角色列表
-    List<Role> getRoles(String userId);
+    List<Role> getRoles(UUID userId);
 
 }

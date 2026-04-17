@@ -19,6 +19,8 @@ package com.devops00.spectra.common.constant;
 
 import org.jspecify.annotations.Nullable;
 
+import java.util.UUID;
+
 /// 通用常量
 ///
 /// @author Jack Young
@@ -28,7 +30,7 @@ public final class Common {
 
     /// 默认的PID
     @Nullable
-    public static final String PID = null;
+    public static final UUID PID = null;
 
     private Common() {
     }

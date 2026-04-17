@@ -2,6 +2,7 @@ package com.devops00.spectra.common.assembler;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 /// 名称查询抽象接口
 ///
@@ -30,7 +31,7 @@ public interface NameLookup<ID> {
     /// @return ID 的 Class 类型
     default Class<ID> idType() {
         @SuppressWarnings("unchecked")
-        Class<ID> type = (Class<ID>) String.class;
+        Class<ID> type = (Class<ID>) UUID.class;
         return type;
     }
 

@@ -8,6 +8,7 @@ import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// Token存储相关
 ///
@@ -42,7 +43,7 @@ public interface SecHolderStrategy {
     /// 根据用户id删除他的所有登录信息
     ///
     /// @param userId 用户ID
-    void deleteByUserId(String userId);
+    void deleteByUserId(UUID userId);
 
     /// 根据用户id删除指定客户端类型的登录信息
     ///
@@ -72,7 +73,7 @@ public interface SecHolderStrategy {
     /// 获取当前用户 ID
     ///
     /// @return 当前用户 ID, 可能为null
-    @Nullable String getCurrentUserId();
+    @Nullable UUID getCurrentUserId();
 
     /// 获取当前用户时区ID
     ///

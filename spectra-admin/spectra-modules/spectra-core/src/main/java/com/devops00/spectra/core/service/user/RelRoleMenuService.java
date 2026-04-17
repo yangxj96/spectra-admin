@@ -20,6 +20,7 @@ import com.devops00.spectra.core.javabean.system.vo.MenuVO;
 import com.devops00.spectra.core.javabean.user.from.RoleMenuFrom;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 关联服务-角色和菜单
 ///
@@ -32,17 +33,17 @@ public interface RelRoleMenuService {
     ///
     /// @param roleId 角色ID
     /// @param from   角色关联菜单信息
-    void grant(String roleId, RoleMenuFrom from);
+    void grant(UUID roleId, RoleMenuFrom from);
 
     /// 撤销角色菜单
     ///
     /// @param roleId 角色ID
-    void revoke(String roleId);
+    void revoke(UUID roleId);
 
     /// 获取角色菜单
     ///
     /// @param roleId 角色ID
     /// @return 菜单列表
-    List<MenuVO> get(String roleId);
+    List<MenuVO> get(UUID roleId);
 
 }

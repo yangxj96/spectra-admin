@@ -84,14 +84,6 @@ spring:
           max-active: 20
           max-wait: 5000ms
         shutdown-timeout: 100ms
-  # 关闭他自带的用户
-  security:
-    user:
-      name:
-      password:
-  # 缓存
-  cache:
-    type: redis
 # mybatis plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -122,12 +114,3 @@ logging:
     root: info
     other: error
     spectra: debug
-# 健康检查
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health, info, metrics
-  endpoint:
-    health:
-      show-details: when-authorized

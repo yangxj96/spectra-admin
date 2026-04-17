@@ -16,10 +16,12 @@
 
 package com.devops00.spectra.core.javabean.user.event;
 
+import java.util.UUID;
+
 /// 角色删除事件
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025-11-11
-public record RoleDeletedEvent(String roleId) {
+public record RoleDeletedEvent(UUID roleId) {
 }

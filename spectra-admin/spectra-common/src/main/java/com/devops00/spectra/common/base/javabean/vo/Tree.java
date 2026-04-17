@@ -20,6 +20,7 @@ package com.devops00.spectra.common.base.javabean.vo;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 所有树形结构 VO 的通用接口
 ///
@@ -30,17 +31,17 @@ import java.util.List;
 public interface Tree<T> {
 
     /// 获取ID
-    String getId();
+    UUID getId();
 
     /// 设置ID
-    void setId(String id);
+    void setId(UUID id);
 
     /// 获取父级ID
     @Nullable
-    String getPid();
+    UUID getPid();
 
     /// 设置父级ID
-    void setPid(@Nullable String pid);
+    void setPid(@Nullable UUID pid);
 
     /// 获取下级
     @Nullable

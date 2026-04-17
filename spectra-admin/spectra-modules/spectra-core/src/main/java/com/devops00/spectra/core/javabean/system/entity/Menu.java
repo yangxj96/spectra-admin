@@ -24,12 +24,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import tools.jackson.databind.annotation.JsonSerialize;
-import tools.jackson.databind.ser.std.ToStringSerializer;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Map;
+import java.util.UUID;
 
 /// 菜单表
 ///
@@ -47,9 +46,8 @@ public class Menu extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 父级ID
-    @JsonSerialize(using = ToStringSerializer.class)
     @TableField(value = "pid")
-    private String pid;
+    private UUID pid;
 
     /// 图标
     @TableField(value = "icon")

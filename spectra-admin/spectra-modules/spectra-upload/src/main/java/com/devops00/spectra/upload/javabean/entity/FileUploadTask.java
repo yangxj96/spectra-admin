@@ -7,6 +7,8 @@ import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import lombok.*;
 
+import java.util.UUID;
+
 /// 文件上传-上传任务表
 ///
 /// @author Jack Young
@@ -54,6 +56,6 @@ public class FileUploadTask extends BaseEntity {
 
     /// 关联文件ID（上传完成后生成）
     @TableField(value = "file_id")
-    private String fileId;
+    private UUID fileId;
 
 }

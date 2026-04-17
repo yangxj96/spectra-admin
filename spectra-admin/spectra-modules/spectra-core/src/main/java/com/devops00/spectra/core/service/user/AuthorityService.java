@@ -22,6 +22,7 @@ import com.devops00.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 权限service层
 ///
@@ -34,7 +35,7 @@ public interface AuthorityService extends BaseService<Authority> {
     ///
     /// @param id 角色ID
     /// @return 关联的权限
-    List<Authority> getByRelRoleId(String id);
+    List<Authority> getByRelRoleId(UUID id);
 
     /// 获取权限树
     ///

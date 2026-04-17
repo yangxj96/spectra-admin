@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 角色响应VO
 ///
@@ -36,7 +37,7 @@ public class RoleVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    private UUID id;
 
     /// 名称
     private String name;

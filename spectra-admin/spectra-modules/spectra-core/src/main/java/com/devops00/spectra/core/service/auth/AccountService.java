@@ -6,6 +6,8 @@ import com.devops00.spectra.core.javabean.auth.entity.Account;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.UUID;
+
 /// 账号服务
 ///
 /// @author Jack Young
@@ -24,10 +26,10 @@ public interface AccountService extends BaseService<Account> {
     ///
     /// @param userId 用户ID
     /// @return 账号信息
-    Account getDefaultByUserId(String userId);
+    Account getDefaultByUserId(UUID userId);
 
     /// 根据用户ID删除用户的所有登录方式
     ///
     /// @param userId 用户ID
-    void deleteByUserId(String userId);
+    void deleteByUserId(UUID userId);
 }

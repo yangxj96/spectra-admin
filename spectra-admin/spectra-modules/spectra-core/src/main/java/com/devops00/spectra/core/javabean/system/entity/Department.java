@@ -28,6 +28,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 ///
 /// 组织机构
@@ -49,7 +50,7 @@ public class Department extends BaseEntity implements Serializable {
     /// 上级ID
     @Nullable
     @TableField(value = "pid")
-    private String pid;
+    private UUID pid;
 
     /// 名称
     @TableField(value = "name")
@@ -68,7 +69,7 @@ public class Department extends BaseEntity implements Serializable {
 
     /// 行政区划ID
     @TableField("region_id")
-    private String regionId;
+    private UUID regionId;
 
     /// 构建路径
     /// > 格式:比如总部/二级/三级/部门

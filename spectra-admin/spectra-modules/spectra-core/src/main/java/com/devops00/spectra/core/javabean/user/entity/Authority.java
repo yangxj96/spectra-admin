@@ -23,6 +23,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 权限表
 ///
@@ -42,7 +43,7 @@ public class Authority extends BaseEntity implements Serializable {
 
     /// 父级ID,用于构建树形结构
     @TableField(value = "pid")
-    private String pid;
+    private UUID pid;
 
     /// 权限名称
     @TableField(value = "name")

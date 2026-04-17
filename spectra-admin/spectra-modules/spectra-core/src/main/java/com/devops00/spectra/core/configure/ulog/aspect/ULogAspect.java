@@ -35,7 +35,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.core.NamedThreadLocal;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import tools.jackson.databind.ObjectMapper;
 
 /// ULog注解AOP切面
 ///
@@ -51,9 +50,6 @@ public class ULogAspect {
 
     @Resource
     private ULogEventPublisher publisher;
-
-    @Resource
-    private ObjectMapper om;
 
     /// 请求前
     @Before("@annotation(annotation)")
@@ -103,7 +99,7 @@ public class ULogAspect {
             datum.setMethod(request.getMethod());
             datum.setUrl(request.getRequestURI());
             datum.setStatus(getHttpResponseStatus(response));
-            datum.setResult(safeWriteValueAsString(jsonResult));
+            datum.setResult(jsonResult);
             datum.setTimeCost(System.currentTimeMillis() - TIME_THREADLOCAL.get());
             // 尝试获取当前用户,不要让mybatis plus去获取,因为要用异步处理,获取不到上下文
             datum.setCurrentId(SecUtil.getCurrentUserId());
@@ -115,24 +111,6 @@ public class ULogAspect {
             TIME_THREADLOCAL.remove();
         }
         log.debug(LogPrefix.LOG.f("操作日志-记录结束"));
-    }
-
-
-    /// 安全序列化
-    ///
-    /// @param obj 对象
-    /// @return null或者字符串
-    private @Nullable String safeWriteValueAsString(@Nullable Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        try {
-            return om.writeValueAsString(obj);
-        } catch (Exception e) {
-            log.error("{}JSON 序列化失败: {}", LogPrefix.LOG.p(), obj.getClass(), e);
-
-            return null;
-        }
     }
 
     /// 获取状态码,如果失败则返回未知

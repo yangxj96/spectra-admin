@@ -37,6 +37,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 角色操作
 ///
@@ -72,7 +73,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
     public void delete(@PathVariable String id) {
         try {
-            bindService.delete(id);
+            bindService.delete(UUID.fromString(id));
         } catch (NumberFormatException e) {
             log.error("ID转换异常", e);
         }
@@ -105,7 +106,7 @@ public class RoleController {
     @GetMapping("/{roleId}/authority")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
         try {
-            return relRoleAuthorityService.get(roleId);
+            return relRoleAuthorityService.get(UUID.fromString(roleId));
         } catch (Exception e) {
             log.error("{}获取角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -116,7 +117,7 @@ public class RoleController {
     @GetMapping("/{roleId}/menu")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
         try {
-            return relRoleMenuService.get(roleId);
+            return relRoleMenuService.get(UUID.fromString(roleId));
         } catch (Exception e) {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -128,7 +129,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
-            relRoleAuthorityService.grant(roleId, from);
+            relRoleAuthorityService.grant(UUID.fromString(roleId), from);
         } catch (Exception e) {
             log.error("{}保存角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -140,7 +141,7 @@ public class RoleController {
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
-            relRoleMenuService.grant(roleId, from);
+            relRoleMenuService.grant(UUID.fromString(roleId), from);
         } catch (Exception e) {
             log.error("{}保存角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");

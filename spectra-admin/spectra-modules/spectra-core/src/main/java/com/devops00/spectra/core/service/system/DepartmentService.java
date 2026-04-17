@@ -24,6 +24,7 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 /// 组织机构业务层
 ///
@@ -51,7 +52,7 @@ public interface DepartmentService extends IService<Department> {
     ///
     /// @param id 组织机构ID
     /// @return 组织机构路径
-    String generatePath(String id);
+    String generatePath(UUID id);
 
     /// 组织机构树形结构
     ///
@@ -61,11 +62,11 @@ public interface DepartmentService extends IService<Department> {
     /// 获取自己包含下级的节点的ID
     ///
     /// @return id列表
-    Collection<String> getSelfAndDescendantIds(String departmentId);
+    Collection<UUID> getSelfAndDescendantIds(UUID departmentId);
 
     /// 获取所有下级部门 ID（不包含自己）
     ///
     /// @return id列表
-    Collection<String> getDescendantIds(String departmentId);
+    Collection<UUID> getDescendantIds(UUID departmentId);
 
 }

@@ -3,8 +3,9 @@ package com.devops00.spectra.upload.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
-import com.devops00.spectra.common.mybatis.handler.StringArrayTypeHandler;
+import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -27,20 +28,16 @@ public class FileType extends BaseEntity {
     private String name;
 
     /// 文件后缀（.jpg .png 等）
-    @TableField(value = "extension", typeHandler = StringArrayTypeHandler.class)
+    @TableField(value = "extension", typeHandler = Jackson3TypeHandler.class)
     private List<String> extension;
 
     /// MIME 类型
-    @TableField(value = "mime", typeHandler = StringArrayTypeHandler.class)
+    @TableField(value = "mime", typeHandler = Jackson3TypeHandler.class)
     private List<String> mime;
 
     /// 文件魔数
-    @TableField("magic_number")
-    private byte[] magicNumber;
-
-    /// 魔数偏移
-    @TableField("magic_offset")
-    private Integer magicOffset;
+    @TableField(value = "magic_rules", typeHandler = Jackson3TypeHandler.class)
+    private List<MagicRule> magicRules;
 
     /// 最大文件大小（bytes）
     @TableField("max_size")

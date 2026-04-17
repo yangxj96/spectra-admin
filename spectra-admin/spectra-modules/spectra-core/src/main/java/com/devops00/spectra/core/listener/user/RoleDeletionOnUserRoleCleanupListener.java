@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.Collections;
+import java.util.UUID;
 
 /// 角色删除事件
 /// >用户-角色关联处理
@@ -65,7 +66,7 @@ public class RoleDeletionOnUserRoleCleanupListener {
         // 获取哪些用户有这个角色
         var userIds = relUserRoles.stream().map(RelUserRole::getUserId).distinct().toList();
         // 循环查询这个用户的角色进行处理
-        for (String userId : userIds) {
+        for (UUID userId : userIds) {
             var roles = relUserRoleService.getRoles(userId);
             // 他只有一个角色的情况,取消了关联就要给他一个默认保底
             if (roles.size() <= 1) {

@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 /// 账号表
 ///
@@ -27,7 +28,7 @@ public class Account extends BaseEntity implements Serializable {
 
     /// 用户 ID
     @TableField(value = "user_id")
-    private String userId;
+    private UUID userId;
 
     /// 登录类型
     @TableField(value = "type")

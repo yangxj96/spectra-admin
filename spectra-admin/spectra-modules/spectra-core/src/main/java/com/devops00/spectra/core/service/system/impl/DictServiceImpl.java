@@ -39,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 /// 字典操作业务层实现
 ///
@@ -74,7 +75,7 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void deleteGroup(String id) {
+    public void deleteGroup(UUID id) {
         var group = groupService.getById(id);
         if (null == group) {
             throw new DataNotExistException("字典组不存在");

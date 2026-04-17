@@ -36,6 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 /// 菜单service层-实现
 ///
@@ -86,7 +87,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     }
 
     @Override
-    public List<Menu> getByRelRoleId(String id) {
+    public List<Menu> getByRelRoleId(UUID id) {
         var relRoleMenus = roleMenuMapper.getByRoleId(id);
         if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();

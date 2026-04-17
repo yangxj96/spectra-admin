@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.upload.strategy.impl;
 
-import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /// 文件类型验证策略-根据文件魔数验证
@@ -35,50 +34,9 @@ import java.util.List;
 @Slf4j
 public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
 
-    private final List<FileType> allowedTypes = new ArrayList<>();
+    private static final int DEFAULT_HEADER_SIZE = 32;
 
-    /// 判断两个字节数组前 n 字节是否相等
-    ///
-    /// @param fileHeader 文件头字节
-    /// @param magic      文件类型的魔数字节
-    /// @return 是否相等
-    public static boolean matches(byte[] fileHeader, byte[] magic) {
-        log.debug(LogPrefix.STORAGE.f("文件魔数验证"));
-        if ((fileHeader.length == 0 || magic.length == 0) || fileHeader.length < magic.length) {
-            return false;
-        }
-        for (int i = 0; i < magic.length; i++) {
-            if (fileHeader[i] != magic[i]) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /// 从 MultipartFile 读取指定长度的文件头
-    ///
-    /// @param file 需要读取的文件
-    /// @return 读取到的头部长度
-    public static byte[] readHeader(MultipartFile file) throws IOException {
-        return file.getBytes();
-        //var length = Arrays.stream(FileType.values())
-        //        .mapToInt(t -> t.getMagicNumber().length)
-        //        .max()
-        //        .orElse(0);
-        //
-        //if (length <= 0) {
-        //    throw new FileTypeException("不允许的文件类型");
-        //}
-        //
-        //try (var is = new ByteArrayInputStream(file.getBytes())) {
-        //    var header = new byte[length];
-        //    var bytesRead = is.read(header);
-        //    if (bytesRead < 1) {
-        //        throw new IOException("空文件");
-        //    }
-        //    return header;
-        //}
-    }
+    private final List<FileType> allowedTypes = List.of();
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) throws IOException {
@@ -86,15 +44,87 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
             return false;
         }
 
-        var fileHeader = readHeader(file);
+        byte[] header = readHeader(file, DEFAULT_HEADER_SIZE);
 
-        for (var type : allowedTypes) {
-            var magic = type.getMagicNumber();
-            if (matches(fileHeader, magic)) {
+        for (FileType type : allowedTypes) {
+            if (matchType(header, type)) {
                 return true;
             }
         }
+
         return false;
     }
 
+    /**
+     * 判断某个 FileType 是否匹配
+     */
+    private boolean matchType(byte[] header, FileType type) {
+        var rules = type.getMagicRules();
+        if (rules == null || rules.isEmpty()) {
+            return false;
+        }
+
+        for (MagicRule rule : rules) {
+            if (matchRule(header, rule)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * 单条规则匹配
+     */
+    private boolean matchRule(byte[] header, MagicRule rule) {
+        byte[] magic = getCompiled(rule);
+        int offset = rule.getOffset() == null ? 0 : rule.getOffset();
+
+        if (header.length < offset + magic.length) {
+            return false;
+        }
+
+        for (int i = 0; i < magic.length; i++) {
+            if (header[offset + i] != magic[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * 读取文件头（只读前 N 字节）
+     */
+    private byte[] readHeader(MultipartFile file, int maxLen) throws IOException {
+        try (var is = file.getInputStream()) {
+            return is.readNBytes(maxLen);
+        }
+    }
+
+    /**
+     * 编译 hex → byte[]（带缓存）
+     */
+    private byte[] getCompiled(MagicRule rule) {
+        if (rule.getCompiled() == null) {
+            rule.setCompiled(hexToBytes(rule.getBytes()));
+        }
+        return rule.getCompiled();
+    }
+
+    /**
+     * hex 字符串转 byte[]
+     */
+    private byte[] hexToBytes(String hex) {
+        int len = hex.length();
+        byte[] data = new byte[len / 2];
+
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) (
+                    (Character.digit(hex.charAt(i), 16) << 4)
+                            + Character.digit(hex.charAt(i + 1), 16)
+            );
+        }
+        return data;
+    }
 }

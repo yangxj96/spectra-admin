@@ -26,6 +26,7 @@ import com.devops00.spectra.core.javabean.user.vo.UserPageVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 用户service层
 ///
@@ -54,12 +55,12 @@ public interface UserService extends BaseService<User> {
     /// 根据用户ID删除用户信息
     ///
     /// @param uid 用户ID
-    void deleteById(String uid);
+    void deleteById(UUID uid);
 
     /// 重置用户密码
     ///
     /// @param uid 用户ID
-    void passwordResetById(String uid);
+    void passwordResetById(UUID uid);
 
     /// 分页获取在线用户
     ///

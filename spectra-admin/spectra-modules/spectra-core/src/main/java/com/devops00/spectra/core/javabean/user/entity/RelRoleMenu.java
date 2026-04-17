@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.UUID;
 
 /// 角色关联菜单中间表
 ///
@@ -43,11 +44,11 @@ public class RelRoleMenu extends BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /// 角色ID
-    @TableField("role_id")
-    private String roleId;
+    @TableField(value = "role_id")
+    private UUID roleId;
 
     /// 菜单ID
-    @TableField("menu_id")
-    private String menuId;
+    @TableField(value = "menu_id")
+    private UUID menuId;
 
 }

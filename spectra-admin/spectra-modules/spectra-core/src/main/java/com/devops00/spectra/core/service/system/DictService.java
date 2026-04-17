@@ -24,6 +24,7 @@ import com.devops00.spectra.core.javabean.system.vo.DictItemVO;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 字典操作业务层
 ///
@@ -40,7 +41,7 @@ public interface DictService {
     /// 根据ID删除字典组
     ///
     /// @param id 字典组主键ID
-    void deleteGroup(String id);
+    void deleteGroup(UUID id);
 
     /// 修改字典组
     ///

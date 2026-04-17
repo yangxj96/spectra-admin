@@ -34,7 +34,7 @@ class UserControllerTest {
         from.setCountry("China");
         from.setCity("Kunming");
         from.setOrganizationId(UuidCreator.getTimeOrderedEpoch().toString());
-        from.setRoleIds(Lists.newArrayList(UuidCreator.getTimeOrderedEpoch().toString()));
+        from.setRoleIds(Lists.newArrayList(UuidCreator.getTimeOrderedEpoch()));
 
         userService.create(from);
 

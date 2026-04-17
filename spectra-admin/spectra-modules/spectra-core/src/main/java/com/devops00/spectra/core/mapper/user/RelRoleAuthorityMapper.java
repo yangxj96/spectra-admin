@@ -22,6 +22,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 角色关联权限中间表
 ///
@@ -35,5 +36,5 @@ public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
     ///
     /// @param roleId 角色ID
     /// @return 关联权限信息
-    List<RelRoleAuthority> getByRoleId(@Param("roleId") String roleId);
+    List<RelRoleAuthority> getByRoleId(@Param("roleId") UUID roleId);
 }
