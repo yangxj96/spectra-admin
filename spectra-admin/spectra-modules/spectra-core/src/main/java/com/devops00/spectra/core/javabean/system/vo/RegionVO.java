@@ -19,7 +19,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RegionVO implements Serializable {
 
-
     /// 主键ID
     private UUID id;
 
