@@ -19,7 +19,7 @@
         <result column="city"      property="city"/>
         <result column="language"  property="language"/>
         <result column="timezone"  property="timezone"/>
-        <result column="department_id" property="departmentId"/>
+        <result column="department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
 

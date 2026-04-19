@@ -63,9 +63,14 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
     @Transactional
     public void grant(UUID roleId, RoleAuthorityFrom from) {
         // 压缩权限树
+        // 权限树
+        List<AuthorityTreeVO> authorityTreeVOS = authorityService.tree();
+        if (authorityTreeVOS == null) {
+            authorityTreeVOS = new ArrayList<>();
+        }
         from.setAuthorityIds(
                 TreeUtils.compressSelectedNodes(
-                        authorityService.tree(),
+                        authorityTreeVOS,
                         new HashSet<>(from.getAuthorityIds()),
                         AuthorityTreeVO::getId
                 ).stream().toList()

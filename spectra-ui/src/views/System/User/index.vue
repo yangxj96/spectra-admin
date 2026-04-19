@@ -34,8 +34,7 @@ const organizationTree = ref<DepartmentTree[]>([]);
 const dictStore = useDictStore();
 
 async function handleInitData() {
-    const departmentTree = await departmentApi.tree();
-    organizationTree.value = departmentTree;
+    organizationTree.value = (await departmentApi.tree()) || [];
 }
 
 // 用户新增或编辑dialog配置
@@ -112,7 +111,7 @@ onMounted(async () => {
     await dictStore.getDictData("sys_user_gender");
     await dictStore.getDictData("sys_language");
     await dictStore.getDictData("sys_timezone");
-    handleInitData();
+    await handleInitData();
 });
 </script>
 
@@ -161,7 +160,7 @@ onMounted(async () => {
                 <el-table-column align="center" width="150" show-overflow-tooltip label="显示名称" prop="username" />
                 <el-table-column align="center" width="150" show-overflow-tooltip label="真实姓名" prop="real_name" />
                 <el-table-column align="center" width="250" show-overflow-tooltip label="邮箱" prop="email" />
-                <el-table-column align="center" width="080" show-overflow-tooltip label="性别" prop="gender">
+                <el-table-column align="center" width="110" show-overflow-tooltip label="性别" prop="gender">
                     <template v-slot:default="scope">
                         {{ dictStore.getDictItemSync("sys_user_gender", scope.row.gender)?.label }}
                     </template>

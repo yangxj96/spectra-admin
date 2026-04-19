@@ -25,7 +25,6 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +59,7 @@ public class UserPageVO implements Serializable {
     private String realName;
 
     /// 性别
-    private Integer gender;
+    private Short gender;
 
     /// 生日
     private LocalDate birthday;

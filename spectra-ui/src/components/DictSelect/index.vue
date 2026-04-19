@@ -8,7 +8,9 @@ defineOptions({
     name: "DictSelect"
 });
 
-const model = defineModel<string | number | null | undefined>({
+type ModelType = string | number | boolean | undefined;
+
+const model = defineModel<ModelType>({
     required: true,
     default: null
 });
@@ -23,16 +25,16 @@ const dictStore = useDictStore();
 const options = ref<DictItem[]>([]);
 
 // localValue 用来绑定 el-select，支持字符串/数字/空
-const localValue = ref<string | number | undefined>(undefined);
+const localValue = ref<string | undefined>(undefined);
 
 // 计算绑定，保证双向绑定
 const localComputed = computed({
     get() {
-        return localValue.value ?? undefined;
+        return toInner(localValue.value);
     },
-    set(val: string | number) {
-        localValue.value = val ?? undefined;
-        model.value = localValue.value;
+    set(val: string | undefined) {
+        localValue.value = val;
+        model.value = toOuter(val);
     }
 });
 
@@ -40,17 +42,16 @@ const localComputed = computed({
 onMounted(async () => {
     try {
         options.value = (await dictStore.getDictData(dict_code.value)) || [];
-
         // 如果外部 model 未传值，使用 default_flag 的值
         if (model.value === undefined) {
             const defaultItem = options.value.find(item => item.default_flag);
             if (defaultItem) {
                 localValue.value = defaultItem.value;
-                model.value = defaultItem.value;
+                model.value = toOuter(defaultItem.value);
             }
         } else {
             // 如果外部传入了 model，则覆盖 default_flag
-            localValue.value = model.value ?? undefined;
+            localValue.value = toInner(model.value);
         }
     } catch {
         MessageUtils.error("获取字典数据失败");
@@ -59,10 +60,29 @@ onMounted(async () => {
 
 // 监听外部 model 改变，同步 localValue
 watch(model, val => {
-    if (val !== localValue.value) {
-        localValue.value = val ?? undefined;
+    const inner = toInner(val);
+    if (inner !== localValue.value) {
+        localValue.value = inner;
     }
 });
+
+function toInner(val: ModelType): string | undefined {
+    if (val === undefined || val === null) return undefined;
+    return String(val);
+}
+
+function toOuter(val: string | undefined): ModelType {
+    if (val === undefined) return undefined;
+
+    switch (model.value) {
+        case "number":
+            return Number(val);
+        case "boolean":
+            return val === "true";
+        default:
+            return val;
+    }
+}
 </script>
 
 <template>

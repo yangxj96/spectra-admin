@@ -34,7 +34,7 @@ const rules = {
     phone: [{ validator: mobile, trigger: "blur" }],
     status: [{ required: true, message: "请选择状态", trigger: "blur" }],
     timezone: [{ required: true, message: "请选择时区", trigger: "blur" }],
-    organization_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
+    department_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
 } as FormRules;
 
 // 数据
@@ -186,7 +186,7 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
                         <el-option v-for="item in roles" :key="item.id" :label="item.name" :value="item.id" />
                     </el-select>
                 </el-form-item>
-                <el-form-item label="所属组织" prop="organization_id">
+                <el-form-item label="所属组织" prop="department_id">
                     <el-tree-select
                         v-model="form.department_id"
                         :data="department_tree"

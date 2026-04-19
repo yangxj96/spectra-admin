@@ -26,6 +26,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
 /// 用户信息
 ///
@@ -57,7 +58,7 @@ public class User extends BaseEntity implements Serializable {
 
     /// 性别(0:保密,1-男,2-女)
     @TableField(value = "gender")
-    private Integer gender;
+    private Short gender;
 
     /// 生日
     @TableField(value = "birthday")
@@ -89,5 +90,5 @@ public class User extends BaseEntity implements Serializable {
 
     /// 组织机构ID
     @TableField(value = "department_id")
-    private String departmentId;
+    private UUID departmentId;
 }

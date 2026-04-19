@@ -48,9 +48,15 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
 
     @Override
     public List<RegionVO> lazyTree(Integer level, String id) {
+        UUID pid = null;
+
+        if (StrUtils.isNotBlank(id)) {
+            pid = UUID.fromString(id);
+        }
+
         List<Region> regions = lambdaQuery()
                 .eq(Region::getLevel, RegionLevel.of(level))
-                .eq(StrUtils.isNotBlank(id), Region::getPid, id)
+                .eq(pid != null, Region::getPid, pid)
                 .list();
         return converter.toVOList(regions);
     }

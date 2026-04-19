@@ -1,26 +1,17 @@
-# 工作流配置
 flowable:
-  # 数据库确定
   database-schema: spectra_workflow
   database-schema-update: false
   jpa-enabled: false
-  # 流程定义
   process-definition-location-prefix: classpath*:/processes/
   async-executor-activate: true
   history-level: full
-  # 下面是所有可选模块,都用不到
-  # 事件注册模块
   eventregistry:
     enabled: false
-  # 身份管理引擎
   idm:
     enabled: false
-  # Flowable 的“应用元模型”
   app:
     enabled: false
-  # 决策模型引擎
   dmn:
     enabled: false
-  # 案例管理引擎
   cmmn:
     enabled: false

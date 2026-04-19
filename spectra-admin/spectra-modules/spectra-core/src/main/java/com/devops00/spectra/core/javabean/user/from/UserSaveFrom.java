@@ -82,7 +82,7 @@ public class UserSaveFrom {
 
     /// 所属组织机构ID
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private String organizationId;
+    private UUID departmentId;
 
     /// 角色ID列表
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})

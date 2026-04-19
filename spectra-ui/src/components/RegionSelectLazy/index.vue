@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
-
 import { regionApi } from "@/api/system/region.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -11,21 +9,20 @@ defineOptions({
     name: "RegionSelectLazy"
 });
 
+/**
+ * 行政区划ID
+ */
 const model = defineModel<string>({
     required: true
 });
 
+/**
+ * full_name（回显核心）
+ * 格式：云南省/保山市/隆阳区
+ */
 const name = defineModel<string>("name", {
     required: true
 });
-
-// 用作区域懒加载没数据的时候的回显
-// const regionCache = computed(() => {
-//     return {
-//         id: model,
-//         name: name
-//     };
-// });
 
 // 懒加载行政区划
 const handleLoadRegion: LoadFunction = async (node, resolve) => {
@@ -38,6 +35,7 @@ const handleLoadRegion: LoadFunction = async (node, resolve) => {
         resolve(regions ?? []);
     } catch (e) {
         MessageUtils.error(`获取行政区划失败:${(e as Error).message}`);
+        resolve([]);
     }
 };
 
@@ -48,23 +46,22 @@ const getPathLabel = (node: TreeSelectNode, data: DataParam) => {
         return node.pathLabels.join(" / ");
     }
     // 默认值 / 懒加载未命中
-    if (data?.pathLabels?.length) {
-        return data.pathLabels.join(" / ");
+    if (name.value) {
+        return name.value.replaceAll("/", " / ");
     }
     // 兜底
     return data?.name ?? "";
 };
 
-onMounted(() => {
-    console.log(model);
-    console.log(name);
-});
+/**
+ * 选中时同步 full_name（关键，否则无法联动）
+ */
+const handleNodeClick = (data: Region) => {
+    name.value = data.full_name ?? data.name ?? "";
+};
 </script>
 
 <template>
-    <!--
-    :cache-data="regionCache"
-    -->
     <el-tree-select
         v-model="model"
         node-key="id"
@@ -73,6 +70,7 @@ onMounted(() => {
         v-bind="{ 'append-to': '.box-content', ...$attrs }"
         check-strictly
         clearable
+        @node-click="handleNodeClick"
         :props="treeDefaultProps">
         <template #label="{ node, data }">
             {{ getPathLabel(node, data) }}

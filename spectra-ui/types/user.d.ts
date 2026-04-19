@@ -29,9 +29,9 @@ declare global {
         // 真实姓名
         real_name: string;
         // 状态
-        status: number;
+        status: string;
         // 性别
-        gender: number;
+        gender: string;
         // 生日
         birthday: Date;
         // 手机号码
