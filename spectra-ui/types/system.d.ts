@@ -53,6 +53,8 @@ declare global {
         region_id: string;
         // 路径
         path: string;
+        // 排序
+        sort: number;
         // 备注
         remark?: string;
         // VO扩展字段,行政区划名称
@@ -201,4 +203,10 @@ declare global {
         // 排序
         sort: number;
     };
+
+    interface RegionPathVO {
+        ids: string[];
+        names: string[];
+        full_name: string;
+    }
 }

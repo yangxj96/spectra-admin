@@ -112,6 +112,9 @@ async function handleOrganizationSave() {
                 <el-form-item label="类型" prop="type">
                     <DictSelect v-model="form.type" dict_code="sys_organization_type" placeholder="请选择部门类型" />
                 </el-form-item>
+                <el-form-item label="排序" prop="sort">
+                    <el-input-number v-model="form.sort" placeholder="请输入排序" style="width: 100%" />
+                </el-form-item>
                 <el-form-item label="备注" prop="remark">
                     <el-input v-model="form.remark" type="textarea" :rows="5" clearable placeholder="请输入相关备注" />
                 </el-form-item>

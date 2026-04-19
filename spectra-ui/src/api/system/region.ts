@@ -10,7 +10,7 @@ export const regionApi = {
      * @param params 查询条件
      */
     load(params: { level: number; id?: string }): Promise<Region[]> {
-        return get<Region[]>("/api/region", params);
+        return get<Region[]>("/api/region/lazy", params, { loading: false });
     },
     /**
      * 分页查询系统配置信息
@@ -18,5 +18,12 @@ export const regionApi = {
      */
     page(params?: RegionPageParams): Promise<Page<Region>> {
         return get<Page<Region>>("/api/region/page", params);
+    },
+    /**
+     * 根据ID查询路径信息
+     * @param id id
+     */
+    path(id: string): Promise<RegionPathVO> {
+        return get<RegionPathVO>(`/api/region/path/${id}`, {}, { loading: false });
     }
 };

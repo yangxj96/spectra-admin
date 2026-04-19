@@ -12,6 +12,7 @@ import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.javabean.system.converter.RegionConverter;
 import com.devops00.spectra.core.javabean.system.entity.Region;
 import com.devops00.spectra.core.javabean.system.from.RegionPageFrom;
+import com.devops00.spectra.core.javabean.system.vo.RegionPathVO;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 import com.devops00.spectra.core.mapper.system.RegionMapper;
 import com.devops00.spectra.core.service.system.RegionService;
@@ -69,5 +70,36 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         return converter.toVOPage(db);
+    }
+
+    @Override
+    public RegionPathVO getPath(UUID id) {
+
+        List<UUID> ids = new ArrayList<>();
+        List<String> names = new ArrayList<>();
+
+        Region current = this.getBaseMapper().selectById(id);
+
+        while (current != null) {
+            ids.add(current.getId());
+            names.add(current.getName());
+
+            if (current.getPid() == null) {
+                break;
+            }
+
+            current = this.getBaseMapper().selectById(current.getPid());
+        }
+
+        // 因为是从子 -> 父，需要反转
+        Collections.reverse(ids);
+        Collections.reverse(names);
+
+        RegionPathVO vo = new RegionPathVO();
+        vo.setIds(ids);
+        vo.setNames(names);
+        vo.setFullName(String.join("/", names));
+
+        return vo;
     }
 }

@@ -68,8 +68,8 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     /// 备注
     private String remark;
 
-    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
-    private Integer sort = 0;
+    /// tree必备字段,进行排序用
+    private Integer sort;
 
     /// 下级菜单
     private List<DepartmentTreeVo> children;

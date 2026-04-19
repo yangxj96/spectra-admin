@@ -1,81 +1,109 @@
 <script setup lang="ts">
 import { regionApi } from "@/api/system/region.ts";
-import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
-import type { LoadFunction } from "element-plus";
+import type { CascaderNode, CascaderProps, CascaderValue } from "element-plus";
 
 defineOptions({
     name: "RegionSelectLazy"
 });
 
 /**
- * 行政区划ID
+ * 对外：只要 ID
  */
 const model = defineModel<string>({
     required: true
 });
 
 /**
- * full_name（回显核心）
- * 格式：云南省/保山市/隆阳区
+ * full_name
  */
 const name = defineModel<string>("name", {
     required: true
 });
 
-// 懒加载行政区划
-const handleLoadRegion: LoadFunction = async (node, resolve) => {
+/**
+ * 内部：路径数组（核心）
+ */
+const cascaderValue = ref<string[]>([]);
+
+/**
+ * lazy load
+ */
+const handleLoad: CascaderProps["lazyLoad"] = async (node: CascaderNode, resolve) => {
     try {
-        // 构建参数
-        const regions = await regionApi.load({
+        const res = await regionApi.load({
             level: node.level + 1,
-            id: node.data?.id
+            id: (node.data as Region | undefined)?.id
         });
-        resolve(regions ?? []);
+
+        resolve(res ?? []);
     } catch (e) {
-        MessageUtils.error(`获取行政区划失败:${(e as Error).message}`);
+        MessageUtils.error((e as Error).message);
         resolve([]);
     }
 };
 
-// 格式化选择的节点
-const getPathLabel = (node: TreeSelectNode, data: DataParam) => {
-    // 节点已加载（正常选中）
-    if (node?.pathLabels?.length) {
-        return node.pathLabels.join(" / ");
+/**
+ * 用户选择 → 同步 model + name
+ */
+const handleChange = async (value: CascaderValue | null | undefined) => {
+    if (!value || !Array.isArray(value)) return;
+
+    const last = value[value.length - 1];
+    if (typeof last !== "string") return;
+
+    // ✔ 更新对外 model（关键）
+    model.value = last;
+
+    try {
+        const res = await regionApi.path(last);
+        name.value = res.full_name;
+    } catch (e) {
+        MessageUtils.error((e as Error).message);
     }
-    // 默认值 / 懒加载未命中
-    if (name.value) {
-        return name.value.replaceAll("/", " / ");
-    }
-    // 兜底
-    return data?.name ?? "";
 };
 
 /**
- * 选中时同步 full_name（关键，否则无法联动）
+ * 回显核心
  */
-const handleNodeClick = (data: Region) => {
-    name.value = data.full_name ?? data.name ?? "";
+const initPath = async () => {
+    if (!model.value) return;
+
+    try {
+        const res = await regionApi.path(model.value);
+
+        // ✔ 设置路径数组（关键）
+        cascaderValue.value = res.ids;
+
+        // ✔ 设置 full_name
+        name.value = res.full_name;
+    } catch (e) {
+        MessageUtils.error((e as Error).message);
+    }
+};
+
+onMounted(initPath);
+
+/**
+ * props
+ */
+const cascaderProps: CascaderProps = {
+    lazy: true,
+    checkStrictly: true,
+    value: "id",
+    label: "name",
+    emitPath: true,
+    lazyLoad: handleLoad
 };
 </script>
 
 <template>
-    <el-tree-select
-        v-model="model"
-        node-key="id"
-        lazy
-        :load="handleLoadRegion"
-        v-bind="{ 'append-to': '.box-content', ...$attrs }"
-        check-strictly
+    <el-cascader
+        v-model="cascaderValue"
+        :props="cascaderProps"
         clearable
-        @node-click="handleNodeClick"
-        :props="treeDefaultProps">
-        <template #label="{ node, data }">
-            {{ getPathLabel(node, data) }}
-        </template>
-    </el-tree-select>
+        filterable
+        @change="handleChange"
+        style="width: 100%" />
 </template>
-
-<style scoped lang="scss"></style>

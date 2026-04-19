@@ -24,8 +24,7 @@ onMounted(() => {
 
 // 初始化数据
 async function handleCriteriaQuery() {
-    const departmentTree = await departmentApi.tree();
-    table_data.value = departmentTree;
+    table_data.value = await departmentApi.tree();
 }
 
 // 表行删除按钮被单击
@@ -35,7 +34,7 @@ function handleTableItemDelete(row: Department) {
             await departmentApi.deleteById(row.id);
             MessageUtils.success("删除成功");
         } finally {
-            handleCriteriaQuery();
+            await handleCriteriaQuery();
         }
     });
 }
@@ -74,17 +73,15 @@ function handleDialogClose() {
     <el-row class="box-body">
         <el-table :data="table_data" height="100%" border stripe default-expand-all row-key="id">
             <el-table-column align="center" width="060" type="index" label="序号" />
-            <el-table-column align="center" width="200" prop="name" label="名称" />
+            <el-table-column header-align="center" align="left" width="200" prop="name" label="名称" />
             <el-table-column align="center" width="300" prop="code" label="编码" />
-            <el-table-column align="center" width="150" prop="province_code" label="省编码" />
-            <el-table-column align="center" width="150" prop="city_code" label="市编码" />
-            <el-table-column align="center" width="150" prop="county_code" label="市编码" />
             <el-table-column align="center" width="150" prop="type" label="类型">
                 <template #default="scope">
                     <DictTag v-model="scope.row.type" dict_code="sys_organization_type" />
                 </template>
             </el-table-column>
-            <el-table-column align="center" width="150" prop="region_name" label="所在区域" show-overflow-tooltip />
+            <el-table-column align="center" width="200" prop="region_name" label="所在区域" show-overflow-tooltip />
+            <el-table-column align="center" width="100" prop="sort" label="排序"/>
             <el-table-column align="center" prop="remark" label="说明" show-overflow-tooltip />
             <el-table-column align="center" width="180" label="操作">
                 <template #default="scope">

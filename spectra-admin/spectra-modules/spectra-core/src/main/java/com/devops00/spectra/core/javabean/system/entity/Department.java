@@ -76,6 +76,10 @@ public class Department extends BaseEntity implements Serializable {
     @TableField(value = "path")
     private String path;
 
+    /// 排序,默认0
+    @TableField(value = "sort")
+    private Integer sort;
+
     /// 备注
     @TableField(value = "remark")
     private String remark;

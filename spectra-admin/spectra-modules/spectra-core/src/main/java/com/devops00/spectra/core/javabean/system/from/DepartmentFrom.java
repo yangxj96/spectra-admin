@@ -55,6 +55,9 @@ public class DepartmentFrom {
     /// 行政区划ID
     private UUID regionId;
 
+    /// 排序字段
+    private Integer sort;
+
     /// 备注
     private String remark;
 

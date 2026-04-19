@@ -6,9 +6,11 @@ import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.javabean.system.entity.Region;
 import com.devops00.spectra.core.javabean.system.from.RegionPageFrom;
+import com.devops00.spectra.core.javabean.system.vo.RegionPathVO;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 行政区域Service
 ///
@@ -31,4 +33,5 @@ public interface RegionService extends BaseService<Region> {
     /// @return 分页响应信息
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
+    RegionPathVO getPath(UUID id);
 }
