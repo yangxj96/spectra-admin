@@ -81,7 +81,7 @@ function handleDialogClose() {
                 </template>
             </el-table-column>
             <el-table-column align="center" width="200" prop="region_name" label="所在区域" show-overflow-tooltip />
-            <el-table-column align="center" width="100" prop="sort" label="排序"/>
+            <el-table-column align="center" width="100" prop="sort" label="排序" />
             <el-table-column align="center" prop="remark" label="说明" show-overflow-tooltip />
             <el-table-column align="center" width="180" label="操作">
                 <template #default="scope">
