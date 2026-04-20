@@ -1,5 +1,8 @@
 package com.devops00.spectra.common.assembler;
 
+import com.devops00.spectra.common.assembler.converter.IdConverter;
+import com.devops00.spectra.common.assembler.converter.UuidConverter;
+
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -33,6 +36,13 @@ public interface NameLookup<ID> {
         @SuppressWarnings("unchecked")
         Class<ID> type = (Class<ID>) UUID.class;
         return type;
+    }
+
+    /// ID 转换器（默认 UUID）
+    default IdConverter<ID> idConverter() {
+        @SuppressWarnings("unchecked")
+        var converter = (IdConverter<ID>) new UuidConverter();
+        return converter;
     }
 
     /// 批量查询 ID 对应的名称映射

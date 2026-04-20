@@ -1,15 +1,13 @@
 package com.devops00.spectra.common.assembler;
 
 
+import com.devops00.spectra.common.assembler.converter.IdConverter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 
 /// NameFill 注解的执行器
@@ -45,46 +43,40 @@ public class NameFillExecutor {
         this.applicationContext = applicationContext;
     }
 
-
     /// 对 VO 列表执行 NameFill 注解填充
     ///
-    /// 该方法会：
-    /// 1. 扫描 VO 类中所有标注 {@link NameFill} 的字段</li>
-    /// 2. 从 sourceField 中批量提取 ID</li>
-    /// 3. 调用对应的 {@link NameLookup} 查询 name 映射</li>
-    /// 4. 将查询结果回填到目标字段</li>
-    ///
-    /// @param list VO 列表（必须为同一类型）
-    /// @param <T>  VO 类型
-    /// @throws IllegalAccessException 反射访问异常（理论上不会发生）
+    /// @param list 需要填充的lies
+    /// @param <T>  ID类型
     public <T> void fill(List<T> list) throws IllegalAccessException {
         if (list == null || list.isEmpty()) {
             return;
         }
-        // 获取vo类
+
+        // 获取 VO 类
         Class<?> voClass = list.getFirst().getClass();
-        // 字段遍历
+
+        // 遍历字段
         for (Field targetField : voClass.getDeclaredFields()) {
-            // 如果没获取到注解则跳过
+
             NameFill fillName = targetField.getAnnotation(NameFill.class);
             if (fillName == null) {
                 continue;
             }
-            // 获取注解的值
+
+            // source 字段
             Field sourceField = getField(voClass, fillName.sourceField());
 
             targetField.setAccessible(true);
             sourceField.setAccessible(true);
 
-            // 1. 获取 Lookup Bean
+            // 获取 Lookup Bean
             NameLookup<?> lookup =
                     applicationContext.getBean(fillName.lookup());
 
             Class<?> idType = lookup.idType();
 
-            // 2. 收集 ID（类型安全）
+            // 收集 ID
             Set<Object> ids = new HashSet<>();
-
             for (T vo : list) {
                 Object id = getValue(sourceField, vo);
                 if (idType.isInstance(id)) {
@@ -96,12 +88,18 @@ public class NameFillExecutor {
                 continue;
             }
 
-            // 3. 查询 nameMap（语义安全的 cast）
+            // 查询 nameMap
             @SuppressWarnings("unchecked")
-            Map<Object, String> nameMap =
-                    ((NameLookup<Object>) lookup).getNameMap(ids);
+            Map<Object, String> rawMap = ((NameLookup<Object>) lookup).getNameMap(ids);
 
-            // 4. 回填
+            if (rawMap == null || rawMap.isEmpty()) {
+                continue;
+            }
+
+            // 关键：统一 key 类型（兼容 Redis String key）
+            Map<Object, String> nameMap = normalizeKeyType(rawMap, lookup);
+
+            // 回填
             for (T vo : list) {
                 Object id = getValue(sourceField, vo);
                 if (id != null) {
@@ -111,12 +109,41 @@ public class NameFillExecutor {
         }
     }
 
-    /// 根据字段名获取 VO 中声明的字段
+    /// 统一 Map key 类型：
+    /// 如果缓存导致 key 变成 String，则转回 ID 类型
     ///
-    /// @param clazz     VO 类
-    /// @param fieldName 字段名
-    /// @return Field 对象
-    /// @throws IllegalStateException 当字段不存在时抛出
+    /// @param rawMap 行map
+    /// @param lookup lookup
+    /// @return 转换后的map
+    @SuppressWarnings("unchecked")
+    private Map<Object, String> normalizeKeyType(Map<Object, String> rawMap, NameLookup<?> lookup) {
+
+        // 判断 key 类型
+        Object firstKey = rawMap.keySet().iterator().next();
+
+        // 如果本来就是正确类型，直接返回
+        if (!(firstKey instanceof String)) {
+            return rawMap;
+        }
+
+        // 使用 converter 转换回 ID
+        IdConverter<Object> converter = (IdConverter<Object>) lookup.idConverter();
+
+        Map<Object, String> result = new HashMap<>(rawMap.size());
+
+        for (var entry : rawMap.entrySet()) {
+            String key = (String) entry.getKey();
+            Object realKey = converter.fromString(key);
+            result.put(realKey, entry.getValue());
+        }
+
+        return result;
+    }
+
+    /// 获取字段
+    ///
+    /// @param clazz     clz
+    /// @param fieldName 字段名称
     private @NonNull Field getField(@NonNull Class<?> clazz, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
@@ -127,11 +154,10 @@ public class NameFillExecutor {
         }
     }
 
-    /// 从指定对象中读取字段值
+    /// 读取字段值
     ///
-    /// @param field  目标字段
-    /// @param target 对象实例
-    /// @return 字段值
+    /// @param field  字段
+    /// @param target 目标对象
     private Object getValue(@NonNull Field field, Object target) {
         try {
             return field.get(target);
@@ -139,5 +165,4 @@ public class NameFillExecutor {
             throw new IllegalStateException(e);
         }
     }
-
 }
