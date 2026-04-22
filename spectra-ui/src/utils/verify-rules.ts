@@ -3,7 +3,7 @@ import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import type { FormItemRule } from "element-plus";
 
 // 手机号码验证规则
-export const mobile: FormItemRule["validator"] = (rule, value, callback) => {
+export const mobile: FormItemRule["validator"] = (_rule, value, callback) => {
     if (!value) {
         return callback(new Error("请输入手机号"));
     }
@@ -40,7 +40,7 @@ export const email: FormItemRule["validator"] = (_rule, value, callback) => {
             if (!allowedSuffixes.includes(domain)) {
                 callback(new Error("不支持的邮箱类型"));
             } else {
-                callback(); // ✅ 通过
+                callback();
             }
         })
         .catch(() => {

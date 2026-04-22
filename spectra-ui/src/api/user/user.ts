@@ -12,21 +12,21 @@ export const userApi = {
      * 分页获取用户列表
      * @param params 分页参数
      */
-    async page(params?: UserPageParams): Promise<Page<User>> {
-        return get<Page<User>>("/api/user/page", params);
+    async page(params?: UserPageParams): Promise<Page<UserPageVO>> {
+        return get<Page<UserPageVO>>("/api/user/page", params);
     },
     /**
      * 新增用户
      * @param params 角色入参
      */
-    async create(params: User): Promise<void> {
+    async create(params: UserDTO): Promise<void> {
         return post<void>("/api/user", params);
     },
     /**
      * 修改用户
      * @param params 角色入参
      */
-    async update(params: User): Promise<void> {
+    async update(params: UserDTO): Promise<void> {
         return put<void>("/api/user", params);
     },
     /**

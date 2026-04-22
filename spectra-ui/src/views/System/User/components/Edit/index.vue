@@ -11,13 +11,11 @@ import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
+import { userConverter } from "@/converter/user-converter.ts";
 
 // 定义Model
-const form = defineModel("form", {
-    required: false,
-    default: {
-        ...({} as User)
-    }
+const form = defineModel<UserForm>("form", {
+    required: true
 });
 
 const open = defineModel<boolean>("open", { required: true, default: false });
@@ -26,8 +24,8 @@ const open = defineModel<boolean>("open", { required: true, default: false });
 const emits = defineEmits(["close"]);
 
 // 表单规则
-const rules = {
-    name: [{ required: true, message: "请输入用户名", trigger: "blur" }],
+const rules: FormRules<UserForm> = {
+    username: [{ required: true, message: "请输入用户名", trigger: "blur" }],
     email: [
         { required: true, message: "请输入邮箱", trigger: "blur" },
         { validator: email, trigger: "blur" }
@@ -36,7 +34,7 @@ const rules = {
     status: [{ required: true, message: "请选择状态", trigger: "blur" }],
     timezone: [{ required: true, message: "请选择时区", trigger: "blur" }],
     department_id: [{ required: true, message: "请选择所属组织", trigger: "blur" }]
-} as FormRules;
+};
 
 // 数据
 const roles = ref<Role[]>();
@@ -72,9 +70,9 @@ async function handleUserSave() {
     try {
         await formRef.value?.validate();
         if (form.value.id) {
-            await userApi.update(form.value);
+            await userApi.update(userConverter.toDTO(form.value));
         } else {
-            await userApi.create(form.value);
+            await userApi.create(userConverter.toDTO(form.value));
         }
         MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
             handleCurrentDialogClose();
@@ -199,14 +197,14 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
                 </el-form-item>
                 <el-form-item label="用户数据范围">
                     <el-select v-model="form.data_scope" placeholder="请选择用户数据范围" style="width: 100%">
-                        <el-option label="全局" value="全局" />
-                        <el-option label="本人" value="本人" />
-                        <el-option label="部门" value="部门" />
-                        <el-option label="部门及子部门" value="部门及子部门" />
-                        <el-option label="自定义" value="自定义" />
+                        <el-option label="全局" :value="0" />
+                        <el-option label="本人" :value="1" />
+                        <el-option label="部门" :value="2" />
+                        <el-option label="部门及子部门" :value="3" />
+                        <el-option label="自定义" :value="4" />
                     </el-select>
                 </el-form-item>
-                <el-form-item v-if="form.data_scope === '自定义'" label="自定义数据范围">
+                <el-form-item v-if="form.data_scope === 4" label="自定义数据范围">
                     <el-tree-select
                         v-model="form.target_ids"
                         :data="department_tree"

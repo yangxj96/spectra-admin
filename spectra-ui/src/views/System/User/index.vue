@@ -3,18 +3,22 @@ import { onMounted, ref } from "vue";
 
 import { departmentApi } from "@/api/user/organization.ts";
 import { userApi } from "@/api/user/user.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictTag from "@/components/DictTag/index.vue";
+import { userConverter } from "@/converter/user-converter.ts";
 import UseTable from "@/hooks/use-table.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 import UserEdit from "./components/Edit/index.vue";
-import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 
 // 编辑组件
-const dialog_edit = ref({
-    form: {} as User | undefined,
+const dialog_edit = ref<{
+    form: UserForm;
+    open: boolean;
+}>({
+    form: userConverter.createForm(),
     open: false
 });
 
@@ -24,41 +28,32 @@ const condition = ref<UserPageParams>({
     page_size: 10
 });
 
-// table分页请求
-const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<User>(
-    userApi.page,
-    condition.value
-);
-
 const organizationTree = ref<DepartmentTree[]>([]);
 
 const dictStore = useDictStore();
+
+// table分页请求
+const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<UserPageVO>(
+    userApi.page,
+    condition.value
+);
 
 async function handleInitData() {
     organizationTree.value = (await departmentApi.tree()) || [];
 }
 
-// 用户新增或编辑dialog配置
-function handleUserEditDialog(row: User) {
-    const datum = JSON.parse(JSON.stringify(row));
-    if (datum.roles && datum.roles.length > 0) {
-        if (!datum.role_ids) {
-            datum.role_ids = [] as string[];
-        }
-        for (const role of datum.roles) {
-            datum.role_ids.push(role.id);
-        }
-        datum.roles = [];
-    }
+function handleUserAdd() {
+    dialog_edit.value.form = userConverter.createForm();
+    dialog_edit.value.open = true;
+}
 
-    dialog_edit.value = {
-        form: datum,
-        open: true
-    };
+function handleUserEdit(row: UserPageVO) {
+    dialog_edit.value.form = userConverter.toForm(row);
+    dialog_edit.value.open = true;
 }
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: User) {
+function handleTableItemDelete(row: UserPageVO) {
     MessageUtils.box.confirm(`是否要删除[${row.username}]`, "提示").then(async () => {
         await userApi.deleteById(row.id);
         MessageUtils.success("删除成功", () => {
@@ -68,7 +63,7 @@ function handleTableItemDelete(row: User) {
 }
 
 // 用户重置密码
-function handleTableItemResetPassword(row: User) {
+function handleTableItemResetPassword(row: UserPageVO) {
     console.log(`重置密码:${JSON.stringify(row)}`);
     MessageUtils.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(async () => {
         await userApi.passwordResetById(row.id);
@@ -76,16 +71,6 @@ function handleTableItemResetPassword(row: User) {
             handlerConditionQuery();
         });
     });
-}
-
-// 排序字段改变
-function handleTableSortChange(data: { column: User; prop: string; order: string }) {
-    const order: OrderItem = {
-        column: data.prop,
-        asc: data.order === "ascending"
-    };
-    condition.value.orders = [order];
-    handlerConditionQuery();
 }
 
 // 组织机构树节点被单击
@@ -99,7 +84,7 @@ function handleDialogClose() {
     if (dialog_edit.value.open) {
         dialog_edit.value = {
             open: false,
-            form: {} as User
+            form: userConverter.createForm()
         };
     }
     // 最后重新获取下列表数据
@@ -135,7 +120,7 @@ onMounted(async () => {
             <el-form-item>
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button @click="handleUserEditDialog({} as User)">
+                <el-button @click="handleUserAdd()">
                     <ComponentsIcons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
                     &nbsp;新增用户
                 </el-button>
@@ -156,7 +141,7 @@ onMounted(async () => {
         </el-col>
         <el-col :span="20">
             <!-- 列表 -->
-            <el-table :data="table_data" height="92%" stripe @sort-change="handleTableSortChange">
+            <el-table :data="table_data" height="92%" stripe>
                 <el-table-column align="center" type="index" />
                 <el-table-column align="center" width="150" show-overflow-tooltip label="显示名称" prop="username" />
                 <el-table-column align="center" width="150" show-overflow-tooltip label="真实姓名" prop="real_name" />
@@ -210,7 +195,7 @@ onMounted(async () => {
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="编辑用户" placement="top">
-                            <el-button link type="primary" @click="handleUserEditDialog(scope.row)">
+                            <el-button link type="primary" @click="handleUserEdit(scope.row)">
                                 <ComponentsIcons name="icon-user-edit" style="width: 1.4em; height: 1.4em" />
                             </el-button>
                         </el-tooltip>
@@ -234,7 +219,11 @@ onMounted(async () => {
         </el-col>
     </el-row>
     <!-- 用户组件区 -->
-    <UserEdit :open="dialog_edit.open" :form="dialog_edit.form" @close="handleDialogClose" />
+    <UserEdit
+        v-if="dialog_edit.open"
+        v-model:open="dialog_edit.open"
+        v-model:form="dialog_edit.form"
+        @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">
