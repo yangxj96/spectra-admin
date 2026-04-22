@@ -23,7 +23,7 @@ declare global {
     };
 
     // 用户分页查询的实体
-    type UserPageVO = BaseEntity & {
+    type UserPageVO = {
         // 主键
         id: string;
         // 用户名
