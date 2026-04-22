@@ -2,9 +2,6 @@ import { resolve } from "path";
 
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
-import AutoImport from "unplugin-auto-import/vite";
-import { ElementPlusResolver } from "unplugin-vue-components/resolvers";
-import Components from "unplugin-vue-components/vite";
 import { defineConfig, loadEnv } from "vite";
 import viteCompression from "vite-plugin-compression2";
 
@@ -17,31 +14,9 @@ export default defineConfig(({ mode }) => {
     const srcPath = resolve(__dirname, "src");
     return {
         base: "/",
-        server: {
-            open: false,
-            watch: {
-                usePolling: true
-            }
-        },
         plugins: [
             vue(),
             vueJsx(),
-            // 自动导入 Vue API
-            AutoImport({
-                imports: ["vue", "vue-router", "pinia"],
-                dts: "src/auto-imports.d.ts",
-                eslintrc: {
-                    enabled: true
-                }
-            }),
-            // 自动注册组件
-            Components({
-                dirs: ["src/components"],
-                extensions: ["vue"],
-                deep: true,
-                resolvers: [ElementPlusResolver()],
-                dts: "src/components.d.ts"
-            }),
             // 生产环境压缩
             mode === "production" &&
                 viteCompression({

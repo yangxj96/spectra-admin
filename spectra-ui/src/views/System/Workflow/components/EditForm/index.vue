@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type Config } from "@form-create/designer";
-import { onMounted, useTemplateRef } from "vue";
+import { defineAsyncComponent, onMounted, useTemplateRef } from "vue";
 
 const FcDesigner = defineAsyncComponent({
     loader: () => import("@form-create/designer"),
@@ -45,7 +45,7 @@ onMounted(() => {
     height: 100%;
 }
 
-:deep(.el-aside._fc-l-menu) {
+:deep(.el-aside ._fc-l-menu) {
     display: none !important;
 }
 </style>

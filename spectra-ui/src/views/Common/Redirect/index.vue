@@ -40,9 +40,9 @@ function waitForMenuLoad() {
 
         // 否则监听变化
         const unwatch = watch(
-            () => [useAppStore().menus.length, useAppStore().isFetchingMenus],
+            () => [useAppStore().menus.length, useAppStore().isFetchingMenus] as const,
             ([length, isFetching]) => {
-                if (typeof length === "number" && length > 0 && !isFetching) {
+                if (length > 0 && !isFetching) {
                     unwatch(); // 停止监听
                     resolve();
                 }

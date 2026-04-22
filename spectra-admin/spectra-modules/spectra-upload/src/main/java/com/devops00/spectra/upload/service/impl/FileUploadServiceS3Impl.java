@@ -13,6 +13,8 @@ import com.devops00.spectra.upload.service.FileUploadService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 /// 文件上传服务-S3协议
 ///
 /// @author Jack Young
@@ -49,5 +51,10 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     @Override
     public FileUploadStatusVO getStatus(String uploadId) {
         return null;
+    }
+
+    @Override
+    public void preview(UUID fileId) {
+
     }
 }

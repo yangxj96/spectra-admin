@@ -33,7 +33,8 @@ export const fileUploadApi = {
      * 等待文件合并
      * @param upload_id 上传ID
      */
-    async merge(upload_id: string): Promise<void> {
-        return post<void>(`/api/file/merge/${upload_id}`, undefined, { loading: false, dedupe: false });
+    async merge(upload_id: string): Promise<string> {
+        await post<void>(`/api/file/merge/${upload_id}`, undefined, { loading: false, dedupe: false });
+        return "";
     }
 };

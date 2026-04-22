@@ -20,9 +20,9 @@ import com.devops00.spectra.upload.service.FileUploadChunkService;
 import com.devops00.spectra.upload.service.FileUploadService;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
 import com.github.f4b6a3.uuid.UuidCreator;
-import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /// 文件上传服务-本地上传
 ///
@@ -40,17 +41,15 @@ import java.nio.file.Paths;
 /// @version 1.0
 /// @since 2026/4/2 10:59
 @Slf4j
-@RequiredArgsConstructor
+@NullMarked
 @Service("fileUploadServiceLocalImpl")
 public class FileUploadServiceLocalImpl implements FileUploadService {
 
     /// 本地文件管理的根文件路径
-    private Path root;
+    private final Path root;
 
     /// 本地文件管理的临时文件路径
-    private Path temp;
-
-    private final LocalProperties properties;
+    private final Path temp;
 
     private final FileUploadProperties uploadProperties;
 
@@ -60,25 +59,31 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     private final FileUploadChunkService chunkService;
 
-    @PostConstruct
-    public void init() {
-        try {
-            log.debug(
-                    "{}初始化本地存储位置,存储位置:{},临时文件位置:{}",
-                    LogPrefix.STORAGE.p(),
-                    properties.getUploadDir(),
-                    properties.getUploadTempDir()
-            );
-            this.root = Paths.get(properties.getUploadDir());
-            if (!Files.exists(root)) {
-                Files.createDirectories(root);
-            }
-            this.temp = Paths.get(properties.getUploadTempDir());
-            if (!Files.exists(temp)) {
-                Files.createDirectories(temp);
-            }
-        } catch (IOException e) {
-            log.error(LogPrefix.STORAGE.f("初始化本地存储位置失败"), e);
+    public FileUploadServiceLocalImpl(
+            LocalProperties properties,
+            FileUploadProperties uploadProperties,
+            FileInfoService infoService,
+            FileUploadTaskService taskService,
+            FileUploadChunkService chunkService
+    ) throws IOException {
+        this.uploadProperties = uploadProperties;
+        this.infoService = infoService;
+        this.taskService = taskService;
+        this.chunkService = chunkService;
+
+        log.debug(
+                "{}初始化本地存储位置,存储位置:{},临时文件位置:{}",
+                LogPrefix.STORAGE.p(),
+                properties.getUploadDir(),
+                properties.getUploadTempDir()
+        );
+        this.root = Paths.get(properties.getUploadDir());
+        if (!Files.exists(root)) {
+            Files.createDirectories(root);
+        }
+        this.temp = Paths.get(properties.getUploadTempDir());
+        if (!Files.exists(temp)) {
+            Files.createDirectories(temp);
         }
     }
 
@@ -96,7 +101,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         if (file != null) {
             infoService.incrRefCount(file.getId());
-            // TODO 存在的情况下,应该要响应一个一个ID之类的用作下载
+            vo.setFileId(file.getId());
             vo.setExists(true);
             return vo;
         }
@@ -286,33 +291,58 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         return vo;
     }
 
+    @Override
+    public void preview(UUID fileId) {
+
+    }
+
+    /// 构建文件保存路径
+    ///
+    /// @param filename 文件名称
     private Path buildFilePath(String filename) {
         return root.resolve(filename);
     }
 
+    /// 构建临时文件路径
+    ///
+    /// @param uploadId 文件ID
     private Path buildTempDir(String uploadId) {
         return temp.resolve(uploadId);
     }
 
+    /// 构建上传响应VO
+    ///
+    /// @param url 地址
     private FileUploadVO buildUploadVO(String url) {
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
         return vo;
     }
 
+    /// 构建分片上传响应VO
+    ///
+    /// @param chunkNumber 分片序号
     private FileUploadChunkVO buildChunkVO(int chunkNumber) {
         FileUploadChunkVO vo = new FileUploadChunkVO();
         vo.setChunkNumber(chunkNumber);
         return vo;
     }
 
-    public static String getSuffix(MultipartFile file) {
+    /// 根据文件获取后缀
+    ///
+    /// @param file 文件
+    /// @return 获取到的后缀.可能为空字符串
+    public static String getSuffix(@Nullable MultipartFile file) {
         if (file == null) return "";
         String filename = file.getOriginalFilename();
         return getSuffix(filename);
     }
 
-    public static String getSuffix(String filename) {
+    /// 根据文件名获取后缀
+    ///
+    /// @param filename 文件名称
+    /// @return 获取到的后缀.可能为空字符串
+    public static String getSuffix(@Nullable String filename) {
         if (filename == null) return "";
         int index = filename.lastIndexOf(".");
         if (index == -1 || index == filename.length() - 1) {
@@ -320,4 +350,5 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         }
         return filename.substring(index);
     }
+
 }

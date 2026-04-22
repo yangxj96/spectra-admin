@@ -1,10 +1,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
 
 export default defineComponent({
     name: "PropsPersonalDetails",
+    components: { ComponentsIcons },
     data() {
         return {
             isShow: usePropsStore().personal_details
@@ -46,7 +48,7 @@ export default defineComponent({
         width="30%">
         <template #header>
             <span>
-                <components-icons name="icon-user" />
+                <ComponentsIcons name="icon-user" />
                 个人信息
             </span>
         </template>

@@ -5,6 +5,7 @@ import { useRoute } from "vue-router";
 import { authApi } from "@/api/auth/auth.ts";
 import avatar from "@/assets/images/avatar.png";
 import logo from "@/assets/images/logo.svg";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import ChangePassword from "@/components/Props/ChangePassword/index.vue";
 import PersonalDetails from "@/components/Props/PersonalDetails/index.vue";
 import { cancelAllRequests } from "@/plugin/request/http.ts";
@@ -123,7 +124,7 @@ function handlePersonalPopup() {
         <el-col :span="20" style="padding-right: 40px">
             <el-menu :default-active="active" :router="true" mode="horizontal">
                 <el-menu-item v-for="o in prefixes" :key="o.path" :index="o.path" :route="{ path: o.path }">
-                    <components-icons :name="o.icon" class-name="icon-sidebar" />
+                    <ComponentsIcons :name="o.icon" class-name="icon-sidebar" />
                     {{ o.name }}
                 </el-menu-item>
             </el-menu>
@@ -139,15 +140,15 @@ function handlePersonalPopup() {
                 <template #dropdown>
                     <el-dropdown-menu>
                         <el-dropdown-item @click="handlePersonalPopup">
-                            <components-icons name="icon-user" class-name="icon-navbar" />
+                            <ComponentsIcons name="icon-user" class-name="icon-navbar" />
                             <span>个人信息</span>
                         </el-dropdown-item>
                         <el-dropdown-item @click="handleModifyPasswordPopup">
-                            <components-icons name="icon-change-password" class-name="icon-navbar" />
+                            <ComponentsIcons name="icon-change-password" class-name="icon-navbar" />
                             <span>修改密码</span>
                         </el-dropdown-item>
                         <el-dropdown-item @click="handleUserLogout">
-                            <components-icons name="icon-logout" class-name="icon-navbar" />
+                            <ComponentsIcons name="icon-logout" class-name="icon-navbar" />
                             <span>退出登录</span>
                         </el-dropdown-item>
                     </el-dropdown-menu>

@@ -3,6 +3,7 @@ import { type FormInstance, type FormRules } from "element-plus";
 import { computed, ref, useTemplateRef } from "vue";
 
 import { departmentApi } from "@/api/user/organization.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 import RegionSelectLazy from "@/components/RegionSelectLazy/index.vue";
 import { treeDefaultProps } from "@/utils/default-config.ts";
@@ -75,7 +76,7 @@ async function handleOrganizationSave() {
         @close="handleCurrentDialogClose">
         <template #header>
             <div>
-                <components-icons name="icon-edit" />
+                <ComponentsIcons name="icon-edit" />
                 {{ (modify ? "编辑" : "新增") + "部门" }}
             </div>
         </template>

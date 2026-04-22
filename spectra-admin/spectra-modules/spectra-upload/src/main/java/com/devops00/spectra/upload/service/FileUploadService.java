@@ -25,6 +25,8 @@ import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadStatusVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 
+import java.util.UUID;
+
 /// 文件业务层
 ///
 /// @author Jack Young
@@ -61,4 +63,10 @@ public interface FileUploadService {
     /// @param uploadId 上传ID
     /// @return 文件上传状态
     FileUploadStatusVO getStatus(String uploadId);
+
+    /**
+     * 根据文件ID预览图片
+     * @param fileId 文件ID
+     */
+    void preview(UUID fileId);
 }

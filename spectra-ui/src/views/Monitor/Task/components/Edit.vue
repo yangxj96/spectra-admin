@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import JsonEditor from "@/components/JsonEditor/index.vue";
 
 const visible = ref(false);
@@ -23,7 +24,7 @@ const rules = {
         :destroy-on-close="true"
         width="35vw">
         <template #header>
-            <components-icons name="icon-edit" />
+            <ComponentsIcons name="icon-edit" />
             新增定时任务
         </template>
         <template #default>

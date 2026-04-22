@@ -3,6 +3,7 @@ import { type FormInstance } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 
 import { dictApi } from "@/api/system/dict.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
@@ -75,7 +76,7 @@ function handleSaveDictGroup() {
 <template>
     <el-dialog v-model="edit.visible" width="500" class="loading-box">
         <template #header>
-            <components-icons name="icon-edit" />
+            <ComponentsIcons name="icon-edit" />
             {{ edit.title }}
         </template>
         <template #default>

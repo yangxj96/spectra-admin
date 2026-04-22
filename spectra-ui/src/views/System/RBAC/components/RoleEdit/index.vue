@@ -3,6 +3,7 @@ import { type FormInstance, type FormRules } from "element-plus";
 import { computed, useTemplateRef } from "vue";
 
 import { roleApi } from "@/api/auth/role.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model
@@ -65,7 +66,7 @@ const handleSave = async () => {
     <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleClose">
         <template #header>
             <div>
-                <components-icons name="icon-edit" />
+                <ComponentsIcons name="icon-edit" />
                 {{ `${modify ? "编辑" : "新增"}角色` }}
             </div>
         </template>

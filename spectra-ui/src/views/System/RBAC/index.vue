@@ -54,7 +54,7 @@ function handleRoleDelete(row: Role) {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         await roleApi.delete(row.id);
         MessageUtils.success("删除成功");
-        handlerConditionQuery();
+        await handlerConditionQuery();
     });
 }
 

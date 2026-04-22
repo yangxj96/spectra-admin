@@ -3,6 +3,7 @@ import { ElTable, type FormInstance, type FormRules } from "element-plus";
 import { onMounted, reactive, ref, useTemplateRef } from "vue";
 
 import { menuApi } from "@/api/system/menu.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import IconPicker from "@/components/IconPicker/index.vue";
 import JsonEditor from "@/components/JsonEditor/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -108,7 +109,7 @@ async function handleMenuSave() {
             <el-table-column align="left" header-align="center" prop="name" label="名称" />
             <el-table-column align="center" prop="icon" label="图标">
                 <template #default="scope">
-                    <components-icons :name="scope.row.icon" />
+                    <ComponentsIcons :name="scope.row.icon" />
                 </template>
             </el-table-column>
             <el-table-column align="center" prop="path" label="请求路径" />
@@ -156,7 +157,7 @@ async function handleMenuSave() {
         :destroy-on-close="true"
         width="30vw">
         <template #header>
-            <components-icons name="icon-edit" />
+            <ComponentsIcons name="icon-edit" />
             {{ (menu.modify ? "编辑" : "新增") + "菜单" }}
         </template>
         <template #default>

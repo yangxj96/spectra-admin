@@ -5,6 +5,7 @@ import { onMounted, ref, useTemplateRef } from "vue";
 import { roleApi } from "@/api/auth/role.ts";
 import { departmentApi } from "@/api/user/organization.ts";
 import { userApi } from "@/api/user/user.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
@@ -124,7 +125,7 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
     <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleCurrentDialogClose">
         <template #header>
             <div>
-                <components-icons name="icon-edit" />
+                <ComponentsIcons name="icon-edit" />
                 {{ (form.id ? "编辑" : "新增") + "用户" }}
             </div>
         </template>
@@ -162,7 +163,7 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
                         placeholder="请输入邮箱">
                         <template #suffix>
                             <el-tooltip effect="dark" content="同时也作为默认登录账号" placement="right">
-                                <components-icons
+                                <ComponentsIcons
                                     name="icon-hint"
                                     style="margin-left: 10px; width: 1.4em; height: 1.4em" />
                             </el-tooltip>

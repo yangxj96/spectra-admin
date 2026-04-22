@@ -10,6 +10,7 @@ import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 import UserEdit from "./components/Edit/index.vue";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 
 // 编辑组件
 const dialog_edit = ref({
@@ -135,7 +136,7 @@ onMounted(async () => {
                 <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
                 <el-button>重置</el-button>
                 <el-button @click="handleUserEditDialog({} as User)">
-                    <components-icons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
+                    <ComponentsIcons name="icon-user-add" style="width: 1.1em; height: 1.1em" />
                     &nbsp;新增用户
                 </el-button>
             </el-form-item>
@@ -205,23 +206,17 @@ onMounted(async () => {
                     <template #default="scope">
                         <el-tooltip content="重置密码" placement="top">
                             <el-button link type="primary" @click="handleTableItemResetPassword(scope.row)">
-                                <components-icons
-                                    name="icon-reset-passwords"
-                                    style="width: 1.4em; height: 1.4em"></components-icons>
+                                <ComponentsIcons name="icon-reset-passwords" style="width: 1.4em; height: 1.4em" />
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="编辑用户" placement="top">
                             <el-button link type="primary" @click="handleUserEditDialog(scope.row)">
-                                <components-icons
-                                    name="icon-user-edit"
-                                    style="width: 1.4em; height: 1.4em"></components-icons>
+                                <ComponentsIcons name="icon-user-edit" style="width: 1.4em; height: 1.4em" />
                             </el-button>
                         </el-tooltip>
                         <el-tooltip content="删除用户" placement="top">
                             <el-button link type="primary" @click="handleTableItemDelete(scope.row)">
-                                <components-icons
-                                    name="icon-user-del"
-                                    style="width: 1.4em; height: 1.4em"></components-icons>
+                                <ComponentsIcons name="icon-user-del" style="width: 1.4em; height: 1.4em" />
                             </el-button>
                         </el-tooltip>
                     </template>

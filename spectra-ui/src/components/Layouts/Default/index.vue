@@ -8,6 +8,7 @@ import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 import Sidebar from "./components/sidebar/index.vue";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 
 defineOptions({
     name: "LayoutsDefault"
@@ -84,8 +85,8 @@ function handleMenu() {
                 <el-row class="box-breadcrumb">
                     <el-col :span="21">
                         <i class="box-unfold-a" @click="handleMenu">
-                            <components-icons v-if="appStore.unfold" name="icon-fold-left" />
-                            <components-icons v-else name="icon-fold-right" />
+                            <ComponentsIcons v-if="appStore.unfold" name="icon-fold-left" />
+                            <ComponentsIcons v-else name="icon-fold-right" />
                         </i>
                         <!-- 面包屑 -->
                         <el-breadcrumb style="display: inline-block">
@@ -107,16 +108,16 @@ function handleMenu() {
                                     :size="'small'"
                                     @change="handleDarkSwitch">
                                     <template #active-action>
-                                        <components-icons name="icon-moon" />
+                                        <ComponentsIcons name="icon-moon" />
                                     </template>
                                     <template #inactive-action>
-                                        <components-icons name="icon-sun" />
+                                        <ComponentsIcons name="icon-sun" />
                                     </template>
                                 </el-switch>
                             </el-form-item>
                             <!-- 全屏切换 -->
                             <el-form-item class="form-item form-item-end">
-                                <components-icons
+                                <ComponentsIcons
                                     name="icon-fullScreen"
                                     class="box-unfold-a"
                                     style="width: 1.4em; height: 1.4em"

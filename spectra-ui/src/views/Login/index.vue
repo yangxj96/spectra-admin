@@ -5,6 +5,7 @@ import { computed, reactive, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { authApi } from "@/api/auth/auth.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { useUserStore } from "@/plugin/store/modules/use-user-store.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { loginParticlesDark, loginParticlesLight } from "@/views/Login/config/login-particles.ts";
@@ -87,7 +88,7 @@ async function handleLogin() {
             width="20%">
             <template #header>
                 <p>
-                    <components-icons name="icon-login" style="color: #9b9b9b" />
+                    <ComponentsIcons name="icon-login" style="color: #9b9b9b" />
                     用户登录
                 </p>
             </template>
@@ -108,7 +109,7 @@ async function handleLogin() {
                                 <el-image :src="kaptchaUrl" class="v-code" @click="refreshKaptcha">
                                     <template v-slot:placeholder>
                                         <div class="el-image__error" style="">
-                                            <components-icons name="icon-loading" class-name="v-code-ico" />
+                                            <ComponentsIcons name="icon-loading" class-name="v-code-ico" />
                                             加载中...
                                         </div>
                                     </template>
@@ -120,7 +121,7 @@ async function handleLogin() {
             </div>
             <template #footer>
                 <el-button type="primary" @click="handleLogin">
-                    <components-icons name="icon-login" />
+                    <ComponentsIcons name="icon-login" />
                     <span>&nbsp;登录</span>
                 </el-button>
             </template>
@@ -159,7 +160,6 @@ async function handleLogin() {
 }
 
 .v-code-ico {
-    //color: var(--el-text-color-placeholder);
     color: var(--el-text-color-placeholder);
     animation: v-code-ico-rotate 2s linear infinite;
 }

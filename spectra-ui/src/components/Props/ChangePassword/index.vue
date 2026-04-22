@@ -1,10 +1,12 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { usePropsStore } from "@/plugin/store/modules/use-props-store.ts";
 
 export default defineComponent({
     name: "PropsChangePassword",
+    components: { ComponentsIcons },
     data() {
         return {
             isShow: usePropsStore().change_password,
@@ -44,7 +46,7 @@ export default defineComponent({
         width="30%">
         <template #header>
             <span>
-                <components-icons name="icon-reset-password" />
+                <ComponentsIcons name="icon-reset-password" />
                 修改密码
             </span>
         </template>

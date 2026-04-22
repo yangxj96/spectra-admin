@@ -3,9 +3,11 @@ import { onMounted, reactive, ref } from "vue";
 
 import { departmentApi } from "@/api/user/organization.ts";
 import DictTag from "@/components/DictTag/index.vue";
+import { DeptConverter } from "@/converter/dept-converter.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 import OrganizationEdit from "./components/Edit/index.vue";
+
 
 const table_data = ref<DepartmentTree[]>();
 
@@ -41,7 +43,7 @@ function handleTableItemDelete(row: Department) {
 
 // 处理菜单Dialog打开
 function handleDialogOpen(row: Department) {
-    edit.form = JSON.parse(JSON.stringify(row));
+    edit.form = Object.assign({}, row, DeptConverter.createForm());
     edit.dialog = true;
 }
 
@@ -106,7 +108,7 @@ function handleDialogClose() {
         </el-table>
     </el-row>
     <!-- 新增或编辑 -->
-    <OrganizationEdit :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
+    <OrganizationEdit v-if="edit.dialog" :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

@@ -2,6 +2,7 @@
 import { useTemplateRef } from "vue";
 
 import { configuredApi } from "@/api/system/configured.ts";
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
@@ -47,7 +48,7 @@ const handleConfiguredSave = async () => {
     <el-drawer v-model="show" :modal="true" modal-penetrable destroy-on-close @close="handleDrawerClose">
         <template #header>
             <div>
-                <components-icons name="icon-edit" />
+                <ComponentsIcons name="icon-edit" />
                 编辑配置
             </div>
         </template>
