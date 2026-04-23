@@ -11,14 +11,14 @@ export const departmentApi = {
     /**
      * 获取组织机构树形列表
      */
-    tree(): Promise<DepartmentTree[]> {
-        return get<DepartmentTree[]>("/api/department/tree");
+    tree(): Promise<DepartmentTreeVO[]> {
+        return get<DepartmentTreeVO[]>("/api/department/tree");
     },
     /**
      * 新增组织机构
      * @param params 组织机构入参
      */
-    create(params: Department): Promise<void> {
+    create(params: DepartmentDTO): Promise<void> {
         return post<void>("/api/department", params);
     },
     /**
@@ -32,7 +32,7 @@ export const departmentApi = {
      * 修改组织机构
      * @param params 组织机构入参
      */
-    update(params: Department): Promise<void> {
+    update(params: DepartmentDTO): Promise<void> {
         return put<void>("/api/department", params);
     }
 };

@@ -38,7 +38,7 @@ const rules: FormRules<UserForm> = {
 
 // 数据
 const roles = ref<RolePageVO[]>();
-const department_tree = ref<DepartmentTree[]>();
+const department_tree = ref<DepartmentTreeVO[]>();
 
 // 组件
 const formRef = useTemplateRef<FormInstance>("formRef");

@@ -39,34 +39,6 @@ declare global {
         children?: Menu[];
     };
 
-    // 部门
-    type Department = BaseEntity & {
-        // 上级ID
-        pid: string;
-        // 名称
-        name: string;
-        // 代码
-        code: string;
-        // 类型
-        type: number;
-        // 行政区划ID
-        region_id: string;
-        // 路径
-        path: string;
-        // 排序
-        sort: number;
-        // 备注
-        remark?: string;
-        // VO扩展字段,行政区划名称
-        region_name: string;
-    };
-
-    // 组织机构树形
-    type DepartmentTree = Department & {
-        // 子级
-        children?: DepartmentTree[];
-    };
-
     // 字典组
     type DictGroup = BaseEntity & {
         //父级ID

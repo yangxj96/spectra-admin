@@ -28,7 +28,7 @@ const condition = ref<UserPageParams>({
     page_size: 10
 });
 
-const organizationTree = ref<DepartmentTree[]>([]);
+const organizationTree = ref<DepartmentTreeVO[]>([]);
 
 const dictStore = useDictStore();
 
@@ -74,7 +74,7 @@ function handleTableItemResetPassword(row: UserPageVO) {
 }
 
 // 组织机构树节点被单击
-function handleOrganizationTreeNodeClick(row: DepartmentTree) {
+function handleOrganizationTreeNodeClick(row: DepartmentTreeVO) {
     condition.value.department_id = row.id;
     handlerConditionQuery();
 }

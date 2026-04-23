@@ -3,17 +3,17 @@ import { onMounted, reactive, ref } from "vue";
 
 import { departmentApi } from "@/api/user/organization.ts";
 import DictTag from "@/components/DictTag/index.vue";
-import { DeptConverter } from "@/converter/dept-converter.ts";
+import { deptConverter } from "@/converter/dept-converter.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 import OrganizationEdit from "./components/Edit/index.vue";
 
-const table_data = ref<DepartmentTree[]>();
+const table_data = ref<DepartmentTreeVO[]>();
 
 // 新增或编辑
 const edit = reactive({
     dialog: false,
-    form: {} as Department
+    form: {} as DepartmentForm
 });
 
 const ready = ref(false);
@@ -29,7 +29,7 @@ async function handleCriteriaQuery() {
 }
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: Department) {
+function handleTableItemDelete(row: DepartmentTreeVO) {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         try {
             await departmentApi.deleteById(row.id);
@@ -40,17 +40,23 @@ function handleTableItemDelete(row: Department) {
     });
 }
 
-// 处理菜单Dialog打开
-function handleDialogOpen(row: Department) {
-    edit.form = Object.assign({}, row, DeptConverter.createForm());
+// 部门新增
+const handleDepartmentAdd = () => {
+    edit.form = deptConverter.createForm();
     edit.dialog = true;
-}
+};
+
+// 部门编辑
+const handleDepartmentEdit = (row: DepartmentTreeVO) => {
+    edit.form = deptConverter.toForm(row);
+    edit.dialog = true;
+};
 
 // 关闭弹窗
 function handleDialogClose() {
     if (edit.dialog) {
         edit.dialog = false;
-        edit.form = {} as Department;
+        edit.form = deptConverter.createForm();
     }
     handleCriteriaQuery();
 }
@@ -66,7 +72,7 @@ function handleDialogClose() {
             <el-form-item>
                 <el-button type="primary" @click="handleCriteriaQuery">查询</el-button>
                 <el-button>重置</el-button>
-                <el-button v-owner="'DEPT:INSERT'" @click="handleDialogOpen({} as Department)">新增</el-button>
+                <el-button v-owner="'DEPT:INSERT'" @click="handleDepartmentAdd()">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -91,7 +97,7 @@ function handleDialogClose() {
                         link
                         type="primary"
                         size="small"
-                        @click="handleDialogOpen(scope.row)">
+                        @click="handleDepartmentEdit(scope.row)">
                         编辑
                     </el-button>
                     <el-button
