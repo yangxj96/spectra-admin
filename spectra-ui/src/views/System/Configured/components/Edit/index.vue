@@ -4,6 +4,7 @@ import { useTemplateRef } from "vue";
 import { configuredApi } from "@/api/system/configured.ts";
 import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import { configuredConverter } from "@/converter/configured-converter.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 import type { ElForm } from "element-plus";
@@ -16,8 +17,7 @@ const show = defineModel("show", {
 });
 
 // 表单
-const form = defineModel<Configured>("form", {
-    type: Object,
+const form = defineModel<ConfiguredForm>("form", {
     required: true
 });
 
@@ -26,7 +26,7 @@ const formRef = useTemplateRef("formRef");
 // 定义响应方法
 const emits = defineEmits(["close"]);
 
-const handleDrawerClose = () => {
+const handleClose = () => {
     show.value = false;
     emits("close");
 };
@@ -35,8 +35,8 @@ const handleConfiguredSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value.validate();
-        await configuredApi.upload(form.value!);
-        MessageUtils.success("修改配置成功", () => handleDrawerClose());
+        await configuredApi.upload(configuredConverter.toDTO(form.value));
+        MessageUtils.success("修改配置成功", handleClose);
     } catch (error) {
         console.error(error);
     }
@@ -45,11 +45,11 @@ const handleConfiguredSave = async () => {
 
 <template>
     <!-- 配置编辑 -->
-    <el-drawer v-model="show" :modal="true" modal-penetrable destroy-on-close @close="handleDrawerClose">
+    <el-drawer v-model="show" :modal="true" modal-penetrable destroy-on-close @close="handleClose">
         <template #header>
             <div>
                 <ComponentsIcons name="icon-edit" />
-                编辑配置
+                编辑系统配置
             </div>
         </template>
 
@@ -77,7 +77,7 @@ const handleConfiguredSave = async () => {
         </template>
 
         <template #footer>
-            <el-button @click="handleDrawerClose">取消</el-button>
+            <el-button @click="handleClose">取消</el-button>
             <el-button @click="handleConfiguredSave" type="primary">确定</el-button>
         </template>
     </el-drawer>

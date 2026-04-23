@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import _ from "lodash";
 import { onMounted, ref } from "vue";
 
 import { configuredApi } from "@/api/system/configured.ts";
 import DictTag from "@/components/DictTag/index.vue";
+import { configuredConverter } from "@/converter/configured-converter.ts";
 import UseTable from "@/hooks/use-table.ts";
 import ConfiguredEdit from "@/views/System/Configured/components/Edit/index.vue";
 
-const edit = ref({
+const edit = ref<{
+    show: boolean;
+    form: ConfiguredForm;
+}>({
     show: false,
-    form: {} as Configured
+    form: configuredConverter.createForm()
 });
 
 // 查询条件
@@ -19,10 +22,8 @@ const condition = ref<ConfiguredPageParams>({
 });
 
 // table分页请求
-const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } = UseTable<Configured>(
-    configuredApi.page,
-    condition.value
-);
+const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination, table_data } =
+    UseTable<ConfiguredPageVO>(configuredApi.page, condition.value);
 
 onMounted(() => {});
 
@@ -31,16 +32,21 @@ function handleDialogClose() {
     if (edit.value.show) {
         edit.value = {
             show: false,
-            form: {} as Configured
+            form: configuredConverter.createForm()
         };
     }
     // 最后重新获取下列表数据
     handlerConditionQuery();
 }
 
-const handleEditConfigured = (row: Configured) => {
+const handleConfiguredAdd = () => {
+    edit.value.form = configuredConverter.createForm();
     edit.value.show = true;
-    edit.value.form = _.cloneDeep(row);
+};
+
+const handleConfiguredEdit = (row: ConfiguredPageVO) => {
+    edit.value.form = configuredConverter.toForm(row);
+    edit.value.show = true;
 };
 </script>
 
@@ -52,8 +58,9 @@ const handleEditConfigured = (row: Configured) => {
                 <el-input placeholder="请输入菜单名称" clearable />
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="handlerConditionQuery">查询</el-button>
+                <el-button type="primary" @click="handlerConditionQuery()">查询</el-button>
                 <el-button>重置</el-button>
+                <el-button type="primary" @click="handleConfiguredAdd()">新增</el-button>
             </el-form-item>
         </el-form>
     </el-row>
@@ -88,7 +95,7 @@ const handleEditConfigured = (row: Configured) => {
                         link
                         type="primary"
                         size="small"
-                        @click="handleEditConfigured(scope.row)">
+                        @click="handleConfiguredEdit(scope.row)">
                         编辑
                     </el-button>
                 </template>
@@ -105,7 +112,7 @@ const handleEditConfigured = (row: Configured) => {
             @current-change="handleCurrentChange" />
     </el-row>
     <!-- 用户组件区 -->
-    <ConfiguredEdit :show="edit.show" :form="edit.form" @close="handleDialogClose" />
+    <ConfiguredEdit v-if="edit.show" v-bind:show="edit.show" v-bind:form="edit.form" @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">
