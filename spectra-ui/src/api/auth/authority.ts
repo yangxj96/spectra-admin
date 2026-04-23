@@ -12,7 +12,7 @@ export const authorityApi = {
      * 创建权限
      * @param params 权限入参
      */
-    create(params: Role): Promise<void> {
+    create(params: RolePageVO): Promise<void> {
         return post<void>("/api/authority", params);
     },
     /**
@@ -26,7 +26,7 @@ export const authorityApi = {
      * 修改权限
      * @param params 权限入参
      */
-    update(params: Role): Promise<void> {
+    update(params: RolePageVO): Promise<void> {
         return put<void>("/api/authority", params);
     },
     /**

@@ -14,7 +14,7 @@ export const roleApi = {
      * 创建角色
      * @param params 角色入参
      */
-    create(params: Role): Promise<void> {
+    create(params: RoleForm): Promise<void> {
         return post<void>("/api/role", params);
     },
     /**
@@ -28,21 +28,21 @@ export const roleApi = {
      * 修改角色
      * @param params 角色入参
      */
-    update(params: Role): Promise<void> {
+    update(params: RoleForm): Promise<void> {
         return put<void>("/api/role", params);
     },
     /**
      * 分页查询
      * @param params 分页参数
      */
-    page(params?: RolePageParams): Promise<Page<Role>> {
-        return get<Page<Role>>("/api/role/page", params);
+    page(params?: RolePageParams): Promise<Page<RolePageVO>> {
+        return get<Page<RolePageVO>>("/api/role/page", params);
     },
     /**
      * 列表查询（全量）
      */
-    list(): Promise<Role[]> {
-        return get<Role[]>("/api/role/list");
+    list(): Promise<RolePageVO[]> {
+        return get<RolePageVO[]>("/api/role/list");
     },
     /**
      * 根据角色ID获取角色下有哪些权限

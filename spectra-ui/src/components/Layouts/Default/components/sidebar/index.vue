@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { nextTick, onMounted, ref } from "vue";
 
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { cancelAllRequests } from "@/plugin/request/http.ts";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
-import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 
 defineOptions({
     name: "LayoutsSidebar"

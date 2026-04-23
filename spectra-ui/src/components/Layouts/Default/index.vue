@@ -3,12 +3,12 @@ import { useDark, useFullscreen, useToggle } from "@vueuse/core";
 import { onMounted, ref, useTemplateRef, watch } from "vue";
 import { type RouteLocationMatched, useRouter } from "vue-router";
 
+import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import Footer from "@/components/Layouts/components/Footer/index.vue";
 import Navbar from "@/components/Layouts/components/Navbar/index.vue";
 import { useAppStore } from "@/plugin/store/modules/use-app-store.ts";
 
 import Sidebar from "./components/sidebar/index.vue";
-import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 
 defineOptions({
     name: "LayoutsDefault"

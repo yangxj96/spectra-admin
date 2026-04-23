@@ -8,7 +8,6 @@ import { MessageUtils } from "@/utils/message-utils.ts";
 
 import OrganizationEdit from "./components/Edit/index.vue";
 
-
 const table_data = ref<DepartmentTree[]>();
 
 // 新增或编辑
@@ -108,7 +107,12 @@ function handleDialogClose() {
         </el-table>
     </el-row>
     <!-- 新增或编辑 -->
-    <OrganizationEdit v-if="edit.dialog" :show="edit.dialog" :form="edit.form" :tree="table_data!" @close="handleDialogClose" />
+    <OrganizationEdit
+        v-if="edit.dialog"
+        :show="edit.dialog"
+        :form="edit.form"
+        :tree="table_data!"
+        @close="handleDialogClose" />
 </template>
 
 <style scoped lang="scss">

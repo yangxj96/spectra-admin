@@ -19,7 +19,7 @@ declare global {
         // 权限列表
         authorities: string[];
         // 角色
-        roles: Role[];
+        roles: RolePageVO[];
     };
 
     // 用户分页查询的实体
@@ -51,7 +51,7 @@ declare global {
         // 时区
         timezone: string;
         // 角色列表
-        roles: Role[];
+        roles: RolePageVO[];
         // 部门ID
         department_id: string;
         // 部门名称

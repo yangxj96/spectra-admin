@@ -5,6 +5,7 @@ import { onMounted, reactive, ref, useTemplateRef } from "vue";
 import { authorityApi } from "@/api/auth/authority.ts";
 import { roleApi } from "@/api/auth/role.ts";
 import { menuApi } from "@/api/system/menu.ts";
+import { roleConverter } from "@/converter/role-converter.ts";
 import UseTable from "@/hooks/use-table.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
@@ -22,13 +23,16 @@ const condition = ref<RolePageParams>({
     page_num: 1,
     page_size: 100
 });
-const edit = reactive({
+const edit = reactive<{
+    dialog: boolean;
+    form: RoleForm;
+}>({
     dialog: false,
-    form: {} as Role
+    form: roleConverter.createForm()
 });
-const currentRow = ref<Role>();
+const currentRow = ref<RolePageVO>();
 
-const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination, table_data } = UseTable<Role>(
+const { handlerConditionQuery, handleCurrentChange, handleSizeChange, pagination, table_data } = UseTable<RolePageVO>(
     roleApi.page,
     condition.value
 );
@@ -43,14 +47,18 @@ async function handleInitData() {
     authority_tree.value = await authorityApi.tree();
 }
 
-// 角色编辑框Dialog
-function handleRoleEditDialogOpen(row: Role) {
-    edit.form = JSON.parse(JSON.stringify(row));
+const handleRoleAdd = () => {
+    edit.form = roleConverter.createForm();
     edit.dialog = true;
-}
+};
+
+const handleRoleEdit = (row: RolePageVO) => {
+    edit.form = roleConverter.toForm(row);
+    edit.dialog = true;
+};
 
 // 角色删除
-function handleRoleDelete(row: Role) {
+function handleRoleDelete(row: RolePageVO) {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         await roleApi.delete(row.id);
         MessageUtils.success("删除成功");
@@ -78,7 +86,7 @@ function cleanTreeCheckState() {
 }
 
 // 角色列表行被单机
-async function handleRoleTableRowClick(row: Role) {
+async function handleRoleTableRowClick(row: RolePageVO) {
     if (currentRow.value && currentRow.value.id && currentRow.value.id === row.id) return;
     try {
         currentRow.value = row;
@@ -150,8 +158,8 @@ async function handleSaveRoleMenu() {
                         </el-select>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary" @click="handleRoleConditionQuery">查询</el-button>
-                        <el-button @click="handleRoleEditDialogOpen({} as Role)">新增</el-button>
+                        <el-button type="primary" @click="handleRoleConditionQuery()">查询</el-button>
+                        <el-button @click="handleRoleAdd()">新增</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
@@ -184,9 +192,7 @@ async function handleSaveRoleMenu() {
                 <el-table-column align="center" prop="remark" label="备注" show-overflow-tooltip />
                 <el-table-column align="center" label="编辑" width="120">
                     <template #default="scope">
-                        <el-button link type="primary" size="small" @click="handleRoleEditDialogOpen(scope.row)">
-                            编辑
-                        </el-button>
+                        <el-button link type="primary" size="small" @click="handleRoleEdit(scope.row)">编辑</el-button>
                         <el-button link type="primary" size="small" @click="handleRoleDelete(scope.row)">
                             删除
                         </el-button>
@@ -235,7 +241,7 @@ async function handleSaveRoleMenu() {
         </el-col>
     </el-row>
     <!-- 角色编辑框 -->
-    <RoleEdit v-model:show="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
+    <RoleEdit v-if="edit.dialog" v-model:open="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
 </template>
 
 <style scoped lang="scss">

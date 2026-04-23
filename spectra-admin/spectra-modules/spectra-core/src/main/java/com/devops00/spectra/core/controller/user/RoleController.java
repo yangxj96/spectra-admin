@@ -31,6 +31,7 @@ import com.devops00.spectra.core.javabean.user.vo.RoleVO;
 import com.devops00.spectra.core.service.user.RelRoleAuthorityService;
 import com.devops00.spectra.core.service.user.RelRoleMenuService;
 import com.devops00.spectra.core.service.user.RoleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -47,6 +48,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequestMapping("/role")
+@RequiredArgsConstructor
 public class RoleController {
 
     private final RoleService bindService;
@@ -54,12 +56,6 @@ public class RoleController {
     private final RelRoleMenuService relRoleMenuService;
 
     private final RelRoleAuthorityService relRoleAuthorityService;
-
-    public RoleController(RoleService bindService, RelRoleMenuService relRoleMenuService, RelRoleAuthorityService relRoleAuthorityService) {
-        this.bindService = bindService;
-        this.relRoleMenuService = relRoleMenuService;
-        this.relRoleAuthorityService = relRoleAuthorityService;
-    }
 
     @ULog("创建角色")
     @PostMapping
@@ -71,9 +67,9 @@ public class RoleController {
     @ULog("删除角色")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
-    public void delete(@PathVariable String id) {
+    public void delete(@PathVariable UUID id) {
         try {
-            bindService.delete(UUID.fromString(id));
+            bindService.delete(id);
         } catch (NumberFormatException e) {
             log.error("ID转换异常", e);
         }
@@ -104,9 +100,9 @@ public class RoleController {
 
     @ULog("获取角色关联的权限列表")
     @GetMapping("/{roleId}/authority")
-    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable String roleId) {
+    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable UUID roleId) {
         try {
-            return relRoleAuthorityService.get(UUID.fromString(roleId));
+            return relRoleAuthorityService.get(roleId);
         } catch (Exception e) {
             log.error("{}获取角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -115,9 +111,9 @@ public class RoleController {
 
     @ULog("获取角色关联的菜单列表")
     @GetMapping("/{roleId}/menu")
-    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable String roleId) {
+    public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {
         try {
-            return relRoleMenuService.get(UUID.fromString(roleId));
+            return relRoleMenuService.get(roleId);
         } catch (Exception e) {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");
@@ -139,9 +135,9 @@ public class RoleController {
     @ULog("保存角色关联的菜单列表")
     @PutMapping("/{roleId}/menus")
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
-    public void saveRoleRelMenuByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleMenuFrom from) {
+    public void saveRoleRelMenuByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
-            relRoleMenuService.grant(UUID.fromString(roleId), from);
+            relRoleMenuService.grant(roleId, from);
         } catch (Exception e) {
             log.error("{}保存角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new IllegalArgumentException("参数转换失败");

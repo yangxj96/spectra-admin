@@ -7,11 +7,11 @@ import { departmentApi } from "@/api/user/organization.ts";
 import { userApi } from "@/api/user/user.ts";
 import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import DictSelect from "@/components/DictSelect/index.vue";
+import { userConverter } from "@/converter/user-converter.ts";
 import { useDictStore } from "@/plugin/store/modules/use-dict-store.ts";
 import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 import { email, mobile } from "@/utils/verify-rules.ts";
-import { userConverter } from "@/converter/user-converter.ts";
 
 // 定义Model
 const form = defineModel<UserForm>("form", {
@@ -37,7 +37,7 @@ const rules: FormRules<UserForm> = {
 };
 
 // 数据
-const roles = ref<Role[]>();
+const roles = ref<RolePageVO[]>();
 const department_tree = ref<DepartmentTree[]>();
 
 // 组件
@@ -59,7 +59,7 @@ onMounted(async () => {
 });
 
 // 处理关闭
-function handleCurrentDialogClose() {
+function handleClose() {
     open.value = false;
     emits("close");
 }
@@ -74,12 +74,10 @@ async function handleUserSave() {
         } else {
             await userApi.create(userConverter.toDTO(form.value));
         }
-        MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", () => {
-            handleCurrentDialogClose();
-        });
+        MessageUtils.success(form.value.id ? "修改用户成功" : "新增用户成功", handleClose);
     } catch (error) {
-        // 输出到控制台就好了,不需要进行提示
         console.error(error);
+        MessageUtils.error(error);
     }
 }
 
@@ -120,7 +118,7 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
 
 <template>
     <!-- 新增或编辑 -->
-    <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleCurrentDialogClose">
+    <el-drawer v-model="open" class="loading-box" :modal="true" @close="handleClose">
         <template #header>
             <div>
                 <ComponentsIcons name="icon-edit" />
@@ -219,7 +217,7 @@ const handleEmailSuggestions = (query: string, callback: (results: AutocompleteD
         </template>
 
         <template #footer>
-            <el-button @click="handleCurrentDialogClose">取消</el-button>
+            <el-button @click="handleClose">取消</el-button>
             <el-button type="primary" @click="handleUserSave">确定</el-button>
         </template>
     </el-drawer>

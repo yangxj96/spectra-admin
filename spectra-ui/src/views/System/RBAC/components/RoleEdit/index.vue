@@ -4,17 +4,17 @@ import { computed, useTemplateRef } from "vue";
 
 import { roleApi } from "@/api/auth/role.ts";
 import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
+import { roleConverter } from "@/converter/role-converter.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model
-const open = defineModel("show", {
+const open = defineModel("open", {
     required: true,
     default: false
 });
 
-const form = defineModel("form", {
-    required: false,
-    default: {} as Role
+const form = defineModel<RoleForm>("form", {
+    required: true
 });
 
 // 定义响应方法
@@ -29,19 +29,21 @@ const modify = computed(() => {
 });
 
 // 路由规则
-const rules = {
+const rules: FormRules<RoleForm> = {
     name: [
         { required: true, message: "请输入角色名称", trigger: "blur" },
         { min: 2, max: 20, message: "角色名称长度需要在2-20字符范围内", trigger: "blur" }
     ],
     scope: [{ required: true, message: "请选择角色分类", trigger: "change" }],
     state: [{ required: true, message: "请选择角色状态", trigger: "change" }]
-} as FormRules;
+};
 
 // 处理关闭
 const handleClose = () => {
     open.value = false;
-    emits("close");
+    setTimeout(() => {
+        emits("close");
+    }, 200);
 };
 
 // 角色保存
@@ -50,9 +52,9 @@ const handleSave = async () => {
     try {
         await formRef.value?.validate();
         if (modify.value) {
-            await roleApi.update(form.value);
+            await roleApi.update(roleConverter.toDTO(form.value));
         } else {
-            await roleApi.create(form.value);
+            await roleApi.create(roleConverter.toDTO(form.value));
         }
         MessageUtils.success(modify.value ? "修改角色成功" : "新增角色成功", handleClose);
     } catch (error) {
@@ -63,7 +65,7 @@ const handleSave = async () => {
 </script>
 
 <template>
-    <el-drawer v-model="open" :modal="true" modal-penetrable destroy-on-close @close="handleClose">
+    <el-drawer v-model="open" class="loading-box" :modal="true" @close="handleClose">
         <template #header>
             <div>
                 <ComponentsIcons name="icon-edit" />
@@ -83,9 +85,11 @@ const handleSave = async () => {
                 </el-form-item>
                 <el-form-item label="角色范围" prop="scope">
                     <el-select v-model="form.scope" clearable append-to=".box-content">
-                        <el-option value="全局" label="全局" />
-                        <el-option value="本级及下级" label="本级及下级" />
-                        <el-option value="本级" label="本级" />
+                        <el-option label="全局" :value="0" />
+                        <el-option label="本人" :value="1" />
+                        <el-option label="部门" :value="2" />
+                        <el-option label="部门及子部门" :value="3" />
+                        <el-option label="自定义" :value="4" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="是否启用" prop="state">
