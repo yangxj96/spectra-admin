@@ -28,7 +28,7 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
 onMounted(() => {});
 
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
-function handleDialogClose() {
+const handleDialogClose = () => {
     if (edit.value.show) {
         edit.value = {
             show: false,
@@ -37,7 +37,7 @@ function handleDialogClose() {
     }
     // 最后重新获取下列表数据
     handlerConditionQuery();
-}
+};
 
 const handleConfiguredAdd = () => {
     edit.value.form = configuredConverter.createForm();

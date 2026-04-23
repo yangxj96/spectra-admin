@@ -31,7 +31,7 @@ onMounted(async () => {
 });
 
 // 等待菜单加载完成
-function waitForMenuLoad() {
+const waitForMenuLoad = () => {
     return new Promise<void>(resolve => {
         // 如果菜单已加载，直接返回
         if (useAppStore().menus.length > 0 && !useAppStore().isFetchingMenus) {
@@ -50,16 +50,16 @@ function waitForMenuLoad() {
             { immediate: true }
         );
     });
-}
+};
 
 // 辅助函数：判断路由是否存在（更精确）
-function isRouteExists(path: string) {
+const isRouteExists = (path: string) => {
     try {
         return router.resolve(path).name !== undefined;
     } catch {
         return false;
     }
-}
+};
 </script>
 
 <template>

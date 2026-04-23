@@ -7,7 +7,7 @@ import DictSelect from "@/components/DictSelect/index.vue";
 import { configuredConverter } from "@/converter/configured-converter.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
-import type { ElForm } from "element-plus";
+import type { ElForm, FormInstance } from "element-plus";
 
 // 是否显示
 const show = defineModel("show", {
@@ -21,7 +21,7 @@ const form = defineModel<ConfiguredForm>("form", {
     required: true
 });
 
-const formRef = useTemplateRef("formRef");
+const formRef = useTemplateRef<FormInstance>("formRef");
 
 // 定义响应方法
 const emits = defineEmits(["close"]);

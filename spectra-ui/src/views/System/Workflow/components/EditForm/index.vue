@@ -19,13 +19,13 @@ const config = {
 
 const designer = useTemplateRef<InstanceType<typeof FcDesigner>>("designer");
 
-function handleSave(data: { rule: string; options: string }) {
+const handleSave = (data: { rule: string; options: string }) => {
     console.log(`保存数据`);
     console.log(`路由规则: `, JSON.parse(data.rule));
     console.log(`配置规则: `, JSON.parse(data.options));
     const json = designer.value?.getJson();
     console.log(`json:${JSON.stringify(json)}`);
-}
+};
 
 onMounted(() => {
     const json = designer.value?.getJson();

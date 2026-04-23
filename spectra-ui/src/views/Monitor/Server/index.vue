@@ -68,17 +68,21 @@ const cpuChart = useTemplateRef("cpuChart");
 
 onMounted(() => {
     initData();
+    // 初始更新
+    updateData();
+    // 定时更新数据（2秒一次）
+    setInterval(updateData, 2000);
 });
 
 // 初始化所需数据
-function initData() {
+const initData = () => {
     const requests = [serviceMonitorApi.getCPUInfo(), serviceMonitorApi.getRAMInfo(), serviceMonitorApi.getJVMInfo()];
     Promise.all(requests).then(res => {
         cpuInfo.value = (res[0] ?? []) as CPUInfo;
         ramInfo.value = (res[1] ?? []) as RAMInfo;
         jvmInfo.value = (res[2] ?? []) as JVMInfo;
     });
-}
+};
 
 //////////////// 以下位辅助方法,还需要整理
 
@@ -87,7 +91,7 @@ const timeData = [] as string[];
 const cpuData = [] as number[];
 let currentTime = new Date();
 
-function updateData() {
+const updateData = () => {
     // 生成随机CPU使用率
     const cpuValue = Math.floor(Math.random() * 45) + 20; // 20-65%范围
 
@@ -120,13 +124,7 @@ function updateData() {
             }
         ]
     });
-}
-
-// 初始更新
-updateData();
-
-// 定时更新数据（2秒一次）
-setInterval(updateData, 2000);
+};
 </script>
 
 <template>

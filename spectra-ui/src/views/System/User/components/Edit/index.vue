@@ -59,13 +59,13 @@ onMounted(async () => {
 });
 
 // 处理关闭
-function handleClose() {
+const handleClose = () => {
     open.value = false;
     emits("close");
-}
+};
 
 // 新增或编辑用户
-async function handleUserSave() {
+const handleUserSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
@@ -79,7 +79,7 @@ async function handleUserSave() {
         console.error(error);
         MessageUtils.error(error);
     }
-}
+};
 
 // 处理自动提示补全组件的补全过程
 const handleEmailSuggestions = (query: string, callback: (results: AutocompleteData) => void) => {

@@ -49,12 +49,12 @@ onMounted(() => {
 });
 
 // 初始化数据
-async function handleInitData() {
+const handleInitData = async () => {
     gropus.value = await dictApi.getTypesGroupTree();
-}
+};
 
 // 保存字典组
-function handleSaveDictGroup() {
+const handleSaveDictGroup = () => {
     if (!editForm.value) return;
     editForm.value?.validate(async valid => {
         if (!valid) {
@@ -70,7 +70,7 @@ function handleSaveDictGroup() {
             emit("close");
         });
     });
-}
+};
 </script>
 
 <template>

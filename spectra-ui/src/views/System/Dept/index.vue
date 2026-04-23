@@ -24,12 +24,12 @@ onMounted(() => {
 });
 
 // 初始化数据
-async function handleCriteriaQuery() {
+const handleCriteriaQuery = async () => {
     table_data.value = await departmentApi.tree();
-}
+};
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: DepartmentTreeVO) {
+const handleTableItemDelete = (row: DepartmentTreeVO) => {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         try {
             await departmentApi.deleteById(row.id);
@@ -38,7 +38,7 @@ function handleTableItemDelete(row: DepartmentTreeVO) {
             await handleCriteriaQuery();
         }
     });
-}
+};
 
 // 部门新增
 const handleDepartmentAdd = () => {
@@ -53,13 +53,13 @@ const handleDepartmentEdit = (row: DepartmentTreeVO) => {
 };
 
 // 关闭弹窗
-function handleDialogClose() {
+const handleDialogClose = () => {
     if (edit.dialog) {
         edit.dialog = false;
         edit.form = deptConverter.createForm();
     }
     handleCriteriaQuery();
-}
+};
 </script>
 
 <template>

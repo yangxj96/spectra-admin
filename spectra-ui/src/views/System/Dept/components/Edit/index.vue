@@ -48,7 +48,7 @@ function handleClose() {
 }
 
 // 新增或编辑
-async function handleOrganizationSave() {
+const handleOrganizationSave = async () => {
     if (!formRef.value) return;
     try {
         await formRef.value?.validate();
@@ -61,7 +61,7 @@ async function handleOrganizationSave() {
     } catch (error) {
         console.log(error);
     }
-}
+};
 </script>
 
 <template>

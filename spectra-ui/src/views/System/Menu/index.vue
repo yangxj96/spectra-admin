@@ -33,19 +33,19 @@ onMounted(() => {
 });
 
 // 初始化数据
-async function handleCriteriaQuery() {
+const handleCriteriaQuery = async () => {
     table_data.value = await menuApi.tree();
-}
+};
 
 // 表行修改按钮被单击
-function handleTableItemModify(row: Menu) {
+const handleTableItemModify = (row: Menu) => {
     menu.modify = true;
     menu.form = JSON.parse(JSON.stringify(row));
     menu.dialog = true;
-}
+};
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: Menu) {
+const handleTableItemDelete = (row: Menu) => {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         console.log(`确定删除`);
         await menuApi.deleteById(row.id);
@@ -53,17 +53,17 @@ function handleTableItemDelete(row: Menu) {
             handleCriteriaQuery();
         });
     });
-}
+};
 
 // 处理菜单Dialog打开
-function handleMenuAddDialog() {
+const handleMenuAddDialog = () => {
     menu.modify = false;
     menu.form = {} as Menu;
     menu.dialog = true;
-}
+};
 
 // 新增或编辑
-async function handleMenuSave() {
+const handleMenuSave = async () => {
     if (!menuForm.value) return;
     await menuForm.value?.validate(async valid => {
         if (valid) {
@@ -78,7 +78,7 @@ async function handleMenuSave() {
             });
         }
     });
-}
+};
 </script>
 
 <template>

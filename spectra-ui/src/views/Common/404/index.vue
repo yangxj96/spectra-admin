@@ -20,12 +20,12 @@ onUnmounted(() => {
     clearTimeout(time.value);
 });
 
-function handleBack() {
+const handleBack = () => {
     if (time.value !== -1) {
         clearTimeout(time.value);
     }
     router.replace("/");
-}
+};
 </script>
 
 <template>

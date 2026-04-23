@@ -42,10 +42,10 @@ onMounted(() => {
 });
 
 // 初始化数据
-async function handleInitData() {
+const handleInitData = async () => {
     menu_tree.value = await menuApi.tree();
     authority_tree.value = await authorityApi.tree();
-}
+};
 
 const handleRoleAdd = () => {
     edit.form = roleConverter.createForm();
@@ -58,22 +58,22 @@ const handleRoleEdit = (row: RolePageVO) => {
 };
 
 // 角色删除
-function handleRoleDelete(row: RolePageVO) {
+const handleRoleDelete = (row: RolePageVO) => {
     MessageUtils.box.confirm(`是否要删除[${row.name}]`, "提示").then(async () => {
         await roleApi.delete(row.id);
         MessageUtils.success("删除成功");
         await handlerConditionQuery();
     });
-}
+};
 
 // 条件查询
-function handleRoleConditionQuery() {
+const handleRoleConditionQuery = () => {
     cleanTreeCheckState();
     handlerConditionQuery();
-}
+};
 
 // 清理右边两棵树的选中状态
-function cleanTreeCheckState() {
+const cleanTreeCheckState = () => {
     if (authority_tree.value)
         for (const item of authority_tree.value) {
             powerRef.value?.setChecked(item.id, false, true);
@@ -83,10 +83,10 @@ function cleanTreeCheckState() {
         for (const item of menu_tree.value) {
             menuRef.value?.setChecked(item.id, false, true);
         }
-}
+};
 
 // 角色列表行被单机
-async function handleRoleTableRowClick(row: RolePageVO) {
+const handleRoleTableRowClick = async (row: RolePageVO) => {
     if (currentRow.value && currentRow.value.id && currentRow.value.id === row.id) return;
     try {
         currentRow.value = row;
@@ -102,10 +102,10 @@ async function handleRoleTableRowClick(row: RolePageVO) {
     } catch (error: unknown) {
         console.error("未知错误", error);
     }
-}
+};
 
 // 角色-权限关联关系保存
-async function handleSaveRoleAuthority() {
+const handleSaveRoleAuthority = async () => {
     if (!currentRow.value) {
         MessageUtils.warning("请先选中一个角色");
         return;
@@ -116,10 +116,10 @@ async function handleSaveRoleAuthority() {
     };
     await roleApi.saveRoleAuthority(params);
     MessageUtils.success("保存成功");
-}
+};
 
 // 角色-菜单 关联关系保存
-async function handleSaveRoleMenu() {
+const handleSaveRoleMenu = async () => {
     if (!currentRow.value) {
         MessageUtils.warning("请先选中一个角色");
         return;
@@ -130,7 +130,7 @@ async function handleSaveRoleMenu() {
     };
     await roleApi.saveRoleMenu(params);
     MessageUtils.success("保存成功");
-}
+};
 </script>
 
 <template>

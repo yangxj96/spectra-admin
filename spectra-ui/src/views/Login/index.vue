@@ -40,12 +40,12 @@ if (import.meta.env.DEV) {
 }
 
 // 刷新验证码
-function refreshKaptcha() {
+const refreshKaptcha = () => {
     kaptchaUrl.value = import.meta.env.VITE_API_URL + "api/common/kaptcha?_t=" + Date.now();
-}
+};
 
 // 登录
-async function handleLogin() {
+const handleLogin = async () => {
     // 没获取到表单对象
     if (!loginRef) {
         return;
@@ -72,7 +72,7 @@ async function handleLogin() {
         refreshKaptcha();
         console.error("登录请求失败:", error);
     }
-}
+};
 </script>
 
 <template>

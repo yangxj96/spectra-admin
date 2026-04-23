@@ -38,32 +38,32 @@ const { handleCurrentChange, handleSizeChange, handlerConditionQuery, pagination
     condition.value
 );
 
-async function handleInitData() {
+const handleInitData = async () => {
     organizationTree.value = (await departmentApi.tree()) || [];
-}
+};
 
-function handleUserAdd() {
+const handleUserAdd = () => {
     dialog_edit.value.form = userConverter.createForm();
     dialog_edit.value.open = true;
-}
+};
 
-function handleUserEdit(row: UserPageVO) {
+const handleUserEdit = (row: UserPageVO) => {
     dialog_edit.value.form = userConverter.toForm(row);
     dialog_edit.value.open = true;
-}
+};
 
 // 表行删除按钮被单击
-function handleTableItemDelete(row: UserPageVO) {
+const handleTableItemDelete = (row: UserPageVO) => {
     MessageUtils.box.confirm(`是否要删除[${row.username}]`, "提示").then(async () => {
         await userApi.deleteById(row.id);
         MessageUtils.success("删除成功", () => {
             handlerConditionQuery();
         });
     });
-}
+};
 
 // 用户重置密码
-function handleTableItemResetPassword(row: UserPageVO) {
+const handleTableItemResetPassword = (row: UserPageVO) => {
     console.log(`重置密码:${JSON.stringify(row)}`);
     MessageUtils.box.confirm(`是否要重置[${row.username}]的密码`, "提示").then(async () => {
         await userApi.passwordResetById(row.id);
@@ -71,16 +71,16 @@ function handleTableItemResetPassword(row: UserPageVO) {
             handlerConditionQuery();
         });
     });
-}
+};
 
 // 组织机构树节点被单击
-function handleOrganizationTreeNodeClick(row: DepartmentTreeVO) {
+const handleOrganizationTreeNodeClick = (row: DepartmentTreeVO) => {
     condition.value.department_id = row.id;
     handlerConditionQuery();
-}
+};
 
 // 处理dialog框关闭,如果有其他的dialog也在这里处理关闭
-function handleDialogClose() {
+const handleDialogClose = () => {
     if (dialog_edit.value.open) {
         dialog_edit.value = {
             open: false,
@@ -89,7 +89,7 @@ function handleDialogClose() {
     }
     // 最后重新获取下列表数据
     handlerConditionQuery();
-}
+};
 
 // 挂载后执行
 onMounted(async () => {
