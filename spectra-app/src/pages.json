@@ -1,0 +1,146 @@
+{
+    "easycom": {
+        "autoscan": true,
+        "custom": {
+            // uni-ui 规则如下配置
+            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+        }
+    },
+    "pages": [
+        //pages数组中第一项表示应用启动页，参考：https://doc.dcloud.net.cn/uni-app-x/collocation/pagesjson.html
+        {
+            "path": "pages/splash/index",
+            "style": {
+                "navigationBarTitleText": "启动中",
+                "navigationStyle": "custom"
+            }
+        },
+        {
+            "path": "pages/login/index",
+            "style": {
+                "navigationBarTitleText": "登陆"
+            }
+        },
+        {
+            "path": "pages/message/index",
+            "style": {
+                "navigationBarTitleText": "消息"
+            }
+        },
+        {
+            "path": "pages/contacts/index",
+            "style": {
+                "navigationBarTitleText": "通讯录"
+            }
+        },
+        {
+            "path": "pages/workbench/index",
+            "style": {
+                "navigationBarTitleText": "工作台"
+            }
+        },
+        {
+            "path": "pages/mine/index",
+            "style": {
+                "navigationBarTitleText": "我",
+                "navigationStyle": "custom"
+            }
+        }
+    ],
+    // 分包
+    "subPackages": [
+        // 聊天
+        {
+            "root": "subpackages/message",
+            "pages": [
+                {
+                    "path": "chat/index",
+                    "style": {
+                        "navigationBarTitleText": "聊天"
+                    }
+                },
+                {
+                    "path": "group/index",
+                    "style": {
+                        "navigationBarTitleText": "群聊"
+                    }
+                }
+            ]
+        }
+    ],
+    // 分包预加载
+    "preloadRule": {
+        "pages/message/index": {
+            "network": "all",
+            "packages": ["subpackages/message"]
+        }
+    },
+    "globalStyle": {
+        "navigationBarTextStyle": "black",
+        "navigationBarTitleText": "光谱",
+        "navigationBarBackgroundColor": "#F8F8F8",
+        "navigationStyle": "custom",
+        "backgroundColor": "#F8F8F8"
+    },
+    // 登陆规则验证,暂时不用
+    // "uniIdRouter": {},
+    "tabBar": {
+        "iconfontSrc": "static/iconfont/iconfont.ttf",
+        "color": "#999999",
+        "selectedColor": "#007AFF",
+        "backgroundColor": "#FFFFFF",
+        "borderStyle": "black",
+        "list": [
+            {
+                "pagePath": "pages/message/index",
+                "text": "消息",
+                "iconfont": {
+                    "text": "",
+                    "fontSize": "24px",
+                    "color": "#999999",
+                    "selectedColor": "#007AFF"
+                }
+            },
+            {
+                "pagePath": "pages/contacts/index",
+                "text": "通讯录",
+                "iconfont": {
+                    "text": "",
+                    "fontSize": "24px",
+                    "color": "#999999",
+                    "selectedColor": "#007AFF"
+                }
+            },
+            {
+                "pagePath": "pages/workbench/index",
+                "text": "工作台",
+                "iconfont": {
+                    "text": "",
+                    "fontSize": "24px",
+                    "color": "#999999",
+                    "selectedColor": "#007AFF"
+                }
+            },
+            {
+                "pagePath": "pages/mine/index",
+                "text": "我",
+                "iconfont": {
+                    "text": "",
+                    "fontSize": "24px",
+                    "color": "#999999",
+                    "selectedColor": "#007AFF"
+                }
+            }
+        ]
+    },
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}

@@ -164,6 +164,3 @@ env.properties
 
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java
-
-# 暂时忽略APP
-spectra-app

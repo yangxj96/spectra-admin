@@ -1,0 +1,22 @@
+# 依赖
+node_modules/
+
+# 构建产物
+dist/
+unpackage/
+uni_modules/
+
+# 静态资源
+static/
+*.log
+
+# 类型定义
+*.d.ts
+
+# 配置文件
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# 系统文件
+.DS_Store
