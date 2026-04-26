@@ -37,9 +37,11 @@
         <bitwalker.version>1.21</bitwalker.version>
         <oshi.version>6.9.1</oshi.version>
         <jetcache.version>2.7.8</jetcache.version>
-        <bcprov.version>1.83</bcprov.version>
+        <bcprov.version>1.84</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
         <mica.version>4.0.2</mica.version>
+        <!-- spring ai ver -->
+        <spring-ai.version>2.0.0-M4</spring-ai.version>
     </properties>
 
     <modules>
@@ -60,12 +62,11 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- 统一netty版本 -->
-            <!-- 较低版本使用了不安全代码 -->
+            <!-- Spring AI -->
             <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-bom</artifactId>
-                <version>4.2.6.Final</version>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -143,20 +144,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!-- 修复漏洞 -->
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec-http</artifactId>
-            <version>4.2.12.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-codec-http2</artifactId>
-            <version>4.2.12.Final</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <plugins>
