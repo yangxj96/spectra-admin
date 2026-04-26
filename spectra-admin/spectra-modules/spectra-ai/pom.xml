@@ -5,23 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.devops00.spectra</groupId>
-        <artifactId>spectra-admin</artifactId>
+        <artifactId>spectra-modules</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-starter</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>spectra-ai</artifactId>
 
-    <description>所有starter的父级</description>
-
-    <modules>
-        <module>spectra-security-base</module>
-        <module>spectra-security-starter</module>
-        <module>spectra-datascope-base</module>
-        <module>spectra-datascope-starter</module>
-        <module>spectra-ai-base</module>
-    </modules>
+    <description>AI功能模块</description>
 
     <properties>
         <java.version>25</java.version>
@@ -32,14 +23,14 @@
     </properties>
 
     <dependencies>
+        <!-- === 项目模块 === -->
 
-        <!-- === 工具 === -->
-        <!-- lombok -->
+        <!-- === 项目模块-Spring模块 === -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+
     </dependencies>
 
 </project>

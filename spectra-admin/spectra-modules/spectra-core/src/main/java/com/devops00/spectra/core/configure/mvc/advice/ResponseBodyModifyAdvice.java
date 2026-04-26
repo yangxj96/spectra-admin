@@ -31,6 +31,7 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+import reactor.core.publisher.Flux;
 
 import java.util.regex.Pattern;
 
@@ -49,6 +50,12 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         log.debug(LogPrefix.WEB.f("进入修改"));
+
+        // 忽略流式
+        if (returnType.getParameterType().isAssignableFrom(Flux.class)) {
+            return false;
+        }
+
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
             return false;
@@ -66,19 +73,29 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> converterType,
                                   ServerHttpRequest request,
                                   ServerHttpResponse response) {
-        // 跳过 String 和 byte[] 类型（避免 JSON 包装干扰）
-        if (body instanceof String || body instanceof byte[]) {
-            log.debug(LogPrefix.WEB.f("跳过 String 和 byte[] 类型(避免 JSON 包装干扰)"));
+
+        // 第一优先级：流式直接放行
+        if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
+                || body instanceof Flux
+                || Flux.class.isAssignableFrom(returnType.getParameterType())) {
+            log.debug(LogPrefix.WEB.f("跳过流式响应包装"));
             return body;
         }
 
-        // 如果是空且能转换成ServletServerHttpResponse则直接读取响应码后退出
+        // 第二：String / byte[]
+        if (body instanceof String || body instanceof byte[]) {
+            log.debug(LogPrefix.WEB.f("跳过 String 和 byte[]"));
+            return body;
+        }
+
+        // 第三：null 处理（必须放后面）
         if (body == null) {
-            log.debug(LogPrefix.WEB.f("body为null的情况处理"));
+            log.debug(LogPrefix.WEB.f("body为null处理"));
             return handleNullBody(request, response);
         }
 
-        log.debug(LogPrefix.WEB.f("包装后返回"));
+        // 正常包装
+        log.debug(LogPrefix.WEB.f("包装返回"));
         return R.success(body);
     }
 

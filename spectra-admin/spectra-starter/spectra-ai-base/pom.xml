@@ -5,23 +5,14 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.devops00.spectra</groupId>
-        <artifactId>spectra-admin</artifactId>
+        <artifactId>spectra-starter</artifactId>
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>spectra-starter</artifactId>
-    <packaging>pom</packaging>
+    <artifactId>spectra-ai-base</artifactId>
 
-    <description>所有starter的父级</description>
-
-    <modules>
-        <module>spectra-security-base</module>
-        <module>spectra-security-starter</module>
-        <module>spectra-datascope-base</module>
-        <module>spectra-datascope-starter</module>
-        <module>spectra-ai-base</module>
-    </modules>
+    <description>AI支持的基础包</description>
 
     <properties>
         <java.version>25</java.version>
@@ -32,13 +23,21 @@
     </properties>
 
     <dependencies>
-
-        <!-- === 工具 === -->
-        <!-- lombok -->
+        <!-- spring ai -->
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.modelcontextprotocol.sdk</groupId>
+                    <artifactId>mcp-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-core</artifactId>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 

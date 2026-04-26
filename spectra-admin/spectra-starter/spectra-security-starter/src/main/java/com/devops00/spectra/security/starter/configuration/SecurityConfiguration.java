@@ -5,6 +5,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.eval.SpectraPermissionEvaluator;
 import com.devops00.spectra.security.starter.filter.TokenAuthenticationFilter;
+import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -118,6 +119,8 @@ public class SecurityConfiguration {
                 // 权限匹配
                 .authorizeHttpRequests(auth ->
                         auth
+                                // 允许 ASYNC 调度
+                                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
                                 // 预检请求必须放行
                                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 // 白名单路径放行

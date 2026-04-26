@@ -59,11 +59,11 @@
             <artifactId>spectra-oa</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- === 项目模块-Spring模块 === -->
+        <!-- AI -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-ai</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>
