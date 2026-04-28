@@ -1,0 +1,8 @@
+spring:
+  ai:
+    openai:
+      api-key: ${AI_KEY}
+      base-url: ${AI_BASE_URL}
+      chat:
+        options:
+          model: ${AI_MODEL}

@@ -30,13 +30,6 @@ server:
         http-only: true
 # spring 配置
 spring:
-  ai:
-    openai:
-      api-key: ${AI_KEY}
-      base-url: ${AI_BASE_URL}
-      chat:
-        options:
-          model: ${AI_MODEL}
   # servlet
   servlet:
     multipart:
