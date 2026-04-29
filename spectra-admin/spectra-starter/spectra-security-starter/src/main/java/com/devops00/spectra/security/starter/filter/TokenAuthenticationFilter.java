@@ -32,13 +32,14 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         if (StrUtils.isNotBlank(token)) {
             SecurityUser user = SecUtil.getCurrentUser(token);
             if (user == null) {
-                // token 无效
-                throw new InsufficientAuthenticationException("Token无效或已过期");
+                // token 解析异常（过期/篡改等）→ 清空上下文
+                SecurityContextHolder.clearContext();
+            } else {
+                // 构建 Authentication 对象
+                var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
+                // 绑定到 SecurityContext
+                SecurityContextHolder.getContext().setAuthentication(auth);
             }
-            // 构建 Authentication 对象
-            var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
-            // 绑定到 SecurityContext
-            SecurityContextHolder.getContext().setAuthentication(auth);
         }
         chain.doFilter(request, response);
     }

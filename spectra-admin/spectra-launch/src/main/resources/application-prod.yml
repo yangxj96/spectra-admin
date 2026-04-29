@@ -5,6 +5,7 @@ spring:
       - classpath:application-core-prod.yml
       - classpath:application-oa-prod.yml
       - classpath:application-upload-prod.yml
+      - classpath:application-ai-prod.yml
       - classpath:application-workflow-prod.yml
   # 关闭他自带的用户
   security:

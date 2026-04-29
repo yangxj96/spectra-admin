@@ -33,8 +33,7 @@ public class AuthController {
     }
 
     @PermitAll
-    @PostMapping("/login")
-    // @ULog(value = "用户登录", type = SysLogType.SAFETY)
+    @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {
         var authentication = loginDispatcher.authenticate(params);
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -46,10 +45,9 @@ public class AuthController {
     }
 
 
-    @PostMapping("/logout")
+    @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
-    // @ULog(value = "用户登出", type = SysLogType.SAFETY)
     public void logout() {
         SecUtil.logout();
     }
@@ -58,7 +56,6 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/check", version = "1.0.0+")
-    //@ULog("token 检查", type = SysLogType.SAFETY)
     public void check() {
         // 能进入方法就说明 token 是正常的
     }
