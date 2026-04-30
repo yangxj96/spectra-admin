@@ -1,10 +1,31 @@
 {
   "id": "5156752",
   "name": "spectra-app",
-  "font_family": "iconfont",
-  "css_prefix_text": "icon-",
+  "font_family": "icons",
+  "css_prefix_text": "icons-",
   "description": "光谱APP",
   "glyphs": [
+    {
+      "icon_id": "3833182",
+      "name": "收藏",
+      "font_class": "collect",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
+      "icon_id": "5540724",
+      "name": "特色服务",
+      "font_class": "service",
+      "unicode": "e660",
+      "unicode_decimal": 58976
+    },
+    {
+      "icon_id": "11852259",
+      "name": "设置",
+      "font_class": "settings",
+      "unicode": "e616",
+      "unicode_decimal": 58902
+    },
     {
       "icon_id": "4161079",
       "name": "工作台",

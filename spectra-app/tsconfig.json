@@ -26,7 +26,7 @@
         // 输出和源码映射
         "sourceMap": true,
         // 类型定义
-        "types": ["@dcloudio/types"],
+        "types": ["vite/client", "@dcloudio/types", "@tdesign/uniapp/global"],
         // 确保正确处理 JSON 模块
         "resolveJsonModule": true
     },

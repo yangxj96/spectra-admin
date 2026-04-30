@@ -2,5 +2,19 @@
     "files.associations": {
         "pages.json": "jsonc",
         "manifest.json": "jsonc"
-    }
+    },
+    "cSpell.words": [
+        "automator",
+        "autoscan",
+        "dcloudio",
+        "easycom",
+        "easyinput",
+        "iconfont",
+        "quickapp",
+        "stacktracey",
+        "subpackages",
+        "tdesign",
+        "uniapp",
+        "weixin"
+    ]
 }

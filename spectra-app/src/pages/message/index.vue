@@ -78,9 +78,9 @@ const handlerItemClick = (item: MessageItem) => {
 <template>
     <view class="page">
         <!-- 头部固定 -->
-        <uni-nav-bar showMenuButtonWidth statusBar fixed title="消息" />
+        <uni-nav-bar statusBar fixed title="消息" />
+        <!-- 公告 -->
         <uni-notice-bar single :text="notice" />
-
         <!-- 搜索） -->
         <uni-search-bar :focus="false" placeholder="请输入搜索内容" />
         <!-- 列表区域（可滚动 + 下拉刷新） -->

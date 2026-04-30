@@ -63,7 +63,7 @@
     "quickapp": {},
     /* 小程序特有相关 */
     "mp-weixin": {
-        "appid": "",
+        "appid": "wx2e37346319f1d2b5",
         "setting": {
             "urlCheck": false
         },
@@ -87,6 +87,9 @@
         "title": "光谱",
         "unipush": {
             "enable": true
+        },
+        "router": {
+            "base": "./"
         }
     },
     "fallbackLocale": "zh-Hans"

@@ -2,8 +2,10 @@
     "easycom": {
         "autoscan": true,
         "custom": {
-            // uni-ui 规则如下配置
-            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue"
+            // uni-ui 规则配置
+            "^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
+            // tdesign 规则配置
+            "^t-(.*)": "@tdesign/uniapp/$1/$1.vue"
         }
     },
     "pages": [
@@ -18,25 +20,29 @@
         {
             "path": "pages/login/index",
             "style": {
-                "navigationBarTitleText": "登陆"
+                "navigationBarTitleText": "登陆",
+                "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/message/index",
             "style": {
-                "navigationBarTitleText": "消息"
+                "navigationBarTitleText": "消息",
+                "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/contacts/index",
             "style": {
-                "navigationBarTitleText": "通讯录"
+                "navigationBarTitleText": "通讯录",
+                "navigationStyle": "custom"
             }
         },
         {
             "path": "pages/workbench/index",
             "style": {
-                "navigationBarTitleText": "工作台"
+                "navigationBarTitleText": "工作台",
+                "navigationStyle": "custom"
             }
         },
         {
@@ -94,42 +100,26 @@
             {
                 "pagePath": "pages/message/index",
                 "text": "消息",
-                "iconfont": {
-                    "text": "",
-                    "fontSize": "24px",
-                    "color": "#999999",
-                    "selectedColor": "#007AFF"
-                }
+                "iconPath": "static/tab_bar/message.png",
+                "selectedIconPath": "static/tab_bar/message_s.png"
             },
             {
                 "pagePath": "pages/contacts/index",
                 "text": "通讯录",
-                "iconfont": {
-                    "text": "",
-                    "fontSize": "24px",
-                    "color": "#999999",
-                    "selectedColor": "#007AFF"
-                }
+                "iconPath": "static/tab_bar/contacts.png",
+                "selectedIconPath": "static/tab_bar/contacts_s.png"
             },
             {
                 "pagePath": "pages/workbench/index",
                 "text": "工作台",
-                "iconfont": {
-                    "text": "",
-                    "fontSize": "24px",
-                    "color": "#999999",
-                    "selectedColor": "#007AFF"
-                }
+                "iconPath": "static/tab_bar/workbench.png",
+                "selectedIconPath": "static/tab_bar/workbench_s.png"
             },
             {
                 "pagePath": "pages/mine/index",
                 "text": "我",
-                "iconfont": {
-                    "text": "",
-                    "fontSize": "24px",
-                    "color": "#999999",
-                    "selectedColor": "#007AFF"
-                }
+                "iconPath": "static/tab_bar/mine.png",
+                "selectedIconPath": "static/tab_bar/mine_s.png"
             }
         ]
     }

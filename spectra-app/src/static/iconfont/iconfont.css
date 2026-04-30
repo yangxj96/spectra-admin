@@ -1,31 +1,43 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 5156752 */
-  src: url('iconfont.woff2?t=1775715711297') format('woff2'),
-       url('iconfont.woff?t=1775715711297') format('woff'),
-       url('iconfont.ttf?t=1775715711297') format('truetype');
+  font-family: "icons"; /* Project id 5156752 */
+  src: url('iconfont.woff2?t=1777517078709') format('woff2'),
+       url('iconfont.woff?t=1777517078709') format('woff'),
+       url('iconfont.ttf?t=1777517078709') format('truetype');
 }
 
-.iconfont {
-  font-family: "iconfont" !important;
+.icons {
+  font-family: "icons" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-workbench:before {
+.icons-collect:before {
+  content: "\e604";
+}
+
+.icons-service:before {
+  content: "\e660";
+}
+
+.icons-settings:before {
+  content: "\e616";
+}
+
+.icons-workbench:before {
   content: "\e605";
 }
 
-.icon-msg:before {
+.icons-msg:before {
   content: "\e62c";
 }
 
-.icon-contacts:before {
+.icons-contacts:before {
   content: "\e655";
 }
 
-.icon-mine:before {
+.icons-mine:before {
   content: "\e62f";
 }
 
