@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { DEFAULT_AVATAR } from "@/config/default";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import { ref } from "vue";
+
+// #ifdef MP-WEIXIN
+useAuthGuard();
+// #endif
 
 const userAvatar = ref("/static/example/avatar.jpg");
 

@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { DEFAULT_FEATURE } from "@/config/default";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+
+// #ifdef MP-WEIXIN
+useAuthGuard();
+// #endif
 </script>
 
 <template>

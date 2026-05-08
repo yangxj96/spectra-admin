@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import { useAuthGuard } from "@/hooks/useAuthGuard";
 import useAppStore from "@/stores/app";
 import type { MessageItem } from "@/types/index";
 import { onMounted, ref } from "vue";
+
+// #ifdef MP-WEIXIN
+useAuthGuard();
+// #endif
 
 // 刷新状态
 const refreshing = ref(false);

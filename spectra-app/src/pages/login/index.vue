@@ -1,3 +1,64 @@
+<script setup lang="ts">
+import { onLoad } from "@dcloudio/uni-app";
+import { ref } from "vue";
+
+const redirect = ref("");
+
+const form = ref({
+    username: "",
+    password: "",
+    captcha: ""
+});
+
+// 模拟验证码（实际项目换成后端接口）
+const captchaUrl = ref(getCaptcha());
+
+onLoad((options: any) => {
+    if (options.redirect) {
+        // 关键：解码两次
+        redirect.value = decodeURIComponent(options.redirect);
+        console.log("redirect:", redirect.value);
+    }
+});
+
+function getCaptcha() {
+    return `https://dummyimage.com/120x40/007aff/fff&text=${Math.random().toString(36).slice(2, 6)}`;
+}
+
+/**
+ * 刷新验证码
+ */
+function refreshCaptcha() {
+    captchaUrl.value = getCaptcha();
+}
+
+// 登录逻辑
+function handleLogin() {
+    if (!form.value.username) {
+        uni.showToast({ title: "请输入用户名", icon: "none" });
+        return;
+    }
+    if (!form.value.password) {
+        uni.showToast({ title: "请输入密码", icon: "none" });
+        return;
+    }
+    if (!form.value.captcha) {
+        uni.showToast({ title: "请输入验证码", icon: "none" });
+        return;
+    }
+
+    // TODO: 调用接口
+    console.log("登录参数", form.value);
+
+    uni.showLoading({ title: "登录中..." });
+
+    setTimeout(() => {
+        uni.hideLoading();
+        uni.showToast({ title: "登录成功" });
+    }, 1000);
+}
+</script>
+
 <template>
     <!-- #ifdef APP -->
     <scroll-view style="flex: 1">
@@ -32,54 +93,7 @@
     <!-- #endif -->
 </template>
 
-<script setup lang="ts">
-import { ref } from "vue";
-
-const form = ref({
-    username: "",
-    password: "",
-    captcha: ""
-});
-
-// 模拟验证码（实际项目换成后端接口）
-const captchaUrl = ref(getCaptcha());
-
-function getCaptcha() {
-    return `https://dummyimage.com/120x40/007aff/fff&text=${Math.random().toString(36).slice(2, 6)}`;
-}
-
-function refreshCaptcha() {
-    captchaUrl.value = getCaptcha();
-}
-
-// 登录逻辑
-function handleLogin() {
-    if (!form.value.username) {
-        uni.showToast({ title: "请输入用户名", icon: "none" });
-        return;
-    }
-    if (!form.value.password) {
-        uni.showToast({ title: "请输入密码", icon: "none" });
-        return;
-    }
-    if (!form.value.captcha) {
-        uni.showToast({ title: "请输入验证码", icon: "none" });
-        return;
-    }
-
-    // TODO: 调用接口
-    console.log("登录参数", form.value);
-
-    uni.showLoading({ title: "登录中..." });
-
-    setTimeout(() => {
-        uni.hideLoading();
-        uni.showToast({ title: "登录成功" });
-    }, 1000);
-}
-</script>
-
-<style scoped>
+<style lang="scss" scoped>
 .page {
     min-height: 100vh;
     background: linear-gradient(180deg, #007aff 0%, #ffffff 300px);

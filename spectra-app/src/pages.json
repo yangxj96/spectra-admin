@@ -13,43 +13,37 @@
         {
             "path": "pages/splash/index",
             "style": {
-                "navigationBarTitleText": "启动中",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "启动中"
             }
         },
         {
             "path": "pages/login/index",
             "style": {
-                "navigationBarTitleText": "登陆",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "登陆"
             }
         },
         {
             "path": "pages/message/index",
             "style": {
-                "navigationBarTitleText": "消息",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "消息"
             }
         },
         {
             "path": "pages/contacts/index",
             "style": {
-                "navigationBarTitleText": "通讯录",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "通讯录"
             }
         },
         {
             "path": "pages/workbench/index",
             "style": {
-                "navigationBarTitleText": "工作台",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "工作台"
             }
         },
         {
             "path": "pages/mine/index",
             "style": {
-                "navigationBarTitleText": "我",
-                "navigationStyle": "custom"
+                "navigationBarTitleText": "我"
             }
         }
     ],
@@ -76,6 +70,7 @@
     ],
     // 分包预加载
     "preloadRule": {
+        // 意思是进入这个页面的时候预加载这个分包，参考：https://doc.dcloud.net.cn/uni-app-x/collocation/pagesjson.html
         "pages/message/index": {
             "network": "all",
             "packages": ["subpackages/message"]
@@ -88,8 +83,6 @@
         "navigationStyle": "custom",
         "backgroundColor": "#F8F8F8"
     },
-    // 登陆规则验证,暂时不用
-    // "uniIdRouter": {},
     "tabBar": {
         "iconfontSrc": "static/iconfont/iconfont.ttf",
         "color": "#999999",

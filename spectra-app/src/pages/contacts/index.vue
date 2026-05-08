@@ -1,5 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useAuthGuard } from "@/hooks/useAuthGuard";
+
+// #ifdef MP-WEIXIN
+useAuthGuard();
+// #endif
 
 const list = ref([
     {
