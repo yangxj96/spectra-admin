@@ -25,6 +25,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
+import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.configure.mvc.properties.UserProperties;
 import com.devops00.spectra.core.javabean.auth.entity.Account;
@@ -113,32 +114,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         // 关联角色
         relUserRoleService.grant(entity.getId(), params.getRoleIds());
-        // TODO 数据范围处理
-        if (params.getDataScope() == null) {
-            // 现在设置为null了.移除数据库中的数据范围
-            dataScopeMapper.removeByUserId(entity.getId());
-            dataScopeTargetMapper.removeByUserId(entity.getId());
-        }
-        if (params.getDataScope() != null) {
-            // 新增
-            var dataScopeEntity = new UserDataScope();
-            dataScopeEntity.setUserId(entity.getId());
-            dataScopeEntity.setScopeType(params.getDataScope());
-            dataScopeMapper.insert(dataScopeEntity);
-            // 如果是自定义的话,要插入自定义的数据
-            if (params.getDataScope() == DataScopeType.CUSTOM) {
-                var targets = new ArrayList<UserDataScopeTarget>();
-                for (String targetId : params.getTargetIds()) {
-                    var datum = new UserDataScopeTarget();
-                    datum.setUserId(entity.getId());
-                    datum.setTargetId(targetId);
-                    datum.setTargetType(0);
-                    targets.add(datum);
-                }
-                dataScopeTargetMapper.insert(targets);
-            }
-        }
-
+        // 更新用户数据范围
+        this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
     }
 
     @Override
@@ -179,50 +156,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             accountService.updateById(account);
         }
 
-        // 数据范围处理
-        UserDataScope dataScope = dataScopeMapper.findByUserId(entity.getId());
-        if (params.getDataScope() == null && dataScope != null) {
-            // 请求参数不存在数据范围,但是数据范围数据存在,则删除数据范围数据
-            dataScopeMapper.deleteById(dataScope.getId());
-        }
-        //if (params.getDataScope() != null) {
-        //    if (dataScope == null) {
-        //        // 新增
-        //        var dataScopeEntity = new UserDataScope();
-        //        dataScopeEntity.setUserId(entity.getId());
-        //        dataScopeEntity.setScopeType(params.getDataScope());
-        //        dataScopeMapper.insert(dataScopeEntity);
-        //    } else {
-        //        // 如果之前存的是CUSTOM,则需要清除一下
-        //        if (dataScope.getScopeType().equals(DataScopeType.CUSTOM)) {
-        //            List<UserDataScopeTarget> userDataScopeTargets = dataScopeTargetMapper.selectList(
-        //                    new LambdaQueryWrapper<UserDataScopeTarget>()
-        //                            .eq(UserDataScopeTarget::getUserId, entity.getId())
-        //            );
-        //            dataScopeTargetMapper.deleteByIds(
-        //                    userDataScopeTargets.stream()
-        //                            .map(BaseEntity::getId)
-        //                            .toList()
-        //            );
-        //        }
-        //        dataScope.setScopeType(params.getDataScope());
-        //        dataScopeMapper.updateById(dataScope);
-        //    }
-        //
-        //    // 如果现在修改成了自定义的话,要插入自定义的数据
-        //    if (params.getDataScope() == DataScopeType.CUSTOM) {
-        //        var targets = new ArrayList<UserDataScopeTarget>();
-        //        for (String targetId : params.getTargetIds()) {
-        //            var datum = new UserDataScopeTarget();
-        //            datum.setUserId(entity.getId());
-        //            datum.setTargetId(targetId);
-        //            datum.setTargetType(0);
-        //            targets.add(datum);
-        //        }
-        //        dataScopeTargetMapper.insert(targets);
-        //    }
-        //}
-
+        // 数据范围修改
+        this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
 
         // 角色处理
         // 判断角色是否修改过,有角色就要判断下角色是否修改过了
@@ -294,26 +229,22 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         result.getRecords().forEach(vo -> {
             var roles = relUserRoleService.getRoles(vo.getId());
             if (null != roles && !roles.isEmpty()) {
-                vo.setRoles(
-                        roles.stream()
-                                .map(roleConverter::toVO)
-                                .toList()
-                );
+                vo.setRoles(roles.stream().map(roleConverter::toVO).toList());
             }
-            // 数据范围
-            //UserDataScope dataScope = dataScopeMapper.findByUserId(vo.getId());
-            //if (dataScope != null) {
-            //    vo.setDataScope(dataScope.getScopeType());
-            //    if (dataScope.getScopeType().equals(1)) {
-            //        List<UserDataScopeTarget> targets = dataScopeTargetMapper.findByUserId(vo.getId());
-            //        vo.setTargetIds(
-            //                targets.stream()
-            //                        .map(UserDataScopeTarget::getTargetId)
-            //                        .map(Object::toString)
-            //                        .toList()
-            //        );
-            //    }
-            //}
+            // 补充数据范围
+            var scope = dataScopeMapper.findByUserId(vo.getId());
+            if (scope != null) {
+                vo.setDataScope(scope.getScopeType());
+                if (scope.getScopeType() == DataScopeType.CUSTOM) {
+                    var targets = dataScopeTargetMapper.findByUserId(vo.getId());
+                    vo.setTargetIds(
+                            targets
+                                    .stream()
+                                    .map(target -> target.getTargetId().toString())
+                                    .toList()
+                    );
+                }
+            }
         });
         // 响应
         return result;
@@ -322,5 +253,44 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public List<UserOnlineVO> online(PageFrom page) {
         return SecUtil.online();
+    }
+
+
+    /// 更新用户数据范围
+    ///
+    /// @param userId    用户ID
+    /// @param type      权限范围类型
+    /// @param targetIds 自定义权限范围
+    private void updateUserScope(UUID userId, DataScopeType type, List<UUID> targetIds) {
+        // 定义默认
+        if (type == null) {
+            type = DataScopeType.DEPT;
+        }
+        // 更新或新增用户的权限范围
+        var scope = dataScopeMapper.findByUserId(userId);
+        if (scope == null) {
+            scope = new UserDataScope();
+        }
+        scope.setUserId(userId);
+        scope.setScopeType(type);
+        dataScopeMapper.insertOrUpdate(scope);
+
+        // 先清空自定义范围
+        dataScopeTargetMapper.removeByUserId(userId);
+        // 如果为自定义则添加新的自定义范围
+        if (type == DataScopeType.CUSTOM && CollUtils.isNotEmpty(targetIds)) {
+            var targets = new ArrayList<UserDataScopeTarget>();
+            for (UUID targetId : targetIds) {
+                var target = new UserDataScopeTarget();
+                target.setTargetId(targetId);
+                target.setUserId(userId);
+                target.setTargetType(type.getCode());
+
+                targets.add(target);
+            }
+            dataScopeTargetMapper.insert(targets);
+        }
+
+
     }
 }

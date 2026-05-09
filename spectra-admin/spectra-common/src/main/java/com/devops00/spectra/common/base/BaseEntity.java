@@ -48,6 +48,7 @@ public class BaseEntity implements Serializable {
     private UUID createdBy;
 
     /// 创建时间
+    @OrderBy(asc = true, sort = 1)
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private Instant createdAt;
 

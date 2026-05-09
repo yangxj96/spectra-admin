@@ -18,6 +18,7 @@ package com.devops00.spectra.core.javabean.user.vo;
 
 import com.devops00.spectra.common.assembler.NameFill;
 import com.devops00.spectra.core.service.system.impl.DepartmentServiceImpl;
+import com.devops00.spectra.datascope.base.constant.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -93,7 +94,7 @@ public class UserPageVO implements Serializable {
     private String departmentName;
 
     /// 数据范围
-    private Integer dataScope;
+    private DataScopeType dataScope;
 
     /// 自定义时的目标ID列表
     private List<String> targetIds;

@@ -21,6 +21,7 @@ import com.devops00.spectra.core.javabean.user.entity.RelUserRole;
 import com.devops00.spectra.core.javabean.user.event.RoleDeletedEvent;
 import com.devops00.spectra.core.service.user.RelUserRoleService;
 import com.devops00.spectra.core.service.user.RoleService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -36,16 +37,13 @@ import java.util.UUID;
 /// @since 2025-11-11
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class RoleDeletionOnUserRoleCleanupListener {
 
     private final RoleService roleService;
 
     private final RelUserRoleService relUserRoleService;
 
-    public RoleDeletionOnUserRoleCleanupListener(RoleService roleService, RelUserRoleService relUserRoleService) {
-        this.roleService = roleService;
-        this.relUserRoleService = relUserRoleService;
-    }
 
     /// 角色删除事件监听器
     /// <p>撤销关联的用户</p>

@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.core.configure.ulog.entity.ULogEntity;
 import com.devops00.spectra.core.javabean.system.entity.OperationLog;
 import com.devops00.spectra.core.service.system.OperationLogService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.event.EventListener;
@@ -33,13 +34,10 @@ import org.springframework.stereotype.Component;
 /// @since 2025/7/3
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ULogListener {
 
     private final OperationLogService logService;
-
-    public ULogListener(OperationLogService logService) {
-        this.logService = logService;
-    }
 
     @Async
     @EventListener

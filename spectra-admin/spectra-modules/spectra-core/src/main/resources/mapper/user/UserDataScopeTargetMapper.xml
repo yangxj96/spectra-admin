@@ -29,6 +29,6 @@
     <delete id="removeByUserId">
         DELETE
         FROM ${schema}.sys_user_data_scope_target
-        WHERE user_id == #{userId}
+        WHERE user_id = #{userId}
     </delete>
 </mapper>
