@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 用户数据范围目标表Mapper
 ///
@@ -22,4 +23,8 @@ public interface UserDataScopeTargetMapper extends BaseMapper<UserDataScopeTarge
     /// @return 数据范围目标列表
     List<UserDataScopeTarget> findByUserId(@Param("userId") String userId);
 
+    /// 根据用户ID删除用户的数据范围内容
+    ///
+    /// @param userId 用户ID
+    void removeByUserId(@Param("userId") UUID userId);
 }

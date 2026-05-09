@@ -24,4 +24,10 @@
         FROM ${schema}.sys_user_data_scope
         WHERE user_id = #{userId}
     </select>
+
+    <delete id="removeByUserId">
+        DELETE
+        FROM ${schema}.sys_user_data_scope
+        WHERE user_id == #{userId}
+    </delete>
 </mapper>

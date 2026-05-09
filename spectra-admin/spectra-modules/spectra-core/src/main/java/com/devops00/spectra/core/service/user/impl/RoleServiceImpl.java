@@ -67,6 +67,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         // 生成一个角色 CODE
         role.setCode(IdWorker.get32UUID());
         BeanUtils.copyProperties(params, role);
+        // 保存角色范围
         this.save(role);
     }
 

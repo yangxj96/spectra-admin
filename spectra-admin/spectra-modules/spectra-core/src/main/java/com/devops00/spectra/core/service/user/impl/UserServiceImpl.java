@@ -33,6 +33,7 @@ import com.devops00.spectra.core.javabean.user.converter.UserConverter;
 import com.devops00.spectra.core.javabean.user.entity.Role;
 import com.devops00.spectra.core.javabean.user.entity.User;
 import com.devops00.spectra.core.javabean.user.entity.UserDataScope;
+import com.devops00.spectra.core.javabean.user.entity.UserDataScopeTarget;
 import com.devops00.spectra.core.javabean.user.from.UserPageFrom;
 import com.devops00.spectra.core.javabean.user.from.UserSaveFrom;
 import com.devops00.spectra.core.javabean.user.vo.UserPageVO;
@@ -43,6 +44,7 @@ import com.devops00.spectra.core.service.auth.AccountService;
 import com.devops00.spectra.core.service.system.DepartmentService;
 import com.devops00.spectra.core.service.user.RelUserRoleService;
 import com.devops00.spectra.core.service.user.UserService;
+import com.devops00.spectra.datascope.base.constant.DataScopeType;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
@@ -52,6 +54,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -108,32 +111,34 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!accountService.save(defaultAccount)) {
             throw new DataSaveException("保存用户信息异常");
         }
-
-        // 数据范围处理
+        // 关联角色
+        relUserRoleService.grant(entity.getId(), params.getRoleIds());
+        // TODO 数据范围处理
+        if (params.getDataScope() == null) {
+            // 现在设置为null了.移除数据库中的数据范围
+            dataScopeMapper.removeByUserId(entity.getId());
+            dataScopeTargetMapper.removeByUserId(entity.getId());
+        }
         if (params.getDataScope() != null) {
             // 新增
             var dataScopeEntity = new UserDataScope();
             dataScopeEntity.setUserId(entity.getId());
             dataScopeEntity.setScopeType(params.getDataScope());
             dataScopeMapper.insert(dataScopeEntity);
-
-            // TODO 如果是自定义的话,要插入自定义的数据
-            //if (params.getDataScope() == DataScopeType.CUSTOM) {
-            //    var targets = new ArrayList<UserDataScopeTarget>();
-            //    for (String targetId : params.getTargetIds()) {
-            //        var datum = new UserDataScopeTarget();
-            //        datum.setUserId(entity.getId());
-            //        datum.setTargetId(targetId);
-            //        datum.setTargetType(0);
-            //        targets.add(datum);
-            //    }
-            //    dataScopeTargetMapper.insert(targets);
-            //}
+            // 如果是自定义的话,要插入自定义的数据
+            if (params.getDataScope() == DataScopeType.CUSTOM) {
+                var targets = new ArrayList<UserDataScopeTarget>();
+                for (String targetId : params.getTargetIds()) {
+                    var datum = new UserDataScopeTarget();
+                    datum.setUserId(entity.getId());
+                    datum.setTargetId(targetId);
+                    datum.setTargetType(0);
+                    targets.add(datum);
+                }
+                dataScopeTargetMapper.insert(targets);
+            }
         }
 
-
-        // 关联角色
-        relUserRoleService.grant(entity.getId(), params.getRoleIds());
     }
 
     @Override
