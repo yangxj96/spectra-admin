@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.core.configure.mybatis.interceptor.ParamInjectExecutorInterceptor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -77,6 +78,11 @@ public class MyBatisPlusConfiguration {
         log.debug("{}额外的Interceptor数量{}", LogPrefix.PERSISTENCE.p(), interceptors.size());
         interceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
+    }
+
+    @Bean
+    public ParamInjectExecutorInterceptor paramInjectExecutorInterceptor() {
+        return new ParamInjectExecutorInterceptor();
     }
 
 }

@@ -34,6 +34,7 @@ import com.devops00.spectra.core.javabean.user.from.RolePageFrom;
 import com.devops00.spectra.core.javabean.user.vo.RoleVO;
 import com.devops00.spectra.core.mapper.user.RoleMapper;
 import com.devops00.spectra.core.service.user.RoleService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -48,16 +49,12 @@ import java.util.UUID;
 /// @version 1.0
 /// @since 2025-6-14
 @Service
+@RequiredArgsConstructor
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {
 
     private final RoleConverter roleConverter;
 
     private final ApplicationEventPublisher publisher;
-
-    public RoleServiceImpl(RoleConverter roleConverter, ApplicationEventPublisher publisher) {
-        this.roleConverter = roleConverter;
-        this.publisher = publisher;
-    }
 
 
     @Override
@@ -86,7 +83,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
             throw new DefaultDataException();
         }
 
-        // 发布事物同步的事件
+        // 发布事务同步的事件
         publisher.publishEvent(new RoleDeletedEvent(id));
         // 在删除角色
         this.removeById(role.getId());
@@ -110,12 +107,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         Page<Role> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         Page<RoleVO> result = new Page<>();
         BeanUtils.copyProperties(db, result);
-        result.setRecords(
-                db.getRecords()
-                        .stream()
-                        .map(roleConverter::toVO)
-                        .toList()
-        );
+        result.setRecords(db.getRecords().stream().map(roleConverter::toVO).toList());
         return result;
     }
 

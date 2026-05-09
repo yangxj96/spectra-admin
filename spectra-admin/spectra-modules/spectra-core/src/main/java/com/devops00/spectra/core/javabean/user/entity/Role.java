@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.datascope.base.constant.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -57,7 +58,7 @@ public class Role extends BaseEntity implements Serializable {
 
     /// 范围
     @TableField(value = "scope")
-    private Integer scope;
+    private DataScopeType scope;
 
     /// 是否内置字段,为true则不允许他进行修改删除操作
     @TableField(value = "builtin")

@@ -23,6 +23,9 @@
         <include refid="Base_Column_List"/>
         FROM ${schema}.sys_user_data_scope
         WHERE user_id = #{userId}
+        <if test="_ctx_sc != null">
+            AND 2 = #{_ctx_sc}
+        </if>
     </select>
 
     <delete id="removeByUserId">
