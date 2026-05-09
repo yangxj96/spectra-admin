@@ -1,7 +1,6 @@
 export {};
 
 declare global {
-
     // 部门树形响应
     type DepartmentTreeVO = {
         // 主键ID

@@ -55,7 +55,6 @@ declare global {
         state?: boolean;
     };
 
-
     // 行政区划分页请求参数定义
     type RegionPageParams = BasePageParams & {
         str?: string;

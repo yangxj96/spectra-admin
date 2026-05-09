@@ -83,7 +83,7 @@ const handleSave = async () => {
                 <el-form-item label="角色名称" prop="name">
                     <el-input v-model="form.name" show-word-limit clearable />
                 </el-form-item>
-                <el-form-item label="角色范围" prop="scope">
+                <el-form-item label="数据范围" prop="scope">
                     <el-select v-model="form.scope" clearable append-to=".box-content">
                         <el-option label="全局" :value="0" />
                         <el-option label="本人" :value="1" />

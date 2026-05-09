@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.min.css";
-import lodash from "lodash";
 import { onMounted, useTemplateRef, watch } from "vue";
 
 defineOptions({
@@ -23,15 +22,23 @@ const editor = useTemplateRef<HTMLElement>("editor");
 let instance: JSONEditor | undefined;
 let isUserTyping = false;
 
-const handleChangeText = lodash.debounce(newValue => {
-    isUserTyping = true;
-    try {
-        const parsed = newValue ? JSON.parse(newValue) : {};
-        emit("update:modelValue", parsed);
-    } catch (error) {
-        console.error("JSON 解析错误:", error);
+let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+const handleChangeText = (newValue: string) => {
+    if (debounceTimer) {
+        clearTimeout(debounceTimer);
     }
-}, 300);
+
+    debounceTimer = setTimeout(() => {
+        isUserTyping = true;
+
+        try {
+            const parsed = newValue ? JSON.parse(newValue) : {};
+            emit("update:modelValue", parsed);
+        } catch (error) {
+            console.error("JSON 解析错误:", error);
+        }
+    }, 300);
+};
 
 /**
  * 安全 stringify

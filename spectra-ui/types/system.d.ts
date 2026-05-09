@@ -1,7 +1,6 @@
 export {};
 
 declare global {
-
     // CPU信息
     type CPUInfo = {
         name: string;
@@ -57,5 +56,4 @@ declare global {
         class_path: string;
         library_path: string;
     };
-
 }

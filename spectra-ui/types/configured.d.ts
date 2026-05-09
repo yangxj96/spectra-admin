@@ -3,7 +3,6 @@ import type { BasePageParams } from "./paging";
 export {};
 
 declare global {
-
     // 系统配置分页请求参数定义
     type ConfiguredPageParams = BasePageParams & {
         username?: string;

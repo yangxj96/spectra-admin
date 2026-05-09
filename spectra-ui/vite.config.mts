@@ -4,6 +4,7 @@ import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
 import { defineConfig, loadEnv } from "vite";
 import viteCompression from "vite-plugin-compression2";
+import vueDevTools from "vite-plugin-vue-devtools";
 
 export default defineConfig(({ mode }) => {
     const root = process.cwd();
@@ -22,7 +23,8 @@ export default defineConfig(({ mode }) => {
                 viteCompression({
                     threshold: 10240,
                     algorithms: ["gzip", "brotliCompress"]
-                })
+                }),
+            vueDevTools()
         ].filter(Boolean),
         resolve: {
             alias: {
@@ -36,56 +38,17 @@ export default defineConfig(({ mode }) => {
                 }
             }
         },
+        // 构建时配置
         build: {
-            target: "esnext",
-            outDir: "build",
-            sourcemap: false,
-            minify: "esbuild",
-            cssCodeSplit: true,
             chunkSizeWarningLimit: 1500,
-            esbuild: {
-                drop: ["console", "debugger"]
-            },
-            rollupOptions: {
+            rolldownOptions: {
                 output: {
-                    manualChunks(id) {
-                        if (!id.includes("node_modules")) return;
-                        if (id.includes("vue")) return "vue";
-                        if (id.includes("element-plus")) return "element";
-                        if (id.includes("@form-create")) return "form-create";
-                        if (id.includes("echarts")) return "echarts";
-                        if (id.includes("@logicflow")) return "logicflow";
-                        if (id.includes("jsoneditor")) return "jsoneditor";
-                        return "vendor";
-                    },
                     entryFileNames: "js/[name]-[hash].js",
                     chunkFileNames: "js/[name]-[hash].js",
-                    assetFileNames(assetInfo) {
-                        const ext = assetInfo.name?.split(".").pop()?.toLowerCase() ?? "";
-                        const map: Record<string, string> = {
-                            css: "css",
-
-                            png: "img",
-                            jpg: "img",
-                            jpeg: "img",
-                            gif: "img",
-                            svg: "img",
-                            webp: "img",
-                            avif: "img",
-
-                            woff: "fonts",
-                            woff2: "fonts",
-                            ttf: "fonts",
-                            otf: "fonts",
-                            eot: "fonts"
-                        };
-                        const dir = map[ext] || "other";
-                        return `${dir}/[name]-[hash][extname]`;
-                    }
+                    assetFileNames: "[ext]/[name]-[hash][extname]"
                 }
             }
         },
-
         test: {
             environment: "happy-dom",
             silent: false,

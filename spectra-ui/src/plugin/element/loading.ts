@@ -1,7 +1,6 @@
 // ElLoading       : loading组件
 // ILoadingInstance: loading对象类型接口
 import { ElLoading } from "element-plus";
-import _ from "lodash";
 
 import type { LoadingInstance } from "element-plus/lib/components/loading/src/loading";
 
@@ -34,7 +33,7 @@ async function close(): Promise<void> {
     const elapsed = Date.now() - startTime;
     const remaining = Math.max(0, minLoadingTime - elapsed);
     // 使用 lodash delay 或原生 setTimeout 补足时间
-    _.delay(() => {
+    setTimeout(() => {
         if (loading) {
             loading.close();
         }
@@ -61,6 +60,8 @@ export function hideLoading(): void {
     }
     count--;
     if (count === 0) {
-        close();
+        close().then(() => {
+            console.log("loading关闭");
+        });
     }
 }

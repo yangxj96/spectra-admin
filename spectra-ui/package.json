@@ -18,7 +18,7 @@
         "type-check": "vue-tsc --noEmit --composite false",
         "test": "vitest run",
         "test:watch": "vitest",
-        "prestart": "npm run format && npm run lint:fix && npm run type-check"
+        "prestart": "pnpm run format && pnpm run lint:fix && pnpm run type-check"
     },
     "lint-staged": {
         "*.{js,ts,vue}": "eslint --fix",
@@ -31,6 +31,7 @@
         }
     },
     "dependencies": {
+        "@element-plus/icons-vue": "2.3.2",
         "@form-create/designer": "3.4.0",
         "@form-create/element-ui": "3.2.38",
         "@logicflow/core": "2.2.0",
@@ -42,7 +43,6 @@
         "echarts": "6.0.0",
         "element-plus": "2.13.2",
         "jsoneditor": "10.4.2",
-        "lodash": "^4.18.1",
         "p-queue": "9.1.0",
         "pinia": "3.0.4",
         "pinia-plugin-persistedstate": "4.7.1",
@@ -80,16 +80,12 @@
         "lint-staged": "16.2.7",
         "npm-run-all2": "8.0.4",
         "prettier": "3.8.1",
-        "terser": "5.46.0",
         "typescript": "5.9.3",
-        "vite": "8.0.5",
+        "vite": "8.0.11",
         "vite-plugin-compression2": "2.5.0",
+        "vite-plugin-vue-devtools": "8.1.2",
         "vitest": "4.0.18",
         "vue-tsc": "3.2.4"
-    },
-    "overrides": {
-        "vite-plugin-inspect": "11.3.0",
-        "wangeditor": "4.7.15"
     },
     "browserslist": [
         "> 1%",
