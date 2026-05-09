@@ -74,6 +74,7 @@ const handleRoleConditionQuery = () => {
 
 // 清理右边两棵树的选中状态
 const cleanTreeCheckState = () => {
+    currentRow.value = undefined;
     if (authority_tree.value)
         for (const item of authority_tree.value) {
             powerRef.value?.setChecked(item.id, false, true);
@@ -241,7 +242,11 @@ const handleSaveRoleMenu = async () => {
         </el-col>
     </el-row>
     <!-- 角色编辑框 -->
-    <RoleEdit v-if="edit.dialog" v-model:open="edit.dialog" v-model:form="edit.form" @close="handlerConditionQuery" />
+    <RoleEdit
+        v-if="edit.dialog"
+        v-model:open="edit.dialog"
+        v-model:form="edit.form"
+        @close="handleRoleConditionQuery" />
 </template>
 
 <style scoped lang="scss">

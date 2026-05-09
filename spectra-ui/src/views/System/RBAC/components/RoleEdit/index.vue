@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { type FormInstance, type FormRules } from "element-plus";
-import { computed, useTemplateRef } from "vue";
+import { computed, onMounted, ref, useTemplateRef } from "vue";
 
 import { roleApi } from "@/api/auth/role.ts";
+import { departmentApi } from "@/api/user/organization.ts";
 import ComponentsIcons from "@/components/ComponentsIcons/index.vue";
 import { roleConverter } from "@/converter/role-converter.ts";
+import { treeDefaultProps } from "@/utils/default-config.ts";
 import { MessageUtils } from "@/utils/message-utils.ts";
 
 // model
@@ -16,6 +18,9 @@ const open = defineModel("open", {
 const form = defineModel<RoleForm>("form", {
     required: true
 });
+
+// 数据
+const department_tree = ref<DepartmentTreeVO[]>();
 
 // 定义响应方法
 const emits = defineEmits(["close"]);
@@ -35,15 +40,30 @@ const rules: FormRules<RoleForm> = {
         { min: 2, max: 20, message: "角色名称长度需要在2-20字符范围内", trigger: "blur" }
     ],
     scope: [{ required: true, message: "请选择角色分类", trigger: "change" }],
+    target_ids: [
+        {
+            validator: (_rule, value, callback) => {
+                console.log(form.value.scope, value);
+                if (form.value.scope === 4 && !value) {
+                    callback(new Error("自定义范围需要选择目标部门"));
+                } else {
+                    callback();
+                }
+            },
+            trigger: "change"
+        }
+    ],
     state: [{ required: true, message: "请选择角色状态", trigger: "change" }]
 };
+
+onMounted(async () => {
+    department_tree.value = await departmentApi.tree();
+});
 
 // 处理关闭
 const handleClose = () => {
     open.value = false;
-    setTimeout(() => {
-        emits("close");
-    }, 200);
+    emits("close");
 };
 
 // 角色保存
@@ -91,6 +111,17 @@ const handleSave = async () => {
                         <el-option label="部门及子部门" :value="3" />
                         <el-option label="自定义" :value="4" />
                     </el-select>
+                </el-form-item>
+                <el-form-item v-if="form.scope === 4" label="自定义数据范围" prop="target_ids">
+                    <el-tree-select
+                        v-model="form.target_ids"
+                        :data="department_tree"
+                        node-key="id"
+                        clearable
+                        check-strictly
+                        multiple
+                        default-expand-all
+                        :props="treeDefaultProps" />
                 </el-form-item>
                 <el-form-item label="是否启用" prop="state">
                     <el-select v-model="form.state" clearable append-to=".box-content">

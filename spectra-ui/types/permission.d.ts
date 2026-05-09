@@ -29,6 +29,8 @@ declare global {
         state: boolean;
         //角色范围
         scope: number;
+        // 自定义范围ID列表
+        target_ids: string[];
         // 是否内置
         builtin: boolean;
         //角色备注
@@ -39,17 +41,19 @@ declare global {
     type RoleForm = {
         // 主键ID
         id: string;
-        //角色名称
+        // 角色名称
         name: string;
         // 角色代码
         code: string;
-        //角色状态
+        // 角色状态
         state: boolean | undefined;
-        //角色范围
+        // 角色范围
         scope: number | undefined;
+        // 自定义范围ID列表
+        target_ids: string[];
         // 是否内置
         builtin: boolean | undefined;
-        //角色备注
+        // 角色备注
         remark: string;
     };
 
@@ -65,6 +69,8 @@ declare global {
         state: boolean | undefined;
         //角色范围
         scope: number | undefined;
+        // 自定义范围ID列表
+        target_ids: string[];
         // 是否内置
         builtin: boolean | undefined;
         //角色备注

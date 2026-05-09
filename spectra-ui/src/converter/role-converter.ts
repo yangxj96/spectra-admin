@@ -10,17 +10,19 @@ export const roleConverter = {
         return {
             // 主键ID
             id: "",
-            //角色名称
+            // 角色名称
             name: "",
             // 角色代码
             code: "",
-            //角色状态
+            // 角色状态
             state: undefined,
-            //角色范围
+            // 角色范围
             scope: undefined,
+            // 自定义范围ID列表
+            target_ids: [],
             // 是否内置
             builtin: undefined,
-            //角色备注
+            // 角色备注
             remark: ""
         };
     },
@@ -31,6 +33,7 @@ export const roleConverter = {
             code: datum.code ?? "",
             state: datum.state ?? undefined,
             scope: datum.scope ?? undefined,
+            target_ids: datum.target_ids ?? [],
             builtin: datum.builtin ?? undefined,
             remark: datum.remark ?? ""
         };
@@ -42,6 +45,7 @@ export const roleConverter = {
             code: datum.code ?? "",
             state: datum.state ?? undefined,
             scope: datum.scope ?? undefined,
+            target_ids: datum.target_ids ?? [],
             builtin: datum.builtin ?? undefined,
             remark: datum.remark ?? ""
         };
