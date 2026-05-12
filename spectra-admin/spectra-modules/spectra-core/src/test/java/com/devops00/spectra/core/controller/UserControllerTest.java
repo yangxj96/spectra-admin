@@ -33,7 +33,7 @@ class UserControllerTest {
         from.setEmail("admin@devops00.com");
         from.setCountry("China");
         from.setCity("Kunming");
-        from.setOrganizationId(UuidCreator.getTimeOrderedEpoch().toString());
+        from.setDepartmentId(UuidCreator.getTimeOrderedEpoch());
         from.setRoleIds(Lists.newArrayList(UuidCreator.getTimeOrderedEpoch()));
 
         userService.create(from);
