@@ -12,7 +12,7 @@
         "start": "vite",
         "build": "vite build",
         "preview": "vite preview --host",
-        "format": "prettier . --write --config ./.prettierrc.yml --log-level silent",
+        "format": "prettier . --write --config ./.prettierrc.yml --log-level warn",
         "lint": "eslint . --cache",
         "lint:fix": "eslint . --fix --cache",
         "type-check": "vue-tsc --noEmit --composite false",
