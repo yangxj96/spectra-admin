@@ -45,7 +45,7 @@ import com.devops00.spectra.core.service.auth.AccountService;
 import com.devops00.spectra.core.service.system.DepartmentService;
 import com.devops00.spectra.core.service.user.RelUserRoleService;
 import com.devops00.spectra.core.service.user.UserService;
-import com.devops00.spectra.datascope.base.constant.DataScopeType;
+import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;

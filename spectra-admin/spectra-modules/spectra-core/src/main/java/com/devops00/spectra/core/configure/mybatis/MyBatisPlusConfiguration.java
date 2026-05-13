@@ -19,12 +19,9 @@ package com.devops00.spectra.core.configure.mybatis;
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.BlockAttackInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.InnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.OptimisticLockerInnerInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.inner.*;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.core.configure.mybatis.interceptor.ParamInjectExecutorInterceptor;
+import com.devops00.spectra.core.configure.mybatis.interceptor.DataScopeInnerInterceptor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -73,16 +70,13 @@ public class MyBatisPlusConfiguration {
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
         // 乐观锁
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
+        // 数据范围
+        interceptor.addInnerInterceptor(new DataPermissionInterceptor(new DataScopeInnerInterceptor()));
         // 收集的bean进行注册
         List<InnerInterceptor> interceptors = innerInterceptors.stream().toList();
         log.debug("{}额外的Interceptor数量{}", LogPrefix.PERSISTENCE.p(), interceptors.size());
         interceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
-    }
-
-    @Bean
-    public ParamInjectExecutorInterceptor paramInjectExecutorInterceptor() {
-        return new ParamInjectExecutorInterceptor();
     }
 
 }

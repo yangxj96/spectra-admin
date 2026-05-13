@@ -18,8 +18,6 @@
     <modules>
         <module>spectra-security-base</module>
         <module>spectra-security-starter</module>
-        <module>spectra-datascope-base</module>
-        <module>spectra-datascope-starter</module>
         <module>spectra-ai-base</module>
     </modules>
 

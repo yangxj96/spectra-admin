@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.javabean.user.from;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.datascope.base.constant.DataScopeType;
+import com.devops00.spectra.common.constant.DataScopeType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

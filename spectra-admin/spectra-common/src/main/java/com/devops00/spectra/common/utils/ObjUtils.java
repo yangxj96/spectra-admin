@@ -73,18 +73,18 @@ public final class ObjUtils {
     /// object转list map
     ///
     /// @param obj    对象
-    /// @param kCalzz k类型
-    /// @param vCalzz v类型
-    /// @param <K>    kclass
-    /// @param <V>    vclass
+    /// @param kClazz k类型
+    /// @param vClazz v类型
+    /// @param <K>    class
+    /// @param <V>    class
     /// @return 转换后的List Map
-    public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kCalzz, Class<V> vCalzz) {
+    public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kClazz, Class<V> vClazz) {
         if (!(obj instanceof List<?> list)) {
             return Collections.emptyList();
         }
         List<Map<K, V>> result = new ArrayList<>(list.size());
         for (Object item : list) {
-            Map<K, V> map = castMap(item, kCalzz, vCalzz);
+            Map<K, V> map = castMap(item, kClazz, vClazz);
             if (!map.isEmpty()) {
                 result.add(map);
             }

@@ -1,4 +1,4 @@
-package com.devops00.spectra.datascope.base.constant;
+package com.devops00.spectra.common.constant;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;

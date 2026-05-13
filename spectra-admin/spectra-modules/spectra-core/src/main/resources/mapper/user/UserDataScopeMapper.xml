@@ -21,11 +21,8 @@
     <select id="findByUserId" resultType="com.devops00.spectra.core.javabean.user.entity.UserDataScope">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM ${schema}.sys_user_data_scope
-        WHERE user_id = #{userId}
-        <if test="_ctx_sc != null">
-            AND 2 = #{_ctx_sc}
-        </if>
+        FROM ${schema}.sys_user_data_scope AS suds
+        WHERE suds.user_id = #{userId}
     </select>
 
     <delete id="removeByUserId">

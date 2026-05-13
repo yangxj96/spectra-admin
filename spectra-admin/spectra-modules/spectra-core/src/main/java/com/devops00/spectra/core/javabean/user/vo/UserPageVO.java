@@ -18,7 +18,7 @@ package com.devops00.spectra.core.javabean.user.vo;
 
 import com.devops00.spectra.common.assembler.NameFill;
 import com.devops00.spectra.core.service.system.impl.DepartmentServiceImpl;
-import com.devops00.spectra.datascope.base.constant.DataScopeType;
+import com.devops00.spectra.common.constant.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
