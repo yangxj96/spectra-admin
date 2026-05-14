@@ -4,6 +4,7 @@ package com.devops00.spectra.core.javabean.user.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.common.constant.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,6 +31,6 @@ public class RoleDataScope extends BaseEntity implements Serializable {
 
     /// 数据范围类型
     @TableField(value = "scope_type")
-    private Integer scopeType;
+    private DataScopeType scopeType;
 
 }

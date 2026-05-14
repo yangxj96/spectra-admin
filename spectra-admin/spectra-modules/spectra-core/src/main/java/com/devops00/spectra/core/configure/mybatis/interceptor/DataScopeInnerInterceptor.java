@@ -2,7 +2,11 @@ package com.devops00.spectra.core.configure.mybatis.interceptor;
 
 
 import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
+import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.core.javabean.user.dto.DataScopeDTO;
+import com.devops00.spectra.security.base.holder.SecUtil;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Alias;
 import net.sf.jsqlparser.expression.DoubleValue;
@@ -10,6 +14,8 @@ import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+
+import java.util.UUID;
 
 /**
  * MP执行的单表SQL拦截处理
@@ -19,10 +25,29 @@ import net.sf.jsqlparser.schema.Table;
  * @since 2026/5/9 17:35
  */
 @Slf4j
+@RequiredArgsConstructor
 public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     @Override
     public Expression getSqlSegment(Table table, Expression where, String mappedStatementId) {
+
+        UUID userId = SecUtil.getCurrentUserId();
+        if (userId == null) {
+            return null;
+        }
+
+        // TODO 方向已定,还需完善
+
+        // 获取用户的权限范围
+        DataScopeDTO scope = new DataScopeDTO();
+        scope.setScope(DataScopeType.GLOBAL);
+
+        // 全局状态不进行添加限制
+        if (scope.getScope().equals(DataScopeType.GLOBAL)) {
+            return null;
+        }
+
+
         // 过滤需要处理权限的表
         //if (!"sys_user".equalsIgnoreCase(table.getName())) {
         //    return null;
@@ -51,4 +76,6 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         return new EqualsTo(column, new DoubleValue(1));
 
     }
+
+
 }
