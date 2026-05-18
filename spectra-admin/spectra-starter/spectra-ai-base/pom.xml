@@ -25,15 +25,32 @@
     </properties>
 
     <dependencies>
+        <!--<dependency>-->
+        <!--    <groupId>dev.langchain4j</groupId>-->
+        <!--    <artifactId>langchain4j-open-ai-spring-boot4-starter</artifactId>-->
+        <!--    <version>${langchain4j.version}</version>-->
+        <!--</dependency>-->
+        <!--<dependency>-->
+        <!--    <groupId>dev.langchain4j</groupId>-->
+        <!--    <artifactId>langchain4j-spring-boot4-starter</artifactId>-->
+        <!--    <version>${langchain4j.version}</version>-->
+        <!--</dependency>-->
+
         <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-open-ai-spring-boot4-starter</artifactId>
-            <version>${langchain4j.version}</version>
+            <groupId>io.agentscope</groupId>
+            <artifactId>agentscope-spring-boot-starter</artifactId>
+            <version>1.0.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>io.modelcontextprotocol.sdk</groupId>
+                    <artifactId>mcp</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
-            <groupId>dev.langchain4j</groupId>
-            <artifactId>langchain4j-spring-boot4-starter</artifactId>
-            <version>${langchain4j.version}</version>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp</artifactId>
+            <version>1.1.2</version>
         </dependency>
     </dependencies>
 

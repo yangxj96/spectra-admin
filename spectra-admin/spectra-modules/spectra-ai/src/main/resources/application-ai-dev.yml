@@ -1,18 +1,32 @@
-langchain4j:
-  open-ai:
-    chat-model:
-      api-key: ${AI_KEY}
-      model-name: ${AI_MODEL}
-      base-url: ${AI_BASE_URL}
-      temperature: 0.7
-      log-requests: true
-      log-responses: true
-      return-thinking: true
-    streaming-chat-model:
-      api-key: ${AI_KEY}
-      model-name: ${AI_MODEL}
-      base-url: ${AI_BASE_URL}
-      temperature: 0.7
-      log-requests: true
-      log-responses: true
-      return-thinking: true
+agentscope:
+  agent:
+    enabled: true
+    name: "Assistant"
+    sys-prompt: "你是企业数据分析助手:\n1. 不允许编造数据\n2. 需要分析的数据使用提供的tool获取"
+    max-iters: 10
+  model:
+    provider: openai
+  openai:
+    enabled: true
+    apiKey: ${AI_KEY}
+    model-name: ${AI_MODEL}
+    base_url: ${AI_BASE_URL}
+
+#langchain4j:
+#  open-ai:
+#    chat-model:
+#      api-key: ${AI_KEY}
+#      model-name: ${AI_MODEL}
+#      base-url: ${AI_BASE_URL}
+#      temperature: 0.7
+#      log-requests: true
+#      log-responses: true
+#      return-thinking: true
+#    streaming-chat-model:
+#      api-key: ${AI_KEY}
+#      model-name: ${AI_MODEL}
+#      base-url: ${AI_BASE_URL}
+#      temperature: 0.7
+#      log-requests: true
+#      log-responses: true
+#      return-thinking: true
