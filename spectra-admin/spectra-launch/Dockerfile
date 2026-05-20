@@ -9,8 +9,16 @@ WORKDIR /app
 ARG JAR_FILE
 COPY target/${JAR_FILE} app.jar
 
+# 提前验证 JAR 文件存在
+RUN if [ ! -f app.jar ]; then echo "ERROR: app.jar not found!" >&2; exit 1; fi
+
 # 使用 layertools 分层解压
-RUN java -Djarmode=layertools -jar app.jar extract
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher
+
+# 验证解压结果
+RUN for dir in dependencies spring-boot-loader snapshot-dependencies application; do \
+        if [ ! -d "$dir" ]; then echo "ERROR: $dir not found after extract!" >&2; exit 1; fi; \
+    done && echo "Builder stage: All layers exist ✔"
 
 # =========================================
 # Stage 2: Minimal Runner
@@ -52,5 +60,5 @@ COPY --from=builder /app/application/ ./application/
 EXPOSE 8888
 
 # 启动命令
-#ENTRYPOINT ["java","-Dspring.profiles.active=prod","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher"]
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
+#ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher","-Dspring.profiles.active=prod"]
