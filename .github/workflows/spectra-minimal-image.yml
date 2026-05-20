@@ -67,7 +67,7 @@ jobs:
           file: ./spectra-admin/spectra-launch/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal
+            ghcr.io/${{ github.repository_owner }}/spectra-admin:latest
             ghcr.io/${{ github.repository_owner }}/spectra-admin:${{ env.VERSION }}
           build-args: |
             JAR_FILE=spectra-launch-${{ env.VERSION }}.jar
