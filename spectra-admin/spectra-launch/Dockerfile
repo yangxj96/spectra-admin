@@ -6,7 +6,8 @@ FROM eclipse-temurin:25-jdk AS builder
 WORKDIR /app
 
 # 复制 Spring Boot jar
-COPY target/spectra-launch-0.0.16.jar app.jar
+ARG JAR_FILE
+COPY target/${JAR_FILE} app.jar
 
 # 使用 layertools 分层解压
 RUN java -Djarmode=layertools -jar app.jar extract
