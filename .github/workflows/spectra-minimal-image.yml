@@ -72,7 +72,7 @@ jobs:
       # ---------------------------
       - name: Build & Push Minimal Docker Image
         run: |
-          cd spectra-launch
+          cd ./spectra-admin/spectra-launch
           # 构建镜像，上下文为当前目录（包含 target/*.jar）
           docker build -t ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal .
           # 推送到 GHCR
