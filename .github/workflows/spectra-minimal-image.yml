@@ -33,7 +33,7 @@ jobs:
       # ---------------------------
       - name: Build Maven Project (skip tests)
         run: |
-          mvn -B clean install -DskipTests
+          mvn -B clean package -DskipTests
         shell: bash
         working-directory: ./spectra-admin
 
