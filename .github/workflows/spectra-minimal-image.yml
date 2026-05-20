@@ -31,9 +31,8 @@ jobs:
       # ---------------------------
       # Maven 打包
       # ---------------------------
-      - name: Build Maven Project (skip tests)
-        run: |
-          mvn -B clean package -DskipTests
+      - name: Build Maven Project
+        run: mvn -B clean package -DskipTests
         shell: bash
         working-directory: ./spectra-admin
 

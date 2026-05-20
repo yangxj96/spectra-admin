@@ -9,11 +9,9 @@ WORKDIR /app
 ARG JAR_FILE
 COPY target/${JAR_FILE} app.jar
 
-# 提前验证 JAR 文件存在
-RUN if [ ! -f app.jar ]; then echo "ERROR: app.jar not found!" >&2; exit 1; fi
-
 # 使用 layertools 分层解压
-RUN java -Djarmode=tools -jar app.jar extract --layers --launcher
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher && \
+    ls -R
 
 # 验证解压结果
 RUN for dir in dependencies spring-boot-loader snapshot-dependencies application; do \
