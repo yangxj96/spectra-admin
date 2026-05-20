@@ -1,0 +1,80 @@
+name: Build Minimal Docker Image to GHCR
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    services:
+      docker:
+        image: docker:26.1.4-dind
+        options: --privileged
+        env:
+          DOCKER_TLS_CERTDIR: ""
+        ports:
+          - 2375:2375
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      # ---------------------------
+      # Maven 打包
+      # ---------------------------
+      - name: Build Maven Project (skip tests)
+        run: |
+          cd spectra-admin
+          mvn -B clean install -DskipTests
+        shell: bash
+
+      # ---------------------------
+      # Docker 登录 GHCR
+      # ---------------------------
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # ---------------------------
+      # Docker Buildx
+      # ---------------------------
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # ---------------------------
+      # 设置Docker环境变量
+      # ---------------------------
+      - name: Set Docker environment
+        run: |
+          echo "DOCKER_HOST=tcp://127.0.0.1:2375" >> $GITHUB_ENV
+          echo "DOCKER_TLS_VERIFY=0" >> $GITHUB_ENV
+          source $GITHUB_ENV
+          docker info
+        shell: bash
+
+      # ---------------------------
+      # 构建并推送最小化镜像
+      # ---------------------------
+      - name: Build & Push Minimal Docker Image
+        run: |
+          cd spectra-launch
+          # 构建镜像，上下文为当前目录（包含 target/*.jar）
+          docker build -t ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal .
+          # 推送到 GHCR
+          docker push ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal
+        shell: bash
