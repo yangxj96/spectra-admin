@@ -10,13 +10,14 @@ ARG JAR_FILE
 COPY target/${JAR_FILE} app.jar
 
 # 使用 layertools 分层解压
-RUN java -Djarmode=tools -jar app.jar extract --layers --launcher && \
-    ls -R
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --dest .
 
-# 验证解压结果
-RUN for dir in dependencies spring-boot-loader snapshot-dependencies application; do \
-        if [ ! -d "$dir" ]; then echo "ERROR: $dir not found after extract!" >&2; exit 1; fi; \
-    done && echo "Builder stage: All layers exist ✔"
+# 验证分成解压结果
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher --dest . && \
+    test -d dependencies && \
+    test -d spring-boot-loader && \
+    test -d application && \
+    test -f application/BOOT-INF/classes/com/devops00/spectra/launch/LaunchApplication.class
 
 # =========================================
 # Stage 2: Minimal Runner
