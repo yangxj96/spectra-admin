@@ -51,4 +51,4 @@ COPY --from=builder /app/application/ ./application/
 EXPOSE 8888
 
 # 启动命令
-ENTRYPOINT ["java","-Dspring.profiles.active=prod","org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java","-Dspring.profiles.active=prod","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher"]
