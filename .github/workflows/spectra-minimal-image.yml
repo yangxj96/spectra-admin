@@ -36,9 +36,9 @@ jobs:
       # ---------------------------
       - name: Build Maven Project (skip tests)
         run: |
-          cd spectra-admin
           mvn -B clean install -DskipTests
         shell: bash
+        working-directory: ./spectra-admin
 
       # ---------------------------
       # Docker 登录 GHCR
@@ -72,9 +72,9 @@ jobs:
       # ---------------------------
       - name: Build & Push Minimal Docker Image
         run: |
-          cd ./spectra-admin/spectra-launch
           # 构建镜像，上下文为当前目录（包含 target/*.jar）
           docker build -t ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal .
           # 推送到 GHCR
           docker push ghcr.io/${{ github.repository_owner }}/spectra-admin:minimal
+        working-directory: ./spectra-admin/spectra-launch
         shell: bash
