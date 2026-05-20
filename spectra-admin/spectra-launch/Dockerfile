@@ -12,6 +12,8 @@ COPY target/${JAR_FILE} app.jar
 # 使用 layertools 分层解压
 RUN java -Djarmode=tools -jar app.jar extract --layers --launcher .
 
+RUN ls -R
+
 
 # =========================================
 # Stage 2: Minimal Runner
@@ -34,6 +36,8 @@ COPY --from=builder /app/app/application/ ./application/
 # 暴露端口
 EXPOSE 8888
 
+RUN ls -R
+
 # 启动命令
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
-#ENTRYPOINT ["java","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher","-Dspring.profiles.active=prod"]
+#ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher","-Dspring.profiles.active=prod"]
