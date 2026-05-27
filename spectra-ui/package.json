@@ -32,6 +32,13 @@
     },
     "dependencies": {
         "@element-plus/icons-vue": "2.3.2",
+        "@embedpdf/core": "2.14.3",
+        "@embedpdf/engines": "2.14.3",
+        "@embedpdf/plugin-document-manager": "2.14.3",
+        "@embedpdf/plugin-render": "2.14.3",
+        "@embedpdf/plugin-scroll": "2.14.3",
+        "@embedpdf/plugin-viewport": "2.14.3",
+        "@embedpdf/vue-pdf-viewer": "2.14.3",
         "@form-create/designer": "3.4.0",
         "@form-create/element-ui": "3.2.38",
         "@logicflow/core": "2.2.0",
@@ -91,5 +98,12 @@
         "> 1%",
         "last 2 versions",
         "not dead"
-    ]
+    ],
+    "pnpm": {
+        "overrides": {
+            "codemirror": "^6.0.2",
+            "glob": "^13.0.6",
+            "ini": "^7.0.0"
+        }
+    }
 }

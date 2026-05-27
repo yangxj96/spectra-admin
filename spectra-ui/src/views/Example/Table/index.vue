@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import PDFViewer from "@/components/PDFViewer/index.vue";
+</script>
 <template>
-    <div>表格展示</div>
+    <PDFViewer />
 </template>
