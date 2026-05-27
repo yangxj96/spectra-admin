@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiConfiguration implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final Toolkit toolkit; // 假设你的 Toolkit 是一个单例 Bean
+    private final Toolkit toolkit;
 
     public AiConfiguration(Toolkit toolkit) {
         this.toolkit = toolkit;
