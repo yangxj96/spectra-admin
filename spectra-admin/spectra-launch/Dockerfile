@@ -1,37 +1,30 @@
 # =========================================
-# Stage 1: Builder
+# Stage 1: 构建
 # =========================================
 FROM eclipse-temurin:25-jdk AS builder
-
-WORKDIR /app
-
+WORKDIR /layers
 # 复制 Spring Boot jar
 ARG JAR_FILE
 COPY target/${JAR_FILE} app.jar
-
 # 使用 layertools 分层解压
-RUN java -Djarmode=tools -jar app.jar extract --layers --launcher .
-
-RUN ls -R
-
+RUN java -Djarmode=tools -jar app.jar extract --layers --launcher
 
 # =========================================
-# Stage 2: Minimal Runner
+# Stage 2: 轻量运行时
 # =========================================
-#FROM eclipse-temurin:25-jre-jammy
 FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
 # 设置时区
 ENV TZ=Asia/Shanghai
-ENV JAVA_TOOL_OPTIONS="-Djava.awt.headless=true"
+RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 复制 Spring Boot 分层
-COPY --from=builder /app/app/dependencies/ ./dependencies/
-COPY --from=builder /app/app/spring-boot-loader/ ./spring-boot-loader/
-COPY --from=builder /app/app/snapshot-dependencies/ ./snapshot-dependencies/
-COPY --from=builder /app/app/application/ ./application/
+COPY --from=builder /layers/app/dependencies/ ./
+COPY --from=builder /layers/app/spring-boot-loader/ ./
+COPY --from=builder /layers/app/snapshot-dependencies/ ./
+COPY --from=builder /layers/app/application/ ./
 
 # 暴露端口
 EXPOSE 8888
@@ -39,5 +32,4 @@ EXPOSE 8888
 RUN ls -R
 
 # 启动命令
-#ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
-ENTRYPOINT ["java","-cp","spring-boot-loader/*:dependencies/*:snapshot-dependencies/*:application/","org.springframework.boot.loader.JarLauncher","-Dspring.profiles.active=prod"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
