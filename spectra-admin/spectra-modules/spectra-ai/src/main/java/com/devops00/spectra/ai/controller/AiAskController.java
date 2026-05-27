@@ -87,7 +87,7 @@ public class AiAskController {
                     var errorResponse = new OpenAIStreamVO();
                     errorResponse.setId(responseId);
                     errorResponse.setCreated(createdTime);
-                    errorResponse.setModel("agentscope-java-agent");
+                    errorResponse.setModel(agent.getModel().getModelName());
 
                     var choice = new OpenAIStreamVO.Choice();
                     choice.setIndex(0);
