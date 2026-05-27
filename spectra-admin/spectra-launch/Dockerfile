@@ -32,4 +32,4 @@ EXPOSE 8888
 RUN ls -R
 
 # 启动命令
-ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.JarLauncher"]
+ENTRYPOINT ["java", "-Dspring.profiles.active=prod", "org.springframework.boot.loader.launch.JarLauncher"]
