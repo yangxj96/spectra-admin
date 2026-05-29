@@ -23,8 +23,6 @@
     </properties>
 
     <dependencies>
-        <!-- === 项目模块 === -->
-
         <!-- === 项目模块-Spring模块 === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -32,26 +30,12 @@
         </dependency>
 
         <!-- === 其他模块 === -->
-        <!--<dependency>-->
-        <!--    <groupId>dev.langchain4j</groupId>-->
-        <!--    <artifactId>langchain4j-reactor</artifactId>-->
-        <!--    <version>1.13.1-beta23</version>-->
-        <!--</dependency>-->
-
         <!-- OpenAi依赖 -->
-        <!--<dependency>-->
-        <!--    <groupId>com.openai</groupId>-->
-        <!--    <artifactId>openai-java</artifactId>-->
-        <!--    <version>4.35.0</version>-->
-        <!--</dependency>-->
-        <!-- gemini依赖 -->
         <dependency>
-            <groupId>com.google.genai</groupId>
-            <artifactId>google-genai</artifactId>
-            <version>1.55.0</version>
+            <groupId>com.openai</groupId>
+            <artifactId>openai-java</artifactId>
+            <version>4.35.0</version>
         </dependency>
-
-
     </dependencies>
 
 </project>

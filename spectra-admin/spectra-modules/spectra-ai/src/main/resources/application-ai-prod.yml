@@ -5,15 +5,9 @@ agentscope:
     sys-prompt: "你是企业数据分析助手:\n1. 不允许编造数据\n2. 需要分析的数据使用提供的tool获取"
     max-iters: 10
   model:
-    # provider: openai
-    provider: gemini
-  #openai:
-  #  enabled: true
-  #  apiKey: ${AI_KEY}
-  #  model-name: ${AI_MODEL}
-  #  base_url: ${AI_BASE_URL}
-  gemini:
+     provider: openai
+  openai:
     enabled: true
-    api-key: ${AI_KEY}
+    apiKey: ${AI_KEY}
     model-name: ${AI_MODEL}
-    stream: true
+    base_url: ${AI_BASE_URL}
