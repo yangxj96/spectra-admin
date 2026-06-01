@@ -17,11 +17,10 @@
 package com.devops00.spectra.core.controller.system;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.exception.NotImplementedException;
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
 import com.devops00.spectra.core.javabean.system.from.MenuSaveFrom;
 import com.devops00.spectra.core.javabean.system.vo.MenuTreeVO;
 import com.devops00.spectra.core.service.system.MenuService;
+import com.devops00.spectra.log.base.annotation.ULog;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;

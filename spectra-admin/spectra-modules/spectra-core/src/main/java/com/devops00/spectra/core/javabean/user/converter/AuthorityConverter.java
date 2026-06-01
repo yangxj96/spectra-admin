@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.core.javabean.user.converter;
 
-import com.devops00.spectra.core.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.core.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.javabean.user.entity.Authority;
 import com.devops00.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import com.devops00.spectra.core.javabean.user.vo.AuthorityVO;
+import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 
 import java.util.List;

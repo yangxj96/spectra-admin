@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.core.javabean.system.converter;
 
-import com.devops00.spectra.core.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.core.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.javabean.system.entity.DictItem;
 import com.devops00.spectra.core.javabean.system.from.DictItemFrom;
 import com.devops00.spectra.core.javabean.system.vo.DictItemVO;
+import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 
 import java.util.List;

@@ -2,10 +2,10 @@ package com.devops00.spectra.core.javabean.system.converter;
 
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.core.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.javabean.system.entity.Configured;
 import com.devops00.spectra.core.javabean.system.vo.ConfiguredVO;
+import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

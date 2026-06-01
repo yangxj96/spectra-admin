@@ -17,9 +17,9 @@
 package com.devops00.spectra.core.listener.ulog;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.core.configure.ulog.entity.ULogEntity;
 import com.devops00.spectra.core.javabean.system.entity.OperationLog;
 import com.devops00.spectra.core.service.system.OperationLogService;
+import com.devops00.spectra.log.base.entity.ULogEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

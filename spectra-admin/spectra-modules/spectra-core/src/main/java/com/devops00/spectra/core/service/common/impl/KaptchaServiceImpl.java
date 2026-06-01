@@ -18,9 +18,9 @@ package com.devops00.spectra.core.service.common.impl;
 
 import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
-import com.devops00.spectra.core.configure.kaptcha.properties.KaptchaProperties;
-import com.devops00.spectra.core.configure.redis.RedisCacheKey;
 import com.devops00.spectra.core.service.common.KaptchaService;
+import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
+import com.devops00.spectra.framework.configure.redis.RedisCacheKey;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

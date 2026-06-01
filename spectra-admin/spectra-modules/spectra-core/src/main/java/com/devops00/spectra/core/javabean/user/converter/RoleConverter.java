@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.core.javabean.user.converter;
 
-import com.devops00.spectra.core.configure.mapstruct.GlobalMapperConfig;
-import com.devops00.spectra.core.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.javabean.user.entity.Role;
 import com.devops00.spectra.core.javabean.user.vo.RoleVO;
+import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 
 /// 角色转换用的

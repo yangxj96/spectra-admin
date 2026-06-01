@@ -3,7 +3,7 @@ package com.devops00.spectra.oa.asset.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
+import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.service.AssetService;
 import lombok.RequiredArgsConstructor;

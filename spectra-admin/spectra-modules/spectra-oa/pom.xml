@@ -34,8 +34,6 @@
             <artifactId>spectra-workflow</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- === Spring Boot === -->
-
 
     </dependencies>
 

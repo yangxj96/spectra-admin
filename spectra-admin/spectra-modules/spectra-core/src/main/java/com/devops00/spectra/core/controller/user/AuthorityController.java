@@ -18,10 +18,10 @@ package com.devops00.spectra.core.controller.user;
 
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.exception.NotImplementedException;
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
 import com.devops00.spectra.core.javabean.user.from.RoleFrom;
 import com.devops00.spectra.core.javabean.user.vo.AuthorityTreeVO;
 import com.devops00.spectra.core.service.user.AuthorityService;
+import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;

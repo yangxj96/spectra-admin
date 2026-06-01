@@ -40,12 +40,22 @@
         </dependency>
         <dependency>
             <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-framework</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-security-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-ai-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-log-base</artifactId>
             <version>${project.version}</version>
         </dependency>
 

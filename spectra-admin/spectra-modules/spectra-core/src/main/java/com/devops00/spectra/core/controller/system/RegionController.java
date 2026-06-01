@@ -3,11 +3,11 @@ package com.devops00.spectra.core.controller.system;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
 import com.devops00.spectra.core.javabean.system.from.RegionPageFrom;
 import com.devops00.spectra.core.javabean.system.vo.RegionPathVO;
 import com.devops00.spectra.core.javabean.system.vo.RegionVO;
 import com.devops00.spectra.core.service.system.RegionService;
+import com.devops00.spectra.log.base.annotation.ULog;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 

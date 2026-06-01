@@ -42,7 +42,12 @@
         <!-- Security -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-security-starter</artifactId>
+            <artifactId>spectra-security-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-log-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
 

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.upload.controller;
 
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
+import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.upload.javabean.from.FileUploadChunkFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;

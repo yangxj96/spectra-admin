@@ -17,12 +17,12 @@
 package com.devops00.spectra.core.controller.system;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.core.configure.ulog.annotation.ULog;
 import com.devops00.spectra.core.javabean.system.from.DictGroupFrom;
 import com.devops00.spectra.core.javabean.system.from.DictItemFrom;
 import com.devops00.spectra.core.javabean.system.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.javabean.system.vo.DictItemVO;
 import com.devops00.spectra.core.service.system.DictService;
+import com.devops00.spectra.log.base.annotation.ULog;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
