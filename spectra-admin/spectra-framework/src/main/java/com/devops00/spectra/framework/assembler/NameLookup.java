@@ -1,7 +1,8 @@
-package com.devops00.spectra.common.assembler;
+package com.devops00.spectra.framework.assembler;
 
-import com.devops00.spectra.common.assembler.converter.IdConverter;
-import com.devops00.spectra.common.assembler.converter.UuidConverter;
+
+import com.devops00.spectra.framework.assembler.converter.IdConverter;
+import com.devops00.spectra.framework.assembler.converter.UuidConverter;
 
 import java.util.Map;
 import java.util.Set;

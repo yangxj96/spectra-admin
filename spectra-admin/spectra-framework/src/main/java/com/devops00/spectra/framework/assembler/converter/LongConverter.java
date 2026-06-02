@@ -1,4 +1,4 @@
-package com.devops00.spectra.common.assembler.converter;
+package com.devops00.spectra.framework.assembler.converter;
 
 /// Long作为主键的转换器
 ///

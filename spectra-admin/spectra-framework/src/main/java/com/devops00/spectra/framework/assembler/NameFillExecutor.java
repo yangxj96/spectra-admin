@@ -1,7 +1,7 @@
-package com.devops00.spectra.common.assembler;
+package com.devops00.spectra.framework.assembler;
 
 
-import com.devops00.spectra.common.assembler.converter.IdConverter;
+import com.devops00.spectra.framework.assembler.converter.IdConverter;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;

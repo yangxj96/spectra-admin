@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.javabean.system.vo;
 
-import com.devops00.spectra.common.assembler.NameFill;
+import com.devops00.spectra.framework.assembler.NameFill;
 import com.devops00.spectra.common.base.javabean.vo.Tree;
 import com.devops00.spectra.core.service.system.impl.RegionServiceImpl;
 import lombok.AllArgsConstructor;

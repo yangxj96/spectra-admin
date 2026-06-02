@@ -3,7 +3,7 @@ package com.devops00.spectra.core.service.system.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.assembler.NameLookup;
+import com.devops00.spectra.framework.assembler.NameLookup;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;

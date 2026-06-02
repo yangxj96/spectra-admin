@@ -1,4 +1,4 @@
-package com.devops00.spectra.common.assembler.converter;
+package com.devops00.spectra.framework.assembler.converter;
 
 
 import java.util.UUID;

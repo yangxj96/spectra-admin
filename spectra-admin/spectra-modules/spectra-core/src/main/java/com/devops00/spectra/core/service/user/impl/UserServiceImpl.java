@@ -19,7 +19,7 @@ package com.devops00.spectra.core.service.user.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
-import com.devops00.spectra.common.assembler.NameFillExecutor;
+import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;

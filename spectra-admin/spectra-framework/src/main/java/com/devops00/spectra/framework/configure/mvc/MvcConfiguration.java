@@ -19,7 +19,7 @@ package com.devops00.spectra.framework.configure.mvc;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SpectraSystemProperties;
 import com.devops00.spectra.framework.configure.mvc.properties.UserProperties;
-import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -38,10 +38,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
         SpectraSystemProperties.class,
         UserProperties.class
 })
+@RequiredArgsConstructor
 public class MvcConfiguration implements WebMvcConfigurer {
 
-    @Resource
-    private SpectraSystemProperties spectraProperties;
+    private final SpectraSystemProperties spectraProperties;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {

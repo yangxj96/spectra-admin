@@ -1,4 +1,4 @@
-package com.devops00.spectra.common.assembler;
+package com.devops00.spectra.framework.assembler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
