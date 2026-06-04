@@ -2,7 +2,7 @@ package com.devops00.spectra.security.starter.configuration;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SpectraSystemProperties;
+import com.devops00.spectra.common.properties.SystemProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 public class SecJacksonConfiguration {
 
     @Resource
-    private SpectraSystemProperties spectraSystemProperties;
+    private SystemProperties spectraSystemProperties;
 
     @Bean("securityObjectMapper")
     public ObjectMapper redisObjectMapper(ObjectMapper om) {

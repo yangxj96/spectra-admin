@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.framework.configure.mvc.advice;
+package com.devops00.spectra.framework.configure.mvc.advice.response;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.response.R;
@@ -22,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -42,8 +44,9 @@ import java.util.regex.Pattern;
 /// @since 2025-06-14
 @Slf4j
 @NullMarked
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
+public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Pattern PATTERN = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller.*");
 
@@ -131,6 +134,5 @@ public class ResponseBodyModifyAdvice implements ResponseBodyAdvice<Object> {
         }
         return r;
     }
-
 
 }

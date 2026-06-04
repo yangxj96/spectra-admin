@@ -17,7 +17,7 @@
 package com.devops00.spectra.core.runner;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SpectraSystemProperties;
+import com.devops00.spectra.common.properties.SystemProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.ApplicationArguments;
@@ -35,9 +35,9 @@ import java.io.File;
 @Component
 public class FolderCheckRunner implements ApplicationRunner {
 
-    private final SpectraSystemProperties properties;
+    private final SystemProperties properties;
 
-    public FolderCheckRunner(SpectraSystemProperties properties) {
+    public FolderCheckRunner(SystemProperties properties) {
         this.properties = properties;
     }
 

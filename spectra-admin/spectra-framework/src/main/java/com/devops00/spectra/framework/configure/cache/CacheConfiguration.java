@@ -2,7 +2,7 @@ package com.devops00.spectra.framework.configure.cache;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.common.properties.SpectraSystemProperties;
+import com.devops00.spectra.common.properties.SystemProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,7 @@ import java.time.Duration;
 @RequiredArgsConstructor
 public class CacheConfiguration {
 
-    private final SpectraSystemProperties spectraSystemProperties;
+    private final SystemProperties systemProperties;
 
     /// 缓存管理器
     @Bean
@@ -68,7 +68,7 @@ public class CacheConfiguration {
         log.debug(LogPrefix.SERIALIZATION.f("开始配置缓存使用的ObjectMapper"));
 
         var ptv = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
+                .allowIfSubType(systemProperties.getPackagePrefix())
                 .allowIfSubType("java.util")
                 .allowIfSubType("java.time")
                 .allowIfSubType("java.lang")

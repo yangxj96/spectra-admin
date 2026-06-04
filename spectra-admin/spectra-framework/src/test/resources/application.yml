@@ -1,0 +1,5 @@
+spring:
+  config:
+    import:
+      - classpath:application-common-dev.yml
+      - classpath:application-framework-dev.yml

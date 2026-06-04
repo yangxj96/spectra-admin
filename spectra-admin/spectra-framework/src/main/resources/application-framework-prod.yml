@@ -1,0 +1,88 @@
+spectra:
+  system:
+    base-dir: files
+  user:
+    default-password: ${DEFAULT_PASSWORD}
+  kaptcha:
+    type: math
+    verify: false
+server:
+  port: ${SERVER_PORT:80}
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        name: JSESSIONID
+        path: /
+        same-site: none
+        secure: true
+        http-only: true
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: spectra-admin
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      data-source-properties:
+        currentSchema: public
+        reWriteBatchedInserts: true
+        binaryTransfer: true
+        tcpKeepAlive: true
+        connectTimeout: 10
+        socketTimeout: 60
+        ApplicationName: ${spring.application.name}
+        loginTimeout: 10
+        sslmode: disable
+        prepareThreshold: 5
+  data:
+    redis:
+      url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}
+      timeout: 10s
+      connect-timeout: 5s
+      lettuce:
+        pool:
+          enabled: true
+          max-idle: 10
+          min-idle: 2
+          max-active: 20
+          max-wait: 5000ms
+        shutdown-timeout: 100ms
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.devops00.**.entity
+  type-handlers-package: com.devops00.spectra.common.mybatis.handler
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+    local-cache-scope: statement
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+      logic-delete-field: deleted
+      logic-not-delete-value: "null"
+      logic-delete-value: "now()"
+      schema: spectra_core
+  configuration-properties:
+    schema: spectra_core
+logging:
+  group:
+    spectra: >-
+      com.devops00.spectra
+    other: >-
+      com.ulisesbocchio.jasyptspringboot.configuration
+  level:
+    root: info
+    other: error
+    spectra: debug

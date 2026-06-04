@@ -29,7 +29,7 @@ import java.util.List;
 /// @since 2025/6/19
 @Data
 @ConfigurationProperties(prefix = "spectra.system")
-public class SpectraSystemProperties {
+public class SystemProperties {
 
     /// 基础文件位置,所有文件都会在这个目录下面进行存放
     private String baseDir = "files";
@@ -40,9 +40,11 @@ public class SpectraSystemProperties {
     /// 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表,
     /// 以下为没法直接使用这个属性进行修改的位置,
     /// 1. com.devops00.spectra.framework.configure.MyBatisPlusConfiguration
-    /// 2. com.devops00.spectra.framework.advice.ResponseBodyModifyAdvice
-    /// 3. com.devops00.spectra.launch.LaunchApplication
+    /// 2. com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice
+    /// 3. com.devops00.spectra.framework.configure.mvc.advice.response.ResponseModifyAdvice
+    /// 4. com.devops00.spectra.launch.LaunchApplication
     private String packagePrefix = "com.devops00.spectra";
+
 
     /// mvc配置
     private SpectraMvc mvc = new SpectraMvc();
@@ -86,5 +88,6 @@ public class SpectraSystemProperties {
         /// 默认一小时
         private Long maxAge = 3600L;
     }
+
 
 }
