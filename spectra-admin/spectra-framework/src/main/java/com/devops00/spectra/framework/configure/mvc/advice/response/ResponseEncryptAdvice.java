@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @Order
 @NullMarked
-@ControllerAdvice
+//@ControllerAdvice
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Pattern PATTERN = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller.*");

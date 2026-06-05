@@ -1,6 +1,7 @@
 package com.devops00.spectra.ai;
 
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -11,6 +12,6 @@ import org.springframework.context.annotation.ComponentScan;
  * @since 2026/4/26 12:12
  */
 @ComponentScan("com.devops00.spectra.ai")
-//@MapperScan("com.devops00.spectra.core.mapper")
+@MapperScan("com.devops00.spectra.ai.mapper")
 public class AiModule {
 }

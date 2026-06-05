@@ -4,10 +4,13 @@ package com.devops00.spectra.ai.controller;
 import com.devops00.spectra.ai.javabean.form.AiAskForm;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
 import io.agentscope.core.ReActAgent;
+import io.agentscope.core.agent.RuntimeContext;
+import io.agentscope.core.event.*;
 import io.agentscope.core.message.Msg;
 import io.agentscope.core.message.MsgRole;
 import io.agentscope.core.message.TextBlock;
-import io.agentscope.core.tool.AgentTool;
+import io.agentscope.core.state.SimpleSessionKey;
+import io.agentscope.harness.agent.HarnessAgent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -31,7 +34,7 @@ import java.util.UUID;
 @RequestMapping("/ai/ask")
 public class AiAskController {
 
-    private final ReActAgent agent;
+    private final HarnessAgent agent;
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<OpenAIStreamVO> stream(@RequestBody AiAskForm form) {
@@ -45,8 +48,15 @@ public class AiAskController {
         // 生成唯一的响应ID和当前时间戳，保证整个流返回中这两个字段保持一致
         var responseId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "");
         long createdTime = System.currentTimeMillis() / 1000;
+        var ctx = RuntimeContext
+                .builder()
+                .sessionId("session1")
+                .sessionKey(new SimpleSessionKey("session1"))
+                .userId("user1")
+                .put("request_id", "req-2026-06-01-abc")
+                .build();
 
-        return agent.stream(msg)
+        return agent.streamEvents(msg, ctx)
                 .map(event -> {
                     var response = new OpenAIStreamVO();
                     response.setId(responseId);
@@ -55,22 +65,27 @@ public class AiAskController {
 
                     var choice = new OpenAIStreamVO.Choice();
                     choice.setIndex(0);
-
                     var delta = new OpenAIStreamVO.Delta();
                     delta.setRole("assistant");
 
-                    // 核心修改：使用 isLast() 判断是否为最后一块
-                    if (event.isLast()) {
-                        // 如果是最后一块，设置结束原因，并且不携带具体的文本内容
+                    // 根据官方示例，使用 instanceof 进行类型匹配
+                    if (event instanceof AgentEndEvent) {
+                        // 1. Agent 执行结束，设置结束原因，不携带文本内容
                         choice.setFinish_reason("stop");
-                    } else {
-                        // 如果不是最后一块，提取当前的增量文本内容
-                        var textContent = event.getMessage().getContent().stream()
-                                .filter(block -> block instanceof TextBlock)
-                                .map(block -> ((TextBlock) block).getText())
-                                .reduce("", String::concat);
 
-                        delta.setContent(textContent);
+                    } else if (event instanceof TextBlockDeltaEvent e) {
+                        // 2. 文本增量事件，提取 delta 文本内容
+                        delta.setContent(e.getDelta());
+                    //} else if (event instanceof ToolCallStartEvent e) {
+                    //    // 3. 工具调用开始（可选：将工具调用信息作为文本返回给前端）
+                    //    delta.setContent("\n[Calling Tool: " + e.getToolCallName() + "]\n");
+                    //} else if (event instanceof ToolResultEndEvent e) {
+                    //    // 4. 工具执行结束（可选：将工具结果作为文本返回给前端）
+                    //    delta.setContent("\n[Tool Result: " + e.getState() + "]\n");
+                    } else {
+                        // 5. 其他事件（如 AgentStartEvent, ModelCallStartEvent 等）
+                        // 不需要向前端发送实际内容，返回空的 delta
+                        // 你也可以选择用 .filter() 提前过滤掉这些事件
                     }
 
                     choice.setDelta(delta);
@@ -81,8 +96,7 @@ public class AiAskController {
                     return response;
                 })
                 .onErrorResume(error -> {
-                    // 建议在这里打印具体的 error 日志，例如：log.error("Agent stream error", error);
-                    log.error("Agent stream error", error);
+                    log.error("Agent streamEvents error", error);
 
                     var errorResponse = new OpenAIStreamVO();
                     errorResponse.setId(responseId);
@@ -91,16 +105,72 @@ public class AiAskController {
 
                     var choice = new OpenAIStreamVO.Choice();
                     choice.setIndex(0);
-                    choice.setFinish_reason("error"); // 标记为错误结束
-                    choice.setDelta(new OpenAIStreamVO.Delta()); // 返回空的 delta
+                    choice.setFinish_reason("error");
+                    choice.setDelta(new OpenAIStreamVO.Delta());
 
                     var choices = new ArrayList<OpenAIStreamVO.Choice>();
                     choices.add(choice);
                     errorResponse.setChoices(choices);
 
-                    // 返回封装好的 VO 对象流
                     return Flux.just(errorResponse);
                 });
+
+
+        //return agent.stream(msg)
+        //        .map(event -> {
+        //            var response = new OpenAIStreamVO();
+        //            response.setId(responseId);
+        //            response.setCreated(createdTime);
+        //            response.setModel(agent.getModel().getModelName());
+        //
+        //            var choice = new OpenAIStreamVO.Choice();
+        //            choice.setIndex(0);
+        //
+        //            var delta = new OpenAIStreamVO.Delta();
+        //            delta.setRole("assistant");
+        //
+        //            // 核心修改：使用 isLast() 判断是否为最后一块
+        //            if (event.isLast()) {
+        //                // 如果是最后一块，设置结束原因，并且不携带具体的文本内容
+        //                choice.setFinish_reason("stop");
+        //            } else {
+        //                // 如果不是最后一块，提取当前的增量文本内容
+        //                var textContent = event.getMessage().getContent().stream()
+        //                        .filter(block -> block instanceof TextBlock)
+        //                        .map(block -> ((TextBlock) block).getText())
+        //                        .reduce("", String::concat);
+        //
+        //                delta.setContent(textContent);
+        //            }
+        //
+        //            choice.setDelta(delta);
+        //            var choices = new ArrayList<OpenAIStreamVO.Choice>();
+        //            choices.add(choice);
+        //            response.setChoices(choices);
+        //
+        //            return response;
+        //        })
+        //        .onErrorResume(error -> {
+        //            // 建议在这里打印具体的 error 日志，例如：log.error("Agent stream error", error);
+        //            log.error("Agent stream error", error);
+        //
+        //            var errorResponse = new OpenAIStreamVO();
+        //            errorResponse.setId(responseId);
+        //            errorResponse.setCreated(createdTime);
+        //            errorResponse.setModel(agent.getModel().getModelName());
+        //
+        //            var choice = new OpenAIStreamVO.Choice();
+        //            choice.setIndex(0);
+        //            choice.setFinish_reason("error"); // 标记为错误结束
+        //            choice.setDelta(new OpenAIStreamVO.Delta()); // 返回空的 delta
+        //
+        //            var choices = new ArrayList<OpenAIStreamVO.Choice>();
+        //            choices.add(choice);
+        //            errorResponse.setChoices(choices);
+        //
+        //            // 返回封装好的 VO 对象流
+        //            return Flux.just(errorResponse);
+        //        });
     }
 
 }

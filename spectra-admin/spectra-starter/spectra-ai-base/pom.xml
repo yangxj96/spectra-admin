@@ -22,24 +22,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <langchain4j.version>1.14.1-beta24</langchain4j.version>
+
+        <agentscope.version>2.0.0-RC1</agentscope.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>io.agentscope</groupId>
-            <artifactId>agentscope-spring-boot-starter</artifactId>
-            <version>1.0.12</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>io.modelcontextprotocol.sdk</groupId>
-                    <artifactId>mcp</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>io.modelcontextprotocol.sdk</groupId>
-            <artifactId>mcp</artifactId>
-            <version>1.1.2</version>
+            <artifactId>agentscope-harness</artifactId>
+            <version>${agentscope.version}</version>
         </dependency>
     </dependencies>
 

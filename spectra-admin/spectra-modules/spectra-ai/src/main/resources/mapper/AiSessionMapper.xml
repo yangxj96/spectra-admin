@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.ai.mapper.AiSessionMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.ai.javabean.entity.AiSession">
+        <!--@mbg.generated-->
+        <!--@Table spectra_core.oa_meeting-->
+        <result column="session_id" property="sessionId"/>
+        <result column="state_key"  property="stateKey"/>
+        <result column="item_index" property="itemIndex"/>
+        <result column="state_data" property="stateData"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        session_id,
+        state_key,
+        item_index,
+        state_data,
+        <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+    </sql>
+</mapper>

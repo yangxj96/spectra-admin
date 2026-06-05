@@ -1,47 +1,65 @@
 package com.devops00.spectra.ai.configuration;
 
 
-import io.agentscope.core.tool.Tool;
-import io.agentscope.core.tool.Toolkit;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
+import com.devops00.spectra.ai.service.AiSessionService;
+import io.agentscope.core.ReActAgent;
+import io.agentscope.core.model.Model;
+import io.agentscope.core.model.OpenAIChatModel;
+import io.agentscope.core.session.Session;
+import io.agentscope.harness.agent.HarnessAgent;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 /// AI配置类
 ///
 /// @author Jack Young
 /// @version 1.0
 /// @since 2026/5/15 17:15
-@Component
-public class AiConfiguration implements ApplicationListener<ContextRefreshedEvent> {
+@Configuration
+@RequiredArgsConstructor
+public class AiConfiguration {
 
-    private final Toolkit toolkit;
-
-    public AiConfiguration(Toolkit toolkit) {
-        this.toolkit = toolkit;
+    /**
+     * ai session存储
+     *
+     * @return {@link Session}
+     */
+    @Bean
+    public Session aiSession(AiSessionService service) {
+        return new PostgreSQLSession(service);
     }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        ApplicationContext ctx = event.getApplicationContext();
-        // 遍历容器中所有的 Bean
-        for (String beanName : ctx.getBeanDefinitionNames()) {
-            Object bean = ctx.getBean(beanName);
-            // 检查 Bean 的类及其方法上是否有 @Tool 注解
-            if (hasToolMethod(bean.getClass())) {
-                toolkit.registerTool(bean);
-            }
-        }
+    /**
+     * 模型信息
+     *
+     * @return 模型
+     */
+    @Bean
+    public Model model() {
+        return OpenAIChatModel
+                .builder()
+                .apiKey("sk-c73be100f54240208a7437238d7afe61")
+                .baseUrl("https://api.deepseek.com")
+                .modelName("deepseek-v4-pro")
+                .build();
     }
 
-    // 辅助方法：通过反射检查类的方法上是否有 @Tool 注解
-    private boolean hasToolMethod(Class<?> clazz) {
-        for (var method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Tool.class)) {
-                return true;
-            }
-        }
-        return false;
+    /**
+     * 智能体agent
+     *
+     * @return agent
+     */
+    @Bean
+    public HarnessAgent agent(Model model, Session session) {
+        return HarnessAgent.builder()
+                .name("Assistant")
+                .sysPrompt("你是企业数据分析助手:\\n1. 不允许编造数据")
+                .maxIters(10)
+                .model(model)
+                .session(session)
+                .build();
     }
+
+
 }
