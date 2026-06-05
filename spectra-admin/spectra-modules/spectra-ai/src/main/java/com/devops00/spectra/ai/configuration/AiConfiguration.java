@@ -39,7 +39,7 @@ public class AiConfiguration {
     public Model model() {
         return OpenAIChatModel
                 .builder()
-                .apiKey("sk-c73be100f54240208a7437238d7afe61")
+                .apiKey("sk-xxx")
                 .baseUrl("https://api.deepseek.com")
                 .modelName("deepseek-v4-pro")
                 .build();
