@@ -6,8 +6,8 @@ import com.devops00.spectra.ai.starter.dto.OpenAIStreamVO;
 import com.devops00.spectra.ai.starter.response.OpenAiResponse;
 import com.devops00.spectra.ai.starter.utils.AiUtils;
 import com.devops00.spectra.security.base.holder.SecUtil;
+import io.agentscope.core.ReActAgent;
 import io.agentscope.core.agent.RuntimeContext;
-import io.agentscope.harness.agent.HarnessAgent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -32,7 +32,7 @@ import java.util.UUID;
 @RequestMapping("/ai/ask")
 public class AiAskController {
 
-    private final HarnessAgent agent;
+    private final ReActAgent agent;
 
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<OpenAIStreamVO> stream(@RequestBody AiAskForm form, @AuthenticationPrincipal UserDetails userDetails) {

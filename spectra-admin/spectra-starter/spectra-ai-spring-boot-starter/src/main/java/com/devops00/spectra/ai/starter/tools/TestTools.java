@@ -1,6 +1,7 @@
 package com.devops00.spectra.ai.starter.tools;
 
 
+import com.devops00.spectra.common.constant.LogPrefix;
 import io.agentscope.core.tool.Tool;
 import io.agentscope.core.tool.ToolParam;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +29,7 @@ public class TestTools {
             @ToolParam(name = "timezone", description = "IANA timezone, e.g. Asia/Shanghai")
             String timezone,
             String userId) {
-        log.info("获得注入的user id: {}", userId);
+        log.info("{}获得注入的user id: {}", LogPrefix.AI.p(), userId);
         return LocalDateTime.now(ZoneId.of(timezone)).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 

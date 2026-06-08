@@ -1,6 +1,8 @@
 package com.devops00.spectra.ai.starter.configuration;
 
+import com.devops00.spectra.common.constant.LogPrefix;
 import io.agentscope.core.tool.Toolkit;
+import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
@@ -12,8 +14,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-@Component
-// 🚀 核心改进：通过实现 ApplicationListener 监听上下文刷新完毕事件，此时所有 Bean（包括 Agent）都已实例化完毕，绝不会再报循环依赖错误！
+@Slf4j
 public class AgentScopeToolRegistrar implements ApplicationListener<ContextRefreshedEvent> {
 
     private final ApplicationContext applicationContext;
@@ -31,7 +32,7 @@ public class AgentScopeToolRegistrar implements ApplicationListener<ContextRefre
             return;
         }
 
-        System.out.println("[AgentScope-Spring] 开始安全扫描 @Tool 工具类...");
+        log.debug("{}开始安全扫描 @Tool 工具类...", LogPrefix.AI.p());
 
         // 1. 获取容器中所有被 @Component（或 @Service, @RestController 等）标记的 Bean
         Map<String, Object> allComponents = applicationContext.getBeansWithAnnotation(Component.class);
@@ -72,9 +73,9 @@ public class AgentScopeToolRegistrar implements ApplicationListener<ContextRefre
 
                 // 4. 将保留了完整注解的“壳对象”注册进 AgentScope
                 toolkit.registerTool(proxyObject);
-                System.out.println("[AgentScope-Spring] 成功无感代理并注册工具类: " + targetClass.getName());
+                log.debug("{}成功无感代理并注册工具类:{}", LogPrefix.AI.p(), targetClass.getName());
             }
         }
-        System.out.println("[AgentScope-Spring] 工具类扫描与 Toolkit 动态装配全部完成！");
+        log.debug("{}工具类扫描与 Toolkit 动态装配全部完成！", LogPrefix.AI.p());
     }
 }

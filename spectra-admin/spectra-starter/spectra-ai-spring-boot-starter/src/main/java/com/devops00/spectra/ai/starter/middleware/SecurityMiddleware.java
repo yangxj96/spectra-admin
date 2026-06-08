@@ -1,7 +1,7 @@
 package com.devops00.spectra.ai.starter.middleware;
 
 
-import io.agentscope.core.ReActAgent;
+import com.devops00.spectra.common.constant.LogPrefix;
 import io.agentscope.core.agent.Agent;
 import io.agentscope.core.event.AgentEvent;
 import io.agentscope.core.middleware.AgentInput;
@@ -25,10 +25,10 @@ public class SecurityMiddleware implements MiddlewareBase {
     public Flux<AgentEvent> onAgent(Agent agent, AgentInput input, Function<AgentInput, Flux<AgentEvent>> next) {
         return next.apply(input)
                 .doOnSubscribe(__ -> {
-                    log.info("Agent {} started", agent.getAgentId());
+                    log.info("{}doOnSubscribe:AgentID[{}]", LogPrefix.AI.p(), agent.getAgentId());
                 })
                 .doOnComplete(() -> {
-                    log.debug("onAgent 当前agent:{}", agent.getName());
+                    log.debug("{}doOnComplete:AgentName[{}]", LogPrefix.AI.p(), agent.getName());
                 });
     }
 

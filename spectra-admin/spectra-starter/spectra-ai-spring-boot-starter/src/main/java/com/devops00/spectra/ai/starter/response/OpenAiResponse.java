@@ -2,6 +2,7 @@ package com.devops00.spectra.ai.starter.response;
 
 
 import com.devops00.spectra.ai.starter.dto.OpenAIStreamVO;
+import com.devops00.spectra.common.constant.LogPrefix;
 import io.agentscope.core.event.*;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
@@ -50,112 +51,112 @@ public class OpenAiResponse {
             switch (event) {
                 // Agent任务流的开始
                 case AgentStartEvent e:
-                    log.trace("AgentStartEvent:{}", e.getReplyId());
+                    log.trace("{}AgentStartEvent:{}", LogPrefix.AI.p(), e.getReplyId());
                     break;
                 // Agent任务流的结束
                 case AgentEndEvent e:
-                    log.trace("AgentEndEvent:{}", e.getReplyId());
+                    log.trace("{}AgentEndEvent:{}", LogPrefix.AI.p(), e.getReplyId());
                     choice.setFinish_reason("stop");
                     break;
                 // 外部请求主动终止了 Agent 的执行
                 case RequestStopEvent e:
-                    log.trace("RequestStopEvent:{}", e.getReason());
+                    log.trace("{}RequestStopEvent:{}", LogPrefix.AI.p(), e.getReason());
                     break;
                 // Agent最终面向用户的自然语言回复的流式输出 开始
                 case TextBlockStartEvent e:
-                    log.trace("TextBlockStartEvent:{}", e.getBlockId());
+                    log.trace("{}TextBlockStartEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // Agent最终面向用户的自然语言回复的流式输出 结束
                 case TextBlockEndEvent e:
-                    log.trace("TextBlockEndEvent:{}", e.getBlockId());
+                    log.trace("{}TextBlockEndEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // Agent最终面向用户的自然语言回复的流式输出 增量内容
                 case TextBlockDeltaEvent e:
-                    log.trace("TextBlockDeltaEvent:{}", e.getDelta());
+                    log.trace("{}TextBlockDeltaEvent:{}", LogPrefix.AI.p(), e.getDelta());
                     delta.setContent(e.getDelta());
                     break;
                 // 非文本的结构化数据输出 开始
                 case DataBlockStartEvent e:
-                    log.trace("DataBlockStartEvent:{}", e.getBlockId());
+                    log.trace("{}DataBlockStartEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // 非文本的结构化数据输出 结束
                 case DataBlockEndEvent e:
-                    log.trace("DataBlockEndEvent:{}", e.getBlockId());
+                    log.trace("{}DataBlockEndEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // 非文本的结构化数据输出 增量内容
                 case DataBlockDeltaEvent e:
-                    log.trace("DataBlockDeltaEvent:{}", e.getBlockId());
+                    log.trace("{}DataBlockDeltaEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // Agent 陷入了死循环或思考过久，达到了最大迭代次数限制被强制停止。
                 case ExceedMaxItersEvent e:
-                    log.trace("ExceedMaxItersEvent:{}", e.getId());
+                    log.trace("{}ExceedMaxItersEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // Agent 开始向大模型发送请求
                 case ModelCallStartEvent e:
-                    log.trace("ModelCallStartEvent:{}", e.getId());
+                    log.trace("{}ModelCallStartEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // Agent 开始向大模型发送请求收到完整响应
                 case ModelCallEndEvent e:
-                    log.trace("ModelCallEndEvent:{}", e.getId());
+                    log.trace("{}ModelCallEndEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 推理 开始
                 case ThinkingBlockStartEvent e:
-                    log.trace("ThinkingBlockStartEvent:{}", e.getBlockId());
+                    log.trace("{}ThinkingBlockStartEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // 推理 结束
                 case ThinkingBlockEndEvent e:
-                    log.trace("ThinkingBlockEndEvent:{}", e.getBlockId());
+                    log.trace("{}ThinkingBlockEndEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // 推理 增量内容
                 case ThinkingBlockDeltaEvent e:
-                    log.trace("ThinkingBlockDeltaEvent:{}", e.getBlockId());
+                    log.trace("{}ThinkingBlockDeltaEvent:{}", LogPrefix.AI.p(), e.getBlockId());
                     break;
                 // 工具调用流式 开始
                 case ToolCallStartEvent e:
-                    log.trace("ToolCallStartEvent:{}", e.getToolCallId());
+                    log.trace("{}ToolCallStartEvent:{}", LogPrefix.AI.p(), e.getToolCallId());
                     break;
                 // 工具调用流式 结束
                 case ToolCallEndEvent e:
-                    log.trace("ToolCallEndEvent:{}", e.getToolCallId());
+                    log.trace("{}ToolCallEndEvent:{}", LogPrefix.AI.p(), e.getToolCallId());
                     break;
                 // 工具调用流式 增量内容
                 case ToolCallDeltaEvent e:
-                    log.trace("ToolCallDeltaEvent:{}", e.getToolCallId());
+                    log.trace("{}ToolCallDeltaEvent:{}", LogPrefix.AI.p(), e.getToolCallId());
                     break;
                 // 工具结果流式 开始
                 case ToolResultStartEvent e:
-                    log.trace("ToolResultStartEvent:{}", e.getId());
+                    log.trace("{}ToolResultStartEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 工具结果流式 结束
                 case ToolResultEndEvent e:
-                    log.trace("ToolResultEndEvent:{}", e.getId());
+                    log.trace("{}ToolResultEndEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 工具结果流式 数据增量内容
                 case ToolResultDataDeltaEvent e:
-                    log.trace("ToolResultDataDeltaEvent:{}", e.getId());
+                    log.trace("{}ToolResultDataDeltaEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 工具结果流式 文本增量内容
                 case ToolResultTextDeltaEvent e:
-                    log.trace("ToolResultTextDeltaEvent:{}", e.getId());
+                    log.trace("{}ToolResultTextDeltaEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // Agent 需要执行外部系统操作，暂停等待。
                 case RequireExternalExecutionEvent e:
-                    log.trace("RequireExternalExecutionEvent:{}", e.getId());
+                    log.trace("{}RequireExternalExecutionEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // Agent 在执行高危操作（如删除数据、发送邮件）前，暂停等待用户确认。
                 case RequireUserConfirmEvent e:
-                    log.trace("RequireUserConfirmEvent:{}", e.getId());
+                    log.trace("{}RequireUserConfirmEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 用户点击了“同意”或“拒绝”后产生的事件。
                 case UserConfirmResultEvent e:
-                    log.trace("UserConfirmResultEvent:{}", e.getId());
+                    log.trace("{}UserConfirmResultEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 // 外部系统执行完毕，将结果回传给 Agent。
                 case ExternalExecutionResultEvent e:
-                    log.trace("ExternalExecutionResultEvent:{}", e.getId());
+                    log.trace("{}ExternalExecutionResultEvent:{}", LogPrefix.AI.p(), e.getId());
                     break;
                 default:
-                    throw new RuntimeException("未识别的响应类型:" + event);
+                    throw new RuntimeException(LogPrefix.AI.p() + "未识别的响应类型:" + event);
             }
         }
         choice.setDelta(delta);
