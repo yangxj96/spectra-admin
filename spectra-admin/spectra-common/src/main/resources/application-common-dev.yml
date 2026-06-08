@@ -115,8 +115,9 @@ logging:
   group:
     spectra: >-
       com.devops00.spectra
-    other: >-
-      com.ulisesbocchio.jasyptspringboot.configuration
+    other:
+      - com.ulisesbocchio.jasyptspringboot.configuration
+      - io.agentscope.harness.agent.middleware
   level:
     root: info
     other: error

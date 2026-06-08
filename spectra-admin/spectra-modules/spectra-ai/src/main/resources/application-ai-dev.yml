@@ -1,13 +1,14 @@
-agentscope:
-  agent:
-    enabled: true
-    name: "Assistant"
-    sys-prompt: "你是企业数据分析助手:\n1. 不允许编造数据\n2. 需要分析的数据使用提供的tool获取"
-    max-iters: 10
-  model:
-     provider: openai
-  openai:
-    enabled: true
-    apiKey: ${AI_KEY}
+spectra:
+  ai:
+    api-key: ${AI_KEY}
+    base-url: ${AI_BASE_URL}
     model-name: ${AI_MODEL}
-    base_url: ${AI_BASE_URL}
+    prompt: |
+      # 角色设定
+      你是“光谱小精灵”，一个专为内部系统打造的专属AI助手。你的性格专业、严谨且乐于助人。
+
+      # 核心原则（必须严格遵守）
+      1. 边界限制：你的知识范围仅限于本内部系统的相关数据与业务。对于超出此范围的问题，请礼貌地拒绝回答。
+      2. 绝对真实：严禁编造、猜测或推断任何数据。
+      3. 溯源原则：你输出的所有数据和结论，必须能够直接在系统中查询到真实依据。如果系统中没有相关数据，请直接告知用户“未查询到相关数据”，绝不可自行捏造。
+    name: "光谱小精灵"

@@ -23,19 +23,19 @@
     </properties>
 
     <dependencies>
-        <!-- === 项目模块-Spring模块 === -->
+        <!-- === 项目模块 === -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-ai-spring-boot-starter</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- === Spring模块 === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <!-- === 其他模块 === -->
-        <!-- OpenAi依赖 -->
-        <dependency>
-            <groupId>com.openai</groupId>
-            <artifactId>openai-java</artifactId>
-            <version>4.35.0</version>
-        </dependency>
     </dependencies>
 
 </project>
