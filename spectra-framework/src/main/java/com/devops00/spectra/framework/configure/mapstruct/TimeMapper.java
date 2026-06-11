@@ -188,8 +188,14 @@ public class TimeMapper {
     /// @return Instant
     public @Nullable Instant toInstant(@Nullable String text) {
         if (text == null || text.isBlank()) return null;
-        LocalDateTime ldt = LocalDateTime.parse(text, ISO_FORMATTER);
-        return ldt.atZone(getUserZoneId()).toInstant();
+        try {
+            // 优先解析带时区偏移的 ISO 8601 字符串
+            return OffsetDateTime.parse(text, ISO_FORMATTER).toInstant();
+        } catch (Exception e) {
+            // 降级处理：无时区信息的字符串，按用户当前时区解析
+            LocalDateTime ldt = LocalDateTime.parse(text, ISO_FORMATTER);
+            return ldt.atZone(getUserZoneId()).toInstant();
+        }
     }
 
 }

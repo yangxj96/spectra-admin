@@ -16,9 +16,9 @@ FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 
-# 设置时区
-ENV TZ=Asia/Shanghai
-RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# 设置时区[不设置时区,让他默认UTC+0.项目中做适配]
+#ENV TZ=Asia/Shanghai
+#RUN ln -sf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # 复制 Spring Boot 分层
 COPY --from=builder /layers/app/dependencies/ ./

@@ -1,4 +1,4 @@
-name: Build Minimal Docker Image to GHCR
+name: 构建最小化Docker镜像并推送到GHCR
 
 on:
   workflow_dispatch:
@@ -13,13 +13,13 @@ jobs:
 
     steps:
       # ---------------------------
-      # Checkout
+      # 检出代码
       # ---------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
 
       # ---------------------------
-      # Setup Java 25
+      # 设置Java 25
       # ---------------------------
       - name: Set up Java 25
         uses: actions/setup-java@v4
@@ -34,17 +34,15 @@ jobs:
       - name: Build Maven Project
         run: mvn -B clean package -DskipTests
         shell: bash
-        working-directory: ./spectra-admin
 
       # ---------------------------
-      # 4. Extract Maven project version
+      # 提取Maven项目版本
       # ---------------------------
       - name: Get Maven Version
         id: maven_version
         run: |
           VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-        working-directory: ./spectra-admin
 
       # ---------------------------
       # 登录 GHCR
@@ -57,13 +55,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       # ---------------------------
-      # Build & Push Minimal Docker Image
+      # 构建并推送最小化的Docker镜像
       # ---------------------------
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v4
         with:
-          context: ./spectra-admin/spectra-launch
-          file: ./spectra-admin/spectra-launch/Dockerfile
+          context: ./spectra-launch
+          file: ./spectra-launch/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/spectra-admin:latest
