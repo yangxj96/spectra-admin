@@ -39,28 +39,58 @@ public class AiAskController {
         // 利用 Sinks 桥接 LangChain4j 的异步回调流和 Spring WebFlux 的 Flux 流
         return Flux.create(sink -> {
             assistant.stream(SecUtil.getCurrentToken(), form.getMessage())
-                    // 1. 每当 DeepSeek 吐出一个字（增量文本）
-                    .onNext(token -> {
-                        OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null);
-                        sink.next(om.writeValueAsString(vo));
-                    })
-                    // 2. 整个流顺利结束时
-                    .onComplete(response -> {
-                        // 按照 OpenAI 标准，流结束时通常会发一个带 finish_reason="stop" 的空内容包
-                        String finishReason = "stop";
-                        if (response != null && response.finishReason() != null) {
-                            finishReason = response.finishReason().name().toLowerCase();
+                    // 1. 【核心改动】：替代了旧版的 onNext
+                    .onPartialResponse(token -> {
+                        try {
+                            OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null);
+                            sink.next(om.writeValueAsString(vo));
+                        } catch (Exception e) {
+                            sink.error(e);
                         }
-
-                        OpenAIStreamVO finalVo = buildOpenAIDelta(streamId, null, finishReason);
-                        sink.next(om.writeValueAsString(finalVo));
-                        // 真正关闭 Flux 通道
-                        sink.complete();
                     })
-                    // 3. 异常处理
+                    // 2. 【核心改动】：替代了旧版的 onComplete，入参换成了全新的 ChatResponse
+                    .onCompleteResponse(chatResponse -> {
+                        try {
+                            String finishReason = "stop";
+                            // 从 1.0.0 的全新 ChatResponse 中提取结束原因
+                            if (chatResponse != null && chatResponse.finishReason() != null) {
+                                finishReason = chatResponse.finishReason().name().toLowerCase();
+                            }
+                            OpenAIStreamVO finalVo = buildOpenAIDelta(streamId, null, finishReason);
+                            sink.next(om.writeValueAsString(finalVo));
+                            // 真正关闭 Flux 通道
+                            sink.complete();
+                        } catch (Exception e) {
+                            sink.error(e);
+                        }
+                    })
+                    // 3. 异常处理：依然保持原有标准
                     .onError(sink::error)
-                    // 4. 驱动 LangChain4j 的底层 OkHttp 异步线程开始传输
+                    // 4. 真正触发：发送请求给大模型开始传输
                     .start();
+
+            //// 1. 每当 DeepSeek 吐出一个字（增量文本）
+            //.onNext(token -> {
+            //    OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null);
+            //    sink.next(om.writeValueAsString(vo));
+            //})
+            //// 2. 整个流顺利结束时
+            //.onComplete(response -> {
+            //    // 按照 OpenAI 标准，流结束时通常会发一个带 finish_reason="stop" 的空内容包
+            //    String finishReason = "stop";
+            //    if (response != null && response.finishReason() != null) {
+            //        finishReason = response.finishReason().name().toLowerCase();
+            //    }
+            //
+            //    OpenAIStreamVO finalVo = buildOpenAIDelta(streamId, null, finishReason);
+            //    sink.next(om.writeValueAsString(finalVo));
+            //    // 真正关闭 Flux 通道
+            //    sink.complete();
+            //})
+            //// 3. 异常处理
+            //.onError(sink::error)
+            //// 4. 驱动 LangChain4j 的底层 OkHttp 异步线程开始传输
+            //.start();
         });
     }
 

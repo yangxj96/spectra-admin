@@ -29,3 +29,7 @@ S3_REGION= ""
 AI_KEY= ""
 AI_BASE_URL= ""
 AI_MODEL= ""
+# RAG
+RAG_KEY= ""
+RAG_BASE_URL= ""
+RAG_MODEL= ""

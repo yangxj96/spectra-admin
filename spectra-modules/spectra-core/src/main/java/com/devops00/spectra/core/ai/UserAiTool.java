@@ -1,6 +1,7 @@
 package com.devops00.spectra.core.ai;
 
 
+import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.core.service.user.UserService;
 import com.devops00.spectra.ai.base.ToolExecutor;
 import dev.langchain4j.agent.tool.Tool;
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserAiTool {
+public class UserAiTool implements AiToolMarker {
 
     private final UserService userService;
 

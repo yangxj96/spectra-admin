@@ -12,7 +12,6 @@
 #      2. 绝对真实：严禁编造、猜测或推断任何数据。
 #      3. 溯源原则：你输出的所有数据和结论，必须能够直接在系统中查询到真实依据。如果系统中没有相关数据，请直接告知用户“未查询到相关数据”，绝不可自行捏造。
 #    name: "光谱小精灵"
-
 langchain4j:
   open-ai:
     chat-model:
@@ -25,3 +24,9 @@ langchain4j:
       base-url: ${AI_BASE_URL}
       api-key: ${AI_KEY}
       model-name: ${AI_MODEL}
+spectra:
+  ai:
+    rag:
+      api-key: ${RAG_KEY}
+      base-url: ${RAG_BASE_URL}
+      model-name: ${RAG_MODEL}

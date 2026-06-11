@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.launch;
 
+import dev.langchain4j.http.client.jdk.JdkHttpClientBuilderFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -35,6 +36,7 @@ public class LaunchApplication {
     }
 
     static void main(String[] args) {
+        System.setProperty("langchain4j.http.clientBuilderFactory", "dev.langchain4j.http.client.jdk.JdkHttpClientBuilderFactory");
         // 强制程序整体使用UTC时区.在展示的时候在格式化为对应时区
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(LaunchApplication.class, args);
