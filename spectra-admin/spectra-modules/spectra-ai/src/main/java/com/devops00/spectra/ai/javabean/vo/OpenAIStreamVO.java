@@ -1,4 +1,4 @@
-package com.devops00.spectra.ai.starter.dto;
+package com.devops00.spectra.ai.javabean.vo;
 
 import lombok.Data;
 

@@ -22,12 +22,19 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
+
+
     <dependencies>
         <!-- === 项目模块 === -->
         <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-ai-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-open-ai-spring-boot-starter</artifactId>
+            <version>${langchain4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-spring-boot-starter</artifactId>
+            <version>${langchain4j.version}</version>
         </dependency>
 
         <!-- === Spring模块 === -->
