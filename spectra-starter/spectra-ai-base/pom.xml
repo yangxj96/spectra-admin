@@ -24,6 +24,20 @@
 
 
     <dependencies>
+        <!-- === 项目模块 === -->
+        <!-- 公用 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- === 依赖模块 === -->
         <dependency>
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-core</artifactId>

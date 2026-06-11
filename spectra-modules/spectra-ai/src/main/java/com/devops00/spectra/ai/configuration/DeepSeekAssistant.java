@@ -29,6 +29,6 @@ public interface DeepSeekAssistant {
      * 返回 TokenStream 是 LangChain4j 流式响应的标准抽象
      */
     @SystemMessage("你是一个全能的开发助手。")
-    TokenStream stream(@MemoryId String userId, @UserMessage String message);
+    TokenStream stream(@MemoryId String token, @UserMessage String message);
 
 }

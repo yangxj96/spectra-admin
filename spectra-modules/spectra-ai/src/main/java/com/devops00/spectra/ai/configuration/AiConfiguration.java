@@ -1,7 +1,6 @@
 package com.devops00.spectra.ai.configuration;
 
 
-import com.devops00.spectra.ai.tools.UserTools;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,7 +12,5 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class AiConfiguration {
-
-
 
 }

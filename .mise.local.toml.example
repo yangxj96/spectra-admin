@@ -4,8 +4,6 @@ java = "temurin-25.0.2+10.0.LTS"
 [env]
 # 默认密码
 DEFAULT_PASSWORD = "admin123"
-# 许可密码
-LICENSE_PASSWORD = "admin123"
 # SSL配置
 SSL_PASSWORD = "xxx"
 SSL_TYPE = "PKCS12"

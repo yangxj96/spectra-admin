@@ -38,7 +38,7 @@ public class AiAskController {
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
         // 利用 Sinks 桥接 LangChain4j 的异步回调流和 Spring WebFlux 的 Flux 流
         return Flux.create(sink -> {
-            assistant.stream(SecUtil.getCurrentUserId().toString(), form.getMessage())
+            assistant.stream(SecUtil.getCurrentToken(), form.getMessage())
                     // 1. 每当 DeepSeek 吐出一个字（增量文本）
                     .onNext(token -> {
                         OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null);
