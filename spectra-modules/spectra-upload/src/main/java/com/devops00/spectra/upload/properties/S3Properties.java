@@ -23,4 +23,6 @@ public class S3Properties {
 
     private String bucket;
 
+    private Integer previewMinutes = 10;
+
 }

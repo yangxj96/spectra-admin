@@ -50,6 +50,6 @@ public class FileUploadProperties {
     ));
 
     /// 分片大小,默认5M 5242880L
-    private Long chunkSize = 1048576L;
+    private Long chunkSize = 5242880L;
 
 }

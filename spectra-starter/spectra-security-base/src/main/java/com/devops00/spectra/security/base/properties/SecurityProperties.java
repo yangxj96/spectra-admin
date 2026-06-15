@@ -22,7 +22,9 @@ public class SecurityProperties {
     private List<String> whitelists = new ArrayList<>(Arrays.asList(
             "/common/kaptcha",
             "/auth/login",
-            "/actuator/**"
+            "/actuator/**",
+            // 图片预览接口
+            "/file/preview/**"
     ));
 
     /// token有效期时长(秒)

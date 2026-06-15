@@ -17,4 +17,4 @@ spectra:
         bucket: ${S3_BUCKET}
         region: ${S3_REGION}
       # 默认存储使用的bean类型
-      impl: local
+      default-storage: s3

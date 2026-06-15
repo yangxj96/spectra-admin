@@ -59,6 +59,7 @@ CREATE TABLE "spectra_core"."file_upload_task"
     "total_chunks" int4,
     "storage_type" VARCHAR(20)    NOT NULL,
     "status"       VARCHAR(20)    NOT NULL,
+    "eid"          VARCHAR(255),
     "file_id"      uuid,
     ------------- 审计字段
     "created_by"   uuid,
@@ -92,6 +93,7 @@ COMMENT ON COLUMN "spectra_core"."file_upload_task"."chunk_size" IS '分片大�
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."total_chunks" IS '总分片数';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."storage_type" IS '存储类型(LOCAL/S3/OSS)';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."status" IS '上传状态(INIT(初始化)/UPLOADING(上传中)/MERGING(合并中)/DONE(完成)/FAILED(失败))';
+COMMENT ON COLUMN "spectra_core"."file_upload_task"."eid" IS 's3协议相关ID';
 COMMENT ON COLUMN "spectra_core"."file_upload_task"."file_id" IS '关联文件ID(上传完成后生成)';
 ------------- 索引说明
 COMMENT ON INDEX "spectra_core"."uk_upload_id" IS '上传任务ID唯一索引';

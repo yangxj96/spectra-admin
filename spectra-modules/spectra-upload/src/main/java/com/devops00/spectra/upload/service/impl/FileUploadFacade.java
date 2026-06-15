@@ -2,18 +2,21 @@ package com.devops00.spectra.upload.service.impl;
 
 import com.devops00.spectra.upload.configure.FileUploadServiceRegistry;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
+import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadTask;
 import com.devops00.spectra.upload.javabean.from.FileUploadChunkFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;
 import com.devops00.spectra.upload.javabean.vo.FileUploadChunkVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
-import com.devops00.spectra.upload.javabean.vo.FileUploadStatusVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
+import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 /// 对外门面
 ///
@@ -29,6 +32,8 @@ public class FileUploadFacade {
     private final FileUploadProperties properties;
 
     private final FileUploadTaskService fileUploadTaskService;
+
+    private final FileInfoService fileInfoService;
 
     /// 预处理
     public FileUploadPreVO pre(FileUploadPreFrom from) {
@@ -52,11 +57,6 @@ public class FileUploadFacade {
         return registry.getByType(type).merge(uploadId);
     }
 
-    /// 状态查询
-    public FileUploadStatusVO getStatus(String uploadId) {
-        return registry.getByType(properties.getDefaultStorage()).getStatus(uploadId);
-    }
-
     /// 从任务表获取类型
     private UploadType getTypeFromTask(String uploadId) {
         FileUploadTask task = fileUploadTaskService.findByUploadId(uploadId);
@@ -66,4 +66,18 @@ public class FileUploadFacade {
         return task.getStorageType();
     }
 
+    /// 文件预览
+    ///
+    /// @param id 文件ID
+    public void preview(UUID id) {
+        FileInfo info = fileInfoService.getById(id);
+        if (info == null) {
+            return;
+        }
+        switch (info.getStorageType()) {
+            case LOCAL -> registry.getByType(UploadType.LOCAL).preview(info);
+            case S3 -> registry.getByType(UploadType.S3).preview(info);
+            default -> throw new RuntimeException("未识别的存储方式");
+        }
+    }
 }

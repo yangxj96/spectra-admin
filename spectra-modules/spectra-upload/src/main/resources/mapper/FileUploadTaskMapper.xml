@@ -15,6 +15,7 @@
         <result column="total_chunks"    property="totalChunks"/>
         <result column="storage_type"    property="storageType"/>
         <result column="status"          property="status"/>
+        <result column="eid"             property="eid"/>
         <result column="file_id"         property="fileId"/>
     </resultMap>
     <!-- @formatter:on -->
@@ -29,6 +30,7 @@
         total_chunks,
         storage_type,
         status,
+        eid,
         file_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>

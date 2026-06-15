@@ -11,7 +11,6 @@ import com.devops00.spectra.upload.javabean.from.FileUploadFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadPreFrom;
 import com.devops00.spectra.upload.javabean.vo.FileUploadChunkVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadPreVO;
-import com.devops00.spectra.upload.javabean.vo.FileUploadStatusVO;
 import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
 import com.devops00.spectra.upload.properties.LocalProperties;
@@ -20,20 +19,25 @@ import com.devops00.spectra.upload.service.FileUploadChunkService;
 import com.devops00.spectra.upload.service.FileUploadService;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
 import com.github.f4b6a3.uuid.UuidCreator;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
+import java.time.LocalDate;
 
 /// 文件上传服务-本地上传
 ///
@@ -120,7 +124,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         FileUploadTask task = new FileUploadTask();
         task.setUploadId(uploadId);
-        task.setFilename(from.getFilename());
+        task.setFilename(generatePathFilename(from.getFilename()));
         task.setHash(from.getHash());
         task.setSize(from.getSize());
         task.setChunkSize(chunkSize);
@@ -144,7 +148,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     public FileUploadVO upload(FileUploadFrom from) {
         MultipartFile file = from.getFile();
         // 拼装存储文件名
-        String filename = UuidCreator.getTimeOrderedEpoch().toString() + getSuffix(file);
+        String filename = generatePathFilename(file.getOriginalFilename());
         // 构建存储路径
         Path path = buildFilePath(filename);
         // 尝试保存
@@ -273,34 +277,83 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         }
     }
 
-    @Override
-    public FileUploadStatusVO getStatus(String uploadId) {
-        var task = taskService.findByUploadId(uploadId);
-        var chunks = chunkService.findByUploadId(uploadId);
-        FileUploadStatusVO vo = new FileUploadStatusVO();
-        vo.setStatus(task.getStatus());
-        vo.setTotalChunks(task.getTotalChunks());
-        vo.setChunkSize(task.getChunkSize());
-        vo.setUploadedChunks(
-                chunks.stream()
-                        .map(FileUploadChunk::getChunkNumber)
-                        .sorted()
-                        .toList()
-        );
-        vo.setCompleted("DONE".equals(task.getStatus()));
-        return vo;
-    }
 
     @Override
-    public void preview(UUID fileId) {
+    public void preview(FileInfo file) {
+        // 从当前线程的上下文中获取请求属性
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            log.error("{}无法获取当前请求上下文，可能未在 Web 线程中调用", LogPrefix.STORAGE.p());
+            throw new IllegalStateException("当前不在有效的 Web 请求上下文中");
+        }
+        // 直接拿到真正的 HttpServletResponse
+        HttpServletResponse response = attributes.getResponse();
+        if (response == null) {
+            log.error("{}获取的 HttpServletResponse 为空", LogPrefix.STORAGE.p());
+            return;
+        }
+        // 构建本地文件的绝对路径
+        Path filePath = buildFilePath(file.getFilename());
+        // 检查文件在物理磁盘上是否存在
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND); // 404
+            log.warn("{}预览文件不存在, filename: {}", LogPrefix.STORAGE.p(), file.getFilename());
+            return;
+        }
+        try {
+            // 动态探测并设置文件的媒体类型（MIME Type），例如 image/jpeg, application/pdf
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                // 如果探测不到，默认采用二进制流
+                contentType = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+            response.setContentType(contentType);
+            // 设置为 inline（内联），告诉浏览器“能预览就预览，不能预览再下载”
+            // 对文件名进行 URL 编码，防止中文或特殊字符在 Header 中乱码
+            String encodedFilename = URLEncoder
+                    .encode(file.getOriginalName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedFilename + "\"");
 
+            // 设置文件大小，方便浏览器展示进度条
+            response.setContentLengthLong(file.getSize());
+
+            // 使用 NIO 将文件高效传输到 Response 的输出流
+            try (OutputStream out = response.getOutputStream()) {
+                Files.copy(filePath, out);
+                out.flush();
+            }
+        } catch (IOException e) {
+            log.error("{}文件预览流传输失败, filename: {}", LogPrefix.STORAGE.p(), file.getFilename(), e);
+            // 注意：此时如果已经输出了部分流，setStatus 可能失效，但仍建议设置
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
     /// 构建文件保存路径
     ///
     /// @param filename 文件名称
     private Path buildFilePath(String filename) {
-        return root.resolve(filename);
+        // 1. 动态获取当前年月的字符串，如 "202606"
+        String dateDir = LocalDate.now().format(DATE_FORMATTER);
+
+        // 2. 拼装绝对路径，如：/var/data/upload/202606
+        Path dirPath = root.resolve(dateDir);
+
+        // 3. 确保这个月的物理文件夹在磁盘上真实存在
+        try {
+            if (!Files.exists(dirPath)) {
+                Files.createDirectories(dirPath);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("创建每月归类目录失败", e);
+        }
+
+        // 4. 返回最终文件的全路径：/var/data/upload/202606/xxxx.png
+        return dirPath.resolve(filename);
+        //return root.resolve(filename);
     }
 
     /// 构建临时文件路径
@@ -326,29 +379,6 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         FileUploadChunkVO vo = new FileUploadChunkVO();
         vo.setChunkNumber(chunkNumber);
         return vo;
-    }
-
-    /// 根据文件获取后缀
-    ///
-    /// @param file 文件
-    /// @return 获取到的后缀.可能为空字符串
-    public static String getSuffix(@Nullable MultipartFile file) {
-        if (file == null) return "";
-        String filename = file.getOriginalFilename();
-        return getSuffix(filename);
-    }
-
-    /// 根据文件名获取后缀
-    ///
-    /// @param filename 文件名称
-    /// @return 获取到的后缀.可能为空字符串
-    public static String getSuffix(@Nullable String filename) {
-        if (filename == null) return "";
-        int index = filename.lastIndexOf(".");
-        if (index == -1 || index == filename.length() - 1) {
-            return "";
-        }
-        return filename.substring(index);
     }
 
 }

@@ -18,6 +18,12 @@ server:
         secure: true
         http-only: true
 spring:
+  web:
+    error:
+      whitelabel:
+        enabled: false
+      include-stacktrace: never
+      include-message: never
   servlet:
     multipart:
       enabled: true

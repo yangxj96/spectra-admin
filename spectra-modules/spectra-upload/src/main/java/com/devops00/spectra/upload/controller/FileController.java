@@ -30,6 +30,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /// 文件操作相关控制器
 ///
 /// @author Jack Young
@@ -76,6 +78,16 @@ public class FileController {
     @PostMapping("/merge/{uploadId}")
     public FileUploadVO merge(@PathVariable String uploadId) {
         return bindService.merge(uploadId);
+    }
+
+    /// 附件预览
+    ///
+    /// @param id 文件ID
+    @ULog("附件预览")
+    @PreAuthorize("permitAll()")
+    @GetMapping("/preview/{id}")
+    public void preview(@PathVariable UUID id) {
+        bindService.preview(id);
     }
 
 }

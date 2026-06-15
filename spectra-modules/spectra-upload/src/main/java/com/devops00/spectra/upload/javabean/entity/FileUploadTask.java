@@ -54,6 +54,10 @@ public class FileUploadTask extends BaseEntity {
     @TableField(value = "status")
     private String status;
 
+    /// S3协议扩展ID
+    @TableField(value = "eid")
+    private String eid;
+
     /// 关联文件ID（上传完成后生成）
     @TableField(value = "file_id")
     private UUID fileId;

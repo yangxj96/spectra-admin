@@ -10,4 +10,4 @@ spectra:
         secretKey: ${S3_SECRET_KEY}
         bucket: ${S3_BUCKET}
         region: ${S3_REGION}
-      impl: local
+      default-storage: local
