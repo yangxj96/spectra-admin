@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
 import com.devops00.spectra.log.base.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -70,11 +71,11 @@ public class OperationLog extends BaseEntity implements Serializable {
     private String url;
 
     /// 请求参数
-    @TableField(value = "args")
-    private String args;
+    @TableField(value = "args",typeHandler = PgJsonbTypeHandler.class)
+    private Map<String, Object> args;
 
     /// 请求响应
-    @TableField(value = "result", typeHandler = Jackson3TypeHandler.class)
+    @TableField(value = "result", typeHandler = PgJsonbTypeHandler.class)
     private Map<String, Object> result;
 
     /// 耗时

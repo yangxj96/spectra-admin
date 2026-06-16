@@ -1,6 +1,8 @@
 package com.devops00.spectra.security.starter.web.controller;
 
 
+import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
@@ -32,6 +34,10 @@ public class AuthController {
         this.loginDispatcher = loginDispatcher;
     }
 
+    @ULog(
+            value = "'用户[' + #params.username + ']进行登陆'",
+            type = SysLogType.SAFETY
+    )
     @PermitAll
     @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {
@@ -44,7 +50,10 @@ public class AuthController {
         }
     }
 
-
+    @ULog(
+            value = "'用户[' + T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername() + ']登出系统'",
+            type = SysLogType.SAFETY
+    )
     @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
@@ -52,7 +61,10 @@ public class AuthController {
         SecUtil.logout();
     }
 
-
+    @ULog(
+            value = "'用户[' + T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername() + ']检查是否可用'",
+            type = SysLogType.SAFETY
+    )
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/check", version = "1.0.0+")

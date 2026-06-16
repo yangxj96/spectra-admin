@@ -126,4 +126,11 @@ public class SecUtil {
     public static String getCurrentUserZoneId() {
         return getStrategy().getCurrentUserZoneId();
     }
+
+    /// 获取当前用户名
+    ///
+    /// @return 用户名
+    public static String getCurrentUsername(){
+        return getStrategy().getCurrentUsername();
+    }
 }

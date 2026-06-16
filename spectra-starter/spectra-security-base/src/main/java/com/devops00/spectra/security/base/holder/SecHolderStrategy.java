@@ -80,4 +80,9 @@ public interface SecHolderStrategy {
     /// @return 时区ID
     String getCurrentUserZoneId();
 
+    /// 获取当前用户名
+    ///
+    /// @return 用户名
+    String getCurrentUsername();
+
 }

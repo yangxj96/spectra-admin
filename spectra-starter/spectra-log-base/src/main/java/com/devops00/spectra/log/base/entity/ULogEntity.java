@@ -42,7 +42,8 @@ public class ULogEntity implements Serializable {
     private String explain;
 
     /// 请求参数
-    private String args;
+    @Nullable
+    private Object args;
 
     /// 请求IP
     private String ip;

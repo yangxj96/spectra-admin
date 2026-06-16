@@ -80,7 +80,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         }
         var extra = user.getExtraData();
         extra.put("ip", IpUtils.getClientIP(this.getHttpServletRequest()));
-        extra.put("timezone",user.getTimezone());
+        extra.put("timezone", user.getTimezone());
 
         // =======================
         // 3. 权限拆分
@@ -388,6 +388,15 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             return "UTC";
         }
         return user.getTimezone();
+    }
+
+    @Override
+    public String getCurrentUsername() {
+        SecurityUser user = this.getCurrentUser();
+        if (user == null) {
+            return "未找到用户名";
+        }
+        return user.getUsername();
     }
 
     //--------------------------  辅助方法  --------------------------------//

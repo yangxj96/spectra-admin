@@ -13,8 +13,8 @@
         <result column="ip"        property="ip"/>
         <result column="method"    property="method"/>
         <result column="url"       property="url"/>
-        <result column="args"      property="args"/>
-        <result column="result"    property="result" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
+        <result column="args"      property="args" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="result"    property="result" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
         <result column="time_cost" property="timeCost"/>
     </resultMap>
     <!-- @formatter:on -->
