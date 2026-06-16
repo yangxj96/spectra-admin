@@ -22,6 +22,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -34,6 +35,7 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -62,6 +64,8 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     private final FileUploadTaskService taskService;
 
     private final FileUploadChunkService chunkService;
+
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public UploadType getType() {
@@ -171,6 +175,8 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl("/api/file/preview/" + fileInfo.getId());
+
+        publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
         return vo;
     }
 
@@ -282,6 +288,8 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
             FileUploadVO vo = new FileUploadVO();
             vo.setUrl("/api/file/preview/" + fileInfo.getId());
+
+            publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
             return vo;
         }
     }
@@ -313,6 +321,30 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY); // 302
         response.setHeader(HttpHeaders.LOCATION, presignedUrl);
         log.debug("{} 触发 S3 302 预览分流成功, 文件 ID: {}", LogPrefix.STORAGE.p(), file.getId());
+    }
+
+    @Override
+    public InputStream openStream(FileInfo fileInfo) {
+        log.debug("{} 开始获取 S3 文件流, 文件ID: {}, 存储Key: {}",
+                LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
+        try {
+            // 1. 构建 S3 获取对象的请求
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(s3Properties.getBucket())
+                    .key(fileInfo.getFilename()) // 数据库中存放的实际存储文件名/路径
+                    .build();
+
+            // 2. 调用 S3 客户端获取输入流
+            // s3Client.getObject() 返回的是 ResponseInputStream，它继承了 InputStream
+            return s3Client.getObject(getObjectRequest);
+
+        } catch (NoSuchKeyException e) {
+            log.error("{} S3 中未找到指定文件: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
+            throw new RuntimeException("文件在云存储中不存在", e);
+        } catch (S3Exception e) {
+            log.error("{} 调用 S3 获取文件流失败", LogPrefix.STORAGE.p(), e);
+            throw new RuntimeException("远程云存储服务异常", e);
+        }
     }
 
     /// 辅助小工具：由于跨方法需要用到 S3 的 uploadId，

@@ -1,8 +1,8 @@
-package com.devops00.spectra.ai.configuration;
+package com.devops00.spectra.ai.configuration.rag;
 
 
 import com.devops00.spectra.ai.properties.AiRAGProperties;
-import com.devops00.spectra.ai.store.PostgresEmbeddingStore;
+import com.devops00.spectra.ai.configuration.rag.store.PostgresEmbeddingStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.annotation.EnableAsync;
 import tools.jackson.databind.ObjectMapper;
 
 /**
@@ -21,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
  * @version 1.0
  * @since 2026/6/11 17:44
  */
+@EnableAsync
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(AiRAGProperties.class)

@@ -1,4 +1,4 @@
-package com.devops00.spectra.ai.tools;
+package com.devops00.spectra.ai.configuration.tool;
 
 
 import com.devops00.spectra.ai.base.AiToolMarker;
@@ -23,12 +23,12 @@ import java.time.format.DateTimeFormatter;
  */
 @Slf4j
 @Component
-public class UserTools implements AiToolMarker {
+public class TimeTools implements AiToolMarker {
 
     /// 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
     ///
     /// @param token 当前请求token
-    @Tool("获取当前日期和时间，返回标准的 ISO 8601 格式字符串")
+    @Tool("获取当前日期和时间，返回标准的ISO 8601格式字符串")
     public String getCurrentDateTimeISO(@ToolMemoryId String token) {
         return ToolExecutor.execute(token, _ -> {
             String zoneId = SecUtil.getCurrentUserZoneId();
@@ -36,7 +36,6 @@ public class UserTools implements AiToolMarker {
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of(zoneId));
             return now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         });
-
     }
 
 }

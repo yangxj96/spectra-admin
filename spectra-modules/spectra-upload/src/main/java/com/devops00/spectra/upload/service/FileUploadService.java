@@ -28,6 +28,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -38,7 +39,7 @@ import java.time.format.DateTimeFormatter;
 /// @since 2025/6/19
 public interface FileUploadService {
 
-    /// 🎯 公用常量：规定按年月归类文件夹，如 "202606"
+    /// 公用常量：规定按年月归类文件夹，如 "202606"
     DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMM");
 
     /// 当前实现类型
@@ -71,6 +72,14 @@ public interface FileUploadService {
      * @param file 文件信息数据
      */
     void preview(FileInfo file);
+
+    /**
+     * 根据文件信息打开文件流
+     *
+     * @param fileInfo 文件信息
+     * @return 文件流
+     */
+    InputStream openStream(FileInfo fileInfo);
 
 
     /// 生成带年月前缀的系统唯一文件名 (例如: "202606/019eca58-xxxx...")
@@ -106,4 +115,5 @@ public interface FileUploadService {
         }
         return filename.substring(index);
     }
+
 }

@@ -16,6 +16,7 @@ import com.devops00.spectra.upload.service.FileUploadTaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
 import java.util.UUID;
 
 /// 对外门面
@@ -79,5 +80,15 @@ public class FileUploadFacade {
             case S3 -> registry.getByType(UploadType.S3).preview(info);
             default -> throw new RuntimeException("未识别的存储方式");
         }
+    }
+
+    /// 根据文件信息读取文件返回输入流
+    ///
+    /// @param fileInfo 文件信息
+    public InputStream openStream(FileInfo fileInfo) {
+        return switch (fileInfo.getStorageType()) {
+            case LOCAL -> registry.getByType(UploadType.LOCAL).openStream(fileInfo);
+            case S3 -> registry.getByType(UploadType.S3).openStream(fileInfo);
+        };
     }
 }

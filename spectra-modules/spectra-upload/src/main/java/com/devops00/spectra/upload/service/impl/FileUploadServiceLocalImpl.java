@@ -2,6 +2,7 @@ package com.devops00.spectra.upload.service.impl;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.event.FileUploadFinishEvent;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadChunk;
@@ -22,6 +23,7 @@ import com.github.f4b6a3.uuid.UuidCreator;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -63,17 +66,20 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     private final FileUploadChunkService chunkService;
 
+    private final ApplicationEventPublisher publisher;
+
     public FileUploadServiceLocalImpl(
             LocalProperties properties,
             FileUploadProperties uploadProperties,
             FileInfoService infoService,
             FileUploadTaskService taskService,
-            FileUploadChunkService chunkService
+            FileUploadChunkService chunkService, ApplicationEventPublisher publisher
     ) throws IOException {
         this.uploadProperties = uploadProperties;
         this.infoService = infoService;
         this.taskService = taskService;
         this.chunkService = chunkService;
+        this.publisher = publisher;
 
         log.debug(
                 "{}初始化本地存储位置,存储位置:{},临时文件位置:{}",
@@ -178,6 +184,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
 
+        publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
         return vo;
     }
 
@@ -273,6 +280,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                 log.warn("清理临时目录失败: {}", tempDir, e);
             }
 
+            publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
             return buildUploadVO(url);
         }
     }
@@ -329,6 +337,29 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             if (!response.isCommitted()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
+        }
+    }
+
+    @Override
+    public InputStream openStream(FileInfo fileInfo) {
+        log.debug("{} 开始获取本地文件流, 文件ID: {}, 存储Key: {}",
+                LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
+
+        // 1. 获取文件在磁盘上的绝对路径
+        Path filePath = buildFilePath(fileInfo.getFilename());
+
+        // 2. 严妙校验：检查文件在物理磁盘上是否存在，防止因意外删改导致抛出底层原生异常
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
+            log.error("{} 本地物理文件不存在: {}", LogPrefix.STORAGE.p(), filePath);
+            throw new RuntimeException("本地存储中未找到该文件");
+        }
+
+        try {
+            // 3. 基于 NIO 高效打开本地文件输入流
+            return Files.newInputStream(filePath);
+        } catch (IOException e) {
+            log.error("{} 打开本地文件流失败, filename: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
+            throw new RuntimeException("读取物理文件流异常", e);
         }
     }
 

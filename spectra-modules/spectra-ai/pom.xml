@@ -35,6 +35,14 @@
     </dependencyManagement>
 
     <dependencies>
+        <!-- === 项目模块 === -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-upload</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+
         <!-- === Spring模块 === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -63,7 +71,14 @@
             <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-document-parser-apache-tika</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-document-parser-apache-poi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-document-parser-apache-pdfbox</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

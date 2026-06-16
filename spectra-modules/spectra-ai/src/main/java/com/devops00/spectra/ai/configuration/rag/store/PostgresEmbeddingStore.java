@@ -1,4 +1,4 @@
-package com.devops00.spectra.ai.store;
+package com.devops00.spectra.ai.configuration.rag.store;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
@@ -113,7 +113,7 @@ public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     @Override
     public EmbeddingSearchResult<TextSegment> search(EmbeddingSearchRequest request) {
-        log.debug("{}向量数据库搜索了", LogPrefix.AI.p());
+        log.debug("{}向量数据库搜索了:{}", LogPrefix.AI.p(), request.query());
         Embedding queryEmbedding = request.queryEmbedding();
         int maxResults = request.maxResults();
         double minScore = request.minScore();
