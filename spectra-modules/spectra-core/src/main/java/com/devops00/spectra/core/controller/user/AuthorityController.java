@@ -46,28 +46,28 @@ public class AuthorityController {
         this.bindService = bindService;
     }
 
-    @ULog("创建权限")
+    @ULog("'创建权限'")
     @PostMapping
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         throw new NotImplementedException("无需实现错误," + params);
     }
 
-    @ULog("删除权限")
+    @ULog("'删除权限'")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void deleteAuthority(@PathVariable String id) {
         throw new NotImplementedException("无需实现错误," + id);
     }
 
-    @ULog("修改权限信息")
+    @ULog("'修改权限信息'")
     @PutMapping
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         throw new NotImplementedException("无需实现错误," + params);
     }
 
-    @ULog("获取权限树列表")
+    @ULog("'获取权限树列表'")
     @GetMapping("/tree")
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();

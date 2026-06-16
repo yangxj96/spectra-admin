@@ -51,7 +51,7 @@ public class AuthController {
     }
 
     @ULog(
-            value = "'用户[' + T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername() + ']登出系统'",
+            value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']登出系统'",
             type = SysLogType.SAFETY
     )
     @PostMapping(value = "/logout", version = "1.0.0+")
@@ -62,7 +62,7 @@ public class AuthController {
     }
 
     @ULog(
-            value = "'用户[' + T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername() + ']检查是否可用'",
+            value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']检查是否可用'",
             type = SysLogType.SAFETY
     )
     @ResponseStatus(HttpStatus.OK)

@@ -18,6 +18,7 @@ package com.devops00.spectra.log.base.annotation;
 
 import com.devops00.spectra.log.base.enums.SysLogType;
 
+import org.intellij.lang.annotations.Language;
 import java.lang.annotation.*;
 
 /// 操作日志记录注解
@@ -31,6 +32,7 @@ import java.lang.annotation.*;
 public @interface ULog {
 
     ///  默认值
+    @Language("SpEL")
     String value() default "未填写操作说明";
 
     /// 日志类型

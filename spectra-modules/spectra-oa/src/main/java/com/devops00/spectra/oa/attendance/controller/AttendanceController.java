@@ -23,7 +23,7 @@ public class AttendanceController {
 
     private final AttendanceService bindService;
 
-    @ULog("分页查询考勤")
+    @ULog("'分页查询考勤'")
     @GetMapping("/page")
     public IPage<Attendance> page(PageFrom page) {
         return bindService.page(page.toPage());

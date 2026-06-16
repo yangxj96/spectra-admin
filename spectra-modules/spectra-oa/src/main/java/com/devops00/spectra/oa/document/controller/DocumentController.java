@@ -23,7 +23,7 @@ public class DocumentController {
 
     private final DocumentService bindService;
 
-    @ULog("分页查询文档")
+    @ULog("'分页查询文档'")
     @GetMapping("/page")
     public IPage<Document> page(PageFrom page) {
         return bindService.page(page.toPage());

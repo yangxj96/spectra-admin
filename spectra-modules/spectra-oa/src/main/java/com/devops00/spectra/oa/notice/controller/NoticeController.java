@@ -23,7 +23,7 @@ public class NoticeController {
 
     private final NoticeService bindService;
 
-    @ULog("分页查询公告")
+    @ULog("'分页查询公告'")
     @GetMapping("/page")
     public IPage<Notice> page(PageFrom page) {
         return bindService.page(page.toPage());

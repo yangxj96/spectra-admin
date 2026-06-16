@@ -49,41 +49,41 @@ public class UserController {
         this.bindService = bindService;
     }
 
-    @ULog("创建用户")
+    @ULog("'创建用户'")
     @PostMapping
     @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
 
-    @ULog("根据ID删除用户")
+    @ULog("'根据ID删除用户'")
     @DeleteMapping("/{uid}")
     @PreAuthorize("hasPermission(null ,'USER:DELETE')")
     public void deleteById(@PathVariable String uid) {
         bindService.deleteById(UUID.fromString(uid));
     }
 
-    @ULog("根据ID更新用户信息")
+    @ULog("'根据ID更新用户信息'")
     @PutMapping
     @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
     public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.updateById(params);
     }
 
-    @ULog("重置用户密码")
+    @ULog("'重置用户密码'")
     @PutMapping("/password/reset/{uid}")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void passwordResetById(@PathVariable String uid) {
         bindService.passwordResetById(UUID.fromString(uid));
     }
 
-    @ULog("分页查询用户列表")
+    @ULog("'分页查询用户列表'")
     @GetMapping("/page")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 
-    @ULog("获取在线用户")
+    @ULog("'获取在线用户'")
     @GetMapping("/online")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);

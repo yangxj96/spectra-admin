@@ -23,7 +23,7 @@ public class AssetController {
 
     private final AssetService bindService;
 
-    @ULog("分页查询资产")
+    @ULog("'分页查询资产'")
     @GetMapping("/page")
     public IPage<Asset> page(PageFrom page) {
         return bindService.page(page.toPage());

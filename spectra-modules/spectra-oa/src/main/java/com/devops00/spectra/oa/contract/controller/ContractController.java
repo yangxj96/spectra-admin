@@ -23,7 +23,7 @@ public class ContractController {
 
     private final ContractService bindService;
 
-    @ULog("分页查询合同")
+    @ULog("'分页查询合同'")
     @GetMapping("/page")
     public IPage<Contract> page(PageFrom page) {
         return bindService.page(page.toPage());

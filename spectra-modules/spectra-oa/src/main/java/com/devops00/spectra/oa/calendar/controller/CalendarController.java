@@ -23,7 +23,7 @@ public class CalendarController {
 
     private final CalendarService bindService;
 
-    @ULog("分页查询日历")
+    @ULog("'分页查询日历'")
     @GetMapping("/page")
     public IPage<Calendar> page(PageFrom page) {
         return bindService.page(page.toPage());

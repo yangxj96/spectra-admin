@@ -37,10 +37,19 @@
             <version>${project.version}</version>
         </dependency>
 
+        <!-- === SpringBoot === -->
         <!-- AOP -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aspectj</artifactId>
+        </dependency>
+
+        <!-- === 工具 === -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>26.1.0</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

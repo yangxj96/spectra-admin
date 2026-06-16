@@ -23,7 +23,7 @@ public class ReportController {
 
     private ReportService bindService;
 
-    @ULog("分页查询报表")
+    @ULog("'分页查询报表'")
     @GetMapping("/page")
     public IPage<Report> page(PageFrom page) {
         return bindService.page(page.toPage());

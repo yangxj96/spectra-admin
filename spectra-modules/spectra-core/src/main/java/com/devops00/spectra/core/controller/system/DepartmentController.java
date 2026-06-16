@@ -48,7 +48,7 @@ public class DepartmentController {
      *
      * @param from 请求入参
      */
-    @ULog("新增组织机构")
+    @ULog("'新增组织机构'")
     @PostMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void created(@RequestBody @Validated(Verify.Insert.class) DepartmentFrom from) {
@@ -60,7 +60,7 @@ public class DepartmentController {
      *
      * @param id 组织机构ID
      */
-    @ULog("新增组织机构")
+    @ULog("'新增组织机构'")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void deleteById(@PathVariable String id) {
@@ -72,7 +72,7 @@ public class DepartmentController {
      *
      * @param from 请求入参
      */
-    @ULog("编辑组织机构")
+    @ULog("'编辑组织机构'")
     @PutMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void modify(@RequestBody @Validated(Verify.Update.class) DepartmentFrom from) {
@@ -84,7 +84,7 @@ public class DepartmentController {
      *
      * @return 组织机构树形结构数组
      */
-    @ULog("获取组织机构树形列表")
+    @ULog("'获取组织机构树形列表'")
     @GetMapping("/tree")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();

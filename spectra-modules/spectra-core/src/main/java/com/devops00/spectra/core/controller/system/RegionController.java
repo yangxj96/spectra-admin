@@ -39,7 +39,7 @@ public class RegionController {
         return bindService.lazyTree(level, id);
     }
 
-    @ULog("分页查询行政区划")
+    @ULog("'分页查询行政区划'")
     @GetMapping("/page")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {

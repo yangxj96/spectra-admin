@@ -16,7 +16,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.jspecify.annotations.Nullable;
-import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -25,7 +24,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 
 /// ULog注解AOP环绕切面（工业精装版）
@@ -38,8 +36,6 @@ import java.util.Arrays;
 public class ULogAspect {
 
     private final ExpressionParser parser = new SpelExpressionParser();
-
-    private final DefaultParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
 
     @Resource
     private ULogEventPublisher publisher;
@@ -155,15 +151,23 @@ public class ULogAspect {
      * 解析 SpEL 表达式，让 ULog 的说明内容支持动态传参
      */
     private String parseSpel(String spelExpression, ProceedingJoinPoint point) {
+        if (spelExpression == null || spelExpression.isBlank()) {
+            return "";
+        }
+
+        // 💡 性能轻量优化：如果既没有冒号（单引号）、也没有井号、也没有 T(，说明它 100% 是个普通纯文本
+        if (!spelExpression.contains("#") && !spelExpression.contains("T(") && !spelExpression.contains("'")) {
+            return spelExpression;
+        }
+
         try {
             MethodSignature signature = (MethodSignature) point.getSignature();
-            Method method = signature.getMethod();
             Object[] args = point.getArgs();
 
-            // 使用 StandardEvaluationContext，它完美支持 T() 静态方法类加载
+            // 使用 StandardEvaluationContext，完美承载 T() 静态方法与高级特性
             EvaluationContext context = new StandardEvaluationContext();
 
-            // 绑定参数名，支持 #params 形态的动态解析
+            // 绑定参数名，支持 #params.username 动态解析
             String[] parameterNames = signature.getParameterNames();
             if (parameterNames != null) {
                 for (int i = 0; i < parameterNames.length; i++) {
@@ -171,6 +175,7 @@ public class ULogAspect {
                 }
             }
 
+            // 去掉 templateParserContext！直接单刀直入解析纯 SpEL 表达式
             return parser.parseExpression(spelExpression).getValue(context, String.class);
         } catch (Exception e) {
             log.warn("SpEL 表达式解析失败, 表达式: {}, 错误: {}", spelExpression, e.getMessage());
