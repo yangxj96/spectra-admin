@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devops00.spectra.core.mapper.system.ConfiguredMapper">
+<mapper namespace="com.devops00.spectra.core.system.mapper.ConfiguredMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="com.devops00.spectra.core.javabean.system.entity.Configured">
+               type="com.devops00.spectra.core.system.javabean.entity.Configured">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_config-->
         <result column="key"       property="key"/>

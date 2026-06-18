@@ -1,0 +1,39 @@
+package com.devops00.spectra.core.system.ai.tools;
+
+
+import com.devops00.spectra.ai.base.AiToolMarker;
+import com.devops00.spectra.ai.base.ToolExecutor;
+import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.core.system.service.DepartmentService;
+import dev.langchain4j.agent.tool.Tool;
+import dev.langchain4j.agent.tool.ToolMemoryId;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+
+/**
+ * AI使用的部门相关工具
+ *
+ * @author Jack Young
+ * @version 1.0
+ * @since 2026/6/18 17:56
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class AiDeptTool implements AiToolMarker {
+
+    private final DepartmentService departmentService;
+
+    /// 获取所有部门信息
+    ///
+    /// @param token 当前请求token
+    @Tool("获取所有部门信息")
+    public String getAllDepartments(@ToolMemoryId String token) {
+        return ToolExecutor.execute(token, _ -> {
+            log.debug("{}获取所有部门信息", LogPrefix.AI.p());
+            return departmentService.list();
+        });
+    }
+
+}

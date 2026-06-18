@@ -55,7 +55,7 @@ public class ToolExecutor {
     /// @param <T>           业务返回结果的强类型泛型（Target/Result Object）
     /// @return 序列化后的符合项目 Jackson 规范的 JSON 结果字符串（若发生异常则返回错误 JSON 文本）
     /// @throws IllegalStateException 如果工具类未被 Spring 成功注入初始化则抛出
-    public static <R, T> String execute(String jsonParams, String token, Class<R> reqClass, BiFunction<R, String, T> businessLogic) {
+    public static <R, T> String execute(String token, String jsonParams, Class<R> reqClass, BiFunction<R, String, T> businessLogic) {
         return executeWithSecurity(token, () -> {
             // 1. 解析入参
             R request = parseParams(jsonParams, reqClass);

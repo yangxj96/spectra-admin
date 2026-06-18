@@ -3,8 +3,8 @@ package com.devops00.spectra.core.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.RegionLevel;
-import com.devops00.spectra.core.javabean.system.entity.Region;
-import com.devops00.spectra.core.service.system.RegionService;
+import com.devops00.spectra.core.common.javabean.system.entity.Region;
+import com.devops00.spectra.core.common.service.system.RegionService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

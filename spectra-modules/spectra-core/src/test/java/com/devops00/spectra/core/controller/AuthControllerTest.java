@@ -1,6 +1,6 @@
 package com.devops00.spectra.core.controller;
 
-import com.devops00.spectra.core.service.common.IpLocationService;
+import com.devops00.spectra.core.common.service.IpLocationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;

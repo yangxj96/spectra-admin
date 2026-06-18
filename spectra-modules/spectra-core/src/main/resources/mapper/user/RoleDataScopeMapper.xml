@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devops00.spectra.core.mapper.user.RoleDataScopeMapper">
+<mapper namespace="com.devops00.spectra.core.user.mapper.RoleDataScopeMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="com.devops00.spectra.core.javabean.user.entity.RoleDataScope">
+               type="com.devops00.spectra.core.user.javabean.entity.RoleDataScope">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_role_data_scope-->
         <result column="role_id"    property="roleId"/>
@@ -18,7 +18,7 @@
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 
-    <select id="findByRoleId" resultType="com.devops00.spectra.core.javabean.user.entity.RoleDataScope">
+    <select id="findByRoleId" resultType="com.devops00.spectra.core.user.javabean.entity.RoleDataScope">
         SELECT
         <include refid="Base_Column_List"/>
         FROM ${schema}.sys_role_data_scope

@@ -42,7 +42,7 @@
         <mica.version>4.0.2</mica.version>
         <!-- ai集成包 -->
         <!--<langchain4j.version>0.36.2</langchain4j.version>-->
-        <langchain4j.version>1.16.1</langchain4j.version>
+        <langchain4j.version>1.16.3</langchain4j.version>
     </properties>
 
     <modules>

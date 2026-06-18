@@ -1,14 +1,21 @@
 package com.devops00.spectra.ai.configuration;
 
 
-import dev.langchain4j.http.client.HttpClientBuilder;
-import dev.langchain4j.http.client.jdk.JdkHttpClientBuilder;
+import com.devops00.spectra.ai.base.AiToolMarker;
+import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.model.chat.StreamingChatModel;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.store.embedding.EmbeddingStore;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import tools.jackson.databind.ObjectMapper;
+
+import java.util.List;
 
 /// Ai相关配置
 ///
@@ -19,45 +26,49 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class AiConfiguration {
 
-    private final ObjectMapper om;
+    private final ChatModel chatModel;
 
-    // 对应非流式大模型的 Bean 名字
-    public static final String CHAT_MODEL_HTTP_CLIENT_BUILDER = "openAiChatModelHttpClientBuilder";
+    private final StreamingChatModel streamingChatModel;
 
-    // 对应流式大模型的 Bean 名字（也就是这次引爆异常的背后黑手）
-    public static final String STREAMING_CHAT_MODEL_HTTP_CLIENT_BUILDER = "openAiStreamingChatModelHttpClientBuilder";
+    private final EmbeddingStore<TextSegment> embeddingStore;
 
-    /**
-     * 封印非流式的有毒代码
-     */
-    @Bean(name = CHAT_MODEL_HTTP_CLIENT_BUILDER)
-    public HttpClientBuilder openAiChatModelHttpClientBuilder() {
-        // 使用 langchain4j-http-client-jdk 包提供的原生安全构建器
-        return new JdkHttpClientBuilder();
-    }
+    private final EmbeddingModel embeddingModel;
+
+    private final List<AiToolMarker> availableTools;
 
     /**
-     * 封印流式的有毒代码
-     * 抢先定义它，触发官方 Starter 上的 @ConditionalOnMissingBean，强行截断其内部对 RestClient 的调用
-     */
-    @Bean(name = STREAMING_CHAT_MODEL_HTTP_CLIENT_BUILDER)
-    public HttpClientBuilder openAiStreamingChatModelHttpClientBuilder() {
-        // 同样塞入安全的 JDK HttpClient 驱动
-        return new JdkHttpClientBuilder();
-    }
-
-    /**
-     * 直接向Spring容器注册一个全局的聊天记忆提供者 Bean
-     * 这样Starter自己的AiServiceFactory就能在初始化时自动识别并注入它
+     * 动态创建一个具备 RAG 能力的智能体
      */
     @Bean
-    public ChatMemoryProvider chatMemoryProvider() {
-        // 每当有一个新的 memoryId (比如新的会话Token) 进来，就为它分配一个独立的、能记住最近 10 条对话的内存滑窗
-        return memoryId -> MessageWindowChatMemory.builder()
+    public DeepSeekAssistant assistant() {
+        // 构建知识库检索器：提问时自动去你那个独立的 Schema 里翻书
+        var contentRetriever = EmbeddingStoreContentRetriever.builder()
+                .embeddingStore(embeddingStore)
+                .embeddingModel(embeddingModel)
+                // 每次最多捞 3 条最相关的知识碎块塞给 DeepSeek
+                .maxResults(3)
+                // 过滤相似度太低的无关数据
+                .minScore(0.68)
+                .build();
+
+        ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
+                // 自动记住最近 10 条上下文
                 .maxMessages(10)
                 .build();
-    }
 
+        // 组装并返回智能体实例
+        return AiServices.builder(DeepSeekAssistant.class)
+                // 挂载model
+                .chatModel(chatModel)
+                .streamingChatModel(streamingChatModel)
+                // 挂载内存记忆
+                .chatMemoryProvider(chatMemoryProvider)
+                // 挂载工具
+                .tools(availableTools.toArray())
+                // 挂载知识库
+                .contentRetriever(contentRetriever)
+                .build();
+    }
 
 }

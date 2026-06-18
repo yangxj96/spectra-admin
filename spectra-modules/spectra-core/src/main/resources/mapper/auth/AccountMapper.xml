@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devops00.spectra.core.mapper.auth.AccountMapper">
+<mapper namespace="com.devops00.spectra.core.auth.mapper.AccountMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="com.devops00.spectra.core.javabean.auth.entity.Account">
+               type="com.devops00.spectra.core.auth.javabean.entity.Account">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_account-->
         <result column="user_id"    property="userId"/>

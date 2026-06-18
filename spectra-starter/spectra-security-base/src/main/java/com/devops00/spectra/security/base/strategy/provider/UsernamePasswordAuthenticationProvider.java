@@ -16,7 +16,7 @@ import org.springframework.security.core.AuthenticationException;
 /// @since 2025/12/29 10:51
 @Slf4j
 @NullMarked
-public abstract class UsernamePasswordAuthenticationProvider implements SpectraAuthenticationProvider {
+public abstract class UsernamePasswordAuthenticationProvider implements BasicAuthenticationProvider {
 
     @Override
     public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {

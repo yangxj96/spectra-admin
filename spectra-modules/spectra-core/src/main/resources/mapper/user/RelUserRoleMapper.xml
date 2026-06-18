@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.devops00.spectra.core.mapper.user.RelUserRoleMapper">
+<mapper namespace="com.devops00.spectra.core.user.mapper.RelUserRoleMapper">
     <!-- @formatter:off -->
     <resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
-               type="com.devops00.spectra.core.javabean.user.entity.RelUserRole">
+               type="com.devops00.spectra.core.user.javabean.entity.RelUserRole">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_rel_user_role-->
         <result column="user_id" property="userId"/>

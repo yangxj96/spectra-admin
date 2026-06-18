@@ -1,8 +1,8 @@
 package com.devops00.spectra.core.controller;
 
 
-import com.devops00.spectra.core.javabean.user.from.UserSaveFrom;
-import com.devops00.spectra.core.service.user.UserService;
+import com.devops00.spectra.core.common.javabean.user.from.UserSaveFrom;
+import com.devops00.spectra.core.common.service.user.UserService;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
