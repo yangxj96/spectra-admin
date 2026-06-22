@@ -62,11 +62,6 @@ public class SecurityConfiguration {
         return new SpectraPermissionEvaluator(properties);
     }
 
-    /// SpringSecurity Token 过滤器
-    @Bean
-    public TokenAuthenticationFilter tokenAuthenticationFilter() {
-        return new TokenAuthenticationFilter();
-    }
 
     /// 主认证管理器
     @Bean
@@ -113,7 +108,7 @@ public class SecurityConfiguration {
                 // SESSION 规则
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 注册过滤器
-                .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 // 允许同源iframe
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 权限匹配

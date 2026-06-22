@@ -9,10 +9,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -22,7 +20,6 @@ import java.io.IOException;
 /// @author Jack Young
 /// @version 1.0
 /// @since 2025/12/2 23:45
-@Component
 @NullMarked
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
