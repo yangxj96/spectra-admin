@@ -29,15 +29,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "spectra.system.sm")
 public class SMProperties {
 
-    /**
-     * 公钥(Base64格式).
-     */
+    /// 公钥(Base64格式).
     private String publicKey;
 
 
-    /**
-     * 私钥(Base64格式).
-     */
+    /// 私钥(Base64格式).
     private String privateKey;
 
 }

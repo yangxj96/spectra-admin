@@ -62,7 +62,7 @@ public class ULogAspect {
     ///
     /// 掌控整个执行链路，天然线程隔离，彻底绝育内存泄漏风险
     ///
-    /// @param point 入点
+    /// @param point      入点
     /// @param annotation 注解
     @Around("@annotation(annotation)")
     public Object handleAround(ProceedingJoinPoint point, ULog annotation) throws Throwable {
@@ -142,9 +142,7 @@ public class ULogAspect {
         }
     }
 
-    /**
-     * 轻量化提纯：只清洗，不序列化，不伤主线程性能
-     */
+    /// 轻量化提纯：只清洗，不序列化，不伤主线程性能
     private Object[] extractAndCleanArgs(ProceedingJoinPoint point) {
         Object[] args = point.getArgs();
         if (args == null || args.length == 0) {
@@ -160,16 +158,12 @@ public class ULogAspect {
                 )).toArray();
     }
 
-    /**
-     * 防御性提纯响应返回值，防止大对象溢出
-     */
+    /// 防御性提纯响应返回值，防止大对象溢出
     private @Nullable Object cleanResult(@Nullable Object result) {
         return result;
     }
 
-    /**
-     * 解析 SpEL 表达式，让 ULog 的说明内容支持动态传参
-     */
+    /// 解析 SpEL 表达式，让 ULog 的说明内容支持动态传参
     private String parseSpel(String spelExpression, ProceedingJoinPoint point) {
         if (spelExpression == null || spelExpression.isBlank()) {
             return "";

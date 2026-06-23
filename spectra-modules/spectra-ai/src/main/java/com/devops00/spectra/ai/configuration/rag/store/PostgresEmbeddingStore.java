@@ -32,26 +32,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * PGSQL向量数据库存储操作
- * <p>
- * 配置向量存储器：绑定到 PgSQL 独立的 ai_rag schema 中
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/11 17:49
- */
+/// PGSQL向量数据库存储操作
+///
+/// 配置向量存储器：绑定到 PgSQL 独立的 ai_rag schema 中
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/11 17:49
 @Slf4j
 public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
-
-    private final JdbcTemplate jdbcTemplate;
-
-    private final ObjectMapper objectMapper;
 
     // 可扩展点：后续若需动态切表，可将以下常量改为动态配置或方法入参
     private static final String SCHEMA_TABLE = "spectra_rag.ai_knowledge_chunks";
     private static final String VECTOR_TYPE = "::spectra_rag.vector";
     private static final String VECTOR_OP = "OPERATOR(spectra_rag.<=>)";
+    private final JdbcTemplate jdbcTemplate;
+    private final ObjectMapper objectMapper;
 
     public PostgresEmbeddingStore(JdbcTemplate jdbcTemplate, ObjectMapper objectMapper) {
         this.jdbcTemplate = jdbcTemplate;

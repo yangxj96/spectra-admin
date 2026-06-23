@@ -42,12 +42,11 @@ public class ConfiguredController {
         this.bindService = bindService;
     }
 
-    /**
-     * 修改系统配置<br/>
-     * <b>只能修改值和说明</b>
-     *
-     * @param params 修改参数入参实体
-     */
+    /// 修改系统配置
+    ///
+    /// 只能修改值和说明
+    ///
+    /// @param params 修改参数入参实体
     @ULog("'修改系统配置'")
     @PutMapping
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

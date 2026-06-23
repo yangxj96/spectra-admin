@@ -52,9 +52,7 @@ public class AiConfiguration {
 
     private final List<AiToolMarker> availableTools;
 
-    /**
-     * 动态创建一个具备 RAG 能力的智能体
-     */
+    /// 动态创建一个具备 RAG 能力的智能体
     @Bean
     public DeepSeekAssistant assistant() {
         // 构建知识库检索器：提问时自动去你那个独立的 Schema 里翻书

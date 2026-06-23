@@ -66,19 +66,15 @@ public interface FileUploadService {
     /// @param uploadId 上传ID
     FileUploadVO merge(String uploadId);
 
-    /**
-     * 根据文件ID预览图片
-     *
-     * @param file 文件信息数据
-     */
+    /// 根据文件ID预览图片
+    ///
+    /// @param file 文件信息数据
     void preview(FileInfo file);
 
-    /**
-     * 根据文件信息打开文件流
-     *
-     * @param fileInfo 文件信息
-     * @return 文件流
-     */
+    /// 根据文件信息打开文件流
+    ///
+    /// @param fileInfo 文件信息
+    /// @return 文件流
     InputStream openStream(FileInfo fileInfo);
 
 

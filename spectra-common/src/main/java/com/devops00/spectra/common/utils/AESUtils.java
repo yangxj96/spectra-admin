@@ -26,13 +26,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-/**
- * AES对称加密
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/4 16:06
- */
+/// AES对称加密
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/4 16:06
 public class AESUtils {
 
     private static final String ALGORITHM = "AES";
@@ -41,27 +39,21 @@ public class AESUtils {
     private static final int IV_SIZE = 12; // 12字节推荐
     private static final int TAG_LENGTH = 128; // GCM标签长度
 
-    /**
-     * 生成随机AES密钥
-     */
+    /// 生成随机AES密钥
     public static SecretKey generateKey() throws Exception {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(ALGORITHM);
         keyGenerator.init(KEY_SIZE, new SecureRandom());
         return keyGenerator.generateKey();
     }
 
-    /**
-     * 生成随机IV
-     */
+    /// 生成随机IV
     public static byte[] generateIv() {
         byte[] iv = new byte[IV_SIZE];
         new SecureRandom().nextBytes(iv);
         return iv;
     }
 
-    /**
-     * AES-GCM加密，返回Base64编码的密文
-     */
+    /// AES-GCM加密，返回Base64编码的密文
     public static String encrypt(String plainText, SecretKey key, byte[] iv) throws Exception {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         GCMParameterSpec gcmSpec = new GCMParameterSpec(TAG_LENGTH, iv);
@@ -70,9 +62,7 @@ public class AESUtils {
         return Base64.getEncoder().encodeToString(encrypted);
     }
 
-    /**
-     * AES-GCM解密
-     */
+    /// AES-GCM解密
     public static String decrypt(String encryptedText, SecretKey key, byte[] iv) throws Exception {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
         GCMParameterSpec gcmSpec = new GCMParameterSpec(TAG_LENGTH, iv);
@@ -82,17 +72,13 @@ public class AESUtils {
         return new String(decrypted, StandardCharsets.UTF_8);
     }
 
-    /**
-     * AES-GCM解密（接受byte[]类型的密钥）
-     */
+    /// AES-GCM解密（接受byte[]类型的密钥）
     public static String decrypt(String encryptedText, byte[] key, byte[] iv) throws Exception {
         SecretKey secretKey = new SecretKeySpec(key, "AES");
         return decrypt(encryptedText, secretKey, iv);
     }
 
-    /**
-     * IV转Hex字符串
-     */
+    /// IV转Hex字符串
     public static String getIvHex(byte[] iv) {
         StringBuilder sb = new StringBuilder();
         for (byte b : iv) {
@@ -101,9 +87,7 @@ public class AESUtils {
         return sb.toString();
     }
 
-    /**
-     * Hex字符串转IV
-     */
+    /// Hex字符串转IV
     public static byte[] hexToIv(String hex) {
         int len = hex.length();
         byte[] iv = new byte[len / 2];

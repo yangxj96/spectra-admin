@@ -41,13 +41,11 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * 系统接口单元测试
- *
- * @author yangxj96
- * @version 1.0
- * @since 2025/12/11 17:49
- */
+/// 系统接口单元测试
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2025/12/11 17:49
 @SpringBootTest
 class SystemControllerTest {
 
@@ -78,9 +76,7 @@ class SystemControllerTest {
     @Resource
     private RelRoleMenuService relRoleMenuService;
 
-    /**
-     * 初始化权限
-     */
+    /// 初始化权限
     @Test
     void initAuthority() {
         var root = new Authority();
@@ -122,9 +118,7 @@ class SystemControllerTest {
         authorityService.saveBatch(ops);
     }
 
-    /**
-     * 初始化角色
-     */
+    /// 初始化角色
     @Test
     void initRoles() {
         var roles = List.of(
@@ -136,9 +130,7 @@ class SystemControllerTest {
         roleService.saveBatch(roles);
     }
 
-    /**
-     * 角色关联权限
-     */
+    /// 角色关联权限
     @Test
     void initRelRoleAuthority() {
         var p = new RoleAuthorityFrom();
@@ -147,9 +139,7 @@ class SystemControllerTest {
         relRoleAuthorityService.grant(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"), p);
     }
 
-    /**
-     * 初始化菜单
-     */
+    /// 初始化菜单
     @Test
     void initMenus() {
         var roots = List.of(
@@ -355,9 +345,7 @@ class SystemControllerTest {
         departmentService.updateBatchById(organizations);
     }
 
-    /**
-     * 测试UUIv7查询速度
-     */
+    /// 测试UUIv7查询速度
     @Test
     void queryConfig() {
         System.out.println("总条目数:" + sysConfigService.count());

@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
 /// private String deptName;
 /// }
 /// </pre>
-/// 
+///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/2/2 16:26

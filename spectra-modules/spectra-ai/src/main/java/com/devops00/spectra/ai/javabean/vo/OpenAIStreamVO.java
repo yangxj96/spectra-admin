@@ -20,13 +20,11 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * OpenAI标准响应VO
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/5/18 09:44
- */
+/// OpenAI标准响应VO
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/5/18 09:44
 @Data
 public class OpenAIStreamVO {
 

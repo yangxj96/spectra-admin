@@ -23,13 +23,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * 基础的认证适配器
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/2/17 23:47
- */
+/// 基础的认证适配器
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/2/17 23:47
 public interface BasicAuthenticationProvider extends AuthenticationProvider {
 
     /// 用户对象转SecurityUser对象

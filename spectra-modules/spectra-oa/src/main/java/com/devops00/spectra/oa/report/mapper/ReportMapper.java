@@ -18,7 +18,6 @@ package com.devops00.spectra.oa.report.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.oa.notice.javabean.entity.Notice;
 import com.devops00.spectra.oa.report.javabean.entity.Report;
 
 /// 报表表-主表Mapper

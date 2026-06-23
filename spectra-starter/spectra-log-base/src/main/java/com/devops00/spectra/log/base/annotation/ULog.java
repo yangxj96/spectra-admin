@@ -19,6 +19,7 @@ package com.devops00.spectra.log.base.annotation;
 import com.devops00.spectra.log.base.enums.SysLogType;
 
 import org.intellij.lang.annotations.Language;
+
 import java.lang.annotation.*;
 
 /// 操作日志记录注解

@@ -21,13 +21,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 会议-参会人-入参
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/3/30 15:27
- */
+/// 会议-参会人-入参
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/3/30 15:27
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

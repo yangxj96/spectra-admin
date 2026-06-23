@@ -26,19 +26,17 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-/**
- * S3协议测试
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/3/31 01:32
- */
+/// S3协议测试
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/3/31 01:32
 @Slf4j
 @SpringBootTest(classes = UploadTestApplication.class)
 public class S3ServiceTest {
 
     @Autowired
-    private S3Properties  s3Properties;
+    private S3Properties s3Properties;
 
     @Autowired
     private S3Service s3Service;
@@ -52,7 +50,7 @@ public class S3ServiceTest {
     }
 
     @Test
-    public void testPresigner(){
+    public void testPresigner() {
         String uploadUrl = s3Service.createUploadUrl(s3Properties.getBucket(), "images/v2/a.png");
         log.info("uploadUrl: {}", uploadUrl);
     }

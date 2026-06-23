@@ -27,13 +27,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/**
- * AI使用的部门相关工具
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/18 17:56
- */
+/// AI使用的部门相关工具
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/18 17:56
 @Slf4j
 @Component
 @RequiredArgsConstructor

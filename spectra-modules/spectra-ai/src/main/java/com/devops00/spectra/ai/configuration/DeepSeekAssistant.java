@@ -21,25 +21,25 @@ import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
 
-/**
- *
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/9 17:53
- */
+/// Assistant
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/9 17:53
 public interface DeepSeekAssistant {
 
-    /**
-     * 场景一：标准的同步阻塞对话
-     */
+    /// 标准的同步阻塞对话
+    ///
+    /// @param token   传递token,用来设置Security上下文
+    /// @param message 问题内容
     @SystemMessage("你是一个全能的开发助手。")
-    String chat(@MemoryId String token, String message);
+    String chat(@MemoryId String token, @UserMessage String message);
 
-    /**
-     * 场景二：高级流式输出（打字机效果）
-     * 返回 TokenStream 是 LangChain4j 流式响应的标准抽象
-     */
+    /// 高级流式输出（打字机效果）
+    /// 返回 TokenStream 是 LangChain4j 流式响应的标准抽象
+    ///
+    /// @param token   传递token,用来设置Security上下文
+    /// @param message 问题内容
     @SystemMessage("你是一个全能的开发助手。")
     TokenStream stream(@MemoryId String token, @UserMessage String message);
 

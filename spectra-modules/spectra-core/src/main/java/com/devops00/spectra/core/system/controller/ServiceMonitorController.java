@@ -40,33 +40,27 @@ public class ServiceMonitorController {
         this.bindService = bindService;
     }
 
-    /**
-     * 获取服务器 CPU 信息
-     *
-     * @return CPU 信息
-     */
+    /// 获取服务器 CPU 信息
+    ///
+    /// @return CPU 信息
     @GetMapping("/getCPUInfo")
     @PreAuthorize("hasRole(@sec.administrators())")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
     }
 
-    /**
-     * 获取服务器内存信息
-     *
-     * @return 内存信息
-     */
+    /// 获取服务器内存信息
+    ///
+    /// @return 内存信息
     @GetMapping("/getRAMInfo")
     @PreAuthorize("hasRole(@sec.administrators())")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
     }
 
-    /**
-     * 获取服务器内存信息
-     *
-     * @return 内存信息
-     */
+    /// 获取服务器内存信息
+    ///
+    /// @return 内存信息
     @GetMapping("/getJVMInfo")
     @PreAuthorize("hasRole(@sec.administrators())")
     public JVMInfoVO getJVMInfo() {

@@ -38,9 +38,7 @@ public class CommonController {
         this.kaptchaService = kaptchaService;
     }
 
-    /**
-     * 获取验证码
-     */
+    /// 获取验证码
     @GetMapping("/kaptcha")
     public void kaptcha() throws IOException {
         kaptchaService.generate();

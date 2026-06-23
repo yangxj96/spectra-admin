@@ -33,13 +33,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-/**
- * 区域测试
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/1/30 14:01
- */
+/// 区域测试
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/1/30 14:01
 @Slf4j
 @SpringBootTest
 public class RegionServiceTest {

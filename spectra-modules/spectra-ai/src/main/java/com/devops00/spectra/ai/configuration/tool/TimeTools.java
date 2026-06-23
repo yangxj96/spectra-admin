@@ -30,13 +30,11 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * 用户工具类
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/9 16:36
- */
+/// 用户工具类
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/9 16:36
 @Slf4j
 @Component
 public class TimeTools implements AiToolMarker {

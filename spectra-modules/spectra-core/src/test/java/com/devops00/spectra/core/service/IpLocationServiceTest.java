@@ -35,9 +35,7 @@ public class IpLocationServiceTest {
     @Resource
     private IpLocationService ipLocationService;
 
-    /**
-     * 测试IP转区域效果
-     */
+    /// 测试IP转区域效果
     @Test
     void testIpCheck() {
         var region = ipLocationService.getCityEn("106.60.114.81", 3);

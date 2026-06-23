@@ -35,13 +35,11 @@ import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 
-/**
- * 国密加解密测试
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/2 17:05
- */
+/// 国密加解密测试
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/2 17:05
 @Slf4j
 @SpringBootTest
 public class GuoMiUtilTest {
@@ -52,9 +50,43 @@ public class GuoMiUtilTest {
     @Autowired
     private ObjectMapper om;
 
-    /**
-     * 解密测试
-     */
+    public static void main(String[] args) throws Exception {
+        // ===== AES 测试 =====
+        SecretKey aesKey = AESUtils.generateKey();
+        byte[] aesIv = AESUtils.generateIv();
+        String aesEncrypted = AESUtils.encrypt("Hello AES", aesKey, aesIv);
+        String aesDecrypted = AESUtils.decrypt(aesEncrypted, aesKey, aesIv);
+        System.out.println("AES 解密(GCM): " + aesDecrypted);
+        System.out.println("AES 密钥(Base64): " + Base64.getEncoder().encodeToString(aesKey.getEncoded()));
+        System.out.println("AES IV(Hex): " + AESUtils.getIvHex(aesIv));
+
+        // ===== RSA 签名验签 =====
+        KeyPair keyPair = RSAUtils.generateKeyPair();
+        String sign = RSAUtils.sign("Hello RSA", keyPair.getPrivate());
+        boolean isValid = RSAUtils.verify("Hello RSA", sign, keyPair.getPublic());
+        System.out.println("RSA 验签: " + isValid);
+        System.out.println("公钥(Base64): " + RSAUtils.getPublicKeyBase64(keyPair.getPublic()));
+        System.out.println("私钥(Base64): " + RSAUtils.getPrivateKeyBase64(keyPair.getPrivate()));
+
+        // ===== RSA 加解密测试（加密AES密钥的场景）=====
+        byte[] fakeAesKey = aesKey.getEncoded();
+        String encryptedKey = RSAUtils.encrypt(fakeAesKey, keyPair.getPublic());
+        byte[] decryptedKey = RSAUtils.decrypt(encryptedKey, keyPair.getPrivate());
+        System.out.println("RSA 加解密AES密钥: " + Arrays.equals(fakeAesKey, decryptedKey));
+
+        // ===== SHA-256 测试 =====
+        String digest = SHA256Utils.hash("Hello SHA256");
+        System.out.println("SHA-256 摘要: " + digest);
+
+        // ===== HMAC-SHA256 测试 =====
+        String hmac = SHA256Utils.hmac("Hello HMAC", "secret-key");
+        System.out.println("HMAC-SHA256: " + hmac);
+
+        // ===== Nonce 生成测试 =====
+        System.out.println("Nonce: " + SHA256Utils.generateNonce());
+    }
+
+    /// 解密测试
     @Test
     void decrypt() throws Exception {
         var str = """
@@ -97,43 +129,6 @@ public class GuoMiUtilTest {
         String decryptedData = AESUtils.decrypt(encryptedData, decryptedAesKey, iv);
         System.out.println("解密后的业务数据: " + decryptedData);
 
-    }
-
-
-    public static void main(String[] args) throws Exception {
-        // ===== AES 测试 =====
-        SecretKey aesKey = AESUtils.generateKey();
-        byte[] aesIv = AESUtils.generateIv();
-        String aesEncrypted = AESUtils.encrypt("Hello AES", aesKey, aesIv);
-        String aesDecrypted = AESUtils.decrypt(aesEncrypted, aesKey, aesIv);
-        System.out.println("AES 解密(GCM): " + aesDecrypted);
-        System.out.println("AES 密钥(Base64): " + Base64.getEncoder().encodeToString(aesKey.getEncoded()));
-        System.out.println("AES IV(Hex): " + AESUtils.getIvHex(aesIv));
-
-        // ===== RSA 签名验签 =====
-        KeyPair keyPair = RSAUtils.generateKeyPair();
-        String sign = RSAUtils.sign("Hello RSA", keyPair.getPrivate());
-        boolean isValid = RSAUtils.verify("Hello RSA", sign, keyPair.getPublic());
-        System.out.println("RSA 验签: " + isValid);
-        System.out.println("公钥(Base64): " + RSAUtils.getPublicKeyBase64(keyPair.getPublic()));
-        System.out.println("私钥(Base64): " + RSAUtils.getPrivateKeyBase64(keyPair.getPrivate()));
-
-        // ===== RSA 加解密测试（加密AES密钥的场景）=====
-        byte[] fakeAesKey = aesKey.getEncoded();
-        String encryptedKey = RSAUtils.encrypt(fakeAesKey, keyPair.getPublic());
-        byte[] decryptedKey = RSAUtils.decrypt(encryptedKey, keyPair.getPrivate());
-        System.out.println("RSA 加解密AES密钥: " + Arrays.equals(fakeAesKey, decryptedKey));
-
-        // ===== SHA-256 测试 =====
-        String digest = SHA256Utils.hash("Hello SHA256");
-        System.out.println("SHA-256 摘要: " + digest);
-
-        // ===== HMAC-SHA256 测试 =====
-        String hmac = SHA256Utils.hmac("Hello HMAC", "secret-key");
-        System.out.println("HMAC-SHA256: " + hmac);
-
-        // ===== Nonce 生成测试 =====
-        System.out.println("Nonce: " + SHA256Utils.generateNonce());
     }
 
 }

@@ -43,11 +43,9 @@ public class MenuController {
         this.bindService = bindService;
     }
 
-    /**
-     * 新增菜单信息
-     *
-     * @param params 菜单信息
-     */
+    /// 新增菜单信息
+    ///
+    /// @param params 菜单信息
     @ULog("'新增菜单'")
     @PostMapping("/created")
     @PreAuthorize("hasPermission(null ,'MENU:INSERT')")
@@ -62,11 +60,9 @@ public class MenuController {
         bindService.deleteById(id);
     }
 
-    /**
-     * 修改菜单信息
-     *
-     * @param params 菜单信息
-     */
+    /// 修改菜单信息
+    ///
+    /// @param params 菜单信息
     @ULog("'修改菜单'")
     @PutMapping("/modify")
     @PreAuthorize("hasPermission(null ,'MENU:UPDATE')")
@@ -74,11 +70,9 @@ public class MenuController {
         bindService.modify(params);
     }
 
-    /**
-     * 获取树形菜单
-     *
-     * @return 构建的树形菜单
-     */
+    /// 获取树形菜单
+    ///
+    /// @return 构建的树形菜单
     @ULog(value = "'获取树形菜单'")
     @GetMapping("/tree")
     public @Nullable List<MenuTreeVO> tree() {

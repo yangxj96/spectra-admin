@@ -31,13 +31,11 @@ import net.sf.jsqlparser.schema.Table;
 
 import java.util.UUID;
 
-/**
- * MP执行的单表SQL拦截处理
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/5/9 17:35
- */
+/// MP执行的单表SQL拦截处理
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/5/9 17:35
 @Slf4j
 @RequiredArgsConstructor
 public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {

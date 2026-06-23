@@ -20,13 +20,11 @@ package com.devops00.spectra.oa.meeting.javabean.constant;
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
-/**
- * 会议状态
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/3/30 14:30
- */
+/// 会议状态
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/3/30 14:30
 @Getter
 public enum MeetingApprovalStatus implements IEnum<String> {
 

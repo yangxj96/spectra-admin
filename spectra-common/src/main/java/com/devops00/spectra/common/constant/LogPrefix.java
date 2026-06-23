@@ -46,16 +46,12 @@ public enum LogPrefix {
         this.value = value;
     }
 
-    /**
-     * 获取带中括号的标准前缀
-     */
+    /// 获取带中括号的标准前缀
     public String p() {
         return "[" + value + "] ";
     }
 
-    /**
-     * 拼接日志内容
-     */
+    /// 拼接日志内容
     public String f(String message) {
         return p() + message;
     }

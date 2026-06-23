@@ -17,8 +17,8 @@
 package com.devops00.spectra.ai.configuration.rag;
 
 
-import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.ai.configuration.rag.store.PostgresEmbeddingStore;
+import com.devops00.spectra.ai.properties.AiRAGProperties;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.openai.OpenAiEmbeddingModel;
@@ -31,13 +31,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import tools.jackson.databind.ObjectMapper;
 
-/**
- * RAG向量库配置
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/11 17:44
- */
+/// RAG向量库配置
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/11 17:44
 @EnableAsync
 @Configuration
 @RequiredArgsConstructor

@@ -52,11 +52,9 @@ public class ToolExecutor {
 
     private static ObjectMapper objectMapper;
 
-    /**
-     * 构造函数注入，用于在 Spring 启动时将容器中配好的 ObjectMapper 赋给静态变量。
-     *
-     * @param objectMapper 项目全局 Jackson 映射器
-     */
+    /// 构造函数注入，用于在 Spring 启动时将容器中配好的 ObjectMapper 赋给静态变量。
+    ///
+    /// @param objectMapper 项目全局 Jackson 映射器
     public ToolExecutor(ObjectMapper objectMapper) {
         ToolExecutor.objectMapper = objectMapper;
     }

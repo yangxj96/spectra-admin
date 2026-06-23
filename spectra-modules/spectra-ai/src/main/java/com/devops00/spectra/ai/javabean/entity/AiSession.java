@@ -24,13 +24,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * AI模块Session记录存储
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/5 17:10
- */
+/// AI模块Session记录存储
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/5 17:10
 @Getter
 @Setter
 @ToString

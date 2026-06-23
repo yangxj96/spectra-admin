@@ -27,13 +27,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-/**
- * 用户接口单元测试
- *
- * @author yangxj96
- * @version 1.0
- * @since 2025/12/11 17:49
- */
+/// 用户接口单元测试
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2025/12/11 17:49
 @Slf4j
 @SpringBootTest
 class UserControllerTest {

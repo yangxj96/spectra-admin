@@ -55,9 +55,7 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return false;
     }
 
-    /**
-     * 判断某个 FileType 是否匹配
-     */
+    /// 判断某个 FileType 是否匹配
     private boolean matchType(byte[] header, FileType type) {
         var rules = type.getMagicRules();
         if (rules == null || rules.isEmpty()) {
@@ -73,9 +71,7 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return false;
     }
 
-    /**
-     * 单条规则匹配
-     */
+    /// 单条规则匹配
     private boolean matchRule(byte[] header, MagicRule rule) {
         byte[] magic = getCompiled(rule);
         int offset = rule.getOffset() == null ? 0 : rule.getOffset();
@@ -93,18 +89,14 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return true;
     }
 
-    /**
-     * 读取文件头（只读前 N 字节）
-     */
+    /// 读取文件头（只读前 N 字节）
     private byte[] readHeader(MultipartFile file, int maxLen) throws IOException {
         try (var is = file.getInputStream()) {
             return is.readNBytes(maxLen);
         }
     }
 
-    /**
-     * 编译 hex → byte[]（带缓存）
-     */
+    /// 编译 hex → byte[]（带缓存）
     private byte[] getCompiled(MagicRule rule) {
         if (rule.getCompiled() == null) {
             rule.setCompiled(hexToBytes(rule.getBytes()));
@@ -112,9 +104,10 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return rule.getCompiled();
     }
 
-    /**
-     * hex 字符串转 byte[]
-     */
+    /// hex 字符串转 byte[]
+    ///
+    /// @param hex hex字符串
+    /// @return byte数组
     private byte[] hexToBytes(String hex) {
         int len = hex.length();
         byte[] data = new byte[len / 2];

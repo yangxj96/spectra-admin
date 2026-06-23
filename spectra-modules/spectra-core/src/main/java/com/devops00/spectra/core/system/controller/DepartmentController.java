@@ -43,11 +43,9 @@ public class DepartmentController {
         this.bindService = bindService;
     }
 
-    /**
-     * 新增组织机构
-     *
-     * @param from 请求入参
-     */
+    /// 新增组织机构
+    ///
+    /// @param from 请求入参
     @ULog("'新增组织机构'")
     @PostMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
@@ -55,11 +53,9 @@ public class DepartmentController {
         bindService.created(from);
     }
 
-    /**
-     * 删除组织机构
-     *
-     * @param id 组织机构ID
-     */
+    /// 删除组织机构
+    ///
+    /// @param id 组织机构ID
     @ULog("'新增组织机构'")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
@@ -67,11 +63,9 @@ public class DepartmentController {
         bindService.deleteById(id);
     }
 
-    /**
-     * 编辑组织机构
-     *
-     * @param from 请求入参
-     */
+    /// 编辑组织机构
+    ///
+    /// @param from 请求入参
     @ULog("'编辑组织机构'")
     @PutMapping
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
@@ -79,11 +73,9 @@ public class DepartmentController {
         bindService.modify(from);
     }
 
-    /**
-     * 组织机构树形结构
-     *
-     * @return 组织机构树形结构数组
-     */
+    /// 组织机构树形结构
+    ///
+    /// @return 组织机构树形结构数组
     @ULog("'获取组织机构树形列表'")
     @GetMapping("/tree")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {

@@ -49,10 +49,8 @@ public class RedisConfiguration {
 
     private final DataRedisProperties redisProperties;
 
-    /**
-     * 配置原生 RedisClient Bean
-     * 用于满足 LettuceClientAdapter.of() 的需求
-     */
+    /// 配置原生 RedisClient Bean
+    /// 用于满足 LettuceClientAdapter.of() 的需求
     @Bean
     public RedisClient redisClient() {
         log.debug(LogPrefix.REDIS.f("正在构建原生 RedisClient，地址: {}"), redisProperties.getUrl());

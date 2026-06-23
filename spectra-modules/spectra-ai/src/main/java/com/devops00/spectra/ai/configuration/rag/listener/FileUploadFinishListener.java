@@ -17,8 +17,8 @@
 package com.devops00.spectra.ai.configuration.rag.listener;
 
 
-import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.ai.configuration.rag.utils.SpectraDocumentParser;
+import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
@@ -40,14 +40,11 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.util.List;
 
-/**
- * 文件上传完成监听
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/15 17:29
- */
-
+/// 文件上传完成监听
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/6/15 17:29
 @Slf4j
 @Component
 @RequiredArgsConstructor

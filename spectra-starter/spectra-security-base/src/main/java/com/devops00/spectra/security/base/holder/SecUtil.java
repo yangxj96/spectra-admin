@@ -43,16 +43,6 @@ public class SecUtil {
     private SecUtil() {
     }
 
-
-    public static void setStrategy(SecHolderStrategy s) {
-        if (strategy != null) {
-            throw new IllegalStateException(
-                    "SecHolderStrategy already initialized"
-            );
-        }
-        strategy = s;
-    }
-
     /// 内部调用获取 Holder
     ///
     /// @return {@link SecHolderStrategy} holder,为null会直接报错
@@ -64,6 +54,15 @@ public class SecUtil {
             );
         }
         return s;
+    }
+
+    public static void setStrategy(SecHolderStrategy s) {
+        if (strategy != null) {
+            throw new IllegalStateException(
+                    "SecHolderStrategy already initialized"
+            );
+        }
+        strategy = s;
     }
 
     public static void setHolder(SecHolderStrategy holder) {
@@ -146,7 +145,7 @@ public class SecUtil {
     /// 获取当前用户名
     ///
     /// @return 用户名
-    public static String getCurrentUsername(){
+    public static String getCurrentUsername() {
         return getStrategy().getCurrentUsername();
     }
 }
