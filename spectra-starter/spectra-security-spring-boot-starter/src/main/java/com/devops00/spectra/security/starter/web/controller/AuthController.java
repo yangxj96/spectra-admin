@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package com.devops00.spectra.security.starter.web.controller;
 
 
@@ -19,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 
 /// 认证处理器
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
 /// @since 2026/2/17 23:28
 @Slf4j
@@ -34,6 +50,10 @@ public class AuthController {
         this.loginDispatcher = loginDispatcher;
     }
 
+    /// 用户登陆
+    ///
+    /// @param params [LoginFrom]登陆入参
+    /// @return 成功响应token,失败跑出异常
     @ULog(
             value = "'用户[' + #params.username + ']进行登陆'",
             type = SysLogType.SAFETY
@@ -50,6 +70,7 @@ public class AuthController {
         }
     }
 
+    /// 用户退出登陆
     @ULog(
             value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']登出系统'",
             type = SysLogType.SAFETY
@@ -61,6 +82,7 @@ public class AuthController {
         SecUtil.logout();
     }
 
+    /// 检查当前token是否有效
     @ULog(
             value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']检查是否可用'",
             type = SysLogType.SAFETY

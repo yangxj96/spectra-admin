@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -37,9 +37,9 @@ import java.util.regex.Pattern;
 
 /// SQL相关错误处理
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025/7/28
+/// @since 2025/7/28 00:00
 @Slf4j
 @NullMarked
 @Order(Integer.MIN_VALUE)

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,9 +27,9 @@ import java.util.UUID;
 
 /// 切面中存储的数据的实体
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025/6/27
+/// @since 2025/6/27 00:00
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

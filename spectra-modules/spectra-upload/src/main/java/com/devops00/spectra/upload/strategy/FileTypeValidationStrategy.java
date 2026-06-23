@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import java.io.IOException;
 
 /// 文件类型验证策略
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025/06/19
+/// @since 2025/06/19 00:00
 public interface FileTypeValidationStrategy {
 
     /// 验证文件类型

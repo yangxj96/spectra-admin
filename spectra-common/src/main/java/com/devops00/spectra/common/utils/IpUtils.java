@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,14 +23,15 @@ import java.util.Objects;
 
 /// ip工具类
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025/7/23
+/// @since 2025/7/23 00:00
 public final class IpUtils {
 
     private static final String UNKNOWN = "unknown";
     private static final String LOCALHOST_IPV6 = "0:0:0:0:0:0:0:1";
     private static final String LOCALHOST_IPV4 = "127.0.0.1";
+
     private IpUtils() {
         // 工具类禁止实例化
     }

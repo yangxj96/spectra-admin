@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 
 /// 操作日志相关配置
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/27
 @Slf4j

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import java.util.UUID;
 
 /// 菜单保存接口
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025-6-14
+/// @since 2025/6/14 00:00
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

@@ -1,19 +1,35 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package com.devops00.spectra.core.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.common.javabean.system.entity.Department;
-import com.devops00.spectra.core.common.javabean.system.entity.DictGroup;
-import com.devops00.spectra.core.common.javabean.system.entity.DictItem;
-import com.devops00.spectra.core.common.javabean.system.entity.Menu;
-import com.devops00.spectra.core.common.javabean.user.entity.Authority;
-import com.devops00.spectra.core.common.javabean.user.entity.Role;
-import com.devops00.spectra.core.common.javabean.user.from.RoleAuthorityFrom;
-import com.devops00.spectra.core.common.javabean.user.from.RoleMenuFrom;
-import com.devops00.spectra.core.common.service.system.*;
-import com.devops00.spectra.core.common.service.user.AuthorityService;
-import com.devops00.spectra.core.common.service.user.RelRoleAuthorityService;
-import com.devops00.spectra.core.common.service.user.RelRoleMenuService;
-import com.devops00.spectra.core.common.service.user.RoleService;
+import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.core.system.javabean.entity.DictGroup;
+import com.devops00.spectra.core.system.javabean.entity.DictItem;
+import com.devops00.spectra.core.system.javabean.entity.Menu;
+import com.devops00.spectra.core.system.service.*;
+import com.devops00.spectra.core.user.javabean.entity.Authority;
+import com.devops00.spectra.core.user.javabean.entity.Role;
+import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
+import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
+import com.devops00.spectra.core.user.service.AuthorityService;
+import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
+import com.devops00.spectra.core.user.service.RelRoleMenuService;
+import com.devops00.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +41,13 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * 系统接口单元测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/11 17:49
+ */
 @SpringBootTest
 class SystemControllerTest {
 

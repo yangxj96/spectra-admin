@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import com.devops00.spectra.core.system.javabean.entity.SysConfig;
 
 /// 系统配置表-业务接口
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025/9/18
+/// @since 2025/9/18 00:00
 public interface SysConfigService extends BaseService<SysConfig> {
 
 }

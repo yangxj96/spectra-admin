@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 /// 工作流-流程实例
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.0
-/// @since 2025-11-11
+/// @since 2025/11/11 00:00
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-instances")

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2018-2025 yangxj96
+ *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,22 +22,33 @@ import lombok.Data;
 import java.time.Instant;
 
 /// 在线用户VO
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2025/10/15 10:58
 @Data
 @Builder
 public class UserOnlineVO {
 
+    /// 用户ID
     private String userId;
 
+    /// 用户名
     private String username;
 
+    /// 登陆类型
     private String loginType;
 
+    /// IP
     private String ip;
 
+    /// IP所在地
     private String address;
 
+    /// 登陆时间
     private Instant loginTime;
 
+    /// 关联的token
     private String token;
 
 }

@@ -1,3 +1,19 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
 package com.devops00.spectra.log.base.aspect;
 
 import com.devops00.spectra.common.constant.LogPrefix;
@@ -26,11 +42,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
-/// ULog注解AOP环绕切面（工业精装版）
+/// ULog注解AOP环绕切面
+///
 /// 彻底移除 ThreadLocal，完美防范内存泄漏、参数暴雷及长文本溢出
 ///
-/// @author Jack Young
+/// @author yangxj96
 /// @version 1.1
+/// @since 2025/7/23 15:44
 @Slf4j
 @Aspect
 public class ULogAspect {
@@ -40,10 +58,12 @@ public class ULogAspect {
     @Resource
     private ULogEventPublisher publisher;
 
-    /**
-     * 改用 @Around 环绕通知
-     * 一手掌控整个执行链路，天然线程隔离，彻底绝育内存泄漏风险
-     */
+    /// 改用 @Around 环绕通知
+    ///
+    /// 掌控整个执行链路，天然线程隔离，彻底绝育内存泄漏风险
+    ///
+    /// @param point 入点
+    /// @param annotation 注解
     @Around("@annotation(annotation)")
     public Object handleAround(ProceedingJoinPoint point, ULog annotation) throws Throwable {
         long startTime = System.currentTimeMillis();
@@ -57,7 +77,7 @@ public class ULogAspect {
             // 在目标方法执行前，趁着登录上下文还在，提前解析 SpEL 静态方法
             if (!annotation.value().isEmpty()) {
                 preParsedExplain = parseSpel(annotation.value(), point);
-                // 💡 此时 preParsedExplain 已经稳稳拿到了 "用户[019bdfa5-...]登出系统" 文本
+                // 此时 preParsedExplain 已经稳稳拿到了 "用户[019bdfa5-...]登出系统" 文本
             }
 
             // 执行真正的目标 Controller 业务方法
