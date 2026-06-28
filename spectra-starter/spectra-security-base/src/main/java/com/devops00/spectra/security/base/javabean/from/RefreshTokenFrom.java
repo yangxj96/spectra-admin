@@ -14,19 +14,14 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.framework.configure.redis;
+package com.devops00.spectra.security.base.javabean.from;
 
-
-/// Redis缓存的key
+/// 刷新token入参
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/12/4 09:53
-public final class RedisCacheKey {
-
-    /// 验证码
-    public static final String KAPTCHA = "core:common:kaptcha:";
-
-    private RedisCacheKey() {
-    }
+/// @since 2026/6/28
+public record RefreshTokenFrom(
+        String refreshToken
+) {
 }

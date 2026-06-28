@@ -54,6 +54,9 @@ public class TokenVO implements Serializable {
     /// 权限TOKEN
     private String accessToken;
 
+    /// 刷新TOKEN
+    private String refreshToken;
+
     /// 权限列表
     private List<String> authorities;
 

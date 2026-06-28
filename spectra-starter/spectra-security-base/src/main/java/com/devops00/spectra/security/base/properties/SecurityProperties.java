@@ -36,16 +36,27 @@ public class SecurityProperties {
 
     ///  验证白名单
     private List<String> whitelists = new ArrayList<>(Arrays.asList(
+            // 生成图形验证码
             "/common/kaptcha",
+            // 用户登陆
             "/auth/login",
+            // 刷新token
+            "/auth/refresh",
+            // 发送短信验证码
+            "/auth/sms",
+            // 发送邮箱验证码
+            "/auth/email",
+            // 健康检查
             "/actuator/**",
             // 图片预览接口
             "/file/preview/**"
     ));
 
-    /// token有效期时长(秒)
-    /// 暂时未启用
-    private Long tokenExpire = 7200L;
+    /// accessToken有效期（秒），默认5分钟
+    private long accessTokenExpire = 300L;
+
+    /// refreshToken有效期（秒），默认7天
+    private long refreshTokenExpire = 604800L;
 
     /// 超管角色名称
     private String administrators = "ROLE_DEV_OPS";

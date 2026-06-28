@@ -31,9 +31,7 @@ public enum ClientType {
     /// 移动App
     APP("app", "App端"),
     /// 小程序
-    MINI("mini", "小程序"),
-    /// H5页面
-    H5("h5", "H5端");
+    MINI("mini", "小程序");
 
     private final String name;
     private final String description;

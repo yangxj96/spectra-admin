@@ -44,6 +44,18 @@ public interface AccountService extends BaseService<Account> {
     /// @return 账号信息
     Account getDefaultByUserId(UUID userId);
 
+    /// 根据手机号查询账号
+    ///
+    /// @param phone 手机号
+    /// @return 账号信息，可能为null
+    @Nullable Account getByPhone(String phone);
+
+    /// 根据邮箱查询账号
+    ///
+    /// @param email 邮箱
+    /// @return 账号信息，可能为null
+    @Nullable Account getByEmail(String email);
+
     /// 根据用户ID删除用户的所有登录方式
     ///
     /// @param userId 用户ID

@@ -14,16 +14,25 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.security.base.strategy.provider;
+package com.devops00.spectra.common.constant;
 
 
-import org.springframework.security.authentication.AuthenticationProvider;
-
-/// 基础的认证适配器
+/// Redis缓存的key
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/2/17 23:47
-public interface BasicAuthenticationProvider extends AuthenticationProvider {
+/// @since 2025/12/4 09:53
+public final class RedisCacheKey {
 
+    /// 验证码
+    public static final String KAPTCHA = "core:common:kaptcha:up:";
+
+    /// 短信验证码
+    public static final String SMS_CODE = "core:common:kaptcha:sms:";
+
+    /// 邮箱验证码
+    public static final String EMAIL_CODE = "core:common:kaptcha:email:";
+
+    private RedisCacheKey() {
+    }
 }

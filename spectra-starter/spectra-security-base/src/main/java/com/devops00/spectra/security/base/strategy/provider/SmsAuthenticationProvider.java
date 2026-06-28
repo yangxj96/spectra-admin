@@ -17,10 +17,11 @@
 package com.devops00.spectra.security.base.strategy.provider;
 
 
-import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.security.authentication.AuthenticationProvider;
+import org.jspecify.annotations.Nullable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
@@ -29,14 +30,33 @@ import org.springframework.security.core.AuthenticationException;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/12/29 10:44
+@Slf4j
 @NullMarked
-public class SmsAuthenticationProvider implements AuthenticationProvider {
+public abstract class SmsAuthenticationProvider implements BasicAuthenticationProvider {
 
     @Override
-    public Authentication authenticate(Authentication authentication)
-            throws AuthenticationException {
-        throw new NotImplementedException("暂未实现");
+    public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        if (!(authentication instanceof SmsAuthenticationToken params)) {
+            throw new RuntimeException("登录失败,未知原因");
+        }
+        try {
+            kaptchaValidate(params.getCredentials().toString());
+
+            if (params.getPrincipal() == null || params.getCredentials() == null) {
+                throw new BadCredentialsException("手机号或验证码不能为空");
+            }
+
+            return login(params.getPrincipal().toString(), params.getCredentials().toString());
+        } finally {
+            kaptchaDelete();
+        }
     }
+
+    public abstract Authentication login(String phone, String code) throws AuthenticationException;
+
+    public abstract void kaptchaValidate(String kaptcha);
+
+    public abstract void kaptchaDelete();
 
     @Override
     public boolean supports(Class<?> authentication) {

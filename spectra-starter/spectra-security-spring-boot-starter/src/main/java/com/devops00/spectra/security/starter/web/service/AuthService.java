@@ -14,16 +14,22 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.security.base.strategy.provider;
+package com.devops00.spectra.security.starter.web.service;
 
-
-import org.springframework.security.authentication.AuthenticationProvider;
-
-/// 基础的认证适配器
+/// 认证服务接口
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/2/17 23:47
-public interface BasicAuthenticationProvider extends AuthenticationProvider {
+/// @since 2026/6/28
+public interface AuthService {
 
+    /// 发送短信验证码
+    ///
+    /// @param phone 手机号
+    void sendSmsCode(String phone);
+
+    /// 发送邮箱验证码
+    ///
+    /// @param email 邮箱
+    void sendEmailCode(String email);
 }

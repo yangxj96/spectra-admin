@@ -22,10 +22,13 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.security.base.javabean.from.EmailCodeFrom;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
+import com.devops00.spectra.security.base.javabean.from.RefreshTokenFrom;
+import com.devops00.spectra.security.base.javabean.from.SmsCodeFrom;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.starter.web.dispatcher.LoginDispatcher;
-import jakarta.annotation.security.PermitAll;
+import com.devops00.spectra.security.starter.web.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,9 +50,12 @@ public class AuthController {
 
     private final LoginDispatcher loginDispatcher;
 
+    private final AuthService authService;
 
-    public AuthController(LoginDispatcher loginDispatcher) {
+
+    public AuthController(LoginDispatcher loginDispatcher, AuthService authService) {
         this.loginDispatcher = loginDispatcher;
+        this.authService = authService;
     }
 
     /// 用户登陆
@@ -60,7 +66,7 @@ public class AuthController {
             value = "'用户[' + #params.username + ']进行登陆'",
             type = SysLogType.SAFETY
     )
-    @PermitAll
+    @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {
         String username = params.username() != null ? params.username() : "";
@@ -107,5 +113,40 @@ public class AuthController {
     @PostMapping(value = "/check", version = "1.0.0+")
     public void check() {
         // 能进入方法就说明 token 是正常的
+    }
+
+    /// 发送短信验证码
+    @ULog(
+            value = "'发送短信验证码至[' + #params.phone + ']'",
+            type = SysLogType.SAFETY
+    )
+    @PreAuthorize("permitAll()")
+    @PostMapping(value = "/sms", version = "1.0.0+")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendSms(@Validated @RequestBody SmsCodeFrom params) {
+        authService.sendSmsCode(params.phone());
+    }
+
+    /// 发送邮箱验证码
+    @ULog(
+            value = "'发送邮箱验证码至[' + #params.email + ']'",
+            type = SysLogType.SAFETY
+    )
+    @PreAuthorize("permitAll()")
+    @PostMapping(value = "/email", version = "1.0.0+")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendEmail(@Validated @RequestBody EmailCodeFrom params) {
+        authService.sendEmailCode(params.email());
+    }
+
+    /// 刷新token
+    @ULog(
+            value = "'刷新token'",
+            type = SysLogType.SAFETY
+    )
+    @PreAuthorize("permitAll()")
+    @PostMapping(value = "/refresh", version = "1.0.0+")
+    public TokenVO refresh(@Validated @RequestBody RefreshTokenFrom params) {
+        return SecUtil.refreshByRefreshToken(params.refreshToken());
     }
 }

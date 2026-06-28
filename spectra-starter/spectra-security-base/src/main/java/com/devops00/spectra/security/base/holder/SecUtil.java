@@ -96,6 +96,11 @@ public class SecUtil {
         getStrategy().refreshToken(token);
     }
 
+    /// 根据刷新token签发新的token对
+    public static TokenVO refreshByRefreshToken(String refreshToken) {
+        return getStrategy().refreshByRefreshToken(refreshToken);
+    }
+
     /// 记录登录失败
     public static void recordLoginFail(String username) {
         getStrategy().recordLoginFail(username);

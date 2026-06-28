@@ -26,19 +26,17 @@ import com.devops00.spectra.security.base.constant.LoginType;
 public record LoginFrom(
         // 登录方式
         LoginType type,
-        // 账号密码
+        // 通用账号,可能是用户名/邮箱/手机号
         String username,
+        // 账号密码
         String password,
         String captcha,
         // 手机验证码
-        String phone,
         String smsCode,
         // 邮箱验证码
-        String email,
         String emailCode,
         // OTP
         String principal,
         String otp
-
 ) {
 }

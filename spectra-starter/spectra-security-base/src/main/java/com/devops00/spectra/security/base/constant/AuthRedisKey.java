@@ -39,7 +39,10 @@ public enum AuthRedisKey implements RedisKey {
     ONLINE_USERS("auth:online"),
 
     /// 登录失败计数（锁定账号）
-    LOGIN_FAIL("auth:fail:%s");
+    LOGIN_FAIL("auth:fail:%s"),
+
+    /// 刷新token → accessToken 映射
+    REFRESH_TOKEN("auth:rt:%s");
 
     private final String pattern;
 

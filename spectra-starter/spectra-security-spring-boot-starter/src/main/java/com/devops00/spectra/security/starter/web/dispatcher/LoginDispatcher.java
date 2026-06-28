@@ -57,14 +57,14 @@ public class LoginDispatcher {
 
             case LoginType.SMS -> authenticationManager.authenticate(
                     new SmsAuthenticationToken(
-                            request.phone(),
+                            request.username(),
                             request.smsCode()
                     )
             );
 
             case LoginType.EMAIL -> authenticationManager.authenticate(
                     new EmailAuthenticationToken(
-                            request.email(),
+                            request.username(),
                             request.emailCode()
                     )
             );

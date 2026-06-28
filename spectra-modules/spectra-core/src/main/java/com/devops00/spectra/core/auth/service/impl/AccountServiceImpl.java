@@ -57,6 +57,22 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     }
 
     @Override
+    public @Nullable Account getByPhone(String phone) {
+        var wrapper = new LambdaQueryWrapper<Account>()
+                .eq(Account::getPhone, phone)
+                .last("LIMIT 1");
+        return this.getOne(wrapper);
+    }
+
+    @Override
+    public @Nullable Account getByEmail(String email) {
+        var wrapper = new LambdaQueryWrapper<Account>()
+                .eq(Account::getEmail, email)
+                .last("LIMIT 1");
+        return this.getOne(wrapper);
+    }
+
+    @Override
     public void deleteByUserId(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Account>()
                 .eq(Account::getUserId, userId);

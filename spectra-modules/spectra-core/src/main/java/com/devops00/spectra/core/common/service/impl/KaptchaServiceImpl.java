@@ -20,7 +20,7 @@ import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
-import com.devops00.spectra.framework.configure.redis.RedisCacheKey;
+import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

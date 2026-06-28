@@ -45,6 +45,9 @@ public interface SecHolderStrategy {
     /// 刷新 token TTL（活跃续期）
     void refreshToken(String token);
 
+    /// 根据刷新token签发新的token对
+    TokenVO refreshByRefreshToken(String refreshToken);
+
     /// 删除单个 token
     void deleteToken(String token);
 
