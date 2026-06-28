@@ -48,14 +48,14 @@ public class ConfiguredController {
     ///
     /// @param params 修改参数入参实体
     @ULog("'修改系统配置'")
-    @PutMapping
+    @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {
         bindService.modify(params);
     }
 
     @ULog("'分页查询系统配置'")
-    @GetMapping("/page")
+    @GetMapping("/page", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);

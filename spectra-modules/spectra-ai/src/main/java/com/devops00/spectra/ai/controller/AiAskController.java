@@ -49,7 +49,7 @@ public class AiAskController {
 
     private final ObjectMapper om;
 
-    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
     public Flux<String> stream(@RequestBody AiAskForm form) {
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
         // 利用 Sinks 桥接 LangChain4j 的异步回调流和 Spring WebFlux 的 Flux 流

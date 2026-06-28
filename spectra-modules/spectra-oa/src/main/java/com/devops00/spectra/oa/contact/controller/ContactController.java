@@ -40,7 +40,7 @@ public class ContactController {
     private final ContactService bindService;
 
     @ULog("'分页查通讯录'")
-    @GetMapping("/page")
+    @GetMapping("/page", version = "1.0.0+")
     public IPage<Contact> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

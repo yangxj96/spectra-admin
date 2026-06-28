@@ -39,7 +39,7 @@ public class CommonController {
     }
 
     /// 获取验证码
-    @GetMapping("/kaptcha")
+    @GetMapping("/kaptcha", version = "1.0.0+")
     public void kaptcha() throws IOException {
         kaptchaService.generate();
     }

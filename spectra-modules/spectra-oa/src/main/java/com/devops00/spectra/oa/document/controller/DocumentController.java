@@ -40,7 +40,7 @@ public class DocumentController {
     private final DocumentService bindService;
 
     @ULog("'分页查询文档'")
-    @GetMapping("/page")
+    @GetMapping("/page", version = "1.0.0+")
     public IPage<Document> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

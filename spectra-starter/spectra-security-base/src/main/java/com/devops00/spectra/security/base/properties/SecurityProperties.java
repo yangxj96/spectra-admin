@@ -57,7 +57,7 @@ public class SecurityProperties {
     private int lockoutMaxAttempts = 5;
 
     /// 登录失败锁定：锁定时长（秒），0=不锁定
-    private long lockoutSeconds = 1800L;
+    private long lockoutSeconds = 300L;
 
     /// Token自动续期间隔（秒），请求距上次续期超过此值才刷新
     private long tokenRefreshInterval = 300L;

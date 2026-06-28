@@ -40,13 +40,13 @@ public class MeetingController {
 
     /// 创建一个会议
     @ULog("'创建会议'")
-    @PostMapping
+    @PostMapping(version = "1.0.0+")
     public void create(@RequestBody MeetingCreateFrom from) {
         bindService.create(from);
     }
 
     @ULog("'分页查询会议'")
-    @GetMapping("/page")
+    @GetMapping("/page", version = "1.0.0+")
     public IPage<Meeting> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

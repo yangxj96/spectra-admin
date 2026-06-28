@@ -48,7 +48,7 @@ public class FileController {
 
     /// 文件上传预处理
     @ULog("'文件上传预处理'")
-    @PostMapping("/pre")
+    @PostMapping("/pre", version = "1.0.0+")
     public FileUploadPreVO pre(@RequestBody FileUploadPreFrom from) {
         return bindService.pre(from);
     }
@@ -57,7 +57,7 @@ public class FileController {
     ///
     /// @param from 文件直接保存的参数
     @ULog("'普通上传'")
-    @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
     public FileUploadVO uploadSingle(@ModelAttribute FileUploadFrom from) {
         return bindService.upload(from);
     }
@@ -66,7 +66,7 @@ public class FileController {
     ///
     /// @param from 文件分片上传参数
     @ULog("'分片上传'")
-    @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
     public FileUploadChunkVO uploadChunk(@ModelAttribute FileUploadChunkFrom from) {
         return bindService.chunk(from);
     }
@@ -75,7 +75,7 @@ public class FileController {
     ///
     /// @param uploadId 上传id
     @ULog("'分片上传'")
-    @PostMapping("/merge/{uploadId}")
+    @PostMapping("/merge/{uploadId}", version = "1.0.0+")
     public FileUploadVO merge(@PathVariable String uploadId) {
         return bindService.merge(uploadId);
     }
@@ -85,7 +85,7 @@ public class FileController {
     /// @param id 文件ID
     @ULog("'附件预览'")
     @PreAuthorize("permitAll()")
-    @GetMapping("/preview/{id}")
+    @GetMapping("/preview/{id}", version = "1.0.0+")
     public void preview(@PathVariable UUID id) {
         bindService.preview(id);
     }

@@ -43,7 +43,7 @@ public class ServiceMonitorController {
     /// 获取服务器 CPU 信息
     ///
     /// @return CPU 信息
-    @GetMapping("/getCPUInfo")
+    @GetMapping("/getCPUInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
@@ -52,7 +52,7 @@ public class ServiceMonitorController {
     /// 获取服务器内存信息
     ///
     /// @return 内存信息
-    @GetMapping("/getRAMInfo")
+    @GetMapping("/getRAMInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
@@ -61,7 +61,7 @@ public class ServiceMonitorController {
     /// 获取服务器内存信息
     ///
     /// @return 内存信息
-    @GetMapping("/getJVMInfo")
+    @GetMapping("/getJVMInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();

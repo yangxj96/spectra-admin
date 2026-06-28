@@ -35,16 +35,15 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 /// Redis 方式存储 Token（简化版：5 个 key 覆盖全部场景）
 ///
@@ -95,7 +94,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             String oldSessionKey = AuthRedisKey.SESSION.format(oldToken);
             if (Boolean.TRUE.equals(redis.hasKey(oldSessionKey))) {
                 this.refreshTTL(oldToken.toString(), userId, clientType.getName());
-                return buildTokenVO(user, clientType, oldToken.toString());
+                return buildTokenVO(user, oldToken.toString());
             }
             // 旧 session 已过期，清理残留
             redis.delete(ucKey);
@@ -103,7 +102,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
         // 生成新 token
         String token = UUID.randomUUID().toString().toUpperCase();
-        long ttl = TimeUnit.DAYS.toSeconds(7);
+        Duration ttl = Duration.ofDays(7);
         String ip = IpUtils.getClientIP(this.getHttpServletRequest());
 
         // 构造 session hash（事实源）
@@ -121,17 +120,17 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
 
         redis.opsForHash().putAll(sessionKey, session);
-        redis.expire(sessionKey, ttl, TimeUnit.SECONDS);
-        redis.opsForValue().set(ucKey, token, ttl, TimeUnit.SECONDS);
+        redis.expire(sessionKey, ttl);
+        redis.opsForValue().set(ucKey, token, ttl);
         redis.opsForSet().add(userTokensKey, token);
-        redis.expire(userTokensKey, ttl, TimeUnit.SECONDS);
+        redis.expire(userTokensKey, ttl);
         redis.opsForSet().add(AuthRedisKey.ONLINE_USERS.getPattern(), userId);
 
         // 设置 SecurityContext
         var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        return buildTokenVO(user, clientType, token);
+        return buildTokenVO(user, token);
     }
 
     @Override
@@ -308,7 +307,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         String key = AuthRedisKey.LOGIN_FAIL.format(username);
         Long count = redis.opsForValue().increment(key);
         if (count != null && count == 1 && properties.getLockoutSeconds() > 0) {
-            redis.expire(key, properties.getLockoutSeconds(), TimeUnit.SECONDS);
+            redis.expire(key, Duration.ofSeconds(properties.getLockoutSeconds()));
         }
     }
 
@@ -331,14 +330,14 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     /// 刷新 session / user-client / user-tokens 三个 key 的 TTL
     private void refreshTTL(String token, String userId, String clientType) {
-        long ttl = TimeUnit.DAYS.toSeconds(7);
-        redis.expire(AuthRedisKey.SESSION.format(token), ttl, TimeUnit.SECONDS);
-        redis.expire(AuthRedisKey.USER_CLIENT.format(userId, clientType), ttl, TimeUnit.SECONDS);
-        redis.expire(AuthRedisKey.USER_TOKENS.format(userId), ttl, TimeUnit.SECONDS);
+        Duration ttl = Duration.ofDays(7);
+        redis.expire(AuthRedisKey.SESSION.format(token), ttl);
+        redis.expire(AuthRedisKey.USER_CLIENT.format(userId, clientType), ttl);
+        redis.expire(AuthRedisKey.USER_TOKENS.format(userId), ttl);
     }
 
     /// 构造 TokenVO
-    private TokenVO buildTokenVO(SecurityUser user, ClientType clientType, String token) {
+    private TokenVO buildTokenVO(SecurityUser user, String token) {
         var roles = new ArrayList<String>();
         var authorities = new ArrayList<String>();
         for (GrantedAuthority ga : user.getAuthorities()) {
