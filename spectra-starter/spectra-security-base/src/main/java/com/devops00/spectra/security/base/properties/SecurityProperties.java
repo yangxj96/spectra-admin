@@ -53,4 +53,13 @@ public class SecurityProperties {
     /// SecUtil工具当前类型
     private SecMode secMode = SecMode.REDIS;
 
+    /// 登录失败锁定：最大尝试次数
+    private int lockoutMaxAttempts = 5;
+
+    /// 登录失败锁定：锁定时长（秒），0=不锁定
+    private long lockoutSeconds = 1800L;
+
+    /// Token自动续期间隔（秒），请求距上次续期超过此值才刷新
+    private long tokenRefreshInterval = 300L;
+
 }

@@ -26,32 +26,20 @@ import com.devops00.spectra.common.constant.RedisKey;
 /// @since 2026/2/8 18:41
 public enum AuthRedisKey implements RedisKey {
 
-    /// 登录会话详情（事实源）
-    SESSION_TOKEN_DETAIL("auth:session:token:%s"),
+    /// 会话详情（事实源）Hash: userId, username, email, clientType, ip, loginTime, lastActiveTime, user(SecurityUser JSON)
+    SESSION("auth:sess:%s"),
 
-    /// 在线用户何几,SESSION级
-    SESSION_ONLINE("auth:session:online"),
+    /// 用户+端 → token（同端复用 & 按端踢出）
+    USER_CLIENT("auth:uc:%s:%s"),
 
-    /// token -> userId 快速映射
-    TOKEN_USER("auth:token:user:%s"),
-
-    /// 用户所有登录 token
-    USER_TOKENS("auth:user:tokens:%s"),
-
-    /// 用户在某个客户端的 token 集合
-    USER_CLIENT_TOKENS("auth:user:client:tokens:%s:%s"),
+    /// 用户所有 token 集合（全端踢出 & 在线查询）
+    USER_TOKENS("auth:ut:%s"),
 
     /// 在线用户 ID 集合
-    ONLINE_USER_IDS("auth:online:user:ids"),
+    ONLINE_USERS("auth:online"),
 
-    /// 用户状态（封禁 / 禁用）
-    USER_STATUS("auth:user:status:%s"),
-
-    /// 用户客户端登录限制
-    USER_CLIENT_LIMIT("auth:user:client:limit:%s:%s"),
-
-    /// 用户详情(暂时这样存储)
-    USER_DETAIL("auth:user:detail:%s");
+    /// 登录失败计数（锁定账号）
+    LOGIN_FAIL("auth:fail:%s");
 
     private final String pattern;
 

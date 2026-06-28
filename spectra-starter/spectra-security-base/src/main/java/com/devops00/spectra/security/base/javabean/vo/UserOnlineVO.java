@@ -39,6 +39,9 @@ public class UserOnlineVO {
     /// 登陆类型
     private String loginType;
 
+    /// 客户端类型
+    private String clientType;
+
     /// IP
     private String ip;
 

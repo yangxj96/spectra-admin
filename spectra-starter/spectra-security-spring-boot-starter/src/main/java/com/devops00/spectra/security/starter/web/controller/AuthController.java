@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.starter.web.controller;
 
 
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -28,6 +29,7 @@ import jakarta.annotation.security.PermitAll;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
@@ -53,7 +55,7 @@ public class AuthController {
     /// 用户登陆
     ///
     /// @param params [LoginFrom]登陆入参
-    /// @return 成功响应token,失败跑出异常
+    /// @return 成功响应token,失败抛出异常
     @ULog(
             value = "'用户[' + #params.username + ']进行登陆'",
             type = SysLogType.SAFETY
@@ -61,12 +63,25 @@ public class AuthController {
     @PermitAll
     @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {
-        var authentication = loginDispatcher.authenticate(params);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        if (authentication.getPrincipal() instanceof SecurityUser su) {
-            return SecUtil.login(su);
-        } else {
-            throw new UsernameNotFoundException("未找到用户");
+        String username = params.username() != null ? params.username() : "";
+
+        // 登录锁定检查
+        if (SecUtil.isLockedOut(username)) {
+            throw new SpectraException("账号已锁定，请稍后再试");
+        }
+
+        try {
+            var authentication = loginDispatcher.authenticate(params);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (authentication.getPrincipal() instanceof SecurityUser su) {
+                SecUtil.clearLoginFail(username);
+                return SecUtil.login(su);
+            } else {
+                throw new UsernameNotFoundException("未找到用户");
+            }
+        } catch (BadCredentialsException e) {
+            SecUtil.recordLoginFail(username);
+            throw e;
         }
     }
 

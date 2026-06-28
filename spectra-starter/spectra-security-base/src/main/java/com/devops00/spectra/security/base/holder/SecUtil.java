@@ -44,8 +44,6 @@ public class SecUtil {
     }
 
     /// 内部调用获取 Holder
-    ///
-    /// @return {@link SecHolderStrategy} holder,为null会直接报错
     private static SecHolderStrategy getStrategy() {
         SecHolderStrategy s = strategy;
         if (s == null) {
@@ -69,18 +67,12 @@ public class SecUtil {
         SecUtil.strategy = holder;
     }
 
-    /// 根据用户信息进行登录操作
-    ///
-    /// @param su 用户信息
-    /// @return 登录后的 token 信息
+    /// 登录（默认 WEB 端）
     public static TokenVO login(SecurityUser su) {
-        // 默认创建的就是密码,后面添加多个登录方式就要调整下
         return getStrategy().createToken(su);
     }
 
-    /// 根据用户信息登出
-    ///
-    /// @param token 用户 token
+    /// 登出指定 token
     public static void logout(String token) {
         getStrategy().deleteToken(token);
     }
@@ -94,11 +86,29 @@ public class SecUtil {
         logout(token);
     }
 
-    /// 根据用户ID踢出用户
-    ///
-    /// @param id 用户ID
+    /// 踢出用户所有端
     public static void kick(UUID id) {
         getStrategy().deleteByUserId(id);
+    }
+
+    /// 刷新 token（活跃续期）
+    public static void refreshToken(String token) {
+        getStrategy().refreshToken(token);
+    }
+
+    /// 记录登录失败
+    public static void recordLoginFail(String username) {
+        getStrategy().recordLoginFail(username);
+    }
+
+    /// 检查是否被锁定
+    public static boolean isLockedOut(String username) {
+        return getStrategy().isLockedOut(username);
+    }
+
+    /// 清除登录失败计数
+    public static void clearLoginFail(String username) {
+        getStrategy().clearLoginFail(username);
     }
 
     /// 获取在线用户列表
@@ -106,45 +116,32 @@ public class SecUtil {
         return getStrategy().listOnlineUsers();
     }
 
-    /// 根据用户 token 获取用户信息
-    ///
-    /// @param token token
-    /// @return 当前用户信息,可能为null
+    /// 根据 token 获取用户信息
     public static @Nullable SecurityUser getCurrentUser(String token) {
         return getStrategy().getCurrentUser(token);
     }
 
     /// 获取当前请求的用户信息
-    ///
-    /// @return 当前用户信息,可能为null
     public static @Nullable SecurityUser getCurrentUser() {
         return getStrategy().getCurrentUser();
     }
 
     /// 获取当前用户的 token
-    ///
-    /// @return 当前用户的 token,可能为null
     public static @Nullable String getCurrentToken() {
         return getStrategy().getCurrentToken();
     }
 
     /// 获取当前用户 ID
-    ///
-    /// @return 用户 ID,可能为null
     public static @Nullable UUID getCurrentUserId() {
         return getStrategy().getCurrentUserId();
     }
 
     /// 获取当前用户时区ID
-    ///
-    /// @return 时区ID
     public static String getCurrentUserZoneId() {
         return getStrategy().getCurrentUserZoneId();
     }
 
     /// 获取当前用户名
-    ///
-    /// @return 用户名
     public static String getCurrentUsername() {
         return getStrategy().getCurrentUsername();
     }

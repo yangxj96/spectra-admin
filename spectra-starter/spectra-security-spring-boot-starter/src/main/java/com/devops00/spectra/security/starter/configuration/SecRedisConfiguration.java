@@ -63,8 +63,8 @@ public class SecRedisConfiguration {
 
     /// Security自定义Redis监听KEY事件
     @Bean
-    public SecurityRedisKeyExpirationListener securityRedisKeyExpirationListener(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis) {
-        return new SecurityRedisKeyExpirationListener(redis);
+    public SecurityRedisKeyExpirationListener securityRedisKeyExpirationListener() {
+        return new SecurityRedisKeyExpirationListener();
     }
 
     /// Redis消息监听bean
