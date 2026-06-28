@@ -3,7 +3,7 @@
 > 基于 Spring Boot 4 的现代化通用后端框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
-![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.5-brightgreen)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.0-brightgreen)
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18.2-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
@@ -30,8 +30,8 @@
 |-----------------|--------|----------------|
 | Java            | JDK25  | 使用最新LTS版本，性能更强 |
 | Maven           | 3.9.12 | 构建工具           |
-| Spring Boot     | 4.0.5  | 核心框架           |
-| Spring Security | 7.0.4  | 权限认证框架         |
+| Spring Boot     | 4.1.0  | 核心框架           |
+| Spring Security | 7.1.0  | 权限认证框架         |
 | MyBatis-Plus    | 3.5.15 | 增强ORM，简化CRUD   |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
 | PostgreSQL      | 18.2   | 知名关系型数据库       |
