@@ -64,17 +64,22 @@
 
 | 环境变量               | 说明               | 示例                                                            |
 |--------------------|------------------|---------------------------------------------------------------|
-| `DB_URL`           | 数据库URL           | `DB_URL=jdbc:postgresql://127.0.0.1:5237/devops00_spectra_db` |
+| `DB_URL`           | 数据库URL           | `DB_URL=jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db` |
 | `DB_USERNAME`      | 数据库用户名           | `DB_USERNAME=XXX`                                             |
 | `DB_PASSWORD`      | 数据库密码            | `DB_PASSWORD=XXX`                                             |
 | `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码 | `DEFAULT_PASSWORD=admin123`                                   |
+| `SERVER_PORT`      | 服务端口              | `SERVER_PORT=8080`                                            |
+| `REDIS_HOST`       | Redis地址           | `REDIS_HOST=127.0.0.1`                                        |
+| `REDIS_PORT`       | Redis端口           | `REDIS_PORT=6379`                                             |
+| `REDIS_DB`         | Redis数据库          | `REDIS_DB=0`                                                  |
+| `REDIS_PASSWORD`   | Redis密码           | `REDIS_PASSWORD=XXX`                                          |
 | `SSL_PASSWORD`     | SSL的密码           | `SSL_PASSWORD=xxx`                                            |
 | `SSL_TYPE`         | SSL的类型           | `SSL_TYPE=PKCS12`                                             |
 | `SSL_ALIAS`        | SSL的别名           | `SSL_ALIAS=xxx`                                               |
 
 > 用于数据库密码等敏感配置的加密保护。
 
-1. SSL 开头的几个配置根据实际需要进行配置即可
+> Redis和S3相关配置可根据实际需要进行配置。
 
 ---
 
@@ -83,8 +88,12 @@
 | 模块                 | 路径                                                                 | 说明                        |
 |--------------------|--------------------------------------------------------------------|---------------------------|
 | `spectra-common`   | [spectra-common](spectra-admin/spectra-common)                     | 通用工具类、注解、常量、DTO等共享内容      |
+| `spectra-framework`| [spectra-framework](spectra-admin/spectra-framework)               | 平台配置、Redis、AOP、缓存      |
 | `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)         | 核心接口定义、领域模型、服务契约          |
+| `spectra-upload`   | [spectra-upload](spectra-admin/spectra-modules/spectra-upload)     | 文件上传模块（S3）               |
 | `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块,选用的flowable流程框架     |
+| `spectra-oa`       | [spectra-oa](spectra-admin/spectra-modules/spectra-oa)             | OA模块                     |
+| `spectra-ai`       | [spectra-ai](spectra-admin/spectra-modules/spectra-ai)             | AI集成模块（LangChain4j）       |
 | `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)                     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑 |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
@@ -96,6 +105,9 @@
 - ✅ 基于 Spring Boot 4 + Java 25
 - ✅ SpringSecurity 实现 RBAC 权限模型（用户、角色、菜单、按钮权限）
 - ✅ MyBatis-Plus + MapStruct 提升开发效率
+- ✅ 集成 Flowable 工作流引擎
+- ✅ 集成 LangChain4j AI 能力
+- ✅ 支持 S3 文件存储
 - ✅ 标准 RESTful API 设计
 - ✅ 可扩展的模块化架构，便于二次开发
 
