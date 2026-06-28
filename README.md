@@ -1,19 +1,20 @@
 # 光谱后台管理系统（Spectra Admin System）
 
-> 一个基于 Spring Boot 4 + Vue 3 的现代化前后端分离通用框架
+> 基于 Spring Boot 4 的现代化通用后端框架
 
 ![Java](https://img.shields.io/badge/Java-25-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.0.5-brightgreen)
-![Vue](https://img.shields.io/badge/Vue-3.5.28-green)
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18.2-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
+
+前端项目已分离至独立仓库：[spectra-ui](https://github.com/yangxj96/spectra-ui)
 
 ---
 
 ## 🚀 为什么做这个项目？
 
 在多年的后端开发实践中，微服务等高阶架构并非每个项目都能用上。  
-而“**Spring Boot + Vue**”的单体前后端分离架构，依然是中小型项目和快速开发场景下的主流选择。
+而后端框架的标准化和复用，对于提升团队效率至关重要。
 
 为了**减少重复造轮子、统一开发规范、提升团队效率**，我着手打造了一个开箱即用、结构清晰、技术栈现代化的通用后台管理系统框架 —— **Spectra**。
 
@@ -39,24 +40,6 @@
 
 ---
 
-### 前端技术栈
-
-| 包名           | 版本      | 用途                     |
-|--------------|---------|------------------------|
-| Vue          | 3.5.28  | 渐进式前端框架                |
-| Vue Router   | 5.0.2   | 路由管理                   |
-| Pinia        | 3.0.4   | 状态管理（Vuex替代）           |
-| @vueuse/core | 14.2.0  | 实用 Composition API 工具库 |
-| Vite         | 8.0.2   | 构建工具，极速启动              |
-| Element Plus | 2.13.2  | UI 组件库                 |
-| ECharts      | 6.0.0   | 数据可视化图表                |
-| vue-echarts  | 8.0.1   | 转为vue封装的echarts操作组件    |
-| Lodash       | 4.17.23 | 工具函数库，简化数据操作           |
-| Eslint       | 9.39.2  | 代码质量检查                 |
-| Prettier     | 3.8.1   | 统一代码格式风格               |
-
----
-
 ## ⚙️ 开发环境配置建议
 
 ### IDEA JVM 参数调优（降低内存占用）
@@ -79,15 +62,15 @@
 
 ### 后端 `.mise.local.toml` 文件（位于 [spectra-admin](spectra-admin) 目录下）
 
-| 环境变量               | 说明                | 示例                                                   |
-|--------------------|-------------------|------------------------------------------------------|
-| `DB_URL`           | 数据库URL            | `DB_URL=jdbc:postgresql://127.0.0.1:5237/devops00_spectra_db` |
-| `DB_USERNAME`      | 数据库用户名            | `DB_USERNAME=XXX`                                    |
-| `DB_PASSWORD`      | 数据库密码             | `DB_PASSWORD=XXX`                                    |
-| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码  | `DEFAULT_PASSWORD=admin123`                          |
-| `SSL_PASSWORD`     | SSL的密码            | `SSL_PASSWORD=xxx`                                   |
-| `SSL_TYPE`         | SSL的类型            | `SSL_TYPE=PKCS12`                                    |
-| `SSL_ALIAS`        | SSL的别名            | `SSL_ALIAS=xxx`                                      |
+| 环境变量               | 说明               | 示例                                                            |
+|--------------------|------------------|---------------------------------------------------------------|
+| `DB_URL`           | 数据库URL           | `DB_URL=jdbc:postgresql://127.0.0.1:5237/devops00_spectra_db` |
+| `DB_USERNAME`      | 数据库用户名           | `DB_USERNAME=XXX`                                             |
+| `DB_PASSWORD`      | 数据库密码            | `DB_PASSWORD=XXX`                                             |
+| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码 | `DEFAULT_PASSWORD=admin123`                                   |
+| `SSL_PASSWORD`     | SSL的密码           | `SSL_PASSWORD=xxx`                                            |
+| `SSL_TYPE`         | SSL的类型           | `SSL_TYPE=PKCS12`                                             |
+| `SSL_ALIAS`        | SSL的别名           | `SSL_ALIAS=xxx`                                               |
 
 > 用于数据库密码等敏感配置的加密保护。
 
@@ -95,26 +78,14 @@
 
 ---
 
-### 前端 `.env` 文件（位于 [spectra-ui](spectra-ui) 目录）
-
-| 环境变量             | 说明                  | 示例                                     |
-|------------------|---------------------|----------------------------------------|
-| `VITE_API_URL`   | 后端API基础地址（末尾需带 `/`） | `VITE_API_URL=https://localhost:8888/` |
-| `VITE_WEB_TITLE` | 网站名称                | `光谱平台`                                 |
-
-> 支持 `.env.development`、`.env.production` 多环境配置。
-
----
-
 ## 🧩 项目模块结构
 
-| 模块                 | 路径                                                 | 说明                               |
-|--------------------|----------------------------------------------------|----------------------------------|
-| `spectra-common`   | [spectra-common](spectra-admin/spectra-common)     | 通用工具类、注解、常量、DTO等共享内容             |
-| `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)        | 核心接口定义、领域模型、服务契约                 |
-| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块,选用的flowable流程框架            |
-| `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑        |
-| `spectra-ui`       | [spectra-ui](spectra-ui)                           | 前端 Vue 项目，基于 Vite + Element Plus |
+| 模块                 | 路径                                                                 | 说明                        |
+|--------------------|--------------------------------------------------------------------|---------------------------|
+| `spectra-common`   | [spectra-common](spectra-admin/spectra-common)                     | 通用工具类、注解、常量、DTO等共享内容      |
+| `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)         | 核心接口定义、领域模型、服务契约          |
+| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块,选用的flowable流程框架     |
+| `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)                     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑 |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
 
@@ -122,8 +93,7 @@
 
 ## 🌟 特性亮点
 
-- ✅ 基于 Spring Boot 4 + Java 25，响应式编程支持
-- ✅ 前后端完全分离，Vite 提供极速 HMR
+- ✅ 基于 Spring Boot 4 + Java 25
 - ✅ SpringSecurity 实现 RBAC 权限模型（用户、角色、菜单、按钮权限）
 - ✅ MyBatis-Plus + MapStruct 提升开发效率
 - ✅ 标准 RESTful API 设计
