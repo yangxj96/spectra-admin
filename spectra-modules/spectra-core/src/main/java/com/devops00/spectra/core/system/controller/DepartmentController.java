@@ -57,7 +57,7 @@ public class DepartmentController {
     ///
     /// @param id 组织机构ID
     @ULog("'新增组织机构'")
-    @DeleteMapping("/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void deleteById(@PathVariable String id) {
         bindService.deleteById(id);
@@ -77,7 +77,7 @@ public class DepartmentController {
     ///
     /// @return 组织机构树形结构数组
     @ULog("'获取组织机构树形列表'")
-    @GetMapping("/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0+")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();
     }

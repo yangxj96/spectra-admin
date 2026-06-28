@@ -55,7 +55,7 @@ public class ConfiguredController {
     }
 
     @ULog("'分页查询系统配置'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);

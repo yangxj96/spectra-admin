@@ -40,7 +40,7 @@ public class ReportController {
     private ReportService bindService;
 
     @ULog("'分页查询报表'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<Report> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

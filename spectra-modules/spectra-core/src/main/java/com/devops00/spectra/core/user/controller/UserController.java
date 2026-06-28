@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @ULog("'根据ID删除用户'")
-    @DeleteMapping("/{uid}", version = "1.0.0+")
+    @DeleteMapping(value = "/{uid}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'USER:DELETE')")
     public void deleteById(@PathVariable String uid) {
         bindService.deleteById(UUID.fromString(uid));
@@ -71,20 +71,20 @@ public class UserController {
     }
 
     @ULog("'重置用户密码'")
-    @PutMapping("/password/reset/{uid}", version = "1.0.0+")
+    @PutMapping(value = "/password/reset/{uid}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void passwordResetById(@PathVariable String uid) {
         bindService.passwordResetById(UUID.fromString(uid));
     }
 
     @ULog("'分页查询用户列表'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 
     @ULog("'获取在线用户'")
-    @GetMapping("/online", version = "1.0.0+")
+    @GetMapping(value = "/online", version = "1.0.0+")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }

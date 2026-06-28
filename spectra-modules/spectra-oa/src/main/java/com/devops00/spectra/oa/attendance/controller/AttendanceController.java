@@ -40,7 +40,7 @@ public class AttendanceController {
     private final AttendanceService bindService;
 
     @ULog("'分页查询考勤'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<Attendance> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

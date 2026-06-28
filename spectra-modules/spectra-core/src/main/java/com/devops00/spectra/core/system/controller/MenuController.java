@@ -47,14 +47,14 @@ public class MenuController {
     ///
     /// @param params 菜单信息
     @ULog("'新增菜单'")
-    @PostMapping("/created", version = "1.0.0+")
+    @PostMapping(value = "/created", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
     }
 
     @ULog("'删除菜单'")
-    @DeleteMapping("/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:DELETE')")
     public void deleteById(@PathVariable String id) {
         bindService.deleteById(id);
@@ -64,7 +64,7 @@ public class MenuController {
     ///
     /// @param params 菜单信息
     @ULog("'修改菜单'")
-    @PutMapping("/modify", version = "1.0.0+")
+    @PutMapping(value = "/modify", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:UPDATE')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
@@ -74,7 +74,7 @@ public class MenuController {
     ///
     /// @return 构建的树形菜单
     @ULog(value = "'获取树形菜单'")
-    @GetMapping("/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0+")
     public @Nullable List<MenuTreeVO> tree() {
         return bindService.tree();
     }

@@ -40,7 +40,7 @@ public class ContractController {
     private final ContractService bindService;
 
     @ULog("'分页查询合同'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<Contract> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

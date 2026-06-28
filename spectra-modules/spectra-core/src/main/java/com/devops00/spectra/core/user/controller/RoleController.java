@@ -65,7 +65,7 @@ public class RoleController {
     }
 
     @ULog("'删除角色'")
-    @DeleteMapping("/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
     public void delete(@PathVariable UUID id) {
         try {
@@ -85,13 +85,13 @@ public class RoleController {
     /* 查询部分 */
 
     @ULog("'分页查询角色列表'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         return bindService.page(page, params);
     }
 
     @ULog("'查询角色列表'")
-    @GetMapping("/list", version = "1.0.0+")
+    @GetMapping(value = "/list", version = "1.0.0+")
     public List<RoleVO> list() {
         return bindService.all();
     }
@@ -99,7 +99,7 @@ public class RoleController {
     /* 关联处理部分 */
 
     @ULog("'获取角色关联的权限列表'")
-    @GetMapping("/{roleId}/authority", version = "1.0.0+")
+    @GetMapping(value = "/{roleId}/authority", version = "1.0.0+")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleAuthorityService.get(roleId);
@@ -110,7 +110,7 @@ public class RoleController {
     }
 
     @ULog("'获取角色关联的菜单列表'")
-    @GetMapping("/{roleId}/menu", version = "1.0.0+")
+    @GetMapping(value = "/{roleId}/menu", version = "1.0.0+")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleMenuService.get(roleId);
@@ -121,7 +121,7 @@ public class RoleController {
     }
 
     @ULog("'保存角色关联的权限列表'")
-    @PutMapping("/{roleId}/authorities", version = "1.0.0+")
+    @PutMapping(value = "/{roleId}/authorities", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
@@ -133,7 +133,7 @@ public class RoleController {
     }
 
     @ULog("'保存角色关联的菜单列表'")
-    @PutMapping("/{roleId}/menus", version = "1.0.0+")
+    @PutMapping(value = "/{roleId}/menus", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelMenuByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {

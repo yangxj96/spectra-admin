@@ -48,7 +48,7 @@ public class FileController {
 
     /// 文件上传预处理
     @ULog("'文件上传预处理'")
-    @PostMapping("/pre", version = "1.0.0+")
+    @PostMapping(value = "/pre", version = "1.0.0+")
     public FileUploadPreVO pre(@RequestBody FileUploadPreFrom from) {
         return bindService.pre(from);
     }
@@ -75,7 +75,7 @@ public class FileController {
     ///
     /// @param uploadId 上传id
     @ULog("'分片上传'")
-    @PostMapping("/merge/{uploadId}", version = "1.0.0+")
+    @PostMapping(value = "/merge/{uploadId}", version = "1.0.0+")
     public FileUploadVO merge(@PathVariable String uploadId) {
         return bindService.merge(uploadId);
     }
@@ -85,7 +85,7 @@ public class FileController {
     /// @param id 文件ID
     @ULog("'附件预览'")
     @PreAuthorize("permitAll()")
-    @GetMapping("/preview/{id}", version = "1.0.0+")
+    @GetMapping(value = "/preview/{id}", version = "1.0.0+")
     public void preview(@PathVariable UUID id) {
         bindService.preview(id);
     }

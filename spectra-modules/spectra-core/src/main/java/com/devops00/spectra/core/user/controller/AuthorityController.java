@@ -54,7 +54,7 @@ public class AuthorityController {
     }
 
     @ULog("'删除权限'")
-    @DeleteMapping("/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void deleteAuthority(@PathVariable String id) {
         throw new NotImplementedException("无需实现错误," + id);
@@ -68,7 +68,7 @@ public class AuthorityController {
     }
 
     @ULog("'获取权限树列表'")
-    @GetMapping("/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0+")
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();
     }

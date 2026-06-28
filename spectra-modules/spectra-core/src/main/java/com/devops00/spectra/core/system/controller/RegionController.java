@@ -50,19 +50,19 @@ public class RegionController {
     /// @param level 层级
     /// @param id    父级ID
     /// @return 根据条件获取的下级的列表
-    @GetMapping("/lazy", version = "1.0.0+")
+    @GetMapping(value = "/lazy", version = "1.0.0+")
     public List<RegionVO> lazyTree(Integer level, @RequestParam(value = "id", required = false) String id) {
         return bindService.lazyTree(level, id);
     }
 
     @ULog("'分页查询行政区划'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
         return bindService.page(page, params);
     }
 
-    @GetMapping("/path/{id}", version = "1.0.0+")
+    @GetMapping(value = "/path/{id}", version = "1.0.0+")
     public RegionPathVO getPath(@PathVariable UUID id) {
         return bindService.getPath(id);
     }

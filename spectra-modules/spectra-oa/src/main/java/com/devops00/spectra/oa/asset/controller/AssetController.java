@@ -40,7 +40,7 @@ public class AssetController {
     private final AssetService bindService;
 
     @ULog("'分页查询资产'")
-    @GetMapping("/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<Asset> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

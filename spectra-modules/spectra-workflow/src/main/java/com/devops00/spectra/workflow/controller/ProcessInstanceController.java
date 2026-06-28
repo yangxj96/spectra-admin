@@ -47,7 +47,7 @@ public class ProcessInstanceController {
      */
 
     /// 启动流程
-    @PostMapping("/start", version = "1.0.0+")
+    @PostMapping(value = "/start", version = "1.0.0+")
     public void start() {
 
     }

@@ -65,7 +65,7 @@ public class ProcessDefinitionController {
     /// 获取所有的流程定义
     ///
     /// @return 流程定义列表
-    @GetMapping("/definitions", version = "1.0.0+")
+    @GetMapping(value = "/definitions", version = "1.0.0+")
     public List<Map<String, Object>> definitions() {
         var definitions = repositoryService
                 .createProcessDefinitionQuery()
