@@ -22,6 +22,7 @@ import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
 import com.devops00.spectra.framework.configure.mvc.properties.UserProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
@@ -65,4 +66,17 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .maxAge(spectraProperties.getCors().getMaxAge());
     }
 
+    @Override
+    public void configureApiVersioning(@NonNull ApiVersionConfigurer configurer) {
+        log.debug(
+                "{}配置API版本号,默认请求头为{},默认版本号为{}",
+                LogPrefix.WEB.p(),
+                spectraProperties.getMvc().getApiHeader(),
+                spectraProperties.getMvc().getApiVersion()
+        );
+        configurer
+                .useRequestHeader(spectraProperties.getMvc().getApiHeader())
+                .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
+                .detectSupportedVersions(true);
+    }
 }
