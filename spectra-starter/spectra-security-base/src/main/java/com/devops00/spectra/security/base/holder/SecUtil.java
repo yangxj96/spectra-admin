@@ -86,6 +86,11 @@ public class SecUtil {
         logout(token);
     }
 
+    /// 根据刷新token登出
+    public static void logoutByRefreshToken(String refreshToken) {
+        getStrategy().deleteByRefreshToken(refreshToken);
+    }
+
     /// 踢出用户所有端
     public static void kick(UUID id) {
         getStrategy().deleteByUserId(id);

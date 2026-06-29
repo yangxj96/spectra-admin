@@ -51,6 +51,9 @@ public interface SecHolderStrategy {
     /// 删除单个 token
     void deleteToken(String token);
 
+    /// 根据刷新token删除
+    void deleteByRefreshToken(String refreshToken);
+
     /// 踢出用户所有端
     void deleteByUserId(UUID userId);
 

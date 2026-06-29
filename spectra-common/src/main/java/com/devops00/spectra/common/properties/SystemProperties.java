@@ -45,24 +45,9 @@ public class SystemProperties {
     /// 4. com.devops00.spectra.launch.LaunchApplication
     private String packagePrefix = "com.devops00.spectra";
 
-
-    /// mvc配置
-    private SpectraMvc mvc = new SpectraMvc();
-
     /// cors配置
     private SpectraCors cors = new SpectraCors();
 
-    /// MVC相关配置
-    @Data
-    public static class SpectraMvc {
-
-        /// api版本号请求头
-        private String apiHeader = "Api-Version";
-
-        /// 默认API版本号
-        private String apiVersion = "1.0.0";
-
-    }
 
     /// CORS相关配置
     @Data

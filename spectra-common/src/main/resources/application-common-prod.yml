@@ -24,6 +24,12 @@ spring:
         enabled: false
       include-stacktrace: never
       include-message: never
+  mvc:
+    apiversion:
+      use:
+        header: Api-Version
+      default: 1.0.0
+      detect-supported: true
   servlet:
     multipart:
       enabled: true

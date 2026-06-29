@@ -36,6 +36,12 @@ spring:
       enabled: true
       max-file-size: 5MB
       max-request-size: 10MB
+  mvc:
+    apiversion:
+      use:
+        header: Api-Version
+      default: 1.0.0
+      detect-supported: true
   # 虚拟线程
   threads:
     virtual:

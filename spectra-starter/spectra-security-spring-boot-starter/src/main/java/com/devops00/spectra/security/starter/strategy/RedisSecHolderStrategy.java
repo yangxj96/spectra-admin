@@ -291,6 +291,35 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     }
 
     @Override
+    public void deleteByRefreshToken(String refreshToken) {
+        String rtRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(refreshToken);
+        Map<Object, Object> rtData = redis.opsForHash().entries(rtRefreshKey);
+        if (rtData.isEmpty()) {
+            return;
+        }
+
+        String accessToken = Objects.toString(rtData.get("accessToken"), null);
+        String userId = Objects.toString(rtData.get("userId"), null);
+
+        redis.delete(rtRefreshKey);
+        if (accessToken != null) {
+            redis.delete(AuthRedisKey.REFRESH_TOKEN.format(accessToken));
+        }
+
+        if (userId != null) {
+            String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
+            if (accessToken != null) {
+                redis.opsForSet().remove(userTokensKey, accessToken);
+            }
+            Long remain = redis.opsForSet().size(userTokensKey);
+            if (remain == null || remain == 0) {
+                redis.opsForSet().remove(AuthRedisKey.ONLINE_USERS.getPattern(), userId);
+                redis.delete(userTokensKey);
+            }
+        }
+    }
+
+    @Override
     public void deleteByUserId(UUID userId) {
         String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
         Set<Object> tokens = redis.opsForSet().members(userTokensKey);

@@ -65,22 +65,4 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .maxAge(spectraProperties.getCors().getMaxAge());
     }
 
-    /// api版本策略配置
-    ///
-    /// @param configurer 配置
-    @Override
-    public void configureApiVersioning(ApiVersionConfigurer configurer) {
-        log.debug(
-                "{}配置API版本号,默认请求头为{},默认版本号为{}",
-                LogPrefix.WEB.p(),
-                spectraProperties.getMvc().getApiHeader(),
-                spectraProperties.getMvc().getApiVersion()
-        );
-        configurer
-                .useRequestHeader(spectraProperties.getMvc().getApiHeader())
-                .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
-                .detectSupportedVersions(true);
-    }
-
-
 }

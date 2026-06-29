@@ -162,6 +162,7 @@ document/jar/
 env.properties
 .mise.local.toml
 .agentscope
+.mimocode
 
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java

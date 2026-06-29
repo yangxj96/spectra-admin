@@ -18,6 +18,7 @@ package com.devops00.spectra.security.starter.web.controller;
 
 
 import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -98,21 +99,18 @@ public class AuthController {
     )
     @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
-    public void logout() {
-        SecUtil.logout();
-    }
+    @PreAuthorize("permitAll()")
+    public void logout(@RequestBody(required = false) RefreshTokenFrom params) {
+        String refreshToken = params != null ? params.refreshToken() : null;
+        var token = SecUtil.getCurrentToken();
 
-    /// 检查当前token是否有效
-    @ULog(
-            value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']检查是否可用'",
-            type = SysLogType.SAFETY
-    )
-    @ResponseStatus(HttpStatus.OK)
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping(value = "/check", version = "1.0.0+")
-    public void check() {
-        // 能进入方法就说明 token 是正常的
+        if (StrUtils.isNotBlank(token)) {
+            SecUtil.logout(token);
+        }
+
+        if (StrUtils.isNotBlank(refreshToken)) {
+            SecUtil.logoutByRefreshToken(refreshToken);
+        }
     }
 
     /// 发送短信验证码
