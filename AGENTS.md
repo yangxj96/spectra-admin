@@ -2,7 +2,12 @@
 
 ## Project Overview
 
-Spectra Admin is a Java backend system built with Spring Boot 4 + JDK 25, using Maven multi-module architecture.
+Spectra Admin is the **backend API server** for the Spectra system. It serves both the web admin panel (`spectra-ui`) and the mobile app (`spectra-app`).
+
+- Stack: Java 25, Spring Boot 4, Maven multi-module
+- Entry point: `com.devops00.spectra.launch.LaunchApplication`
+- Dev port: **4004** (set via `SERVER_PORT` in `.mise.local.toml`)
+- Both frontends connect to `https://127.0.0.1:4004/` in development
 
 ## Build & Run
 
@@ -10,7 +15,7 @@ Spectra Admin is a Java backend system built with Spring Boot 4 + JDK 25, using 
 # Build (skip tests for speed)
 ./mvnw clean package -DskipTests
 
-# Run locally
+# Run locally (start this before running either frontend)
 ./mvnw spring-boot:run -pl spectra-launch
 
 # Or run the built jar
@@ -36,8 +41,6 @@ spectra-modules/     → business modules
   spectra-ai         → AI integration (LangChain4j)
 spectra-launch       → application entry point, run this
 ```
-
-Entry point: `com.devops00.spectra.launch.LaunchApplication`
 
 ## Environment Setup
 
@@ -142,6 +145,7 @@ GitHub Actions workflow: `.github/workflows/spectra-minimal-image.yml`
 - JVM args for native: `--add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED`
 - PostgreSQL required on port 5432 by default
 - Redis required on port 6379 by default
+- API changes here directly break `spectra-ui` and `spectra-app` — coordinate with frontend when modifying endpoints
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph

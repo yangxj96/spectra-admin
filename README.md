@@ -7,7 +7,15 @@
 ![PostgreSQL18](https://img.shields.io/badge/PostgreSQL-18.2-blue)
 ![License](https://img.shields.io/github/license/yangxj96/spectra-admin)
 
-前端项目已分离至独立仓库：[spectra-ui](https://github.com/yangxj96/spectra-ui)
+Spectra 系统由三个项目组成，本仓库为后端 API 服务：
+
+| 项目 | 说明 |
+|---|---|
+| **spectra-admin**（本仓库） | 后端 API（Spring Boot 4 + Java 25） |
+| [spectra-ui](https://github.com/yangxj96/spectra-ui) | Web 管理端（Vue 3 + Element Plus） |
+| [spectra-app](https://github.com/yangxj96/spectra-app) | 移动端（uni-app，H5 / 微信小程序） |
+
+两个前端均连接本服务作为 API 后端（开发环境默认端口 `4004`）。
 
 ---
 
