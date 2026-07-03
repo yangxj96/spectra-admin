@@ -61,6 +61,52 @@ Required services: PostgreSQL, Redis.
 - **Spring profiles**: `dev` (local), `prod` (Docker/deploy)
 - **Config import order**: application-common → framework → core → oa → upload → ai → workflow
 
+## Code Style & Naming Conventions
+
+### Comments
+- Use triple-slash (`///`) comments instead of Javadoc block comments
+- Every Java file must include Apache License 2.0 header
+
+### Git Commit Messages
+Follow Conventional Commits format: `type(scope): description`
+- Common types: `feat`, `fix`, `refactor`, `docs`, `ci`, `chore`, `build`, `style`
+- Scope is typically module name: `ai`, `security`, `core`, `framework`, `log`, `project`
+- Example: `feat(security): 重构会话令牌Redis键设计并支持登录锁定与令牌续期`
+
+### Naming Conventions
+- Entity classes: PascalCase, e.g. `User`, `BaseEntity`
+- Controllers: PascalCase + `Controller` suffix
+- Services: PascalCase + `Service` suffix (interface), `ServiceImpl` suffix (implementation)
+- Form objects: PascalCase + `From` suffix (note: `From` not `Form`)
+- VO objects: PascalCase + `VO` suffix
+- Package structure: `com.devops00.spectra.{module}.{layer}`
+
+### Layer Structure
+```
+controller/    → REST endpoints
+service/       → Business logic interfaces
+service/impl/  → Service implementations
+mapper/        → MyBatis-Plus mappers
+javabean/
+  entity/      → Database entities
+  from/        → Request form objects
+  vo/          → Response view objects
+```
+
+### Entity Conventions
+- Use UUID as primary key type (`@TableId(type = IdType.INPUT)`)
+- Include audit fields: `createdBy`, `createdAt`, `updatedBy`, `updatedAt`
+- Use `Instant deleted` for soft delete (null = not deleted)
+- Use `@Version` for optimistic locking
+- Use `@OrderBy` for default sorting
+
+### Controller Conventions
+- Use constructor injection (not field injection)
+- Use `@PreAuthorize` for permission control
+- Use `@ULog` for operation logging
+- Use `version = "1.0.0+"` in mapping annotations for API versioning
+- Use `@Validated(Verify.Insert.class)` or `@Validated(Verify.Update.class)` for group validation
+
 ## Testing
 
 ```bash
@@ -96,3 +142,14 @@ GitHub Actions workflow: `.github/workflows/spectra-minimal-image.yml`
 - JVM args for native: `--add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED`
 - PostgreSQL required on port 5432 by default
 - Redis required on port 6379 by default
+
+<!-- CODEGRAPH_START -->
+## CodeGraph
+
+In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading files when you need to understand or locate code:
+
+- **MCP tool** (when available): `codegraph_explore` answers most code questions in one call — the relevant symbols' verbatim source plus the call paths between them, including dynamic-dispatch hops grep can't follow. Name a file or symbol in the query to read its current line-numbered source. If it's listed but deferred, load it by name via tool search.
+- **Shell** (always works): `codegraph explore "<symbol names or question>"` prints the same output.
+
+If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
+<!-- CODEGRAPH_END -->
