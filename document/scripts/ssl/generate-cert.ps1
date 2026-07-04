@@ -3,7 +3,7 @@
 # 保存脚本执行前的当前目录
 $OriginalLocation = Get-Location
 
-$WorkDir = "D:\Devops\Platform\LocalHttps"
+$WorkDir = "D:\Devops\Platform\https"
 $CA_Cert = Join-Path $WorkDir "SpectraRootCA.crt"
 $CA_Key  = Join-Path $WorkDir "SpectraRootCA.key"
 

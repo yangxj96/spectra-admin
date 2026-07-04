@@ -4,7 +4,7 @@
 $OriginalLocation = Get-Location
 
 $CA_Name = "Spectra CA"
-$WorkDir = "D:\Devops\Platform\LocalHttps"
+$WorkDir = "D:\Devops\Platform\https"
 
 if (-not (Test-Path $WorkDir)) {
     New-Item -ItemType Directory -Path $WorkDir | Out-Null
