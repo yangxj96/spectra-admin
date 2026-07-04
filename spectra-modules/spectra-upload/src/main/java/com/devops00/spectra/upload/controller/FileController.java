@@ -94,7 +94,6 @@ public class FileController {
     ///
     /// @param id 文件ID
     @ULog("'下载文件'")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     @GetMapping(value = "/download/{id}", version = "1.0.0+")
     public void download(@PathVariable UUID id) {
         bindService.download(id);
