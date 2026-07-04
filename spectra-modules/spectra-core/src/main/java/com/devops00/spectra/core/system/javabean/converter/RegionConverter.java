@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.javabean.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Region;
+import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
@@ -40,6 +41,10 @@ public interface RegionConverter {
 
 
     List<RegionVO> toVOList(List<Region> source);
+
+    Region toEntity(RegionFrom source);
+
+    void toEntity(RegionFrom source, @org.mapstruct.MappingTarget Region target);
 
     /// 转换到分页的VO信息
     ///

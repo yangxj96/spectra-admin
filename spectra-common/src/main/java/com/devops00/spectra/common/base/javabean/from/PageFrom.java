@@ -38,7 +38,7 @@ import java.util.List;
 public class PageFrom {
 
     /// 页码
-    private Long pageSize = 10L;
+    private Long pageSize = 15L;
 
     /// 每页数量
     private Long pageNum = 1L;

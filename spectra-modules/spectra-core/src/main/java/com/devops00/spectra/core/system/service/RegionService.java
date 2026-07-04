@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.system.javabean.entity.Region;
+import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
@@ -50,4 +51,21 @@ public interface RegionService extends BaseService<Region> {
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
     RegionPathVO getPath(UUID id);
+
+    /// 新增行政区划
+    ///
+    /// @param params 行政区划信息
+    /// @return 新增后的行政区划信息
+    RegionVO created(RegionFrom params);
+
+    /// 修改行政区划
+    ///
+    /// @param params 行政区划信息
+    /// @return 修改后的行政区划信息
+    RegionVO modify(RegionFrom params);
+
+    /// 根据ID删除行政区划
+    ///
+    /// @param id 行政区划ID
+    void deleteById(UUID id);
 }

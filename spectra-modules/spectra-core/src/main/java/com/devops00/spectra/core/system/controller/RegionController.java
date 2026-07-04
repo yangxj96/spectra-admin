@@ -18,13 +18,16 @@ package com.devops00.spectra.core.system.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.core.system.service.RegionService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,6 +68,38 @@ public class RegionController {
     @GetMapping(value = "/path/{id}", version = "1.0.0+")
     public RegionPathVO getPath(@PathVariable UUID id) {
         return bindService.getPath(id);
+    }
+
+    /// 新增行政区划
+    ///
+    /// @param params 行政区划信息
+    /// @return 新增后的行政区划信息
+    @ULog("'新增行政区划'")
+    @PostMapping(value = "/created", version = "1.0.0+")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    public RegionVO created(@Validated(Verify.Insert.class) @RequestBody RegionFrom params) {
+        return bindService.created(params);
+    }
+
+    /// 修改行政区划
+    ///
+    /// @param params 行政区划信息
+    /// @return 修改后的行政区划信息
+    @ULog("'修改行政区划'")
+    @PutMapping(value = "/modify", version = "1.0.0+")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    public RegionVO modify(@Validated(Verify.Update.class) @RequestBody RegionFrom params) {
+        return bindService.modify(params);
+    }
+
+    /// 根据ID删除行政区划
+    ///
+    /// @param id 行政区划ID
+    @ULog("'删除行政区划'")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    public void deleteById(@PathVariable UUID id) {
+        bindService.deleteById(id);
     }
 
 }

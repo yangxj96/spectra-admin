@@ -26,6 +26,7 @@ import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.RegionConverter;
 import com.devops00.spectra.core.system.javabean.entity.Region;
+import com.devops00.spectra.core.system.javabean.from.RegionFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
@@ -117,5 +118,28 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         vo.setFullName(String.join("/", names));
 
         return vo;
+    }
+
+    @Override
+    public RegionVO created(RegionFrom params) {
+        Region region = converter.toEntity(params);
+        this.save(region);
+        return converter.toVO(region);
+    }
+
+    @Override
+    public RegionVO modify(RegionFrom params) {
+        Region region = this.getById(params.getId());
+        if (region == null) {
+            throw new IllegalArgumentException("行政区划不存在");
+        }
+        converter.toEntity(params, region);
+        this.updateById(region);
+        return converter.toVO(region);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        this.removeById(id);
     }
 }
