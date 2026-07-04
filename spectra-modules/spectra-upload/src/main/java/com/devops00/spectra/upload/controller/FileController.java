@@ -39,7 +39,7 @@ import java.util.UUID;
 /// @since 2025/6/19 00:00
 @Slf4j
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/file/upload")
 @RequiredArgsConstructor
 @PreAuthorize("isAuthenticated()")
 public class FileController {
@@ -88,6 +88,16 @@ public class FileController {
     @GetMapping(value = "/preview/{id}", version = "1.0.0+")
     public void preview(@PathVariable UUID id) {
         bindService.preview(id);
+    }
+
+    /// 下载文件
+    ///
+    /// @param id 文件ID
+    @ULog("'下载文件'")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @GetMapping(value = "/download/{id}", version = "1.0.0+")
+    public void download(@PathVariable UUID id) {
+        bindService.download(id);
     }
 
 }

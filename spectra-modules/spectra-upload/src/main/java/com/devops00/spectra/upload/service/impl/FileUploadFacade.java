@@ -107,4 +107,19 @@ public class FileUploadFacade {
             case S3 -> registry.getByType(UploadType.S3).openStream(fileInfo);
         };
     }
+
+    /// 下载文件
+    ///
+    /// @param id 文件ID
+    public void download(UUID id) {
+        FileInfo info = fileInfoService.getById(id);
+        if (info == null) {
+            throw new IllegalArgumentException("文件不存在");
+        }
+        switch (info.getStorageType()) {
+            case LOCAL -> registry.getByType(UploadType.LOCAL).download(info);
+            case S3 -> registry.getByType(UploadType.S3).download(info);
+            default -> throw new RuntimeException("未识别的存储方式");
+        }
+    }
 }

@@ -77,6 +77,11 @@ public interface FileUploadService {
     /// @return 文件流
     InputStream openStream(FileInfo fileInfo);
 
+    /// 下载文件
+    ///
+    /// @param file 文件信息
+    void download(FileInfo file);
+
 
     /// 生成带年月前缀的系统唯一文件名 (例如: "202606/019eca58-xxxx...")
     ///

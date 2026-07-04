@@ -363,6 +363,36 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         }
     }
 
+    @Override
+    public void download(FileInfo file) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null || attributes.getResponse() == null) {
+            throw new IllegalStateException("不在 Web 请求上下文中");
+        }
+        HttpServletResponse response = attributes.getResponse();
+
+        String encodedFilename = java.net.URLEncoder
+                .encode(file.getOriginalName(), java.nio.charset.StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                .bucket(s3Properties.getBucket())
+                .key(file.getFilename())
+                .responseContentDisposition("attachment; filename=\"" + encodedFilename + "\"")
+                .build();
+
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofMinutes(s3Properties.getPreviewMinutes()))
+                .getObjectRequest(getObjectRequest)
+                .build();
+
+        String presignedUrl = s3Presigner.presignGetObject(presignRequest).url().toString();
+
+        response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
+        response.setHeader(HttpHeaders.LOCATION, presignedUrl);
+        log.debug("{} 触发 S3 302 下载分流成功, 文件 ID: {}", LogPrefix.STORAGE.p(), file.getId());
+    }
+
     /// 辅助小工具：由于跨方法需要用到 S3 的 uploadId，
     /// 你可以在本地设计中通过在 `file_upload_task` 表增加字段保存它，
     /// 或是临时拼装在某个非关键字段里（如存放在备注或扩展字段）。

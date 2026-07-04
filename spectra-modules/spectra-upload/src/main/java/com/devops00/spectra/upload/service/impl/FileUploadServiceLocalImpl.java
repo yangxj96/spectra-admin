@@ -379,6 +379,47 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         }
     }
 
+    @Override
+    public void download(FileInfo file) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            log.error("{}无法获取当前请求上下文，可能未在 Web 线程中调用", LogPrefix.STORAGE.p());
+            throw new IllegalStateException("当前不在有效的 Web 请求上下文中");
+        }
+        HttpServletResponse response = attributes.getResponse();
+        if (response == null) {
+            log.error("{}获取的 HttpServletResponse 为空", LogPrefix.STORAGE.p());
+            return;
+        }
+        Path filePath = buildFilePath(file.getFilename());
+        if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            log.warn("{}下载文件不存在, filename: {}", LogPrefix.STORAGE.p(), file.getFilename());
+            return;
+        }
+        try {
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
+            }
+            response.setContentType(contentType);
+            String encodedFilename = URLEncoder
+                    .encode(file.getOriginalName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+            response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"");
+            response.setContentLengthLong(file.getSize());
+            try (OutputStream out = response.getOutputStream()) {
+                Files.copy(filePath, out);
+                out.flush();
+            }
+        } catch (IOException e) {
+            log.error("{}文件下载流传输失败, filename: {}", LogPrefix.STORAGE.p(), file.getFilename(), e);
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
     /// 构建文件保存路径
     ///
     /// @param filename 文件名称

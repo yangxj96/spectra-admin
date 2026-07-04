@@ -16,8 +16,12 @@
 
 package com.devops00.spectra.upload.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
+import com.devops00.spectra.upload.javabean.from.FilePageFrom;
+import com.devops00.spectra.upload.javabean.vo.FileInfoVO;
 
 import java.util.UUID;
 
@@ -36,4 +40,16 @@ public interface FileInfoService extends BaseService<FileInfo> {
 
     /// 增加引用计数
     void incrRefCount(UUID id);
+
+    /// 分页查询文件列表
+    ///
+    /// @param page   分页参数
+    /// @param params 查询参数
+    /// @return 分页结果
+    IPage<FileInfoVO> page(PageFrom page, FilePageFrom params);
+
+    /// 根据ID删除文件(软删除)
+    ///
+    /// @param id 文件ID
+    void deleteById(UUID id);
 }
