@@ -16,8 +16,11 @@
 
 package com.devops00.spectra.ocr.engine;
 
+import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.ocr.model.OcrResult;
 import com.devops00.spectra.ocr.model.TextBlock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -32,22 +35,25 @@ import java.util.List;
 @Component
 public class ColumnClusterer {
 
+    private static final Logger log = LoggerFactory.getLogger(ColumnClusterer.class);
+
     /// 将文本块按空间位置聚类为队伍
-    ///
-    /// @param textBlocks  OCR识别出的文本块列表
-    /// @param imgWidth    图像宽度
-    /// @param imgHeight   图像高度
-    /// @return 聚类后的OCR结果
     public OcrResult cluster(List<TextBlock> textBlocks, int imgWidth, int imgHeight) {
         List<TextBlock> filtered = textBlocks.stream()
                 .filter(tb -> !isDigitHeader(tb.getText()))
                 .toList();
 
+        int removedDigits = textBlocks.size() - filtered.size();
+        log.info("{}聚类: 输入{}个文本, 过滤数字标题{}个, 剩余{}个",
+                LogPrefix.OCR.p(), textBlocks.size(), removedDigits, filtered.size());
+
         if (filtered.isEmpty()) {
-            return new OcrResult(List.of(), List.of(), "columns", 0);
+            return new OcrResult(List.of(), "columns", 0);
         }
 
         float yGap = findMaxYGap(filtered, imgHeight);
+        log.info("{}Y分界线: {}", LogPrefix.OCR.p(), String.format("%.0f", yGap));
+
         List<TextBlock> topGroup = new ArrayList<>();
         List<TextBlock> bottomGroup = new ArrayList<>();
 
@@ -59,44 +65,36 @@ public class ColumnClusterer {
             }
         }
 
+        log.info("{}上排: {}个文本, 下排: {}个文本", LogPrefix.OCR.p(), topGroup.size(), bottomGroup.size());
+
         List<OcrResult.TeamEntry> teams = new ArrayList<>();
-        List<OcrResult.TextEntry> entries = new ArrayList<>();
         float xThreshold = imgWidth * 0.06f;
 
         // 上排
         List<List<TextBlock>> topClusters = clusterByX(topGroup, xThreshold);
+        log.info("{}上排聚类: {} 个队伍", LogPrefix.OCR.p(), topClusters.size());
         for (int i = 0; i < topClusters.size(); i++) {
-            int teamId = i + 1;
-            List<TextBlock> cluster = topClusters.get(i);
-            List<String> members = cluster.stream()
+            List<String> members = topClusters.get(i).stream()
                     .sorted(Comparator.comparingDouble(TextBlock::getCenterY))
                     .map(TextBlock::getText)
                     .toList();
-            teams.add(new OcrResult.TeamEntry(teamId, members));
-
-            // 为每个文本块生成 TextEntry
-            for (TextBlock tb : cluster) {
-                entries.add(buildTextEntry(tb, teamId));
-            }
+            log.info("{}  队伍{}: {} 人 - {}", LogPrefix.OCR.p(), i + 1, members.size(), members);
+            teams.add(new OcrResult.TeamEntry(i + 1, members));
         }
 
         // 下排
         List<List<TextBlock>> bottomClusters = clusterByX(bottomGroup, xThreshold);
+        log.info("{}下排聚类: {} 个队伍", LogPrefix.OCR.p(), bottomClusters.size());
         for (int i = 0; i < bottomClusters.size(); i++) {
-            int teamId = 6 + i;
-            List<TextBlock> cluster = bottomClusters.get(i);
-            List<String> members = cluster.stream()
+            List<String> members = bottomClusters.get(i).stream()
                     .sorted(Comparator.comparingDouble(TextBlock::getCenterY))
                     .map(TextBlock::getText)
                     .toList();
-            teams.add(new OcrResult.TeamEntry(teamId, members));
-
-            for (TextBlock tb : cluster) {
-                entries.add(buildTextEntry(tb, teamId));
-            }
+            log.info("{}  队伍{}: {} 人 - {}", LogPrefix.OCR.p(), 6 + i, members.size(), members);
+            teams.add(new OcrResult.TeamEntry(6 + i, members));
         }
 
-        return new OcrResult(entries, teams, "columns", filtered.size());
+        return new OcrResult(teams, "columns", filtered.size());
     }
 
     private boolean isDigitHeader(String text) {
@@ -146,34 +144,5 @@ public class ColumnClusterer {
         }
         clusters.add(currentCluster);
         return clusters;
-    }
-
-    private OcrResult.TextEntry buildTextEntry(TextBlock tb, int teamId) {
-        float[][] bbox = tb.getBbox();
-        float x, y, w, h;
-
-        if (bbox != null && bbox.length == 4) {
-            // bbox 是 4 个角点 [[x1,y1],[x2,y2],[x3,y3],[x4,y4]]
-            float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
-            float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
-            for (float[] pt : bbox) {
-                minX = Math.min(minX, pt[0]);
-                minY = Math.min(minY, pt[1]);
-                maxX = Math.max(maxX, pt[0]);
-                maxY = Math.max(maxY, pt[1]);
-            }
-            x = minX;
-            y = minY;
-            w = maxX - minX;
-            h = maxY - minY;
-        } else {
-            // fallback: 以 center 为中心，估算尺寸
-            w = Math.max(40, tb.getText().length() * 14);
-            h = 20;
-            x = tb.getCenterX() - w / 2;
-            y = tb.getCenterY() - h / 2;
-        }
-
-        return new OcrResult.TextEntry(tb.getText(), teamId, x, y, w, h);
     }
 }

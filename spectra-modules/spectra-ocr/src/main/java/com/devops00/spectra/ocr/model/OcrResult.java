@@ -32,13 +32,10 @@ import java.util.List;
 @NoArgsConstructor
 public class OcrResult {
 
-    /// 识别到的每个文本块（含位置和所属队伍）
-    private List<TextEntry> entries;
-
     /// 队伍列表
     private List<TeamEntry> teams;
 
-    /// 布局类型: "columns" 或 "grid_5x5"
+    /// 布局类型: "columns"
     private String layout;
 
     /// 总文本数量
@@ -55,30 +52,5 @@ public class OcrResult {
 
         /// 队员列表
         private List<String> members;
-    }
-
-    /// 文本块条目（含位置和队伍归属）
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class TextEntry {
-
-        /// 文本内容
-        private String text;
-
-        /// 所属队伍编号
-        private int teamId;
-
-        /// 中心点X坐标
-        private float x;
-
-        /// 中心点Y坐标
-        private float y;
-
-        /// 宽度
-        private float width;
-
-        /// 高度
-        private float height;
     }
 }

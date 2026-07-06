@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ocr.service;
 
-import com.devops00.spectra.ocr.model.OcrForm;
 import com.devops00.spectra.ocr.model.OcrResult;
 
 import java.io.InputStream;
@@ -28,10 +27,9 @@ import java.io.InputStream;
 /// @since 2026/7/6 12:00
 public interface OcrService {
 
-    /// 按区域识别图片中的文字
+    /// 识别图片中的文字
     ///
     /// @param imageStream 图片流
-    /// @param form        识别请求（含各区域坐标）
     /// @return 识别结果
-    OcrResult recognize(InputStream imageStream, OcrForm form);
+    OcrResult recognize(InputStream imageStream);
 }

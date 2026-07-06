@@ -17,7 +17,6 @@
 package com.devops00.spectra.ocr.controller;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.ocr.model.OcrForm;
 import com.devops00.spectra.ocr.model.OcrResult;
 import com.devops00.spectra.ocr.service.OcrService;
 import org.slf4j.Logger;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 /// OCR识别接口
 ///
@@ -45,20 +43,14 @@ public class OcrController {
         this.ocrService = ocrService;
     }
 
-    /// 按区域识别图片中的文字
+    /// 识别图片中的文字
     ///
-    /// @param file    上传的图片文件
-    /// @param regions JSON格式的区域列表
+    /// @param file 上传的图片文件
     /// @return OCR识别结果
     @PostMapping(value = "/recognize", version = "1.0.0+")
-    public OcrResult recognize(
-            @RequestParam("file") MultipartFile file,
-            @RequestPart("regions") List<OcrForm.Region> regions) throws IOException {
-
-        log.info("{}收到OCR识别请求, 文件={}, 大小={}, 区域数={}", LogPrefix.OCR.p(),
-                file.getOriginalFilename(), file.getSize(), regions.size());
-
-        OcrForm form = new OcrForm(regions);
-        return ocrService.recognize(file.getInputStream(), form);
+    public OcrResult recognize(@RequestParam("file") MultipartFile file) throws IOException {
+        log.info("{}收到OCR识别请求, 文件={}, 大小={}B", LogPrefix.OCR.p(),
+                file.getOriginalFilename(), file.getSize());
+        return ocrService.recognize(file.getInputStream());
     }
 }

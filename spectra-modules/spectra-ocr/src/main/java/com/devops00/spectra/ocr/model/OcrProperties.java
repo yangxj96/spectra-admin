@@ -38,11 +38,11 @@ public class OcrProperties {
     private String dictPath = "models/ppocrv6_dict.txt";
 
     /// 检测置信度阈值
-    private float detThresh = 0.3f;
+    private float detThresh = 0.2f;
 
     /// 检测框置信度阈值
-    private float detBoxThresh = 0.6f;
+    private float detBoxThresh = 0.4f;
 
     /// 检测框扩展比例
-    private float detUnclipRatio = 1.5f;
+    private float detUnclipRatio = 1.4f;
 }
