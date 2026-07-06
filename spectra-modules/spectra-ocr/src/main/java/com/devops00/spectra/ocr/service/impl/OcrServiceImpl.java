@@ -17,12 +17,11 @@
 package com.devops00.spectra.ocr.service.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.ocr.engine.ColumnClusterer;
 import com.devops00.spectra.ocr.engine.CtcDecoder;
 import com.devops00.spectra.ocr.engine.OnnxDetEngine;
 import com.devops00.spectra.ocr.engine.OnnxRecEngine;
+import com.devops00.spectra.ocr.model.OcrForm;
 import com.devops00.spectra.ocr.model.OcrResult;
-import com.devops00.spectra.ocr.model.TextBlock;
 import com.devops00.spectra.ocr.service.OcrService;
 import org.bytedeco.opencv.opencv_core.*;
 import org.slf4j.Logger;
@@ -31,12 +30,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
-import static org.bytedeco.opencv.global.opencv_imgcodecs.imdecode;
 import static org.bytedeco.opencv.global.opencv_imgcodecs.IMREAD_COLOR;
+import static org.bytedeco.opencv.global.opencv_imgcodecs.imdecode;
 
-/// OCR服务实现
+/// OCR服务实现：按用户指定区域进行识别
 ///
 /// @author yangxj96
 /// @version 1.0
@@ -48,61 +48,101 @@ public class OcrServiceImpl implements OcrService {
 
     private final OnnxDetEngine detEngine;
     private final OnnxRecEngine recEngine;
-    private final ColumnClusterer columnClusterer;
 
-    public OcrServiceImpl(OnnxDetEngine detEngine, OnnxRecEngine recEngine, ColumnClusterer columnClusterer) {
+    public OcrServiceImpl(OnnxDetEngine detEngine, OnnxRecEngine recEngine) {
         this.detEngine = detEngine;
         this.recEngine = recEngine;
-        this.columnClusterer = columnClusterer;
     }
 
     @Override
-    public OcrResult recognize(InputStream imageStream) {
+    public OcrResult recognize(InputStream imageStream, OcrForm form) {
         try {
             byte[] imageBytes = imageStream.readAllBytes();
             Mat dataMat = new Mat(imageBytes);
             Mat image = imdecode(dataMat, IMREAD_COLOR);
 
-            log.info("{}开始识别, 图片尺寸={}x{}", LogPrefix.OCR.p(), image.cols(), image.rows());
+            log.info("{}开始识别, 图片尺寸={}x{}, 区域数={}",
+                    LogPrefix.OCR.p(), image.cols(), image.rows(), form.getRegions().size());
 
-            List<float[][]> boxes = detEngine.detect(image);
-            log.info("{}检测到 {} 个文本区域", LogPrefix.OCR.p(), boxes.size());
+            List<OcrResult.TeamEntry> teams = new ArrayList<>();
+            int totalTexts = 0;
 
-            List<TextBlock> textBlocks = new ArrayList<>();
-            for (float[][] box : boxes) {
-                Mat cropped = cropRegion(image, box);
+            for (OcrForm.Region region : form.getRegions()) {
+                // 1. 裁剪区域
+                Mat cropped = cropRegion(image, region);
                 if (cropped == null || cropped.empty()) {
+                    log.warn("{}区域 {} 裁剪为空, 跳过", LogPrefix.OCR.p(), region.getTeamId());
+                    teams.add(new OcrResult.TeamEntry(region.getTeamId(), List.of()));
                     continue;
                 }
 
-                CtcDecoder.DecodedResult result = recEngine.recognize(cropped);
+                log.debug("{}区域 {}: 裁剪尺寸={}x{}", LogPrefix.OCR.p(), region.getTeamId(),
+                        cropped.cols(), cropped.rows());
 
-                float cx = (box[0][0] + box[1][0] + box[2][0] + box[3][0]) / 4;
-                float cy = (box[0][1] + box[1][1] + box[2][1] + box[3][1]) / 4;
+                // 2. 在裁剪区域内检测文本
+                List<float[][]> boxes = detEngine.detect(cropped);
+                log.debug("{}区域 {}: 检测到 {} 个文本", LogPrefix.OCR.p(), region.getTeamId(), boxes.size());
 
-                textBlocks.add(new TextBlock(
-                        result.text(),
-                        result.confidence(),
-                        cx,
-                        cy,
-                        box
-                ));
+                // 3. 识别每个文本，同时保存位置信息
+                List<float[]> centerYList = new ArrayList<>();
+                List<String> textList = new ArrayList<>();
+
+                for (float[][] box : boxes) {
+                    Mat textImg = cropBox(cropped, box);
+                    if (textImg == null || textImg.empty()) {
+                        continue;
+                    }
+
+                    CtcDecoder.DecodedResult result = recEngine.recognize(textImg);
+                    if (!result.text().isBlank()) {
+                        float cy = (box[0][1] + box[1][1] + box[2][1] + box[3][1]) / 4;
+                        centerYList.add(new float[]{cy});
+                        textList.add(result.text());
+                        log.debug("{}区域 {}: 识别到 '{}' (score={})",
+                                LogPrefix.OCR.p(), region.getTeamId(),
+                                result.text(), String.format("%.3f", result.confidence()));
+                    }
+                }
+
+                // 4. 按 Y 坐标升序排序（从上到下）
+                List<Integer> indices = new ArrayList<>();
+                for (int i = 0; i < textList.size(); i++) indices.add(i);
+                indices.sort(Comparator.comparingDouble(i -> centerYList.get(i)[0]));
+
+                List<String> members = indices.stream()
+                        .map(textList::get)
+                        .toList();
+
+                totalTexts += members.size();
+                teams.add(new OcrResult.TeamEntry(region.getTeamId(), members));
             }
 
-            log.info("{}识别完成, 共 {} 个文本", LogPrefix.OCR.p(), textBlocks.size());
+            log.info("{}识别完成, 共 {} 支队伍, {} 个文本", LogPrefix.OCR.p(), teams.size(), totalTexts);
 
-            OcrResult result = columnClusterer.cluster(textBlocks, image.cols(), image.rows());
-            log.info("{}聚类完成, {} 支队伍, 布局={}", LogPrefix.OCR.p(),
-                    result.getTeams().size(), result.getLayout());
-
-            return result;
+            return new OcrResult(List.of(), teams, "columns", totalTexts);
         } catch (Exception e) {
             log.error("{}OCR识别失败", LogPrefix.OCR.p(), e);
             throw new RuntimeException("OCR recognition failed", e);
         }
     }
 
-    private Mat cropRegion(Mat image, float[][] box) {
+    /// 按区域裁剪图片
+    private Mat cropRegion(Mat image, OcrForm.Region region) {
+        int x1 = Math.max(0, Math.round(region.getX()));
+        int y1 = Math.max(0, Math.round(region.getY()));
+        int x2 = Math.min(image.cols(), Math.round(region.getX() + region.getWidth()));
+        int y2 = Math.min(image.rows(), Math.round(region.getY() + region.getHeight()));
+
+        if (x2 <= x1 || y2 <= y1) {
+            return null;
+        }
+
+        Rect roi = new Rect(x1, y1, x2 - x1, y2 - y1);
+        return new Mat(image, roi).clone();
+    }
+
+    /// 按检测框裁剪文本区域
+    private Mat cropBox(Mat image, float[][] box) {
         float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE;
         float maxX = -Float.MAX_VALUE, maxY = -Float.MAX_VALUE;
         for (float[] pt : box) {
