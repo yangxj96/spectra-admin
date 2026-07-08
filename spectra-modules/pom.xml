@@ -29,7 +29,6 @@
         <module>spectra-workflow</module>
         <module>spectra-oa</module>
         <module>spectra-ai</module>
-        <module>spectra-ocr</module>
     </modules>
 
     <dependencies>
