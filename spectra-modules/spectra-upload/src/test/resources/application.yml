@@ -1,5 +1,4 @@
 spring:
   config:
     import:
-      - classpath:application-common-dev.yml
-      - classpath:application-upload-dev.yml
+      - classpath:application-dev.yml

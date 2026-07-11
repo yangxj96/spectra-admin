@@ -1,9 +1,0 @@
-# XSS防范
-mica:
-  xss:
-    # 是否开启
-    enabled: true
-    # 拦截的
-    path-patterns: /**
-    # 放行的
-    path-exclude-patterns:

@@ -1,21 +1,175 @@
+# ==================== 项目自定义配置 ====================
+spectra:
+  system:
+    base-dir: files
+    sm:
+      public-key: ${SPECTRA_SYSTEM_SM_PUBLIC_KEY}
+      private-key: ${SPECTRA_SYSTEM_SM_PRIVATE_KEY}
+      enabled: ${SPECTRA_SYSTEM_SM_ENABLED:false}
+  user:
+    default-password: ${DEFAULT_PASSWORD}
+  kaptcha:
+    type: math
+    verify: false
+  file:
+    upload:
+      local:
+        upload-dir: ${spectra.system.base-dir}/uploads
+        upload-temp-dir: ${spectra.system.base-dir}/temp
+      s3:
+        endpoint: ${S3_ENDPOINT}
+        accessKey: ${S3_ACCESS_KEY}
+        secretKey: ${S3_SECRET_KEY}
+        bucket: ${S3_BUCKET}
+        region: ${S3_REGION}
+      default-storage: s3
+  ai:
+    rag:
+      api-key: ${RAG_KEY}
+      base-url: ${RAG_BASE_URL}
+      model-name: ${RAG_MODEL}
+      embedding-batch-size: 20
+      max-segment-size: 300
+      max-overlap-size: 30
+
+# ==================== 服务器配置 ====================
+server:
+  port: ${SERVER_PORT:4004}
+  ssl:
+    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+    key-store-password: ${SSL_PASSWORD}
+    key-store-type: ${SSL_TYPE}
+    key-alias: ${SSL_ALIAS}
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        name: JSESSIONID
+        path: /
+        same-site: none
+        secure: true
+        http-only: true
+
+# ==================== Spring 配置 ====================
 spring:
-  config:
-    import:
-      - classpath:application-common-dev.yml
-      - classpath:application-framework-dev.yml
-      - classpath:application-core-dev.yml
-      - classpath:application-upload-dev.yml
-      - classpath:application-ai-dev.yml
-      - classpath:application-workflow-dev.yml
-  # 关闭他自带的用户
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 10MB
+  threads:
+    virtual:
+      enabled: true
+  application:
+    name: spectra-admin
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      data-source-properties:
+        currentSchema: public
+        reWriteBatchedInserts: true
+        binaryTransfer: true
+        tcpKeepAlive: true
+        connectTimeout: 10
+        socketTimeout: 60
+        ApplicationName: ${spring.application.name}
+        loginTimeout: 10
+        sslmode: disable
+        prepareThreshold: 5
+  data:
+    redis:
+      url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}
+      timeout: 10s
+      connect-timeout: 5s
+      lettuce:
+        pool:
+          enabled: true
+          max-idle: 10
+          min-idle: 2
+          max-active: 20
+          max-wait: 5000ms
+        shutdown-timeout: 100ms
   security:
     user:
       name:
       password:
-  # 缓存
   cache:
     type: redis
-# 健康检查
+
+# ==================== MyBatis-Plus 配置 ====================
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.devops00.**.entity
+  type-handlers-package: com.devops00.spectra.common.mybatis.handler
+  configuration:
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+    local-cache-scope: statement
+  global-config:
+    banner: false
+    db-config:
+      id-type: assign_id
+      schema: spectra_core
+  configuration-properties:
+    schema: spectra_core
+
+# ==================== XSS 防范 ====================
+mica:
+  xss:
+    enabled: true
+    path-patterns: /**
+    path-exclude-patterns:
+
+# ==================== Flowable 工作流 ====================
+flowable:
+  database-schema: spectra_workflow
+  database-schema-update: true
+  jpa-enabled: false
+  process-definition-location-prefix: classpath*:/processes/
+  async-executor-activate: true
+  history-level: full
+  eventregistry:
+    enabled: false
+  idm:
+    enabled: false
+  app:
+    enabled: false
+  dmn:
+    enabled: false
+  cmmn:
+    enabled: false
+
+# ==================== LangChain4j / AI ====================
+langchain4j:
+  open-ai:
+    chat-model:
+      base-url: ${AI_BASE_URL}
+      api-key: ${AI_KEY}
+      model-name: ${AI_MODEL}
+      log-requests: true
+      log-responses: true
+    streaming-chat-model:
+      base-url: ${AI_BASE_URL}
+      api-key: ${AI_KEY}
+      model-name: ${AI_MODEL}
+
+# ==================== 日志配置 ====================
+logging:
+  group:
+    spectra: >-
+      com.devops00.spectra
+    other:
+      - com.ulisesbocchio.jasyptspringboot.configuration
+      - io.agentscope.harness.agent.middleware
+  level:
+    root: info
+    other: error
+    spectra: debug
+
+# ==================== 健康检查 ====================
 management:
   endpoints:
     web:

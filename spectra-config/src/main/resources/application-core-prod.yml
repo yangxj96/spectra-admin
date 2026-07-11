@@ -1,5 +1,0 @@
-mica:
-  xss:
-    enabled: true
-    path-patterns: /**
-    path-exclude-patterns:
