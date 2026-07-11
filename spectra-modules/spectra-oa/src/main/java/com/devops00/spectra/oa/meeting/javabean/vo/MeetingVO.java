@@ -14,76 +14,55 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.oa.meeting.javabean.entity;
+package com.devops00.spectra.oa.meeting.javabean.vo;
 
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.annotation.DataScope;
-import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// OA-会议表主表实体
+/// 会议列表VO
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/5 23:53
-@Getter
-@Setter
-@ToString
-@TableName(value = "oa_meeting")
-@DataScope(relations = {
-        @DataScope.Relation(
-                table = "oa_meeting_participant",
-                joinColumn = "meeting_id",
-                userColumn = "user_id"
-        )
-})
-public class Meeting extends BaseEntity {
+/// @since 2026/7/11
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class MeetingVO {
+
+    private UUID id;
 
     /// 会议标题
-    @TableField("title")
     private String title;
 
-    /// 发起人
-    @TableField("initiator_id")
+    /// 发起人ID
     private String initiatorId;
 
     /// 开始时间
-    @TableField("start_time")
     private String startTime;
 
     /// 结束时间
-    @TableField("end_time")
     private String endTime;
 
     /// 会议地点
-    @TableField("location")
     private String location;
 
     /// 会议内容/议题
-    @TableField("content")
     private String content;
 
     /// 会议业务状态
-    @TableField("status")
     private MeetingStatus status;
 
-    /// 工作流审核实例ID
-    @TableField("process_instance_id")
-    private String processInstanceId;
-
     /// 工作流审核状态
-    @TableField("approval_status")
     private MeetingStatus approvalStatus;
 
-    /// 所属部门ID
-    @TableField("department_id")
-    private UUID departmentId;
+    /// 工作流审核实例ID
+    private String processInstanceId;
 
+    /// 创建时间
+    private String createdAt;
 }

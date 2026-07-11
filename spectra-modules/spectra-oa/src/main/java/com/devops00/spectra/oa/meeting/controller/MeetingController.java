@@ -22,6 +22,8 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -45,10 +47,11 @@ public class MeetingController {
         bindService.create(from);
     }
 
+    /// 分页查询会议
     @ULog("'分页查询会议'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    public IPage<Meeting> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
+        return bindService.page(page, params);
     }
 
 

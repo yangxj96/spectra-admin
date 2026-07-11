@@ -21,7 +21,10 @@ import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
+import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /// 会议javabean转换器
 ///
@@ -33,5 +36,11 @@ public interface MeetingConverter {
 
     /// 入参转实体
     Meeting toEntity(MeetingCreateFrom source);
+
+    /// 实体转VO
+    MeetingVO toVO(Meeting source);
+
+    /// 实体列表转VO列表
+    List<MeetingVO> toVOList(List<Meeting> source);
 
 }

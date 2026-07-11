@@ -32,7 +32,10 @@ public enum MeetingStatus implements IEnum<String> {
     SCHEDULED("scheduled", "已安排"),
     ONGOING("ongoing", "进行中"),
     FINISHED("finished", "已结束"),
-    CANCELLED("cancelled", "已取消");
+    CANCELLED("cancelled", "已取消"),
+    PROCESSING("processing", "审批中"),
+    APPROVED("approved", "已通过"),
+    REJECTED("rejected", "已驳回");
 
 
     /// 状态

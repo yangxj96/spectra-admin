@@ -17,16 +17,23 @@
 package com.devops00.spectra.oa.meeting.service.impl;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.mapper.MeetingMapper;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 /// 会仪表-服务默认实现
 ///
@@ -52,6 +59,24 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         // 补充流程信息后更新
         entity.setProcessInstanceId(processId);
         this.updateById(entity);
+    }
+
+    @Override
+    public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
+        var wrapper = new LambdaQueryWrapper<Meeting>();
+        if (StringUtils.hasText(params.getTitle())) {
+            wrapper.like(Meeting::getTitle, params.getTitle());
+        }
+        if (StringUtils.hasText(params.getStatus())) {
+            wrapper.eq(Meeting::getStatus, params.getStatus());
+        }
+        wrapper.orderByDesc(Meeting::getCreatedAt);
+        var result = this.page(page.toPage(), wrapper);
+        var voPage = new Page<MeetingVO>(
+                result.getCurrent(), result.getSize(), result.getTotal()
+        );
+        voPage.setRecords(meetingConverter.toVOList(result.getRecords()));
+        return voPage;
     }
 
 }

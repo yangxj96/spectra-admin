@@ -17,8 +17,13 @@
 package com.devops00.spectra.oa.meeting.service;
 
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 /// 会仪表-服务
 ///
@@ -31,4 +36,11 @@ public interface MeetingService extends BaseService<Meeting> {
     ///
     /// @param from 入参
     void create(MeetingCreateFrom from);
+
+    /// 分页查询会议
+    ///
+    /// @param page   分页参数
+    /// @param params 查询参数
+    /// @return 分页结果
+    IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params);
 }
