@@ -26,6 +26,7 @@ import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -35,6 +36,7 @@ import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
@@ -54,6 +56,8 @@ import java.util.regex.Pattern;
 /// @since 2026/6/3 10:40
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
+@ControllerAdvice
+@ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
 @NullMarked
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
@@ -73,6 +77,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         } catch (Exception e) {
             throw new IllegalStateException("RSA密钥初始化失败", e);
         }
+        log.info(LogPrefix.WEB.f("接口加解密已启用 (spectra.system.sm.enabled=true)"));
     }
 
     @Override
