@@ -47,11 +47,12 @@ spectra-launch       → 应用入口，运行此模块
 使用 mise 管理工具链。复制 `.mise.local.toml.example` 为 `.mise.local.toml` 并配置：
 
 - `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL 连接
-- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` - Redis 连接
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` - Redis 连接
 - `DEFAULT_PASSWORD` - 默认用户密码
 - `SSL_*` - SSL 配置（可选）
 - `S3_*` - S3 存储配置
 - `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - AI 服务配置
+- `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - RAG 检索增强生成配置
 
 需要运行的服务：PostgreSQL, Redis。
 

@@ -83,11 +83,22 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 | `REDIS_PASSWORD`   | Redis密码           | `REDIS_PASSWORD=XXX`                                          |
 | `SSL_PASSWORD`     | SSL的密码           | `SSL_PASSWORD=xxx`                                            |
 | `SSL_TYPE`         | SSL的类型           | `SSL_TYPE=PKCS12`                                             |
-| `SSL_ALIAS`        | SSL的别名           | `SSL_ALIAS=xxx`                                               |
+| `SSL_ALIAS`        | SSL的别名           | `SSL_ALIAS=tomcat`                                            |
+| `S3_ENDPOINT`      | S3 端点            | `S3_ENDPOINT=https://xxx`                                     |
+| `S3_ACCESS_KEY`    | S3 访问密钥          | `S3_ACCESS_KEY=XXX`                                           |
+| `S3_SECRET_KEY`    | S3 秘密密钥          | `S3_SECRET_KEY=XXX`                                           |
+| `S3_BUCKET`        | S3 存储桶           | `S3_BUCKET=xxx`                                               |
+| `S3_REGION`        | S3 区域            | `S3_REGION=xxx`                                               |
+| `AI_KEY`           | AI API 密钥        | `AI_KEY=XXX`                                                  |
+| `AI_BASE_URL`      | AI API 地址        | `AI_BASE_URL=https://xxx`                                     |
+| `AI_MODEL`         | AI 模型名           | `AI_MODEL=xxx`                                                |
+| `RAG_KEY`          | RAG API 密钥       | `RAG_KEY=XXX`                                                 |
+| `RAG_BASE_URL`     | RAG API 地址       | `RAG_BASE_URL=https://xxx`                                    |
+| `RAG_MODEL`        | RAG 模型名          | `RAG_MODEL=xxx`                                               |
 
 > 用于数据库密码等敏感配置的加密保护。
 
-> Redis和S3相关配置可根据实际需要进行配置。
+> Redis、S3、AI、RAG 相关配置可根据实际需要进行配置。
 
 ---
 
