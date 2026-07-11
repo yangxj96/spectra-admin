@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.*;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.framework.configure.mybatis.interceptor.DataScopeInnerInterceptor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,9 @@ public class MyBatisPlusConfiguration {
     @Resource
     private ObjectProvider<InnerInterceptor> innerInterceptors;
 
+    @Resource
+    private DataScopeProvider dataScopeProvider;
+
 
     /// 添加注释
     @Bean
@@ -70,7 +74,7 @@ public class MyBatisPlusConfiguration {
         // 乐观锁
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
         // 数据范围
-        interceptor.addInnerInterceptor(new DataPermissionInterceptor(new DataScopeInnerInterceptor()));
+        interceptor.addInnerInterceptor(new DataPermissionInterceptor(new DataScopeInnerInterceptor(dataScopeProvider)));
         // 收集的bean进行注册
         List<InnerInterceptor> interceptors = innerInterceptors.stream().toList();
         log.debug("{}额外的Interceptor数量{}", LogPrefix.PERSISTENCE.p(), interceptors.size());

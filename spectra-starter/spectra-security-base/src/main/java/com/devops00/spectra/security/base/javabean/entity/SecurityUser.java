@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.base.javabean.entity;
 
 
+import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import lombok.AllArgsConstructor;
@@ -54,6 +55,18 @@ public class SecurityUser implements UserDetails {
 
     /// 所属组织机构ID
     private String organizationId;
+
+    /// 有效数据范围类型
+    @Nullable
+    private DataScopeType dataScopeType;
+
+    /// 所属部门ID
+    @Nullable
+    private UUID departmentId;
+
+    /// 数据范围目标部门（DEPT/DEPT_AND_CHILDREN/CUSTOM 时填充）
+    @Nullable
+    private List<UUID> dataScopeTargetIds;
 
     /// 用户密码
     private String password;

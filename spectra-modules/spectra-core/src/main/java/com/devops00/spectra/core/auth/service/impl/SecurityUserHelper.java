@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.auth.service.impl;
 
 
+import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.ObjUtils;
 import com.devops00.spectra.core.auth.javabean.converter.AuthConverter;
@@ -51,10 +52,13 @@ public class SecurityUserHelper {
 
     private final AuthConverter authConverter;
 
-    public SecurityUserHelper(RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, AuthConverter authConverter) {
+    private final DataScopeProvider dataScopeProvider;
+
+    public SecurityUserHelper(RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, AuthConverter authConverter, DataScopeProvider dataScopeProvider) {
         this.relRoleAuthorityService = relRoleAuthorityService;
         this.relUserRoleService = relUserRoleService;
         this.authConverter = authConverter;
+        this.dataScopeProvider = dataScopeProvider;
     }
 
     /// 数据库用户实体转SpringSecurity使用的用户对象
@@ -68,6 +72,13 @@ public class SecurityUserHelper {
 
         var securityUser = authConverter.toSecurityUser(u);
         securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
+
+        // 加载数据范围信息
+        var scope = dataScopeProvider.resolve(securityUser.getId());
+        securityUser.setDataScopeType(scope.getScopeType());
+        securityUser.setDepartmentId(scope.getDepartmentId());
+        securityUser.setDataScopeTargetIds(scope.getTargetIds());
+
         return securityUser;
     }
 

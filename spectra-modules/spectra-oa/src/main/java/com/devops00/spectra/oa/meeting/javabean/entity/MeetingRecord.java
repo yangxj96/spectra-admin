@@ -19,6 +19,7 @@ package com.devops00.spectra.oa.meeting.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -35,6 +36,14 @@ import java.util.UUID;
 @Setter
 @ToString
 @TableName(value = "oa_meeting_record")
+@DataScope(column = "department_id", relations = {
+        @DataScope.Relation(
+                table = "oa_meeting_participant",
+                joinColumn = "meeting_id",
+                userColumn = "user_id",
+                mainColumn = "meeting_id"
+        )
+})
 public class MeetingRecord extends BaseEntity {
 
     /// 会议ID
@@ -44,5 +53,9 @@ public class MeetingRecord extends BaseEntity {
     /// 参会人ID
     @TableField("content")
     private String content;
+
+    /// 所属部门ID
+    @TableField("department_id")
+    private UUID departmentId;
 
 }

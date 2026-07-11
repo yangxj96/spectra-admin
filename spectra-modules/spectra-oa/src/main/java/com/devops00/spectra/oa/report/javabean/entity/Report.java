@@ -17,7 +17,11 @@
 package com.devops00.spectra.oa.report.javabean.entity;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import java.util.UUID;
+
+import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,5 +36,9 @@ import lombok.ToString;
 @Setter
 @ToString
 @TableName(value = "oa_report")
+@DataScope
 public class Report extends BaseEntity {
+    /// 所属部门ID
+    @TableField("department_id")
+    private UUID departmentId;
 }

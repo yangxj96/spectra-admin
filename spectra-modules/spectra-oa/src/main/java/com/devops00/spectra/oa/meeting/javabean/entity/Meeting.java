@@ -19,10 +19,13 @@ package com.devops00.spectra.oa.meeting.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.UUID;
 
 /// OA-会议表主表实体
 ///
@@ -33,6 +36,13 @@ import lombok.ToString;
 @Setter
 @ToString
 @TableName(value = "oa_meeting")
+@DataScope(relations = {
+        @DataScope.Relation(
+                table = "oa_meeting_participant",
+                joinColumn = "meeting_id",
+                userColumn = "user_id"
+        )
+})
 public class Meeting extends BaseEntity {
 
     /// 会议标题
@@ -70,5 +80,9 @@ public class Meeting extends BaseEntity {
     /// 工作流审核状态
     @TableField("approval_status")
     private String approvalStatus;
+
+    /// 所属部门ID
+    @TableField("department_id")
+    private UUID departmentId;
 
 }
