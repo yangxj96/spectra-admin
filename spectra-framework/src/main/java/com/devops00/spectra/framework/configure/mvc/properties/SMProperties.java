@@ -29,6 +29,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "spectra.system.sm")
 public class SMProperties {
 
+    /// 是否启用接口加解密，默认关闭.
+    private boolean enabled = false;
+
     /// 公钥(Base64格式).
     private String publicKey;
 

@@ -18,16 +18,20 @@ package com.devops00.spectra.framework.configure.mvc;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SystemProperties;
+import com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice;
 import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
 import com.devops00.spectra.framework.configure.mvc.properties.UserProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import tools.jackson.databind.ObjectMapper;
 
 /// mvc配置
 ///
@@ -78,5 +82,12 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .useRequestHeader(spectraProperties.getMvc().getApiHeader())
                 .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
                 .detectSupportedVersions(true);
+    }
+
+    /// 注册响应加密 Advice（仅 spectra.system.sm.enabled=true 时生效）
+    @Bean
+    @ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
+    public ResponseEncryptAdvice responseEncryptAdvice(SMProperties properties, ObjectMapper om) {
+        return new ResponseEncryptAdvice(properties, om);
     }
 }

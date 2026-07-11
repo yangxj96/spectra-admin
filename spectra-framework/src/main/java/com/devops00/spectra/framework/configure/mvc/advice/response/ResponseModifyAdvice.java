@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 /// @since 2025/6/14 00:00
 @Slf4j
 @NullMarked
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 @ControllerAdvice
 public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 

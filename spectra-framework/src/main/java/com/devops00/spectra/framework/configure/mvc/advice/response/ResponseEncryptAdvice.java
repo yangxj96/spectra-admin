@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -49,9 +50,8 @@ import java.util.regex.Pattern;
 /// @version 1.0
 /// @since 2026/6/3 10:40
 @Slf4j
-@Order
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @NullMarked
-//@ControllerAdvice
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     private static final Pattern PATTERN = Pattern.compile("com\\.devops00\\.spectra\\..*\\.controller.*");
@@ -106,13 +106,14 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return body;
         }
 
+        // 第二：null 处理（必须放后面），直接返回 null 交给 ResponseModifyAdvice 处理
+        if (body == null) {
+            log.debug(LogPrefix.WEB.f("body为null，跳过加密"));
+            return null;
+        }
+
         Map<String, Object> result = new HashMap<>();
 
-        // 第二：null 处理（必须放后面）
-        if (body == null) {
-            log.debug(LogPrefix.WEB.f("body为null处理"));
-            return result;
-        }
         try {
             long start = System.currentTimeMillis();
 
@@ -152,8 +153,8 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
             return result;
         } catch (Exception e) {
-            log.error("加密失败:{}", e.getMessage(), e);
-            return result;
+            log.error("响应加密失败: {}", e.getMessage(), e);
+            throw new com.devops00.spectra.common.exception.EncryptException("响应加密失败", e);
         }
     }
 
