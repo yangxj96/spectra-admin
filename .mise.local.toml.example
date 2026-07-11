@@ -33,3 +33,7 @@ AI_MODEL= ""
 RAG_KEY= ""
 RAG_BASE_URL= ""
 RAG_MODEL= ""
+# 接口加解密（默认关闭，启用时需设置 enabled=true 并填入 RSA 密钥对）
+SPECTRA_SYSTEM_SM_ENABLED = "false"
+SPECTRA_SYSTEM_SM_PUBLIC_KEY = ""
+SPECTRA_SYSTEM_SM_PRIVATE_KEY = ""

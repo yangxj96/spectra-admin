@@ -95,6 +95,9 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 | `RAG_KEY`          | RAG API 密钥       | `RAG_KEY=XXX`                                                 |
 | `RAG_BASE_URL`     | RAG API 地址       | `RAG_BASE_URL=https://xxx`                                    |
 | `RAG_MODEL`        | RAG 模型名          | `RAG_MODEL=xxx`                                               |
+| `SPECTRA_SYSTEM_SM_ENABLED` | 是否启用接口加解密（默认false） | `SPECTRA_SYSTEM_SM_ENABLED=true` |
+| `SPECTRA_SYSTEM_SM_PUBLIC_KEY` | RSA公钥 (Base64) | `SPECTRA_SYSTEM_SM_PUBLIC_KEY=xxx` |
+| `SPECTRA_SYSTEM_SM_PRIVATE_KEY` | RSA私钥 (Base64) | `SPECTRA_SYSTEM_SM_PRIVATE_KEY=xxx` |
 
 > 用于数据库密码等敏感配置的加密保护。
 
@@ -127,6 +130,7 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 - ✅ 集成 Flowable 工作流引擎
 - ✅ 集成 LangChain4j AI 能力
 - ✅ 支持 S3 文件存储
+- ✅ 前后端接口数据混合加密（AES-256-GCM + RSA-2048-OAEP）
 - ✅ 标准 RESTful API 设计
 - ✅ 可扩展的模块化架构，便于二次开发
 

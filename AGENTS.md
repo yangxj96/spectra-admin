@@ -26,7 +26,7 @@ java -jar spectra-launch/target/spectra-launch-*.jar
 
 ```
 spectra-common       → 共享工具、DTO、MyBatis-Plus 配置
-spectra-framework    → 平台配置、Redis、AOP、缓存
+spectra-framework    → 平台配置、Redis、AOP、缓存、接口加解密（Advice）
 spectra-starter/     → 自动配置 Starter
   spectra-security-base
   spectra-security-spring-boot-starter
@@ -53,6 +53,7 @@ spectra-launch       → 应用入口，运行此模块
 - `S3_*` - S3 存储配置
 - `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - AI 服务配置
 - `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - RAG 检索增强生成配置
+- `SPECTRA_SYSTEM_SM_ENABLED`, `SPECTRA_SYSTEM_SM_PUBLIC_KEY`, `SPECTRA_SYSTEM_SM_PRIVATE_KEY` - 接口加解密（默认关闭）
 
 需要运行的服务：PostgreSQL, Redis。
 
