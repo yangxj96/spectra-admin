@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
 /// @since 2025/7/28 00:00
 @Slf4j
 @NullMarked
-@Order(Integer.MIN_VALUE)
+@Order(-100)
 @RestControllerAdvice
 public class SqlExceptionAdvice {
 

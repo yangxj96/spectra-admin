@@ -49,7 +49,7 @@ public class MyBatisPlusConfiguration {
     private ObjectProvider<InnerInterceptor> innerInterceptors;
 
     @Resource
-    private DataScopeProvider dataScopeProvider;
+    private ObjectProvider<DataScopeProvider> dataScopeProvider;
 
 
     /// 添加注释

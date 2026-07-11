@@ -39,7 +39,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 /// @version 1.0
 /// @since 2025/6/14 00:00
 @Slf4j
-@Order
+@Order(-10)
 @NullMarked
 @RestControllerAdvice
 public class CommonExceptionAdvice {

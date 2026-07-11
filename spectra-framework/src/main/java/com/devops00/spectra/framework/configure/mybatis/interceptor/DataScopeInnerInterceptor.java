@@ -23,6 +23,7 @@ import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -57,9 +58,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
-    private final DataScopeProvider dataScopeProvider;
+    private final ObjectProvider<DataScopeProvider> dataScopeProvider;
 
-    public DataScopeInnerInterceptor(DataScopeProvider dataScopeProvider) {
+    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider) {
         this.dataScopeProvider = dataScopeProvider;
     }
 
@@ -88,7 +89,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         }
 
         // 解析用户有效数据范围
-        DataScopeProvider.EffectiveScope scope = dataScopeProvider.resolve(userId);
+        DataScopeProvider.EffectiveScope scope = dataScopeProvider.getObject().resolve(userId);
         if (scope.getScopeType() == DataScopeType.GLOBAL) {
             return null;
         }

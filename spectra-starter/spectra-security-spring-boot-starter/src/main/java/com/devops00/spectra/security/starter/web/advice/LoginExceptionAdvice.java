@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /// @version 1.0
 /// @since 2026/2/19 23:24
 @Slf4j
-@Order(0)
+@Order(-50)
 @RestControllerAdvice
 public class LoginExceptionAdvice {
 
