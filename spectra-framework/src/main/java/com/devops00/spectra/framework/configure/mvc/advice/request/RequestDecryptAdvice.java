@@ -24,9 +24,11 @@ import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -44,11 +46,13 @@ import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.time.Duration;
 
 /// 请求体解密 Advice
 ///
 /// 在 MessageConverter 反序列化之前拦截请求，
-/// 自动检测加密请求（包含 data/key/iv 字段）并解密后放行。
+/// 自动检测加密请求并解密后放行。
+/// 支持验签、防重放攻击（时间窗口 + Nonce 去重）。
 ///
 /// @author yangxj96
 /// @version 1.0
@@ -59,9 +63,21 @@ import java.security.PublicKey;
 @ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
 public class RequestDecryptAdvice implements RequestBodyAdvice {
 
+    /// 加密请求标记头
+    private static final String ENCRYPTED_HEADER = "X-Encrypted";
+
+    /// 防重放时间窗口（秒）
+    private static final long REPLAY_WINDOW_SECONDS = 300;
+
+    /// Redis nonce 缓存前缀
+    private static final String NONCE_PREFIX = "crypto:nonce:";
+
     private final ObjectMapper om;
     private final PublicKey publicKey;
     private final PrivateKey privateKey;
+
+    @Autowired(required = false)
+    private RedisTemplate<String, Object> redisTemplate;
 
     public RequestDecryptAdvice(SMProperties properties, ObjectMapper om) {
         this.om = om;
@@ -105,6 +121,9 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
                                            Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
         byte[] bodyBytes = inputMessage.getBody().readAllBytes();
 
+        // 优先检查 X-Encrypted 请求头
+        boolean hasEncryptedHeader = "1".equals(inputMessage.getHeaders().getFirst(ENCRYPTED_HEADER));
+
         // 尝试解析 JSON 并检测是否为加密请求
         JsonNode node;
         try {
@@ -115,12 +134,13 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             return new DecryptedHttpInputMessage(inputMessage, bodyBytes);
         }
 
-        if (!isEncryptedBody(node)) {
+        // 双重判断：请求头标记 或 请求体结构
+        if (!hasEncryptedHeader && !isEncryptedBody(node)) {
             log.debug(LogPrefix.WEB.f("明文请求，跳过解密"));
             return new DecryptedHttpInputMessage(inputMessage, bodyBytes);
         }
 
-        log.debug(LogPrefix.WEB.f("检测到加密请求，开始解密"));
+        log.debug("{}检测到加密请求（X-Encrypted={}），开始解密", LogPrefix.WEB.p(), hasEncryptedHeader);
 
         try {
             long start = System.currentTimeMillis();
@@ -155,7 +175,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         return node.has("data") && node.has("key") && node.has("iv");
     }
 
-    /// 解密加密请求体
+    /// 解密加密请求体（含验签 + 防重放）
     private String decrypt(JsonNode node) throws Exception {
         String encryptedData = node.get("data").asText();
         String encryptedKey = node.get("key").asText();
@@ -174,6 +194,22 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
                 throw new EncryptException("请求签名验证失败，数据可能被篡改");
             }
             log.info("{}请求签名验证耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
+        }
+
+        // 防重放：时间窗口校验
+        long now = System.currentTimeMillis() / 1000;
+        if (timestamp > 0 && Math.abs(now - timestamp) > REPLAY_WINDOW_SECONDS) {
+            throw new EncryptException("请求已过期（时间戳超出" + REPLAY_WINDOW_SECONDS + "秒窗口）");
+        }
+
+        // 防重放：Nonce 去重（Redis 缓存）
+        if (nonce != null && !nonce.isEmpty() && redisTemplate != null) {
+            String nonceKey = NONCE_PREFIX + nonce;
+            Boolean success = redisTemplate.opsForValue()
+                    .setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS));
+            if (Boolean.FALSE.equals(success)) {
+                throw new EncryptException("重复请求（nonce 已使用）");
+            }
         }
 
         // RSA 私钥解密 AES 密钥
