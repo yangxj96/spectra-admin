@@ -1,151 +1,198 @@
 # AGENTS.md
 
-## Project Overview
+## 项目概述
 
-Spectra Admin is the **backend API server** for the Spectra system. It serves both the web admin panel (`spectra-ui`) and the mobile app (`spectra-app`).
+Spectra Admin 是 Spectra 系统的**后端 API 服务**，同时为 Web 管理后台（`spectra-ui`）和移动端（`spectra-app`）提供接口。
 
-- Stack: Java 25, Spring Boot 4, Maven multi-module
-- Entry point: `com.devops00.spectra.launch.LaunchApplication`
-- Dev port: **4004** (set via `SERVER_PORT` in `.mise.local.toml`)
-- Both frontends connect to `https://127.0.0.1:4004/` in development
+- 技术栈：Java 25, Spring Boot 4, Maven 多模块
+- 启动入口：`com.devops00.spectra.launch.LaunchApplication`
+- 开发端口：**4004**（通过 `.mise.local.toml` 中的 `SERVER_PORT` 设置）
+- 两个前端在开发环境均连接 `https://127.0.0.1:4004/`
 
-## Build & Run
+## 构建与运行
 
 ```bash
-# Build (skip tests for speed)
+# 构建（跳过测试以加快速度）
 ./mvnw clean package -DskipTests
 
-# Run locally (start this before running either frontend)
+# 本地运行（启动前端之前先启动此服务）
 ./mvnw spring-boot:run -pl spectra-launch
 
-# Or run the built jar
+# 或运行构建好的 jar
 java -jar spectra-launch/target/spectra-launch-*.jar
 ```
 
-## Module Structure
+## 模块结构
 
 ```
-spectra-common       → shared utils, DTOs, MyBatis-Plus config
-spectra-framework    → platform config, Redis, AOP, caching
-spectra-starter/     → auto-configuration starters
+spectra-common       → 共享工具、DTO、MyBatis-Plus 配置
+spectra-framework    → 平台配置、Redis、AOP、缓存
+spectra-starter/     → 自动配置 Starter
   spectra-security-base
   spectra-security-spring-boot-starter
   spectra-log-base
   spectra-log-spring-boot-starter
   spectra-ai-base
-spectra-modules/     → business modules
-  spectra-core       → core business logic
-  spectra-upload     → file upload (S3)
-  spectra-workflow   → Flowable workflow
-  spectra-oa         → OA module
-  spectra-ai         → AI integration (LangChain4j)
-spectra-launch       → application entry point, run this
+spectra-modules/     → 业务模块
+  spectra-core       → 核心业务逻辑
+  spectra-upload     → 文件上传（S3）
+  spectra-workflow   → Flowable 工作流
+  spectra-oa         → OA 模块
+  spectra-ai         → AI 集成（LangChain4j）
+spectra-launch       → 应用入口，运行此模块
 ```
 
-## Environment Setup
+## 环境配置
 
-Uses mise for toolchain management. Copy `.mise.local.toml.example` to `.mise.local.toml` and configure:
+使用 mise 管理工具链。复制 `.mise.local.toml.example` 为 `.mise.local.toml` 并配置：
 
-- `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL connection
-- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` - Redis connection
-- `DEFAULT_PASSWORD` - default user password
-- `SSL_*` - SSL configuration (optional)
-- `S3_*` - S3 storage config
-- `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - AI service config
+- `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL 连接
+- `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD` - Redis 连接
+- `DEFAULT_PASSWORD` - 默认用户密码
+- `SSL_*` - SSL 配置（可选）
+- `S3_*` - S3 存储配置
+- `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - AI 服务配置
 
-Required services: PostgreSQL, Redis.
+需要运行的服务：PostgreSQL, Redis。
 
-## Key Conventions
+## 关键约定
 
-- **Java 25** with Temurin distribution
-- **UTC timezone** forced at startup (display formatting handles local timezone)
-- **MapStruct dependency order matters**: mapstruct → lombok → mapstruct-processor (breaking change if reordered)
-- **Version property**: `${revision}` in pom.xml, flattened by `flatten-maven-plugin`
-- **Spring profiles**: `dev` (local), `prod` (Docker/deploy)
-- **Config import order**: application-common → framework → core → oa → upload → ai → workflow
+- **Java 25** Temurin 发行版
+- **UTC 时区** 启动时强制设置（显示层处理本地时区格式化）
+- **MapStruct 依赖顺序**：mapstruct → lombok → mapstruct-processor（不可重排，否则编译失败）
+- **版本属性**：pom.xml 中使用 `${revision}`，由 `flatten-maven-plugin` 展平
+- **Spring profiles**：`dev`（本地）、`prod`（Docker/部署）
+- **配置导入顺序**：application-common → framework → core → oa → upload → ai → workflow
 
-## Code Style & Naming Conventions
+## 代码风格与命名约定
 
-### Comments
-- Use triple-slash (`///`) comments instead of Javadoc block comments
-- Every Java file must include Apache License 2.0 header
+### 注释
+- 使用三斜杠（`///`）注释，而非 Javadoc 块注释
+- 每个 Java 文件必须包含 Apache License 2.0 头部
 
 ### Git Commit Messages
-Follow Conventional Commits format: `type(scope): description`
-- Common types: `feat`, `fix`, `refactor`, `docs`, `ci`, `chore`, `build`, `style`
-- Scope is typically module name: `ai`, `security`, `core`, `framework`, `log`, `project`
-- Example: `feat(security): 重构会话令牌Redis键设计并支持登录锁定与令牌续期`
 
-### Naming Conventions
-- Entity classes: PascalCase, e.g. `User`, `BaseEntity`
-- Controllers: PascalCase + `Controller` suffix
-- Services: PascalCase + `Service` suffix (interface), `ServiceImpl` suffix (implementation)
-- Form objects: PascalCase + `From` suffix (note: `From` not `Form`)
-- VO objects: PascalCase + `VO` suffix
-- Package structure: `com.devops00.spectra.{module}.{layer}`
+基于 Conventional Commits 规范，针对中文团队适配。
 
-### Layer Structure
+#### 格式
+
 ```
-controller/    → REST endpoints
-service/       → Business logic interfaces
-service/impl/  → Service implementations
-mapper/        → MyBatis-Plus mappers
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+#### 类型（type）定义
+
+| 类型 | 说明 | 示例场景 |
+|---|---|---|
+| `feat` | 新功能 | 添加用户注册模块 |
+| `fix` | 修复缺陷 | 修复登录页白屏问题 |
+| `docs` | 文档变更 | 更新 API 接口文档 |
+| `style` | 代码格式（不影响逻辑） | 调整缩进、补充分号 |
+| `refactor` | 重构（非新功能、非修复） | 拆分过长的服务类 |
+| `perf` | 性能优化 | 优化首页列表查询速度 |
+| `test` | 测试相关 | 补充用户模块单元测试 |
+| `chore` | 构建/工具/依赖变更 | 升级 Maven 版本 |
+| `ci` | 持续集成配置 | 修改 GitHub Actions 流程 |
+| `revert` | 回滚提交 | 回滚 v2.1.0 的登录重构 |
+
+#### 规则
+
+- **type**：必填，保留英文关键字（工具链兼容性好）
+- **scope**：选填，使用中文模块名（如 `安全`、`用户`、`AI`、`工作流`）
+- **description**：必填，中文简述，不超过 50 字符，使用动宾短语（「添加 xxx」「修复 xxx」），不加句号
+- **body**：选填，说明变更原因和方案，每行不超过 72 字符
+- **footer**：选填，标注 BREAKING CHANGE 或关联 Issue
+
+#### 好的示例
+
+```
+feat(安全): 添加基于 RBAC 的细粒度权限控制
+fix(支付): 修复微信支付回调签名验证失败的问题
+perf(列表页): 优化大数据量表格的虚拟滚动渲染
+refactor(网关): 将单体网关拆分为独立微服务
+```
+
+#### 反面示例
+
+```
+fix: 修了一个 bug
+feat: 更新代码
+chore: 改了点东西
+```
+
+### 命名约定
+- 实体类：PascalCase，如 `User`、`BaseEntity`
+- Controller：PascalCase + `Controller` 后缀
+- Service：接口 PascalCase + `Service` 后缀，实现类 `ServiceImpl` 后缀
+- 表单对象：PascalCase + `From` 后缀（注意：`From` 而非 `Form`）
+- VO 对象：PascalCase + `VO` 后缀
+- 包结构：`com.devops00.spectra.{module}.{layer}`
+
+### 分层结构
+```
+controller/    → REST 端点
+service/       → 业务逻辑接口
+service/impl/  → Service 实现
+mapper/        → MyBatis-Plus Mapper
 javabean/
-  entity/      → Database entities
-  from/        → Request form objects
-  vo/          → Response view objects
+  entity/      → 数据库实体
+  from/        → 请求表单对象
+  vo/          → 响应视图对象
 ```
 
-### Entity Conventions
-- Use UUID as primary key type (`@TableId(type = IdType.INPUT)`)
-- Include audit fields: `createdBy`, `createdAt`, `updatedBy`, `updatedAt`
-- Use `Instant deleted` for soft delete (null = not deleted)
-- Use `@Version` for optimistic locking
-- Use `@OrderBy` for default sorting
+### 实体约定
+- 使用 UUID 作为主键（`@TableId(type = IdType.INPUT)`）
+- 包含审计字段：`createdBy`、`createdAt`、`updatedBy`、`updatedAt`
+- 使用 `Instant deleted` 实现软删除（null = 未删除）
+- 使用 `@Version` 实现乐观锁
+- 使用 `@OrderBy` 设置默认排序
 
-### Controller Conventions
-- Use constructor injection (not field injection)
-- Use `@PreAuthorize` for permission control
-- Use `@ULog` for operation logging
-- Use `version = "1.0.0+"` in mapping annotations for API versioning
-- Use `@Validated(Verify.Insert.class)` or `@Validated(Verify.Update.class)` for group validation
+### Controller 约定
+- 使用构造器注入（非字段注入）
+- 使用 `@PreAuthorize` 进行权限控制
+- 使用 `@ULog` 记录操作日志
+- 在 Mapping 注解中使用 `version = "1.0.0+"` 进行 API 版本控制
+- 使用 `@Validated(Verify.Insert.class)` 或 `@Validated(Verify.Update.class)` 进行分组校验
 
-## Testing
+## 测试
 
 ```bash
-# Run all tests
+# 运行全部测试
 ./mvnw test
 
-# Run tests in specific module
+# 运行指定模块的测试
 ./mvnw test -pl spectra-common
 ```
 
-Currently no test files in spectra-launch module.
+spectra-launch 模块当前无测试文件。
 
 ## Docker
 
-Build requires full JDK image for captcha/AWT support:
+构建需要完整 JDK 镜像以支持验证码/AWT：
 
 ```bash
-# From spectra-launch directory
+# 在 spectra-launch 目录下执行
 docker build --build-arg JAR_FILE=spectra-launch-*.jar -t spectra-admin .
 ```
 
-Use `paketobuildpacks/builder-jammy-full` if using Spring Boot build-image goal.
+若使用 Spring Boot build-image 目标，请使用 `paketobuildpacks/builder-jammy-full`。
 
 ## CI/CD
 
-GitHub Actions workflow: `.github/workflows/spectra-minimal-image.yml`
-- Manual trigger (`workflow_dispatch`)
-- Builds Maven project, creates Docker image, pushes to GHCR
+GitHub Actions 工作流：`.github/workflows/spectra-minimal-image.yml`
+- 手动触发（`workflow_dispatch`）
+- 构建 Maven 项目，创建 Docker 镜像，推送到 GHCR
 
-## Common Pitfalls
+## 常见陷阱
 
-- `.mise.local.toml` is gitignored - must create from example before running
-- JVM args for native: `--add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED`
-- PostgreSQL required on port 5432 by default
-- Redis required on port 6379 by default
-- API changes here directly break `spectra-ui` and `spectra-app` — coordinate with frontend when modifying endpoints
+- `.mise.local.toml` 在 gitignore 中——运行时必须从 example 创建
+- 原生 JVM 参数：`--add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED`
+- PostgreSQL 默认端口 5432，Redis 默认端口 6379
+- 此处 API 变更会直接影响 `spectra-ui` 和 `spectra-app`——修改端点时需与前端协调
 
 <!-- CODEGRAPH_START -->
 ## CodeGraph
