@@ -94,6 +94,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
                             Class<? extends HttpMessageConverter<?>> converterType) {
         // 忽略 ByteArrayHttpMessageConverter（文件上传等二进制场景）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
+            log.debug(LogPrefix.WEB.f("跳过请求解密: 字节数组转换器"));
             return false;
         }
 
@@ -102,12 +103,18 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         if (method != null) {
             Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
             if (methodAnno != null) {
+                if (!methodAnno.value()) {
+                    log.debug("{}跳过请求解密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getName());
+                }
                 return methodAnno.value();
             }
 
             Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
                     method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
+                if (!classAnno.value()) {
+                    log.debug("{}跳过请求解密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getDeclaringClass().getSimpleName());
+                }
                 return classAnno.value();
             }
         }
@@ -145,7 +152,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         try {
             long start = System.currentTimeMillis();
             String decryptedJson = decrypt(node);
-            log.info("{}请求解密耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
+            log.debug("{}请求解密完成, 耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
             return new DecryptedHttpInputMessage(inputMessage,
                     decryptedJson.getBytes(StandardCharsets.UTF_8));
         } catch (EncryptException e) {
@@ -193,7 +200,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             if (!valid) {
                 throw new EncryptException("请求签名验证失败，数据可能被篡改");
             }
-            log.info("{}请求签名验证耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
+            log.debug("{}请求签名验证耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
         }
 
         // 防重放：时间窗口校验
@@ -215,13 +222,13 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         // RSA 私钥解密 AES 密钥
         long t2 = System.currentTimeMillis();
         byte[] aesKeyBytes = RSAUtils.decrypt(encryptedKey, privateKey);
-        log.info("{}RSA解密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
+        log.debug("{}RSA解密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
         // AES-GCM 解密业务数据
         long t3 = System.currentTimeMillis();
         byte[] iv = AESUtils.hexToIv(ivHex);
         String decrypted = AESUtils.decrypt(encryptedData, aesKeyBytes, iv);
-        log.info("{}AES解密业务数据耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t3);
+        log.debug("{}AES解密业务数据耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t3);
 
         return decrypted;
     }

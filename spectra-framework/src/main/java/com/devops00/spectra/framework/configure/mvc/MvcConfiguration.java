@@ -88,6 +88,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Bean
     @ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
     public ResponseEncryptAdvice responseEncryptAdvice(SMProperties properties, ObjectMapper om) {
+        log.info(LogPrefix.WEB.f("接口加解密已启用 (spectra.system.sm.enabled=true)"));
         return new ResponseEncryptAdvice(properties, om);
     }
 }

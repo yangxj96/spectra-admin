@@ -77,15 +77,15 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
-        log.debug(LogPrefix.WEB.f("进入响应加解密处理"));
-
         // 忽略流式
         if (returnType.getParameterType().isAssignableFrom(Flux.class)) {
+            log.debug(LogPrefix.WEB.f("跳过响应加密: 流式返回类型"));
             return false;
         }
 
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
+            log.debug(LogPrefix.WEB.f("跳过响应加密: 字节数组转换器"));
             return false;
         }
 
@@ -94,19 +94,29 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         if (method != null) {
             Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
             if (methodAnno != null) {
+                if (!methodAnno.value()) {
+                    log.debug("{}跳过响应加密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getName());
+                }
                 return methodAnno.value();
             }
 
             Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
                     method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
+                if (!classAnno.value()) {
+                    log.debug("{}跳过响应加密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getDeclaringClass().getSimpleName());
+                }
                 return classAnno.value();
             }
         }
 
         // 兜底：包名匹配
         var declaringClass = returnType.getContainingClass();
-        return PATTERN.matcher(declaringClass.getPackageName()).matches();
+        boolean matched = PATTERN.matcher(declaringClass.getPackageName()).matches();
+        if (!matched) {
+            log.debug("{}跳过响应加密: 包名不匹配 {}", LogPrefix.WEB.p(), declaringClass.getPackageName());
+        }
+        return matched;
     }
 
     @Override
@@ -132,6 +142,8 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
         Map<String, Object> result = new HashMap<>();
 
+        log.debug("{}开始加密响应, body类型={}", LogPrefix.WEB.p(), body.getClass().getSimpleName());
+
         try {
             long start = System.currentTimeMillis();
 
@@ -142,12 +154,12 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             // AES-GCM加密业务数据
             long t1 = System.currentTimeMillis();
             String encryptedData = AESUtils.encrypt(om.writeValueAsString(body), aesKey, iv);
-            log.info("AES加密耗时: {}ms", System.currentTimeMillis() - t1);
+            log.debug("{}AES加密耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
 
             // RSA-OAEP公钥加密AES密钥
             long t2 = System.currentTimeMillis();
             String encryptedAesKey = RSAUtils.encrypt(aesKey.getEncoded(), publicKey);
-            log.info("RSA加密AES密钥耗时: {}ms", System.currentTimeMillis() - t2);
+            log.debug("{}RSA加密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
             // 组织待签名字符串
             long t3 = System.currentTimeMillis();
@@ -157,9 +169,9 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
             // RSA私钥签名（SHA256withRSA）
             String signature = RSAUtils.sign(signContent, privateKey);
-            log.info("签名耗时: {}ms", System.currentTimeMillis() - t3);
+            log.debug("{}签名耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t3);
 
-            log.info("总耗时: {}ms", System.currentTimeMillis() - start);
+            log.debug("{}响应加密总耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
 
             // 组装返回
             result.put("data", encryptedData);
@@ -169,6 +181,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             result.put("timestamp", timestamp);
             result.put("signature", signature);
 
+            log.debug("{}响应加密完成, 返回字段={data,key,iv,nonce,timestamp,signature}", LogPrefix.WEB.p());
             return result;
         } catch (Exception e) {
             log.error("响应加密失败: {}", e.getMessage(), e);

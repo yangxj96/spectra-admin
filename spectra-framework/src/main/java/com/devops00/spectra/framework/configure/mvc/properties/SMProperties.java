@@ -35,7 +35,6 @@ public class SMProperties {
     /// 公钥(Base64格式).
     private String publicKey;
 
-
     /// 私钥(Base64格式).
     private String privateKey;
 

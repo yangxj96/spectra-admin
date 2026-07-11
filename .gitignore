@@ -166,3 +166,4 @@ env.properties
 
 # 忽略特定测试文件
 **/src/test/**/jasypt/**.java
+start-with-encrypt.ps1
