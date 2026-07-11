@@ -1,0 +1,6 @@
+spectra:
+  system:
+    sm:
+      public-key: ${SPECTRA_SYSTEM_SM_PUBLIC_KEY}
+      private-key: ${SPECTRA_SYSTEM_SM_PRIVATE_KEY}
+      enabled: ${SPECTRA_SYSTEM_SM_ENABLED:false}

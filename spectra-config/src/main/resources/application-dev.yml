@@ -4,7 +4,6 @@ spring:
       - classpath:application-common-dev.yml
       - classpath:application-framework-dev.yml
       - classpath:application-core-dev.yml
-      - classpath:application-oa-dev.yml
       - classpath:application-upload-dev.yml
       - classpath:application-ai-dev.yml
       - classpath:application-workflow-dev.yml

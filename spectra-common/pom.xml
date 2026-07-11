@@ -39,6 +39,12 @@
 
     <dependencies>
         <!-- === 内部模块 === -->
+        <!-- 统一配置文件 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-config</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <!-- === Spring Boot === -->
         <dependency>

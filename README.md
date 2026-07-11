@@ -109,6 +109,7 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 
 | 模块                 | 路径                                                                 | 说明                        |
 |--------------------|--------------------------------------------------------------------|---------------------------|
+| `spectra-config`   | [spectra-config](spectra-admin/spectra-config)                       | 统一配置文件，所有 application-*.yml 集中管理 |
 | `spectra-common`   | [spectra-common](spectra-admin/spectra-common)                     | 通用工具类、注解、常量、DTO等共享内容      |
 | `spectra-framework`| [spectra-framework](spectra-admin/spectra-framework)               | 平台配置、Redis、AOP、缓存      |
 | `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)         | 核心接口定义、领域模型、服务契约          |

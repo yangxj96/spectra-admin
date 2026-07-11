@@ -15,7 +15,7 @@ flowable:
   # 身份管理引擎
   idm:
     enabled: false
-  # Flowable 的“应用元模型”
+  # Flowable 的"应用元模型"
   app:
     enabled: false
   # 决策模型引擎

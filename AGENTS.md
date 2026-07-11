@@ -25,6 +25,7 @@ java -jar spectra-launch/target/spectra-launch-*.jar
 ## 模块结构
 
 ```
+spectra-config       → 统一配置文件（所有 application-*.yml 集中管理）
 spectra-common       → 共享工具、DTO、MyBatis-Plus 配置
 spectra-framework    → 平台配置、Redis、AOP、缓存、接口加解密（Advice）
 spectra-starter/     → 自动配置 Starter
@@ -64,7 +65,7 @@ spectra-launch       → 应用入口，运行此模块
 - **MapStruct 依赖顺序**：mapstruct → lombok → mapstruct-processor（不可重排，否则编译失败）
 - **版本属性**：pom.xml 中使用 `${revision}`，由 `flatten-maven-plugin` 展平
 - **Spring profiles**：`dev`（本地）、`prod`（Docker/部署）
-- **配置导入顺序**：application-common → framework → core → oa → upload → ai → workflow
+- **配置文件管理**：所有 `application-*.yml` 集中在 `spectra-config` 模块，通过 `spectra-common` 传递依赖对全项目可见
 
 ## 代码风格与命名约定
 

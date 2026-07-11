@@ -45,6 +45,7 @@
     </properties>
 
     <modules>
+        <module>spectra-config</module>
         <module>spectra-common</module>
         <module>spectra-framework</module>
         <module>spectra-launch</module>
