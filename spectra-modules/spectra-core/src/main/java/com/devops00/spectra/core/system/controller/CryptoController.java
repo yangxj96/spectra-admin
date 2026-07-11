@@ -72,10 +72,10 @@ public class CryptoController {
             result.put("privateKey", privateKey);
 
             log.info("已生成新的 RSA 密钥对（2048位），请将密钥配置到 spectra.system.sm 中并重启服务");
-            return R.success(result);
+            return R.<Map<String, String>>success(result);
         } catch (Exception e) {
             log.error("生成RSA密钥对失败: {}", e.getMessage(), e);
-            return R.failure("密钥生成失败: " + e.getMessage());
+            throw new RuntimeException("密钥生成失败: " + e.getMessage(), e);
         }
     }
 
@@ -88,6 +88,6 @@ public class CryptoController {
     public R<Map<String, String>> getPublicKey() {
         Map<String, String> result = new HashMap<>();
         result.put("publicKey", properties.getPublicKey());
-        return R.success(result);
+        return R.<Map<String, String>>success(result);
     }
 }
