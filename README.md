@@ -26,7 +26,7 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 
 为了**减少重复造轮子、统一开发规范、提升团队效率**，我着手打造了一个开箱即用、结构清晰、技术栈现代化的通用后台管理系统框架 —— **Spectra**。
 
-它不仅包含权限管理、通用 CRUD等基础能力，还集成了当前主流的技术组件，力求做到**易用、可扩展、可持续维护**。
+它不仅包含权限管理、通用 CRUD 等基础能力，还集成了当前主流的技术组件，力求做到**易用、可扩展、可持续维护**。
 
 ---
 
@@ -36,11 +36,11 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 
 | 技术              | 版本     | 说明             |
 |-----------------|--------|----------------|
-| Java            | JDK25  | 使用最新LTS版本，性能更强 |
+| Java            | JDK 25  | 使用最新 LTS 版本，性能更强 |
 | Maven           | 3.9.12 | 构建工具           |
 | Spring Boot     | 4.1.0  | 核心框架           |
 | Spring Security | 7.1.0  | 权限认证框架         |
-| MyBatis-Plus    | 3.5.15 | 增强ORM，简化CRUD   |
+| MyBatis-Plus    | 3.5.15 | 增强 ORM，简化 CRUD   |
 | MapStruct       | 1.6.3  | 实体映射工具，提升性能    |
 | PostgreSQL      | 18.2   | 知名关系型数据库       |
 
@@ -64,8 +64,8 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 
 ```text
 ⚠️ 该文件不会提交至 Git，请自行创建。
-⚠️ 项目使用mise管理环境.
-⚠️ 可重命名`.mise.local.toml.example`文件为`.mise.local.toml`,并把值设置为本地相关的值
+⚠️ 项目使用 mise 管理环境。
+⚠️ 可重命名 `.mise.local.toml.example` 文件为 `.mise.local.toml`，并把值设置为本地相关的值
 ```
 
 ### 后端 `.mise.local.toml` 文件（位于 [spectra-admin](spectra-admin) 目录下）
@@ -75,7 +75,7 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 | `DB_URL`           | 数据库URL           | `DB_URL=jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db` |
 | `DB_USERNAME`      | 数据库用户名           | `DB_USERNAME=XXX`                                             |
 | `DB_PASSWORD`      | 数据库密码            | `DB_PASSWORD=XXX`                                             |
-| `DEFAULT_PASSWORD` | 新增用户,重置用户密码的默认密码 | `DEFAULT_PASSWORD=admin123`                                   |
+| `DEFAULT_PASSWORD` | 新增用户，重置用户密码的默认密码 | `DEFAULT_PASSWORD=admin123`                                   |
 | `SERVER_PORT`      | 服务端口              | `SERVER_PORT=8080`                                            |
 | `REDIS_HOST`       | Redis地址           | `REDIS_HOST=127.0.0.1`                                        |
 | `REDIS_PORT`       | Redis端口           | `REDIS_PORT=6379`                                             |
@@ -99,9 +99,9 @@ Spectra 系统由三个项目组成，本仓库为后端 API 服务：
 | `spectra-framework`| [spectra-framework](spectra-admin/spectra-framework)               | 平台配置、Redis、AOP、缓存      |
 | `spectra-core`     | [spectra-core](spectra-admin/spectra-modules/spectra-core)         | 核心接口定义、领域模型、服务契约          |
 | `spectra-upload`   | [spectra-upload](spectra-admin/spectra-modules/spectra-upload)     | 文件上传模块（S3）               |
-| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块,选用的flowable流程框架     |
-| `spectra-oa`       | [spectra-oa](spectra-admin/spectra-modules/spectra-oa)             | OA模块                     |
-| `spectra-ai`       | [spectra-ai](spectra-admin/spectra-modules/spectra-ai)             | AI集成模块（LangChain4j）       |
+| `spectra-workflow` | [spectra-workflow](spectra-admin/spectra-modules/spectra-workflow) | 工作流模块，选用的 Flowable 流程框架     |
+| `spectra-oa`       | [spectra-oa](spectra-admin/spectra-modules/spectra-oa)             | OA 模块                     |
+| `spectra-ai`       | [spectra-ai](spectra-admin/spectra-modules/spectra-ai)             | AI 集成模块（LangChain4j）       |
 | `spectra-launch`   | [spectra-launch](spectra-admin/spectra-launch)                     | 启动模块 & 业务入口，用户可在此编写具体业务逻辑 |
 
 > 📌 推荐使用方式：`spectra-launch` 作为你的“业务模块”，可自由扩展控制器、服务、Mapper 等。
