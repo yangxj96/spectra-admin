@@ -10,7 +10,7 @@ spectra:
     default-password: ${DEFAULT_PASSWORD}
   kaptcha:
     type: math
-    verify: false
+    verify: true
   file:
     upload:
       local:
@@ -22,12 +22,15 @@ spectra:
         secretKey: ${S3_SECRET_KEY}
         bucket: ${S3_BUCKET}
         region: ${S3_REGION}
-      default-storage: local
+      default-storage: s3
   ai:
     rag:
       api-key: ${RAG_KEY}
       base-url: ${RAG_BASE_URL}
       model-name: ${RAG_MODEL}
+      embedding-batch-size: 20
+      max-segment-size: 300
+      max-overlap-size: 30
 
 # ==================== 服务器配置 ====================
 server:
@@ -175,8 +178,9 @@ logging:
   group:
     spectra: >-
       com.devops00.spectra
-    other: >-
-      com.ulisesbocchio.jasyptspringboot.configuration
+    other:
+      - com.ulisesbocchio.jasyptspringboot.configuration
+      - io.agentscope.harness.agent.middleware
   level:
     root: info
     other: error
