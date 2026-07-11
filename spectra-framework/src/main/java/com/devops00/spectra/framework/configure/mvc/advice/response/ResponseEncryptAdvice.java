@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.configure.mvc.advice.response;
 
 
+import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
@@ -27,6 +28,7 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -38,6 +40,7 @@ import reactor.core.publisher.Flux;
 import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.SecretKey;
+import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.HashMap;
@@ -86,8 +89,23 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
+        // 检查 @Encrypt 注解（方法级优先于类级）
+        Method method = returnType.getMethod();
+        if (method != null) {
+            Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
+            if (methodAnno != null) {
+                return methodAnno.value();
+            }
+
+            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
+                    method.getDeclaringClass(), Encrypt.class);
+            if (classAnno != null) {
+                return classAnno.value();
+            }
+        }
+
+        // 兜底：包名匹配
         var declaringClass = returnType.getContainingClass();
-        // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
         return PATTERN.matcher(declaringClass.getPackageName()).matches();
     }
 

@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework.configure.mvc.advice.request;
 
+import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -37,6 +39,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -77,6 +80,22 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
             return false;
         }
+
+        // 检查 @Encrypt 注解（方法级优先于类级）
+        Method method = methodParameter.getMethod();
+        if (method != null) {
+            Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
+            if (methodAnno != null) {
+                return methodAnno.value();
+            }
+
+            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
+                    method.getDeclaringClass(), Encrypt.class);
+            if (classAnno != null) {
+                return classAnno.value();
+            }
+        }
+
         return true;
     }
 
