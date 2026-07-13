@@ -22,11 +22,10 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.common.utils.SHA256Utils;
-import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
+import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
@@ -57,7 +56,6 @@ import java.util.regex.Pattern;
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
-@ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
 @NullMarked
 public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
@@ -65,23 +63,21 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     private final ObjectMapper om;
 
-    private final PublicKey publicKey;
+    private final CryptoKeyManager cryptoKeyManager;
 
-    private final PrivateKey privateKey;
-
-    public ResponseEncryptAdvice(SMProperties properties, ObjectMapper om) {
+    public ResponseEncryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om) {
+        this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
-        try {
-            this.publicKey = RSAUtils.restorePublicKey(properties.getPublicKey());
-            this.privateKey = RSAUtils.restorePrivateKey(properties.getPrivateKey());
-        } catch (Exception e) {
-            throw new IllegalStateException("RSA密钥初始化失败", e);
-        }
-        log.info(LogPrefix.WEB.f("接口加解密已启用 (spectra.system.sm.enabled=true)"));
+        log.info(LogPrefix.WEB.f("接口加密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
     @Override
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
+        // 检查加解密是否启用
+        if (!cryptoKeyManager.isEnabled()) {
+            return false;
+        }
+
         // 忽略流式
         if (returnType.getParameterType().isAssignableFrom(Flux.class)) {
             log.debug(LogPrefix.WEB.f("跳过响应加密: 流式返回类型"));
@@ -99,19 +95,19 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         if (method != null) {
             Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
             if (methodAnno != null) {
-                if (!methodAnno.value()) {
-                    log.debug("{}跳过响应加密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getName());
+                if (!methodAnno.value() || !methodAnno.response()) {
+                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), methodAnno.value(), methodAnno.response(), method.getName());
                 }
-                return methodAnno.value();
+                return methodAnno.value() && methodAnno.response();
             }
 
             Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
                     method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
-                if (!classAnno.value()) {
-                    log.debug("{}跳过响应加密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getDeclaringClass().getSimpleName());
+                if (!classAnno.value() || !classAnno.response()) {
+                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(), method.getDeclaringClass().getSimpleName());
                 }
-                return classAnno.value();
+                return classAnno.value() && classAnno.response();
             }
         }
 
@@ -152,6 +148,14 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
         try {
             long start = System.currentTimeMillis();
 
+            // 获取密钥（从 CryptoKeyManager 内存缓存）
+            PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
+            PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
+            if (clientPublicKey == null || serverPrivateKey == null) {
+                log.warn(LogPrefix.WEB.f("密钥不完整，跳过加密"));
+                return body;
+            }
+
             // 随机生成AES密钥和IV
             SecretKey aesKey = AESUtils.generateKey();
             byte[] iv = AESUtils.generateIv();
@@ -161,9 +165,9 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             String encryptedData = AESUtils.encrypt(om.writeValueAsString(body), aesKey, iv);
             log.debug("{}AES加密耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
 
-            // RSA-OAEP公钥加密AES密钥
+            // RSA-OAEP客户端公钥加密AES密钥
             long t2 = System.currentTimeMillis();
-            String encryptedAesKey = RSAUtils.encrypt(aesKey.getEncoded(), publicKey);
+            String encryptedAesKey = RSAUtils.encrypt(aesKey.getEncoded(), clientPublicKey);
             log.debug("{}RSA加密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
             // 组织待签名字符串
@@ -173,7 +177,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             String signContent = String.format("data=%s&nonce=%s&timestamp=%d", encryptedData, nonce, timestamp);
 
             // RSA私钥签名（SHA256withRSA）
-            String signature = RSAUtils.sign(signContent, privateKey);
+            String signature = RSAUtils.sign(signContent, serverPrivateKey);
             log.debug("{}签名耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t3);
 
             log.debug("{}响应加密总耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);

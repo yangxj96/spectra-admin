@@ -35,7 +35,10 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Encrypt {
 
-    /// true=需要加密, false=显式不加密
+    /// true=需要加密请求, false=显式不加密请求
     boolean value() default true;
+
+    /// true=需要加密响应, false=显式不加密响应
+    boolean response() default true;
 
 }

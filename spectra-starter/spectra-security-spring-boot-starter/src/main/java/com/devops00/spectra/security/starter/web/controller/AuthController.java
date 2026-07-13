@@ -18,6 +18,7 @@ package com.devops00.spectra.security.starter.web.controller;
 
 
 import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
@@ -67,6 +68,7 @@ public class AuthController {
             value = "'用户[' + #params.username + ']进行登陆'",
             type = SysLogType.SAFETY
     )
+    @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {

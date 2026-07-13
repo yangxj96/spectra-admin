@@ -21,11 +21,10 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
-import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
+import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -60,7 +59,6 @@ import java.time.Duration;
 @Slf4j
 @NullMarked
 @ControllerAdvice
-@ConditionalOnProperty(prefix = "spectra.system.sm", name = "enabled", havingValue = "true")
 public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     /// 加密请求标记头
@@ -73,25 +71,25 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     private static final String NONCE_PREFIX = "crypto:nonce:";
 
     private final ObjectMapper om;
-    private final PublicKey publicKey;
-    private final PrivateKey privateKey;
+    private final CryptoKeyManager cryptoKeyManager;
 
     @Autowired(required = false)
     private RedisTemplate<String, Object> redisTemplate;
 
-    public RequestDecryptAdvice(SMProperties properties, ObjectMapper om) {
+    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om) {
+        this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
-        try {
-            this.publicKey = RSAUtils.restorePublicKey(properties.getPublicKey());
-            this.privateKey = RSAUtils.restorePrivateKey(properties.getPrivateKey());
-        } catch (Exception e) {
-            throw new IllegalStateException("RSA密钥初始化失败", e);
-        }
+        log.info(LogPrefix.WEB.f("请求解密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType,
                             Class<? extends HttpMessageConverter<?>> converterType) {
+        // 检查加解密是否启用
+        if (!cryptoKeyManager.isEnabled()) {
+            return false;
+        }
+
         // 忽略 ByteArrayHttpMessageConverter（文件上传等二进制场景）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
             log.debug(LogPrefix.WEB.f("跳过请求解密: 字节数组转换器"));
@@ -190,13 +188,20 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         String nonce = node.has("nonce") ? node.get("nonce").asText() : null;
         long timestamp = node.has("timestamp") ? node.get("timestamp").asLong() : 0;
 
+        // 从 CryptoKeyManager 获取密钥
+        PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
+        PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
+        if (clientPublicKey == null || serverPrivateKey == null) {
+            throw new EncryptException("密钥未就绪，无法解密请求");
+        }
+
         // 签名验证（如果提供了 signature）
         if (node.has("signature")) {
             long t1 = System.currentTimeMillis();
             String signature = node.get("signature").asText();
             String signContent = String.format("data=%s&nonce=%s&timestamp=%d",
                     encryptedData, nonce != null ? nonce : "", timestamp);
-            boolean valid = RSAUtils.verify(signContent, signature, publicKey);
+            boolean valid = RSAUtils.verify(signContent, signature, clientPublicKey);
             if (!valid) {
                 throw new EncryptException("请求签名验证失败，数据可能被篡改");
             }
@@ -221,7 +226,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
         // RSA 私钥解密 AES 密钥
         long t2 = System.currentTimeMillis();
-        byte[] aesKeyBytes = RSAUtils.decrypt(encryptedKey, privateKey);
+        byte[] aesKeyBytes = RSAUtils.decrypt(encryptedKey, serverPrivateKey);
         log.debug("{}RSA解密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
         // AES-GCM 解密业务数据

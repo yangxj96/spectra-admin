@@ -20,7 +20,7 @@ package com.devops00.spectra.framework;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.common.utils.SHA256Utils;
-import com.devops00.spectra.framework.configure.mvc.properties.SMProperties;
+import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +45,7 @@ import java.util.Base64;
 public class GuoMiUtilTest {
 
     @Autowired
-    private SMProperties properties;
+    private CryptoKeyManager cryptoKeyManager;
 
     @Autowired
     private ObjectMapper om;
@@ -100,8 +100,8 @@ public class GuoMiUtilTest {
                 }
                 """;
 
-        PublicKey publicKey = RSAUtils.restorePublicKey(properties.getPublicKey());
-        PrivateKey privateKey = RSAUtils.restorePrivateKey(properties.getPrivateKey());
+        PublicKey publicKey = cryptoKeyManager.getServerPublicKey();
+        PrivateKey privateKey = cryptoKeyManager.getServerPrivateKey();
 
         // 解析 JSON
         JsonNode json = om.readTree(str);
