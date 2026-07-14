@@ -49,7 +49,9 @@ public class SecurityProperties {
             // 健康检查
             "/actuator/**",
             // 图片预览接口
-            "/file/preview/**"
+            "/file/preview/**",
+            // 获取系统加密配置接口
+            "/system/crypto/config"
     ));
 
     /// accessToken有效期（秒），默认5分钟

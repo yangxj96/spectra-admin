@@ -45,7 +45,10 @@ import java.util.Map;
 @RequestMapping("/system/crypto")
 public class CryptoController {
 
+    /// CryptoKey管理服务
     private final CryptoKeyManager cryptoKeyManager;
+
+    /// 系统配置服务
     private final ConfiguredService configuredService;
 
     public CryptoController(CryptoKeyManager cryptoKeyManager, ConfiguredService configuredService) {

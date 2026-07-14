@@ -75,6 +75,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
     public boolean supports(MethodParameter returnType, Class<? extends HttpMessageConverter<?>> converterType) {
         // 检查加解密是否启用
         if (!cryptoKeyManager.isEnabled()) {
+            log.debug(LogPrefix.WEB.f("加密已禁用"));
             return false;
         }
 
@@ -101,8 +102,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
                 return methodAnno.value() && methodAnno.response();
             }
 
-            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
-                    method.getDeclaringClass(), Encrypt.class);
+            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
                 if (!classAnno.value() || !classAnno.response()) {
                     log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(), method.getDeclaringClass().getSimpleName());
