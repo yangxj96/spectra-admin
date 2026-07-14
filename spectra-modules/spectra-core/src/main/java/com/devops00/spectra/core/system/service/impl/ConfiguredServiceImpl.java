@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.system.javabean.converter.ConfiguredConverter;
@@ -68,6 +69,25 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         return configuredConverter.toVOPage(db);
+    }
+
+    @Override
+    @Transactional
+    public void upsert(String key, String value, String remarks) {
+        var existing = this.getOne(
+                new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
+        if (existing != null) {
+            existing.setValue(value);
+            existing.setRemarks(remarks);
+            this.updateById(existing);
+        } else {
+            var entity = new Configured();
+            entity.setKey(key);
+            entity.setValue(value);
+            entity.setType(ConfiguredValueType.TEXT);
+            entity.setRemarks(remarks);
+            this.save(entity);
+        }
     }
 
 }

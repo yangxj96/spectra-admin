@@ -160,6 +160,14 @@ javabean/
 - 使用 `@ULog` 记录操作日志
 - 在 Mapping 注解中使用 `version = "1.0.0+"` 进行 API 版本控制
 - 使用 `@Validated(Verify.Insert.class)` 或 `@Validated(Verify.Update.class)` 进行分组校验
+- Controller 层只处理请求转发，不包含业务逻辑（业务逻辑放 Service 层）
+- Controller 响应必须使用 VO 对象，禁止使用 Map
+
+### 方法命名规范
+- 数据库 CRUD：`save`、`update`、`delete`、`getById`、`list`
+- 数据库 upsert：`upsert`（按唯一键去重的插入/更新）
+- 分页查询：`page`
+- 批量操作：`saveBatch`、`updateBatch`、`deleteBatch`
 
 ## 测试
 
