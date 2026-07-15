@@ -144,6 +144,7 @@ public class AuthController {
             value = "'刷新token'",
             type = SysLogType.SAFETY
     )
+    @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0+")
     public TokenVO refresh(@Validated @RequestBody RefreshTokenFrom params) {
