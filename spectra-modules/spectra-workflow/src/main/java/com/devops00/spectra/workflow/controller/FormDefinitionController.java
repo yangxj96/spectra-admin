@@ -26,6 +26,7 @@ import com.devops00.spectra.workflow.javabean.vo.FormVersionVO;
 import com.devops00.spectra.workflow.service.FormDefinitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,7 @@ public class FormDefinitionController {
     /// 分页查询表单列表
     @ULog("'查询表单列表'")
     @GetMapping(value = "", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public Object page(PageFrom page, FormPageFrom params) {
         return formDefinitionService.page(page, params);
     }
@@ -54,6 +56,7 @@ public class FormDefinitionController {
     /// 查询表单详情（含当前版本内容）
     @ULog("'查询表单详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public FormDefinitionVO getDetail(@PathVariable UUID id) {
         return formDefinitionService.getDetail(id);
     }
@@ -61,6 +64,7 @@ public class FormDefinitionController {
     /// 创建表单（同时创建版本1）
     @ULog("'创建表单定义'")
     @PostMapping(value = "", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
     public void create(@RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.create(from);
     }
@@ -68,6 +72,7 @@ public class FormDefinitionController {
     /// 更新表单元数据
     @ULog("'更新表单定义'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:UPDATE')")
     public void update(@PathVariable UUID id, @RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.update(id, from);
     }
@@ -75,6 +80,7 @@ public class FormDefinitionController {
     /// 删除表单（级联删除版本）
     @ULog("'删除表单定义'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:DELETE')")
     public void remove(@PathVariable UUID id) {
         formDefinitionService.remove(id);
     }
@@ -82,6 +88,7 @@ public class FormDefinitionController {
     /// 保存新版本（版本号自增）
     @ULog("'保存表单新版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
     public void saveVersion(@PathVariable UUID id, @RequestBody FormVersionSaveFrom from) {
         formDefinitionService.saveVersion(id, from);
     }
@@ -89,6 +96,7 @@ public class FormDefinitionController {
     /// 查询版本历史
     @ULog("'查询表单版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public List<FormVersionVO> getVersions(@PathVariable UUID id) {
         return formDefinitionService.getVersions(id);
     }
@@ -96,6 +104,7 @@ public class FormDefinitionController {
     /// 查询指定版本详情
     @ULog("'查询表单版本详情'")
     @GetMapping(value = "/{id}/versions/{version}", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public FormVersionVO getVersion(@PathVariable UUID id, @PathVariable Integer version) {
         return formDefinitionService.getVersion(id, version);
     }

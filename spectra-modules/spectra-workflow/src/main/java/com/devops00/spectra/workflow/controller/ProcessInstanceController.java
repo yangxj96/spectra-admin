@@ -23,6 +23,7 @@ import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -46,6 +47,7 @@ public class ProcessInstanceController {
     /// @return 流程实例ID
     @ULog("'启动流程'")
     @PostMapping(value = "/start", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:INSERT')")
     public String start(@RequestBody ProcessInstanceStartFrom from) {
         return processInstanceService.start(
                 from.getProcessDefinitionKey(),
@@ -60,6 +62,7 @@ public class ProcessInstanceController {
     /// @return 流程实例信息
     @ULog("'查询流程实例状态'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public ProcessInstanceVO getStatus(@PathVariable String id) {
         return processInstanceService.getStatus(id);
     }
@@ -70,6 +73,7 @@ public class ProcessInstanceController {
     /// @return 流程变量
     @ULog("'查询流程变量'")
     @GetMapping(value = "/{id}/variables", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public Map<String, Object> getVariables(@PathVariable String id) {
         return processInstanceService.getVariables(id);
     }
@@ -80,6 +84,7 @@ public class ProcessInstanceController {
     /// @param from 终止参数
     @ULog("'终止流程'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:UPDATE')")
     public void terminate(@PathVariable String id, @RequestBody Map<String, String> from) {
         processInstanceService.terminate(id, from.get("reason"));
     }
@@ -90,6 +95,7 @@ public class ProcessInstanceController {
     /// @return 流程图图片（PNG格式）
     @ULog("'获取流程实例图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
+    @PreAuthorize("isAuthenticated()")
     public byte[] getDiagram(@PathVariable String id) {
         return processInstanceService.getDiagram(id);
     }

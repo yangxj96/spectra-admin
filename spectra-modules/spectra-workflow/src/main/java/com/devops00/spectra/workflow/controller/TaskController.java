@@ -24,6 +24,8 @@ import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskTransferFrom;
 import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /// 工作流-任务相关
@@ -31,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @RestController
 @RequestMapping("/workflow/tasks")
 @RequiredArgsConstructor
@@ -44,6 +47,7 @@ public class TaskController {
     /// @return 待办任务列表
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public Object todo(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
         return taskService.todo(page, username);
@@ -55,6 +59,7 @@ public class TaskController {
     /// @return 已办任务列表
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public Object done(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
         return taskService.done(page, username);
@@ -66,6 +71,7 @@ public class TaskController {
     /// @param from 完成参数
     @ULog("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void complete(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
         taskService.complete(id, from.getComment());
     }
@@ -76,6 +82,7 @@ public class TaskController {
     /// @param from 完成参数
     @ULog("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void reject(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
         taskService.reject(id, from.getComment());
     }
@@ -86,6 +93,7 @@ public class TaskController {
     /// @param from 转办参数
     @ULog("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void transfer(@PathVariable String id, @RequestBody TaskTransferFrom from) {
         taskService.transfer(id, from.getTargetUserId());
     }
@@ -96,6 +104,7 @@ public class TaskController {
     /// @param from 委派参数
     @ULog("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void delegate(@PathVariable String id, @RequestBody TaskDelegateFrom from) {
         taskService.delegate(id, from.getTargetUserId());
     }

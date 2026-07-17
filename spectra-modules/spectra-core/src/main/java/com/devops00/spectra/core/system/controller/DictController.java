@@ -110,6 +110,7 @@ public class DictController {
     /// @return 字典组树
     @ULog("'获取所有字典类型的树形列表'")
     @GetMapping(value = "/group/tree", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public List<DictGroupTreeVO> listDictGroupWrapTree() {
         return bindService.listDictGroupWrapTree();
     }
@@ -120,6 +121,7 @@ public class DictController {
     /// @return 字典项列表
     @ULog("'根据类型编码获取字典数据'")
     @GetMapping(value = "/data/{code}", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public List<DictItemVO> listDictDataByGroupCode(@PathVariable String code) {
         return bindService.listDictDataByGroupCode(code);
     }

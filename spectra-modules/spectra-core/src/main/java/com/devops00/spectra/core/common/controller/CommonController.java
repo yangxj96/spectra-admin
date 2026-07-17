@@ -18,6 +18,7 @@ package com.devops00.spectra.core.common.controller;
 
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,7 @@ public class CommonController {
     /// 获取验证码
     @ULog("'获取验证码'")
     @GetMapping(value = "/kaptcha", version = "1.0.0+")
+    @PreAuthorize("permitAll()")
     public void kaptcha() throws IOException {
         kaptchaService.generate();
     }

@@ -69,6 +69,7 @@ public class AuthorityController {
 
     @ULog("'获取权限树列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();
     }

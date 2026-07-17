@@ -79,12 +79,14 @@ public class UserController {
 
     @ULog("'分页查询用户列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 
     @ULog("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }

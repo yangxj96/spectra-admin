@@ -78,6 +78,7 @@ public class DepartmentController {
     /// @return 组织机构树形结构数组
     @ULog("'获取组织机构树形列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();
     }

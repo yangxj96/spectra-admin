@@ -23,6 +23,7 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.service.AssetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,6 +42,7 @@ public class AssetController {
 
     @ULog("'分页查询资产'")
     @GetMapping(value = "/page", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public IPage<Asset> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

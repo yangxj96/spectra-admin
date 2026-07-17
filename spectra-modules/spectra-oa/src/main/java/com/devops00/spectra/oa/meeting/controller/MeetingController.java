@@ -26,6 +26,7 @@ import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /// 会议主接口
@@ -43,6 +44,7 @@ public class MeetingController {
     /// 创建一个会议
     @ULog("'创建会议'")
     @PostMapping(version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_MEETING:INSERT')")
     public void create(@RequestBody MeetingCreateFrom from) {
         bindService.create(from);
     }
@@ -50,6 +52,7 @@ public class MeetingController {
     /// 分页查询会议
     @ULog("'分页查询会议'")
     @GetMapping(value = "/page", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
         return bindService.page(page, params);
     }
