@@ -20,6 +20,7 @@ package com.devops00.spectra.ai.controller;
 import com.devops00.spectra.ai.configuration.DeepSeekAssistant;
 import com.devops00.spectra.ai.javabean.form.AiAskForm;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
+import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,7 @@ public class AiAskController {
 
     private final ObjectMapper om;
 
+    @ULog("'AI对话流式问答'")
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
     public Flux<String> stream(@RequestBody AiAskForm form) {
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");

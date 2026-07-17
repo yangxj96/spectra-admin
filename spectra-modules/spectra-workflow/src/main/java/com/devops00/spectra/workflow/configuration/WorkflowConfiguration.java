@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.workflow.configure;
+package com.devops00.spectra.workflow.configuration;
 
 
 import org.flowable.image.ProcessDiagramGenerator;

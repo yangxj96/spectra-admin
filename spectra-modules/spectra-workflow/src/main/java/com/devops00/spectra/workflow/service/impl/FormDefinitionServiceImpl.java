@@ -23,6 +23,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.workflow.javabean.converter.FormConverter;
 import com.devops00.spectra.workflow.javabean.entity.FormDefinition;
 import com.devops00.spectra.workflow.javabean.entity.FormVersion;
 import com.devops00.spectra.workflow.javabean.from.FormDefinitionSaveFrom;
@@ -54,6 +55,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         implements FormDefinitionService {
 
     private final FormVersionMapper formVersionMapper;
+    private final FormConverter formConverter;
 
     @Override
     public IPage<FormDefinitionVO> page(PageFrom page, FormPageFrom params) {
@@ -67,7 +69,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         wrapper.orderByDesc(FormDefinition::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<FormDefinitionVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(formConverter::toVO).toList());
         return voPage;
     }
 
@@ -77,7 +79,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         if (entity == null) {
             throw new DataNotExistException("表单定义不存在");
         }
-        var vo = toVO(entity);
+        var vo = formConverter.toVO(entity);
         // 查询当前版本内容
         var version = formVersionMapper.selectOne(
                 new LambdaQueryWrapper<FormVersion>()
@@ -188,7 +190,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
                         .eq(FormVersion::getFormDefinitionId, id)
                         .orderByDesc(FormVersion::getFormVersion)
         );
-        return versions.stream().map(this::toVersionVO).toList();
+        return versions.stream().map(formConverter::toVO).toList();
     }
 
     @Override
@@ -201,36 +203,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         if (entity == null) {
             throw new DataNotExistException("表单版本不存在");
         }
-        return toVersionVO(entity);
-    }
-
-    /// 实体转VO
-    private FormDefinitionVO toVO(FormDefinition entity) {
-        var vo = new FormDefinitionVO();
-        vo.setId(entity.getId());
-        vo.setName(entity.getName());
-        vo.setCode(entity.getCode());
-        vo.setCurrentVersion(entity.getCurrentVersion());
-        vo.setActive(entity.getActive());
-        vo.setDescription(entity.getDescription());
-        vo.setCreatedBy(entity.getCreatedBy());
-        vo.setCreatedAt(entity.getCreatedAt());
-        vo.setUpdatedAt(entity.getUpdatedAt());
-        return vo;
-    }
-
-    /// 版本实体转VO
-    private FormVersionVO toVersionVO(FormVersion entity) {
-        var vo = new FormVersionVO();
-        vo.setId(entity.getId());
-        vo.setFormDefinitionId(entity.getFormDefinitionId());
-        vo.setFormVersion(entity.getFormVersion());
-        vo.setRuleJson(entity.getRuleJson());
-        vo.setOptionsJson(entity.getOptionsJson());
-        vo.setFormJson(entity.getFormJson());
-        vo.setCreatedBy(entity.getCreatedBy());
-        vo.setCreatedAt(entity.getCreatedAt());
-        return vo;
+        return formConverter.toVO(entity);
     }
 
 }

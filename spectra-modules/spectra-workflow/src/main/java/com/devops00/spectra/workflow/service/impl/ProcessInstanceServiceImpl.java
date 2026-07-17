@@ -17,6 +17,7 @@
 package com.devops00.spectra.workflow.service.impl;
 
 
+import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private final RuntimeService runtimeService;
     private final RepositoryService repositoryService;
     private final ProcessDiagramGenerator processDiagramGenerator;
+    private final ProcessConverter processConverter;
 
     @Override
     public String start(String processDefinitionKey, String businessKey) {
@@ -88,16 +90,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throw new RuntimeException("流程实例不存在: " + processInstanceId);
         }
 
-        ProcessInstanceVO vo = new ProcessInstanceVO();
-        vo.setId(instance.getId());
-        vo.setProcessDefinitionId(instance.getProcessDefinitionId());
-        vo.setProcessDefinitionKey(instance.getProcessDefinitionKey());
-        vo.setBusinessKey(instance.getBusinessKey());
-        vo.setSuspended(instance.isSuspended());
-        vo.setEnded(instance.isEnded());
-        vo.setStartTime(instance.getStartTime() != null ? instance.getStartTime().toString() : null);
-        vo.setStartUserId(instance.getStartUserId());
-        return vo;
+        return processConverter.toVO(instance);
     }
 
     @Override
@@ -138,7 +131,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
 
         // 获取当前活动ID
-        java.util.List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
+        var activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
 
         // 获取 BPMN 模型
         var model = repositoryService.getBpmnModel(instance.getProcessDefinitionId());
@@ -148,17 +141,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
         // 使用 ProcessDiagramGenerator 生成流程图（高亮当前节点）
         try (var diagramStream = processDiagramGenerator.generateDiagram(
-                model,                           // BpmnModel
-                "png",                           // imageType
-                activeActivityIds,               // highLightedActivities
-                java.util.Collections.emptyList(), // highLightedFlows
-                "宋体",                          // activityFontName
-                "宋体",                          // labelFontName
-                "宋体",                          // annotationFontName
-                this.getClass().getClassLoader(), // customClassLoader
-                1.0,                             // scaleFactor
-                false                            // drawSequenceFlowNameWithNoLabelDI
-        )) {
+                model, "png",
+                activeActivityIds,
+                Collections.emptyList(),
+                "宋体", "宋体", "宋体",
+                this.getClass().getClassLoader(),
+                1.0, false)) {
             if (diagramStream == null) {
                 throw new RuntimeException("无法生成流程图: " + processInstanceId);
             }

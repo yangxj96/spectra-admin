@@ -53,6 +53,7 @@ public class RegionController {
     /// @param level 层级
     /// @param id    父级ID
     /// @return 根据条件获取的下级的列表
+    @ULog("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0+")
     public List<RegionVO> lazyTree(Integer level, @RequestParam(value = "id", required = false) String id) {
         return bindService.lazyTree(level, id);
@@ -65,6 +66,7 @@ public class RegionController {
         return bindService.page(page, params);
     }
 
+    @ULog("'获取行政区划路径'")
     @GetMapping(value = "/path/{id}", version = "1.0.0+")
     public RegionPathVO getPath(@PathVariable UUID id) {
         return bindService.getPath(id);

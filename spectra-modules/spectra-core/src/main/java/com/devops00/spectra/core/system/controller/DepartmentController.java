@@ -56,7 +56,7 @@ public class DepartmentController {
     /// 删除组织机构
     ///
     /// @param id 组织机构ID
-    @ULog("'新增组织机构'")
+    @ULog("'删除组织机构'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void deleteById(@PathVariable String id) {

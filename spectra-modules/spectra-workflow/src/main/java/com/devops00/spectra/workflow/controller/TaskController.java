@@ -17,6 +17,7 @@
 package com.devops00.spectra.workflow.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
@@ -41,6 +42,7 @@ public class TaskController {
     ///
     /// @param page 分页参数
     /// @return 待办任务列表
+    @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
     public Object todo(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
@@ -51,6 +53,7 @@ public class TaskController {
     ///
     /// @param page 分页参数
     /// @return 已办任务列表
+    @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
     public Object done(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
@@ -61,6 +64,7 @@ public class TaskController {
     ///
     /// @param id   任务ID
     /// @param from 完成参数
+    @ULog("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
     public void complete(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
         taskService.complete(id, from.getComment());
@@ -70,6 +74,7 @@ public class TaskController {
     ///
     /// @param id   任务ID
     /// @param from 完成参数
+    @ULog("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
     public void reject(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
         taskService.reject(id, from.getComment());
@@ -79,6 +84,7 @@ public class TaskController {
     ///
     /// @param id   任务ID
     /// @param from 转办参数
+    @ULog("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     public void transfer(@PathVariable String id, @RequestBody TaskTransferFrom from) {
         taskService.transfer(id, from.getTargetUserId());
@@ -88,6 +94,7 @@ public class TaskController {
     ///
     /// @param id   任务ID
     /// @param from 委派参数
+    @ULog("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
     public void delegate(@PathVariable String id, @RequestBody TaskDelegateFrom from) {
         taskService.delegate(id, from.getTargetUserId());

@@ -19,19 +19,17 @@ package com.devops00.spectra.workflow.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /// 任务管理Service实现
@@ -47,6 +45,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     private final TaskService flowableTaskService;
     private final RuntimeService runtimeService;
     private final HistoryService historyService;
+    private final TaskConverter taskConverter;
 
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee) {
@@ -56,13 +55,10 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .desc();
 
         long total = taskQuery.count();
-        List<org.flowable.task.api.Task> tasks = taskQuery
+        var tasks = taskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        List<TaskVO> records = new ArrayList<>();
-        for (var task : tasks) {
-            records.add(convertToVO(task));
-        }
+        var records = tasks.stream().map(taskConverter::toVO).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -79,13 +75,10 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .desc();
 
         long total = historicTaskQuery.count();
-        List<HistoricTaskInstance> tasks = historicTaskQuery
+        var tasks = historicTaskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        List<TaskVO> records = new ArrayList<>();
-        for (var task : tasks) {
-            records.add(convertHistoricToVO(task));
-        }
+        var records = tasks.stream().map(taskConverter::fromHistoricTask).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -169,31 +162,5 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         // 委派任务
         flowableTaskService.delegateTask(taskId, targetUserId);
         log.info("任务已委派: taskId={}, from={}, to={}", taskId, task.getAssignee(), targetUserId);
-    }
-
-    /// 将 Flowable Task 转换为 TaskVO
-    private TaskVO convertToVO(org.flowable.task.api.Task task) {
-        TaskVO vo = new TaskVO();
-        vo.setId(task.getId());
-        vo.setName(task.getName());
-        vo.setAssignee(task.getAssignee());
-        vo.setProcessInstanceId(task.getProcessInstanceId());
-        vo.setProcessDefinitionId(task.getProcessDefinitionId());
-        vo.setCreateTime(task.getCreateTime() != null ? task.getCreateTime().toString() : null);
-        vo.setDescription(task.getDescription());
-        return vo;
-    }
-
-    /// 将 HistoricTaskInstance 转换为 TaskVO
-    private TaskVO convertHistoricToVO(HistoricTaskInstance task) {
-        TaskVO vo = new TaskVO();
-        vo.setId(task.getId());
-        vo.setName(task.getName());
-        vo.setAssignee(task.getAssignee());
-        vo.setProcessInstanceId(task.getProcessInstanceId());
-        vo.setProcessDefinitionId(task.getProcessDefinitionId());
-        vo.setCreateTime(task.getStartTime() != null ? task.getStartTime().toString() : null);
-        vo.setDescription(task.getDescription());
-        return vo;
     }
 }
