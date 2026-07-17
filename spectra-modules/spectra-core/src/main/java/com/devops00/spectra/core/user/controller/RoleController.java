@@ -68,9 +68,9 @@ public class RoleController {
     @ULog("'删除角色'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
-    public void delete(@PathVariable UUID id) {
+    public void deleteById(@PathVariable UUID id) {
         try {
-            bindService.delete(id);
+            bindService.deleteById(id);
         } catch (NumberFormatException e) {
             log.error("ID转换异常", e);
         }

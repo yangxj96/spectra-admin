@@ -72,7 +72,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
 
     @Override
     @Transactional
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         Role role = this.getById(id);
         if (role == null) {
             throw new DataNotExistException("角色不存在");

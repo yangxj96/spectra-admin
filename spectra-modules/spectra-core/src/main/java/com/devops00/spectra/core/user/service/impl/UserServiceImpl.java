@@ -137,7 +137,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void updateById(UserSaveFrom params) {
+    public void modify(UserSaveFrom params) {
         var entity = this.getById(params.getId());
         if (null == entity) {
             throw new DataNotExistException("用户不存在");

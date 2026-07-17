@@ -65,24 +65,24 @@ public class FormDefinitionController {
     @ULog("'创建表单定义'")
     @PostMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
-    public void create(@RequestBody FormDefinitionSaveFrom from) {
-        formDefinitionService.create(from);
+    public void created(@RequestBody FormDefinitionSaveFrom from) {
+        formDefinitionService.created(from);
     }
 
     /// 更新表单元数据
     @ULog("'更新表单定义'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:UPDATE')")
-    public void update(@PathVariable UUID id, @RequestBody FormDefinitionSaveFrom from) {
-        formDefinitionService.update(id, from);
+    public void modify(@PathVariable UUID id, @RequestBody FormDefinitionSaveFrom from) {
+        formDefinitionService.modify(id, from);
     }
 
     /// 删除表单（级联删除版本）
     @ULog("'删除表单定义'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:DELETE')")
-    public void remove(@PathVariable UUID id) {
-        formDefinitionService.remove(id);
+    public void deleteById(@PathVariable UUID id) {
+        formDefinitionService.deleteById(id);
     }
 
     /// 保存新版本（版本号自增）

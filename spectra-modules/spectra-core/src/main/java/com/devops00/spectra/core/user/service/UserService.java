@@ -50,7 +50,7 @@ public interface UserService extends BaseService<User> {
     /// 根据用户ID更新用户
     ///
     /// @param params 请求参数
-    void updateById(UserSaveFrom params);
+    void modify(UserSaveFrom params);
 
     /// 根据用户ID删除用户信息
     ///

@@ -47,8 +47,8 @@ public class MeetingController {
     @ULog("'创建会议'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:INSERT')")
-    public void create(@RequestBody MeetingCreateFrom from) {
-        bindService.create(from);
+    public void created(@RequestBody MeetingCreateFrom from) {
+        bindService.created(from);
     }
 
     /// 分页查询会议

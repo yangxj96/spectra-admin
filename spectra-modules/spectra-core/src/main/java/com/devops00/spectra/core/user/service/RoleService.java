@@ -42,7 +42,7 @@ public interface RoleService extends BaseService<Role> {
     /// 删除角色
     ///
     /// @param id 角色ID
-    void delete(UUID id);
+    void deleteById(UUID id);
 
     /// 修改角色
     ///

@@ -96,7 +96,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
 
     @Override
     @Transactional
-    public void create(FormDefinitionSaveFrom from) {
+    public void created(FormDefinitionSaveFrom from) {
         // 创建表单定义
         var entity = new FormDefinition();
         entity.setName(from.getName());
@@ -123,7 +123,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
 
     @Override
     @Transactional
-    public void update(UUID id, FormDefinitionSaveFrom from) {
+    public void modify(UUID id, FormDefinitionSaveFrom from) {
         var entity = this.getById(id);
         if (entity == null) {
             throw new DataNotExistException("表单定义不存在");
@@ -139,7 +139,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
 
     @Override
     @Transactional
-    public void remove(UUID id) {
+    public void deleteById(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
             throw new DataNotExistException("表单定义不存在");

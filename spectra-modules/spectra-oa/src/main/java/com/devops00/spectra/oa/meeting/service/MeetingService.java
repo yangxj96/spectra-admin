@@ -35,7 +35,7 @@ public interface MeetingService extends BaseService<Meeting> {
     /// 创建一个会议
     ///
     /// @param from 入参
-    void create(MeetingCreateFrom from);
+    void created(MeetingCreateFrom from);
 
     /// 分页查询会议
     ///

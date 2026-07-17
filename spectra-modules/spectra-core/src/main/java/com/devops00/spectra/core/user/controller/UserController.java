@@ -66,8 +66,8 @@ public class UserController {
     @ULog("'根据ID更新用户信息'")
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
-    public void updateById(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
-        bindService.updateById(params);
+    public void modify(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
+        bindService.modify(params);
     }
 
     @ULog("'重置用户密码'")

@@ -52,18 +52,18 @@ public interface FormDefinitionService extends BaseService<FormDefinition> {
     /// 创建表单（同时创建版本1）
     ///
     /// @param from 创建参数
-    void create(FormDefinitionSaveFrom from);
+    void created(FormDefinitionSaveFrom from);
 
     /// 更新表单元数据
     ///
     /// @param id   表单定义ID
     /// @param from 更新参数
-    void update(UUID id, FormDefinitionSaveFrom from);
+    void modify(UUID id, FormDefinitionSaveFrom from);
 
     /// 删除表单（级联删除版本）
     ///
     /// @param id 表单定义ID
-    void remove(UUID id);
+    void deleteById(UUID id);
 
     /// 保存新版本（版本号自增）
     ///

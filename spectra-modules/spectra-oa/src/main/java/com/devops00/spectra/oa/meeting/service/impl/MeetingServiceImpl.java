@@ -50,7 +50,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final ProcessInstanceService processInstanceService;
 
     @Override
-    public void create(MeetingCreateFrom from) {
+    public void created(MeetingCreateFrom from) {
         Meeting entity = meetingConverter.toEntity(from);
         this.save(entity);
         // 启动流程
