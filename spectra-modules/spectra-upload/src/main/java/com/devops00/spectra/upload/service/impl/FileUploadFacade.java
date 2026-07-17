@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.upload.service.impl;
 
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.upload.configure.FileUploadServiceRegistry;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
@@ -78,7 +80,7 @@ public class FileUploadFacade {
     private UploadType getTypeFromTask(String uploadId) {
         FileUploadTask task = fileUploadTaskService.findByUploadId(uploadId);
         if (task == null) {
-            throw new IllegalArgumentException("上传任务不存在");
+            throw new DataNotExistException("上传任务不存在");
         }
         return task.getStorageType();
     }
@@ -94,7 +96,7 @@ public class FileUploadFacade {
         switch (info.getStorageType()) {
             case LOCAL -> registry.getByType(UploadType.LOCAL).preview(info);
             case S3 -> registry.getByType(UploadType.S3).preview(info);
-            default -> throw new RuntimeException("未识别的存储方式");
+            default -> throw new DataException("未识别的存储方式");
         }
     }
 
@@ -114,12 +116,12 @@ public class FileUploadFacade {
     public void download(UUID id) {
         FileInfo info = fileInfoService.getById(id);
         if (info == null) {
-            throw new IllegalArgumentException("文件不存在");
+            throw new DataNotExistException("文件不存在");
         }
         switch (info.getStorageType()) {
             case LOCAL -> registry.getByType(UploadType.LOCAL).download(info);
             case S3 -> registry.getByType(UploadType.S3).download(info);
-            default -> throw new RuntimeException("未识别的存储方式");
+            default -> throw new DataException("未识别的存储方式");
         }
     }
 }

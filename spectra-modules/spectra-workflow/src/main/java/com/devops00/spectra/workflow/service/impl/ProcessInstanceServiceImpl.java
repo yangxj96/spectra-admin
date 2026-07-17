@@ -17,6 +17,8 @@
 package com.devops00.spectra.workflow.service.impl;
 
 
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
@@ -61,7 +63,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                     .count();
 
             if (count > 0) {
-                throw new IllegalStateException("流程已存在: " + businessKey);
+                throw new DataException("流程已存在: " + businessKey);
             }
 
             // 2. 启动流程
@@ -76,7 +78,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
         } catch (Exception e) {
             // 3. 统一异常
-            throw new RuntimeException("启动流程失败: " + e.getMessage(), e);
+            throw new DataException("启动流程失败: " + e.getMessage());
         }
     }
 
@@ -87,7 +89,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .singleResult();
 
         if (instance == null) {
-            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+            throw new DataNotExistException("流程实例不存在: " + processInstanceId);
         }
 
         return processConverter.toVO(instance);
@@ -100,7 +102,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .singleResult();
 
         if (instance == null) {
-            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+            throw new DataNotExistException("流程实例不存在: " + processInstanceId);
         }
 
         return runtimeService.getVariables(processInstanceId);
@@ -113,7 +115,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .singleResult();
 
         if (instance == null) {
-            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+            throw new DataNotExistException("流程实例不存在: " + processInstanceId);
         }
 
         runtimeService.deleteProcessInstance(processInstanceId, reason);
@@ -127,7 +129,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .singleResult();
 
         if (instance == null) {
-            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+            throw new DataNotExistException("流程实例不存在: " + processInstanceId);
         }
 
         // 获取当前活动ID
@@ -136,7 +138,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         // 获取 BPMN 模型
         var model = repositoryService.getBpmnModel(instance.getProcessDefinitionId());
         if (model == null) {
-            throw new RuntimeException("无法获取流程模型: " + processInstanceId);
+            throw new DataNotExistException("无法获取流程模型: " + processInstanceId);
         }
 
         // 使用 ProcessDiagramGenerator 生成流程图（高亮当前节点）
@@ -148,11 +150,11 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 this.getClass().getClassLoader(),
                 1.0, false)) {
             if (diagramStream == null) {
-                throw new RuntimeException("无法生成流程图: " + processInstanceId);
+                throw new DataException("无法生成流程图: " + processInstanceId);
             }
             return diagramStream.readAllBytes();
         } catch (Exception e) {
-            throw new RuntimeException("读取流程图失败: " + e.getMessage(), e);
+            throw new DataException("读取流程图失败: " + e.getMessage());
         }
     }
 }

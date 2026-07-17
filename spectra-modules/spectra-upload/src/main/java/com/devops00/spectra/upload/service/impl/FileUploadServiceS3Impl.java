@@ -18,6 +18,9 @@ package com.devops00.spectra.upload.service.impl;
 
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadChunk;
@@ -167,7 +170,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
                             )
             );
         } catch (IOException e) {
-            throw new RuntimeException("S3单文件上传失败", e);
+            throw new FileUploadException("S3单文件上传失败");
         }
 
         // 保存文件主信息
@@ -200,7 +203,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     public FileUploadChunkVO chunk(FileUploadChunkFrom from) {
         FileUploadTask task = taskService.findByUploadId(from.getUploadId());
         if (task == null) {
-            throw new IllegalArgumentException("上传任务不存在");
+            throw new DataNotExistException("上传任务不存在");
         }
 
         MultipartFile file = from.getFile();
@@ -225,7 +228,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
             eTag = uploadPartResponse.eTag(); // S3 返回的该分片唯一数字指纹
         } catch (IOException e) {
-            throw new RuntimeException("S3分片传输失败", e);
+            throw new FileUploadException("S3分片传输失败");
         }
 
         // 录入分片明细表（保存关键的 Etag，合并时全靠它）
@@ -251,13 +254,13 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         synchronized (uploadId.intern()) {
             FileUploadTask task = taskService.findByUploadId(uploadId);
             if (task == null) {
-                throw new IllegalArgumentException("上传任务不存在");
+                throw new DataNotExistException("上传任务不存在");
             }
 
             // 1. 校验分片数
             List<FileUploadChunk> dbChunks = chunkService.findByUploadId(uploadId);
             if (dbChunks.size() != task.getTotalChunks()) {
-                throw new IllegalStateException("本地校验失败：云端分片未上传完整");
+                throw new DataException("本地校验失败：云端分片未上传完整");
             }
 
             // 2. 将本地分片按 chunk_number 升序排序（S3合并协议强制要求）
@@ -314,7 +317,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     public void preview(FileInfo file) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null || attributes.getResponse() == null) {
-            throw new IllegalStateException("不在 Web 请求上下文中");
+            throw new DataException("不在 Web 请求上下文中");
         }
         HttpServletResponse response = attributes.getResponse();
 
@@ -356,10 +359,10 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
         } catch (NoSuchKeyException e) {
             log.error("{} S3 中未找到指定文件: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
-            throw new RuntimeException("文件在云存储中不存在", e);
+            throw new DataNotExistException("文件在云存储中不存在");
         } catch (S3Exception e) {
             log.error("{} 调用 S3 获取文件流失败", LogPrefix.STORAGE.p(), e);
-            throw new RuntimeException("远程云存储服务异常", e);
+            throw new FileUploadException("远程云存储服务异常");
         }
     }
 
@@ -367,7 +370,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     public void download(FileInfo file) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null || attributes.getResponse() == null) {
-            throw new IllegalStateException("不在 Web 请求上下文中");
+            throw new DataException("不在 Web 请求上下文中");
         }
         HttpServletResponse response = attributes.getResponse();
 
@@ -398,7 +401,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     /// 或是临时拼装在某个非关键字段里（如存放在备注或扩展字段）。
     private String getS3UploadIdFromTask(FileUploadTask task) {
         if (task.getEid() == null || task.getEid().isBlank()) {
-            throw new IllegalStateException("该任务缺少 S3 端的 MultipartUploadId (eid)");
+            throw new DataException("该任务缺少 S3 端的 MultipartUploadId (eid)");
         }
         return task.getEid();
     }

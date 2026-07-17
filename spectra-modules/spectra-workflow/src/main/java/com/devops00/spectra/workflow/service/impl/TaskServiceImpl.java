@@ -19,6 +19,7 @@ package com.devops00.spectra.workflow.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import lombok.RequiredArgsConstructor;
@@ -93,7 +94,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .taskId(taskId)
                 .singleResult();
         if (task == null) {
-            throw new RuntimeException("任务不存在: " + taskId);
+            throw new DataNotExistException("任务不存在: " + taskId);
         }
 
         // 添加审批意见
@@ -117,7 +118,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .taskId(taskId)
                 .singleResult();
         if (task == null) {
-            throw new RuntimeException("任务不存在: " + taskId);
+            throw new DataNotExistException("任务不存在: " + taskId);
         }
 
         // 添加驳回意见
@@ -141,7 +142,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .taskId(taskId)
                 .singleResult();
         if (task == null) {
-            throw new RuntimeException("任务不存在: " + taskId);
+            throw new DataNotExistException("任务不存在: " + taskId);
         }
 
         // 转办：设置新的处理人
@@ -156,7 +157,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .taskId(taskId)
                 .singleResult();
         if (task == null) {
-            throw new RuntimeException("任务不存在: " + taskId);
+            throw new DataNotExistException("任务不存在: " + taskId);
         }
 
         // 委派任务

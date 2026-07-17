@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.from.DeployProcessFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionResourceVO;
@@ -63,7 +65,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 .processDefinitionId(id)
                 .singleResult();
         if (definition == null) {
-            throw new RuntimeException("流程定义不存在: " + id);
+            throw new DataNotExistException("流程定义不存在: " + id);
         }
         return toVO(definition);
     }
@@ -74,12 +76,12 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 .processDefinitionId(id)
                 .singleResult();
         if (definition == null) {
-            throw new RuntimeException("流程定义不存在: " + id);
+            throw new DataNotExistException("流程定义不存在: " + id);
         }
 
         var model = repositoryService.getBpmnModel(id);
         if (model == null) {
-            throw new RuntimeException("无法获取流程模型: " + id);
+            throw new DataNotExistException("无法获取流程模型: " + id);
         }
 
         try (var diagramStream = processDiagramGenerator.generateDiagram(
@@ -90,11 +92,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 this.getClass().getClassLoader(),
                 1.0, false)) {
             if (diagramStream == null) {
-                throw new RuntimeException("无法生成流程图: " + id);
+                throw new DataException("无法生成流程图: " + id);
             }
             return diagramStream.readAllBytes();
         } catch (Exception e) {
-            throw new RuntimeException("读取流程图失败: " + e.getMessage(), e);
+            throw new DataException("读取流程图失败: " + e.getMessage());
         }
     }
 
@@ -116,17 +118,17 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 .processDefinitionId(id)
                 .singleResult();
         if (definition == null) {
-            throw new RuntimeException("流程定义不存在: " + id);
+            throw new DataNotExistException("流程定义不存在: " + id);
         }
         try (var resource = repositoryService.getResourceAsStream(
                 definition.getDeploymentId(), definition.getResourceName())) {
             if (resource == null) {
-                throw new RuntimeException("无法获取流程资源: " + id);
+                throw new DataNotExistException("无法获取流程资源: " + id);
             }
             return new ProcessDefinitionResourceVO(
                     new String(resource.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new RuntimeException("读取流程资源失败: " + e.getMessage(), e);
+            throw new DataException("读取流程资源失败: " + e.getMessage());
         }
     }
 
@@ -151,7 +153,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 .latestVersion()
                 .singleResult();
         if (definition == null) {
-            throw new RuntimeException("部署成功但无法查询到流程定义");
+            throw new DataException("部署成功但无法查询到流程定义");
         }
         log.info("流程定义部署成功: id={}, key={}, version={}",
                 definition.getId(), definition.getKey(), definition.getVersion());

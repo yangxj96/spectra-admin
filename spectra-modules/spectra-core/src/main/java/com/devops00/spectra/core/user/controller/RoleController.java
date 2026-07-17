@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
@@ -105,7 +106,7 @@ public class RoleController {
             return relRoleAuthorityService.get(roleId);
         } catch (Exception e) {
             log.error("{}获取角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new IllegalArgumentException("参数转换失败");
+            throw new DataException("参数转换失败");
         }
     }
 
@@ -116,7 +117,7 @@ public class RoleController {
             return relRoleMenuService.get(roleId);
         } catch (Exception e) {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new IllegalArgumentException("参数转换失败");
+            throw new DataException("参数转换失败");
         }
     }
 
@@ -128,7 +129,7 @@ public class RoleController {
             relRoleAuthorityService.grant(UUID.fromString(roleId), from);
         } catch (Exception e) {
             log.error("{}保存角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new IllegalArgumentException("参数转换失败");
+            throw new DataException("参数转换失败");
         }
     }
 
@@ -140,7 +141,7 @@ public class RoleController {
             relRoleMenuService.grant(roleId, from);
         } catch (Exception e) {
             log.error("{}保存角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new IllegalArgumentException("参数转换失败");
+            throw new DataException("参数转换失败");
         }
     }
 

@@ -19,6 +19,9 @@ package com.devops00.spectra.upload.service.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadChunk;
@@ -177,7 +180,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             file.transferTo(path);
         } catch (IOException e) {
-            throw new RuntimeException("文件保存失败", e);
+            throw new FileUploadException("文件保存失败");
         }
         // 成功了存入数据库记录且构建响应vo
         String url = "/file/" + filename;
@@ -209,7 +212,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     public FileUploadChunkVO chunk(FileUploadChunkFrom from) {
         var task = taskService.findByUploadId(from.getUploadId());
         if (task == null) {
-            throw new IllegalArgumentException("上传任务不存在");
+            throw new DataNotExistException("上传任务不存在");
         }
 
         int chunkNumber = from.getIndex();
@@ -218,7 +221,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileUploadException("创建临时目录失败");
         }
 
         Path chunkPath = dir.resolve(String.valueOf(chunkNumber));
@@ -226,7 +229,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             from.getFile().transferTo(chunkPath);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new FileUploadException("分片文件保存失败");
         }
 
         FileUploadChunk chunk = new FileUploadChunk();
@@ -249,13 +252,13 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
             var task = taskService.findByUploadId(uploadId);
             if (task == null) {
-                throw new IllegalArgumentException("上传任务不存在");
+                throw new DataNotExistException("上传任务不存在");
             }
 
             // 校验分片是否完整
             int uploaded = chunkService.countByUploadId(uploadId);
             if (uploaded != task.getTotalChunks()) {
-                throw new IllegalStateException("分片未上传完成");
+                throw new DataException("分片未上传完成");
             }
 
             Path tempDir = buildTempDir(uploadId);
@@ -270,7 +273,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                     Files.copy(chunkPath, out);
                 }
             } catch (IOException e) {
-                throw new RuntimeException("合并失败", e);
+                throw new FileUploadException("合并失败");
             }
 
             String url = "/file/" + filename;
@@ -308,7 +311,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
             log.error("{}无法获取当前请求上下文，可能未在 Web 线程中调用", LogPrefix.STORAGE.p());
-            throw new IllegalStateException("当前不在有效的 Web 请求上下文中");
+            throw new DataException("当前不在有效的 Web 请求上下文中");
         }
         // 直接拿到真正的 HttpServletResponse
         HttpServletResponse response = attributes.getResponse();
@@ -367,7 +370,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         // 2. 严妙校验：检查文件在物理磁盘上是否存在，防止因意外删改导致抛出底层原生异常
         if (!Files.exists(filePath) || Files.isDirectory(filePath)) {
             log.error("{} 本地物理文件不存在: {}", LogPrefix.STORAGE.p(), filePath);
-            throw new RuntimeException("本地存储中未找到该文件");
+            throw new DataNotExistException("本地存储中未找到该文件");
         }
 
         try {
@@ -375,7 +378,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             return Files.newInputStream(filePath);
         } catch (IOException e) {
             log.error("{} 打开本地文件流失败, filename: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
-            throw new RuntimeException("读取物理文件流异常", e);
+            throw new FileUploadException("读取物理文件流异常");
         }
     }
 
@@ -384,7 +387,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes == null) {
             log.error("{}无法获取当前请求上下文，可能未在 Web 线程中调用", LogPrefix.STORAGE.p());
-            throw new IllegalStateException("当前不在有效的 Web 请求上下文中");
+            throw new DataException("当前不在有效的 Web 请求上下文中");
         }
         HttpServletResponse response = attributes.getResponse();
         if (response == null) {
@@ -436,7 +439,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                 Files.createDirectories(dirPath);
             }
         } catch (IOException e) {
-            throw new RuntimeException("创建每月归类目录失败", e);
+            throw new FileUploadException("创建每月归类目录失败");
         }
 
         // 4. 返回最终文件的全路径：/var/data/upload/202606/xxxx.png

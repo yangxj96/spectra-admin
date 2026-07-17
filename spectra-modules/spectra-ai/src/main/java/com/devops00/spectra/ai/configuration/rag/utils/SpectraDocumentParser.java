@@ -17,6 +17,7 @@
 package com.devops00.spectra.ai.configuration.rag.utils;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.DataException;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentParser;
 import dev.langchain4j.data.document.Metadata;
@@ -104,11 +105,11 @@ public class SpectraDocumentParser implements DocumentParser {
         // 黑名单前置拦截
         if (BLACKLIST_IMAGE.contains(suffix)) {
             log.error("{} 文件 [{}] 解析被拦截: 暂不支持图片类型的 RAG 索引构建", LogPrefix.AI.p(), filename);
-            throw new IllegalArgumentException("当前系统暂不支持图片类型的RAG索引构建，请上传文本格式文档");
+            throw new DataException("当前系统暂不支持图片类型的RAG索引构建，请上传文本格式文档");
         }
         if (BLACKLIST_MEDIA.contains(suffix)) {
             log.error("{} 文件 [{}] 解析被拦截: 暂不支持多媒体或压缩包格式", LogPrefix.AI.p(), filename);
-            throw new IllegalArgumentException("暂不支持多媒体或压缩包格式解析");
+            throw new DataException("暂不支持多媒体或压缩包格式解析");
         }
 
         // 智能路由到具体解析器
@@ -128,7 +129,7 @@ public class SpectraDocumentParser implements DocumentParser {
 
         } catch (Exception e) {
             log.error("{} 底层解析器 [{}] 解析文件 [{}] 发生核心崩溃", LogPrefix.AI.p(), delegate.getClass().getSimpleName(), filename, e);
-            throw new RuntimeException("文档物理结构损坏，解析失败", e);
+            throw new DataException("文档物理结构损坏，解析失败");
         }
 
         // 空文本防御机制：防止LangChain4j抛出BlankDocumentException导致流程中断

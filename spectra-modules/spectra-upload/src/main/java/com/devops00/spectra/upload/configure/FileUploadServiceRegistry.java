@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.upload.configure;
 
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.service.FileUploadService;
 import org.springframework.stereotype.Component;
@@ -45,7 +46,7 @@ public class FileUploadServiceRegistry {
     public FileUploadService getByType(UploadType type) {
         FileUploadService service = serviceMap.get(type);
         if (service == null) {
-            throw new IllegalArgumentException("不支持的存储类型: " + type);
+            throw new DataException("不支持的存储类型: " + type);
         }
         return service;
     }

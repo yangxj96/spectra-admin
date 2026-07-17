@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoConfigVO;
@@ -98,7 +99,7 @@ public class CryptoController {
             return new CryptoKeyPairVO(serverPublicKey, serverPrivateKey, clientPublicKey, clientPrivateKey);
         } catch (Exception e) {
             log.error("生成RSA密钥对失败: {}", e.getMessage(), e);
-            throw new RuntimeException("密钥生成失败: " + e.getMessage(), e);
+            throw new DataSaveException("密钥生成失败: " + e.getMessage());
         }
     }
 
