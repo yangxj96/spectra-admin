@@ -17,8 +17,7 @@
 package com.devops00.spectra.upload.javabean.vo;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.UUID;
 
@@ -27,8 +26,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/4/1 16:42
-@Getter
-@Setter
+@Data
 public class FileUploadPreVO {
 
     /// 文件是否已经存在，存在就不在继续了

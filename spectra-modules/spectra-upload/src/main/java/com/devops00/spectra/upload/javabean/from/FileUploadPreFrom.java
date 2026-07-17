@@ -17,16 +17,14 @@
 package com.devops00.spectra.upload.javabean.from;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /// 文件上传预处理
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/12/7 22:59
-@Getter
-@Setter
+@Data
 public class FileUploadPreFrom {
 
     /// 文件名称

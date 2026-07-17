@@ -17,8 +17,7 @@
 package com.devops00.spectra.upload.javabean.vo;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
@@ -27,8 +26,7 @@ import java.util.List;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/4/1 16:50
-@Getter
-@Setter
+@Data
 public class FileUploadStatusVO {
 
     /// 文件上传状态

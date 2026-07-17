@@ -17,6 +17,7 @@
 package com.devops00.spectra.oa.meeting.javabean.from;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,15 +35,18 @@ import java.util.List;
 public class MeetingCreateFrom {
 
     /// 会议标题
+    @NotBlank(message = "会议标题不能为空")
     private String title;
 
     /// 发起人
     private String initiatorId;
 
     /// 开始时间
+    @NotBlank(message = "开始时间不能为空")
     private String startTime;
 
     /// 结束时间
+    @NotBlank(message = "结束时间不能为空")
     private String endTime;
 
     /// 会议地点

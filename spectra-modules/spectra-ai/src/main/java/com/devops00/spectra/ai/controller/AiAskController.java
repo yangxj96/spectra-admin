@@ -18,7 +18,7 @@ package com.devops00.spectra.ai.controller;
 
 
 import com.devops00.spectra.ai.configuration.DeepSeekAssistant;
-import com.devops00.spectra.ai.javabean.form.AiAskForm;
+import com.devops00.spectra.ai.javabean.from.AiAskFrom;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -55,11 +55,11 @@ public class AiAskController {
     @ULog("'AI对话流式问答'")
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
-    public Flux<String> stream(@Validated @RequestBody AiAskForm form) {
+    public Flux<String> stream(@Validated @RequestBody AiAskFrom from) {
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
         // 利用 Sinks 桥接 LangChain4j 的异步回调流和 Spring WebFlux 的 Flux 流
         return Flux.create(sink -> {
-            assistant.stream(SecUtil.getCurrentToken(), form.getMessage())
+            assistant.stream(SecUtil.getCurrentToken(), from.getMessage())
                     // 获取到响应的时候触发
                     .onPartialResponse(token -> {
                         try {

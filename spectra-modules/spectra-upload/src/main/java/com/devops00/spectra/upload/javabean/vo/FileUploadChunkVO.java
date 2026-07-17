@@ -17,16 +17,14 @@
 package com.devops00.spectra.upload.javabean.vo;
 
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /// 分片上传的上传结果
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/4/1 16:42
-@Getter
-@Setter
+@Data
 public class FileUploadChunkVO {
 
 

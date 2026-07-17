@@ -16,8 +16,7 @@
 
 package com.devops00.spectra.upload.javabean.from;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
 /// 文件保存参数
@@ -25,8 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/12/7 23:29
-@Getter
-@Setter
+@Data
 public class FileUploadFrom {
 
     /// 文件

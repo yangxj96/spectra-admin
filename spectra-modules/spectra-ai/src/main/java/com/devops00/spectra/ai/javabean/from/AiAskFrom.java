@@ -14,9 +14,10 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.ai.javabean.form;
+package com.devops00.spectra.ai.javabean.from;
 
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 /// Ai对话请求入参
@@ -25,9 +26,10 @@ import lombok.Data;
 /// @version 1.0
 /// @since 2026/4/26 12:19
 @Data
-public class AiAskForm {
+public class AiAskFrom {
 
     /// 问题消息
+    @NotBlank(message = "消息内容不能为空")
     private String message;
 
 }
