@@ -23,6 +23,7 @@ import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.DictItemVO;
 import com.devops00.spectra.core.system.service.DictService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +36,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/18 00:00
+@Slf4j
 @RestController
 @RequestMapping("/dict")
 public class DictController {

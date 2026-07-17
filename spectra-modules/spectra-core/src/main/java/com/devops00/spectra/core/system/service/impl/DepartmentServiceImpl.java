@@ -33,6 +33,7 @@ import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.framework.assembler.NameLookup;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
@@ -47,6 +48,7 @@ import java.util.stream.Collectors;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/15 00:00
+@Slf4j
 @Service
 @CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<UUID> {

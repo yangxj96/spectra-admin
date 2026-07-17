@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.user.service.impl;
 
 import com.devops00.spectra.core.user.service.PermissionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /// 权限service层-实现
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
+@Slf4j
 @Service
 public class PermissionServiceImpl implements PermissionService {
 

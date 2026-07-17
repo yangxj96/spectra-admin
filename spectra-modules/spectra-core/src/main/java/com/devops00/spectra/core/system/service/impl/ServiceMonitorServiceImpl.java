@@ -20,6 +20,7 @@ import com.devops00.spectra.core.system.javabean.vo.CPUInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import oshi.SystemInfo;
 import oshi.hardware.PhysicalMemory;
@@ -32,6 +33,7 @@ import java.util.*;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @Service
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 

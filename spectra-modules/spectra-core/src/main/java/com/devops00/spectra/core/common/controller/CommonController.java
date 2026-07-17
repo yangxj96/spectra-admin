@@ -18,6 +18,7 @@ package com.devops00.spectra.core.common.controller;
 
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,7 @@ import java.io.IOException;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/7/25 00:00
+@Slf4j
 @RestController
 @RequestMapping("/common")
 public class CommonController {

@@ -26,6 +26,7 @@ import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.core.system.service.RegionService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -38,6 +39,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/1/30 15:32
+@Slf4j
 @RestController
 @RequestMapping("/region")
 public class RegionController {

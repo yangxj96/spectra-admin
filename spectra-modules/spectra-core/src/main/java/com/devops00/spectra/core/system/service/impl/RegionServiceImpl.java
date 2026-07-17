@@ -34,6 +34,7 @@ import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.core.system.mapper.RegionMapper;
 import com.devops00.spectra.core.system.service.RegionService;
 import com.devops00.spectra.framework.assembler.NameLookup;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -44,6 +45,7 @@ import java.util.stream.Collectors;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/1/30 13:57
+@Slf4j
 @Service
 public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<UUID> {
 

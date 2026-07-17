@@ -29,6 +29,7 @@ import com.devops00.spectra.core.system.mapper.MenuMapper;
 import com.devops00.spectra.core.system.service.MenuService;
 import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -43,6 +44,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
+@Slf4j
 @Service
 public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
 

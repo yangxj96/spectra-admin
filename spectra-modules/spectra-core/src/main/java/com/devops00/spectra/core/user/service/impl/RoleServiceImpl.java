@@ -35,6 +35,7 @@ import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implements RoleService {

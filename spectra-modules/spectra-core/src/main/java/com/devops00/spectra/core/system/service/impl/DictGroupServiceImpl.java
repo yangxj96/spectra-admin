@@ -21,6 +21,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import com.devops00.spectra.core.system.mapper.DictGroupMapper;
 import com.devops00.spectra.core.system.service.DictGroupService;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Service;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/18 00:00
+@Slf4j
 @Service
 public class DictGroupServiceImpl extends BaseServiceImpl<DictGroupMapper, DictGroup> implements DictGroupService {
 

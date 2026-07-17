@@ -23,6 +23,7 @@ import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.*;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @RestController
 @RequestMapping("/configured")
 public class ConfiguredController {

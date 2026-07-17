@@ -21,6 +21,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.DictItem;
 import com.devops00.spectra.core.system.mapper.DictItemMapper;
 import com.devops00.spectra.core.system.service.DictItemService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/18 00:00
+@Slf4j
 @Service
 public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictItem> implements DictItemService {
 

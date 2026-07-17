@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import com.devops00.spectra.core.system.mapper.OperationLogMapper;
 import com.devops00.spectra.core.system.service.OperationLogService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /// 操作日志service层-实现
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
+@Slf4j
 @Service
 public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
 }

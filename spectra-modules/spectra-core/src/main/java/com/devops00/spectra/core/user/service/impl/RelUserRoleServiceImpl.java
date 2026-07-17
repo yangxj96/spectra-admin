@@ -22,6 +22,7 @@ import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.mapper.RelUserRoleMapper;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
+import lombok.extern.slf4j.Slf4j;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @Service
 public class RelUserRoleServiceImpl implements RelUserRoleService {
 

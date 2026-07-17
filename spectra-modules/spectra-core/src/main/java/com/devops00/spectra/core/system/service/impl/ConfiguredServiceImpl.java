@@ -30,6 +30,7 @@ import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.core.system.mapper.ConfiguredMapper;
 import com.devops00.spectra.core.system.service.ConfiguredService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/6 00:00
+@Slf4j
 @Service
 public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Configured> implements ConfiguredService {
 

@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @RestController
 @RequestMapping("/service/monitor")
 public class ServiceMonitorController {

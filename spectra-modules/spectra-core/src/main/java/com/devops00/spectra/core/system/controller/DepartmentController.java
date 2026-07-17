@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,7 @@ import java.util.List;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/7/14 00:00
+@Slf4j
 @RestController
 @RequestMapping("/department")
 public class DepartmentController {

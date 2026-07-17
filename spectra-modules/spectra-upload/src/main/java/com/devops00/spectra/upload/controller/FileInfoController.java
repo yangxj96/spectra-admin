@@ -23,6 +23,7 @@ import com.devops00.spectra.upload.javabean.from.FilePageFrom;
 import com.devops00.spectra.upload.javabean.vo.FileInfoVO;
 import com.devops00.spectra.upload.service.FileInfoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/7/4 16:00
+@Slf4j
 @RestController
 @RequestMapping("/file/info")
 @RequiredArgsConstructor

@@ -26,6 +26,7 @@ import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
 import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,7 @@ import java.util.stream.Collectors;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @Service
 public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 

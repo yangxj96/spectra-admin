@@ -23,6 +23,7 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.service.ContractService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/3/5 23:22
+@Slf4j
 @RestController
 @RequestMapping("/oa/contract")
 @RequiredArgsConstructor
