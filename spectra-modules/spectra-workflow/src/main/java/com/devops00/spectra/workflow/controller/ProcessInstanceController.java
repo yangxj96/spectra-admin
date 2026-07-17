@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
@@ -24,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -48,7 +50,7 @@ public class ProcessInstanceController {
     @ULog("'启动流程'")
     @PostMapping(value = "/start", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_INSTANCE:INSERT')")
-    public String start(@RequestBody ProcessInstanceStartFrom from) {
+    public String start(@Validated @RequestBody ProcessInstanceStartFrom from) {
         return processInstanceService.start(
                 from.getProcessDefinitionKey(),
                 from.getBusinessKey(),

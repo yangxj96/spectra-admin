@@ -18,6 +18,7 @@ package com.devops00.spectra.oa.meeting.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
@@ -28,6 +29,7 @@ import com.devops00.spectra.oa.meeting.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /// 会议主接口
@@ -47,7 +49,7 @@ public class MeetingController {
     @ULog("'创建会议'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:INSERT')")
-    public void created(@RequestBody MeetingCreateFrom from) {
+    public void created(@Validated(Verify.Insert.class) @RequestBody MeetingCreateFrom from) {
         bindService.created(from);
     }
 

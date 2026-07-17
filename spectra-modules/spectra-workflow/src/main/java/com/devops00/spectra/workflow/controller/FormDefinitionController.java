@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.workflow.javabean.from.FormDefinitionSaveFrom;
@@ -27,6 +28,7 @@ import com.devops00.spectra.workflow.service.FormDefinitionService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -65,7 +67,7 @@ public class FormDefinitionController {
     @ULog("'创建表单定义'")
     @PostMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
-    public void created(@RequestBody FormDefinitionSaveFrom from) {
+    public void created(@Validated(Verify.Insert.class) @RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.created(from);
     }
 
@@ -73,7 +75,7 @@ public class FormDefinitionController {
     @ULog("'更新表单定义'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:UPDATE')")
-    public void modify(@PathVariable UUID id, @RequestBody FormDefinitionSaveFrom from) {
+    public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.modify(id, from);
     }
 
@@ -89,7 +91,7 @@ public class FormDefinitionController {
     @ULog("'保存表单新版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
-    public void saveVersion(@PathVariable UUID id, @RequestBody FormVersionSaveFrom from) {
+    public void saveVersion(@PathVariable UUID id, @Validated @RequestBody FormVersionSaveFrom from) {
         formDefinitionService.saveVersion(id, from);
     }
 

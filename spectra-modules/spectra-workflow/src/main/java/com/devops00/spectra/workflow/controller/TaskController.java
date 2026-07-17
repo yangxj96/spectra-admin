@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -26,6 +27,7 @@ import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /// 工作流-任务相关
@@ -72,7 +74,7 @@ public class TaskController {
     @ULog("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
-    public void complete(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
+    public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.complete(id, from.getComment());
     }
 
@@ -83,7 +85,7 @@ public class TaskController {
     @ULog("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
-    public void reject(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
+    public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.reject(id, from.getComment());
     }
 
@@ -94,7 +96,7 @@ public class TaskController {
     @ULog("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
-    public void transfer(@PathVariable String id, @RequestBody TaskTransferFrom from) {
+    public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
         taskService.transfer(id, from.getTargetUserId());
     }
 
@@ -105,7 +107,7 @@ public class TaskController {
     @ULog("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
-    public void delegate(@PathVariable String id, @RequestBody TaskDelegateFrom from) {
+    public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {
         taskService.delegate(id, from.getTargetUserId());
     }
 }
