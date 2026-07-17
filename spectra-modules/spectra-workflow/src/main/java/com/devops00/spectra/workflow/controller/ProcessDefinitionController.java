@@ -16,7 +16,10 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.workflow.javabean.from.DeployProcessFrom;
+import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionResourceVO;
 import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionVO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
@@ -26,6 +29,8 @@ import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,6 +137,62 @@ public class ProcessDefinitionController {
     public void activate(@PathVariable String id) {
         repositoryService.activateProcessDefinitionById(id);
         log.info("流程定义已激活: id={}", id);
+    }
+
+    /// 获取流程定义的 BPMN XML 源码
+    ///
+    /// @param id 流程定义ID
+    /// @return 流程定义资源VO
+    @GetMapping(value = "/{id}/resource", version = "1.0.0+")
+    public ProcessDefinitionResourceVO getResource(@PathVariable String id) {
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(id)
+                .singleResult();
+        if (definition == null) {
+            throw new RuntimeException("流程定义不存在: " + id);
+        }
+        try (var resource = repositoryService.getResourceAsStream(
+                definition.getDeploymentId(), definition.getResourceName())) {
+            if (resource == null) {
+                throw new RuntimeException("无法获取流程资源: " + id);
+            }
+            return new ProcessDefinitionResourceVO(
+                    new String(resource.readAllBytes(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException("读取流程资源失败: " + e.getMessage(), e);
+        }
+    }
+
+    /// 部署流程定义（新增或更新版本）
+    ///
+    /// @param from 部署参数
+    /// @return 部署后的流程定义
+    @PostMapping(value = "/deploy", version = "1.0.0+")
+    public ProcessDefinitionVO deploy(@RequestBody @Valid DeployProcessFrom from) {
+        var deploymentBuilder = repositoryService.createDeployment();
+        if (from.getKey() != null) {
+            deploymentBuilder.key(from.getKey());
+        }
+        if (from.getName() != null) {
+            deploymentBuilder.name(from.getName());
+        }
+        if (from.getCategory() != null) {
+            deploymentBuilder.category(from.getCategory());
+        }
+        var deployment = deploymentBuilder
+                .addString("process.bpmn20.xml", from.getBpmnXml())
+                .deploy();
+
+        // 查询刚部署的流程定义（取最新版本）
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .deploymentId(deployment.getId())
+                .latestVersion()
+                .singleResult();
+        if (definition == null) {
+            throw new RuntimeException("部署成功但无法查询到流程定义");
+        }
+        log.info("流程定义部署成功: id={}, key={}, version={}", definition.getId(), definition.getKey(), definition.getVersion());
+        return convertToVO(definition);
     }
 
     /// 将 ProcessDefinition 转换为 ProcessDefinitionVO
