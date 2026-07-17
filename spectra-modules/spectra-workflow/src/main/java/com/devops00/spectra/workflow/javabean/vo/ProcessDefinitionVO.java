@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.workflow.javabean.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
 /// 流程定义响应VO
 ///
@@ -26,7 +26,9 @@ import java.io.Serializable;
 /// @version 1.0
 /// @since 2025/11/11 00:00
 @Data
-public class ProcessDefinitionVO implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProcessDefinitionVO {
 
     /// 流程ID
     private String id;
@@ -48,4 +50,13 @@ public class ProcessDefinitionVO implements Serializable {
 
     /// 是否挂起
     private Boolean suspended;
+
+    /// 流程描述
+    private String description;
+
+    /// 流程分类
+    private String category;
+
+    /// 部署时间
+    private String deploymentTime;
 }

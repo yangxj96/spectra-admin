@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions
+        xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+        xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+        xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="http://example.com/oa-approval">
+
+    <!-- 多级审批流程：适用于合同、采购等复杂场景 -->
+    <bpmn:process id="oaMultiApproval" name="OA多级审批流程" isExecutable="true">
+
+        <!-- 开始事件 -->
+        <bpmn:startEvent id="startEvent" name="开始"/>
+
+        <!-- 提交申请 -->
+        <bpmn:userTask
+                id="submitApplication"
+                name="提交申请"
+                flowable:assignee="${applicant}"/>
+
+        <!-- 部门主管审批 -->
+        <bpmn:userTask
+                id="deptManagerApprove"
+                name="部门主管审批"
+                flowable:assignee="${deptManager}"/>
+
+        <!-- 部门主管审批网关 -->
+        <bpmn:exclusiveGateway
+                id="deptManagerGateway"
+                name="部门主管是否同意"/>
+
+        <!-- 总监审批 -->
+        <bpmn:userTask
+                id="directorApprove"
+                name="总监审批"
+                flowable:assignee="${director}"/>
+
+        <!-- 总监审批网关 -->
+        <bpmn:exclusiveGateway
+                id="directorGateway"
+                name="总监是否同意"/>
+
+        <!-- 总经理审批 -->
+        <bpmn:userTask
+                id="gmApprove"
+                name="总经理审批"
+                flowable:assignee="${generalManager}"/>
+
+        <!-- 总经理审批网关 -->
+        <bpmn:exclusiveGateway
+                id="gmGateway"
+                name="总经理是否同意"/>
+
+        <!-- 结束（通过） -->
+        <bpmn:endEvent
+                id="endApproved"
+                name="审批通过"/>
+
+        <!-- 结束（驳回） -->
+        <bpmn:endEvent
+                id="endRejected"
+                name="审批驳回"/>
+
+        <!-- 顺序流 -->
+        <bpmn:sequenceFlow
+                id="flow_start_submit"
+                sourceRef="startEvent"
+                targetRef="submitApplication"/>
+
+        <bpmn:sequenceFlow
+                id="flow_submit_deptManager"
+                sourceRef="submitApplication"
+                targetRef="deptManagerApprove"/>
+
+        <bpmn:sequenceFlow
+                id="flow_deptManager_gateway"
+                sourceRef="deptManagerApprove"
+                targetRef="deptManagerGateway"/>
+
+        <!-- 部门主管通过 -->
+        <bpmn:sequenceFlow
+                id="flow_deptManager_approved"
+                sourceRef="deptManagerGateway"
+                targetRef="directorApprove">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == true}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <!-- 部门主管驳回 -->
+        <bpmn:sequenceFlow
+                id="flow_deptManager_rejected"
+                sourceRef="deptManagerGateway"
+                targetRef="endRejected">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == false}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <bpmn:sequenceFlow
+                id="flow_director_gateway"
+                sourceRef="directorApprove"
+                targetRef="directorGateway"/>
+
+        <!-- 总监通过 -->
+        <bpmn:sequenceFlow
+                id="flow_director_approved"
+                sourceRef="directorGateway"
+                targetRef="gmApprove">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == true}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <!-- 总监驳回 -->
+        <bpmn:sequenceFlow
+                id="flow_director_rejected"
+                sourceRef="directorGateway"
+                targetRef="endRejected">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == false}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <bpmn:sequenceFlow
+                id="flow_gm_gateway"
+                sourceRef="gmApprove"
+                targetRef="gmGateway"/>
+
+        <!-- 总经理通过 -->
+        <bpmn:sequenceFlow
+                id="flow_gm_approved"
+                sourceRef="gmGateway"
+                targetRef="endApproved">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == true}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+        <!-- 总经理驳回 -->
+        <bpmn:sequenceFlow
+                id="flow_gm_rejected"
+                sourceRef="gmGateway"
+                targetRef="endRejected">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">
+                ${approved == false}
+            </bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+
+    </bpmn:process>
+
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="oaMultiApproval">
+
+            <!-- 开始事件 -->
+            <bpmndi:BPMNShape id="startEvent_di" bpmnElement="startEvent">
+                <dc:Bounds x="100" y="200" width="36" height="36"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="113" y="242" width="24" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 提交申请 -->
+            <bpmndi:BPMNShape id="submitApplication_di" bpmnElement="submitApplication">
+                <dc:Bounds x="224" y="178" width="100" height="80"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+
+            <!-- 部门主管审批 -->
+            <bpmndi:BPMNShape id="deptManagerApprove_di" bpmnElement="deptManagerApprove">
+                <dc:Bounds x="394" y="178" width="100" height="80"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+
+            <!-- 部门主管网关 -->
+            <bpmndi:BPMNShape id="deptManagerGateway_di" bpmnElement="deptManagerGateway" isMarkerVisible="true">
+                <dc:Bounds x="559" y="193" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="545" y="249" width="78" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 总监审批 -->
+            <bpmndi:BPMNShape id="directorApprove_di" bpmnElement="directorApprove">
+                <dc:Bounds x="679" y="178" width="100" height="80"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+
+            <!-- 总监网关 -->
+            <bpmndi:BPMNShape id="directorGateway_di" bpmnElement="directorGateway" isMarkerVisible="true">
+                <dc:Bounds x="844" y="193" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="833" y="249" width="72" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 总经理审批 -->
+            <bpmndi:BPMNShape id="gmApprove_di" bpmnElement="gmApprove">
+                <dc:Bounds x="964" y="178" width="100" height="80"/>
+                <bpmndi:BPMNLabel/>
+            </bpmndi:BPMNShape>
+
+            <!-- 总经理网关 -->
+            <bpmndi:BPMNShape id="gmGateway_di" bpmnElement="gmGateway" isMarkerVisible="true">
+                <dc:Bounds x="1129" y="193" width="50" height="50"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1118" y="249" width="72" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 审批通过 -->
+            <bpmndi:BPMNShape id="endApproved_di" bpmnElement="endApproved">
+                <dc:Bounds x="1246" y="200" width="36" height="36"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="1252" y="242" width="24" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 审批驳回 -->
+            <bpmndi:BPMNShape id="endRejected_di" bpmnElement="endRejected">
+                <dc:Bounds x="650" y="380" width="36" height="36"/>
+                <bpmndi:BPMNLabel>
+                    <dc:Bounds x="656" y="422" width="24" height="14"/>
+                </bpmndi:BPMNLabel>
+            </bpmndi:BPMNShape>
+
+            <!-- 顺序流 -->
+            <bpmndi:BPMNEdge id="flow_start_submit_di" bpmnElement="flow_start_submit">
+                <di:waypoint x="136" y="218"/>
+                <di:waypoint x="224" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_submit_deptManager_di" bpmnElement="flow_submit_deptManager">
+                <di:waypoint x="324" y="218"/>
+                <di:waypoint x="394" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_deptManager_gateway_di" bpmnElement="flow_deptManager_gateway">
+                <di:waypoint x="494" y="218"/>
+                <di:waypoint x="559" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_deptManager_approved_di" bpmnElement="flow_deptManager_approved">
+                <di:waypoint x="609" y="218"/>
+                <di:waypoint x="679" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_deptManager_rejected_di" bpmnElement="flow_deptManager_rejected">
+                <di:waypoint x="584" y="243"/>
+                <di:waypoint x="584" y="380"/>
+                <di:waypoint x="650" y="380"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_director_gateway_di" bpmnElement="flow_director_gateway">
+                <di:waypoint x="779" y="218"/>
+                <di:waypoint x="844" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_director_approved_di" bpmnElement="flow_director_approved">
+                <di:waypoint x="894" y="218"/>
+                <di:waypoint x="964" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_director_rejected_di" bpmnElement="flow_director_rejected">
+                <di:waypoint x="869" y="243"/>
+                <di:waypoint x="869" y="380"/>
+                <di:waypoint x="686" y="380"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_gm_gateway_di" bpmnElement="flow_gm_gateway">
+                <di:waypoint x="1064" y="218"/>
+                <di:waypoint x="1129" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_gm_approved_di" bpmnElement="flow_gm_approved">
+                <di:waypoint x="1179" y="218"/>
+                <di:waypoint x="1246" y="218"/>
+            </bpmndi:BPMNEdge>
+
+            <bpmndi:BPMNEdge id="flow_gm_rejected_di" bpmnElement="flow_gm_rejected">
+                <di:waypoint x="1154" y="243"/>
+                <di:waypoint x="1154" y="380"/>
+                <di:waypoint x="686" y="380"/>
+            </bpmndi:BPMNEdge>
+
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+
+</bpmn:definitions>

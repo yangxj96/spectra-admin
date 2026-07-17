@@ -16,17 +16,34 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
+import com.devops00.spectra.workflow.service.ApprovalCallback;
 import com.devops00.spectra.workflow.service.WorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /// 工作流业务层实现
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
+@Slf4j
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
+    /// 回调注册表：流程定义KEY -> 回调实现
+    private final Map<String, ApprovalCallback> callbackRegistry = new ConcurrentHashMap<>();
 
+    @Override
+    public void registerCallback(String processDefinitionKey, ApprovalCallback callback) {
+        callbackRegistry.put(processDefinitionKey, callback);
+        log.info("审批回调已注册: processDefinitionKey={}", processDefinitionKey);
+    }
+
+    @Override
+    public ApprovalCallback getCallback(String processDefinitionKey) {
+        return callbackRegistry.get(processDefinitionKey);
+    }
 }
-

@@ -16,22 +16,32 @@
 
 package com.devops00.spectra.workflow.service;
 
-/// 工作流业务层
+import java.util.Map;
+
+/// 审批回调接口
+///
+/// 业务模块实现此接口处理审批结果
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/11/11 00:00
-public interface WorkflowService {
+/// @since 2026/7/17
+public interface ApprovalCallback {
 
-    /// 注册审批回调
+    /// 审批通过回调
     ///
-    /// @param processDefinitionKey 流程定义KEY
-    /// @param callback            审批回调实现
-    void registerCallback(String processDefinitionKey, ApprovalCallback callback);
+    /// @param businessKey 业务KEY
+    /// @param variables   流程变量
+    void onApproved(String businessKey, Map<String, Object> variables);
 
-    /// 获取审批回调
+    /// 审批驳回回调
     ///
-    /// @param processDefinitionKey 流程定义KEY
-    /// @return 审批回调实现，未注册时返回null
-    ApprovalCallback getCallback(String processDefinitionKey);
+    /// @param businessKey 业务KEY
+    /// @param reason      驳回原因
+    void onRejected(String businessKey, String reason);
+
+    /// 流程终止回调
+    ///
+    /// @param businessKey 业务KEY
+    /// @param reason      终止原因
+    void onTerminated(String businessKey, String reason);
 }

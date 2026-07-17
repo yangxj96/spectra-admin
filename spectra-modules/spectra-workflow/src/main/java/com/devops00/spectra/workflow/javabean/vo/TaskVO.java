@@ -14,18 +14,40 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.workflow.javabean.from;
+package com.devops00.spectra.workflow.javabean.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-/// 任务完成请求参数
+/// 任务响应VO
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/11/11 00:00
+/// @since 2026/7/17
 @Data
-public class TaskCompleteFrom {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskVO {
 
-    /// 审批意见
-    private String comment;
+    /// 任务ID
+    private String id;
+
+    /// 任务名称
+    private String name;
+
+    /// 任务处理人
+    private String assignee;
+
+    /// 流程实例ID
+    private String processInstanceId;
+
+    /// 流程定义ID
+    private String processDefinitionId;
+
+    /// 任务创建时间
+    private String createTime;
+
+    /// 任务描述
+    private String description;
 }

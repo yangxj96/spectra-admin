@@ -16,10 +16,17 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
+import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
+import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /// 工作流-流程实例
 ///
@@ -29,27 +36,60 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-instances")
+@RequiredArgsConstructor
 public class ProcessInstanceController {
 
-    /*
-    职责
-    启动流程
-    查询实例
-    终止流程
-    查看流程图状态
-    接口示例
-    POST /process-instances/start
-    GET  /process-instances/{id}
-    GET  /process-instances
+    private final ProcessInstanceService processInstanceService;
 
-    POST /process-instances/{id}/terminate
-    GET  /process-instances/{id}/diagram
-     */
-
-    /// 启动流程
+    /// 启动流程（带变量）
+    ///
+    /// @param from 启动参数
+    /// @return 流程实例ID
     @PostMapping(value = "/start", version = "1.0.0+")
-    public void start() {
-
+    public String start(@RequestBody ProcessInstanceStartFrom from) {
+        return processInstanceService.start(
+                from.getProcessDefinitionKey(),
+                from.getBusinessKey(),
+                from.getVariables()
+        );
     }
 
+    /// 查询流程状态
+    ///
+    /// @param id 流程实例ID
+    /// @return 流程实例信息
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    public ProcessInstanceVO getStatus(@PathVariable String id) {
+        return processInstanceService.getStatus(id);
+    }
+
+    /// 获取流程变量
+    ///
+    /// @param id 流程实例ID
+    /// @return 流程变量
+    @GetMapping(value = "/{id}/variables", version = "1.0.0+")
+    public Map<String, Object> getVariables(@PathVariable String id) {
+        return processInstanceService.getVariables(id);
+    }
+
+    /// 终止流程
+    ///
+    /// @param id   流程实例ID
+    /// @param from 终止参数
+    @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
+    public void terminate(@PathVariable String id, @RequestBody Map<String, String> from) {
+        processInstanceService.terminate(id, from.get("reason"));
+    }
+
+    /// 获取流程图（高亮当前节点）
+    ///
+    /// @param id 流程实例ID
+    /// @return 流程图图片（PNG格式）
+    @GetMapping(value = "/{id}/diagram", version = "1.0.0+")
+    public ResponseEntity<byte[]> getDiagram(@PathVariable String id) {
+        byte[] diagramBytes = processInstanceService.getDiagram(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.IMAGE_PNG_VALUE)
+                .body(diagramBytes);
+    }
 }

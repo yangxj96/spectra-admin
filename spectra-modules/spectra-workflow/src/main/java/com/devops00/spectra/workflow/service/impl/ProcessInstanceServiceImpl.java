@@ -17,12 +17,19 @@
 package com.devops00.spectra.workflow.service.impl;
 
 
+import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.image.ProcessDiagramGenerator;
 import org.springframework.stereotype.Service;
+
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /// 流程实例Service实现
 ///
@@ -35,9 +42,16 @@ import org.springframework.stereotype.Service;
 public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     private final RuntimeService runtimeService;
+    private final RepositoryService repositoryService;
+    private final ProcessDiagramGenerator processDiagramGenerator;
 
     @Override
     public String start(String processDefinitionKey, String businessKey) {
+        return start(processDefinitionKey, businessKey, new HashMap<>());
+    }
+
+    @Override
+    public String start(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
         try {
             // 1. 防重复启动
             long count = runtimeService.createProcessInstanceQuery()
@@ -51,14 +65,106 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             // 2. 启动流程
             ProcessInstance instance = runtimeService.startProcessInstanceByKey(
                     processDefinitionKey,
-                    businessKey
+                    businessKey,
+                    variables
             );
 
+            log.info("流程已启动: processInstanceId={}, businessKey={}", instance.getId(), businessKey);
             return instance.getId();
 
         } catch (Exception e) {
             // 3. 统一异常
             throw new RuntimeException("启动流程失败: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public ProcessInstanceVO getStatus(String processInstanceId) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        if (instance == null) {
+            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+        }
+
+        ProcessInstanceVO vo = new ProcessInstanceVO();
+        vo.setId(instance.getId());
+        vo.setProcessDefinitionId(instance.getProcessDefinitionId());
+        vo.setProcessDefinitionKey(instance.getProcessDefinitionKey());
+        vo.setBusinessKey(instance.getBusinessKey());
+        vo.setSuspended(instance.isSuspended());
+        vo.setEnded(instance.isEnded());
+        vo.setStartTime(instance.getStartTime() != null ? instance.getStartTime().toString() : null);
+        vo.setStartUserId(instance.getStartUserId());
+        return vo;
+    }
+
+    @Override
+    public Map<String, Object> getVariables(String processInstanceId) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        if (instance == null) {
+            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+        }
+
+        return runtimeService.getVariables(processInstanceId);
+    }
+
+    @Override
+    public void terminate(String processInstanceId, String reason) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        if (instance == null) {
+            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+        }
+
+        runtimeService.deleteProcessInstance(processInstanceId, reason);
+        log.info("流程已终止: processInstanceId={}, reason={}", processInstanceId, reason);
+    }
+
+    @Override
+    public byte[] getDiagram(String processInstanceId) {
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .singleResult();
+
+        if (instance == null) {
+            throw new RuntimeException("流程实例不存在: " + processInstanceId);
+        }
+
+        // 获取当前活动ID
+        java.util.List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstanceId);
+
+        // 获取 BPMN 模型
+        var model = repositoryService.getBpmnModel(instance.getProcessDefinitionId());
+        if (model == null) {
+            throw new RuntimeException("无法获取流程模型: " + processInstanceId);
+        }
+
+        // 使用 ProcessDiagramGenerator 生成流程图（高亮当前节点）
+        try (var diagramStream = processDiagramGenerator.generateDiagram(
+                model,                           // BpmnModel
+                "png",                           // imageType
+                activeActivityIds,               // highLightedActivities
+                java.util.Collections.emptyList(), // highLightedFlows
+                "宋体",                          // activityFontName
+                "宋体",                          // labelFontName
+                "宋体",                          // annotationFontName
+                this.getClass().getClassLoader(), // customClassLoader
+                1.0,                             // scaleFactor
+                false                            // drawSequenceFlowNameWithNoLabelDI
+        )) {
+            if (diagramStream == null) {
+                throw new RuntimeException("无法生成流程图: " + processInstanceId);
+            }
+            return diagramStream.readAllBytes();
+        } catch (Exception e) {
+            throw new RuntimeException("读取流程图失败: " + e.getMessage(), e);
         }
     }
 }

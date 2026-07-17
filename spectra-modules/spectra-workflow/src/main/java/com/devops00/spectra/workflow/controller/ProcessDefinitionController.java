@@ -16,21 +16,22 @@
 
 package com.devops00.spectra.workflow.controller;
 
+import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.flowable.engine.repository.Deployment;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.image.ProcessDiagramGenerator;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /// 工作流-流程定义
 ///
-/// 面向“设计器 + 运维”
+/// 面向"设计器 + 运维"
 ///
 /// @author yangxj96
 /// @version 1.0
@@ -42,47 +43,120 @@ import java.util.Map;
 public class ProcessDefinitionController {
 
     private final RepositoryService repositoryService;
-
-
-    /*
-    职责
-    流程定义 CRUD
-    发布 / 版本管理
-    导入导出（BPMN / JSON）
-    激活 / 挂起
-    典型接口
-    POST   /process-definitions
-    PUT    /process-definitions/{id}
-    GET    /process-definitions/{id}
-    GET    /process-definitions
-    DELETE /process-definitions/{id}
-
-    POST   /process-definitions/{id}/deploy
-    POST   /process-definitions/{id}/activate
-    POST   /process-definitions/{id}/suspend
-     */
+    private final ProcessDiagramGenerator processDiagramGenerator;
 
     /// 获取所有的流程定义
     ///
     /// @return 流程定义列表
-    @GetMapping(value = "/definitions", version = "1.0.0+")
-    public List<Map<String, Object>> definitions() {
+    @GetMapping(value = "", version = "1.0.0+")
+    public List<ProcessDefinitionVO> definitions() {
         var definitions = repositoryService
                 .createProcessDefinitionQuery()
                 .list();
-        var result = new ArrayList<Map<String, Object>>();
+        var result = new ArrayList<ProcessDefinitionVO>();
         for (var definition : definitions) {
-            var m = new HashMap<String, Object>();
-            m.put("id", definition.getId());
-            m.put("deploymentId", definition.getDeploymentId());
-            m.put("description", definition.getDescription());
-            m.put("key", definition.getKey());
-            m.put("name", definition.getName());
-            m.put("ver", definition.getVersion());
-            result.add(m);
+            result.add(convertToVO(definition));
         }
         return result;
     }
 
+    /// 获取流程定义详情
+    ///
+    /// @param id 流程定义ID
+    /// @return 流程定义详情
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    public ProcessDefinitionVO definitionDetail(@PathVariable String id) {
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(id)
+                .singleResult();
+        if (definition == null) {
+            throw new RuntimeException("流程定义不存在: " + id);
+        }
+        return convertToVO(definition);
+    }
 
+    /// 获取流程定义图
+    ///
+    /// @param id 流程定义ID
+    /// @return 流程图图片（PNG格式）
+    @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
+    public byte[] getDiagram(@PathVariable String id) {
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(id)
+                .singleResult();
+        if (definition == null) {
+            throw new RuntimeException("流程定义不存在: " + id);
+        }
+
+        // 获取 BPMN 模型
+        var model = repositoryService.getBpmnModel(id);
+        if (model == null) {
+            throw new RuntimeException("无法获取流程模型: " + id);
+        }
+
+        // 使用 ProcessDiagramGenerator 生成流程图
+        try (var diagramStream = processDiagramGenerator.generateDiagram(
+                model,                           // BpmnModel
+                "png",                           // imageType
+                java.util.Collections.emptyList(), // highLightedActivities
+                java.util.Collections.emptyList(), // highLightedFlows
+                "宋体",                          // activityFontName
+                "宋体",                          // labelFontName
+                "宋体",                          // annotationFontName
+                this.getClass().getClassLoader(), // customClassLoader
+                1.0,                             // scaleFactor
+                false                            // drawSequenceFlowNameWithNoLabelDI
+        )) {
+            if (diagramStream == null) {
+                throw new RuntimeException("无法生成流程图: " + id);
+            }
+            return diagramStream.readAllBytes();
+        } catch (Exception e) {
+            throw new RuntimeException("读取流程图失败: " + e.getMessage(), e);
+        }
+    }
+
+    /// 挂起流程定义
+    ///
+    /// @param id 流程定义ID
+    @PostMapping(value = "/{id}/suspend", version = "1.0.0+")
+    public void suspend(@PathVariable String id) {
+        repositoryService.suspendProcessDefinitionById(id);
+        log.info("流程定义已挂起: id={}", id);
+    }
+
+    /// 激活流程定义
+    ///
+    /// @param id 流程定义ID
+    @PostMapping(value = "/{id}/activate", version = "1.0.0+")
+    public void activate(@PathVariable String id) {
+        repositoryService.activateProcessDefinitionById(id);
+        log.info("流程定义已激活: id={}", id);
+    }
+
+    /// 将 ProcessDefinition 转换为 ProcessDefinitionVO
+    private ProcessDefinitionVO convertToVO(ProcessDefinition definition) {
+        ProcessDefinitionVO vo = new ProcessDefinitionVO();
+        vo.setId(definition.getId());
+        vo.setKey(definition.getKey());
+        vo.setName(definition.getName());
+        vo.setVersion(definition.getVersion());
+        vo.setDeploymentId(definition.getDeploymentId());
+        vo.setResourceName(definition.getResourceName());
+        vo.setSuspended(definition.isSuspended());
+        vo.setDescription(definition.getDescription());
+        vo.setCategory(definition.getCategory());
+
+        // 获取部署时间
+        if (definition.getDeploymentId() != null) {
+            Deployment deployment = repositoryService.createDeploymentQuery()
+                    .deploymentId(definition.getDeploymentId())
+                    .singleResult();
+            if (deployment != null && deployment.getDeploymentTime() != null) {
+                vo.setDeploymentTime(deployment.getDeploymentTime().toString());
+            }
+        }
+
+        return vo;
+    }
 }

@@ -16,10 +16,14 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import com.devops00.spectra.workflow.service.WorkflowService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
+import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
+import com.devops00.spectra.workflow.javabean.from.TaskTransferFrom;
+import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /// 工作流-任务相关
 ///
@@ -31,23 +35,61 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TaskController {
 
-    private final WorkflowService workflowService;
+    private final TaskService taskService;
 
-    /*
-    👉 ⭐ 最核心（用户日常操作）
-    职责
-    我的待办 / 已办
-    任务处理
-    转办 / 委派
-    接口示例
-    GET  /tasks/todo
-    GET  /tasks/done
+    /// 查询待办任务
+    ///
+    /// @param page 分页参数
+    /// @return 待办任务列表
+    @GetMapping(value = "/todo", version = "1.0.0+")
+    public Object todo(PageFrom page) {
+        String username = SecUtil.getCurrentUsername();
+        return taskService.todo(page, username);
+    }
 
-    POST /tasks/{id}/complete
-    POST /tasks/{id}/reject
-    POST /tasks/{id}/transfer
-    POST /tasks/{id}/delegate
-     */
+    /// 查询已办任务
+    ///
+    /// @param page 分页参数
+    /// @return 已办任务列表
+    @GetMapping(value = "/done", version = "1.0.0+")
+    public Object done(PageFrom page) {
+        String username = SecUtil.getCurrentUsername();
+        return taskService.done(page, username);
+    }
 
+    /// 完成任务（审批通过）
+    ///
+    /// @param id   任务ID
+    /// @param from 完成参数
+    @PostMapping(value = "/{id}/complete", version = "1.0.0+")
+    public void complete(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
+        taskService.complete(id, from.getComment());
+    }
 
+    /// 驳回任务
+    ///
+    /// @param id   任务ID
+    /// @param from 完成参数
+    @PostMapping(value = "/{id}/reject", version = "1.0.0+")
+    public void reject(@PathVariable String id, @RequestBody TaskCompleteFrom from) {
+        taskService.reject(id, from.getComment());
+    }
+
+    /// 转办任务
+    ///
+    /// @param id   任务ID
+    /// @param from 转办参数
+    @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
+    public void transfer(@PathVariable String id, @RequestBody TaskTransferFrom from) {
+        taskService.transfer(id, from.getTargetUserId());
+    }
+
+    /// 委派任务
+    ///
+    /// @param id   任务ID
+    /// @param from 委派参数
+    @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
+    public void delegate(@PathVariable String id, @RequestBody TaskDelegateFrom from) {
+        taskService.delegate(id, from.getTargetUserId());
+    }
 }

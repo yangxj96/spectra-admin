@@ -17,6 +17,11 @@
 package com.devops00.spectra.workflow.configure;
 
 
+import org.flowable.image.ProcessDiagramGenerator;
+import org.flowable.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.boot.EngineConfigurationConfigurer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /// 工作流配置
@@ -27,5 +32,24 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WorkflowConfiguration {
 
+    /// 配置流程引擎
+    @Bean
+    public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
+        return configuration -> {
+            // 启用数据库 schema 自动更新
+            configuration.setDatabaseSchemaUpdate("true");
+            // 配置流程定义部署
+            configuration.setDeploymentMode("single-resource");
+            // 配置流程图生成器字体（中文支持）
+            configuration.setActivityFontName("宋体");
+            configuration.setLabelFontName("宋体");
+            configuration.setAnnotationFontName("宋体");
+        };
+    }
 
+    /// 配置流程图生成器
+    @Bean
+    public ProcessDiagramGenerator processDiagramGenerator() {
+        return new DefaultProcessDiagramGenerator();
+    }
 }
