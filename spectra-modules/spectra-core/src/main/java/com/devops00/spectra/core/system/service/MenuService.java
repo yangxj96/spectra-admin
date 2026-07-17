@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
@@ -30,7 +30,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
-public interface MenuService extends IService<Menu> {
+public interface MenuService extends BaseService<Menu> {
 
     /// 创建菜单
     ///

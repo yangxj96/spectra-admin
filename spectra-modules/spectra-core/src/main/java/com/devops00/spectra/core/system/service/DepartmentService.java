@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service;
 
-import com.baomidou.mybatisplus.extension.service.IService;
+import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
@@ -31,7 +31,7 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/15 00:00
-public interface DepartmentService extends IService<Department> {
+public interface DepartmentService extends BaseService<Department> {
 
     /// 新增组织机构
     ///
