@@ -69,6 +69,20 @@ spectra-launch       → 应用入口，运行此模块
 
 ## 代码风格与命名约定
 
+### 后端开发规范
+
+**编写后端代码时必须遵循以下规范文档：**
+
+- `docs/10-后端/15-后端开发规范` — 完整的后端编码规范（Controller/Service/异常/日志/命名等）
+
+规范概要：
+- **Controller**：`@RequiredArgsConstructor`、`@ULog`（所有接口）、`@PreAuthorize`（所有接口）、`@Validated`（写操作）、瘦 Controller、禁止返回 Object
+- **Service**：接口继承 `IService`、实现类继承 `BaseServiceImpl`、`@Slf4j` 详细日志
+- **异常**：全部自定义异常，禁止 `RuntimeException`，消息统一中文
+- **方法命名**：`created`/`modify`/`deleteById`/`page`
+- **Converter**：所有模块必须使用 MapStruct Converter
+- **From 对象**：统一后缀 `From`（非 Form），必填字段必须加校验注解
+
 ### 注释
 - 使用三斜杠（`///`）注释，而非 Javadoc 块注释
 - 每个 Java 文件必须包含 Apache License 2.0 头部
