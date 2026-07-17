@@ -18,8 +18,8 @@ package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.NotImplementedException;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
-public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<UUID> {
+public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Department> implements DepartmentService, NameLookup<UUID> {
 
     private final OrganizationConverter organizationConverter;
 

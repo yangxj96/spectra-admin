@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import com.devops00.spectra.core.system.mapper.OperationLogMapper;
 import com.devops00.spectra.core.system.service.OperationLogService;
@@ -30,5 +30,5 @@ import org.springframework.stereotype.Service;
 /// @since 2025/6/14 00:00
 @Slf4j
 @Service
-public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
+public class OperationLogServiceImpl extends BaseServiceImpl<OperationLogMapper, OperationLog> implements OperationLogService {
 }

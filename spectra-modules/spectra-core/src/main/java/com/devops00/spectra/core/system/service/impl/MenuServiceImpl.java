@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
@@ -46,7 +46,7 @@ import java.util.UUID;
 /// @since 2025/6/14 00:00
 @Slf4j
 @Service
-public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements MenuService {
+public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implements MenuService {
 
     private final MenuConverter menuConverter;
 
