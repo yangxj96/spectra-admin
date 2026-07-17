@@ -14,18 +14,22 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.workflow;
+package com.devops00.spectra.workflow.javabean.from;
 
+import lombok.Data;
 
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.context.annotation.ComponentScan;
-
-/// 文件上传模块
+/// 表单分页查询条件
 ///
-/// - **作者:** yangxj96
-/// - **版本:** 1.0
-/// - **始于:** 2026/3/8 23:41
-@ComponentScan("com.devops00.spectra.workflow")
-@MapperScan("com.devops00.spectra.workflow.**.mapper")
-public class WorkflowModule {
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/7/17
+@Data
+public class FormPageFrom {
+
+    /// 表单名称（模糊查询）
+    private String name;
+
+    /// 是否启用
+    private Boolean active;
+
 }
