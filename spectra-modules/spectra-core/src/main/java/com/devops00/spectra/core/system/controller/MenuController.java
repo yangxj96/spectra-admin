@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 菜单控制器
 ///
@@ -58,7 +59,7 @@ public class MenuController {
     @ULog("'删除菜单'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:DELETE')")
-    public void deleteById(@PathVariable String id) {
+    public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
     }
 

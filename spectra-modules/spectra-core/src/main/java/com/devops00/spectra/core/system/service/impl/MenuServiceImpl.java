@@ -31,7 +31,6 @@ import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +60,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     @Override
     @Transactional
     public void created(MenuSaveFrom params) {
-        var menu = new Menu();
-        BeanUtils.copyProperties(params, menu);
+        var menu = menuConverter.toEntity(params);
         this.save(menu);
     }
 
@@ -72,8 +70,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         if (null == this.getById(params.getId())) {
             throw new DataNotExistException("[" + params.getId() + "]不存在");
         }
-        var menu = new Menu();
-        BeanUtils.copyProperties(params, menu);
+        var menu = menuConverter.toEntity(params);
         this.updateById(menu);
     }
 
@@ -98,8 +95,8 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     }
 
     @Override
-    public void deleteById(String id) {
-        Menu menu = this.getById(id);
+    public void deleteById(UUID id) {
+        var menu = this.getById(id);
         if (menu == null) {
             throw new DataNotExistException("[" + id + "]不存在");
         }

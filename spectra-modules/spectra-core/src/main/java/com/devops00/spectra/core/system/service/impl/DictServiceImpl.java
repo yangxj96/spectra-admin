@@ -110,7 +110,7 @@ public class DictServiceImpl implements DictService {
 
     @Override
     @Transactional
-    public void deleteData(String id) {
+    public void deleteData(UUID id) {
         var dictData = dataService.getById(id);
         if (null == dictData) {
             throw new DataNotExistException("字典项不存在");

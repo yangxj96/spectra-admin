@@ -56,7 +56,7 @@ public interface DictService {
     /// 根据ID删除字典数据
     ///
     /// @param id 字典数据ID
-    void deleteData(String id);
+    void deleteData(UUID id);
 
     /// 修改字典数据
     ///

@@ -28,6 +28,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 组织机构控制器
 ///
@@ -61,7 +62,7 @@ public class DepartmentController {
     @ULog("'删除组织机构'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
-    public void deleteById(@PathVariable String id) {
+    public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
     }
 

@@ -31,7 +31,7 @@
       <result column="layout"    property="layout" />
       <result column="sort"      property="sort" />
       <result column="hide"      property="hide" />
-      <result column="metadata"  property="metadata" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
+      <result column="metadata"  property="metadata" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
   </resultMap>
   <!-- @formatter:on -->
 

@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
@@ -47,6 +48,7 @@ public interface ConfiguredService extends BaseService<Configured> {
     ///
     /// @param key     配置键
     /// @param value   配置值
+    /// @param type    值类型
     /// @param remarks 备注说明
-    void upsert(String key, String value, String remarks);
+    void upsert(String key, String value, ConfiguredValueType type, String remarks);
 }

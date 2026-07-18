@@ -85,7 +85,7 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
 
     @Override
     @Transactional
-    public void deleteById(String id) {
+    public void deleteById(UUID id) {
         // this.removeById(Long.parseLong(id))
         throw new NotImplementedException("暂未实现");
     }

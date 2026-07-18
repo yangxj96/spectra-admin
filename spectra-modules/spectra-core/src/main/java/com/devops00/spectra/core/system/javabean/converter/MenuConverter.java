@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.javabean.converter;
 
 import com.devops00.spectra.core.system.javabean.entity.Menu;
+import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
@@ -56,4 +57,10 @@ public interface MenuConverter {
     /// @param source 实体
     /// @return VO
     List<MenuVO> toVOList(List<Menu> source);
+
+    /// 保存入参转实体
+    ///
+    /// @param source 保存入参
+    /// @return 实体
+    Menu toEntity(MenuSaveFrom source);
 }

@@ -56,5 +56,5 @@ public interface MenuService extends BaseService<Menu> {
     /// 根据ID删除菜单
     ///
     /// @param id 菜单ID
-    void deleteById(String id);
+    void deleteById(UUID id);
 }

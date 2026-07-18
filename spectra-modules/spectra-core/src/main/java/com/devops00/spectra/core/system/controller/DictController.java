@@ -63,8 +63,8 @@ public class DictController {
     @ULog("'删除字典组'")
     @DeleteMapping(value = "/group/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
-    public void deleteGroup(@PathVariable String id) {
-        bindService.deleteGroup(UUID.fromString(id));
+    public void deleteGroup(@PathVariable UUID id) {
+        bindService.deleteGroup(id);
     }
 
     /// 修改字典组
@@ -93,7 +93,7 @@ public class DictController {
     @ULog("'删除字典项'")
     @DeleteMapping(value = "/data/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
-    public void deleteData(@PathVariable String id) {
+    public void deleteData(@PathVariable UUID id) {
         bindService.deleteData(id);
     }
 

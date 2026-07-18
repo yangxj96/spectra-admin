@@ -124,9 +124,9 @@ public class RoleController {
     @ULog("'保存角色关联的权限列表'")
     @PutMapping(value = "/{roleId}/authorities", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
-    public void saveRoleRelAuthorityByRoleId(@PathVariable String roleId, @Validated @RequestBody RoleAuthorityFrom from) {
+    public void saveRoleRelAuthorityByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         try {
-            relRoleAuthorityService.grant(UUID.fromString(roleId), from);
+            relRoleAuthorityService.grant(roleId, from);
         } catch (Exception e) {
             log.error("{}保存角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new DataException("参数转换失败");

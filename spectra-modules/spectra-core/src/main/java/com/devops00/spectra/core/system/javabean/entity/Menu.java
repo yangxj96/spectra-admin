@@ -16,10 +16,12 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -78,6 +80,7 @@ public class Menu extends BaseEntity implements Serializable {
     private Boolean hide;
 
     /// 菜单元数据
-    @TableField(value = "metadata", typeHandler = Jackson3TypeHandler.class)
+    @TableField(value = "metadata", typeHandler = PgJsonbTypeHandler.class,
+            updateStrategy = FieldStrategy.ALWAYS)
     private Map<String, Object> metadata;
 }

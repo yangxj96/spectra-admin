@@ -75,18 +75,19 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
 
     @Override
     @Transactional
-    public void upsert(String key, String value, String remarks) {
+    public void upsert(String key, String value, ConfiguredValueType type, String remarks) {
         var existing = this.getOne(
                 new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
         if (existing != null) {
             existing.setValue(value);
+            existing.setType(type);
             existing.setRemarks(remarks);
             this.updateById(existing);
         } else {
             var entity = new Configured();
             entity.setKey(key);
             entity.setValue(value);
-            entity.setType(ConfiguredValueType.TEXT);
+            entity.setType(type);
             entity.setRemarks(remarks);
             this.save(entity);
         }

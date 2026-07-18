@@ -41,7 +41,7 @@ public interface DepartmentService extends BaseService<Department> {
     /// 根据ID删除组织机构
     ///
     /// @param id ID
-    void deleteById(String id);
+    void deleteById(UUID id);
 
     /// 编辑组织机构
     ///

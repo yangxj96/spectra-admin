@@ -29,6 +29,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /// 权限相关操作
 ///
@@ -56,7 +57,7 @@ public class AuthorityController {
     @ULog("'删除权限'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public void deleteAuthority(@PathVariable String id) {
+    public void deleteAuthority(@PathVariable UUID id) {
         throw new NotImplementedException("无需实现错误," + id);
     }
 

@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
+import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.core.system.javabean.vo.CryptoClientKeyVO;
@@ -87,11 +88,11 @@ public class CryptoController {
             String clientPrivateKey = RSAUtils.getPrivateKeyBase64(clientPair.getPrivate());
 
             String remarks = "RSA密钥对自动生成";
-            configuredService.upsert("crypto.server.public-key", serverPublicKey, remarks);
-            configuredService.upsert("crypto.server.private-key", serverPrivateKey, remarks);
-            configuredService.upsert("crypto.client.public-key", clientPublicKey, remarks);
-            configuredService.upsert("crypto.client.private-key", clientPrivateKey, remarks);
-            configuredService.upsert("crypto.enabled", "true", remarks);
+            configuredService.upsert("crypto.server.public-key", serverPublicKey, ConfiguredValueType.TEXT, remarks);
+            configuredService.upsert("crypto.server.private-key", serverPrivateKey, ConfiguredValueType.TEXT, remarks);
+            configuredService.upsert("crypto.client.public-key", clientPublicKey, ConfiguredValueType.TEXT, remarks);
+            configuredService.upsert("crypto.client.private-key", clientPrivateKey, ConfiguredValueType.TEXT, remarks);
+            configuredService.upsert("crypto.enabled", "true", ConfiguredValueType.BOOL, remarks);
 
             cryptoKeyManager.refresh();
 
