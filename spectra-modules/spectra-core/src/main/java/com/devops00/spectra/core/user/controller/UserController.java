@@ -20,10 +20,13 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
+import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -89,5 +92,21 @@ public class UserController {
     @PreAuthorize("isAuthenticated()")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
+    }
+
+    @ULog("'获取当前用户详情'")
+    @GetMapping(value = "/profile", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
+    public UserProfileVO getProfile() {
+        UUID userId = SecUtil.getCurrentUserId();
+        return bindService.getProfile(userId);
+    }
+
+    @ULog("'更新当前用户信息'")
+    @PutMapping(value = "/profile", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
+    public void updateProfile(@Validated @RequestBody UserProfileFrom params) {
+        UUID userId = SecUtil.getCurrentUserId();
+        bindService.updateProfile(userId, params);
     }
 }
