@@ -22,6 +22,7 @@ import com.devops00.spectra.core.auth.javabean.entity.Account;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 /// 账号服务
@@ -60,4 +61,30 @@ public interface AccountService extends BaseService<Account> {
     ///
     /// @param userId 用户ID
     void deleteByUserId(UUID userId);
+
+    /// 获取用户的所有绑定账号
+    ///
+    /// @param userId 用户ID
+    /// @return 账号列表
+    List<Account> listByUserId(UUID userId);
+
+    /// 绑定手机号
+    ///
+    /// @param userId 用户ID
+    /// @param phone 手机号
+    /// @param code 验证码
+    void bindPhone(UUID userId, String phone, String code);
+
+    /// 绑定邮箱
+    ///
+    /// @param userId 用户ID
+    /// @param email 邮箱
+    /// @param code 验证码
+    void bindEmail(UUID userId, String email, String code);
+
+    /// 解绑账号
+    ///
+    /// @param userId 用户ID
+    /// @param accountId 账号ID
+    void unbind(UUID userId, UUID accountId);
 }
