@@ -21,8 +21,10 @@ import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
+import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 
 import java.util.List;
@@ -66,5 +68,17 @@ public interface UserService extends BaseService<User> {
     ///
     /// @return 获取到的数据
     List<UserOnlineVO> online(PageFrom page);
+
+    /// 获取当前用户详情
+    ///
+    /// @param userId 用户ID
+    /// @return 用户详情
+    UserProfileVO getProfile(UUID userId);
+
+    /// 更新当前用户信息
+    ///
+    /// @param userId 用户ID
+    /// @param params 更新参数
+    void updateProfile(UUID userId, UserProfileFrom params);
 
 }

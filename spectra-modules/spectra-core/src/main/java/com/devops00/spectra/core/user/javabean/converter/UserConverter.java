@@ -18,8 +18,10 @@ package com.devops00.spectra.core.user.javabean.converter;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
@@ -58,4 +60,16 @@ public interface UserConverter {
     /// @param source 更新的参数
     /// @param target 现有的实体
     void updateUser(UserSaveFrom source, @MappingTarget User target);
+
+    /// 实体转用户详情VO
+    ///
+    /// @param source 实体
+    /// @return 用户详情VO
+    UserProfileVO toProfileVO(User source);
+
+    /// 使用params更新现有的user实体（个人中心）
+    ///
+    /// @param source 更新的参数
+    /// @param target 现有的实体
+    void updateProfile(UserProfileFrom source, @MappingTarget User target);
 }

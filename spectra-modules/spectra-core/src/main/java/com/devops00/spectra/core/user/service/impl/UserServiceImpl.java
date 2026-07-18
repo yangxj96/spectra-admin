@@ -37,8 +37,10 @@ import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScopeTarget;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
+import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
+import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
@@ -253,6 +255,41 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public List<UserOnlineVO> online(PageFrom page) {
         return SecUtil.online();
+    }
+
+    @Override
+    public UserProfileVO getProfile(UUID userId) {
+        var user = this.getById(userId);
+        if (user == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+        var vo = userConverter.toProfileVO(user);
+        // 填充部门名称
+        if (user.getDepartmentId() != null) {
+            var dept = departmentService.getById(user.getDepartmentId());
+            if (dept != null) {
+                vo.setDepartmentName(dept.getName());
+            }
+        }
+        // 填充角色列表
+        var roles = relUserRoleService.getRoles(userId);
+        if (roles != null && !roles.isEmpty()) {
+            vo.setRoles(roles.stream().map(roleConverter::toVO).toList());
+        }
+        return vo;
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(UUID userId, UserProfileFrom params) {
+        var user = this.getById(userId);
+        if (user == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+        userConverter.updateProfile(params, user);
+        if (this.baseMapper.updateById(user) == 0) {
+            throw new EntityUpdateException("更新用户信息失败");
+        }
     }
 
 
