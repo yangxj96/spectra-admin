@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
@@ -80,5 +81,11 @@ public interface UserService extends BaseService<User> {
     /// @param userId 用户ID
     /// @param params 更新参数
     void updateProfile(UUID userId, UserProfileFrom params);
+
+    /// 修改当前用户密码
+    ///
+    /// @param userId 用户ID
+    /// @param params 修改密码参数
+    void changePassword(UUID userId, ChangePasswordFrom params);
 
 }

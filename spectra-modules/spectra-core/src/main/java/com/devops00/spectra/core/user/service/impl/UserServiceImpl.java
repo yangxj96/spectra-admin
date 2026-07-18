@@ -25,6 +25,7 @@ import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
@@ -36,6 +37,7 @@ import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScopeTarget;
+import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
@@ -290,6 +292,44 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (this.baseMapper.updateById(user) == 0) {
             throw new EntityUpdateException("更新用户信息失败");
         }
+    }
+
+    @Override
+    @Transactional
+    public void changePassword(UUID userId, ChangePasswordFrom params) {
+        // 1. 获取用户
+        var user = this.getById(userId);
+        if (user == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+
+        // 2. 获取用户的默认账号
+        var account = accountService.getDefaultByUserId(userId);
+        if (account == null) {
+            throw new DataNotExistException("账号不存在");
+        }
+
+        // 3. 验证旧密码
+        if (!passwordEncoder.matches(params.getOld_password(), account.getPassword())) {
+            throw new SpectraException("旧密码错误");
+        }
+
+        // 4. 验证新密码和确认密码是否一致
+        if (!params.getNew_password().equals(params.getVerify_password())) {
+            throw new SpectraException("两次输入的新密码不一致");
+        }
+
+        // 5. 验证新密码不能与旧密码相同
+        if (passwordEncoder.matches(params.getNew_password(), account.getPassword())) {
+            throw new SpectraException("新密码不能与旧密码相同");
+        }
+
+        // 6. 加密新密码并更新
+        account.setPassword(passwordEncoder.encode(params.getNew_password()));
+        if (!accountService.updateById(account)) {
+            throw new EntityUpdateException("修改密码失败");
+        }
+        log.info("用户 {} 修改密码成功", userId);
     }
 
 
