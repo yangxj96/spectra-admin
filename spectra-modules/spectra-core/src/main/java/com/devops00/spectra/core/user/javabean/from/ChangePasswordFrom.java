@@ -35,7 +35,7 @@ public class ChangePasswordFrom {
 
     /// 旧密码
     @NotBlank(message = "旧密码不能为空")
-    private String old_password;
+    private String oldPassword;
 
     /// 新密码
     @NotBlank(message = "新密码不能为空")
@@ -44,9 +44,9 @@ public class ChangePasswordFrom {
         regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$",
         message = "密码必须包含大小写字母、数字和特殊字符（@$!%*?&）"
     )
-    private String new_password;
+    private String newPassword;
 
     /// 确认密码
     @NotBlank(message = "确认密码不能为空")
-    private String verify_password;
+    private String verifyPassword;
 }

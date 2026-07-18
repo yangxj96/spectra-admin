@@ -310,22 +310,22 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
 
         // 3. 验证旧密码
-        if (!passwordEncoder.matches(params.getOld_password(), account.getPassword())) {
+        if (!passwordEncoder.matches(params.getOldPassword(), account.getPassword())) {
             throw new SpectraException("旧密码错误");
         }
 
         // 4. 验证新密码和确认密码是否一致
-        if (!params.getNew_password().equals(params.getVerify_password())) {
+        if (!params.getNewPassword().equals(params.getVerifyPassword())) {
             throw new SpectraException("两次输入的新密码不一致");
         }
 
         // 5. 验证新密码不能与旧密码相同
-        if (passwordEncoder.matches(params.getNew_password(), account.getPassword())) {
+        if (passwordEncoder.matches(params.getNewPassword(), account.getPassword())) {
             throw new SpectraException("新密码不能与旧密码相同");
         }
 
         // 6. 加密新密码并更新
-        account.setPassword(passwordEncoder.encode(params.getNew_password()));
+        account.setPassword(passwordEncoder.encode(params.getNewPassword()));
         if (!accountService.updateById(account)) {
             throw new EntityUpdateException("修改密码失败");
         }
