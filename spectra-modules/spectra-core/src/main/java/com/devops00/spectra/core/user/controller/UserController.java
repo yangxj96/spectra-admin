@@ -19,6 +19,7 @@ package com.devops00.spectra.core.user.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
@@ -108,5 +109,13 @@ public class UserController {
     public void updateProfile(@Validated @RequestBody UserProfileFrom params) {
         UUID userId = SecUtil.getCurrentUserId();
         bindService.updateProfile(userId, params);
+    }
+
+    @ULog("'修改密码'")
+    @PutMapping(value = "/password", version = "1.0.0+")
+    @PreAuthorize("isAuthenticated()")
+    public void changePassword(@Validated @RequestBody ChangePasswordFrom params) {
+        UUID userId = SecUtil.getCurrentUserId();
+        bindService.changePassword(userId, params);
     }
 }
