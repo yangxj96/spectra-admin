@@ -45,6 +45,11 @@
             <artifactId>flowable-spring-boot-starter</artifactId>
             <version>8.0.0</version>
         </dependency>
+        <!-- === XSS 注解（部署接口需跳过清洗） === -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-xss</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -144,8 +144,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         if (from.getCategory() != null) {
             deploymentBuilder.category(from.getCategory());
         }
+        String bpmnXml = from.getBpmnXml();
+        if (bpmnXml.startsWith("\uFEFF")) {
+            bpmnXml = bpmnXml.substring(1);
+        }
+        bpmnXml = bpmnXml.strip();
         var deployment = deploymentBuilder
-                .addString("process.bpmn20.xml", from.getBpmnXml())
+                .addString("process.bpmn20.xml", bpmnXml)
                 .deploy();
 
         var definition = repositoryService.createProcessDefinitionQuery()

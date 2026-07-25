@@ -24,6 +24,7 @@ import com.devops00.spectra.workflow.service.ProcessDefinitionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.dreamlu.mica.xss.core.XssCleanIgnore;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -94,6 +95,7 @@ public class ProcessDefinitionController {
     }
 
     /// 部署流程定义（新增或更新版本）
+    @XssCleanIgnore
     @ULog("'部署流程定义'")
     @PostMapping(value = "/deploy", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:INSERT')")
