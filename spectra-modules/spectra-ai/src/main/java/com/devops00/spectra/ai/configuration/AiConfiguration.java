@@ -18,6 +18,7 @@ package com.devops00.spectra.ai.configuration;
 
 
 import com.devops00.spectra.ai.base.AiToolMarker;
+import com.devops00.spectra.ai.store.PostgresChatMemoryStore;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
@@ -52,35 +53,42 @@ public class AiConfiguration {
 
     private final List<AiToolMarker> availableTools;
 
+    private final PostgresChatMemoryStore chatMemoryStore;
+
     /// 动态创建一个具备 RAG 能力的智能体
     @Bean
-    public DeepSeekAssistant assistant() {
-        // 构建知识库检索器：提问时自动去你那个独立的 Schema 里翻书
+    public SpectraAssistant assistant() {
         var contentRetriever = EmbeddingStoreContentRetriever.builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(embeddingModel)
-                // 每次最多捞 3 条最相关的知识碎块塞给 DeepSeek
                 .maxResults(3)
-                // 过滤相似度太低的无关数据
                 .minScore(0.68)
                 .build();
 
         ChatMemoryProvider chatMemoryProvider = memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
-                // 自动记住最近 10 条上下文
-                .maxMessages(10)
+                .maxMessages(20)
+                .chatMemoryStore(chatMemoryStore)
                 .build();
 
         // 组装并返回智能体实例
-        return AiServices.builder(DeepSeekAssistant.class)
-                // 挂载model
+        return AiServices.builder(SpectraAssistant.class)
                 .chatModel(chatModel)
                 .streamingChatModel(streamingChatModel)
-                // 挂载内存记忆
                 .chatMemoryProvider(chatMemoryProvider)
-                // 挂载工具
+                .systemMessageProvider(memoryId -> """
+                        你是 Spectra 平台的 AI 助手。
+                        
+                        ## 基本规则
+                        - 始终使用简体中文回答
+                        - 回答简洁直接，避免冗余
+                        
+                        ## 能力边界
+                        - 资料查询通过 Tool 工具和 RAG 知识库检索完成，不要编造数据
+                        - 所有数据查询均在当前用户的权限范围内执行
+                        - 无法获取的信息如实告知用户，不要猜测或虚构
+                        """)
                 .tools(availableTools.toArray())
-                // 挂载知识库
                 .contentRetriever(contentRetriever)
                 .build();
     }

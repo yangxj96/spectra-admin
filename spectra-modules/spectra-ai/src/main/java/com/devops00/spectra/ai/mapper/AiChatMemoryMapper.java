@@ -14,15 +14,19 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.ai.service;
+package com.devops00.spectra.ai.mapper;
 
-import com.devops00.spectra.ai.javabean.entity.AiSession;
-import com.devops00.spectra.common.base.BaseService;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.devops00.spectra.ai.javabean.entity.AiChatMemory;
+import org.apache.ibatis.annotations.Param;
 
-/// Ai模块Session存储Service
+/// AI 对话消息存储 Mapper
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/6/5 17:14
-public interface AiSessionService extends BaseService<AiSession> {
+/// @since 2026/7/26
+public interface AiChatMemoryMapper extends BaseMapper<AiChatMemory> {
+
+    /// 插入或更新消息（PostgreSQL ON CONFLICT）
+    void upsert(@Param("memoryId") String memoryId, @Param("messages") String messages);
 }

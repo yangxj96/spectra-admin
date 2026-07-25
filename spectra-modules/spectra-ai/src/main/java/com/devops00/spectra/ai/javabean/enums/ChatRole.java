@@ -14,15 +14,23 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.ai.mapper;
+package com.devops00.spectra.ai.javabean.enums;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.ai.javabean.entity.AiSession;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-/// Ai模块Session存储Mapper
+/// 对话消息角色枚举
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/6/5 17:12
-public interface AiSessionMapper extends BaseMapper<AiSession> {
+/// @since 2026/7/26
+public enum ChatRole {
+
+    USER,
+    ASSISTANT,
+    SYSTEM;
+
+    @JsonValue
+    public String toValue() {
+        return name().toLowerCase();
+    }
 }

@@ -36,6 +36,8 @@ public class OpenAIStreamVO {
     private long created;
     /// 模型名称
     private String model;
+    /// 会话 ID（前端据此保存当前会话）
+    private String conversationId;
     /// 返回的内容选项
     private List<Choice> choices;
 

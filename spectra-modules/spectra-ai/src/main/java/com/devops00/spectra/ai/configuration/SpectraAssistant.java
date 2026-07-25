@@ -16,31 +16,22 @@
 
 package com.devops00.spectra.ai.configuration;
 
+import com.devops00.spectra.ai.base.AiMemoryId;
 import dev.langchain4j.service.MemoryId;
-import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.TokenStream;
 import dev.langchain4j.service.UserMessage;
 
-/// Assistant
+/// Spectra AI 智能体接口
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/6/9 17:53
-public interface DeepSeekAssistant {
+public interface SpectraAssistant {
 
-    /// 标准的同步阻塞对话
+    /// 流式输出对话（打字机效果）
     ///
-    /// @param token   传递token,用来设置Security上下文
-    /// @param message 问题内容
-    @SystemMessage("你是一个全能的开发助手。")
-    String chat(@MemoryId String token, @UserMessage String message);
-
-    /// 高级流式输出（打字机效果）
-    /// 返回 TokenStream 是 LangChain4j 流式响应的标准抽象
-    ///
-    /// @param token   传递token,用来设置Security上下文
-    /// @param message 问题内容
-    @SystemMessage("你是一个全能的开发助手。")
-    TokenStream stream(@MemoryId String token, @UserMessage String message);
+    /// @param memoryId 复合记忆标识（conversationId + token）
+    /// @param message  问题内容
+    TokenStream stream(@MemoryId AiMemoryId memoryId, @UserMessage String message);
 
 }

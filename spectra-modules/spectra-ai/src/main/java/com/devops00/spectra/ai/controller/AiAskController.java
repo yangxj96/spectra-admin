@@ -17,9 +17,11 @@
 package com.devops00.spectra.ai.controller;
 
 
-import com.devops00.spectra.ai.configuration.DeepSeekAssistant;
+import com.devops00.spectra.ai.configuration.SpectraAssistant;
+import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.ai.javabean.from.AiAskFrom;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
+import com.devops00.spectra.ai.service.AiConversationService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +38,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /// Ai对话控制器
 ///
@@ -48,7 +51,9 @@ import java.util.List;
 @RequestMapping("/ai/ask")
 public class AiAskController {
 
-    private final DeepSeekAssistant assistant;
+    private final SpectraAssistant assistant;
+
+    private final AiConversationService conversationService;
 
     private final ObjectMapper om;
 
@@ -56,63 +61,61 @@ public class AiAskController {
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
     public Flux<String> stream(@Validated @RequestBody AiAskFrom from) {
+        UUID conversationId = from.getConversationId();
+        if (conversationId == null) {
+            conversationId = conversationService.create(SecUtil.getCurrentUserId(), from.getMessage());
+        }
+        AiMemoryId memoryId = new AiMemoryId(conversationId.toString(), SecUtil.getCurrentToken());
+
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
-        // 利用 Sinks 桥接 LangChain4j 的异步回调流和 Spring WebFlux 的 Flux 流
+        final String convId = conversationId.toString();
         return Flux.create(sink -> {
-            assistant.stream(SecUtil.getCurrentToken(), from.getMessage())
-                    // 获取到响应的时候触发
+            assistant.stream(memoryId, from.getMessage())
                     .onPartialResponse(token -> {
                         try {
-                            OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null);
+                            OpenAIStreamVO vo = buildOpenAIDelta(streamId, token, null, convId);
                             sink.next(om.writeValueAsString(vo));
                         } catch (Exception e) {
                             sink.error(e);
                         }
                     })
-                    // 响应完成时触发
                     .onCompleteResponse(chatResponse -> {
                         try {
                             String finishReason = "stop";
-                            // 从 1.0.0 的全新 ChatResponse 中提取结束原因
                             if (chatResponse != null && chatResponse.finishReason() != null) {
                                 finishReason = chatResponse.finishReason().name().toLowerCase();
                             }
-                            OpenAIStreamVO finalVo = buildOpenAIDelta(streamId, null, finishReason);
+                            OpenAIStreamVO finalVo = buildOpenAIDelta(streamId, null, finishReason, convId);
                             sink.next(om.writeValueAsString(finalVo));
-                            // 真正关闭 Flux 通道
                             sink.complete();
                         } catch (Exception e) {
                             sink.error(e);
                         }
                     })
-                    // 异常处理
                     .onError(sink::error)
-                    // 发送请求给大模型开始传输
                     .start();
         });
     }
 
-    private OpenAIStreamVO buildOpenAIDelta(String id, String content, String finishReason) {
+    private OpenAIStreamVO buildOpenAIDelta(String id, String content, String finishReason, String conversationId) {
         OpenAIStreamVO vo = new OpenAIStreamVO();
         vo.setId(id);
-        vo.setObject("chat.completion.chunk"); // OpenAI 流式报文的固定对象类型
+        vo.setObject("chat.completion.chunk");
         vo.setModel("deepseek-chat");
         vo.setCreated(System.currentTimeMillis() / 1000);
+        vo.setConversationId(conversationId);
 
         List<OpenAIStreamVO.Choice> choices = new ArrayList<>();
         OpenAIStreamVO.Choice choice = new OpenAIStreamVO.Choice();
         choice.setIndex(0);
 
-        // 组装 Delta
         OpenAIStreamVO.Delta delta = new OpenAIStreamVO.Delta();
         if (content != null) {
             delta.setContent(content);
-            // 只有当有内容且是第一包或常规包时设置，一般流式可以默认一直带角色，或者在第一包带角色
             delta.setRole("assistant");
         }
         choice.setDelta(delta);
 
-        // 设置结束状态
         if (finishReason != null) {
             choice.setFinish_reason(finishReason);
         }

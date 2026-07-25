@@ -14,27 +14,26 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.ai.javabean.from;
+package com.devops00.spectra.ai.javabean.vo;
 
-
-import jakarta.validation.constraints.NotBlank;
+import com.devops00.spectra.ai.javabean.enums.ChatRole;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
-/// Ai对话请求入参
+/// 对话消息 VO（前端展示用）
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/26 12:19
+/// @since 2026/7/26
 @Data
-public class AiAskFrom {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ChatMessageVO {
 
-    /// 会话 ID（为空时自动创建新会话）
-    private UUID conversationId;
+    /// 角色
+    private ChatRole role;
 
-    /// 问题消息
-    @NotBlank(message = "消息内容不能为空")
-    private String message;
-
+    /// 消息内容
+    private String content;
 }
