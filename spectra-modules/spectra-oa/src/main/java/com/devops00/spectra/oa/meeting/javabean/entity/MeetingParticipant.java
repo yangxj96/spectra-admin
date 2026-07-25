@@ -35,7 +35,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@TableName(value = "oa_meeting_participant")
+@TableName(value = "oa_meeting_participant", schema = "spectra_oa")
 @DataScope(column = "user_id")
 public class MeetingParticipant extends BaseEntity {
 

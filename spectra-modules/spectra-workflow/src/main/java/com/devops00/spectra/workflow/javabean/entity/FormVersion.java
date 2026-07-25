@@ -34,7 +34,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@TableName("wf_form_version")
+@TableName(value = "wf_form_version", schema = "spectra_workflow")
 public class FormVersion extends BaseEntity {
 
     /// 关联表单定义ID

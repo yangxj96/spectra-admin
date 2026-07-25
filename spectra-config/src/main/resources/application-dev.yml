@@ -108,9 +108,6 @@ mybatis-plus:
     banner: false
     db-config:
       id-type: assign_id
-      schema: spectra_core
-  configuration-properties:
-    schema: spectra_core
 
 # ==================== XSS 防范 ====================
 mica:

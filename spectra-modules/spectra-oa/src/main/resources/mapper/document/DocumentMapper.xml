@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.document.javabean.entity.Document">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_document-->
+        <!--@Table spectra_oa.oa_document-->
     </resultMap>
     <!-- @formatter:on -->
 

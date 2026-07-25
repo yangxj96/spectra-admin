@@ -33,7 +33,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "file_info")
+@TableName(value = "file_info", schema = "spectra_upload")
 public class FileInfo extends BaseEntity {
 
     /// 存储文件名(系统生成)

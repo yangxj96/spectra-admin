@@ -36,7 +36,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@TableName(value = "file_type", autoResultMap = true)
+@TableName(value = "file_type", schema = "spectra_upload", autoResultMap = true)
 public class FileType extends BaseEntity {
 
     /// 文件类型名称

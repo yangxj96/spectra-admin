@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.ai.javabean.entity.AiSession">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_meeting-->
+        <!--@Table spectra_ai.ai_session-->
         <result column="session_id" property="sessionId"/>
         <result column="state_key"  property="stateKey"/>
         <result column="item_index" property="itemIndex"/>

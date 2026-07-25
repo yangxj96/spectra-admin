@@ -35,7 +35,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName(value = "oa_calendar")
+@TableName(value = "oa_calendar", schema = "spectra_oa")
 @DataScope
 public class Calendar extends BaseEntity {
     /// 所属部门ID

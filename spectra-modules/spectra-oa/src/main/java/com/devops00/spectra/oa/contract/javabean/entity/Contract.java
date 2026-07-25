@@ -35,7 +35,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName(value = "oa_contract")
+@TableName(value = "oa_contract", schema = "spectra_oa")
 @DataScope
 public class Contract extends BaseEntity {
     /// 所属部门ID

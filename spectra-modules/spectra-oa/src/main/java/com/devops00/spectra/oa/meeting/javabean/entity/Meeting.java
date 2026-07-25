@@ -36,7 +36,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
-@TableName(value = "oa_meeting")
+@TableName(value = "oa_meeting", schema = "spectra_oa")
 @DataScope(relations = {
         @DataScope.Relation(
                 table = "oa_meeting_participant",

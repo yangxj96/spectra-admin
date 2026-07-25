@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileType">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.file_type-->
+        <!--@Table spectra_upload.file_type-->
         <result column="name"           property="name"/>
         <result column="extension"      property="extension" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>
         <result column="mime"           property="mime" typeHandler="com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler"/>

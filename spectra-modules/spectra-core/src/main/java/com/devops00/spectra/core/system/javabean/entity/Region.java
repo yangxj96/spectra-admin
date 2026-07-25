@@ -36,7 +36,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_region")
+@TableName(value = "sys_region", schema = "spectra_core")
 public class Region extends BaseEntity implements Serializable {
 
     /// 区域名称

@@ -43,9 +43,9 @@ import java.util.UUID;
 public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
 
     // 可扩展点：后续若需动态切表，可将以下常量改为动态配置或方法入参
-    private static final String SCHEMA_TABLE = "spectra_rag.ai_knowledge_chunks";
-    private static final String VECTOR_TYPE = "::spectra_rag.vector";
-    private static final String VECTOR_OP = "OPERATOR(spectra_rag.<=>)";
+    private static final String SCHEMA_TABLE = "spectra_ai.ai_knowledge_chunks";
+    private static final String VECTOR_TYPE = "::vector";
+    private static final String VECTOR_OP = "OPERATOR(public.<=>)";
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
 

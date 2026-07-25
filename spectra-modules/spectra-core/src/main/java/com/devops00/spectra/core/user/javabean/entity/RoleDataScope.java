@@ -38,7 +38,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_role_data_scope")
+@TableName(value = "sys_role_data_scope", schema = "spectra_core")
 public class RoleDataScope extends BaseEntity implements Serializable {
 
     /// 角色ID

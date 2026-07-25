@@ -37,7 +37,7 @@
     <select id="findByRoleId" resultType="com.devops00.spectra.core.user.javabean.entity.RoleDataScope">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM ${schema}.sys_role_data_scope
+        FROM spectra_core.sys_role_data_scope
         WHERE role_id = #{roleId}
     </select>
 </mapper>

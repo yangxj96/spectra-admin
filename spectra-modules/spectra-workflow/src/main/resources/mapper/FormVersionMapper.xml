@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.workflow.javabean.entity.FormVersion">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.wf_form_version-->
+        <!--@Table spectra_workflow.wf_form_version-->
         <result column="form_definition_id" property="formDefinitionId"/>
         <result column="form_version"       property="formVersion"/>
         <result column="rule_json"          property="ruleJson"/>

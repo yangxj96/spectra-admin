@@ -54,7 +54,7 @@
                    pid,
                    name,
                    name::TEXT AS path
-            FROM ${schema}.sys_department
+            FROM spectra_core.sys_department
             WHERE pid IS NULL
 
             UNION ALL
@@ -64,7 +64,7 @@
                    o.pid,
                    o.name,
                    ot.path || '/' || o.name AS path
-            FROM ${schema}.sys_department o
+            FROM spectra_core.sys_department o
                      JOIN org_tree ot ON o.pid = ot.id)
         SELECT path, id
         FROM org_tree

@@ -37,7 +37,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_rel_role_menu")
+@TableName(value = "sys_rel_role_menu", schema = "spectra_core")
 public class RelRoleMenu extends BaseEntity implements Serializable {
 
     @Serial

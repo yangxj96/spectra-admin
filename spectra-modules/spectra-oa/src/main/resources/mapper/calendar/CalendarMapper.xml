@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.calendar.javabean.entity.Calendar">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_calendar-->
+        <!--@Table spectra_oa.oa_calendar-->
     </resultMap>
     <!-- @formatter:on -->
 

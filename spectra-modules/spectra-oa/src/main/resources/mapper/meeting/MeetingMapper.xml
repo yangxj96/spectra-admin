@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.meeting.javabean.entity.Meeting">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_meeting-->
+        <!--@Table spectra_oa.oa_meeting-->
         <result column="title"               property="title"/>
         <result column="initiator_id"        property="initiator_id"/>
         <result column="start_time"          property="start_time"/>

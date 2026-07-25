@@ -32,7 +32,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName("wf_form_definition")
+@TableName(value = "wf_form_definition", schema = "spectra_workflow")
 public class FormDefinition extends BaseEntity {
 
     /// 表单名称

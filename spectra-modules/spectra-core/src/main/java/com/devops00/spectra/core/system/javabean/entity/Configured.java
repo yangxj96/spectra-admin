@@ -34,7 +34,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_config")
+@TableName(value = "sys_config", schema = "spectra_core")
 public class Configured extends BaseEntity implements Serializable {
 
     /// 配置key

@@ -35,7 +35,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_authority")
+@TableName(value = "sys_authority", schema = "spectra_core")
 public class Authority extends BaseEntity implements Serializable {
 
     @Serial

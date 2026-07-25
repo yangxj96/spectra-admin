@@ -32,7 +32,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "file_upload_chunk")
+@TableName(value = "file_upload_chunk", schema = "spectra_upload")
 public class FileUploadChunk extends BaseEntity {
 
     /// 上传任务ID

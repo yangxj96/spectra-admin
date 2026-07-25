@@ -41,7 +41,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_menu", autoResultMap = true)
+@TableName(value = "sys_menu", schema = "spectra_core", autoResultMap = true)
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial

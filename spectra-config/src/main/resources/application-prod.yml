@@ -123,9 +123,6 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-not-delete-value: "null"
       logic-delete-value: "now()"
-      schema: spectra_core
-  configuration-properties:
-    schema: spectra_core
 
 # ==================== XSS 防范 ====================
 mica:

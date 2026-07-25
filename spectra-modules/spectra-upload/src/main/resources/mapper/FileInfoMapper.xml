@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileInfo">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.file_info-->
+        <!--@Table spectra_upload.file_info-->
         <result column="filename"      property="filename"/>
         <result column="original_name" property="originalName"/>
         <result column="content_type"  property="contentType"/>

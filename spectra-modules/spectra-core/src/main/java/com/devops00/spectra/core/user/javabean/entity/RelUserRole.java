@@ -35,7 +35,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_rel_user_role")
+@TableName(value = "sys_rel_user_role", schema = "spectra_core")
 public class RelUserRole extends BaseEntity implements Serializable {
 
     @Serial

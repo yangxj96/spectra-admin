@@ -37,13 +37,13 @@
     <select id="findByUserId" resultType="com.devops00.spectra.core.user.javabean.entity.UserDataScope">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM ${schema}.sys_user_data_scope AS suds
+        FROM spectra_core.sys_user_data_scope AS suds
         WHERE suds.user_id = #{userId}
     </select>
 
     <delete id="removeByUserId">
         DELETE
-        FROM ${schema}.sys_user_data_scope
+        FROM spectra_core.sys_user_data_scope
         WHERE user_id = #{userId}
     </delete>
 </mapper>

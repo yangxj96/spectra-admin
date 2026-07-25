@@ -37,7 +37,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_user_data_scope_target")
+@TableName(value = "sys_user_data_scope_target", schema = "spectra_core")
 public class UserDataScopeTarget extends BaseEntity implements Serializable {
 
     /// 用户ID

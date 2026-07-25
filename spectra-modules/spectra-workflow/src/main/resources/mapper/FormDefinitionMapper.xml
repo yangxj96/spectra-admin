@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.workflow.javabean.entity.FormDefinition">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.wf_form_definition-->
+        <!--@Table spectra_workflow.wf_form_definition-->
         <result column="name"            property="name"/>
         <result column="code"            property="code"/>
         <result column="current_version" property="currentVersion"/>

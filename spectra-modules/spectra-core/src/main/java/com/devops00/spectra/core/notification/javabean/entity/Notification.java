@@ -21,7 +21,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_notification")
+@TableName(value = "sys_notification", schema = "spectra_core")
 public class Notification extends BaseEntity implements Serializable {
 
     /// 消息标题

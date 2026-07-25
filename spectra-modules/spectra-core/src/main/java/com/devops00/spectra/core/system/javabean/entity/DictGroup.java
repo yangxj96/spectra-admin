@@ -38,7 +38,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_dict_group")
+@TableName(value = "sys_dict_group", schema = "spectra_core")
 public class DictGroup extends BaseEntity implements Serializable {
 
     @Serial

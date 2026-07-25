@@ -39,7 +39,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_account")
+@TableName(value = "sys_account", schema = "spectra_core")
 public class Account extends BaseEntity implements Serializable {
 
     /// 用户 ID

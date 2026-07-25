@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileUploadTask">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.file_upload_task-->
+        <!--@Table spectra_upload.file_upload_task-->
         <result column="upload_id"       property="uploadId"/>
         <result column="filename"        property="filename"/>
         <result column="hash"            property="hash"/>

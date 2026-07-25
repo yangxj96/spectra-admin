@@ -39,7 +39,7 @@ import java.util.Map;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_log", autoResultMap = true)
+@TableName(value = "sys_log", schema = "spectra_core", autoResultMap = true)
 public class OperationLog extends BaseEntity implements Serializable {
 
     @Serial

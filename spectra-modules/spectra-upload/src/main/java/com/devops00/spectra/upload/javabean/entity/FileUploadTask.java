@@ -35,7 +35,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "file_upload_task")
+@TableName(value = "file_upload_task", schema = "spectra_upload")
 public class FileUploadTask extends BaseEntity {
 
     /// 上传任务ID（前端使用的唯一标识）

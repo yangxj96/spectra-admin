@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.oa_meeting_participant-->
+        <!--@Table spectra_oa.oa_meeting_participant-->
         <result column="meeting_id"  property="meetingId"/>
         <result column="user_id"     property="userId"/>
         <result column="role"        property="role"/>

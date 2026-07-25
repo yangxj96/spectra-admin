@@ -32,7 +32,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-@TableName(value = "ai_session")
+@TableName(value = "ai_session", schema = "spectra_ai")
 public class AiSession extends BaseEntity {
 
     /// session_id

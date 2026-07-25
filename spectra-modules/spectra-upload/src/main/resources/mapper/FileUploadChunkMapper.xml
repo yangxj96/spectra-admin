@@ -22,7 +22,7 @@
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileUploadChunk">
         <!--@mbg.generated-->
-        <!--@Table spectra_core.file_upload_chunk-->
+        <!--@Table spectra_upload.file_upload_chunk-->
         <result column="upload_id"    property="uploadId"/>
         <result column="chunk_number" property="chunkNumber"/>
         <result column="etag"         property="etag"/>

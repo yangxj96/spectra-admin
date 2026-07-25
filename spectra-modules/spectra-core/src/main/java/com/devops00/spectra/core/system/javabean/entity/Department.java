@@ -39,7 +39,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "sys_department")
+@TableName(value = "sys_department", schema = "spectra_core")
 public class Department extends BaseEntity implements Serializable {
 
     @Serial
