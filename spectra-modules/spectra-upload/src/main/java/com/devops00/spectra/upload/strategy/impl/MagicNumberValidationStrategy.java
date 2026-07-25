@@ -16,46 +16,50 @@
 
 package com.devops00.spectra.upload.strategy.impl;
 
+import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import com.devops00.spectra.upload.javabean.entity.FileType;
+import com.devops00.spectra.upload.service.FileTypeService;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
-/// 文件类型验证策略-根据文件魔数验证
+/// 文件类型验证策略-根据文件魔数检测危险文件（仅黑名单）
 ///
 /// @author yangxj96
-/// @version 1.0
+/// @version 2.0
 /// @since 2025/6/19 00:00
 @Slf4j
+@RequiredArgsConstructor
 public class MagicNumberValidationStrategy implements FileTypeValidationStrategy {
 
     private static final int DEFAULT_HEADER_SIZE = 32;
 
-    private final List<FileType> allowedTypes = List.of();
+    private final FileTypeService fileTypeService;
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) throws IOException {
+        log.debug(LogPrefix.STORAGE.f("文件魔数验证"));
         if (file == null || file.isEmpty()) {
             return false;
         }
 
         byte[] header = readHeader(file, DEFAULT_HEADER_SIZE);
 
-        for (FileType type : allowedTypes) {
+        for (FileType type : fileTypeService.findDangerousWithMagicRules()) {
             if (matchType(header, type)) {
-                return true;
+                log.debug(LogPrefix.STORAGE.f("文件头匹配危险类型: " + type.getName()));
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
-    /// 判断某个 FileType 是否匹配
     private boolean matchType(byte[] header, FileType type) {
         var rules = type.getMagicRules();
         if (rules == null || rules.isEmpty()) {
@@ -71,7 +75,6 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return false;
     }
 
-    /// 单条规则匹配
     private boolean matchRule(byte[] header, MagicRule rule) {
         byte[] magic = getCompiled(rule);
         int offset = rule.getOffset() == null ? 0 : rule.getOffset();
@@ -89,14 +92,12 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return true;
     }
 
-    /// 读取文件头（只读前 N 字节）
     private byte[] readHeader(MultipartFile file, int maxLen) throws IOException {
         try (var is = file.getInputStream()) {
             return is.readNBytes(maxLen);
         }
     }
 
-    /// 编译 hex → byte[]（带缓存）
     private byte[] getCompiled(MagicRule rule) {
         if (rule.getCompiled() == null) {
             rule.setCompiled(hexToBytes(rule.getBytes()));
@@ -104,10 +105,6 @@ public class MagicNumberValidationStrategy implements FileTypeValidationStrategy
         return rule.getCompiled();
     }
 
-    /// hex 字符串转 byte[]
-    ///
-    /// @param hex hex字符串
-    /// @return byte数组
     private byte[] hexToBytes(String hex) {
         int len = hex.length();
         byte[] data = new byte[len / 2];

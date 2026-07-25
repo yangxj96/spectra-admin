@@ -18,9 +18,9 @@ package com.devops00.spectra.upload.configure;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
+import com.devops00.spectra.upload.service.FileTypeService;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
 import com.devops00.spectra.upload.strategy.FileTypeValidator;
-import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MimeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.TikaValidationStrategy;
@@ -47,29 +47,29 @@ public class FileUploadConfiguration {
 
     private final FileUploadProperties properties;
 
+    private final FileTypeService fileTypeService;
+
     /// 文件类型验证策略管理器
     ///
     /// @return 文件策略验证管理器
     @Bean
     public FileTypeValidator fileTypeValidator() {
         log.debug(LogPrefix.STORAGE.f("载入文件类型验证策略管理器"));
+        boolean wl = properties.isWhitelistEnabled();
+        boolean bl = properties.isBlacklistEnabled();
         var strategies = new ArrayList<FileTypeValidationStrategy>();
-        // 根据配置添加策略处理器
         for (var strategy : properties.getStrategies()) {
             if (strategy.isAssignableFrom(MimeValidationStrategy.class)) {
-                strategies.add(new MimeValidationStrategy());
-            }
-            if (strategy.isAssignableFrom(ExtensionValidationStrategy.class)) {
-                strategies.add(new ExtensionValidationStrategy());
+                strategies.add(new MimeValidationStrategy(fileTypeService, wl, bl));
             }
             if (strategy.isAssignableFrom(MagicNumberValidationStrategy.class)) {
-                strategies.add(new MagicNumberValidationStrategy());
+                strategies.add(new MagicNumberValidationStrategy(fileTypeService));
             }
             if (strategy.isAssignableFrom(TikaValidationStrategy.class)) {
-                strategies.add(new TikaValidationStrategy());
+                strategies.add(new TikaValidationStrategy(fileTypeService, wl, bl));
             }
         }
-        return new FileTypeValidator(strategies);
+        return new FileTypeValidator(strategies, fileTypeService, wl, bl);
     }
 
 }

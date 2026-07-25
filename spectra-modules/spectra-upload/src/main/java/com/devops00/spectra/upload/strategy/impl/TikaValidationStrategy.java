@@ -17,25 +17,30 @@
 package com.devops00.spectra.upload.strategy.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.upload.service.FileTypeService;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tika.Tika;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
-/// 文件类型验证策略-使用apache的Tika包进行验证
+/// 文件类型验证策略-使用 Apache Tika 检测真实 MIME 类型
 ///
 /// @author yangxj96
-/// @version 1.0
+/// @version 2.0
 /// @since 2025/6/19 00:00
 @Slf4j
+@RequiredArgsConstructor
 public class TikaValidationStrategy implements FileTypeValidationStrategy {
 
-    private final List<String> allowedMimes = new ArrayList<>();
+    private final FileTypeService fileTypeService;
+
+    private final boolean whitelistEnabled;
+
+    private final boolean blacklistEnabled;
 
     private final Tika tika = new Tika();
 
@@ -47,6 +52,17 @@ public class TikaValidationStrategy implements FileTypeValidationStrategy {
         }
 
         var detectedMimeType = tika.detect(file.getInputStream(), file.getOriginalFilename());
-        return allowedMimes.stream().anyMatch(mime -> mime.equalsIgnoreCase(detectedMimeType));
+        if (detectedMimeType == null || detectedMimeType.isBlank()) {
+            return false;
+        }
+        var mime = detectedMimeType.toLowerCase();
+
+        if (blacklistEnabled && fileTypeService.findDangerousMimes().contains(mime)) {
+            return false;
+        }
+        if (whitelistEnabled && !fileTypeService.findAllowedMimes().contains(mime)) {
+            return false;
+        }
+        return true;
     }
 }

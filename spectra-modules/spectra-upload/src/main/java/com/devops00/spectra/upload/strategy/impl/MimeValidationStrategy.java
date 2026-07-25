@@ -17,32 +17,46 @@
 package com.devops00.spectra.upload.strategy.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.upload.service.FileTypeService;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/// 文件类型验证策略-根据文件mime方式验证
+/// 文件类型验证策略-根据文件 MIME 类型验证
 ///
 /// @author yangxj96
-/// @version 1.0
+/// @version 2.0
 /// @since 2025/6/19 00:00
 @Slf4j
+@RequiredArgsConstructor
 public class MimeValidationStrategy implements FileTypeValidationStrategy {
 
-    private final List<String> allowedMimes = new ArrayList<>();
+    private final FileTypeService fileTypeService;
+
+    private final boolean whitelistEnabled;
+
+    private final boolean blacklistEnabled;
 
     @Override
     public boolean isValid(@Nullable MultipartFile file) {
-        log.debug(LogPrefix.STORAGE.f("文件mime验证"));
+        log.debug(LogPrefix.STORAGE.f("文件MIME验证"));
         if (file == null || file.isEmpty()) {
             return false;
         }
         var mimeType = file.getContentType();
-        return allowedMimes.stream().anyMatch(mime -> mime.equalsIgnoreCase(mimeType));
-    }
+        if (mimeType == null || mimeType.isBlank()) {
+            return false;
+        }
+        var mime = mimeType.toLowerCase();
 
+        if (blacklistEnabled && fileTypeService.findDangerousMimes().contains(mime)) {
+            return false;
+        }
+        if (whitelistEnabled && !fileTypeService.findAllowedMimes().contains(mime)) {
+            return false;
+        }
+        return true;
+    }
 }

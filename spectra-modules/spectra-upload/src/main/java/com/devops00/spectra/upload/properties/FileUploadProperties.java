@@ -18,7 +18,6 @@ package com.devops00.spectra.upload.properties;
 
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
-import com.devops00.spectra.upload.strategy.impl.ExtensionValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.MimeValidationStrategy;
 import com.devops00.spectra.upload.strategy.impl.TikaValidationStrategy;
@@ -41,15 +40,20 @@ public class FileUploadProperties {
     /// 文件上传默认实现
     private UploadType defaultStorage = UploadType.LOCAL;
 
-    /// 文件类型验证策略
+    /// 文件类型验证策略（扩展名校验已内置于 FileTypeValidator，无需配置）
     private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(
             TikaValidationStrategy.class,
             MimeValidationStrategy.class,
-            ExtensionValidationStrategy.class,
             MagicNumberValidationStrategy.class
     ));
 
     /// 分片大小,默认5M 5242880L
     private Long chunkSize = 5242880L;
+
+    /// 是否启用白名单模式（仅允许 allowedUpload=true 的类型）
+    private boolean whitelistEnabled = true;
+
+    /// 是否启用黑名单模式（拒绝 dangerous=true 的类型）
+    private boolean blacklistEnabled = true;
 
 }

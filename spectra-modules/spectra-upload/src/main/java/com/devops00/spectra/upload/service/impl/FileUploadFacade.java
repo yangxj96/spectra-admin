@@ -18,6 +18,7 @@ package com.devops00.spectra.upload.service.impl;
 
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.configure.FileUploadServiceRegistry;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
@@ -31,6 +32,7 @@ import com.devops00.spectra.upload.javabean.vo.FileUploadVO;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
+import com.devops00.spectra.upload.strategy.FileTypeValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -54,13 +56,21 @@ public class FileUploadFacade {
 
     private final FileInfoService fileInfoService;
 
+    private final FileTypeValidator fileTypeValidator;
+
     /// 预处理
     public FileUploadPreVO pre(FileUploadPreFrom from) {
+        if (!fileTypeValidator.validateFilename(from.getFilename())) {
+            throw new FileUploadException("文件类型不允许");
+        }
         return registry.getByType(properties.getDefaultStorage()).pre(from);
     }
 
     /// 直接上传
     public FileUploadVO upload(FileUploadFrom from) {
+        if (!fileTypeValidator.validate(from.getFile())) {
+            throw new FileUploadException("文件类型验证不通过");
+        }
         return registry.getByType(properties.getDefaultStorage()).upload(from);
     }
 
