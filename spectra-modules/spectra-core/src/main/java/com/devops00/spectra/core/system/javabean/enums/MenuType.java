@@ -14,32 +14,18 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.user.javabean.from;
+package com.devops00.spectra.core.system.javabean.enums;
 
-import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.UUID;
-
-/// 角色关联菜单入参对象
+/// 菜单节点类型
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/11/11 00:00
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoleMenuFrom {
+/// @since 2026/7/30
+public enum MenuType {
 
-    /// 角色ID
-    @NotNull(message = "角色ID不能为null")
-    private UUID roleId;
+    /// 只负责组织下级节点的目录
+    DIRECTORY,
 
-    /// 菜单ID列表
-    @NotNull(message = "菜单列表不能为null")
-    private List<@NotNull(message = "菜单ID不能为null") UUID> menuIds;
-
+    /// 可以跳转到前端命名路由的菜单
+    MENU
 }

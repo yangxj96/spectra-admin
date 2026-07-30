@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.javabean.vo;
 
 import com.devops00.spectra.common.base.javabean.vo.Tree;
+import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +26,6 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /// 菜单树形VO
@@ -50,27 +50,17 @@ public class MenuTreeVO implements Tree<MenuTreeVO>, Serializable {
     /// 图标
     private String icon;
 
+    /// 菜单节点类型
+    private MenuType menuType;
+
+    /// 对应前端命名路由
+    private String routeName;
+
     /// 名称
     private String name;
 
-    /// 请求路径
-    private String path;
-
-    /// 组件路径,为空则使用布局组件
-    private String component;
-
-    /// 布局
-    private String layout;
-
     /// 排序
     private Integer sort;
-
-    /// 是否显示菜单
-    private Boolean hide;
-
-    /// 菜单元数据
-    private Map<String, Object> metadata;
-
     /// 子级
     private List<MenuTreeVO> children = new ArrayList<>();
 

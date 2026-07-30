@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
+import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -25,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Map;
 import java.util.UUID;
 
 /// 菜单保存接口
@@ -50,25 +50,16 @@ public class MenuSaveFrom {
     @NotNull(message = "图标不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String icon;
 
+    /// 菜单节点类型
+    @NotNull(message = "菜单类型不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    private MenuType menuType;
+
+    /// 对应前端命名路由
+    private String routeName;
+
     /// 名称
     @NotBlank(message = "菜单名称不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String name;
-
-    /// 请求路径
-    @NotBlank(message = "请求路径不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
-    private String path;
-
-    /// 组件路径,为空则使用布局组件
-    private String component;
-
-    /// 布局
-    private String layout;
-
-    /// 是否显示菜单
-    private Boolean hide;
-
-    /// 菜单元数据
-    private Map<String, Object> metadata;
 
     /// 排序
     @NotNull(message = "排序不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})

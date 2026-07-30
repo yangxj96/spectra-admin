@@ -17,9 +17,12 @@
 package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
+import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.core.system.service.MenuService;
 import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
@@ -32,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -60,20 +64,41 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     @Override
     @Transactional
     public void grant(UUID roleId, RoleMenuFrom from) {
+        if (!Objects.equals(roleId, from.getRoleId())) {
+            throw new DataException("路径角色ID与请求角色ID不一致");
+        }
+
+        var requestedIds = new HashSet<>(from.getMenuIds());
+        var targetIds = new HashSet<UUID>();
+        if (CollUtils.isNotEmpty(requestedIds)) {
+            var requestedMenus = menuService.listByIds(requestedIds);
+            var foundIds = requestedMenus.stream()
+                    .filter(menu -> menu.getDeleted() == null)
+                    .map(Menu::getId)
+                    .collect(Collectors.toSet());
+            if (!foundIds.containsAll(requestedIds)) {
+                throw new DataNotExistException("存在无效菜单");
+            }
+            requestedMenus.stream()
+                    .filter(menu -> menu.getDeleted() == null)
+                    .filter(menu -> menu.getMenuType() == MenuType.MENU)
+                    .map(Menu::getId)
+                    .forEach(targetIds::add);
+        }
+
         // 当前角色关联的菜单信息
         var currentIds = relRoleMenuMapper.getByRoleId(roleId)
                 .stream()
                 .map(RelRoleMenu::getMenuId)
                 .collect(Collectors.toSet());
 
-        var targetIds = new HashSet<>(from.getMenuIds());
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
         if (CollUtils.isNotEmpty(removeIds)) {
             var wrapper = new LambdaQueryWrapper<RelRoleMenu>()
                     .eq(RelRoleMenu::getRoleId, roleId)
-                    .in(RelRoleMenu::getRoleId, removeIds);
+                    .in(RelRoleMenu::getMenuId, removeIds);
             relRoleMenuMapper.delete(wrapper);
         }
         // 计算新增且插入

@@ -21,6 +21,7 @@ import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import com.devops00.spectra.core.system.javabean.entity.DictItem;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
+import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import com.devops00.spectra.core.system.service.*;
 import com.devops00.spectra.core.user.javabean.entity.Authority;
 import com.devops00.spectra.core.user.javabean.entity.Role;
@@ -143,11 +144,10 @@ class SystemControllerTest {
     @Test
     void initMenus() {
         var roots = List.of(
-                newMenu(null, "首页", "icon-home", "/", "layout", "blank", 0),
-                newMenu(null, "工作台", "icon-setting", "/workbench", "layout", "blank", 1),
-                newMenu(null, "系统监控", "icon-setting", "/monitor", "layout", "default", 2),
-                newMenu(null, "组件示例", "icon-setting", "/exampl", "layout", "default", 3),
-                newMenu(null, "系统管理", "icon-setting", "/system", "layout", "default", 4)
+                newMenu(null, "首页", "icon-home", MenuType.MENU, "Dashboard", 0),
+                newMenu(null, "系统监控", "icon-setting", MenuType.DIRECTORY, null, 2),
+                newMenu(null, "组件示例", "icon-setting", MenuType.DIRECTORY, null, 3),
+                newMenu(null, "系统管理", "icon-setting", MenuType.DIRECTORY, null, 4)
         );
         menuService.saveBatch(roots);
 
@@ -155,31 +155,26 @@ class SystemControllerTest {
                 .collect(Collectors.toMap(Menu::getName, Function.identity()));
 
         var ops = List.of(
-                // 首页
-                newMenu(map.get("首页").getId(), "首页默认", "icon-module", "", "/Home/index", null, 0),
-                // 工作台
-                newMenu(map.get("工作台").getId(), "工作台默认页面", "icon-module", "", "/Workbench/index", null, 0),
                 // 系统监控
-                newMenu(map.get("系统监控").getId(), "服务监控", "icon-module", "server", "/Monitor/Server/index", null, 0),
-                newMenu(map.get("系统监控").getId(), "在线用户", "icon-module", "online", "/Monitor/Online/index", null, 0),
-                newMenu(map.get("系统监控").getId(), "定时任务", "icon-module", "task", "/Monitor/Task/index", null, 0),
-                newMenu(map.get("系统监控").getId(), "缓存监控", "icon-module", "cache", "/Monitor/Cache/index", null, 0),
-                newMenu(map.get("系统监控").getId(), "数据监控", "icon-module", "database", "/Monitor/Database/index", null, 0),
+                newMenu(map.get("系统监控").getId(), "服务监控", "icon-module", MenuType.MENU, "MonitorServer", 0),
+                newMenu(map.get("系统监控").getId(), "在线用户", "icon-module", MenuType.MENU, "MonitorOnline", 0),
+                newMenu(map.get("系统监控").getId(), "定时任务", "icon-module", MenuType.MENU, "MonitorTask", 0),
+                newMenu(map.get("系统监控").getId(), "缓存监控", "icon-module", MenuType.MENU, "MonitorCache", 0),
                 // 组件示例
-                newMenu(map.get("组件示例").getId(), "列表示例", "icon-module", "table", "/Example/Table/index", null, 0),
-                newMenu(map.get("组件示例").getId(), "Markdown", "icon-module", "markdown", "/Example/Markdown/index", null, 0),
-                newMenu(map.get("组件示例").getId(), "表单示例", "icon-module", "form", "/Example/Form/index", null, 0),
-                newMenu(map.get("组件示例").getId(), "图表示例", "icon-module", "echarts", "/Example/Echarts/index", null, 0),
+                newMenu(map.get("组件示例").getId(), "列表示例", "icon-module", MenuType.MENU, "ExampleTable", 0),
+                newMenu(map.get("组件示例").getId(), "Markdown", "icon-module", MenuType.MENU, "ExampleMarkdown", 0),
+                newMenu(map.get("组件示例").getId(), "表单示例", "icon-module", MenuType.MENU, "ExampleForm", 0),
+                newMenu(map.get("组件示例").getId(), "图表示例", "icon-module", MenuType.MENU, "ExampleEcharts", 0),
                 // 系统管理
-                newMenu(map.get("系统管理").getId(), "文件存储", "icon-module", "storage", "/System/Storage/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "用户管理", "icon-module", "user", "/System/User/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "系统配置", "icon-module", "configured", "System/Configured/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "流程管理", "icon-module", "workflow", "/System/Workflow/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "部门管理", "icon-module", "dept", "/System/Dept/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "字典管理", "icon-module", "dict", "/System/Dict/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "许可管理", "icon-module", "license", "/System/License/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "菜单管理", "icon-module", "menu", "/System/Menu/index", null, 0),
-                newMenu(map.get("系统管理").getId(), "访问控制", "icon-module", "RBAC", "/System/RBAC/index", null, 0)
+                newMenu(map.get("系统管理").getId(), "文件存储", "icon-module", MenuType.MENU, "SystemStorage", 0),
+                newMenu(map.get("系统管理").getId(), "用户管理", "icon-module", MenuType.MENU, "SystemUser", 0),
+                newMenu(map.get("系统管理").getId(), "系统配置", "icon-module", MenuType.MENU, "SystemConfigured", 0),
+                newMenu(map.get("系统管理").getId(), "流程管理", "icon-module", MenuType.MENU, "SystemWorkflow", 0),
+                newMenu(map.get("系统管理").getId(), "部门管理", "icon-module", MenuType.MENU, "SystemDept", 0),
+                newMenu(map.get("系统管理").getId(), "字典管理", "icon-module", MenuType.MENU, "SystemDict", 0),
+                newMenu(map.get("系统管理").getId(), "行政区划", "icon-module", MenuType.MENU, "SystemRegion", 0),
+                newMenu(map.get("系统管理").getId(), "菜单管理", "icon-module", MenuType.MENU, "SystemMenu", 0),
+                newMenu(map.get("系统管理").getId(), "访问控制", "icon-module", MenuType.MENU, "SystemRBAC", 0)
         );
 
         menuService.saveBatch(ops);
@@ -385,14 +380,13 @@ class SystemControllerTest {
         return datum;
     }
 
-    private Menu newMenu(UUID pid, String name, String icon, String path, String component, String layout, Integer sort) {
+    private Menu newMenu(UUID pid, String name, String icon, MenuType menuType, String routeName, Integer sort) {
         var menu = new Menu();
         menu.setPid(pid);
         menu.setName(name);
         menu.setIcon(icon);
-        menu.setPath(path);
-        menu.setComponent(component);
-        menu.setLayout(layout);
+        menu.setMenuType(menuType);
+        menu.setRouteName(routeName);
         menu.setSort(sort);
         return menu;
     }

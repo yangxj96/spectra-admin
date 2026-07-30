@@ -28,6 +28,7 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -43,6 +44,18 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 @NullMarked
 @RestControllerAdvice
 public class CommonExceptionAdvice {
+
+    /// 方法级权限不足异常
+    ///
+    /// @param e        错误信息
+    /// @param response 响应
+    /// @return 格式化为权限不足响应
+    @ExceptionHandler(AccessDeniedException.class)
+    public R<Object> accessDeniedException(AccessDeniedException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        log.warn("{}权限不足,{}", LogPrefix.WEB.p(), e.getMessage());
+        return R.failure(HttpStatus.FORBIDDEN, "权限不足");
+    }
 
     /// 未找到资源
     ///

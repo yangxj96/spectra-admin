@@ -16,12 +16,10 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
-import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
-import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
+import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +27,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Map;
 import java.util.UUID;
 
 /// 菜单表
@@ -41,7 +38,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "sys_menu", schema = "spectra_core", autoResultMap = true)
+@TableName(value = "sys_menu", schema = "spectra_core")
 public class Menu extends BaseEntity implements Serializable {
 
     @Serial
@@ -55,32 +52,19 @@ public class Menu extends BaseEntity implements Serializable {
     @TableField(value = "icon")
     private String icon;
 
+    /// 菜单节点类型
+    @TableField(value = "menu_type")
+    private MenuType menuType;
+
+    /// 对应前端命名路由
+    @TableField(value = "route_name")
+    private String routeName;
+
     /// 名称
     @TableField(value = "name")
     private String name;
 
-    /// 请求路径
-    @TableField(value = "path")
-    private String path;
-
-    /// 组件路径,为空则使用布局组件
-    @TableField(value = "component")
-    private String component;
-
-    /// 布局
-    @TableField(value = "layout")
-    private String layout;
-
     /// 排序
     @TableField(value = "sort")
     private Integer sort;
-
-    /// 是否显示菜单
-    @TableField(value = "hide")
-    private Boolean hide;
-
-    /// 菜单元数据
-    @TableField(value = "metadata", typeHandler = PgJsonbTypeHandler.class,
-            updateStrategy = FieldStrategy.ALWAYS)
-    private Map<String, Object> metadata;
 }

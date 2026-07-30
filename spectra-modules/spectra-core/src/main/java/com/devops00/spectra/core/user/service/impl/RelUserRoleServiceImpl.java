@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,10 +82,16 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
 
     @Override
     public List<Role> getRoles(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<RelUserRole>();
-        wrapper.eq(RelUserRole::getUserId, userId);
+        var wrapper = new LambdaQueryWrapper<RelUserRole>()
+                .eq(RelUserRole::getUserId, userId)
+                .isNull(RelUserRole::getDeleted);
         List<RelUserRole> userRoles = relUserRoleMapper.selectList(wrapper);
-        return roleMapper.selectByIds(userRoles.stream().map(RelUserRole::getRoleId).toList());
+        if (userRoles.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return roleMapper.selectList(new LambdaQueryWrapper<Role>()
+                .in(Role::getId, userRoles.stream().map(RelUserRole::getRoleId).toList())
+                .isNull(Role::getDeleted));
     }
 
 
