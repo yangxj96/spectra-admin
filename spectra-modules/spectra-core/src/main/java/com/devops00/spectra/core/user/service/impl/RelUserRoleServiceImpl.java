@@ -91,6 +91,7 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
         }
         return roleMapper.selectList(new LambdaQueryWrapper<Role>()
                 .in(Role::getId, userRoles.stream().map(RelUserRole::getRoleId).toList())
+                .eq(Role::getState, Boolean.TRUE)
                 .isNull(Role::getDeleted));
     }
 

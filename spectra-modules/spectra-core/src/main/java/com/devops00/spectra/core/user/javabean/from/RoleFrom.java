@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.UUID;
 
 /// 角色操作入参
@@ -48,6 +49,9 @@ public class RoleFrom {
 
     /// 范围
     private DataScopeType scope;
+
+    /// CUSTOM 范围目标部门
+    private List<UUID> targetIds;
 
     /// 状态
     private Boolean state;

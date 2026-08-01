@@ -19,6 +19,7 @@ package com.devops00.spectra.framework.configure.mvc.advice.exception;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -55,6 +56,14 @@ public class CommonExceptionAdvice {
         response.setStatus(HttpStatus.FORBIDDEN.value());
         log.warn("{}权限不足,{}", LogPrefix.WEB.p(), e.getMessage());
         return R.failure(HttpStatus.FORBIDDEN, "权限不足");
+    }
+
+    /// 数据范围缺失或越权异常，统一返回 403，避免被兜底处理成 500。
+    @ExceptionHandler(DataScopeViolationException.class)
+    public R<Object> dataScopeViolationException(DataScopeViolationException e, HttpServletResponse response) {
+        response.setStatus(HttpStatus.FORBIDDEN.value());
+        log.warn("{}数据范围校验失败,{}", LogPrefix.WEB.p(), e.getMessage());
+        return R.failure(HttpStatus.FORBIDDEN, "数据范围不足");
     }
 
     /// 未找到资源

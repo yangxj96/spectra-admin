@@ -39,5 +39,6 @@
         <include refid="Base_Column_List"/>
         FROM spectra_core.sys_role_data_scope
         WHERE role_id = #{roleId}
+          AND deleted IS NULL
     </select>
 </mapper>

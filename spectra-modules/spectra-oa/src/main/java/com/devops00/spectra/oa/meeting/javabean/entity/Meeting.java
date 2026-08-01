@@ -39,6 +39,7 @@ import java.util.UUID;
 @TableName(value = "oa_meeting", schema = "spectra_oa")
 @DataScope(relations = {
         @DataScope.Relation(
+                schema = "spectra_oa",
                 table = "oa_meeting_participant",
                 joinColumn = "meeting_id",
                 userColumn = "user_id"

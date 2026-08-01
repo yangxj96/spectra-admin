@@ -22,6 +22,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
@@ -30,9 +33,11 @@ import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.mapper.MeetingMapper;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 /// 会仪表-服务默认实现
@@ -50,15 +55,28 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final ProcessInstanceService processInstanceService;
 
     @Override
+    @Transactional
     public void created(MeetingCreateFrom from) {
         Meeting entity = meetingConverter.toEntity(from);
-        this.save(entity);
+        var currentUser = SecUtil.getCurrentUser();
+        var currentUserId = SecUtil.getCurrentUserId();
+        if (currentUser == null || currentUserId == null || currentUser.getDepartmentId() == null) {
+            throw new DataScopeViolationException("当前用户没有可用的部门归属，不能创建会议");
+        }
+        // 发起人和部门归属由服务端确定，不能信任客户端传入的 initiatorId。
+        entity.setInitiatorId(currentUserId.toString());
+        entity.setDepartmentId(currentUser.getDepartmentId());
+        if (!this.save(entity)) {
+            throw new DataSaveException("保存会议失败");
+        }
         // 启动流程
         // TODO 流程定义KEY
         String processId = processInstanceService.start("", String.valueOf(entity.getId()));
         // 补充流程信息后更新
         entity.setProcessInstanceId(processId);
-        this.updateById(entity);
+        if (!this.updateById(entity)) {
+            throw new EntityUpdateException("更新会议流程信息失败");
+        }
     }
 
     @Override

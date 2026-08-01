@@ -20,11 +20,15 @@ package com.devops00.spectra.framework.configure.mybatis.interceptor;
 import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.constant.DataScopeType;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.framework.configure.mybatis.DataScopeEntityRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
@@ -49,7 +53,7 @@ import java.util.stream.Collectors;
 /// <ul>
 ///   <li>{@link DataScope#ignore()} = true 的表不过滤</li>
 ///   <li>GLOBAL 范围的用户不过滤</li>
-///   <li>未登录用户不过滤</li>
+///   <li>缺少登录上下文时拒绝执行（fail-closed）</li>
 /// </ul>
 ///
 /// @author yangxj96
@@ -60,17 +64,19 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     private final ObjectProvider<DataScopeProvider> dataScopeProvider;
 
-    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider) {
+    private final DataScopeEntityRegistry dataScopeEntityRegistry;
+
+    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider,
+                                     DataScopeEntityRegistry dataScopeEntityRegistry) {
         this.dataScopeProvider = dataScopeProvider;
+        this.dataScopeEntityRegistry = dataScopeEntityRegistry;
     }
 
     @Override
     public Expression getSqlSegment(Table table, Expression where, String mappedStatementId) {
-        UUID userId = SecUtil.getCurrentUserId();
-        if (userId == null) {
+        if (DataScopeContextHolder.isBypassed()) {
             return null;
         }
-
         // 解析表名与实体类
         String tableName = table.getName();
         if (tableName == null) {
@@ -79,17 +85,37 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
         // 尝试获取实体类上的 @DataScope 注解
         Class<?> entityClass = resolveEntityClass(mappedStatementId);
-        if (entityClass == null) {
-            return null;
+        DataScope annotation = entityClass != null
+                ? entityClass.getAnnotation(DataScope.class)
+                : null;
+        // XML / 自动分页语句等场景可能无法从 mappedStatementId 推导实体，
+        // 此时必须继续使用按表名注册的元数据，不能直接放弃隔离。
+        if (annotation == null) {
+            annotation = dataScopeEntityRegistry.find(tableName);
         }
-
-        DataScope annotation = entityClass.getAnnotation(DataScope.class);
         if (annotation == null || annotation.ignore()) {
             return null;
         }
 
+        // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
+        // 认证流程会在登录前查询 sys_account/sys_user 等基础表，
+        // 这些表不属于数据隔离范围，不能因为当前尚未建立用户上下文而失败。
+        UUID userId = SecUtil.getCurrentUserId();
+        if (userId == null) {
+            throw new DataScopeViolationException("数据权限 SQL 缺少当前用户上下文");
+        }
+
         // 解析用户有效数据范围
-        DataScopeProvider.EffectiveScope scope = dataScopeProvider.getObject().resolve(userId);
+        DataScopeProvider.EffectiveScope scope = DataScopeContextHolder.getScope(userId);
+        if (scope == null) {
+            scope = dataScopeProvider.getObject().resolve(userId);
+            if (scope != null) {
+                DataScopeContextHolder.setScope(userId, scope);
+            }
+        }
+        if (scope == null || scope.getScopeType() == null) {
+            throw new DataScopeViolationException("无法解析当前用户的数据范围，已拒绝访问");
+        }
         if (scope.getScopeType() == DataScopeType.GLOBAL) {
             return null;
         }
@@ -111,7 +137,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         String columnName = annotation != null ? annotation.column() : "department_id";
         UUID currentUserId = SecUtil.getCurrentUserId();
 
-        Expression structuralExpr = buildStructuralExpression(table, columnName, scope, currentUserId);
+        Expression structuralExpr = buildStructuralExpression(table, annotation, columnName, scope, currentUserId);
 
         // 关系维度
         Expression relationalExpr = buildRelationalExpression(table, annotation, currentUserId);
@@ -130,26 +156,28 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
     }
 
     /// 构建结构维度条件（department_id / created_by）
-    private Expression buildStructuralExpression(Table table, String columnName, DataScopeProvider.EffectiveScope scope, UUID currentUserId) {
+    private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName,
+                                                 DataScopeProvider.EffectiveScope scope, UUID currentUserId) {
         return switch (scope.getScopeType()) {
             case SELF -> {
                 // created_by = currentUserId
                 EqualsTo eq = new EqualsTo();
-                eq.setLeftExpression(new Column(new Table(table.getName()), "created_by"));
+                eq.setLeftExpression(new Column(table, annotation.ownerColumn()));
                 eq.setRightExpression(new StringValue(currentUserId.toString()));
                 yield eq;
             }
             case DEPT, DEPT_AND_CHILDREN, CUSTOM -> {
                 var targetIds = scope.getTargetIds();
                 if (targetIds == null || targetIds.isEmpty()) {
-                    yield null;
+                    // 空范围必须拒绝全部数据，不能返回 null 形成 fail-open。
+                    yield new EqualsTo(new LongValue(1), new LongValue(0));
                 }
                 InExpression in = new InExpression();
-                in.setLeftExpression(new Column(new Table(table.getName()), columnName));
+                in.setLeftExpression(new Column(table, columnName));
                 if (targetIds.size() == 1) {
                     // 单个值用 EqualsTo 更高效
                     EqualsTo eq = new EqualsTo();
-                    eq.setLeftExpression(new Column(new Table(table.getName()), columnName));
+                    eq.setLeftExpression(new Column(table, columnName));
                     eq.setRightExpression(new StringValue(targetIds.get(0).toString()));
                     yield eq;
                 }
@@ -185,9 +213,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
             var plainSelect = new net.sf.jsqlparser.statement.select.PlainSelect();
 
             // SELECT joinColumn FROM relationTable
-            plainSelect.addSelectItems(new Column(new Table(relation.table()), relation.joinColumn()));
+            Table relTable = new Table(relation.schema(), relation.table());
+            plainSelect.addSelectItems(new Column(relTable, relation.joinColumn()));
 
-            Table relTable = new Table(relation.table());
             plainSelect.setFromItem(relTable);
 
             // WHERE userColumn = ?

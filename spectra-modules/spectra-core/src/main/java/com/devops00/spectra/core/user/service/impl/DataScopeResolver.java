@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /// 数据范围解析器 — 计算用户的有效数据范围
@@ -89,12 +90,14 @@ public class DataScopeResolver implements DataScopeProvider {
         List<UUID> allTargetIds = new ArrayList<>();
 
         for (var role : roles) {
-            RoleDataScope roleScope = roleDataScopeMapper.findByRoleId(role.getId().toString());
-            if (roleScope == null || roleScope.getScopeType() == null) {
+            RoleDataScope roleScope = roleDataScopeMapper.findByRoleId(role.getId());
+            // 兼容旧版 sys_role.scope：迁移期间规范表为空时仍能正确继承角色范围。
+            DataScopeType roleType = roleScope != null && roleScope.getScopeType() != null
+                    ? roleScope.getScopeType()
+                    : role.getScope();
+            if (roleType == null) {
                 continue;
             }
-
-            DataScopeType roleType = roleScope.getScopeType();
 
             // 规则2：取最大范围
             if (comparePriority(roleType, effectiveType) > 0) {
@@ -106,12 +109,12 @@ public class DataScopeResolver implements DataScopeProvider {
                 var targets = roleDataScopeTargetMapper.selectList(
                         new LambdaQueryWrapper<RoleDataScopeTarget>()
                                 .eq(RoleDataScopeTarget::getRoleId, role.getId())
+                                .isNull(RoleDataScopeTarget::getDeleted)
                 );
                 if (targets != null) {
                     targets.stream()
                             .map(RoleDataScopeTarget::getTargetId)
-                            .map(Object::toString)
-                            .map(UUID::fromString)
+                            .filter(Objects::nonNull)
                             .forEach(allTargetIds::add);
                 }
             }
@@ -125,15 +128,19 @@ public class DataScopeResolver implements DataScopeProvider {
         List<UUID> targetIds = new ArrayList<>();
 
         if (scopeType == DataScopeType.DEPT) {
-            targetIds.add(departmentId);
+            if (departmentId != null) {
+                targetIds.add(departmentId);
+            }
         } else if (scopeType == DataScopeType.DEPT_AND_CHILDREN && departmentId != null) {
-            targetIds = new ArrayList<>(departmentService.getSelfAndDescendantIds(departmentId));
+            var ids = departmentService.getSelfAndDescendantIds(departmentId);
+            targetIds = ids == null ? new ArrayList<>() : new ArrayList<>(ids);
         } else if (scopeType == DataScopeType.CUSTOM) {
             // 从 UserDataScopeTarget 查询
             var targets = userDataScopeTargetMapper.findByUserId(userId);
             if (targets != null) {
                 targetIds = targets.stream()
                         .map(UserDataScopeTarget::getTargetId)
+                        .filter(Objects::nonNull)
                         .toList();
             }
         }
@@ -147,7 +154,7 @@ public class DataScopeResolver implements DataScopeProvider {
             targetIds = List.of(departmentId);
         } else if (scopeType == DataScopeType.DEPT_AND_CHILDREN && departmentId != null) {
             var children = departmentService.getSelfAndDescendantIds(departmentId);
-            targetIds = new ArrayList<>(children);
+            targetIds = children == null ? new ArrayList<>() : new ArrayList<>(children);
         }
 
         return new EffectiveScope(scopeType, departmentId, targetIds);

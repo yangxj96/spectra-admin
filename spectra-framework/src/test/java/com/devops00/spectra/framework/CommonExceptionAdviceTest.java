@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework;
 
 import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.framework.configure.mvc.advice.exception.CommonExceptionAdvice;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
@@ -43,5 +44,19 @@ class CommonExceptionAdviceTest {
         assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
         assertEquals(HttpServletResponse.SC_FORBIDDEN, result.getCode());
         assertEquals("权限不足", result.getMsg());
+    }
+
+    @Test
+    void dataScopeViolationShouldReturnForbidden() throws Exception {
+        var method = CommonExceptionAdvice.class.getMethod(
+                "dataScopeViolationException", DataScopeViolationException.class, HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
+
+        var result = (R<?>) method.invoke(new CommonExceptionAdvice(),
+                new DataScopeViolationException("missing scope"), response);
+
+        assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
+        assertEquals(HttpServletResponse.SC_FORBIDDEN, result.getCode());
+        assertEquals("数据范围不足", result.getMsg());
     }
 }

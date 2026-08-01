@@ -46,9 +46,9 @@ public class RoleDataScopeTarget extends BaseEntity implements Serializable {
 
     /// 目标ID
     @TableField(value = "target_id")
-    private Long targetId;
+    private UUID targetId;
 
     /// 目标类型
     @TableField(value = "target_type")
-    private String targetType;
+    private Integer targetType;
 }

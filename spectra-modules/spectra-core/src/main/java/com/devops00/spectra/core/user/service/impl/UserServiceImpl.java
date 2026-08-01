@@ -24,6 +24,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.CollUtils;
@@ -339,9 +340,17 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     /// @param type      权限范围类型
     /// @param targetIds 自定义权限范围
     private void updateUserScope(UUID userId, DataScopeType type, List<UUID> targetIds) {
-        // 定义默认
+        // null 表示继承角色范围，不能偷偷转换成 DEPT 覆盖角色。
         if (type == null) {
-            type = DataScopeType.DEPT;
+            dataScopeMapper.removeByUserId(userId);
+            dataScopeTargetMapper.removeByUserId(userId);
+            return;
+        }
+        if (type == DataScopeType.GLOBAL && !canManageGlobalScope()) {
+            throw new DataScopeViolationException("只有系统运维角色可以授予 GLOBAL 数据范围");
+        }
+        if (type == DataScopeType.CUSTOM && CollUtils.isEmpty(targetIds)) {
+            throw new DataScopeViolationException("CUSTOM 数据范围必须指定至少一个目标部门");
         }
         // 更新或新增用户的权限范围
         var scope = dataScopeMapper.findByUserId(userId);
@@ -369,5 +378,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
 
 
+    }
+
+    private boolean canManageGlobalScope() {
+        var currentUser = SecUtil.getCurrentUser();
+        return currentUser != null && currentUser.getAuthorities().stream().anyMatch(authority ->
+                "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 }

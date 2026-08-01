@@ -42,6 +42,12 @@ public @interface DataScope {
     /// 结构维度过滤字段名，默认 department_id
     String column() default "department_id";
 
+    /// SELF 范围使用的归属字段，默认使用审计字段 created_by。
+    ///
+    /// 结构字段与本人字段不是同一个概念：例如会议按 department_id 隔离，
+    /// 但本人范围应按 created_by；关联明细则可以显式指定 user_id。
+    String ownerColumn() default "created_by";
+
     /// 是否忽略数据范围过滤（SYS_ 表使用）
     boolean ignore() default false;
 
@@ -49,6 +55,8 @@ public @interface DataScope {
     Relation[] relations() default {};
 
     @interface Relation {
+        /// 关联表所在 schema。为空时使用当前连接的 search_path。
+        String schema() default "";
         /// 关联表名
         String table();
         /// 关联表中指向本实体的外键字段

@@ -48,6 +48,9 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     /// 更新时间
     private static final String UPDATED_AT = "updatedAt";
 
+    /// 统一部门归属字段（存在于带部门隔离的实体中）
+    private static final String DEPARTMENT_ID = "departmentId";
+
 
     @Override
     public void insertFill(MetaObject metaObject) {
@@ -66,6 +69,18 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
             setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
+        }
+        // 只要实体声明了 departmentId，就由当前安全用户统一写入，避免客户端伪造归属。
+        // 系统任务没有用户上下文时保留显式值，由专用服务/受控执行器负责赋值。
+        if (metaObject.hasSetter(DEPARTMENT_ID) && getFieldValByName(DEPARTMENT_ID, metaObject) == null) {
+            try {
+                var currentUser = SecUtil.getCurrentUser();
+                if (currentUser != null && currentUser.getDepartmentId() != null) {
+                    setFieldValByName(DEPARTMENT_ID, currentUser.getDepartmentId(), metaObject);
+                }
+            } catch (IllegalStateException ignored) {
+                // Security 策略尚未初始化（例如离线迁移）时不阻断数据库任务。
+            }
         }
     }
 

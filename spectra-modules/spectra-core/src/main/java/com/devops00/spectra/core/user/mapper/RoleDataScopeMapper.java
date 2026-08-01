@@ -22,6 +22,8 @@ import com.devops00.spectra.core.user.javabean.entity.RoleDataScope;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.UUID;
+
 /// 角色数据范围Mapper
 ///
 /// @author yangxj96
@@ -34,6 +36,6 @@ public interface RoleDataScopeMapper extends BaseMapper<RoleDataScope> {
     ///
     /// @param roleId 角色ID
     /// @return 数据范围信息
-    RoleDataScope findByRoleId(@Param("roleId") String roleId);
+    RoleDataScope findByRoleId(@Param("roleId") UUID roleId);
 
 }

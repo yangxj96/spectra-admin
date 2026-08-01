@@ -51,6 +51,9 @@ public class MyBatisPlusConfiguration {
     @Resource
     private ObjectProvider<DataScopeProvider> dataScopeProvider;
 
+    @Resource
+    private DataScopeEntityRegistry dataScopeEntityRegistry;
+
 
     /// 添加注释
     @Bean
@@ -62,19 +65,23 @@ public class MyBatisPlusConfiguration {
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {
         log.debug(LogPrefix.PERSISTENCE.f("载入MybatisPlusInterceptor"));
+        // 数据权限必须先于分页插件处理原始查询。PaginationInnerInterceptor
+        // 会在 willDoQuery 阶段生成 count SQL；若顺序反过来，count 查询会
+        // 先执行而绕过数据权限谓词，导致分页总数发生越权。
+        var dataPermissionInterceptor = new DataPermissionInterceptor(
+                new DataScopeInnerInterceptor(dataScopeProvider, dataScopeEntityRegistry));
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);
         pageInterceptor.setMaxLimit(500L);
         pageInterceptor.setDbType(DbType.POSTGRE_SQL);
         var interceptor = new MybatisPlusInterceptor();
+        interceptor.addInnerInterceptor(dataPermissionInterceptor);
         interceptor.addInnerInterceptor(pageInterceptor);
         // 针对 update 和 delete 语句 作用: 阻止恶意的全表更新删除
         interceptor.addInnerInterceptor(new BlockAttackInnerInterceptor());
         // 乐观锁
         interceptor.addInnerInterceptor(new OptimisticLockerInnerInterceptor());
-        // 数据范围
-        interceptor.addInnerInterceptor(new DataPermissionInterceptor(new DataScopeInnerInterceptor(dataScopeProvider)));
         // 收集的bean进行注册
         List<InnerInterceptor> interceptors = innerInterceptors.stream().toList();
         log.debug("{}额外的Interceptor数量{}", LogPrefix.PERSISTENCE.p(), interceptors.size());
