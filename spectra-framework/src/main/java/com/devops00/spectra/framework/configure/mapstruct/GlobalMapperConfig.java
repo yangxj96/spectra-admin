@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.configure.mapstruct;
 
 import org.mapstruct.Builder;
+import org.mapstruct.InjectionStrategy;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.ReportingPolicy;
 
@@ -27,6 +28,7 @@ import org.mapstruct.ReportingPolicy;
 /// @since 2026/1/9 14:47
 @MapperConfig(
         componentModel = "spring",
+        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         builder = @Builder(disableBuilder = true)
 )

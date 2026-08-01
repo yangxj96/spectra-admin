@@ -11,7 +11,8 @@
                 ".\\mvnw.cmd",
                 "-pl",
                 "spectra-launch",
-                "spring-boot:run"
+                "spring-boot:run",
+                "-DskipTests"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
@@ -34,7 +35,8 @@
                 ".\\mvnw.cmd",
                 "-f",
                 "spectra-launch\\pom.xml",
-                "spring-boot:run"
+                "spring-boot:run",
+                "-DskipTests"
             ],
             "options": {
                 "cwd": "${workspaceFolder}"
