@@ -67,8 +67,8 @@ public class CryptoController {
     /// 获取客户端私钥（需登录）
     @ULog("'获取客户端私钥'")
     @Encrypt(response = false)
-    @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/keypair/client-private", version = "1.0.0+")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public CryptoClientKeyVO getClientPrivateKey() {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
     }

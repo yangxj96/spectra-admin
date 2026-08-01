@@ -55,6 +55,12 @@ public interface UserService extends BaseService<User> {
     /// @param params 请求参数
     void modify(UserSaveFrom params);
 
+    /// 覆盖用户角色
+    ///
+    /// @param userId 用户ID
+    /// @param roleIds 角色ID列表
+    void replaceRoles(UUID userId, List<UUID> roleIds);
+
     /// 根据用户ID删除用户信息
     ///
     /// @param uid 用户ID

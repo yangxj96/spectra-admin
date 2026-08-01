@@ -44,7 +44,7 @@ public class CalendarController {
 
     @ULog("'分页查询日历'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
     public IPage<Calendar> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

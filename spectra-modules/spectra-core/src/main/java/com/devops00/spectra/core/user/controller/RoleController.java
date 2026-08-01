@@ -87,12 +87,14 @@ public class RoleController {
 
     @ULog("'分页查询角色列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         return bindService.page(page, params);
     }
 
     @ULog("'查询角色列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
     public List<RoleVO> list() {
         return bindService.all();
     }
@@ -101,6 +103,7 @@ public class RoleController {
 
     @ULog("'获取角色关联的权限列表'")
     @GetMapping(value = "/{roleId}/authority", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleAuthorityService.get(roleId);
@@ -112,6 +115,7 @@ public class RoleController {
 
     @ULog("'获取角色关联的菜单列表'")
     @GetMapping(value = "/{roleId}/menu", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleMenuService.get(roleId);

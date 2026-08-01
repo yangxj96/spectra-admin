@@ -50,7 +50,7 @@ public class FormDefinitionController {
     /// 分页查询表单列表
     @ULog("'查询表单列表'")
     @GetMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
     public Object page(PageFrom page, FormPageFrom params) {
         return formDefinitionService.page(page, params);
     }
@@ -58,7 +58,7 @@ public class FormDefinitionController {
     /// 查询表单详情（含当前版本内容）
     @ULog("'查询表单详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
     public FormDefinitionVO getDetail(@PathVariable UUID id) {
         return formDefinitionService.getDetail(id);
     }
@@ -98,7 +98,7 @@ public class FormDefinitionController {
     /// 查询版本历史
     @ULog("'查询表单版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
     public List<FormVersionVO> getVersions(@PathVariable UUID id) {
         return formDefinitionService.getVersions(id);
     }
@@ -106,7 +106,7 @@ public class FormDefinitionController {
     /// 查询指定版本详情
     @ULog("'查询表单版本详情'")
     @GetMapping(value = "/{id}/versions/{version}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
     public FormVersionVO getVersion(@PathVariable UUID id, @PathVariable Integer version) {
         return formDefinitionService.getVersion(id, version);
     }

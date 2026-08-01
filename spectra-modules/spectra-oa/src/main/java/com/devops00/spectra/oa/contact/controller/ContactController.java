@@ -44,7 +44,7 @@ public class ContactController {
 
     @ULog("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_CONTACT:QUERY')")
     public IPage<Contact> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

@@ -49,7 +49,7 @@ public class ProcessDefinitionController {
     /// 获取所有的流程定义
     @ULog("'查询流程定义列表'")
     @GetMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
     public List<ProcessDefinitionVO> definitions() {
         return processDefinitionService.listAll();
     }
@@ -57,7 +57,7 @@ public class ProcessDefinitionController {
     /// 获取流程定义详情
     @ULog("'查询流程定义详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
     public ProcessDefinitionVO definitionDetail(@PathVariable String id) {
         return processDefinitionService.getDetail(id);
     }
@@ -65,7 +65,7 @@ public class ProcessDefinitionController {
     /// 获取流程定义图
     @ULog("'获取流程定义图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
     public byte[] getDiagram(@PathVariable String id) {
         return processDefinitionService.getDiagram(id);
     }
@@ -89,7 +89,7 @@ public class ProcessDefinitionController {
     /// 获取流程定义的 BPMN XML 源码
     @ULog("'获取流程定义BPMN资源'")
     @GetMapping(value = "/{id}/resource", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
     public ProcessDefinitionResourceVO getResource(@PathVariable String id) {
         return processDefinitionService.getResource(id);
     }

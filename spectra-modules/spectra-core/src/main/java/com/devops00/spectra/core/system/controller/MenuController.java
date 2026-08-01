@@ -80,7 +80,7 @@ public class MenuController {
     /// @return 构建的树形菜单
     @ULog(value = "'获取树形菜单'")
     @GetMapping(value = "/tree", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'MENU:*')")
+    @PreAuthorize("hasPermission(null ,'MENU:QUERY')")
     public @Nullable List<MenuTreeVO> tree() {
         return bindService.tree();
     }

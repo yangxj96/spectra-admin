@@ -22,6 +22,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
+import com.devops00.spectra.core.user.javabean.from.UserRelevanceRolesFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
@@ -55,7 +56,7 @@ public class UserController {
 
     @ULog("'创建用户'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'USER:INSERT')")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
@@ -74,6 +75,13 @@ public class UserController {
         bindService.modify(params);
     }
 
+    @ULog("'覆盖用户角色'")
+    @PutMapping(value = "/{uid}/roles", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
+    public void replaceRoles(@PathVariable UUID uid, @Validated @RequestBody UserRelevanceRolesFrom from) {
+        bindService.replaceRoles(uid, from.getRoleIds());
+    }
+
     @ULog("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -83,14 +91,14 @@ public class UserController {
 
     @ULog("'分页查询用户列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'USER:QUERY')")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 
     @ULog("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'MONITOR:QUERY')")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }

@@ -52,6 +52,6 @@ class MenuControllerTest {
     void treeShouldRequireMenuPermissionAfterMigration() throws NoSuchMethodException {
         var method = MenuController.class.getMethod("tree");
 
-        assertEquals("hasPermission(null ,'MENU:*')", method.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'MENU:QUERY')", method.getAnnotation(PreAuthorize.class).value());
     }
 }

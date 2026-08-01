@@ -44,7 +44,7 @@ public class ContractController {
 
     @ULog("'分页查询合同'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
     public IPage<Contract> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

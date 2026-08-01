@@ -33,7 +33,7 @@ public class NotificationController {
     /// 获取消息列表
     @ULog("'查询消息列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
     public IPage<NotificationVO> list(PageFrom page, NotificationQueryFrom params) {
         var userId = SecUtil.getCurrentUserId();
         return notificationService.page(page, params, userId);
@@ -42,7 +42,7 @@ public class NotificationController {
     /// 获取未读数量
     @ULog("'获取未读消息数'")
     @GetMapping(value = "/unread-count", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
     public long unreadCount() {
         var userId = SecUtil.getCurrentUserId();
         return notificationService.getUnreadCount(userId);
@@ -51,7 +51,7 @@ public class NotificationController {
     /// 标记单条已读
     @ULog("'标记消息已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
     public void markAsRead(@PathVariable java.util.UUID id) {
         var userId = SecUtil.getCurrentUserId();
         notificationService.markAsRead(id, userId);
@@ -60,7 +60,7 @@ public class NotificationController {
     /// 全部标记已读
     @ULog("'全部标记已读'")
     @PutMapping(value = "/read-all", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
     public void markAllAsRead() {
         var userId = SecUtil.getCurrentUserId();
         notificationService.markAllAsRead(userId);
@@ -69,7 +69,7 @@ public class NotificationController {
     /// 删除消息
     @ULog("'删除消息'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
     public void deleteById(@PathVariable java.util.UUID id) {
         var userId = SecUtil.getCurrentUserId();
         notificationService.deleteById(id, userId);
@@ -78,7 +78,7 @@ public class NotificationController {
     /// 批量删除
     @ULog("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
     public void batchDelete(@RequestBody List<java.util.UUID> ids) {
         var userId = SecUtil.getCurrentUserId();
         notificationService.batchDelete(ids, userId);
@@ -87,7 +87,7 @@ public class NotificationController {
     /// 发送消息（内部调用）
     @ULog("'发送消息'")
     @PostMapping(value = "/send", version = "1.0.0+")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void send(@Valid @RequestBody NotificationSendDTO dto) {
         notificationService.send(dto);
     }
@@ -95,7 +95,7 @@ public class NotificationController {
     /// 批量发送消息（内部调用）
     @ULog("'批量发送消息'")
     @PostMapping(value = "/batch-send", version = "1.0.0+")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void batchSend(@Valid @RequestBody NotificationBatchSendDTO dto) {
         notificationService.batchSend(dto);
     }

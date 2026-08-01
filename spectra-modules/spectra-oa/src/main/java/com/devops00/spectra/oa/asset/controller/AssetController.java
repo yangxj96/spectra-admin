@@ -44,7 +44,7 @@ public class AssetController {
 
     @ULog("'分页查询资产'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
     public IPage<Asset> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

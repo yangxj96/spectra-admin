@@ -24,6 +24,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.SpectraException;
@@ -47,6 +48,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
@@ -80,6 +82,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final RoleConverter roleConverter;
 
     private final RelUserRoleService relUserRoleService;
+
+    private final RoleMapper roleMapper;
 
     private final DepartmentService departmentService;
 
@@ -196,6 +200,27 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 throw new EntityUpdateException("新增角色关联失败，未完全插入");
             }
         }
+    }
+
+    @Override
+    @Transactional
+    public void replaceRoles(UUID userId, List<UUID> roleIds) {
+        if (this.getById(userId) == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+        var targetIds = new HashSet<>(roleIds == null ? List.<UUID>of() : roleIds);
+        if (targetIds.isEmpty()) {
+            throw new DataException("用户至少需要关联一个角色");
+        }
+        var activeRoleCount = roleMapper.selectCount(new LambdaQueryWrapper<Role>()
+                .in(Role::getId, targetIds)
+                .eq(Role::getState, Boolean.TRUE)
+                .isNull(Role::getDeleted));
+        if (activeRoleCount != targetIds.size()) {
+            throw new DataNotExistException("存在无效或禁用角色");
+        }
+        relUserRoleService.revoke(userId);
+        relUserRoleService.grant(userId, List.copyOf(targetIds));
     }
 
     @Override

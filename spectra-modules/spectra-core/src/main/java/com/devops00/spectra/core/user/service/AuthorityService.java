@@ -18,6 +18,7 @@ package com.devops00.spectra.core.user.service;
 
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.user.javabean.entity.Authority;
+import com.devops00.spectra.core.user.javabean.from.AuthoritySaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import org.jspecify.annotations.Nullable;
 
@@ -30,6 +31,15 @@ import java.util.UUID;
 /// @version 1.0
 /// @since 2025/11/11 00:00
 public interface AuthorityService extends BaseService<Authority> {
+
+    /// 创建权限
+    void created(AuthoritySaveFrom from);
+
+    /// 修改权限
+    void modify(AuthoritySaveFrom from);
+
+    /// 删除权限
+    void deleteById(UUID id);
 
     /// 根据角色ID获取角色关联的权限
     ///

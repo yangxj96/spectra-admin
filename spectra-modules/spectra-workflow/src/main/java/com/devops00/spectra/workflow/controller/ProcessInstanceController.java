@@ -64,7 +64,7 @@ public class ProcessInstanceController {
     /// @return 流程实例信息
     @ULog("'查询流程实例状态'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
     public ProcessInstanceVO getStatus(@PathVariable String id) {
         return processInstanceService.getStatus(id);
     }
@@ -75,7 +75,7 @@ public class ProcessInstanceController {
     /// @return 流程变量
     @ULog("'查询流程变量'")
     @GetMapping(value = "/{id}/variables", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
     public Map<String, Object> getVariables(@PathVariable String id) {
         return processInstanceService.getVariables(id);
     }
@@ -97,7 +97,7 @@ public class ProcessInstanceController {
     /// @return 流程图图片（PNG格式）
     @ULog("'获取流程实例图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
     public byte[] getDiagram(@PathVariable String id) {
         return processInstanceService.getDiagram(id);
     }

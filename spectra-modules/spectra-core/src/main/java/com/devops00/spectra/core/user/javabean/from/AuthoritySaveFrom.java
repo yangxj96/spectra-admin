@@ -16,31 +16,39 @@
 
 package com.devops00.spectra.core.user.javabean.from;
 
+import com.devops00.spectra.common.base.Verify;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
-/// 用户关联角色
+/// 权限保存入参
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/6/15 00:00
+/// @since 2026/8/1
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class UserRelevanceRolesFrom {
+@AllArgsConstructor
+public class AuthoritySaveFrom {
 
-    /// 用户ID
-    @NotNull(message = "用户ID不能为空")
-    private UUID userId;
+    /// 权限ID
+    @Null(message = "新增不能指定权限ID", groups = Verify.Insert.class)
+    @NotNull(message = "权限ID不能为空", groups = Verify.Update.class)
+    private UUID id;
 
-    /// 角色列表
-    @NotNull(message = "需要关联的角色ID列表不能为空")
-    @Size(min = 1, message = "至少需要关联一个角色")
-    private List<UUID> roleIds;
+    /// 父级权限ID
+    private UUID pid;
+
+    /// 权限名称
+    @NotBlank(message = "权限名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private String name;
+
+    /// 权限编码
+    @NotBlank(message = "权限编码不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private String code;
 }

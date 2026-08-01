@@ -57,21 +57,21 @@ public class RegionController {
     /// @return 根据条件获取的下级的列表
     @ULog("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
     public List<RegionVO> lazyTree(Integer level, @RequestParam(value = "id", required = false) String id) {
         return bindService.lazyTree(level, id);
     }
 
     @ULog("'分页查询行政区划'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
         return bindService.page(page, params);
     }
 
     @ULog("'获取行政区划路径'")
     @GetMapping(value = "/path/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
     public RegionPathVO getPath(@PathVariable UUID id) {
         return bindService.getPath(id);
     }

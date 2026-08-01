@@ -56,7 +56,7 @@ public class MeetingController {
     /// 分页查询会议
     @ULog("'分页查询会议'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_MEETING:QUERY')")
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
         return bindService.page(page, params);
     }

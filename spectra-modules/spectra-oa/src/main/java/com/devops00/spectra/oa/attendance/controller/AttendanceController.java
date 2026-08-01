@@ -44,7 +44,7 @@ public class AttendanceController {
 
     @ULog("'分页查询考勤'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_ATTENDANCE:QUERY')")
     public IPage<Attendance> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

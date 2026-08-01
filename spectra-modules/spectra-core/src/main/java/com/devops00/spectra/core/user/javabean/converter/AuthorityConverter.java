@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.user.javabean.converter;
 
 import com.devops00.spectra.core.user.javabean.entity.Authority;
+import com.devops00.spectra.core.user.javabean.from.AuthoritySaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
@@ -32,6 +33,12 @@ import java.util.List;
 /// @since 2025/7/16 00:00
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface AuthorityConverter {
+
+    /// 入参转实体
+    Authority toEntity(AuthoritySaveFrom source);
+
+    /// 更新已有实体
+    void updateEntity(AuthoritySaveFrom source, @org.mapstruct.MappingTarget Authority target);
 
     /// 实体转VO
     ///

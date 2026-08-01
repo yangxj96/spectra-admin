@@ -44,7 +44,7 @@ public class DocumentController {
 
     @ULog("'分页查询文档'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public IPage<Document> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

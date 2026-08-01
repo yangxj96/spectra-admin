@@ -51,7 +51,7 @@ public class AiConversationController {
     /// 获取当前用户的会话列表
     @ULog("'查询AI会话列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'AI:QUERY')")
     public List<AiConversation> list() {
         return conversationService.listByUser(SecUtil.getCurrentUserId());
     }
@@ -59,7 +59,7 @@ public class AiConversationController {
     /// 重命名会话
     @ULog("'重命名AI会话'")
     @PutMapping(value = "/{id}/title", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'AI:UPDATE')")
     public void rename(@PathVariable UUID id, @RequestParam String title) {
         conversationService.rename(id, SecUtil.getCurrentUserId(), title);
     }
@@ -67,7 +67,7 @@ public class AiConversationController {
     /// 删除会话
     @ULog("'删除AI会话'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'AI:DELETE')")
     public void deleteById(@PathVariable UUID id) {
         conversationService.delete(id, SecUtil.getCurrentUserId());
     }
@@ -75,7 +75,7 @@ public class AiConversationController {
     /// 获取对话历史消息
     @ULog("'查询AI对话历史'")
     @GetMapping(value = "/{id}/messages", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'AI:QUERY')")
     public List<ChatMessageVO> messages(@PathVariable UUID id) {
         return conversationService.getMessages(id, SecUtil.getCurrentUserId());
     }

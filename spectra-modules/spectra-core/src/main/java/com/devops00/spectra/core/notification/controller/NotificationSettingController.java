@@ -26,7 +26,7 @@ public class NotificationSettingController {
     /// 获取消息设置
     @ULog("'查询消息设置'")
     @GetMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')")
     public NotificationSettingVO getSetting() {
         var userId = SecUtil.getCurrentUserId();
         return notificationSettingService.getSetting(userId);
@@ -35,7 +35,7 @@ public class NotificationSettingController {
     /// 更新消息设置
     @ULog("'更新消息设置'")
     @PutMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')")
     public void updateSetting(@RequestBody NotificationSettingFrom from) {
         var userId = SecUtil.getCurrentUserId();
         notificationSettingService.updateSetting(userId, from);

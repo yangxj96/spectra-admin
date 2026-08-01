@@ -47,7 +47,7 @@ public class AccountController {
     /// 获取当前用户绑定的账号列表
     @ULog("'获取账号绑定列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'ACCOUNT:QUERY')")
     public List<AccountVO> list() {
         UUID userId = SecUtil.getCurrentUserId();
         var accounts = accountService.listByUserId(userId);
@@ -67,7 +67,7 @@ public class AccountController {
     /// 绑定手机号
     @ULog("'绑定手机号'")
     @PostMapping(value = "/bindPhone", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
     public void bindPhone(@Validated @RequestBody BindPhoneFrom params) {
         UUID userId = SecUtil.getCurrentUserId();
         accountService.bindPhone(userId, params.getPhone(), params.getCode());
@@ -76,7 +76,7 @@ public class AccountController {
     /// 绑定邮箱
     @ULog("'绑定邮箱'")
     @PostMapping(value = "/bindEmail", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
     public void bindEmail(@Validated @RequestBody BindEmailFrom params) {
         UUID userId = SecUtil.getCurrentUserId();
         accountService.bindEmail(userId, params.getEmail(), params.getCode());
@@ -85,7 +85,7 @@ public class AccountController {
     /// 解绑账号
     @ULog("'解绑账号'")
     @DeleteMapping(value = "/unbind/{accountId}", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
     public void unbind(@PathVariable UUID accountId) {
         UUID userId = SecUtil.getCurrentUserId();
         accountService.unbind(userId, accountId);

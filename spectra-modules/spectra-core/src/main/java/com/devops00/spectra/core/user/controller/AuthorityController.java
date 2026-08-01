@@ -17,8 +17,7 @@
 package com.devops00.spectra.core.user.controller;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.exception.NotImplementedException;
-import com.devops00.spectra.core.user.javabean.from.RoleFrom;
+import com.devops00.spectra.core.user.javabean.from.AuthoritySaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import com.devops00.spectra.core.user.service.AuthorityService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -50,27 +49,27 @@ public class AuthorityController {
     @ULog("'创建权限'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        throw new NotImplementedException("无需实现错误," + params);
+    public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody AuthoritySaveFrom params) {
+        bindService.created(params);
     }
 
     @ULog("'删除权限'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void deleteAuthority(@PathVariable UUID id) {
-        throw new NotImplementedException("无需实现错误," + id);
+        bindService.deleteById(id);
     }
 
     @ULog("'修改权限信息'")
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        throw new NotImplementedException("无需实现错误," + params);
+    public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody AuthoritySaveFrom params) {
+        bindService.modify(params);
     }
 
     @ULog("'获取权限树列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null ,'AUTHORITY:QUERY')")
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();
     }

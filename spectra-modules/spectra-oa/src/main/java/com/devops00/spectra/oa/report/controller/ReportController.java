@@ -44,7 +44,7 @@ public class ReportController {
 
     @ULog("'分页查询报表'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
     public IPage<Report> page(PageFrom page) {
         return bindService.page(page.toPage());
     }

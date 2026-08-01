@@ -49,7 +49,7 @@ public class TaskController {
     /// @return 待办任务列表
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
     public Object todo(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
         return taskService.todo(page, username);
@@ -61,7 +61,7 @@ public class TaskController {
     /// @return 已办任务列表
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
     public Object done(PageFrom page) {
         String username = SecUtil.getCurrentUsername();
         return taskService.done(page, username);
