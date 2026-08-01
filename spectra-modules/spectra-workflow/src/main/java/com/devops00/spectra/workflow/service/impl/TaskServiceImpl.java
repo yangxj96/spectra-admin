@@ -16,22 +16,23 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.TaskService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /// 任务管理Service实现
 ///
@@ -44,8 +45,9 @@ import java.util.Map;
 public class TaskServiceImpl implements com.devops00.spectra.workflow.service.TaskService {
 
     private final TaskService flowableTaskService;
-    private final RuntimeService runtimeService;
+
     private final HistoryService historyService;
+
     private final TaskConverter taskConverter;
 
     @Override

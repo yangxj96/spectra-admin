@@ -16,19 +16,25 @@
 
 package com.devops00.spectra.framework;
 
-import com.devops00.spectra.common.utils.AESUtils;
-import com.devops00.spectra.common.utils.RSAUtils;
-import com.devops00.spectra.common.utils.SHA256Utils;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import javax.crypto.SecretKey;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.*;
+import javax.crypto.SecretKey;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import com.devops00.spectra.common.utils.AESUtils;
+import com.devops00.spectra.common.utils.RSAUtils;
+import com.devops00.spectra.common.utils.SHA256Utils;
 
 /// 加解密工具类单元测试（无需 Spring 上下文）
 ///

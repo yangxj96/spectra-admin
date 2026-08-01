@@ -16,17 +16,17 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
+import java.time.Instant;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
 
 /// 用户信息
 ///
@@ -38,7 +38,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_user", schema = "spectra_core")
-public class User extends BaseEntity implements Serializable {
+public class User extends BaseEntity {
 
     /// 显示名称
     @TableField(value = "username")

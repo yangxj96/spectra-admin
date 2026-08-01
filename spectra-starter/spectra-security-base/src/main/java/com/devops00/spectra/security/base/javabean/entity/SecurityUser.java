@@ -103,7 +103,6 @@ public class SecurityUser implements UserDetails {
         return StrUtils.isNotBlank(this.getEmail()) ? this.getEmail() : "";
     }
 
-    @SuppressWarnings("unused")
     public void setUsername(String username) {
         this.setEmail(username);
     }

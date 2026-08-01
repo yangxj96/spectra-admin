@@ -16,17 +16,17 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import java.io.Serial;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
 
 /// 字典-字典数据
 ///
@@ -38,7 +38,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_dict_item", schema = "spectra_core")
-public class DictItem extends BaseEntity implements Serializable {
+public class DictItem extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

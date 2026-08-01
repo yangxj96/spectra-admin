@@ -16,19 +16,19 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import java.io.Serial;
+import java.util.Map;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
 import com.devops00.spectra.log.base.enums.SysLogType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.Map;
 
 /// 菜单表
 ///
@@ -40,7 +40,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_log", schema = "spectra_core", autoResultMap = true)
-public class OperationLog extends BaseEntity implements Serializable {
+public class OperationLog extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -24,7 +24,6 @@ import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -70,15 +69,20 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     /// Redis nonce 缓存前缀
     private static final String NONCE_PREFIX = "crypto:nonce:";
 
+    // jackson序列化
     private final ObjectMapper om;
+
+    // 加解密key管理器
     private final CryptoKeyManager cryptoKeyManager;
 
-    @Autowired(required = false)
-    private RedisTemplate<String, Object> redisTemplate;
+    // redis
+    private final RedisTemplate<String, Object> redisTemplate;
 
-    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om) {
+    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om,
+                                RedisTemplate<String, Object> redisTemplate) {
         this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
+        this.redisTemplate = redisTemplate;
         log.info(LogPrefix.WEB.f("请求解密 Advice 已注册（运行时由 CryptoKeyManager 控制启用/禁用）"));
     }
 
@@ -182,10 +186,10 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     /// 解密加密请求体（含验签 + 防重放）
     private String decrypt(JsonNode node) throws Exception {
-        String encryptedData = node.get("data").asText();
-        String encryptedKey = node.get("key").asText();
-        String ivHex = node.get("iv").asText();
-        String nonce = node.has("nonce") ? node.get("nonce").asText() : null;
+        String encryptedData = node.get("data").asString();
+        String encryptedKey = node.get("key").asString();
+        String ivHex = node.get("iv").asString();
+        String nonce = node.has("nonce") ? node.get("nonce").asString() : null;
         long timestamp = node.has("timestamp") ? node.get("timestamp").asLong() : 0;
 
         // 从 CryptoKeyManager 获取密钥
@@ -198,7 +202,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         // 签名验证（如果提供了 signature）
         if (node.has("signature")) {
             long t1 = System.currentTimeMillis();
-            String signature = node.get("signature").asText();
+            String signature = node.get("signature").asString();
             String signContent = String.format("data=%s&nonce=%s&timestamp=%d",
                     encryptedData, nonce != null ? nonce : "", timestamp);
             boolean valid = RSAUtils.verify(signContent, signature, clientPublicKey);
@@ -215,7 +219,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         }
 
         // 防重放：Nonce 去重（Redis 缓存）
-        if (nonce != null && !nonce.isEmpty() && redisTemplate != null) {
+        if (nonce != null && !nonce.isEmpty()) {
             String nonceKey = NONCE_PREFIX + nonce;
             Boolean success = redisTemplate.opsForValue()
                     .setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS));

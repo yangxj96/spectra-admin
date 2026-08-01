@@ -16,17 +16,17 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
+import java.io.Serial;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
 
 /// 角色关联菜单中间表
 ///
@@ -38,7 +38,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_rel_role_menu", schema = "spectra_core")
-public class RelRoleMenu extends BaseEntity implements Serializable {
+public class RelRoleMenu extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

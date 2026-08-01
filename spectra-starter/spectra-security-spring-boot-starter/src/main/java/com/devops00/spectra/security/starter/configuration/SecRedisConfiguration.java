@@ -22,6 +22,7 @@ import com.devops00.spectra.security.starter.listener.SecurityRedisKeyExpiration
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
@@ -36,6 +37,7 @@ import tools.jackson.databind.ObjectMapper;
 /// @version 1.0
 /// @since 2026/3/9 00:39
 @Slf4j
+@Configuration
 public class SecRedisConfiguration {
 
     /// 自定义redisTemplate

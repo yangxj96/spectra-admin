@@ -16,14 +16,18 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
+import java.io.Serial;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-import lombok.*;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /// 用户和角色中间表
 ///
@@ -36,7 +40,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_rel_user_role", schema = "spectra_core")
-public class RelUserRole extends BaseEntity implements Serializable {
+public class RelUserRole extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

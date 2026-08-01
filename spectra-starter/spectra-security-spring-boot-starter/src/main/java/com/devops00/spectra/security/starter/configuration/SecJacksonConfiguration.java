@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.jackson.SecurityJacksonModules;
 import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
@@ -34,6 +35,7 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 /// @version 1.0
 /// @since 2025/12/15 14:42
 @Slf4j
+@Configuration
 public class SecJacksonConfiguration {
 
     @Resource

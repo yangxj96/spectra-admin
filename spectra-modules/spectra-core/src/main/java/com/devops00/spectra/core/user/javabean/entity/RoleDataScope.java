@@ -16,18 +16,17 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
+import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.constant.DataScopeType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.UUID;
 
 /// 角色数据范围
 ///
@@ -39,7 +38,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_role_data_scope", schema = "spectra_core")
-public class RoleDataScope extends BaseEntity implements Serializable {
+public class RoleDataScope extends BaseEntity {
 
     /// 角色ID
     @TableField(value = "role_id")

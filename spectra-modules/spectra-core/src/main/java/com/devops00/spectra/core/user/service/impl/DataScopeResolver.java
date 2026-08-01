@@ -16,6 +16,15 @@
 
 package com.devops00.spectra.core.user.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.jspecify.annotations.NullMarked;
+import org.springframework.stereotype.Component;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
@@ -31,17 +40,9 @@ import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.NullMarked;
-import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 /// 数据范围解析器 — 计算用户的有效数据范围
 ///
@@ -109,8 +110,7 @@ public class DataScopeResolver implements DataScopeProvider {
                 var targets = roleDataScopeTargetMapper.selectList(
                         new LambdaQueryWrapper<RoleDataScopeTarget>()
                                 .eq(RoleDataScopeTarget::getRoleId, role.getId())
-                                .isNull(RoleDataScopeTarget::getDeleted)
-                );
+                                .isNull(RoleDataScopeTarget::getDeleted));
                 if (targets != null) {
                     targets.stream()
                             .map(RoleDataScopeTarget::getTargetId)

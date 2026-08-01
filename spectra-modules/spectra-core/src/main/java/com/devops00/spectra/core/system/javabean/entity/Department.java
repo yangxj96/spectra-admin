@@ -16,19 +16,20 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import java.io.Serial;
+import java.util.UUID;
+
+import org.jspecify.annotations.Nullable;
+
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.jspecify.annotations.Nullable;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
 
 /// 组织机构
 ///
@@ -40,7 +41,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_department", schema = "spectra_core")
-public class Department extends BaseEntity implements Serializable {
+public class Department extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -54,8 +55,7 @@ public class Department extends BaseEntity implements Serializable {
     @TableField(value = "name")
     private String name;
 
-    /// 编码
-    /// > 插入时候生成,后续不参与更新等操作
+    /// 编码 > 插入时候生成,后续不参与更新等操作
     @TableField(value = "code", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
@@ -69,8 +69,7 @@ public class Department extends BaseEntity implements Serializable {
     @TableField("region_id")
     private UUID regionId;
 
-    /// 构建路径
-    /// > 格式:比如总部/二级/三级/部门
+    /// 构建路径 > 格式:比如总部/二级/三级/部门
     @TableField(value = "path")
     private String path;
 
@@ -82,4 +81,3 @@ public class Department extends BaseEntity implements Serializable {
     @TableField(value = "remark")
     private String remark;
 }
-

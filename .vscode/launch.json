@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "后端 API · Spring Boot run（mise）",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "mise.exe exec -- .\\mvnw.cmd -pl spectra-launch spring-boot:run",
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "name": "后端 API · Spring Boot run（mise · launch POM）",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "mise.exe exec -- .\\mvnw.cmd -f spectra-launch\\pom.xml spring-boot:run",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

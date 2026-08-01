@@ -1,16 +1,16 @@
 package com.devops00.spectra.core.notification.javabean.entity;
 
+import java.time.LocalTime;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.time.LocalTime;
-import java.util.UUID;
 
 /// 用户通知设置表
 ///
@@ -22,7 +22,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_notification_setting", schema = "spectra_core")
-public class NotificationSetting extends BaseEntity implements Serializable {
+public class NotificationSetting extends BaseEntity {
 
     /// 用户ID（一对一关联）
     @TableField(value = "user_id")

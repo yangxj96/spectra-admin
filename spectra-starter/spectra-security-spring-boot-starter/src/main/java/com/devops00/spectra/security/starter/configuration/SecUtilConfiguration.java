@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import tools.jackson.databind.ObjectMapper;
 
@@ -34,6 +35,7 @@ import tools.jackson.databind.ObjectMapper;
 /// @version 1.0
 /// @since 2026/2/19 22:37
 @Slf4j
+@Configuration
 public class SecUtilConfiguration {
 
 

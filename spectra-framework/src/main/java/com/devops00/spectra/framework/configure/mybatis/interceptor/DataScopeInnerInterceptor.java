@@ -16,6 +16,10 @@
 
 package com.devops00.spectra.framework.configure.mybatis.interceptor;
 
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.ObjectProvider;
 
 import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
 import com.devops00.spectra.common.annotation.DataScope;
@@ -23,37 +27,35 @@ import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
-import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.framework.configure.mybatis.DataScopeEntityRegistry;
+import com.devops00.spectra.security.base.holder.SecUtil;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.expression.StringValue;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.expression.operators.conditional.OrExpression;
-import net.sf.jsqlparser.expression.operators.relational.*;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
+import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
-
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 /// MP执行的单表SQL拦截处理 — 自动注入数据范围 WHERE 条件
 ///
 /// <h3>二维过滤</h3>
 /// <ul>
-///   <li><b>结构维度</b>：基于 department_id / created_by 等归属字段，根据用户数据范围类型过滤</li>
-///   <li><b>关系维度</b>：基于 {@link DataScope#relations()} 声明的多对多关联表</li>
+/// <li><b>结构维度</b>：基于 department_id / created_by 等归属字段，根据用户数据范围类型过滤</li>
+/// <li><b>关系维度</b>：基于 {@link DataScope#relations()} 声明的多对多关联表</li>
 /// </ul>
 ///
 /// <h3>跳过规则</h3>
 /// <ul>
-///   <li>{@link DataScope#ignore()} = true 的表不过滤</li>
-///   <li>GLOBAL 范围的用户不过滤</li>
-///   <li>缺少登录上下文时拒绝执行（fail-closed）</li>
+/// <li>{@link DataScope#ignore()} = true 的表不过滤</li>
+/// <li>GLOBAL 范围的用户不过滤</li>
+/// <li>缺少登录上下文时拒绝执行（fail-closed）</li>
 /// </ul>
 ///
 /// @author yangxj96
@@ -67,7 +69,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
     private final DataScopeEntityRegistry dataScopeEntityRegistry;
 
     public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider,
-                                     DataScopeEntityRegistry dataScopeEntityRegistry) {
+            DataScopeEntityRegistry dataScopeEntityRegistry) {
         this.dataScopeProvider = dataScopeProvider;
         this.dataScopeEntityRegistry = dataScopeEntityRegistry;
     }
@@ -157,7 +159,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     /// 构建结构维度条件（department_id / created_by）
     private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName,
-                                                 DataScopeProvider.EffectiveScope scope, UUID currentUserId) {
+            DataScopeProvider.EffectiveScope scope, UUID currentUserId) {
         return switch (scope.getScopeType()) {
             case SELF -> {
                 // created_by = currentUserId
@@ -184,8 +186,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
                 ExpressionList<Expression> exprList = new ExpressionList<>(
                         targetIds.stream()
                                 .map(id -> new StringValue(id.toString()))
-                                .collect(Collectors.toList())
-                );
+                                .collect(Collectors.toList()));
                 in.setRightExpression(exprList);
                 yield in;
             }
@@ -240,8 +241,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     /// 从 MyBatis mappedStatementId 反推实体类
     ///
-    /// mappedStatementId 格式: com.devops00.spectra.core.user.mapper.UserMapper.selectById
-    /// 尝试从 Mapper 包路径推导对应的 Entity 包路径
+    /// mappedStatementId 格式:
+    /// com.devops00.spectra.core.user.mapper.UserMapper.selectById 尝试从 Mapper
+    /// 包路径推导对应的 Entity 包路径
     private Class<?> resolveEntityClass(String mappedStatementId) {
         if (mappedStatementId == null) {
             return null;
@@ -249,7 +251,8 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         try {
             // 格式: mapperPackage.MapperName.methodName
             int lastDot = mappedStatementId.lastIndexOf('.');
-            if (lastDot < 0) return null;
+            if (lastDot < 0)
+                return null;
             String classPath = mappedStatementId.substring(0, lastDot);
 
             // 尝试将 mapper 替换为 javabean/entity 查找实体类

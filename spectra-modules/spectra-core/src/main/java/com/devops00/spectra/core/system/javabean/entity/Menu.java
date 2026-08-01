@@ -16,18 +16,18 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import java.io.Serial;
+import java.util.UUID;
+
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serial;
-import java.io.Serializable;
-import java.util.UUID;
 
 /// 菜单表
 ///
@@ -39,7 +39,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_menu", schema = "spectra_core")
-public class Menu extends BaseEntity implements Serializable {
+public class Menu extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -16,15 +16,18 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
+import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.constant.RegionLevel;
-import lombok.*;
 
-import java.io.Serializable;
-import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /// GB/T 2260的行政区域数据表
 ///
@@ -37,7 +40,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_region", schema = "spectra_core")
-public class Region extends BaseEntity implements Serializable {
+public class Region extends BaseEntity {
 
     /// 区域名称
     @TableField(value = "name")

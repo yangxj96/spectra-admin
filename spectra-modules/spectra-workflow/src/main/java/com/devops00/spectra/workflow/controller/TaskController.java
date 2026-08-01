@@ -16,7 +16,15 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import com.devops00.spectra.common.base.Verify;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -24,11 +32,9 @@ import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskTransferFrom;
 import com.devops00.spectra.workflow.service.TaskService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
 /// 工作流-任务相关
 ///

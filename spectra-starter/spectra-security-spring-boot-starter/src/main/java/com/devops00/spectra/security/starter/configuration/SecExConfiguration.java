@@ -20,6 +20,7 @@ package com.devops00.spectra.security.starter.configuration;
 import com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler;
 import com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import tools.jackson.databind.ObjectMapper;
@@ -29,6 +30,7 @@ import tools.jackson.databind.ObjectMapper;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/3/9 00:35
+@Configuration
 public class SecExConfiguration {
 
     /// 身份认证异常

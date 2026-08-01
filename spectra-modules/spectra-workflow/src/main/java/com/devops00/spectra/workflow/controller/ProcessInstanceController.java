@@ -16,19 +16,25 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import com.devops00.spectra.common.base.Verify;
+import java.util.Map;
+
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /// 工作流-流程实例
 ///
@@ -54,8 +60,7 @@ public class ProcessInstanceController {
         return processInstanceService.start(
                 from.getProcessDefinitionKey(),
                 from.getBusinessKey(),
-                from.getVariables()
-        );
+                from.getVariables());
     }
 
     /// 查询流程状态

@@ -20,9 +20,12 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
-import lombok.*;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /// 系统配置表
 ///
@@ -35,7 +38,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @TableName(value = "sys_config", schema = "spectra_core")
-public class Configured extends BaseEntity implements Serializable {
+public class Configured extends BaseEntity {
 
     /// 配置key
     @TableField(value = "key")
