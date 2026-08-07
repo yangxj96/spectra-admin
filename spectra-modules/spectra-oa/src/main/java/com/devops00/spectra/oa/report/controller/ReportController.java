@@ -20,14 +20,24 @@ package com.devops00.spectra.oa.report.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
 import com.devops00.spectra.oa.report.javabean.entity.Report;
+import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
+import com.devops00.spectra.oa.report.service.DepartmentStatsService;
 import com.devops00.spectra.oa.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /// 报表主接口
 ///
@@ -42,11 +52,31 @@ public class ReportController {
 
     private final ReportService bindService;
 
+    private final DepartmentStatsService departmentStatsService;
+
     @ULog("'分页查询报表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
     public IPage<Report> page(PageFrom page) {
         return bindService.page(page.toPage());
+    }
+
+    @ULog("'查询部门维度统计'")
+    @GetMapping(value = "/department", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
+    public List<DepartmentStatsVO> department(DepartmentStatsFrom from) {
+        return departmentStatsService.list(from);
+    }
+
+    @ULog("'导出部门维度统计'")
+    @GetMapping(value = "/department/export", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
+    public ResponseEntity<byte[]> exportDepartment(DepartmentStatsFrom from) {
+        String filename = URLEncoder.encode("部门统计.xlsx", StandardCharsets.UTF_8).replace("+", "%20");
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + filename)
+                .body(departmentStatsService.export(from));
     }
 
 }
