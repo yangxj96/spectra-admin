@@ -16,37 +16,152 @@
 
 package com.devops00.spectra.oa.contract.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.contract.javabean.entity.Contract;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractVersionFrom;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractMilestoneVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVO;
 import com.devops00.spectra.oa.contract.service.ContractService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-/// 合同主接口
+/// 合同台账接口。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/5 23:22
+/// @since 2026/8/8
 @Slf4j
 @RestController
 @RequestMapping("/oa/contract")
 @RequiredArgsConstructor
 public class ContractController {
 
-    private final ContractService bindService;
+    private final ContractService contractService;
 
     @ULog("'分页查询合同'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
-    public IPage<Contract> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
+        return contractService.page(page, params);
     }
 
+    @ULog("'查询合同详情'")
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
+    public ContractVO get(@PathVariable UUID id) {
+        return contractService.get(id);
+    }
+
+    @ULog("'创建合同台账'")
+    @PostMapping(version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:INSERT')")
+    public UUID created(@Validated @RequestBody ContractSaveFrom from) {
+        return contractService.created(from);
+    }
+
+    @ULog("'修改合同台账'")
+    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void modify(@PathVariable UUID id, @Validated @RequestBody ContractSaveFrom from) {
+        contractService.modify(id, from);
+    }
+
+    @ULog("'删除合同台账'")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:DELETE')")
+    public void deleteById(@PathVariable UUID id) {
+        contractService.deleteById(id);
+    }
+
+    @ULog("'新增合同版本'")
+    @PostMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public UUID addVersion(@PathVariable UUID id, @Validated @RequestBody ContractVersionFrom from) {
+        return contractService.addVersion(id, from);
+    }
+
+    @ULog("'查询合同版本'")
+    @GetMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
+    public List<ContractVersionVO> versions(@PathVariable UUID id) {
+        return contractService.versions(id);
+    }
+
+    @ULog("'创建合同履约节点'")
+    @PostMapping(value = "/{id}/milestones", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public UUID createMilestone(@PathVariable UUID id, @Validated @RequestBody ContractMilestoneSaveFrom from) {
+        return contractService.createMilestone(id, from);
+    }
+
+    @ULog("'查询合同履约节点'")
+    @GetMapping(value = "/{id}/milestones", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
+    public List<ContractMilestoneVO> milestones(@PathVariable UUID id) {
+        return contractService.milestones(id);
+    }
+
+    @ULog("'更新合同履约节点'")
+    @PutMapping(value = "/{id}/milestones/{milestoneId}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void updateMilestone(@PathVariable UUID id, @PathVariable UUID milestoneId,
+                                @Validated @RequestBody ContractMilestoneUpdateFrom from) {
+        contractService.updateMilestone(id, milestoneId, from);
+    }
+
+    @ULog("'标记合同已签署'")
+    @PostMapping(value = "/{id}/sign", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void sign(@PathVariable UUID id) {
+        contractService.sign(id);
+    }
+
+    @ULog("'启用合同'")
+    @PostMapping(value = "/{id}/activate", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void activate(@PathVariable UUID id) {
+        contractService.activate(id);
+    }
+
+    @ULog("'终止合同'")
+    @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void terminate(@PathVariable UUID id) {
+        contractService.terminate(id);
+    }
+
+    @ULog("'预览合同版本'")
+    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
+    public void preview(@PathVariable UUID id, @PathVariable UUID versionId) {
+        contractService.preview(id, versionId);
+    }
+
+    @ULog("'下载合同版本'")
+    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
+    public void download(@PathVariable UUID id, @PathVariable UUID versionId) {
+        contractService.download(id, versionId);
+    }
 }

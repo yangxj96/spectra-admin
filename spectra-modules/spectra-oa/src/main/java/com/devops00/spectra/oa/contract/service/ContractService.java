@@ -16,8 +16,21 @@
 
 package com.devops00.spectra.oa.contract.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractVersionFrom;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractMilestoneVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVO;
 
 /// 合同表主表-服务
 ///
@@ -25,4 +38,34 @@ import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 /// @version 1.0
 /// @since 2026/3/30 11:53
 public interface ContractService extends BaseService<Contract> {
+
+    IPage<ContractVO> page(PageFrom page, ContractPageFrom params);
+
+    ContractVO get(UUID id);
+
+    UUID created(ContractSaveFrom from);
+
+    void modify(UUID id, ContractSaveFrom from);
+
+    void deleteById(UUID id);
+
+    UUID addVersion(UUID id, ContractVersionFrom from);
+
+    List<ContractVersionVO> versions(UUID id);
+
+    UUID createMilestone(UUID id, ContractMilestoneSaveFrom from);
+
+    List<ContractMilestoneVO> milestones(UUID id);
+
+    void updateMilestone(UUID id, UUID milestoneId, ContractMilestoneUpdateFrom from);
+
+    void sign(UUID id);
+
+    void activate(UUID id);
+
+    void terminate(UUID id);
+
+    void preview(UUID id, UUID versionId);
+
+    void download(UUID id, UUID versionId);
 }

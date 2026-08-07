@@ -19,13 +19,16 @@ package com.devops00.spectra.oa.contract.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.UUID;
-
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.UUID;
 
 /// OA-合同表主表实体
 ///
@@ -38,6 +41,66 @@ import lombok.ToString;
 @TableName(value = "oa_contract", schema = "spectra_oa")
 @DataScope
 public class Contract extends BaseEntity {
+    /// 合同编号
+    @TableField("contract_no")
+    private String contractNo;
+
+    /// 合同标题
+    @TableField("title")
+    private String title;
+
+    /// 合同类型
+    @TableField("contract_type")
+    private String contractType;
+
+    /// 相对方名称
+    @TableField("counterparty_name")
+    private String counterpartyName;
+
+    /// 相对方联系人
+    @TableField("counterparty_contact")
+    private String counterpartyContact;
+
+    /// 合同负责人
+    @TableField("owner_id")
+    private UUID ownerId;
+
+    /// 合同金额
+    @TableField("amount")
+    private BigDecimal amount;
+
+    /// 币种
+    @TableField("currency")
+    private String currency;
+
+    /// 生效日期
+    @TableField("start_date")
+    private LocalDate startDate;
+
+    /// 到期日期
+    @TableField("end_date")
+    private LocalDate endDate;
+
+    /// 合同生命周期状态
+    @TableField("status")
+    private String status;
+
+    /// 签署状态
+    @TableField("signing_status")
+    private String signingStatus;
+
+    /// 签署时间
+    @TableField("signed_at")
+    private Instant signedAt;
+
+    /// 可见范围
+    @TableField("visibility")
+    private String visibility;
+
+    /// 合同摘要
+    @TableField("summary")
+    private String summary;
+
     /// 所属部门ID
     @TableField("department_id")
     private UUID departmentId;

@@ -16,20 +16,464 @@
 
 package com.devops00.spectra.oa.contract.service.impl;
 
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.oa.contract.javabean.entity.Contract;
-import com.devops00.spectra.oa.contract.mapper.ContractMapper;
-import com.devops00.spectra.oa.contract.service.ContractService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-/// 合同表主表-服务默认实现
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.oa.contract.javabean.entity.Contract;
+import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
+import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractVersionFrom;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractMilestoneVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVO;
+import com.devops00.spectra.oa.contract.mapper.ContractMapper;
+import com.devops00.spectra.oa.contract.mapper.ContractMilestoneMapper;
+import com.devops00.spectra.oa.contract.mapper.ContractVersionMapper;
+import com.devops00.spectra.oa.contract.service.ContractService;
+import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.upload.javabean.entity.FileInfo;
+import com.devops00.spectra.upload.service.FileInfoService;
+import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/// 合同台账服务实现。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/30 11:53
+/// @since 2026/8/8
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contract> implements ContractService {
+
+    private static final DateTimeFormatter CONTRACT_NO_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final String STATUS_DRAFT = "DRAFT";
+    private static final String STATUS_ACTIVE = "ACTIVE";
+    private static final String STATUS_TERMINATED = "TERMINATED";
+    private static final String SIGNING_UNSIGNED = "UNSIGNED";
+    private static final String SIGNING_SIGNED = "SIGNED";
+
+    private final ContractVersionMapper versionMapper;
+    private final ContractMilestoneMapper milestoneMapper;
+    private final FileInfoService fileInfoService;
+    private final FileUploadFacade fileUploadFacade;
+
+    @Override
+    public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
+        var wrapper = new LambdaQueryWrapper<Contract>();
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
+            wrapper.and(query -> query.like(Contract::getContractNo, params.getKeyword())
+                    .or().like(Contract::getTitle, params.getKeyword())
+                    .or().like(Contract::getCounterpartyName, params.getKeyword()));
+        }
+        if (params != null && StringUtils.hasText(params.getStatus())) {
+            wrapper.eq(Contract::getStatus, params.getStatus());
+        }
+        if (params != null && StringUtils.hasText(params.getContractType())) {
+            wrapper.eq(Contract::getContractType, params.getContractType());
+        }
+        if (params != null && StringUtils.hasText(params.getSigningStatus())) {
+            wrapper.eq(Contract::getSigningStatus, params.getSigningStatus());
+        }
+        wrapper.orderByDesc(Contract::getUpdatedAt);
+        var result = this.page(page.toPage(), wrapper);
+        var voPage = new Page<ContractVO>(result.getCurrent(), result.getSize(), result.getTotal());
+        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        return voPage;
+    }
+
+    @Override
+    public ContractVO get(UUID id) {
+        var contract = requireAccessible(id);
+        var vo = toVO(contract);
+        var current = currentVersion(contract.getId());
+        vo.setCurrentVersion(current == null ? null : toVersionVO(current));
+        vo.setVersions(versions(id));
+        vo.setMilestones(milestones(id));
+        return vo;
+    }
+
+    @Override
+    @Transactional
+    public UUID created(ContractSaveFrom from) {
+        var user = requireCurrentUser();
+        validateDates(from.getStartDate(), from.getEndDate());
+        var entity = new Contract();
+        entity.setContractNo(generateContractNo());
+        entity.setTitle(from.getTitle().trim());
+        entity.setContractType(normalize(from.getContractType(), "OTHER"));
+        entity.setCounterpartyName(from.getCounterpartyName().trim());
+        entity.setCounterpartyContact(trimToNull(from.getCounterpartyContact()));
+        entity.setOwnerId(user.getId());
+        entity.setDepartmentId(user.getDepartmentId());
+        entity.setAmount(normalizeAmount(from.getAmount()));
+        entity.setCurrency(normalize(from.getCurrency(), "CNY"));
+        entity.setStartDate(from.getStartDate());
+        entity.setEndDate(from.getEndDate());
+        entity.setStatus(STATUS_DRAFT);
+        entity.setSigningStatus(SIGNING_UNSIGNED);
+        entity.setVisibility(normalizeVisibility(from.getVisibility()));
+        entity.setSummary(trimToNull(from.getSummary()));
+        if (!save(entity)) {
+            throw new DataSaveException("保存合同台账失败");
+        }
+        log.info("创建合同台账成功: id={}, contractNo={}", entity.getId(), entity.getContractNo());
+        return entity.getId();
+    }
+
+    @Override
+    @Transactional
+    public void modify(UUID id, ContractSaveFrom from) {
+        var entity = requireOwner(id);
+        if (!STATUS_DRAFT.equals(entity.getStatus())) {
+            throw new DataSaveException("只有草稿合同可以修改");
+        }
+        validateDates(from.getStartDate(), from.getEndDate());
+        entity.setTitle(from.getTitle().trim());
+        entity.setContractType(normalize(from.getContractType(), "OTHER"));
+        entity.setCounterpartyName(from.getCounterpartyName().trim());
+        entity.setCounterpartyContact(trimToNull(from.getCounterpartyContact()));
+        entity.setAmount(normalizeAmount(from.getAmount()));
+        entity.setCurrency(normalize(from.getCurrency(), "CNY"));
+        entity.setStartDate(from.getStartDate());
+        entity.setEndDate(from.getEndDate());
+        entity.setVisibility(normalizeVisibility(from.getVisibility()));
+        entity.setSummary(trimToNull(from.getSummary()));
+        if (!updateById(entity)) {
+            throw new DataSaveException("更新合同台账失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID id) {
+        var entity = requireOwner(id);
+        if (!STATUS_DRAFT.equals(entity.getStatus())) {
+            throw new DataSaveException("只有草稿合同可以删除");
+        }
+        if (!removeById(entity)) {
+            throw new DataSaveException("删除合同台账失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public UUID addVersion(UUID id, ContractVersionFrom from) {
+        var contract = requireOwner(id);
+        if (STATUS_TERMINATED.equals(contract.getStatus())) {
+            throw new DataSaveException("已终止合同不能新增版本");
+        }
+        FileInfo file = fileInfoService.getById(from.getFileId());
+        if (file == null || !"ACTIVE".equals(file.getStatus())) {
+            throw new DataNotExistException("合同文件不存在或已失效");
+        }
+        var latest = versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>()
+                .eq(ContractVersion::getContractId, contract.getId())
+                .orderByDesc(ContractVersion::getVersionNo).last("limit 1"));
+        var version = new ContractVersion();
+        version.setContractId(contract.getId());
+        version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
+        version.setFileId(file.getId());
+        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.getOriginalName());
+        version.setFileSize(from.getFileSize() == null ? file.getSize() : from.getFileSize());
+        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
+        version.setVersionNote(trimToNull(from.getVersionNote()));
+        version.setCurrentVersion(true);
+        versionMapper.update(null, new LambdaUpdateWrapper<ContractVersion>()
+                .eq(ContractVersion::getContractId, contract.getId())
+                .eq(ContractVersion::getCurrentVersion, true)
+                .set(ContractVersion::getCurrentVersion, false));
+        if (versionMapper.insert(version) != 1) {
+            throw new DataSaveException("保存合同版本失败");
+        }
+        fileInfoService.incrRefCount(file.getId());
+        return version.getId();
+    }
+
+    @Override
+    public List<ContractVersionVO> versions(UUID id) {
+        var contract = requireAccessible(id);
+        return versionMapper.selectList(new LambdaQueryWrapper<ContractVersion>()
+                        .eq(ContractVersion::getContractId, contract.getId())
+                        .orderByDesc(ContractVersion::getVersionNo))
+                .stream().map(this::toVersionVO).toList();
+    }
+
+    @Override
+    @Transactional
+    public UUID createMilestone(UUID id, ContractMilestoneSaveFrom from) {
+        var contract = requireOwner(id);
+        if (STATUS_TERMINATED.equals(contract.getStatus())) {
+            throw new DataSaveException("已终止合同不能新增履约节点");
+        }
+        var milestone = new ContractMilestone();
+        milestone.setContractId(contract.getId());
+        milestone.setName(from.getName().trim());
+        milestone.setMilestoneType(normalize(from.getMilestoneType(), "OTHER"));
+        milestone.setDueDate(from.getDueDate());
+        milestone.setStatus("PENDING");
+        milestone.setAssigneeId(from.getAssigneeId());
+        milestone.setRemark(trimToNull(from.getRemark()));
+        if (milestoneMapper.insert(milestone) != 1) {
+            throw new DataSaveException("保存合同履约节点失败");
+        }
+        return milestone.getId();
+    }
+
+    @Override
+    public List<ContractMilestoneVO> milestones(UUID id) {
+        var contract = requireAccessible(id);
+        return milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>()
+                        .eq(ContractMilestone::getContractId, contract.getId())
+                        .orderByAsc(ContractMilestone::getDueDate)
+                        .orderByAsc(ContractMilestone::getCreatedAt))
+                .stream().map(this::toMilestoneVO).toList();
+    }
+
+    @Override
+    @Transactional
+    public void updateMilestone(UUID id, UUID milestoneId, ContractMilestoneUpdateFrom from) {
+        requireOwner(id);
+        var milestone = requireMilestone(id, milestoneId);
+        var status = normalize(from.getStatus(), "PENDING");
+        if (!List.of("PENDING", "DONE", "SKIPPED").contains(status)) {
+            throw new DataSaveException("履约节点状态不合法");
+        }
+        milestone.setStatus(status);
+        milestone.setCompletedAt("DONE".equals(status)
+                ? (from.getCompletedAt() == null ? Instant.now() : from.getCompletedAt()) : null);
+        milestone.setRemark(trimToNull(from.getRemark()));
+        if (milestoneMapper.updateById(milestone) != 1) {
+            throw new DataSaveException("更新合同履约节点失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void sign(UUID id) {
+        var contract = requireOwner(id);
+        if (!STATUS_DRAFT.equals(contract.getStatus())) {
+            throw new DataSaveException("只有草稿合同可以标记签署");
+        }
+        contract.setSigningStatus(SIGNING_SIGNED);
+        contract.setSignedAt(Instant.now());
+        if (!updateById(contract)) {
+            throw new DataSaveException("更新合同签署状态失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void activate(UUID id) {
+        var contract = requireOwner(id);
+        if (!SIGNING_SIGNED.equals(contract.getSigningStatus())) {
+            throw new DataSaveException("合同签署后才能生效");
+        }
+        if (currentVersion(contract.getId()) == null) {
+            throw new DataSaveException("合同生效前必须上传合同文件");
+        }
+        contract.setStatus(STATUS_ACTIVE);
+        if (!updateById(contract)) {
+            throw new DataSaveException("合同生效失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void terminate(UUID id) {
+        var contract = requireOwner(id);
+        if (!STATUS_ACTIVE.equals(contract.getStatus())) {
+            throw new DataSaveException("只有生效合同可以终止");
+        }
+        contract.setStatus(STATUS_TERMINATED);
+        if (!updateById(contract)) {
+            throw new DataSaveException("终止合同失败");
+        }
+    }
+
+    @Override
+    public void preview(UUID id, UUID versionId) {
+        fileUploadFacade.preview(requireVersion(id, versionId).getFileId());
+    }
+
+    @Override
+    public void download(UUID id, UUID versionId) {
+        fileUploadFacade.download(requireVersion(id, versionId).getFileId());
+    }
+
+    private ContractVersion requireVersion(UUID id, UUID versionId) {
+        var contract = requireAccessible(id);
+        ContractVersion version = versionId == null ? currentVersion(contract.getId()) : versionMapper.selectOne(
+                new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getId, versionId)
+                        .eq(ContractVersion::getContractId, contract.getId()));
+        if (version == null) {
+            throw new DataNotExistException("合同版本不存在");
+        }
+        return version;
+    }
+
+    private ContractMilestone requireMilestone(UUID id, UUID milestoneId) {
+        var milestone = milestoneMapper.selectOne(new LambdaQueryWrapper<ContractMilestone>()
+                .eq(ContractMilestone::getId, milestoneId)
+                .eq(ContractMilestone::getContractId, id));
+        if (milestone == null) {
+            throw new DataNotExistException("合同履约节点不存在");
+        }
+        return milestone;
+    }
+
+    private ContractVersion currentVersion(UUID id) {
+        return versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>()
+                .eq(ContractVersion::getContractId, id)
+                .eq(ContractVersion::getCurrentVersion, true)
+                .last("limit 1"));
+    }
+
+    private Contract require(UUID id) {
+        var entity = getById(id);
+        if (entity == null) {
+            throw new DataNotExistException("合同不存在: " + id);
+        }
+        return entity;
+    }
+
+    private Contract requireAccessible(UUID id) {
+        var entity = require(id);
+        var user = requireCurrentUser();
+        if ("PRIVATE".equals(entity.getVisibility()) && !Objects.equals(entity.getOwnerId(), user.getId())) {
+            throw new DataNotExistException("合同不存在或无权访问");
+        }
+        if ("DEPARTMENT".equals(entity.getVisibility())
+                && !Objects.equals(entity.getDepartmentId(), user.getDepartmentId())) {
+            throw new DataNotExistException("合同不存在或无权访问");
+        }
+        return entity;
+    }
+
+    private Contract requireOwner(UUID id) {
+        var entity = require(id);
+        var user = requireCurrentUser();
+        if (!Objects.equals(entity.getOwnerId(), user.getId())) {
+            throw new DataNotExistException("合同不存在或无权操作");
+        }
+        return entity;
+    }
+
+    private SecurityUser requireCurrentUser() {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            throw new DataSaveException("当前用户组织信息不可用");
+        }
+        return user;
+    }
+
+    private ContractVO toVO(Contract source) {
+        var vo = new ContractVO();
+        vo.setId(source.getId());
+        vo.setContractNo(source.getContractNo());
+        vo.setTitle(source.getTitle());
+        vo.setContractType(source.getContractType());
+        vo.setCounterpartyName(source.getCounterpartyName());
+        vo.setCounterpartyContact(source.getCounterpartyContact());
+        vo.setOwnerId(source.getOwnerId());
+        vo.setDepartmentId(source.getDepartmentId());
+        vo.setAmount(source.getAmount());
+        vo.setCurrency(source.getCurrency());
+        vo.setStartDate(source.getStartDate());
+        vo.setEndDate(source.getEndDate());
+        vo.setStatus(source.getStatus());
+        vo.setSigningStatus(source.getSigningStatus());
+        vo.setSignedAt(source.getSignedAt());
+        vo.setVisibility(source.getVisibility());
+        vo.setSummary(source.getSummary());
+        vo.setCreatedAt(source.getCreatedAt());
+        vo.setUpdatedAt(source.getUpdatedAt());
+        return vo;
+    }
+
+    private ContractVersionVO toVersionVO(ContractVersion source) {
+        var vo = new ContractVersionVO();
+        vo.setId(source.getId());
+        vo.setVersionNo(source.getVersionNo());
+        vo.setFileId(source.getFileId());
+        vo.setFileName(source.getFileName());
+        vo.setFileSize(source.getFileSize());
+        vo.setContentType(source.getContentType());
+        vo.setVersionNote(source.getVersionNote());
+        vo.setCurrent(source.getCurrentVersion());
+        vo.setCreatedAt(source.getCreatedAt());
+        return vo;
+    }
+
+    private ContractMilestoneVO toMilestoneVO(ContractMilestone source) {
+        var vo = new ContractMilestoneVO();
+        vo.setId(source.getId());
+        vo.setContractId(source.getContractId());
+        vo.setName(source.getName());
+        vo.setMilestoneType(source.getMilestoneType());
+        vo.setDueDate(source.getDueDate());
+        vo.setStatus(source.getStatus());
+        vo.setAssigneeId(source.getAssigneeId());
+        vo.setCompletedAt(source.getCompletedAt());
+        vo.setReminderSentAt(source.getReminderSentAt());
+        vo.setRemark(source.getRemark());
+        vo.setCreatedAt(source.getCreatedAt());
+        return vo;
+    }
+
+    private String generateContractNo() {
+        return "HT" + LocalDate.now(ZoneOffset.UTC).format(CONTRACT_NO_DATE)
+                + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
+            throw new DataSaveException("合同到期日期不能早于生效日期");
+        }
+    }
+
+    private java.math.BigDecimal normalizeAmount(java.math.BigDecimal amount) {
+        return amount == null ? java.math.BigDecimal.ZERO.setScale(2) : amount.setScale(2, RoundingMode.HALF_UP);
+    }
+
+    private String normalizeVisibility(String value) {
+        var normalized = normalize(value, "DEPARTMENT");
+        if (!List.of("PUBLIC", "DEPARTMENT", "PRIVATE").contains(normalized)) {
+            throw new DataSaveException("合同可见范围不合法");
+        }
+        return normalized;
+    }
+
+    private String normalize(String value, String defaultValue) {
+        return StringUtils.hasText(value) ? value.trim().toUpperCase() : defaultValue;
+    }
+
+    private String trimToNull(String value) {
+        return StringUtils.hasText(value) ? value.trim() : null;
+    }
 }
