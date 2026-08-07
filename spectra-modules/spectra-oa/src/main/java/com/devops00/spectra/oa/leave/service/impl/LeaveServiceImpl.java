@@ -60,7 +60,6 @@ import com.devops00.spectra.oa.leave.mapper.LeaveApplicationMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveBalanceMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper;
 import com.devops00.spectra.oa.leave.service.LeaveService;
-import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 
 import lombok.RequiredArgsConstructor;
@@ -150,7 +149,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         wrapper.orderByDesc(LeaveApplication::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<LeaveVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(detail -> toVO(detail, applicationService.require(detail.getApplicationId())))
+        voPage.setRecords(result.getRecords().stream()
+                .map(detail -> toVO(detail, applicationService.require(detail.getApplicationId())))
                 .toList());
         return voPage;
     }
@@ -177,7 +177,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
                 "applicantId", application.getApplicantId().toString(),
                 "leaveTypeCode", detail.getLeaveTypeCode(),
                 "durationHours", detail.getDurationHours().doubleValue());
-        var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(), variables);
+        var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(),
+                variables);
         applicationService.bindProcessInstance(application.getId(), processId);
     }
 
@@ -365,8 +366,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         while (!date.isAfter(last)) {
             if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY
                     && attendanceRecordMapper.selectCount(new LambdaQueryWrapper<AttendanceRecord>()
-                    .eq(AttendanceRecord::getApplicationId, application.getId())
-                    .eq(AttendanceRecord::getAttendanceDate, date)) == 0) {
+                            .eq(AttendanceRecord::getApplicationId, application.getId())
+                            .eq(AttendanceRecord::getAttendanceDate, date)) == 0) {
                 var record = new AttendanceRecord();
                 record.setApplicationId(application.getId());
                 record.setUserId(application.getApplicantId());
