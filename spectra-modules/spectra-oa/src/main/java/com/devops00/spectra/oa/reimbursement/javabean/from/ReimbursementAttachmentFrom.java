@@ -14,24 +14,22 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
+package com.devops00.spectra.oa.reimbursement.javabean.from;
 
 import java.util.UUID;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 普通上传的上传结果
+/// 报销凭证附件参数。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
+/// @since 2026/8/7
 @Data
-public class FileUploadVO {
-
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
+public class ReimbursementAttachmentFrom {
+    @NotNull(message = "凭证文件不能为空")
     private UUID fileId;
 
+    private String fileName;
 }

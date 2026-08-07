@@ -14,24 +14,27 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
+package com.devops00.spectra.oa.calendar.javabean.from;
 
-import java.util.UUID;
-
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 普通上传的上传结果
+/// 日程保存参数。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
+/// @since 2026/8/7
 @Data
-public class FileUploadVO {
+public class CalendarSaveFrom {
+    @NotBlank(message = "日程标题不能为空")
+    private String title;
 
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
-    private UUID fileId;
-
+    private String content;
+    private String startTime;
+    private String endTime;
+    private Boolean allDay = false;
+    private String eventType = "PERSONAL";
+    private String visibility = "PRIVATE";
+    private String location;
+    private String participantIds;
 }

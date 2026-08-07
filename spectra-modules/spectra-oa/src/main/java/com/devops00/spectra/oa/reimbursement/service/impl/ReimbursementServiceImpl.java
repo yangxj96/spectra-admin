@@ -1,0 +1,415 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.oa.reimbursement.service.impl;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
+import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
+import com.devops00.spectra.oa.application.javabean.entity.Application;
+import com.devops00.spectra.oa.application.javabean.entity.ApplicationAttachment;
+import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
+import com.devops00.spectra.oa.application.mapper.ApplicationAttachmentMapper;
+import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
+import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
+import com.devops00.spectra.oa.application.service.ApplicationService;
+import com.devops00.spectra.oa.reimbursement.javabean.converter.ReimbursementConverter;
+import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
+import com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementAttachmentFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementItemFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPageFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPaymentFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSaveFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSubmitFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementAttachmentVO;
+import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
+import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
+import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
+import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
+import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.workflow.service.ProcessInstanceService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/// 费用报销业务闭环服务实现。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/7
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMapper, Reimbursement>
+        implements ReimbursementService {
+
+    private static final String TYPE_CODE = "reimbursement";
+    private static final String PAYMENT_PENDING = "PENDING";
+    private static final String PAYMENT_PAID = "PAID";
+
+    private final ReimbursementItemMapper itemMapper;
+    private final ApplicationAttachmentMapper attachmentMapper;
+    private final ApplicationMapper applicationMapper;
+    private final ApplicationTypeMapper applicationTypeMapper;
+    private final ApplicationService applicationService;
+    private final ProcessInstanceService processInstanceService;
+    private final NotificationService notificationService;
+    private final ReimbursementConverter reimbursementConverter;
+
+    @Override
+    public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
+        var wrapper = new LambdaQueryWrapper<Reimbursement>();
+        if (StringUtils.hasText(params.getPaymentStatus())) {
+            wrapper.eq(Reimbursement::getPaymentStatus, params.getPaymentStatus());
+        }
+        if (StringUtils.hasText(params.getKeyword())) {
+            wrapper.and(query -> query.like(Reimbursement::getPurpose, params.getKeyword())
+                    .or().like(Reimbursement::getPayeeName, params.getKeyword()));
+        }
+        if (StringUtils.hasText(params.getStatus())) {
+            var applicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
+                            .eq(Application::getTypeCode, TYPE_CODE)
+                            .eq(Application::getStatus, params.getStatus()))
+                    .stream().map(Application::getId).toList();
+            if (applicationIds.isEmpty()) {
+                return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+            }
+            wrapper.in(Reimbursement::getApplicationId, applicationIds);
+        }
+        wrapper.orderByDesc(Reimbursement::getCreatedAt);
+        var result = this.page(page.toPage(), wrapper);
+        var voPage = new Page<ReimbursementVO>(result.getCurrent(), result.getSize(), result.getTotal());
+        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        return voPage;
+    }
+
+    @Override
+    public ReimbursementVO get(UUID id) {
+        return toVO(require(id));
+    }
+
+    @Override
+    @Transactional
+    public UUID created(ReimbursementSaveFrom from) {
+        validate(from);
+        var user = SecUtil.getCurrentUser();
+        if (user == null || SecUtil.getCurrentUserId() == null || user.getDepartmentId() == null) {
+            throw new DataSaveException("当前用户组织信息不可用");
+        }
+        var application = applicationService.createDraft(TYPE_CODE, null, "费用报销 - " + from.getPurpose());
+        var entity = new Reimbursement();
+        entity.setApplicationId(application.getId());
+        entity.setDepartmentId(application.getDepartmentId());
+        apply(entity, from);
+        entity.setPaymentStatus(PAYMENT_PENDING);
+        if (!this.save(entity)) {
+            throw new DataSaveException("保存报销单失败");
+        }
+        replaceItems(entity, from.getItems());
+        replaceAttachments(application.getId(), from.getAttachments());
+        applicationService.bindBizId(application.getId(), entity.getId());
+        log.info("创建报销草稿成功: id={}, applicationId={}", entity.getId(), application.getId());
+        return entity.getId();
+    }
+
+    @Override
+    @Transactional
+    public void modify(UUID id, ReimbursementSaveFrom from) {
+        validate(from);
+        var entity = require(id);
+        var application = requireEditableApplication(entity);
+        apply(entity, from);
+        if (!this.updateById(entity)) {
+            throw new DataSaveException("更新报销单失败");
+        }
+        replaceItems(entity, from.getItems());
+        replaceAttachments(application.getId(), from.getAttachments());
+    }
+
+    @Override
+    @Transactional
+    public void submit(UUID id, ReimbursementSubmitFrom from) {
+        var entity = require(id);
+        var application = requireEditableApplication(entity);
+        var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
+                .eq(ApplicationType::getCode, TYPE_CODE).eq(ApplicationType::getEnabled, true));
+        if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
+            throw new DataSaveException("报销流程尚未配置");
+        }
+        applicationService.submit(application.getId());
+        var applicantUsername = SecUtil.getCurrentUser() == null ? null : SecUtil.getCurrentUser().getUsername();
+        if (!StringUtils.hasText(applicantUsername)) {
+            throw new DataSaveException("当前用户缺少流程用户名");
+        }
+        var approver = from == null ? null : from.getApproverUsername();
+        var variables = new LinkedHashMap<String, Object>();
+        variables.put("applicant", applicantUsername);
+        variables.put("approver", StringUtils.hasText(approver) ? approver : applicantUsername);
+        variables.put("applicantId", application.getApplicantId().toString());
+        variables.put("amount", entity.getTotalAmount().doubleValue());
+        var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(), variables);
+        applicationService.bindProcessInstance(application.getId(), processId);
+        log.info("提交报销审批成功: id={}, processInstanceId={}", id, processId);
+    }
+
+    @Override
+    @Transactional
+    public void withdraw(UUID id) {
+        var entity = require(id);
+        var application = requireApplicantApplication(entity);
+        applicationService.withdraw(application.getId());
+        terminateProcess(application);
+    }
+
+    @Override
+    @Transactional
+    public void cancel(UUID id) {
+        var entity = require(id);
+        var application = requireApplicantApplication(entity);
+        applicationService.cancel(application.getId());
+        terminateProcess(application);
+    }
+
+    @Override
+    @Transactional
+    public void markPaid(UUID id, ReimbursementPaymentFrom from) {
+        var entity = require(id);
+        var application = applicationService.require(entity.getApplicationId());
+        if (!ApplicationStatus.APPROVED.name().equals(application.getStatus())) {
+            throw new DataSaveException("只有审批通过的报销单可以登记付款");
+        }
+        if (!PAYMENT_PENDING.equals(entity.getPaymentStatus())) {
+            throw new DataSaveException("当前付款状态不允许登记");
+        }
+        entity.setPaymentStatus(PAYMENT_PAID);
+        entity.setPaymentAt(Instant.now());
+        entity.setPaymentRemark(from == null ? null : from.getPaymentRemark());
+        if (!this.updateById(entity)) {
+            throw new DataSaveException("登记报销付款失败");
+        }
+        sendNotification(application, "报销已付款", "您的报销申请已完成付款");
+    }
+
+    @Override
+    @Transactional
+    public void onApproved(String businessKey, Map<String, Object> variables) {
+        var application = requireApplication(businessKey);
+        if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
+            return;
+        }
+        var entity = require(application.getBizId());
+        applicationService.updateStatus(application.getId(), ApplicationStatus.APPROVED.name(), null);
+        entity.setPaymentStatus(PAYMENT_PENDING);
+        this.updateById(entity);
+        sendNotification(application, "报销申请已通过", "您的报销申请已审批通过，等待付款");
+    }
+
+    @Override
+    @Transactional
+    public void onRejected(String businessKey, String reason) {
+        var application = requireApplication(businessKey);
+        if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
+            return;
+        }
+        applicationService.updateStatus(application.getId(), ApplicationStatus.REJECTED.name(), reason);
+        sendNotification(application, "报销申请已驳回", StringUtils.hasText(reason) ? reason : "报销申请未通过审批");
+    }
+
+    @Override
+    @Transactional
+    public void onTerminated(String businessKey, String reason) {
+        var application = requireApplication(businessKey);
+        if (ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
+            applicationService.updateStatus(application.getId(), ApplicationStatus.CANCELLED.name(), reason);
+        }
+    }
+
+    private void validate(ReimbursementSaveFrom from) {
+        if (from.getExpenseEnd().isBefore(from.getExpenseStart())) {
+            throw new DataSaveException("费用结束日期不能早于开始日期");
+        }
+        var total = from.getItems().stream().map(ReimbursementItemFrom::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+        if (total.compareTo(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP)) != 0) {
+            throw new DataSaveException("报销总额必须等于费用明细合计");
+        }
+        from.getItems().forEach(item -> {
+            if (item.getExpenseDate().isBefore(from.getExpenseStart())
+                    || item.getExpenseDate().isAfter(from.getExpenseEnd())) {
+                throw new DataSaveException("费用日期必须在报销期间内");
+            }
+        });
+    }
+
+    private void apply(Reimbursement entity, ReimbursementSaveFrom from) {
+        entity.setPurpose(from.getPurpose());
+        entity.setExpenseStart(from.getExpenseStart());
+        entity.setExpenseEnd(from.getExpenseEnd());
+        entity.setTotalAmount(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP));
+        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
+        entity.setPayeeName(from.getPayeeName());
+        entity.setPayeeAccount(from.getPayeeAccount());
+    }
+
+    private void replaceItems(Reimbursement entity, List<ReimbursementItemFrom> items) {
+        itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>()
+                .eq(ReimbursementItem::getReimbursementId, entity.getId()));
+        var entities = items.stream().map(item -> {
+            var target = new ReimbursementItem();
+            target.setReimbursementId(entity.getId());
+            target.setDepartmentId(entity.getDepartmentId());
+            target.setExpenseDate(item.getExpenseDate());
+            target.setCategory(item.getCategory());
+            target.setDescription(item.getDescription());
+            target.setAmount(item.getAmount().setScale(2, RoundingMode.HALF_UP));
+            target.setTaxAmount(item.getTaxAmount().setScale(2, RoundingMode.HALF_UP));
+            target.setInvoiceNo(item.getInvoiceNo());
+            return target;
+        }).toList();
+        entities.forEach(item -> {
+            if (itemMapper.insert(item) != 1) {
+                throw new DataSaveException("保存报销明细失败");
+            }
+        });
+    }
+
+    private void replaceAttachments(UUID applicationId, List<ReimbursementAttachmentFrom> attachments) {
+        attachmentMapper.delete(new LambdaQueryWrapper<ApplicationAttachment>()
+                .eq(ApplicationAttachment::getApplicationId, applicationId));
+        if (attachments == null || attachments.isEmpty()) {
+            return;
+        }
+        var unique = new LinkedHashMap<UUID, ReimbursementAttachmentFrom>();
+        attachments.forEach(item -> unique.put(item.getFileId(), item));
+        unique.values().forEach(item -> {
+            var attachment = new ApplicationAttachment();
+            attachment.setApplicationId(applicationId);
+            attachment.setFileId(item.getFileId());
+            attachment.setFileName(item.getFileName());
+            if (attachmentMapper.insert(attachment) != 1) {
+                throw new DataSaveException("保存报销凭证失败");
+            }
+        });
+    }
+
+    private ReimbursementVO toVO(Reimbursement entity) {
+        var application = applicationService.require(entity.getApplicationId());
+        var vo = reimbursementConverter.toVO(entity);
+        vo.setApplicationNo(application.getApplicationNo());
+        vo.setTitle(application.getTitle());
+        vo.setStatus(application.getStatus());
+        vo.setApplicantId(application.getApplicantId());
+        vo.setProcessInstanceId(application.getProcessInstanceId());
+        vo.setRejectReason(application.getRejectReason());
+        vo.setPayeeAccountMasked(mask(entity.getPayeeAccount()));
+        vo.setItems(itemMapper.selectList(new LambdaQueryWrapper<ReimbursementItem>()
+                        .eq(ReimbursementItem::getReimbursementId, entity.getId()).orderByAsc(ReimbursementItem::getExpenseDate))
+                .stream().map(reimbursementConverter::toItemVO).toList());
+        vo.setAttachments(attachmentMapper.selectList(new LambdaQueryWrapper<ApplicationAttachment>()
+                        .eq(ApplicationAttachment::getApplicationId, application.getId()))
+                .stream().map(this::toAttachmentVO).toList());
+        return vo;
+    }
+
+    private ReimbursementAttachmentVO toAttachmentVO(ApplicationAttachment source) {
+        var vo = new ReimbursementAttachmentVO();
+        vo.setId(source.getId());
+        vo.setFileId(source.getFileId());
+        vo.setFileName(source.getFileName());
+        vo.setPreviewUrl("/api/file/upload/preview/" + source.getFileId());
+        return vo;
+    }
+
+    private Reimbursement require(UUID id) {
+        var entity = this.getById(id);
+        if (entity == null) {
+            throw new DataNotExistException("报销单不存在: " + id);
+        }
+        return entity;
+    }
+
+    private Application requireEditableApplication(Reimbursement entity) {
+        var application = requireApplicantApplication(entity);
+        if (!ApplicationStatus.DRAFT.name().equals(application.getStatus())
+                && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
+            throw new DataSaveException("当前状态不允许修改或提交报销单");
+        }
+        return application;
+    }
+
+    private Application requireApplicantApplication(Reimbursement entity) {
+        var application = applicationService.require(entity.getApplicationId());
+        if (!Objects.equals(application.getApplicantId(), SecUtil.getCurrentUserId())) {
+            throw new DataNotExistException("报销单不存在或无权操作");
+        }
+        return application;
+    }
+
+    private Application requireApplication(String businessKey) {
+        try {
+            return applicationService.require(UUID.fromString(businessKey));
+        } catch (IllegalArgumentException exception) {
+            throw new DataNotExistException("审批业务KEY无效: " + businessKey);
+        }
+    }
+
+    private void terminateProcess(Application application) {
+        if (StringUtils.hasText(application.getProcessInstanceId())) {
+            processInstanceService.terminate(application.getProcessInstanceId(), "OA 报销申请已撤回或取消");
+        }
+    }
+
+    private void sendNotification(Application application, String title, String content) {
+        var dto = new NotificationSendDTO();
+        dto.setTitle(title);
+        dto.setContent(content);
+        dto.setType("oa");
+        dto.setReceiverId(application.getApplicantId());
+        dto.setLink("/oa/reimbursement/" + application.getBizId());
+        notificationService.send(dto);
+    }
+
+    private String mask(String account) {
+        if (!StringUtils.hasText(account)) {
+            return null;
+        }
+        if (account.length() <= 4) {
+            return "****";
+        }
+        return "****" + account.substring(account.length() - 4);
+    }
+}

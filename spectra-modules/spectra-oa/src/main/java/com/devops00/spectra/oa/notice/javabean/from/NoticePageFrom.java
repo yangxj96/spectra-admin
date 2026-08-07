@@ -14,24 +14,17 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
-
-import java.util.UUID;
+package com.devops00.spectra.oa.notice.javabean.from;
 
 import lombok.Data;
 
-/// 普通上传的上传结果
+/// 公告分页查询参数。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
+/// @since 2026/8/7
 @Data
-public class FileUploadVO {
-
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
-    private UUID fileId;
-
+public class NoticePageFrom {
+    private String keyword;
+    private String status;
 }

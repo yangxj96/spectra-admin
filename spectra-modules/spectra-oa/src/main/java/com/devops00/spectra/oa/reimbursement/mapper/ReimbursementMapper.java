@@ -14,24 +14,15 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
+package com.devops00.spectra.oa.reimbursement.mapper;
 
-import java.util.UUID;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 
-import lombok.Data;
-
-/// 普通上传的上传结果
+/// 报销主表 Mapper。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
-@Data
-public class FileUploadVO {
-
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
-    private UUID fileId;
-
+/// @since 2026/8/7
+public interface ReimbursementMapper extends BaseMapper<Reimbursement> {
 }

@@ -14,57 +14,31 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.oa.notice.javabean.entity;
+package com.devops00.spectra.oa.notice.javabean.vo;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.annotation.DataScope;
-import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_notice", schema = "spectra_oa")
-@DataScope(ignore = true)
-/// OA 公告实体。
+/// 公告响应视图。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
-public class Notice extends BaseEntity {
-
-    @TableField("department_id")
-    private UUID departmentId;
-
-    @TableField("title")
+@Data
+public class NoticeVO {
+    private UUID id;
     private String title;
-
-    @TableField("summary")
     private String summary;
-
-    @TableField("content")
     private String content;
-
-    @TableField("status")
     private String status;
-
-    @TableField("target_type")
     private String targetType;
-
-    @TableField("target_department_id")
     private UUID targetDepartmentId;
-
-    @TableField("publisher_id")
     private UUID publisherId;
-
-    @TableField("publish_at")
     private Instant publishAt;
-
-    @TableField("required_read")
     private Boolean requiredRead;
+    private Boolean read;
+    private Instant readAt;
+    private Instant createdAt;
 }

@@ -59,7 +59,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
 
 /// 文件上传服务-本地上传
 ///
@@ -202,6 +201,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
+        vo.setFileId(fileInfo.getId());
 
         publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
         return vo;
@@ -300,7 +300,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             }
 
             publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
-            return buildUploadVO(url);
+            return buildUploadVO(url, fileInfo.getId());
         }
     }
 
@@ -425,26 +425,25 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     /// 构建文件保存路径
     ///
-    /// @param filename 文件名称
+    /// 文件名本身包含年月目录前缀（例如 202608/uuid.png），因此这里直接相对根目录解析，
+    /// 避免再次拼接年月目录导致实际保存路径变成 202608/202608/uuid.png。
+    ///
+    /// @param filename 文件名称（可包含相对目录）
     private Path buildFilePath(String filename) {
-        // 1. 动态获取当前年月的字符串，如 "202606"
-        String dateDir = LocalDate.now().format(DATE_FORMATTER);
-
-        // 2. 拼装绝对路径，如：/var/data/upload/202606
-        Path dirPath = root.resolve(dateDir);
-
-        // 3. 确保这个月的物理文件夹在磁盘上真实存在
-        try {
-            if (!Files.exists(dirPath)) {
-                Files.createDirectories(dirPath);
-            }
-        } catch (IOException e) {
-            throw new FileUploadException("创建每月归类目录失败");
+        Path filePath = root.resolve(filename).normalize();
+        if (!filePath.startsWith(root)) {
+            throw new FileUploadException("文件路径非法");
         }
 
-        // 4. 返回最终文件的全路径：/var/data/upload/202606/xxxx.png
-        return dirPath.resolve(filename);
-        //return root.resolve(filename);
+        Path parent = filePath.getParent();
+        try {
+            if (parent != null && !Files.exists(parent)) {
+                Files.createDirectories(parent);
+            }
+        } catch (IOException e) {
+            throw new FileUploadException("创建文件目录失败");
+        }
+        return filePath;
     }
 
     /// 构建临时文件路径
@@ -457,9 +456,10 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     /// 构建上传响应VO
     ///
     /// @param url 地址
-    private FileUploadVO buildUploadVO(String url) {
+    private FileUploadVO buildUploadVO(String url, java.util.UUID fileId) {
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
+        vo.setFileId(fileId);
         return vo;
     }
 

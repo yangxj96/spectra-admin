@@ -16,37 +16,76 @@
 
 package com.devops00.spectra.oa.calendar.controller;
 
+import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.calendar.javabean.entity.Calendar;
-import com.devops00.spectra.oa.calendar.service.CalendarService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 日历主接口
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.Verify;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
+import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
+import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
+import com.devops00.spectra.oa.calendar.service.CalendarService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/// 日程协同接口。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/5 23:21
+/// @since 2026/8/7
 @Slf4j
 @RestController
 @RequestMapping("/oa/calendar")
 @RequiredArgsConstructor
 public class CalendarController {
 
-    private final CalendarService bindService;
+    private final CalendarService calendarService;
 
-    @ULog("'分页查询日历'")
+    @ULog("'查询日程列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
-    public IPage<Calendar> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
+        return calendarService.page(page, params);
     }
 
+    @ULog("'获取日程详情'")
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
+    public CalendarVO get(@PathVariable UUID id) {
+        return calendarService.get(id);
+    }
+
+    @ULog("'创建日程'")
+    @PostMapping(version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:INSERT')")
+    public CalendarVO create(@Validated(Verify.Insert.class) @RequestBody CalendarSaveFrom from) {
+        return calendarService.create(from);
+    }
+
+    @ULog("'更新日程'")
+    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:UPDATE')")
+    public CalendarVO update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody CalendarSaveFrom from) {
+        return calendarService.update(id, from);
+    }
+
+    @ULog("'删除日程'")
+    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:DELETE')")
+    public void delete(@PathVariable UUID id) {
+        calendarService.delete(id);
+    }
 }

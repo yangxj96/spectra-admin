@@ -14,9 +14,10 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.oa.notice.javabean.entity;
+package com.devops00.spectra.oa.reimbursement.javabean.entity;
 
-import java.time.Instant;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -24,47 +25,43 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_notice", schema = "spectra_oa")
-@DataScope(ignore = true)
-/// OA 公告实体。
+/// 费用报销明细。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
-public class Notice extends BaseEntity {
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "oa_reimbursement_item", schema = "spectra_oa")
+@DataScope
+public class ReimbursementItem extends BaseEntity {
+
+    @TableField("reimbursement_id")
+    private UUID reimbursementId;
 
     @TableField("department_id")
     private UUID departmentId;
 
-    @TableField("title")
-    private String title;
+    @TableField("expense_date")
+    private LocalDate expenseDate;
 
-    @TableField("summary")
-    private String summary;
+    @TableField("category")
+    private String category;
 
-    @TableField("content")
-    private String content;
+    @TableField("description")
+    private String description;
 
-    @TableField("status")
-    private String status;
+    @TableField("amount")
+    private BigDecimal amount;
 
-    @TableField("target_type")
-    private String targetType;
+    @TableField("tax_amount")
+    private BigDecimal taxAmount;
 
-    @TableField("target_department_id")
-    private UUID targetDepartmentId;
-
-    @TableField("publisher_id")
-    private UUID publisherId;
-
-    @TableField("publish_at")
-    private Instant publishAt;
-
-    @TableField("required_read")
-    private Boolean requiredRead;
+    @TableField("invoice_no")
+    private String invoiceNo;
 }

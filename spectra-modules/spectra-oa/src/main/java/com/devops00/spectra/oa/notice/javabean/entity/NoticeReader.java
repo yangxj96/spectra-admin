@@ -21,7 +21,6 @@ import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 
 import lombok.Data;
@@ -29,42 +28,19 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_notice", schema = "spectra_oa")
-@DataScope(ignore = true)
-/// OA 公告实体。
+@TableName(value = "oa_notice_reader", schema = "spectra_oa")
+/// 公告阅读回执实体。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
-public class Notice extends BaseEntity {
+public class NoticeReader extends BaseEntity {
+    @TableField("notice_id")
+    private UUID noticeId;
 
-    @TableField("department_id")
-    private UUID departmentId;
+    @TableField("user_id")
+    private UUID userId;
 
-    @TableField("title")
-    private String title;
-
-    @TableField("summary")
-    private String summary;
-
-    @TableField("content")
-    private String content;
-
-    @TableField("status")
-    private String status;
-
-    @TableField("target_type")
-    private String targetType;
-
-    @TableField("target_department_id")
-    private UUID targetDepartmentId;
-
-    @TableField("publisher_id")
-    private UUID publisherId;
-
-    @TableField("publish_at")
-    private Instant publishAt;
-
-    @TableField("required_read")
-    private Boolean requiredRead;
+    @TableField("read_at")
+    private Instant readAt;
 }

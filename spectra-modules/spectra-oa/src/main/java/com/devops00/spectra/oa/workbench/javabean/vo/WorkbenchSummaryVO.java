@@ -17,6 +17,10 @@
 package com.devops00.spectra.oa.workbench.javabean.vo;
 
 import lombok.Data;
+import java.util.List;
+import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
+import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
+import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 
 /// OA 工作台摘要。
 @Data
@@ -27,4 +31,10 @@ public class WorkbenchSummaryVO {
     private long inReviewCount;
     private long approvedCount;
     private long rejectedCount;
+    private long unreadNoticeCount;
+    private long todayCalendarCount;
+    private long upcomingMeetingCount;
+    private List<NoticeVO> notices = List.of();
+    private List<CalendarVO> calendarItems = List.of();
+    private List<MeetingVO> meetings = List.of();
 }

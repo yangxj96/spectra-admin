@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
@@ -30,6 +31,8 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingResponseFrom;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 
@@ -63,6 +66,28 @@ public class MeetingController {
     @PreAuthorize("hasPermission(null, 'OA_MEETING:QUERY')")
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
         return bindService.page(page, params);
+    }
+
+    @ULog("'响应会议邀请'")
+    @PostMapping(value = "/{id}/response", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
+    public void respond(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingResponseFrom from) {
+        bindService.respond(id, from);
+    }
+
+    @ULog("'会议签到'")
+    @PostMapping(value = "/{id}/check-in", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
+    public void checkIn(@PathVariable java.util.UUID id) {
+        bindService.checkIn(id);
+    }
+
+    @ULog("'保存会议纪要'")
+    @PostMapping(value = "/{id}/record", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
+    public void saveRecord(@PathVariable java.util.UUID id,
+            @Validated @RequestBody MeetingRecordFrom from) {
+        bindService.saveRecord(id, from);
     }
 
 }

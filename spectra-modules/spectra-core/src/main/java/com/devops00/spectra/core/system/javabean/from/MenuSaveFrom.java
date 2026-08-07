@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.javabean.from;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import jakarta.validation.constraints.NotBlank;
@@ -52,9 +53,11 @@ public class MenuSaveFrom {
 
     /// 菜单节点类型
     @NotNull(message = "菜单类型不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
+    @JsonAlias("menuType")
     private MenuType menuType;
 
     /// 对应前端命名路由
+    @JsonAlias("routeName")
     private String routeName;
 
     /// 名称

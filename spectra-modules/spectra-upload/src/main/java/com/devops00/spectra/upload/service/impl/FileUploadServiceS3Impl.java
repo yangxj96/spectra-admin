@@ -194,6 +194,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl("/api/file/preview/" + fileInfo.getId());
+        vo.setFileId(fileInfo.getId());
 
         publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
         return vo;
@@ -307,6 +308,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
             FileUploadVO vo = new FileUploadVO();
             vo.setUrl("/api/file/preview/" + fileInfo.getId());
+            vo.setFileId(fileInfo.getId());
 
             publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
             return vo;

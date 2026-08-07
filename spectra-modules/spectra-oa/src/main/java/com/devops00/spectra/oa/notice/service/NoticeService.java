@@ -16,13 +16,31 @@
 
 package com.devops00.spectra.oa.notice.service;
 
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.oa.notice.javabean.entity.Notice;
+import java.util.UUID;
 
-/// 公告表-主表Service
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.oa.notice.javabean.entity.Notice;
+import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
+import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
+import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
+
+/// 公告业务服务。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/26 16:41
+/// @since 2026/8/7
 public interface NoticeService extends BaseService<Notice> {
+    IPage<NoticeVO> page(PageFrom page, NoticePageFrom params);
+
+    NoticeVO get(UUID id);
+
+    Notice createDraft(NoticeCreateFrom from);
+
+    void publish(UUID id);
+
+    void revoke(UUID id);
+
+    void markRead(UUID id);
 }

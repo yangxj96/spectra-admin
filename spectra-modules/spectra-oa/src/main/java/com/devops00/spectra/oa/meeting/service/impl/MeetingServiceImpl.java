@@ -16,66 +16,108 @@
 
 package com.devops00.spectra.oa.meeting.service.impl;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.exception.DataScopeViolationException;
-import com.devops00.spectra.common.exception.EntityUpdateException;
+import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
+import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
+import com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant;
+import com.devops00.spectra.oa.meeting.javabean.entity.MeetingRecord;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingResponseFrom;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 import com.devops00.spectra.oa.meeting.mapper.MeetingMapper;
+import com.devops00.spectra.oa.meeting.mapper.MeetingParticipantMapper;
+import com.devops00.spectra.oa.meeting.mapper.MeetingRecordMapper;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
-import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
-/// 会仪表-服务默认实现
+/// 会议业务服务实现。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/30 11:47
-@Slf4j
+/// @since 2026/8/7
 @Service
 @RequiredArgsConstructor
 public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> implements MeetingService {
 
     private final MeetingConverter meetingConverter;
-
-    private final ProcessInstanceService processInstanceService;
+    private final MeetingParticipantMapper participantMapper;
+    private final MeetingRecordMapper recordMapper;
+    private final NotificationService notificationService;
+    private final UserService userService;
 
     @Override
     @Transactional
     public void created(MeetingCreateFrom from) {
-        Meeting entity = meetingConverter.toEntity(from);
-        var currentUser = SecUtil.getCurrentUser();
-        var currentUserId = SecUtil.getCurrentUserId();
-        if (currentUser == null || currentUserId == null || currentUser.getDepartmentId() == null) {
-            throw new DataScopeViolationException("当前用户没有可用的部门归属，不能创建会议");
+        var user = SecUtil.getCurrentUser();
+        var userId = SecUtil.getCurrentUserId();
+        if (user == null || userId == null || user.getDepartmentId() == null) {
+            throw new DataSaveException("当前用户组织信息不可用");
         }
-        // 发起人和部门归属由服务端确定，不能信任客户端传入的 initiatorId。
-        entity.setInitiatorId(currentUserId.toString());
-        entity.setDepartmentId(currentUser.getDepartmentId());
+        var start = parse(from.getStartTime());
+        var end = parse(from.getEndTime());
+        if (!end.isAfter(start)) {
+            throw new DataSaveException("会议结束时间必须晚于开始时间");
+        }
+        var entity = meetingConverter.toEntity(from);
+        entity.setInitiatorId(userId.toString());
+        entity.setDepartmentId(user.getDepartmentId());
+        entity.setStatus(com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.SCHEDULED);
+        entity.setApprovalStatus(com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.APPROVED);
+        if (hasConflict(entity, start, end)) {
+            throw new DataSaveException("同一地点存在时间重叠的会议");
+        }
         if (!this.save(entity)) {
             throw new DataSaveException("保存会议失败");
         }
-        // 启动流程
-        // TODO 流程定义KEY
-        String processId = processInstanceService.start("", String.valueOf(entity.getId()));
-        // 补充流程信息后更新
-        entity.setProcessInstanceId(processId);
-        if (!this.updateById(entity)) {
-            throw new EntityUpdateException("更新会议流程信息失败");
+        var receivers = new java.util.ArrayList<UUID>();
+        addParticipant(entity, userId, "host", user.getDepartmentId(), "accepted");
+        receivers.add(userId);
+        if (from.getParticipants() != null) {
+            for (var fromParticipant : from.getParticipants()) {
+                if (!StringUtils.hasText(fromParticipant.getUserId())) {
+                    continue;
+                }
+                var participantId = UUID.fromString(fromParticipant.getUserId());
+                if (participantId.equals(userId)) {
+                    continue;
+                }
+                var participant = userService.getById(participantId);
+                if (participant == null) {
+                    continue;
+                }
+                addParticipant(entity, participantId,
+                        StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
+                        participant.getDepartmentId(), "pending");
+                receivers.add(participantId);
+            }
+        }
+        if (!receivers.isEmpty()) {
+            var dto = new NotificationBatchSendDTO();
+            dto.setTitle("会议邀请：" + entity.getTitle());
+            dto.setContent(entity.getContent());
+            dto.setType("oa_meeting");
+            dto.setSenderId(userId);
+            dto.setLink("/oa/meeting?id=" + entity.getId());
+            dto.setReceiverIds(receivers.stream().distinct().toList());
+            notificationService.batchSend(dto);
         }
     }
 
@@ -88,13 +130,104 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (StringUtils.hasText(params.getStatus())) {
             wrapper.eq(Meeting::getStatus, params.getStatus());
         }
-        wrapper.orderByDesc(Meeting::getCreatedAt);
+        wrapper.orderByAsc(Meeting::getStartTime);
         var result = this.page(page.toPage(), wrapper);
-        var voPage = new Page<MeetingVO>(
-                result.getCurrent(), result.getSize(), result.getTotal()
-        );
+        var voPage = new Page<MeetingVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(meetingConverter.toVOList(result.getRecords()));
         return voPage;
     }
 
+    @Override
+    @Transactional
+    public void respond(UUID meetingId, MeetingResponseFrom from) {
+        var userId = SecUtil.getCurrentUserId();
+        var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
+                .eq(MeetingParticipant::getMeetingId, meetingId.toString())
+                .eq(MeetingParticipant::getUserId, userId));
+        if (participant == null) {
+            throw new DataNotExistException("您不是该会议参与人");
+        }
+        if (!List.of("accepted", "declined", "pending").contains(from.getStatus())) {
+            throw new DataSaveException("会议响应状态不正确");
+        }
+        participant.setStatus(from.getStatus());
+        if (participantMapper.updateById(participant) != 1) {
+            throw new DataSaveException("更新会议响应失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void checkIn(UUID meetingId) {
+        var userId = SecUtil.getCurrentUserId();
+        var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
+                .eq(MeetingParticipant::getMeetingId, meetingId.toString())
+                .eq(MeetingParticipant::getUserId, userId));
+        if (participant == null) {
+            throw new DataNotExistException("您不是该会议参与人");
+        }
+        participant.setStatus("checked_in");
+        participant.setCheckInAt(Instant.now().toString());
+        participantMapper.updateById(participant);
+    }
+
+    @Override
+    @Transactional
+    public void saveRecord(UUID meetingId, MeetingRecordFrom from) {
+        var meeting = this.getById(meetingId);
+        var userId = SecUtil.getCurrentUserId();
+        if (meeting == null || !userId.toString().equals(meeting.getInitiatorId())) {
+            throw new DataNotExistException("只有会议发起人可以维护纪要");
+        }
+        var record = recordMapper.selectOne(new LambdaQueryWrapper<MeetingRecord>()
+                .eq(MeetingRecord::getMeetingId, meetingId));
+        if (record == null) {
+            record = new MeetingRecord();
+            record.setMeetingId(meetingId);
+            record.setDepartmentId(meeting.getDepartmentId());
+        }
+        record.setContent(from.getContent());
+        if (record.getId() == null) {
+            recordMapper.insert(record);
+        } else {
+            recordMapper.updateById(record);
+        }
+    }
+
+    private void addParticipant(Meeting meeting, UUID userId, String role, UUID departmentId, String status) {
+        var participant = new MeetingParticipant();
+        participant.setMeetingId(meeting.getId().toString());
+        participant.setUserId(userId);
+        participant.setRole(role);
+        participant.setStatus(status);
+        participant.setDepartmentId(departmentId);
+        participantMapper.insert(participant);
+    }
+
+    private boolean hasConflict(Meeting entity, Instant start, Instant end) {
+        if (!StringUtils.hasText(entity.getLocation())) {
+            return false;
+        }
+        var candidates = this.list(new LambdaQueryWrapper<Meeting>()
+                .eq(Meeting::getLocation, entity.getLocation())
+                .ne(Meeting::getStatus, com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
+        return candidates.stream().anyMatch(item -> {
+            try {
+                return start.isBefore(parse(item.getEndTime())) && end.isAfter(parse(item.getStartTime()));
+            } catch (RuntimeException ignored) {
+                return false;
+            }
+        });
+    }
+
+    private Instant parse(String value) {
+        if (!StringUtils.hasText(value)) {
+            throw new DataSaveException("会议时间不能为空");
+        }
+        try {
+            return Instant.parse(value);
+        } catch (Exception ignored) {
+            throw new DataSaveException("会议时间格式不正确");
+        }
+    }
 }

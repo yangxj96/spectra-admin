@@ -16,37 +16,82 @@
 
 package com.devops00.spectra.oa.notice.controller;
 
+import java.util.UUID;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.notice.javabean.entity.Notice;
-import com.devops00.spectra.oa.notice.service.NoticeService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 公告主接口
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.Verify;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
+import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
+import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
+import com.devops00.spectra.oa.notice.service.NoticeService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+/// 公告中心接口。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/5 23:23
+/// @since 2026/8/7
 @Slf4j
 @RestController
 @RequestMapping("/oa/notice")
 @RequiredArgsConstructor
 public class NoticeController {
 
-    private final NoticeService bindService;
+    private final NoticeService noticeService;
 
-    @ULog("'分页查询公告'")
+    @ULog("'查询公告列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
-    public IPage<Notice> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<NoticeVO> page(PageFrom page, NoticePageFrom params) {
+        return noticeService.page(page, params);
     }
 
+    @ULog("'获取公告详情'")
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
+    public NoticeVO get(@PathVariable UUID id) {
+        return noticeService.get(id);
+    }
+
+    @ULog("'创建公告草稿'")
+    @PostMapping(version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_NOTICE:INSERT')")
+    public NoticeVO create(@Validated(Verify.Insert.class) @RequestBody NoticeCreateFrom from) {
+        return noticeService.get(noticeService.createDraft(from).getId());
+    }
+
+    @ULog("'发布公告'")
+    @PostMapping(value = "/{id}/publish", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
+    public void publish(@PathVariable UUID id) {
+        noticeService.publish(id);
+    }
+
+    @ULog("'撤回公告'")
+    @PostMapping(value = "/{id}/revoke", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
+    public void revoke(@PathVariable UUID id) {
+        noticeService.revoke(id);
+    }
+
+    @ULog("'标记公告已读'")
+    @PutMapping(value = "/{id}/read", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
+    public void markRead(@PathVariable UUID id) {
+        noticeService.markRead(id);
+    }
 }

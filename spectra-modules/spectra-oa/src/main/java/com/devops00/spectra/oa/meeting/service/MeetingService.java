@@ -21,9 +21,12 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
+import com.devops00.spectra.oa.meeting.javabean.from.MeetingResponseFrom;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import java.util.UUID;
 
 /// 会仪表-服务
 ///
@@ -43,4 +46,10 @@ public interface MeetingService extends BaseService<Meeting> {
     /// @param params 查询参数
     /// @return 分页结果
     IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params);
+
+    void respond(UUID meetingId, MeetingResponseFrom from);
+
+    void checkIn(UUID meetingId);
+
+    void saveRecord(UUID meetingId, MeetingRecordFrom from);
 }

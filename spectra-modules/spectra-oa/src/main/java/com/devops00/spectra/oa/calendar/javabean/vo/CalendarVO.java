@@ -14,24 +14,31 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
+package com.devops00.spectra.oa.calendar.javabean.vo;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import lombok.Data;
 
-/// 普通上传的上传结果
+/// 日程响应视图。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
+/// @since 2026/8/7
 @Data
-public class FileUploadVO {
-
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
-    private UUID fileId;
-
+public class CalendarVO {
+    private UUID id;
+    private UUID ownerId;
+    private String title;
+    private String content;
+    private Instant startTime;
+    private Instant endTime;
+    private Boolean allDay;
+    private String eventType;
+    private String visibility;
+    private String location;
+    private String participantIds;
+    private String sourceType;
+    private UUID sourceId;
 }

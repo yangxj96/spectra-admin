@@ -14,24 +14,26 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.upload.javabean.vo;
+package com.devops00.spectra.oa.reimbursement.javabean.vo;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.Data;
 
-/// 普通上传的上传结果
+/// 报销明细响应视图。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/4/1 16:42
+/// @since 2026/8/7
 @Data
-public class FileUploadVO {
-
-    /// 请求地址
-    private String url;
-
-    /// 文件主键，供业务表建立附件关联
-    private UUID fileId;
-
+public class ReimbursementItemVO {
+    private UUID id;
+    private LocalDate expenseDate;
+    private String category;
+    private String description;
+    private BigDecimal amount;
+    private BigDecimal taxAmount;
+    private String invoiceNo;
 }

@@ -16,14 +16,29 @@
 
 package com.devops00.spectra.oa.calendar.service;
 
+import java.util.UUID;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.calendar.javabean.entity.Calendar;
+import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
+import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
+import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 
-/// 日历表主表-服务
+/// 日程业务服务。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/30 14:01
+/// @since 2026/8/7
 public interface CalendarService extends BaseService<Calendar> {
+    IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params);
+
+    CalendarVO get(UUID id);
+
+    CalendarVO create(CalendarSaveFrom from);
+
+    CalendarVO update(UUID id, CalendarSaveFrom from);
+
+    void delete(UUID id);
 }

@@ -16,29 +16,63 @@
 
 package com.devops00.spectra.oa.calendar.javabean.entity;
 
+import java.time.Instant;
+import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.util.UUID;
-
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
 
-/// OA-日历表主表实体
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "oa_calendar", schema = "spectra_oa")
+@DataScope(ignore = true)
+/// OA 日程实体。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2026/3/5 23:53
-@Getter
-@Setter
-@ToString
-@TableName(value = "oa_calendar", schema = "spectra_oa")
-@DataScope
+/// @since 2026/8/7
 public class Calendar extends BaseEntity {
-    /// 所属部门ID
     @TableField("department_id")
     private UUID departmentId;
+
+    @TableField("owner_id")
+    private UUID ownerId;
+
+    @TableField("title")
+    private String title;
+
+    @TableField("content")
+    private String content;
+
+    @TableField("start_time")
+    private Instant startTime;
+
+    @TableField("end_time")
+    private Instant endTime;
+
+    @TableField("all_day")
+    private Boolean allDay;
+
+    @TableField("event_type")
+    private String eventType;
+
+    @TableField("visibility")
+    private String visibility;
+
+    @TableField("location")
+    private String location;
+
+    @TableField("participant_ids")
+    private String participantIds;
+
+    @TableField("source_type")
+    private String sourceType;
+
+    @TableField("source_id")
+    private UUID sourceId;
 }
