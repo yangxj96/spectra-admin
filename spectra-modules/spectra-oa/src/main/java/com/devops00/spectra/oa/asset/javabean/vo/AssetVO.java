@@ -14,89 +14,46 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.oa.asset.javabean.entity;
+package com.devops00.spectra.oa.asset.javabean.vo;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.devops00.spectra.common.annotation.DataScope;
-import com.devops00.spectra.common.base.BaseEntity;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-/// OA 资产台账实体。
+/// 资产台账响应视图。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/8
-@Getter
-@Setter
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_asset", schema = "spectra_oa")
-@DataScope
-public class Asset extends BaseEntity {
-
-    @TableField("category_id")
+@Data
+public class AssetVO {
+    private UUID id;
     private UUID categoryId;
-
-    @TableField("asset_no")
+    private String categoryName;
     private String assetNo;
-
-    @TableField("name")
     private String name;
-
-    @TableField("specification")
     private String specification;
-
-    @TableField("serial_no")
     private String serialNo;
-
-    @TableField("asset_type")
     private String assetType;
-
-    @TableField("status")
     private String status;
-
-    @TableField("quantity")
     private BigDecimal quantity;
-
-    @TableField("acquisition_date")
     private LocalDate acquisitionDate;
-
-    @TableField("acquisition_amount")
     private BigDecimal acquisitionAmount;
-
-    @TableField("currency")
     private String currency;
-
-    @TableField("supplier")
     private String supplier;
-
-    @TableField("location")
     private String location;
-
-    @TableField("department_id")
     private UUID departmentId;
-
-    @TableField("custodian_id")
     private UUID custodianId;
-
-    @TableField("warranty_until")
     private LocalDate warrantyUntil;
-
-    @TableField("source_purchase_id")
     private UUID sourcePurchaseId;
-
-    @TableField("source_receipt_id")
     private UUID sourceReceiptId;
-
-    @TableField("source_purchase_item_id")
     private UUID sourcePurchaseItemId;
-
-    @TableField("remark")
     private String remark;
+    private List<AssetOperationVO> operations = List.of();
+    private Instant createdAt;
+    private Instant updatedAt;
 }

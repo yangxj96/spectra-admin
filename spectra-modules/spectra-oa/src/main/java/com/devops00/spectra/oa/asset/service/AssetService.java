@@ -1,28 +1,45 @@
-/*
- *  Copyright 2018-2026 yangxj96
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-
 package com.devops00.spectra.oa.asset.service;
 
-import com.devops00.spectra.common.base.BaseService;
-import com.devops00.spectra.oa.asset.javabean.entity.Asset;
+import java.util.List;
+import java.util.UUID;
 
-/// 资产表主表-服务
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 14:06
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.oa.asset.javabean.entity.Asset;
+import com.devops00.spectra.oa.asset.javabean.from.AssetCategorySaveFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetOperationFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPageFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPurchaseDraftFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetSaveFrom;
+import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
+import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
+
 public interface AssetService extends BaseService<Asset> {
+
+    IPage<AssetVO> page(PageFrom page, AssetPageFrom params);
+
+    AssetVO get(UUID id);
+
+    UUID created(AssetSaveFrom from);
+
+    void modify(UUID id, AssetSaveFrom from);
+
+    List<AssetCategoryVO> categories();
+
+    UUID createdCategory(AssetCategorySaveFrom from);
+
+    void modifyCategory(UUID id, AssetCategorySaveFrom from);
+
+    void assign(UUID id, AssetOperationFrom from);
+
+    void returnAsset(UUID id, AssetOperationFrom from);
+
+    void transfer(UUID id, AssetOperationFrom from);
+
+    void maintenance(UUID id, AssetOperationFrom from);
+
+    void scrap(UUID id, AssetOperationFrom from);
+
+    List<AssetVO> createFromPurchase(AssetPurchaseDraftFrom from);
 }
