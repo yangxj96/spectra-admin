@@ -18,8 +18,10 @@ package com.devops00.spectra.workflow.service.impl;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.flowable.engine.HistoryService;
+import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,8 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
+import com.devops00.spectra.workflow.service.ApprovalCallback;
+import com.devops00.spectra.workflow.service.WorkflowService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +51,10 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     private final TaskService flowableTaskService;
 
     private final HistoryService historyService;
+
+    private final RepositoryService repositoryService;
+
+    private final WorkflowService workflowService;
 
     private final TaskConverter taskConverter;
 
@@ -110,6 +118,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
         // 完成任务
         flowableTaskService.complete(taskId, variables);
+        dispatchIfFinished(task.getProcessInstanceId(), task.getProcessDefinitionId(), true, null);
         log.info("任务审批通过: taskId={}, processInstanceId={}", taskId, task.getProcessInstanceId());
     }
 
@@ -134,6 +143,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
         // 完成任务（驳回）
         flowableTaskService.complete(taskId, variables);
+        dispatchIfFinished(task.getProcessInstanceId(), task.getProcessDefinitionId(), false, comment);
         log.info("任务已驳回: taskId={}, processInstanceId={}", taskId, task.getProcessInstanceId());
     }
 
@@ -165,5 +175,32 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         // 委派任务
         flowableTaskService.delegateTask(taskId, targetUserId);
         log.info("任务已委派: taskId={}, from={}, to={}", taskId, task.getAssignee(), targetUserId);
+    }
+
+    /// 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。
+    private void dispatchIfFinished(String processInstanceId, String processDefinitionId,
+                                    boolean approved, String reason) {
+        var historic = historyService.createHistoricProcessInstanceQuery()
+                .processInstanceId(processInstanceId).singleResult();
+        if (historic == null || historic.getEndTime() == null) {
+            return;
+        }
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
+        if (definition == null) {
+            return;
+        }
+        ApprovalCallback callback = workflowService.getCallback(definition.getKey());
+        if (callback == null) {
+            return;
+        }
+        if (approved) {
+            var variables = historyService.createHistoricVariableInstanceQuery()
+                    .processInstanceId(processInstanceId).list().stream()
+                    .collect(Collectors.toMap(item -> item.getVariableName(), item -> item.getValue(), (left, right) -> right));
+            callback.onApproved(historic.getBusinessKey(), variables);
+        } else {
+            callback.onRejected(historic.getBusinessKey(), reason);
+        }
     }
 }

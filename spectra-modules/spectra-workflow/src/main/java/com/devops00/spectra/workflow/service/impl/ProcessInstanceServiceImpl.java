@@ -22,6 +22,8 @@ import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import com.devops00.spectra.workflow.service.ApprovalCallback;
+import com.devops00.spectra.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.RepositoryService;
@@ -48,6 +50,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     private final RepositoryService repositoryService;
     private final ProcessDiagramGenerator processDiagramGenerator;
     private final ProcessConverter processConverter;
+    private final WorkflowService workflowService;
 
     @Override
     public String start(String processDefinitionKey, String businessKey) {
@@ -118,7 +121,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throw new DataNotExistException("流程实例不存在: " + processInstanceId);
         }
 
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(instance.getProcessDefinitionId()).singleResult();
         runtimeService.deleteProcessInstance(processInstanceId, reason);
+        if (definition != null) {
+            ApprovalCallback callback = workflowService.getCallback(definition.getKey());
+            if (callback != null) {
+                callback.onTerminated(instance.getBusinessKey(), reason);
+            }
+        }
         log.info("流程已终止: processInstanceId={}, reason={}", processInstanceId, reason);
     }
 

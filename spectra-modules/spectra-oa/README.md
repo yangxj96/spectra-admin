@@ -31,8 +31,15 @@ spectra-oa
 ├── asset       资产管理
 ├── contact     通讯录
 ├── report      统计报表
-└── contract    合同管理
+├── contract    合同管理
+├── application 通用申请内核（P0）
+├── leave       请假闭环（P0）
+└── workbench   工作台摘要（P0）
 ```
+
+## P0 首版闭环
+
+通用申请内核统一保存申请编号、类型、申请人、组织归属、状态和 Flowable `businessKey`。首个业务纵切为请假：草稿 → 提交 → 审批通过/驳回，支持撤回、取消、额度预占与释放、审批通过回写考勤记录和 OA 消息通知。工作台复用前端 Dashboard，仅提供摘要接口，不新增独立工作台页面。
 
 ---
 
