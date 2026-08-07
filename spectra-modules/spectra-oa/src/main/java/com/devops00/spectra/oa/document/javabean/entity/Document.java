@@ -20,6 +20,7 @@ package com.devops00.spectra.oa.document.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.util.UUID;
+import java.time.Instant;
 
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
@@ -38,6 +39,34 @@ import lombok.ToString;
 @TableName(value = "oa_document", schema = "spectra_oa")
 @DataScope
 public class Document extends BaseEntity {
+    /// 所属目录ID
+    @TableField("folder_id")
+    private UUID folderId;
+
+    /// 文档标题
+    @TableField("title")
+    private String title;
+
+    /// 文档摘要
+    @TableField("summary")
+    private String summary;
+
+    /// 文档状态（DRAFT/PUBLISHED）
+    @TableField("status")
+    private String status;
+
+    /// 可见范围（PUBLIC/DEPARTMENT/PRIVATE）
+    @TableField("visibility")
+    private String visibility;
+
+    /// 文档所有者
+    @TableField("owner_id")
+    private UUID ownerId;
+
+    /// 发布时间
+    @TableField("published_at")
+    private Instant publishedAt;
+
     /// 所属部门ID
     @TableField("department_id")
     private UUID departmentId;

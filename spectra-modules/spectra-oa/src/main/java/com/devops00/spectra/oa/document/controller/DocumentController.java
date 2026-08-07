@@ -18,16 +18,31 @@ package com.devops00.spectra.oa.document.controller;
 
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.document.javabean.entity.Document;
+import com.devops00.spectra.oa.document.javabean.from.DocumentFolderSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentVersionFrom;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentFolderVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
 import com.devops00.spectra.oa.document.service.DocumentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
 
 /// 文档管理主接口
 ///
@@ -45,8 +60,58 @@ public class DocumentController {
     @ULog("'分页查询文档'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
-    public IPage<Document> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
+        return bindService.page(page, params);
     }
+
+    @ULog("'查询文档详情'")
+    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
+    public DocumentVO get(@PathVariable UUID id) { return bindService.get(id); }
+
+    @ULog("'创建文档'")
+    @PostMapping(version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:INSERT')")
+    public UUID create(@Validated(Verify.Insert.class) @RequestBody DocumentSaveFrom from) { return bindService.created(from); }
+
+    @ULog("'修改文档'")
+    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
+    public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody DocumentSaveFrom from) { bindService.modify(id, from); }
+
+    @ULog("'新增文档版本'")
+    @PostMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
+    public UUID addVersion(@PathVariable UUID id, @Validated @RequestBody DocumentVersionFrom from) { return bindService.addVersion(id, from); }
+
+    @ULog("'查询文档版本'")
+    @GetMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
+    public List<DocumentVersionVO> versions(@PathVariable UUID id) { return bindService.versions(id); }
+
+    @ULog("'发布文档'")
+    @PostMapping(value = "/{id}/publish", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
+    public void publish(@PathVariable UUID id) { bindService.publish(id); }
+
+    @ULog("'查询文档目录'")
+    @GetMapping(value = "/folders", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
+    public List<DocumentFolderVO> folders() { return bindService.folders(); }
+
+    @ULog("'创建文档目录'")
+    @PostMapping(value = "/folders", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:INSERT')")
+    public UUID createFolder(@Validated(Verify.Insert.class) @RequestBody DocumentFolderSaveFrom from) { return bindService.createFolder(from); }
+
+    @ULog("'预览文档版本'")
+    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
+    public void preview(@PathVariable UUID id, @PathVariable UUID versionId) { bindService.preview(id, versionId); }
+
+    @ULog("'下载文档版本'")
+    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
+    public void download(@PathVariable UUID id, @PathVariable UUID versionId) { bindService.download(id, versionId); }
 
 }

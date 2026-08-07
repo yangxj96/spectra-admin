@@ -16,13 +16,41 @@
 
 package com.devops00.spectra.oa.document.service.impl;
 
+import java.util.List;
+import java.util.UUID;
 
-import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.oa.document.javabean.entity.Document;
-import com.devops00.spectra.oa.document.mapper.DocumentMapper;
-import com.devops00.spectra.oa.document.service.DocumentService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.oa.document.javabean.entity.Document;
+import com.devops00.spectra.oa.document.javabean.entity.DocumentFolder;
+import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
+import com.devops00.spectra.oa.document.javabean.from.DocumentFolderSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentVersionFrom;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentFolderVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
+import com.devops00.spectra.oa.document.mapper.DocumentFolderMapper;
+import com.devops00.spectra.oa.document.mapper.DocumentMapper;
+import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
+import com.devops00.spectra.oa.document.service.DocumentService;
+import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.upload.javabean.entity.FileInfo;
+import com.devops00.spectra.upload.service.FileInfoService;
+import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 
 /// 文档表主表-服务默认实现
 ///
@@ -31,5 +59,253 @@ import org.springframework.stereotype.Service;
 /// @since 2026/3/30 14:13
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Document> implements DocumentService {
+
+    private static final String STATUS_DRAFT = "DRAFT";
+    private static final String STATUS_PUBLISHED = "PUBLISHED";
+    private static final String VISIBILITY_PRIVATE = "PRIVATE";
+
+    private final DocumentVersionMapper versionMapper;
+    private final DocumentFolderMapper folderMapper;
+    private final FileInfoService fileInfoService;
+    private final FileUploadFacade fileUploadFacade;
+
+    @Override
+    public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
+        var wrapper = new LambdaQueryWrapper<Document>();
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
+            wrapper.like(Document::getTitle, params.getKeyword());
+        }
+        if (params != null && StringUtils.hasText(params.getStatus())) {
+            wrapper.eq(Document::getStatus, params.getStatus());
+        }
+        if (params != null && params.getFolderId() != null) {
+            wrapper.eq(Document::getFolderId, params.getFolderId());
+        }
+        wrapper.orderByDesc(Document::getUpdatedAt);
+        var result = this.page(page.toPage(), wrapper);
+        var voPage = new Page<DocumentVO>(result.getCurrent(), result.getSize(), result.getTotal());
+        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        return voPage;
+    }
+
+    @Override
+    public DocumentVO get(UUID id) {
+        return toVO(requireAccessible(id));
+    }
+
+    @Override
+    @Transactional
+    public UUID created(DocumentSaveFrom from) {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            throw new DataSaveException("当前用户组织信息不可用");
+        }
+        var entity = new Document();
+        entity.setTitle(from.getTitle().trim());
+        entity.setSummary(from.getSummary());
+        entity.setFolderId(from.getFolderId());
+        entity.setVisibility(normalizeVisibility(from.getVisibility()));
+        entity.setStatus(STATUS_DRAFT);
+        entity.setOwnerId(user.getId());
+        entity.setDepartmentId(user.getDepartmentId());
+        if (!save(entity)) {
+            throw new DataSaveException("保存文档失败");
+        }
+        return entity.getId();
+    }
+
+    @Override
+    @Transactional
+    public void modify(UUID id, DocumentSaveFrom from) {
+        var entity = requireOwner(id);
+        entity.setTitle(from.getTitle().trim());
+        entity.setSummary(from.getSummary());
+        entity.setFolderId(from.getFolderId());
+        entity.setVisibility(normalizeVisibility(from.getVisibility()));
+        if (!updateById(entity)) {
+            throw new DataSaveException("更新文档失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public UUID addVersion(UUID id, DocumentVersionFrom from) {
+        var document = requireOwner(id);
+        FileInfo file = fileInfoService.getById(from.getFileId());
+        if (file == null || !"ACTIVE".equals(file.getStatus())) {
+            throw new DataNotExistException("文件不存在或已失效");
+        }
+        var latest = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
+                .eq(DocumentVersion::getDocumentId, document.getId())
+                .orderByDesc(DocumentVersion::getVersionNo).last("limit 1"));
+        var version = new DocumentVersion();
+        version.setDocumentId(document.getId());
+        version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
+        version.setFileId(file.getId());
+        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.getOriginalName());
+        version.setFileSize(from.getFileSize() == null ? file.getSize() : from.getFileSize());
+        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
+        version.setVersionNote(from.getVersionNote());
+        version.setCurrent(true);
+        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>()
+                .eq(DocumentVersion::getDocumentId, document.getId()).eq(DocumentVersion::getCurrent, true)
+                .set(DocumentVersion::getCurrent, false));
+        if (versionMapper.insert(version) != 1) {
+            throw new DataSaveException("保存文档版本失败");
+        }
+        fileInfoService.incrRefCount(file.getId());
+        return version.getId();
+    }
+
+    @Override
+    public List<DocumentVersionVO> versions(UUID id) {
+        var document = requireAccessible(id);
+        return versionMapper.selectList(new LambdaQueryWrapper<DocumentVersion>()
+                        .eq(DocumentVersion::getDocumentId, document.getId())
+                        .orderByDesc(DocumentVersion::getVersionNo))
+                .stream().map(this::toVersionVO).toList();
+    }
+
+    @Override
+    @Transactional
+    public void publish(UUID id) {
+        var document = requireOwner(id);
+        var current = currentVersion(document.getId());
+        if (current == null) {
+            throw new DataSaveException("文档必须先上传一个版本");
+        }
+        document.setStatus(STATUS_PUBLISHED);
+        document.setPublishedAt(java.time.Instant.now());
+        if (!updateById(document)) {
+            throw new DataSaveException("发布文档失败");
+        }
+    }
+
+    @Override
+    public List<DocumentFolderVO> folders() {
+        return folderMapper.selectList(new LambdaQueryWrapper<DocumentFolder>().orderByAsc(DocumentFolder::getSort)
+                        .orderByAsc(DocumentFolder::getName))
+                .stream().map(this::toFolderVO).toList();
+    }
+
+    @Override
+    @Transactional
+    public UUID createFolder(DocumentFolderSaveFrom from) {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getDepartmentId() == null) {
+            throw new DataSaveException("当前用户组织信息不可用");
+        }
+        var entity = new DocumentFolder();
+        entity.setPid(from.getPid());
+        entity.setName(from.getName().trim());
+        entity.setVisibility(normalizeVisibility(from.getVisibility()));
+        entity.setSort(from.getSort() == null ? 0 : from.getSort());
+        entity.setDepartmentId(user.getDepartmentId());
+        if (folderMapper.insert(entity) != 1) {
+            throw new DataSaveException("保存文档目录失败");
+        }
+        return entity.getId();
+    }
+
+    @Override
+    public void preview(UUID id, UUID versionId) {
+        fileUploadFacade.preview(requireVersion(id, versionId).getFileId());
+    }
+
+    @Override
+    public void download(UUID id, UUID versionId) {
+        fileUploadFacade.download(requireVersion(id, versionId).getFileId());
+    }
+
+    private DocumentVersion requireVersion(UUID id, UUID versionId) {
+        var document = requireAccessible(id);
+        DocumentVersion version = versionId == null ? currentVersion(document.getId()) : versionMapper.selectOne(
+                new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getId, versionId)
+                        .eq(DocumentVersion::getDocumentId, document.getId()));
+        if (version == null) {
+            throw new DataNotExistException("文档版本不存在");
+        }
+        return version;
+    }
+
+    private DocumentVersion currentVersion(UUID id) {
+        return versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
+                .eq(DocumentVersion::getDocumentId, id).eq(DocumentVersion::getCurrent, true).last("limit 1"));
+    }
+
+    private Document require(UUID id) {
+        var entity = getById(id);
+        if (entity == null) {
+            throw new DataNotExistException("文档不存在: " + id);
+        }
+        return entity;
+    }
+
+    private Document requireAccessible(UUID id) {
+        var entity = require(id);
+        var user = SecUtil.getCurrentUser();
+        if (VISIBILITY_PRIVATE.equals(entity.getVisibility())
+                && (user == null || !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
+            throw new DataNotExistException("文档不存在或无权访问");
+        }
+        return entity;
+    }
+
+    private Document requireOwner(UUID id) {
+        var entity = require(id);
+        var user = SecUtil.getCurrentUser();
+        if (user == null || !java.util.Objects.equals(entity.getOwnerId(), user.getId())) {
+            throw new DataNotExistException("文档不存在或无权操作");
+        }
+        return entity;
+    }
+
+    private DocumentVO toVO(Document source) {
+        var vo = new DocumentVO();
+        vo.setId(source.getId());
+        vo.setFolderId(source.getFolderId());
+        vo.setDepartmentId(source.getDepartmentId());
+        vo.setTitle(source.getTitle());
+        vo.setSummary(source.getSummary());
+        vo.setStatus(source.getStatus());
+        vo.setVisibility(source.getVisibility());
+        vo.setOwnerId(source.getOwnerId());
+        vo.setPublishedAt(source.getPublishedAt());
+        vo.setCreatedAt(source.getCreatedAt());
+        vo.setUpdatedAt(source.getUpdatedAt());
+        var current = currentVersion(source.getId());
+        vo.setCurrentVersion(current == null ? null : toVersionVO(current));
+        return vo;
+    }
+
+    private DocumentVersionVO toVersionVO(DocumentVersion source) {
+        var vo = new DocumentVersionVO();
+        vo.setId(source.getId());
+        vo.setVersionNo(source.getVersionNo());
+        vo.setFileId(source.getFileId());
+        vo.setFileName(source.getFileName());
+        vo.setFileSize(source.getFileSize());
+        vo.setContentType(source.getContentType());
+        vo.setVersionNote(source.getVersionNote());
+        vo.setCurrent(source.getCurrent());
+        vo.setCreatedAt(source.getCreatedAt());
+        return vo;
+    }
+
+    private DocumentFolderVO toFolderVO(DocumentFolder source) {
+        var vo = new DocumentFolderVO();
+        vo.setId(source.getId());
+        vo.setPid(source.getPid());
+        vo.setName(source.getName());
+        vo.setDepartmentId(source.getDepartmentId());
+        vo.setVisibility(source.getVisibility());
+        vo.setSort(source.getSort());
+        return vo;
+    }
+
+    private String normalizeVisibility(String value) {
+        return StringUtils.hasText(value) ? value.trim().toUpperCase() : "DEPARTMENT";
+    }
 }

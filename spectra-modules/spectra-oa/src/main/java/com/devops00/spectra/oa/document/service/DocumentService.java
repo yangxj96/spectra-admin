@@ -16,8 +16,20 @@
 
 package com.devops00.spectra.oa.document.service;
 
+import java.util.List;
+import java.util.UUID;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
+import com.devops00.spectra.oa.document.javabean.from.DocumentFolderSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
+import com.devops00.spectra.oa.document.javabean.from.DocumentVersionFrom;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentFolderVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
 
 /// 文档表主表-服务
 ///
@@ -25,4 +37,25 @@ import com.devops00.spectra.oa.document.javabean.entity.Document;
 /// @version 1.0
 /// @since 2026/3/30 14:12
 public interface DocumentService extends BaseService<Document> {
+    IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params);
+
+    DocumentVO get(UUID id);
+
+    UUID created(DocumentSaveFrom from);
+
+    void modify(UUID id, DocumentSaveFrom from);
+
+    UUID addVersion(UUID id, DocumentVersionFrom from);
+
+    List<DocumentVersionVO> versions(UUID id);
+
+    void publish(UUID id);
+
+    List<DocumentFolderVO> folders();
+
+    UUID createFolder(DocumentFolderSaveFrom from);
+
+    void preview(UUID id, UUID versionId);
+
+    void download(UUID id, UUID versionId);
 }
