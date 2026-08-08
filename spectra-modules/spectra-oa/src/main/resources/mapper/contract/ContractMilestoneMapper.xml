@@ -23,11 +23,29 @@
                type="com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_contract_milestone-->
+        <result column="contract_id" property="contractId"/>
+        <result column="name" property="name"/>
+        <result column="milestone_type" property="milestoneType"/>
+        <result column="due_date" property="dueDate"/>
+        <result column="status" property="status"/>
+        <result column="assignee_id" property="assigneeId"/>
+        <result column="completed_at" property="completedAt"/>
+        <result column="reminder_sent_at" property="reminderSentAt"/>
+        <result column="remark" property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        contract_id,
+        name,
+        milestone_type,
+        due_date,
+        status,
+        assignee_id,
+        completed_at,
+        reminder_sent_at,
+        remark,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

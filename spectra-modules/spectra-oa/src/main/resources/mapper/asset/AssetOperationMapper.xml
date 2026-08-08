@@ -23,11 +23,37 @@
                type="com.devops00.spectra.oa.asset.javabean.entity.AssetOperation">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_asset_operation-->
+        <result column="asset_id" property="assetId"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="from_department_id" property="fromDepartmentId"/>
+        <result column="to_department_id" property="toDepartmentId"/>
+        <result column="from_user_id" property="fromUserId"/>
+        <result column="to_user_id" property="toUserId"/>
+        <result column="from_location" property="fromLocation"/>
+        <result column="to_location" property="toLocation"/>
+        <result column="operation_date" property="operationDate"/>
+        <result column="reason" property="reason"/>
+        <result column="maintenance_content" property="maintenanceContent"/>
+        <result column="maintenance_cost" property="maintenanceCost"/>
+        <result column="status" property="status"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        asset_id,
+        operation_type,
+        from_department_id,
+        to_department_id,
+        from_user_id,
+        to_user_id,
+        from_location,
+        to_location,
+        operation_date,
+        reason,
+        maintenance_content,
+        maintenance_cost,
+        status,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

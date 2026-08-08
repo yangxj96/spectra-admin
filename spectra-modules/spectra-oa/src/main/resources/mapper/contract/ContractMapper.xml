@@ -23,11 +23,43 @@
                type="com.devops00.spectra.oa.contract.javabean.entity.Contract">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_contract-->
+        <result column="contract_no" property="contractNo"/>
+        <result column="title" property="title"/>
+        <result column="contract_type" property="contractType"/>
+        <result column="counterparty_name" property="counterpartyName"/>
+        <result column="counterparty_contact" property="counterpartyContact"/>
+        <result column="owner_id" property="ownerId"/>
+        <result column="amount" property="amount"/>
+        <result column="currency" property="currency"/>
+        <result column="start_date" property="startDate"/>
+        <result column="end_date" property="endDate"/>
+        <result column="status" property="status"/>
+        <result column="signing_status" property="signingStatus"/>
+        <result column="signed_at" property="signedAt"/>
+        <result column="visibility" property="visibility"/>
+        <result column="summary" property="summary"/>
+        <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        contract_no,
+        title,
+        contract_type,
+        counterparty_name,
+        counterparty_contact,
+        owner_id,
+        amount,
+        currency,
+        start_date,
+        end_date,
+        status,
+        signing_status,
+        signed_at,
+        visibility,
+        summary,
+        department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

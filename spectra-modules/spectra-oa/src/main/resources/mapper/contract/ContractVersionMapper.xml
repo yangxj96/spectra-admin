@@ -23,11 +23,27 @@
                type="com.devops00.spectra.oa.contract.javabean.entity.ContractVersion">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_contract_version-->
+        <result column="contract_id" property="contractId"/>
+        <result column="version_no" property="versionNo"/>
+        <result column="file_id" property="fileId"/>
+        <result column="file_name" property="fileName"/>
+        <result column="file_size" property="fileSize"/>
+        <result column="content_type" property="contentType"/>
+        <result column="version_note" property="versionNote"/>
+        <result column="is_current" property="currentVersion"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        contract_id,
+        version_no,
+        file_id,
+        file_name,
+        file_size,
+        content_type,
+        version_note,
+        is_current,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

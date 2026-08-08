@@ -23,11 +23,15 @@
                type="com.devops00.spectra.oa.application.javabean.entity.ApplicationCc">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application_cc-->
+        <result column="application_id" property="applicationId"/>
+        <result column="user_id" property="userId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        application_id,
+        user_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

@@ -23,11 +23,23 @@
                type="com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_purchase_receipt-->
+        <result column="purchase_id" property="purchaseId"/>
+        <result column="receipt_no" property="receiptNo"/>
+        <result column="received_date" property="receivedDate"/>
+        <result column="receiver_id" property="receiverId"/>
+        <result column="status" property="status"/>
+        <result column="remark" property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        purchase_id,
+        receipt_no,
+        received_date,
+        receiver_id,
+        status,
+        remark,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

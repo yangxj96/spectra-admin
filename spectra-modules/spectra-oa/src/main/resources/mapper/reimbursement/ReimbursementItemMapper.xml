@@ -23,11 +23,27 @@
                type="com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_reimbursement_item-->
+        <result column="reimbursement_id" property="reimbursementId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="expense_date" property="expenseDate"/>
+        <result column="category" property="category"/>
+        <result column="description" property="description"/>
+        <result column="amount" property="amount"/>
+        <result column="tax_amount" property="taxAmount"/>
+        <result column="invoice_no" property="invoiceNo"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        reimbursement_id,
+        department_id,
+        expense_date,
+        category,
+        description,
+        amount,
+        tax_amount,
+        invoice_no,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

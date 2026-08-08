@@ -23,11 +23,29 @@
                type="com.devops00.spectra.core.notification.javabean.entity.NotificationSetting">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_notification_setting-->
+        <result column="user_id" property="userId"/>
+        <result column="system_enabled" property="systemEnabled"/>
+        <result column="workflow_enabled" property="workflowEnabled"/>
+        <result column="oa_enabled" property="oaEnabled"/>
+        <result column="inner_mail_enabled" property="innerMailEnabled"/>
+        <result column="approval_enabled" property="approvalEnabled"/>
+        <result column="do_not_disturb" property="doNotDisturb"/>
+        <result column="do_not_disturb_start" property="doNotDisturbStart"/>
+        <result column="do_not_disturb_end" property="doNotDisturbEnd"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        user_id,
+        system_enabled,
+        workflow_enabled,
+        oa_enabled,
+        inner_mail_enabled,
+        approval_enabled,
+        do_not_disturb,
+        do_not_disturb_start,
+        do_not_disturb_end,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

@@ -23,11 +23,17 @@
                type="com.devops00.spectra.oa.notice.javabean.entity.NoticeReader">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_notice_reader-->
+        <result column="notice_id" property="noticeId"/>
+        <result column="user_id" property="userId"/>
+        <result column="read_at" property="readAt"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        notice_id,
+        user_id,
+        read_at,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

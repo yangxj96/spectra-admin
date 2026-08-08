@@ -28,7 +28,6 @@
         <result column="content_type"  property="contentType"/>
         <result column="size"          property="size"/>
         <result column="hash"          property="hash"/>
-        <result column="url"           property="url"/>
         <result column="storage_type"  property="storageType"/>
         <result column="status"        property="status"/>
         <result column="ref_count"     property="refCount"/>
@@ -42,7 +41,6 @@
         content_type,
         size,
         "hash",
-        url,
         storage_type,
         status,
         ref_count,

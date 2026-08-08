@@ -23,11 +23,31 @@
                type="com.devops00.spectra.core.notification.javabean.entity.Notification">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_notification-->
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="type" property="type"/>
+        <result column="sender_id" property="senderId"/>
+        <result column="sender_name" property="senderName"/>
+        <result column="link" property="link"/>
+        <result column="is_read" property="isRead"/>
+        <result column="read_at" property="readAt"/>
+        <result column="receiver_id" property="receiverId"/>
+        <result column="extra" property="extra"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        title,
+        content,
+        type,
+        sender_id,
+        sender_name,
+        link,
+        is_read,
+        read_at,
+        receiver_id,
+        extra,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

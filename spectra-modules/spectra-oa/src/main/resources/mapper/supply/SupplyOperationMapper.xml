@@ -23,11 +23,39 @@
                type="com.devops00.spectra.oa.supply.javabean.entity.SupplyOperation">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_supply_operation-->
+        <result column="supply_id" property="supplyId"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="quantity" property="quantity"/>
+        <result column="before_stock" property="beforeStock"/>
+        <result column="after_stock" property="afterStock"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="user_id" property="userId"/>
+        <result column="location" property="location"/>
+        <result column="operation_date" property="operationDate"/>
+        <result column="reason" property="reason"/>
+        <result column="source_purchase_id" property="sourcePurchaseId"/>
+        <result column="source_receipt_id" property="sourceReceiptId"/>
+        <result column="source_purchase_item_id" property="sourcePurchaseItemId"/>
+        <result column="status" property="status"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        supply_id,
+        operation_type,
+        quantity,
+        before_stock,
+        after_stock,
+        department_id,
+        user_id,
+        location,
+        operation_date,
+        reason,
+        source_purchase_id,
+        source_receipt_id,
+        source_purchase_item_id,
+        status,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

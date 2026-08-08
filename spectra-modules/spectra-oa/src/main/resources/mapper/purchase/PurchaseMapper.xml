@@ -23,11 +23,37 @@
                type="com.devops00.spectra.oa.purchase.javabean.entity.Purchase">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_purchase-->
+        <result column="application_id" property="applicationId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="purpose" property="purpose"/>
+        <result column="expected_date" property="expectedDate"/>
+        <result column="budget_amount" property="budgetAmount"/>
+        <result column="currency" property="currency"/>
+        <result column="suggested_supplier" property="suggestedSupplier"/>
+        <result column="execution_status" property="executionStatus"/>
+        <result column="purchaser_id" property="purchaserId"/>
+        <result column="order_no" property="orderNo"/>
+        <result column="ordered_at" property="orderedAt"/>
+        <result column="completed_at" property="completedAt"/>
+        <result column="execution_remark" property="executionRemark"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        application_id,
+        department_id,
+        purpose,
+        expected_date,
+        budget_amount,
+        currency,
+        suggested_supplier,
+        execution_status,
+        purchaser_id,
+        order_no,
+        ordered_at,
+        completed_at,
+        execution_remark,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

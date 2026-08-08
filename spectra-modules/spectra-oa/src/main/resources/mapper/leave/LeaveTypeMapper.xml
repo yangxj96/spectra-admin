@@ -23,11 +23,21 @@
                type="com.devops00.spectra.oa.leave.javabean.entity.LeaveType">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_leave_type-->
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="unit" property="unit"/>
+        <result column="default_hours" property="defaultHours"/>
+        <result column="enabled" property="enabled"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        code,
+        name,
+        unit,
+        default_hours,
+        enabled,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

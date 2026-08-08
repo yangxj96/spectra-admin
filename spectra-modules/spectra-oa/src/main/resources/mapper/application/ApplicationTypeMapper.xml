@@ -23,11 +23,25 @@
                type="com.devops00.spectra.oa.application.javabean.entity.ApplicationType">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application_type-->
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="form_definition_id" property="formDefinitionId"/>
+        <result column="process_definition_key" property="processDefinitionKey"/>
+        <result column="enabled" property="enabled"/>
+        <result column="sort_order" property="sortOrder"/>
+        <result column="description" property="description"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        code,
+        name,
+        form_definition_id,
+        process_definition_key,
+        enabled,
+        sort_order,
+        description,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

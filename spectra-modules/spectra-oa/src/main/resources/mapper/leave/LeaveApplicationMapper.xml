@@ -23,11 +23,27 @@
                type="com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_leave_application-->
+        <result column="application_id" property="applicationId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="leave_type_code" property="leaveTypeCode"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="duration_hours" property="durationHours"/>
+        <result column="reason" property="reason"/>
+        <result column="contact_address" property="contactAddress"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        application_id,
+        department_id,
+        leave_type_code,
+        start_time,
+        end_time,
+        duration_hours,
+        reason,
+        contact_address,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

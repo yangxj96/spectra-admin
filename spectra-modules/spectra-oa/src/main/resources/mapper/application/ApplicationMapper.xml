@@ -23,11 +23,33 @@
                type="com.devops00.spectra.oa.application.javabean.entity.Application">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application-->
+        <result column="application_no" property="applicationNo"/>
+        <result column="type_code" property="typeCode"/>
+        <result column="biz_id" property="bizId"/>
+        <result column="applicant_id" property="applicantId"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="title" property="title"/>
+        <result column="status" property="status"/>
+        <result column="process_instance_id" property="processInstanceId"/>
+        <result column="submitted_at" property="submittedAt"/>
+        <result column="completed_at" property="completedAt"/>
+        <result column="reject_reason" property="rejectReason"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        application_no,
+        type_code,
+        biz_id,
+        applicant_id,
+        department_id,
+        title,
+        status,
+        process_instance_id,
+        submitted_at,
+        completed_at,
+        reject_reason,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

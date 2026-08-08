@@ -23,11 +23,21 @@
                type="com.devops00.spectra.oa.document.javabean.entity.DocumentFolder">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_document_folder-->
+        <result column="pid" property="pid"/>
+        <result column="name" property="name"/>
+        <result column="department_id" property="departmentId"/>
+        <result column="visibility" property="visibility"/>
+        <result column="sort" property="sort"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        pid,
+        name,
+        department_id,
+        visibility,
+        sort,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

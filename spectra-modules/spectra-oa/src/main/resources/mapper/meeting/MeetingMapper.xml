@@ -23,15 +23,16 @@
                type="com.devops00.spectra.oa.meeting.javabean.entity.Meeting">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_meeting-->
-        <result column="title"               property="title"/>
-        <result column="initiator_id"        property="initiator_id"/>
-        <result column="start_time"          property="start_time"/>
-        <result column="end_time"            property="end_time"/>
-        <result column="location"            property="location"/>
-        <result column="content"             property="content"/>
-        <result column="status"              property="status"/>
+        <result column="title" property="title"/>
+        <result column="initiator_id" property="initiatorId"/>
+        <result column="start_time" property="startTime"/>
+        <result column="end_time" property="endTime"/>
+        <result column="location" property="location"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
         <result column="process_instance_id" property="processInstanceId"/>
-        <result column="approval_status"     property="approvalStatus"/>
+        <result column="approval_status" property="approvalStatus"/>
+        <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -41,11 +42,12 @@
         initiator_id,
         start_time,
         end_time,
-        "location",
-        "content",
+        location,
+        content,
         status,
         process_instance_id,
         approval_status,
+        department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

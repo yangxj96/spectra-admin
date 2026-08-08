@@ -23,11 +23,25 @@
                type="com.devops00.spectra.oa.asset.javabean.entity.AssetCategory">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_asset_category-->
+        <result column="pid" property="pid"/>
+        <result column="code" property="code"/>
+        <result column="name" property="name"/>
+        <result column="asset_type" property="assetType"/>
+        <result column="sort" property="sort"/>
+        <result column="enabled" property="enabled"/>
+        <result column="description" property="description"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        pid,
+        code,
+        name,
+        asset_type,
+        sort,
+        enabled,
+        description,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

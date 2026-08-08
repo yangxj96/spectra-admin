@@ -23,11 +23,31 @@
                type="com.devops00.spectra.oa.notice.javabean.entity.Notice">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_notice-->
+        <result column="department_id" property="departmentId"/>
+        <result column="title" property="title"/>
+        <result column="summary" property="summary"/>
+        <result column="content" property="content"/>
+        <result column="status" property="status"/>
+        <result column="target_type" property="targetType"/>
+        <result column="target_department_id" property="targetDepartmentId"/>
+        <result column="publisher_id" property="publisherId"/>
+        <result column="publish_at" property="publishAt"/>
+        <result column="required_read" property="requiredRead"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        department_id,
+        title,
+        summary,
+        content,
+        status,
+        target_type,
+        target_department_id,
+        publisher_id,
+        publish_at,
+        required_read,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

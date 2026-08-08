@@ -23,11 +23,12 @@
                type="com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_meeting_participant-->
-        <result column="meeting_id"  property="meetingId"/>
-        <result column="user_id"     property="userId"/>
-        <result column="role"        property="role"/>
-        <result column="status"      property="status"/>
+        <result column="meeting_id" property="meetingId"/>
+        <result column="user_id" property="userId"/>
+        <result column="role" property="role"/>
+        <result column="status" property="status"/>
         <result column="check_in_at" property="checkInAt"/>
+        <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -38,6 +39,7 @@
         role,
         status,
         check_in_at,
+        department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

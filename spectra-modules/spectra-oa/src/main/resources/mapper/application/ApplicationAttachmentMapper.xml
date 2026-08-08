@@ -23,11 +23,17 @@
                type="com.devops00.spectra.oa.application.javabean.entity.ApplicationAttachment">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application_attachment-->
+        <result column="application_id" property="applicationId"/>
+        <result column="file_id" property="fileId"/>
+        <result column="file_name" property="fileName"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
+        application_id,
+        file_id,
+        file_name,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

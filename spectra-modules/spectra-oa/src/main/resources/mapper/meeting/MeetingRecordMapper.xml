@@ -24,14 +24,16 @@
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_meeting_record-->
         <result column="meeting_id" property="meetingId"/>
-        <result column="content"    property="content"/>
+        <result column="content" property="content"/>
+        <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         meeting_id,
-        "content",
+        content,
+        department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>
