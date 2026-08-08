@@ -28,8 +28,11 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class ReimbursementAttachmentFrom {
+
+    /// 文件 ID。
     @NotNull(message = "凭证文件不能为空")
     private UUID fileId;
 
+    /// 文件名称。
     private String fileName;
 }

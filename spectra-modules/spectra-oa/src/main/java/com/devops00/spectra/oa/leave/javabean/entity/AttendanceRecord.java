@@ -39,16 +39,28 @@ import lombok.Setter;
 @TableName(value = "oa_attendance_record", schema = "spectra_oa")
 @DataScope
 public class AttendanceRecord extends BaseEntity {
+
+    /// 申请 ID。
     @TableField("application_id")
     private UUID applicationId;
+
+    /// 用户 ID。
     @TableField("user_id")
     private UUID userId;
+
+    /// 考勤日期。
     @TableField("attendance_date")
     private LocalDate attendanceDate;
+
+    /// 状态。
     @TableField("status")
     private String status;
+
+    /// 来源。
     @TableField("source")
     private String source;
+
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
 }

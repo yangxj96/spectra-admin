@@ -28,8 +28,14 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class ContractMilestoneUpdateFrom {
+
+    /// 状态。
     @NotBlank(message = "履约节点状态不能为空")
     private String status;
+
+    /// 完成时间。
     private Instant completedAt;
+
+    /// 备注。
     private String remark;
 }

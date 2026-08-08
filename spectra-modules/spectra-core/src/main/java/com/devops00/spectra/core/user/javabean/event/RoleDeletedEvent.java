@@ -23,5 +23,8 @@ import java.util.UUID;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/11/11 00:00
-public record RoleDeletedEvent(UUID roleId) {
+public record RoleDeletedEvent(
+        /// 角色 ID。
+        UUID roleId
+) {
 }

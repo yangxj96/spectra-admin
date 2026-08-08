@@ -25,7 +25,13 @@ import lombok.Data;
 /// @since 2026/8/9
 @Data
 public class ApplicationPageFrom {
+
+    /// 类型编码。
     private String typeCode;
+
+    /// 状态。
     private String status;
+
+    /// 搜索关键字。
     private String keyword;
 }

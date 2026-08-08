@@ -29,9 +29,12 @@ import java.util.UUID;
 @Data
 public class RegionPathVO {
 
+    /// ID 列表。
     private List<UUID> ids;
 
+    /// 名称列表。
     private List<String> names;
 
+    /// 全名。
     private String fullName;
 }

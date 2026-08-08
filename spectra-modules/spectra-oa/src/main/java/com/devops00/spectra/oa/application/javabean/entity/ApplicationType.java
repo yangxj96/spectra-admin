@@ -37,24 +37,31 @@ import lombok.Setter;
 @TableName(value = "oa_application_type", schema = "spectra_oa")
 public class ApplicationType extends BaseEntity {
 
+    /// 编码。
     @TableField("code")
     private String code;
 
+    /// 名称。
     @TableField("name")
     private String name;
 
+    /// 表单定义 ID。
     @TableField("form_definition_id")
     private UUID formDefinitionId;
 
+    /// 流程定义 Key。
     @TableField("process_definition_key")
     private String processDefinitionKey;
 
+    /// 是否启用。
     @TableField("enabled")
     private Boolean enabled;
 
+    /// 排序序号。
     @TableField("sort_order")
     private Integer sortOrder;
 
+    /// 描述。
     @TableField("description")
     private String description;
 }

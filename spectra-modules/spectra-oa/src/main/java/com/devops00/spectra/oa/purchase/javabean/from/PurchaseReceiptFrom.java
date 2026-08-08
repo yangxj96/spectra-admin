@@ -32,15 +32,21 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseReceiptFrom {
+
+    /// 收货单号。
     private String receiptNo;
 
+    /// 收货日期。
     @NotNull(message = "收货日期不能为空")
     private LocalDate receivedDate;
 
+    /// 接收人 ID。
     private UUID receiverId;
 
+    /// 备注。
     private String remark;
 
+    /// 明细列表。
     @NotEmpty(message = "至少填写一条收货明细")
     @Valid
     private List<PurchaseReceiptItemFrom> items;

@@ -18,12 +18,27 @@ import lombok.Data;
 @Data
 public class ContactVO {
 
+    /// 主键 ID。
     private UUID id;
+
+    /// 用户名。
     private String username;
+
+    /// 真实姓名。
     private String realName;
+
+    /// 头像。
     private String avatar;
+
+    /// 手机号。
     private String phone;
+
+    /// 邮箱。
     private String email;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 部门名称字段。
     private String departmentName;
 }

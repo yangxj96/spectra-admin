@@ -27,15 +27,26 @@ import lombok.Data;
 @Data
 public class ApplicationTypeSaveFrom {
 
+    /// 编码。
     @NotBlank(message = "申请类型编码不能为空")
     private String code;
 
+    /// 名称。
     @NotBlank(message = "申请类型名称不能为空")
     private String name;
 
+    /// 表单定义 ID。
     private java.util.UUID formDefinitionId;
+
+    /// 流程定义 Key。
     private String processDefinitionKey;
+
+    /// 是否启用。
     private Boolean enabled = true;
+
+    /// 排序序号。
     private Integer sortOrder = 0;
+
+    /// 描述。
     private String description;
 }

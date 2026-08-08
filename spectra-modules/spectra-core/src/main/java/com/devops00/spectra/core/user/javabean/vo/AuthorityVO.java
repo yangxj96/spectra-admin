@@ -35,7 +35,7 @@ public class AuthorityVO {
     /// 数据id.
     private UUID id;
 
-
+    /// 父级 ID。
     private UUID pid;
 
     /// 权限名称

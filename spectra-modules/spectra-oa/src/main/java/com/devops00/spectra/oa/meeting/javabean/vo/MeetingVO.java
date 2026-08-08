@@ -34,6 +34,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class MeetingVO {
 
+    /// 主键 ID。
     private UUID id;
 
     /// 会议标题

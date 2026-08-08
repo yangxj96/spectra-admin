@@ -22,6 +22,7 @@ package com.devops00.spectra.security.base.javabean.from;
 /// @version 1.0
 /// @since 2026/6/28
 public record EmailCodeFrom(
+        /// 邮箱地址。
         String email
 ) {
 }

@@ -28,13 +28,31 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseItemVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 明细类型字段。
     private String itemType;
+
+    /// 明细名称字段。
     private String itemName;
+
+    /// 规格。
     private String specification;
+
+    /// 数量。
     private BigDecimal quantity;
+
+    /// 预计单价。
     private BigDecimal estimatedUnitPrice;
+
+    /// 预计金额。
     private BigDecimal estimatedAmount;
+
+    /// 用途。
     private String purpose;
+
+    /// 实收数量。
     private BigDecimal receivedQuantity;
 }

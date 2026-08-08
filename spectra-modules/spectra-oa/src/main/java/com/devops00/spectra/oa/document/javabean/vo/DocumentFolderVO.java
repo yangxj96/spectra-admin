@@ -18,10 +18,22 @@ import java.util.UUID;
 /// @since 2026/8/7
 @Data
 public class DocumentFolderVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 父级 ID。
     private UUID pid;
+
+    /// 名称。
     private String name;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 可见范围。
     private String visibility;
+
+    /// 排序号。
     private Integer sort;
 }

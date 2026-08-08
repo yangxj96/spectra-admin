@@ -30,11 +30,21 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class ContractMilestoneSaveFrom {
+
+    /// 名称。
     @NotBlank(message = "履约节点名称不能为空")
     private String name;
+
+    /// 履约节点类型字段。
     private String milestoneType = "OTHER";
+
+    /// 到期日期。
     @NotNull(message = "履约节点日期不能为空")
     private LocalDate dueDate;
+
+    /// 负责人 ID。
     private UUID assigneeId;
+
+    /// 备注。
     private String remark;
 }

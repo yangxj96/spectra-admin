@@ -27,14 +27,24 @@ import java.util.UUID;
 @TableName(value = "oa_document_folder", schema = "spectra_oa")
 @DataScope
 public class DocumentFolder extends BaseEntity {
+
+    /// 父级 ID。
     @TableField("pid")
     private UUID pid;
+
+    /// 名称。
     @TableField("name")
     private String name;
+
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
+
+    /// 可见范围。
     @TableField("visibility")
     private String visibility;
+
+    /// 排序号。
     @TableField("sort")
     private Integer sort;
 }

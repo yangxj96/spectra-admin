@@ -40,36 +40,47 @@ import lombok.Setter;
 @DataScope
 public class Application extends BaseEntity {
 
+    /// 申请编号。
     @TableField("application_no")
     private String applicationNo;
 
+    /// 类型编码。
     @TableField("type_code")
     private String typeCode;
 
+    /// 业务 ID。
     @TableField("biz_id")
     private UUID bizId;
 
+    /// 申请人 ID。
     @TableField("applicant_id")
     private UUID applicantId;
 
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
 
+    /// 标题。
     @TableField("title")
     private String title;
 
+    /// 状态。
     @TableField("status")
     private String status;
 
+    /// 流程实例 ID。
     @TableField("process_instance_id")
     private String processInstanceId;
 
+    /// 提交时间。
     @TableField("submitted_at")
     private Instant submittedAt;
 
+    /// 完成时间。
     @TableField("completed_at")
     private Instant completedAt;
 
+    /// 驳回原因。
     @TableField("reject_reason")
     private String rejectReason;
 }

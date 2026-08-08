@@ -25,8 +25,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 /// @since 2026/7/26
 public enum ChatRole {
 
+    /// 用户消息。
     USER,
+
+    /// 助手消息。
     ASSISTANT,
+
+    /// 系统消息。
     SYSTEM;
 
     @JsonValue

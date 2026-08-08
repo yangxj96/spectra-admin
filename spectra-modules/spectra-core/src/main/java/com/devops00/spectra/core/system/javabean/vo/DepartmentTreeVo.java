@@ -41,6 +41,7 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /// 主键 ID。
     private UUID id;
 
     /// 上级ID

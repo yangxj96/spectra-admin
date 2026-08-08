@@ -25,8 +25,16 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class ContractPageFrom {
+
+    /// 搜索关键字。
     private String keyword;
+
+    /// 状态。
     private String status;
+
+    /// 合同类型字段。
     private String contractType;
+
+    /// 签署状态。
     private String signingStatus;
 }

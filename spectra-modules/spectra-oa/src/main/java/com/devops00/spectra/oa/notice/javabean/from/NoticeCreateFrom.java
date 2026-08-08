@@ -28,19 +28,27 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class NoticeCreateFrom {
+
+    /// 标题。
     @NotBlank(message = "公告标题不能为空")
     private String title;
 
+    /// 摘要。
     private String summary;
 
+    /// 内容。
     @NotBlank(message = "公告内容不能为空")
     private String content;
 
+    /// 目标类型字段。
     private String targetType = "ALL";
 
+    /// 目标部门 ID。
     private UUID targetDepartmentId;
 
+    /// 是否要求阅读。
     private Boolean requiredRead = false;
 
+    /// 发布时间。
     private String publishAt;
 }

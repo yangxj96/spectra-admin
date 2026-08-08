@@ -42,42 +42,55 @@ import lombok.Setter;
 @DataScope
 public class Purchase extends BaseEntity {
 
+    /// 申请 ID。
     @TableField("application_id")
     private UUID applicationId;
 
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
 
+    /// 用途。
     @TableField("purpose")
     private String purpose;
 
+    /// 预计日期。
     @TableField("expected_date")
     private LocalDate expectedDate;
 
+    /// 预算金额。
     @TableField("budget_amount")
     private BigDecimal budgetAmount;
 
+    /// 币种。
     @TableField("currency")
     private String currency;
 
+    /// 建议供应商。
     @TableField("suggested_supplier")
     private String suggestedSupplier;
 
+    /// 执行状态。
     @TableField("execution_status")
     private String executionStatus;
 
+    /// 采购人 ID。
     @TableField("purchaser_id")
     private UUID purchaserId;
 
+    /// 订单编号。
     @TableField("order_no")
     private String orderNo;
 
+    /// 下单时间。
     @TableField("ordered_at")
     private Instant orderedAt;
 
+    /// 完成时间。
     @TableField("completed_at")
     private Instant completedAt;
 
+    /// 执行备注。
     @TableField("execution_remark")
     private String executionRemark;
 }

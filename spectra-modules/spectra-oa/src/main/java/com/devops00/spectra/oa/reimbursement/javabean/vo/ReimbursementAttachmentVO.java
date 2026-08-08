@@ -27,8 +27,16 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class ReimbursementAttachmentVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 文件 ID。
     private UUID fileId;
+
+    /// 文件名称。
     private String fileName;
+
+    /// 预览地址。
     private String previewUrl;
 }

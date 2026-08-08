@@ -39,6 +39,7 @@ import lombok.ToString;
 @TableName(value = "oa_document", schema = "spectra_oa")
 @DataScope
 public class Document extends BaseEntity {
+
     /// 所属目录ID
     @TableField("folder_id")
     private UUID folderId;

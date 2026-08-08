@@ -27,6 +27,7 @@ import lombok.Getter;
 /// @since 2026/4/2 11:04
 @Getter
 public enum UploadType implements IEnum<String> {
+
     /// 本地上传
     LOCAL("LOCAL", "本地上传"),
     /// S3协议上传

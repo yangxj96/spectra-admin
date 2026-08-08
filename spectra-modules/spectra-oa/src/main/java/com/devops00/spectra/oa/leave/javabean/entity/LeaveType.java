@@ -36,14 +36,24 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_leave_type", schema = "spectra_oa")
 public class LeaveType extends BaseEntity {
+
+    /// 编码。
     @TableField("code")
     private String code;
+
+    /// 名称。
     @TableField("name")
     private String name;
+
+    /// 单位。
     @TableField("unit")
     private String unit;
+
+    /// 默认时长。
     @TableField("default_hours")
     private BigDecimal defaultHours;
+
+    /// 是否启用。
     @TableField("enabled")
     private Boolean enabled;
 }

@@ -31,18 +31,25 @@ import java.util.UUID;
 @Builder
 public class UserOnlineVO {
 
+    /// 用户 ID。
     private UUID userId;
 
+    /// 用户名。
     private String username;
 
+    /// 登录类型字段。
     private String loginType;
 
+    /// IP 地址。
     private String ip;
 
+    /// 地址。
     private String address;
 
+    /// 登录时间字段。
     private Instant loginTime;
 
+    /// 访问令牌。
     private String token;
 
 }

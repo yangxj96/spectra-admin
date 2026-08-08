@@ -25,5 +25,7 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class ReimbursementPaymentFrom {
+
+    /// 支付备注。
     private String paymentRemark;
 }

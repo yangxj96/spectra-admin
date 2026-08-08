@@ -30,14 +30,19 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseReceiptItemFrom {
+
+    /// 采购明细 ID。
     @NotNull(message = "收货明细对应的采购项不能为空")
     private UUID purchaseItemId;
 
+    /// 数量。
     @NotNull(message = "收货数量不能为空")
     @DecimalMin(value = "0.001", message = "收货数量必须大于 0")
     private BigDecimal quantity;
 
+    /// 是否已接受。
     private Boolean accepted = true;
 
+    /// 差异原因。
     private String differenceReason;
 }

@@ -35,6 +35,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DepartmentFrom {
 
+    /// 主键 ID。
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;

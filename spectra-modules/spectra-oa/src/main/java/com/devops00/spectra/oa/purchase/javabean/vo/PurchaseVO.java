@@ -31,28 +31,72 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 申请 ID。
     private UUID applicationId;
+
+    /// 申请编号。
     private String applicationNo;
+
+    /// 标题。
     private String title;
+
+    /// 状态。
     private String status;
+
+    /// 申请人 ID。
     private UUID applicantId;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 用途。
     private String purpose;
+
+    /// 预计日期。
     private LocalDate expectedDate;
+
+    /// 预算金额。
     private BigDecimal budgetAmount;
+
+    /// 币种。
     private String currency;
+
+    /// 建议供应商。
     private String suggestedSupplier;
+
+    /// 执行状态。
     private String executionStatus;
+
+    /// 采购人 ID。
     private UUID purchaserId;
+
+    /// 订单编号。
     private String orderNo;
+
+    /// 下单时间。
     private Instant orderedAt;
+
+    /// 完成时间。
     private Instant completedAt;
+
+    /// 执行备注。
     private String executionRemark;
+
+    /// 流程实例 ID。
     private String processInstanceId;
+
+    /// 驳回原因。
     private String rejectReason;
+
+    /// 创建时间。
     private List<PurchaseItemVO> items = List.of();
     private List<PurchaseReceiptVO> receipts = List.of();
     private Instant createdAt;
+
+    /// 更新时间。
     private Instant updatedAt;
 }

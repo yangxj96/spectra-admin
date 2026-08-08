@@ -28,6 +28,15 @@ import lombok.Getter;
 @Getter
 public enum MeetingStatus implements IEnum<String> {
 
+    /// 草稿。
+    /// 已安排。
+    /// 进行中。
+    /// 已结束。
+    /// 已取消。
+    /// 审批中。
+    /// 已通过。
+    /// 已驳回。
+    /// 状态
     DRAFT("draft", "草稿"),
     SCHEDULED("scheduled", "已安排"),
     ONGOING("ongoing", "进行中"),
@@ -36,9 +45,6 @@ public enum MeetingStatus implements IEnum<String> {
     PROCESSING("processing", "审批中"),
     APPROVED("approved", "已通过"),
     REJECTED("rejected", "已驳回");
-
-
-    /// 状态
     private final String code;
 
     /// 说明

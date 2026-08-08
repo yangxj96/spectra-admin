@@ -28,14 +28,34 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetCategoryVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 父级 ID。
     private UUID pid;
+
+    /// 编码。
     private String code;
+
+    /// 名称。
     private String name;
+
+    /// 资产类型。
     private String assetType;
+
+    /// 排序号。
     private Integer sort;
+
+    /// 是否启用。
     private Boolean enabled;
+
+    /// 描述。
     private String description;
+
+    /// 创建时间。
     private Instant createdAt;
+
+    /// 更新时间。
     private Instant updatedAt;
 }

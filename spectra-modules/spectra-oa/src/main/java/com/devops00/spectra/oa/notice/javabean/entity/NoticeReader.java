@@ -26,21 +26,25 @@ import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_notice_reader", schema = "spectra_oa")
 /// 公告阅读回执实体。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "oa_notice_reader", schema = "spectra_oa")
 public class NoticeReader extends BaseEntity {
+
+    /// 公告 ID。
     @TableField("notice_id")
     private UUID noticeId;
 
+    /// 用户 ID。
     @TableField("user_id")
     private UUID userId;
 
+    /// 阅读时间。
     @TableField("read_at")
     private Instant readAt;
 }

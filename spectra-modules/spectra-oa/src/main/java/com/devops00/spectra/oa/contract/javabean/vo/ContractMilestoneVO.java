@@ -29,15 +29,37 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class ContractMilestoneVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 合同 ID。
     private UUID contractId;
+
+    /// 名称。
     private String name;
+
+    /// 履约节点类型字段。
     private String milestoneType;
+
+    /// 到期日期。
     private LocalDate dueDate;
+
+    /// 状态。
     private String status;
+
+    /// 负责人 ID。
     private UUID assigneeId;
+
+    /// 完成时间。
     private Instant completedAt;
+
+    /// 提醒发送时间。
     private Instant reminderSentAt;
+
+    /// 备注。
     private String remark;
+
+    /// 创建时间。
     private Instant createdAt;
 }

@@ -25,7 +25,13 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class ReimbursementPageFrom {
+
+    /// 状态。
     private String status;
+
+    /// 支付状态。
     private String paymentStatus;
+
+    /// 搜索关键字。
     private String keyword;
 }

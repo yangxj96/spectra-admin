@@ -25,5 +25,7 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseSubmitFrom {
+
+    /// 审批人用户名。
     private String approverUsername;
 }

@@ -28,17 +28,43 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class CalendarVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 所有者 ID。
     private UUID ownerId;
+
+    /// 标题。
     private String title;
+
+    /// 内容。
     private String content;
+
+    /// 开始时间。
     private Instant startTime;
+
+    /// 结束时间。
     private Instant endTime;
+
+    /// 是否全天。
     private Boolean allDay;
+
+    /// 事件类型字段。
     private String eventType;
+
+    /// 可见范围。
     private String visibility;
+
+    /// 位置。
     private String location;
+
+    /// 参与人 ID 列表。
     private String participantIds;
+
+    /// 来源类型字段。
     private String sourceType;
+
+    /// 来源 ID。
     private UUID sourceId;
 }

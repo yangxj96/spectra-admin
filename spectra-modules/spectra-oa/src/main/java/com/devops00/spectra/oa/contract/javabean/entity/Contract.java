@@ -41,6 +41,7 @@ import java.util.UUID;
 @TableName(value = "oa_contract", schema = "spectra_oa")
 @DataScope
 public class Contract extends BaseEntity {
+
     /// 合同编号
     @TableField("contract_no")
     private String contractNo;

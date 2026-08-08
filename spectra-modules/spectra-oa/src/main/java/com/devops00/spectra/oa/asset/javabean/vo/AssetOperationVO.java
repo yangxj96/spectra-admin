@@ -29,18 +29,46 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetOperationVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 资产 ID。
     private UUID assetId;
+
+    /// 操作类型。
     private String operationType;
+
+    /// 原部门 ID。
     private UUID fromDepartmentId;
+
+    /// 目标部门 ID。
     private UUID toDepartmentId;
+
+    /// 原用户 ID。
     private UUID fromUserId;
+
+    /// 目标用户 ID。
     private UUID toUserId;
+
+    /// 原位置。
     private String fromLocation;
+
+    /// 目标位置。
     private String toLocation;
+
+    /// 操作时间。
     private LocalDate operationDate;
+
+    /// 原因。
     private String reason;
+
+    /// 维修内容。
     private String maintenanceContent;
+
+    /// 维修费用。
     private BigDecimal maintenanceCost;
+
+    /// 状态。
     private String status;
 }

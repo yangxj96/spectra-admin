@@ -28,11 +28,15 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetPurchaseDraftFrom {
+
+    /// 采购单 ID。
     @NotNull(message = "采购申请不能为空")
     private UUID purchaseId;
 
+    /// 收货单 ID。
     @NotNull(message = "采购收货单不能为空")
     private UUID receiptId;
 
+    /// 分类 ID。
     private UUID categoryId;
 }

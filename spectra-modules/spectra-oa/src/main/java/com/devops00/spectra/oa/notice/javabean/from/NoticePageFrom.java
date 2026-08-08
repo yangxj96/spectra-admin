@@ -25,6 +25,10 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class NoticePageFrom {
+
+    /// 搜索关键字。
     private String keyword;
+
+    /// 状态。
     private String status;
 }

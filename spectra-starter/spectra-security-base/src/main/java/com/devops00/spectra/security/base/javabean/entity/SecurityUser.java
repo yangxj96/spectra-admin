@@ -77,14 +77,19 @@ public class SecurityUser implements UserDetails {
     /// 时区
     private String timezone;
 
+    /// 是否启用。
     private boolean enabled = true;
 
+    /// 账户是否未过期。
     private boolean accountNonExpired = true;
 
+    /// 账户是否未锁定。
     private boolean accountNonLocked = true;
 
+    /// 凭证是否未过期。
     private boolean credentialsNonExpired = true;
 
+    /// 扩展数据字段。
     @Nullable
     private transient Map<String, Object> extraData;
 

@@ -38,42 +38,56 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_asset_operation", schema = "spectra_oa")
 public class AssetOperation extends BaseEntity {
+
+    /// 资产 ID。
     @TableField("asset_id")
     private UUID assetId;
 
+    /// 操作类型。
     @TableField("operation_type")
     private String operationType;
 
+    /// 原部门 ID。
     @TableField("from_department_id")
     private UUID fromDepartmentId;
 
+    /// 目标部门 ID。
     @TableField("to_department_id")
     private UUID toDepartmentId;
 
+    /// 原用户 ID。
     @TableField("from_user_id")
     private UUID fromUserId;
 
+    /// 目标用户 ID。
     @TableField("to_user_id")
     private UUID toUserId;
 
+    /// 原位置。
     @TableField("from_location")
     private String fromLocation;
 
+    /// 目标位置。
     @TableField("to_location")
     private String toLocation;
 
+    /// 操作时间。
     @TableField("operation_date")
     private LocalDate operationDate;
 
+    /// 原因。
     @TableField("reason")
     private String reason;
 
+    /// 维修内容。
     @TableField("maintenance_content")
     private String maintenanceContent;
 
+    /// 维修费用。
     @TableField("maintenance_cost")
     private BigDecimal maintenanceCost;
 
+    /// 状态。
     @TableField("status")
     private String status;
 }

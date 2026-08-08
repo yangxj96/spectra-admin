@@ -36,24 +36,32 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_asset_category", schema = "spectra_oa")
 public class AssetCategory extends BaseEntity {
+
+    /// 父级 ID。
     @TableField("pid")
     private UUID pid;
 
+    /// 编码。
     @TableField("code")
     private String code;
 
+    /// 名称。
     @TableField("name")
     private String name;
 
+    /// 资产类型。
     @TableField("asset_type")
     private String assetType;
 
+    /// 排序号。
     @TableField("sort")
     private Integer sort;
 
+    /// 是否启用。
     @TableField("enabled")
     private Boolean enabled;
 
+    /// 描述。
     @TableField("description")
     private String description;
 }

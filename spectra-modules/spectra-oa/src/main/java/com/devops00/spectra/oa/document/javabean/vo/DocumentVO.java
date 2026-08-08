@@ -19,16 +19,40 @@ import java.util.UUID;
 /// @since 2026/8/7
 @Data
 public class DocumentVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 目录 ID。
     private UUID folderId;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 标题。
     private String title;
+
+    /// 摘要。
     private String summary;
+
+    /// 状态。
     private String status;
+
+    /// 可见范围。
     private String visibility;
+
+    /// 所有者 ID。
     private UUID ownerId;
+
+    /// 发布时间。
     private Instant publishedAt;
+
+    /// 创建时间。
     private Instant createdAt;
+
+    /// 更新时间。
     private Instant updatedAt;
+
+    /// 当前版本字段。
     private DocumentVersionVO currentVersion;
 }

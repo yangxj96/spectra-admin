@@ -34,27 +34,42 @@ import java.util.List;
 @NoArgsConstructor
 public class RAMInfoVO {
 
+    /// 摘要。
     private String summary;
+
+    /// 数量。
     private String count;
+
+    /// 总容量（字节）。
     private Long totalCapacityBytes;
+
+    /// 总容量（GB）。
     private String totalCapacityGB;
 
+    /// 内存插槽列表。
     private List<RAMSlot> slots;
 
+    /// 内存插槽信息。
     @Data
     @Builder
     public static class RAMSlot {
 
+        /// 插槽编号。
         private Integer slot;
 
+        /// 内存类型。
         private String memoryType;
 
+        /// 时钟频率，单位 Hz。
         private Long clockSpeedHz;
 
+        /// 时钟频率，单位 MHz。
         private String clockSpeedMHz;
 
+        /// 容量，单位字节。
         private Long capacityBytes;
 
+        /// 容量，单位 GB。
         private String capacityGB;
 
     }

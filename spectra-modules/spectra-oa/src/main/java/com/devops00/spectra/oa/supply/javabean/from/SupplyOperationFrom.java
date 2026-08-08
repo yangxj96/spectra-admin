@@ -14,18 +14,36 @@ import lombok.Data;
 /// @since 2026/8/9
 @Data
 public class SupplyOperationFrom {
+
+    /// 数量。
     @DecimalMin(value = "0.001", message = "数量必须大于 0")
     private BigDecimal quantity;
 
+    /// 目标库存。
     @DecimalMin(value = "0", message = "调整后的库存不能小于 0")
     private BigDecimal targetStock;
 
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 用户 ID。
     private UUID userId;
+
+    /// 位置。
     private String location;
+
+    /// 操作时间。
     private LocalDate operationDate;
+
+    /// 原因。
     private String reason;
+
+    /// 来源采购单 ID。
     private UUID sourcePurchaseId;
+
+    /// 来源收货单 ID。
     private UUID sourceReceiptId;
+
+    /// 来源采购明细 ID。
     private UUID sourcePurchaseItemId;
 }

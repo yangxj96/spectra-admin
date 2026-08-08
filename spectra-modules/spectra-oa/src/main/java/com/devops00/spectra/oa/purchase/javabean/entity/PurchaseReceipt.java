@@ -40,21 +40,27 @@ import lombok.Setter;
 @DataScope
 public class PurchaseReceipt extends BaseEntity {
 
+    /// 采购单 ID。
     @TableField("purchase_id")
     private UUID purchaseId;
 
+    /// 收货单号。
     @TableField("receipt_no")
     private String receiptNo;
 
+    /// 收货日期。
     @TableField("received_date")
     private LocalDate receivedDate;
 
+    /// 接收人 ID。
     @TableField("receiver_id")
     private UUID receiverId;
 
+    /// 状态。
     @TableField("status")
     private String status;
 
+    /// 备注。
     @TableField("remark")
     private String remark;
 }

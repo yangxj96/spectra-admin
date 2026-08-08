@@ -26,6 +26,8 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class MeetingResponseFrom {
+
+    /// 会议响应状态。
     @NotBlank(message = "会议响应不能为空")
     private String status;
 }

@@ -25,6 +25,10 @@ import lombok.Data;
 /// @since 2026/8/9
 @Data
 public class LeavePageFrom {
+
+    /// 状态。
     private String status;
+
+    /// 请假类型编码。
     private String leaveTypeCode;
 }

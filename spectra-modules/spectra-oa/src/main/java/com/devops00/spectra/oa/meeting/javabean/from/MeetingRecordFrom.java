@@ -26,6 +26,8 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class MeetingRecordFrom {
+
+    /// 会议纪要内容。
     @NotBlank(message = "会议纪要内容不能为空")
     private String content;
 }

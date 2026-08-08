@@ -27,44 +27,54 @@ import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_notice", schema = "spectra_oa")
-@DataScope(ignore = true)
 /// OA 公告实体。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "oa_notice", schema = "spectra_oa")
+@DataScope(ignore = true)
 public class Notice extends BaseEntity {
 
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
 
+    /// 标题。
     @TableField("title")
     private String title;
 
+    /// 摘要。
     @TableField("summary")
     private String summary;
 
+    /// 内容。
     @TableField("content")
     private String content;
 
+    /// 状态。
     @TableField("status")
     private String status;
 
+    /// 目标类型字段。
     @TableField("target_type")
     private String targetType;
 
+    /// 目标部门 ID。
     @TableField("target_department_id")
     private UUID targetDepartmentId;
 
+    /// 发布人 ID。
     @TableField("publisher_id")
     private UUID publisherId;
 
+    /// 发布时间。
     @TableField("publish_at")
     private Instant publishAt;
 
+    /// 是否要求阅读。
     @TableField("required_read")
     private Boolean requiredRead;
 }

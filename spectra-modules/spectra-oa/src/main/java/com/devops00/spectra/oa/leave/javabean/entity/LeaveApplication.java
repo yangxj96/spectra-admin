@@ -40,20 +40,36 @@ import lombok.Setter;
 @TableName(value = "oa_leave_application", schema = "spectra_oa")
 @DataScope
 public class LeaveApplication extends BaseEntity {
+
+    /// 申请 ID。
     @TableField("application_id")
     private UUID applicationId;
+
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
+
+    /// 请假类型编码。
     @TableField("leave_type_code")
     private String leaveTypeCode;
+
+    /// 开始时间。
     @TableField("start_time")
     private Instant startTime;
+
+    /// 结束时间。
     @TableField("end_time")
     private Instant endTime;
+
+    /// 时长（小时）。
     @TableField("duration_hours")
     private BigDecimal durationHours;
+
+    /// 原因。
     @TableField("reason")
     private String reason;
+
+    /// 联系地址。
     @TableField("contact_address")
     private String contactAddress;
 }

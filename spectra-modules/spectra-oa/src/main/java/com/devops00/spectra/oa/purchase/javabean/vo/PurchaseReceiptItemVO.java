@@ -28,9 +28,19 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchaseReceiptItemVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 采购明细 ID。
     private UUID purchaseItemId;
+
+    /// 数量。
     private BigDecimal quantity;
+
+    /// 是否已接受。
     private Boolean accepted;
+
+    /// 差异原因。
     private String differenceReason;
 }

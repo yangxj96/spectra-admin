@@ -28,16 +28,27 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetCategorySaveFrom {
+
+    /// 父级 ID。
     private UUID pid;
 
+    /// 编码。
     @NotBlank(message = "资产分类编码不能为空")
     private String code;
 
+    /// 名称。
     @NotBlank(message = "资产分类名称不能为空")
     private String name;
 
+    /// 资产类型。
     private String assetType = "FIXED";
+
+    /// 排序号。
     private Integer sort = 0;
+
+    /// 是否启用。
     private Boolean enabled = true;
+
+    /// 描述。
     private String description;
 }

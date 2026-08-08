@@ -28,17 +28,43 @@ import lombok.Data;
 /// @since 2026/8/9
 @Data
 public class ApplicationVO {
+
+    /// 主键 ID。
     private UUID id;
+
+    /// 申请编号。
     private String applicationNo;
+
+    /// 类型编码。
     private String typeCode;
+
+    /// 业务 ID。
     private UUID bizId;
+
+    /// 申请人 ID。
     private UUID applicantId;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 标题。
     private String title;
+
+    /// 状态。
     private String status;
+
+    /// 流程实例 ID。
     private String processInstanceId;
+
+    /// 提交时间。
     private Instant submittedAt;
+
+    /// 完成时间。
     private Instant completedAt;
+
+    /// 驳回原因。
     private String rejectReason;
+
+    /// 创建时间。
     private Instant createdAt;
 }

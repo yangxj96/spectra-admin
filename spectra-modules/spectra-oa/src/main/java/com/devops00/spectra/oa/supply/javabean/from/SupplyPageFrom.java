@@ -9,8 +9,16 @@ import lombok.Data;
 /// @since 2026/8/9
 @Data
 public class SupplyPageFrom {
+
+    /// 搜索关键字。
     private String keyword;
+
+    /// 分类。
     private String category;
+
+    /// 状态。
     private String status;
+
+    /// 是否低库存。
     private Boolean lowStock;
 }

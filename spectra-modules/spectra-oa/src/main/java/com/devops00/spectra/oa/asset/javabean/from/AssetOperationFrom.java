@@ -29,12 +29,28 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetOperationFrom {
+
+    /// 目标部门 ID。
     private UUID toDepartmentId;
+
+    /// 目标用户 ID。
     private UUID toUserId;
+
+    /// 目标位置。
     private String toLocation;
+
+    /// 操作时间。
     private LocalDate operationDate;
+
+    /// 原因。
     private String reason;
+
+    /// 维修内容。
     private String maintenanceContent;
+
+    /// 维修费用。
     private BigDecimal maintenanceCost;
+
+    /// 状态。
     private String status;
 }

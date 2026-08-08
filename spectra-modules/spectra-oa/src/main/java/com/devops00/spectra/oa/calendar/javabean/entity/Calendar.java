@@ -27,52 +27,66 @@ import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
-@TableName(value = "oa_calendar", schema = "spectra_oa")
-@DataScope(ignore = true)
 /// OA 日程实体。
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7
+@Data
+@EqualsAndHashCode(callSuper = true)
+@TableName(value = "oa_calendar", schema = "spectra_oa")
+@DataScope(ignore = true)
 public class Calendar extends BaseEntity {
+
+    /// 部门 ID。
     @TableField("department_id")
     private UUID departmentId;
 
+    /// 所有者 ID。
     @TableField("owner_id")
     private UUID ownerId;
 
+    /// 标题。
     @TableField("title")
     private String title;
 
+    /// 内容。
     @TableField("content")
     private String content;
 
+    /// 开始时间。
     @TableField("start_time")
     private Instant startTime;
 
+    /// 结束时间。
     @TableField("end_time")
     private Instant endTime;
 
+    /// 是否全天。
     @TableField("all_day")
     private Boolean allDay;
 
+    /// 事件类型字段。
     @TableField("event_type")
     private String eventType;
 
+    /// 可见范围。
     @TableField("visibility")
     private String visibility;
 
+    /// 位置。
     @TableField("location")
     private String location;
 
+    /// 参与人 ID 列表。
     @TableField("participant_ids")
     private String participantIds;
 
+    /// 来源类型字段。
     @TableField("source_type")
     private String sourceType;
 
+    /// 来源 ID。
     @TableField("source_id")
     private UUID sourceId;
 }

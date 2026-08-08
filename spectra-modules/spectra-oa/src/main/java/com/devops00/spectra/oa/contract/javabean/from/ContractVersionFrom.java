@@ -28,10 +28,20 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class ContractVersionFrom {
+
+    /// 文件 ID。
     @NotNull(message = "合同文件不能为空")
     private UUID fileId;
+
+    /// 文件名称。
     private String fileName;
+
+    /// 文件大小。
     private Long fileSize;
+
+    /// 内容类型。
     private String contentType;
+
+    /// 版本说明。
     private String versionNote;
 }

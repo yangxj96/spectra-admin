@@ -25,7 +25,13 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class PurchasePageFrom {
+
+    /// 状态。
     private String status;
+
+    /// 执行状态。
     private String executionStatus;
+
+    /// 搜索关键字。
     private String keyword;
 }

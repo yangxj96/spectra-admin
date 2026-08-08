@@ -36,10 +36,16 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_application_attachment", schema = "spectra_oa")
 public class ApplicationAttachment extends BaseEntity {
+
+    /// 申请 ID。
     @TableField("application_id")
     private UUID applicationId;
+
+    /// 文件 ID。
     @TableField("file_id")
     private UUID fileId;
+
+    /// 文件名称。
     @TableField("file_name")
     private String fileName;
 }

@@ -27,9 +27,19 @@ import lombok.Data;
 /// @since 2026/8/8
 @Data
 public class AssetPageFrom {
+
+    /// 搜索关键字。
     private String keyword;
+
+    /// 状态。
     private String status;
+
+    /// 分类 ID。
     private UUID categoryId;
+
+    /// 部门 ID。
     private UUID departmentId;
+
+    /// 保管人 ID。
     private UUID custodianId;
 }

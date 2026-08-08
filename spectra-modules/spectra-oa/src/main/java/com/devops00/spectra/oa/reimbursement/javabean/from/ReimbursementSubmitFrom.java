@@ -27,5 +27,7 @@ import lombok.Data;
 /// @since 2026/8/7
 @Data
 public class ReimbursementSubmitFrom {
+
+    /// 审批人用户名。
     private String approverUsername;
 }

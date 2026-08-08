@@ -18,7 +18,13 @@ import java.util.UUID;
 /// @since 2026/8/7
 @Data
 public class DocumentPageFrom {
+
+    /// 搜索关键字。
     private String keyword;
+
+    /// 状态。
     private String status;
+
+    /// 目录 ID。
     private UUID folderId;
 }
