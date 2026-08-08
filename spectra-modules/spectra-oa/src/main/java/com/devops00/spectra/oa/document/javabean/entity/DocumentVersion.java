@@ -40,5 +40,5 @@ public class DocumentVersion extends BaseEntity {
     @TableField("version_note")
     private String versionNote;
     @TableField("is_current")
-    private Boolean current;
+    private Boolean currentVersion;
 }

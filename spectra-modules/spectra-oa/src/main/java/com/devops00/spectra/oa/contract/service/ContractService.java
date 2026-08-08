@@ -65,6 +65,11 @@ public interface ContractService extends BaseService<Contract> {
 
     void terminate(UUID id);
 
+    void archive(UUID id);
+
+    /// 扫描临近到期的履约节点并发送一次性提醒。
+    int sendDueMilestoneReminders();
+
     void preview(UUID id, UUID versionId);
 
     void download(UUID id, UUID versionId);

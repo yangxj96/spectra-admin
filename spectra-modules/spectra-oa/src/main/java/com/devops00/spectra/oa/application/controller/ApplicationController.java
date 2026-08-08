@@ -21,15 +21,20 @@ import java.util.UUID;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.validation.annotation.Validated;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.application.javabean.from.ApplicationPageFrom;
+import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 import com.devops00.spectra.oa.application.service.ApplicationService;
@@ -65,6 +70,34 @@ public class ApplicationController {
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
     public List<ApplicationTypeVO> listTypes() {
         return applicationService.listTypes();
+    }
+
+    @ULog("'查询全部 OA 申请类型配置'")
+    @GetMapping(value = "/types/all", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:QUERY')")
+    public List<ApplicationTypeVO> listAllTypes() {
+        return applicationService.listAllTypes();
+    }
+
+    @ULog("'创建 OA 申请类型配置'")
+    @PostMapping(value = "/types", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:INSERT')")
+    public UUID createdType(@Validated @RequestBody ApplicationTypeSaveFrom from) {
+        return applicationService.createdType(from);
+    }
+
+    @ULog("'修改 OA 申请类型配置'")
+    @org.springframework.web.bind.annotation.PutMapping(value = "/types/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:UPDATE')")
+    public void modifyType(@PathVariable UUID id, @Validated @RequestBody ApplicationTypeSaveFrom from) {
+        applicationService.modifyType(id, from);
+    }
+
+    @ULog("'删除 OA 申请类型配置'")
+    @DeleteMapping(value = "/types/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:DELETE')")
+    public void deleteType(@PathVariable UUID id) {
+        applicationService.deleteType(id);
     }
 
     @ULog("'撤回 OA 申请'")

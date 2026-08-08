@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.from.ApplicationPageFrom;
+import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 
@@ -33,6 +34,14 @@ public interface ApplicationService {
     ApplicationVO get(UUID id);
 
     List<ApplicationTypeVO> listTypes();
+
+    List<ApplicationTypeVO> listAllTypes();
+
+    java.util.UUID createdType(ApplicationTypeSaveFrom from);
+
+    void modifyType(java.util.UUID id, ApplicationTypeSaveFrom from);
+
+    void deleteType(java.util.UUID id);
 
     Application createDraft(String typeCode, UUID bizId, String title);
 

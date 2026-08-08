@@ -39,6 +39,7 @@ import com.devops00.spectra.oa.application.javabean.converter.ApplicationConvert
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.javabean.from.ApplicationPageFrom;
+import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
@@ -59,18 +60,25 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     private static final DateTimeFormatter APPLICATION_NO_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     private final ApplicationTypeMapper applicationTypeMapper;
+    private final ApplicationMapper applicationMapper;
     private final ApplicationConverter applicationConverter;
 
     @Override
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Application>();
-        if (StringUtils.hasText(params.getTypeCode())) {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.and(query -> query.eq(Application::getApplicantId, user.getId())
+                .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        if (params != null && StringUtils.hasText(params.getTypeCode())) {
             wrapper.eq(Application::getTypeCode, params.getTypeCode());
         }
-        if (StringUtils.hasText(params.getStatus())) {
+        if (params != null && StringUtils.hasText(params.getStatus())) {
             wrapper.eq(Application::getStatus, params.getStatus());
         }
-        if (StringUtils.hasText(params.getKeyword())) {
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Application::getTitle, params.getKeyword())
                     .or().like(Application::getApplicationNo, params.getKeyword()));
         }
@@ -83,7 +91,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
 
     @Override
     public ApplicationVO get(UUID id) {
-        return applicationConverter.toVO(require(id));
+        var entity = require(id);
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null
+                || (!user.getId().equals(entity.getApplicantId())
+                && !user.getDepartmentId().equals(entity.getDepartmentId()))) {
+            throw new DataNotExistException("OA 申请不存在或无权访问");
+        }
+        return applicationConverter.toVO(entity);
     }
 
     @Override
@@ -92,6 +107,65 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
                 .eq(ApplicationType::getEnabled, true)
                 .orderByAsc(ApplicationType::getSortOrder);
         return applicationConverter.toTypeVOList(applicationTypeMapper.selectList(wrapper));
+    }
+
+    @Override
+    public List<ApplicationTypeVO> listAllTypes() {
+        return applicationConverter.toTypeVOList(applicationTypeMapper.selectList(
+                new LambdaQueryWrapper<ApplicationType>().orderByAsc(ApplicationType::getSortOrder)
+                        .orderByAsc(ApplicationType::getCode)));
+    }
+
+    @Override
+    @Transactional
+    public UUID createdType(ApplicationTypeSaveFrom from) {
+        var code = normalizeTypeCode(from.getCode());
+        if (applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
+                .eq(ApplicationType::getCode, code)) != null) {
+            throw new DataSaveException("申请类型编码已存在");
+        }
+        var entity = applicationConverter.toTypeEntity(from);
+        entity.setCode(code);
+        entity.setName(from.getName().trim());
+        entity.setEnabled(from.getEnabled() == null || from.getEnabled());
+        entity.setSortOrder(from.getSortOrder() == null ? 0 : from.getSortOrder());
+        if (applicationTypeMapper.insert(entity) != 1) {
+            throw new DataSaveException("创建申请类型失败");
+        }
+        return entity.getId();
+    }
+
+    @Override
+    @Transactional
+    public void modifyType(UUID id, ApplicationTypeSaveFrom from) {
+        var entity = requireType(id);
+        var code = normalizeTypeCode(from.getCode());
+        var duplicate = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
+                .eq(ApplicationType::getCode, code).ne(ApplicationType::getId, id));
+        if (duplicate != null) {
+            throw new DataSaveException("申请类型编码已存在");
+        }
+        applicationConverter.updateTypeEntity(from, entity);
+        entity.setCode(code);
+        entity.setName(from.getName().trim());
+        entity.setEnabled(from.getEnabled() == null || from.getEnabled());
+        entity.setSortOrder(from.getSortOrder() == null ? 0 : from.getSortOrder());
+        if (applicationTypeMapper.updateById(entity) != 1) {
+            throw new DataSaveException("修改申请类型失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void deleteType(UUID id) {
+        var entity = requireType(id);
+        if (applicationMapper.selectCount(new LambdaQueryWrapper<Application>()
+                .eq(Application::getTypeCode, entity.getCode())) > 0) {
+            throw new DataSaveException("已有业务申请使用该类型，只能停用");
+        }
+        if (applicationTypeMapper.deleteById(entity) != 1) {
+            throw new DataSaveException("删除申请类型失败");
+        }
     }
 
     @Override
@@ -220,5 +294,24 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
             wrapper.eq(Application::getStatus, status);
         }
         return this.count(wrapper);
+    }
+
+    private ApplicationType requireType(UUID id) {
+        var entity = applicationTypeMapper.selectById(id);
+        if (entity == null) {
+            throw new DataNotExistException("申请类型不存在");
+        }
+        return entity;
+    }
+
+    private String normalizeTypeCode(String value) {
+        if (!StringUtils.hasText(value)) {
+            throw new DataSaveException("申请类型编码不能为空");
+        }
+        var code = value.trim().toLowerCase();
+        if (!code.matches("[a-z][a-z0-9_]{1,63}")) {
+            throw new DataSaveException("申请类型编码只能包含小写字母、数字和下划线");
+        }
+        return code;
     }
 }

@@ -31,6 +31,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
+import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentFolder;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
@@ -64,16 +68,30 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private static final String STATUS_DRAFT = "DRAFT";
     private static final String STATUS_PUBLISHED = "PUBLISHED";
+    private static final String STATUS_ARCHIVED = "ARCHIVED";
+    private static final String VISIBILITY_PUBLIC = "PUBLIC";
+    private static final String VISIBILITY_DEPARTMENT = "DEPARTMENT";
     private static final String VISIBILITY_PRIVATE = "PRIVATE";
 
     private final DocumentVersionMapper versionMapper;
     private final DocumentFolderMapper folderMapper;
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
+    private final NotificationService notificationService;
+    private final UserService userService;
 
     @Override
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Document>();
+        var user = SecUtil.getCurrentUser();
+        var userId = SecUtil.getCurrentUserId();
+        if (user == null || userId == null || user.getDepartmentId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.and(query -> query.eq(Document::getOwnerId, userId)
+                .or().eq(Document::getVisibility, VISIBILITY_PUBLIC)
+                .or(q -> q.eq(Document::getVisibility, VISIBILITY_DEPARTMENT)
+                        .eq(Document::getDepartmentId, user.getDepartmentId())));
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.like(Document::getTitle, params.getKeyword());
         }
@@ -148,10 +166,10 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         version.setFileSize(from.getFileSize() == null ? file.getSize() : from.getFileSize());
         version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
         version.setVersionNote(from.getVersionNote());
-        version.setCurrent(true);
+        version.setCurrentVersion(true);
         versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, document.getId()).eq(DocumentVersion::getCurrent, true)
-                .set(DocumentVersion::getCurrent, false));
+                .eq(DocumentVersion::getDocumentId, document.getId()).eq(DocumentVersion::getCurrentVersion, true)
+                .set(DocumentVersion::getCurrentVersion, false));
         if (versionMapper.insert(version) != 1) {
             throw new DataSaveException("保存文档版本失败");
         }
@@ -172,6 +190,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public void publish(UUID id) {
         var document = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(document.getStatus())) {
+            throw new DataSaveException("已归档文档不能再次发布");
+        }
         var current = currentVersion(document.getId());
         if (current == null) {
             throw new DataSaveException("文档必须先上传一个版本");
@@ -181,13 +202,35 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         if (!updateById(document)) {
             throw new DataSaveException("发布文档失败");
         }
+        sendPublishNotification(document);
+    }
+
+    @Override
+    @Transactional
+    public void archive(UUID id) {
+        var document = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(document.getStatus())) {
+            throw new DataSaveException("文档已经归档");
+        }
+        document.setStatus(STATUS_ARCHIVED);
+        if (!updateById(document)) {
+            throw new DataSaveException("归档文档失败");
+        }
     }
 
     @Override
     public List<DocumentFolderVO> folders() {
-        return folderMapper.selectList(new LambdaQueryWrapper<DocumentFolder>().orderByAsc(DocumentFolder::getSort)
-                        .orderByAsc(DocumentFolder::getName))
-                .stream().map(this::toFolderVO).toList();
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getDepartmentId() == null) {
+            return List.of();
+        }
+        var wrapper = new LambdaQueryWrapper<DocumentFolder>()
+                .and(query -> query.eq(DocumentFolder::getVisibility, VISIBILITY_PUBLIC)
+                        .or(q -> q.eq(DocumentFolder::getVisibility, VISIBILITY_DEPARTMENT)
+                                .eq(DocumentFolder::getDepartmentId, user.getDepartmentId())))
+                .orderByAsc(DocumentFolder::getSort)
+                .orderByAsc(DocumentFolder::getName);
+        return folderMapper.selectList(wrapper).stream().map(this::toFolderVO).toList();
     }
 
     @Override
@@ -219,6 +262,26 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         fileUploadFacade.download(requireVersion(id, versionId).getFileId());
     }
 
+    @Override
+    @Transactional
+    public void restoreVersion(UUID id, UUID versionId) {
+        var document = requireOwner(id);
+        var version = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
+                .eq(DocumentVersion::getId, versionId)
+                .eq(DocumentVersion::getDocumentId, document.getId()));
+        if (version == null) {
+            throw new DataNotExistException("文档版本不存在");
+        }
+        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>()
+                .eq(DocumentVersion::getDocumentId, document.getId())
+                .eq(DocumentVersion::getCurrentVersion, true)
+                .set(DocumentVersion::getCurrentVersion, false));
+        version.setCurrentVersion(true);
+        if (versionMapper.updateById(version) != 1) {
+            throw new DataSaveException("恢复文档版本失败");
+        }
+    }
+
     private DocumentVersion requireVersion(UUID id, UUID versionId) {
         var document = requireAccessible(id);
         DocumentVersion version = versionId == null ? currentVersion(document.getId()) : versionMapper.selectOne(
@@ -232,7 +295,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private DocumentVersion currentVersion(UUID id) {
         return versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, id).eq(DocumentVersion::getCurrent, true).last("limit 1"));
+                .eq(DocumentVersion::getDocumentId, id).eq(DocumentVersion::getCurrentVersion, true).last("limit 1"));
     }
 
     private Document require(UUID id) {
@@ -246,8 +309,11 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private Document requireAccessible(UUID id) {
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
-        if (VISIBILITY_PRIVATE.equals(entity.getVisibility())
-                && (user == null || !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
+        if (user == null || user.getDepartmentId() == null
+                || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
+                && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
+                && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
+                && !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
             throw new DataNotExistException("文档不存在或无权访问");
         }
         return entity;
@@ -289,7 +355,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         vo.setFileSize(source.getFileSize());
         vo.setContentType(source.getContentType());
         vo.setVersionNote(source.getVersionNote());
-        vo.setCurrent(source.getCurrent());
+        vo.setCurrent(source.getCurrentVersion());
         vo.setCreatedAt(source.getCreatedAt());
         return vo;
     }
@@ -306,6 +372,35 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     }
 
     private String normalizeVisibility(String value) {
-        return StringUtils.hasText(value) ? value.trim().toUpperCase() : "DEPARTMENT";
+        var normalized = StringUtils.hasText(value) ? value.trim().toUpperCase() : VISIBILITY_DEPARTMENT;
+        if (!List.of(VISIBILITY_PUBLIC, VISIBILITY_DEPARTMENT, VISIBILITY_PRIVATE).contains(normalized)) {
+            throw new DataSaveException("文档可见范围不合法");
+        }
+        return normalized;
+    }
+
+    private void sendPublishNotification(Document document) {
+        try {
+            var wrapper = new LambdaQueryWrapper<User>();
+            if (VISIBILITY_DEPARTMENT.equals(document.getVisibility())) {
+                wrapper.eq(User::getDepartmentId, document.getDepartmentId());
+            } else if (VISIBILITY_PRIVATE.equals(document.getVisibility())) {
+                wrapper.eq(User::getId, document.getOwnerId());
+            }
+            var receiverIds = userService.list(wrapper).stream().map(User::getId).toList();
+            if (receiverIds.isEmpty()) {
+                return;
+            }
+            var notification = new NotificationBatchSendDTO();
+            notification.setTitle("文档已发布: " + document.getTitle());
+            notification.setContent(document.getSummary());
+            notification.setType("oa_document");
+            notification.setSenderId(document.getOwnerId());
+            notification.setLink("/oa/document?id=" + document.getId());
+            notification.setReceiverIds(receiverIds);
+            notificationService.batchSend(notification);
+        } catch (Exception exception) {
+            log.warn("文档发布通知发送失败: documentId={}", document.getId(), exception);
+        }
     }
 }

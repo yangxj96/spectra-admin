@@ -37,6 +37,8 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
+import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
@@ -75,6 +77,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private static final String STATUS_DRAFT = "DRAFT";
     private static final String STATUS_ACTIVE = "ACTIVE";
     private static final String STATUS_TERMINATED = "TERMINATED";
+    private static final String STATUS_ARCHIVED = "ARCHIVED";
     private static final String SIGNING_UNSIGNED = "UNSIGNED";
     private static final String SIGNING_SIGNED = "SIGNED";
 
@@ -82,10 +85,16 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final ContractMilestoneMapper milestoneMapper;
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
+    private final NotificationService notificationService;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Contract>();
+        var user = requireCurrentUser();
+        wrapper.and(query -> query.eq(Contract::getOwnerId, user.getId())
+                .or().eq(Contract::getVisibility, "PUBLIC")
+                .or(q -> q.eq(Contract::getVisibility, "DEPARTMENT")
+                        .eq(Contract::getDepartmentId, user.getDepartmentId())));
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Contract::getContractNo, params.getKeyword())
                     .or().like(Contract::getTitle, params.getKeyword())
@@ -188,6 +197,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (STATUS_TERMINATED.equals(contract.getStatus())) {
             throw new DataSaveException("已终止合同不能新增版本");
         }
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("已归档合同不能新增版本");
+        }
         FileInfo file = fileInfoService.getById(from.getFileId());
         if (file == null || !"ACTIVE".equals(file.getStatus())) {
             throw new DataNotExistException("合同文件不存在或已失效");
@@ -228,6 +240,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public UUID createMilestone(UUID id, ContractMilestoneSaveFrom from) {
         var contract = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("已归档合同不能新增履约节点");
+        }
         if (STATUS_TERMINATED.equals(contract.getStatus())) {
             throw new DataSaveException("已终止合同不能新增履约节点");
         }
@@ -277,6 +292,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public void sign(UUID id) {
         var contract = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("已归档合同不能标记签署");
+        }
         if (!STATUS_DRAFT.equals(contract.getStatus())) {
             throw new DataSaveException("只有草稿合同可以标记签署");
         }
@@ -291,6 +309,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public void activate(UUID id) {
         var contract = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("已归档合同不能生效");
+        }
         if (!SIGNING_SIGNED.equals(contract.getSigningStatus())) {
             throw new DataSaveException("合同签署后才能生效");
         }
@@ -307,6 +328,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public void terminate(UUID id) {
         var contract = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("已归档合同不能终止");
+        }
         if (!STATUS_ACTIVE.equals(contract.getStatus())) {
             throw new DataSaveException("只有生效合同可以终止");
         }
@@ -314,6 +338,67 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (!updateById(contract)) {
             throw new DataSaveException("终止合同失败");
         }
+    }
+
+    @Override
+    @Transactional
+    public void archive(UUID id) {
+        var contract = requireOwner(id);
+        if (STATUS_ARCHIVED.equals(contract.getStatus())) {
+            throw new DataSaveException("合同已经归档");
+        }
+        if (STATUS_DRAFT.equals(contract.getStatus())) {
+            throw new DataSaveException("草稿合同不能归档");
+        }
+        contract.setStatus(STATUS_ARCHIVED);
+        if (!updateById(contract)) {
+            throw new DataSaveException("归档合同失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public int sendDueMilestoneReminders() {
+        var deadline = LocalDate.now(ZoneOffset.UTC).plusDays(3);
+        var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>()
+                .le(ContractMilestone::getDueDate, deadline)
+                .eq(ContractMilestone::getStatus, "PENDING")
+                .isNull(ContractMilestone::getReminderSentAt));
+        var sent = 0;
+        for (var milestone : milestones) {
+            var contract = getById(milestone.getContractId());
+            if (contract == null || STATUS_ARCHIVED.equals(contract.getStatus())) {
+                continue;
+            }
+            var receiverId = milestone.getAssigneeId() == null ? contract.getOwnerId() : milestone.getAssigneeId();
+            if (receiverId == null) {
+                continue;
+            }
+            var claimed = milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>()
+                    .eq(ContractMilestone::getId, milestone.getId())
+                    .isNull(ContractMilestone::getReminderSentAt)
+                    .set(ContractMilestone::getReminderSentAt, Instant.now()));
+            if (claimed != 1) {
+                continue;
+            }
+            var notification = new NotificationSendDTO();
+            notification.setTitle("合同履约节点即将到期");
+            notification.setContent("合同「" + contract.getTitle() + "」的履约节点「" + milestone.getName()
+                    + "」将于 " + milestone.getDueDate() + " 到期，请及时处理。");
+            notification.setType("oa_contract_milestone");
+            notification.setReceiverId(receiverId);
+            notification.setLink("/oa/contract/" + contract.getId());
+            try {
+                notificationService.send(notification);
+                sent++;
+            } catch (RuntimeException exception) {
+                milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>()
+                        .eq(ContractMilestone::getId, milestone.getId())
+                        .set(ContractMilestone::getReminderSentAt, null));
+                log.warn("合同履约节点提醒发送失败: milestoneId={}", milestone.getId(), exception);
+            }
+        }
+        return sent;
     }
 
     @Override

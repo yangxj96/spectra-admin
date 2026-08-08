@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.devops00.spectra.ai.AiModule;
 import com.devops00.spectra.core.CoreModule;
@@ -36,6 +37,7 @@ import java.util.TimeZone;
 /// @since 2025/7/23 00:00
 @Slf4j
 @SpringBootApplication
+@EnableScheduling
 @Import({CoreModule.class, OaModule.class, AiModule.class, UploadModule.class, WorkflowModule.class})
 public class LaunchApplication {
 

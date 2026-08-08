@@ -19,6 +19,7 @@ package com.devops00.spectra.oa.reimbursement.service.impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,22 +94,36 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Reimbursement>();
-        if (StringUtils.hasText(params.getPaymentStatus())) {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        var visibleApplications = new LambdaQueryWrapper<Application>()
+                .eq(Application::getTypeCode, TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId())
+                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        var applicationIds = applicationMapper.selectList(visibleApplications).stream().map(Application::getId).toList();
+        if (applicationIds.isEmpty()) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.in(Reimbursement::getApplicationId, applicationIds);
+        if (params != null && StringUtils.hasText(params.getPaymentStatus())) {
             wrapper.eq(Reimbursement::getPaymentStatus, params.getPaymentStatus());
         }
-        if (StringUtils.hasText(params.getKeyword())) {
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Reimbursement::getPurpose, params.getKeyword())
                     .or().like(Reimbursement::getPayeeName, params.getKeyword()));
         }
-        if (StringUtils.hasText(params.getStatus())) {
-            var applicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
+        if (params != null && StringUtils.hasText(params.getStatus())) {
+            var statusApplicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
                             .eq(Application::getTypeCode, TYPE_CODE)
+                            .in(Application::getId, applicationIds)
                             .eq(Application::getStatus, params.getStatus()))
                     .stream().map(Application::getId).toList();
-            if (applicationIds.isEmpty()) {
+            if (statusApplicationIds.isEmpty()) {
                 return new Page<>(page.getPageNum(), page.getPageSize(), 0);
             }
-            wrapper.in(Reimbursement::getApplicationId, applicationIds);
+            wrapper.in(Reimbursement::getApplicationId, statusApplicationIds);
         }
         wrapper.orderByDesc(Reimbursement::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
@@ -288,6 +303,15 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private void replaceItems(Reimbursement entity, List<ReimbursementItemFrom> items) {
         itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>()
                 .eq(ReimbursementItem::getReimbursementId, entity.getId()));
+        var invoiceNos = items.stream().map(ReimbursementItemFrom::getInvoiceNo)
+                .filter(StringUtils::hasText).map(String::trim).toList();
+        if (invoiceNos.size() != new HashSet<>(invoiceNos).size()) {
+            throw new DataSaveException("同一报销单不能重复使用发票号码");
+        }
+        if (!invoiceNos.isEmpty() && itemMapper.selectCount(new LambdaQueryWrapper<ReimbursementItem>()
+                .in(ReimbursementItem::getInvoiceNo, invoiceNos)) > 0) {
+            throw new DataSaveException("发票号码已被其他报销单使用");
+        }
         var entities = items.stream().map(item -> {
             var target = new ReimbursementItem();
             target.setReimbursementId(entity.getId());
@@ -297,7 +321,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             target.setDescription(item.getDescription());
             target.setAmount(item.getAmount().setScale(2, RoundingMode.HALF_UP));
             target.setTaxAmount(item.getTaxAmount().setScale(2, RoundingMode.HALF_UP));
-            target.setInvoiceNo(item.getInvoiceNo());
+            target.setInvoiceNo(StringUtils.hasText(item.getInvoiceNo()) ? item.getInvoiceNo().trim() : null);
             return target;
         }).toList();
         entities.forEach(item -> {

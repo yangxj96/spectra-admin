@@ -151,6 +151,20 @@ public class ContractController {
         contractService.terminate(id);
     }
 
+    @ULog("'归档合同'")
+    @PostMapping(value = "/{id}/archive", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public void archive(@PathVariable UUID id) {
+        contractService.archive(id);
+    }
+
+    @ULog("'执行合同履约提醒扫描'")
+    @PostMapping(value = "/reminders/run", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
+    public int runReminders() {
+        return contractService.sendDueMilestoneReminders();
+    }
+
     @ULog("'预览合同版本'")
     @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")

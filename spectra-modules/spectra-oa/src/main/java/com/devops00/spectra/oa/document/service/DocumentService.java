@@ -51,6 +51,8 @@ public interface DocumentService extends BaseService<Document> {
 
     void publish(UUID id);
 
+    void archive(UUID id);
+
     List<DocumentFolderVO> folders();
 
     UUID createFolder(DocumentFolderSaveFrom from);
@@ -58,4 +60,6 @@ public interface DocumentService extends BaseService<Document> {
     void preview(UUID id, UUID versionId);
 
     void download(UUID id, UUID versionId);
+
+    void restoreVersion(UUID id, UUID versionId);
 }

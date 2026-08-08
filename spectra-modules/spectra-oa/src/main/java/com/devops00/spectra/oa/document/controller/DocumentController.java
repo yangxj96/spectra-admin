@@ -94,6 +94,11 @@ public class DocumentController {
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
     public void publish(@PathVariable UUID id) { bindService.publish(id); }
 
+    @ULog("'归档文档'")
+    @PostMapping(value = "/{id}/archive", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
+    public void archive(@PathVariable UUID id) { bindService.archive(id); }
+
     @ULog("'查询文档目录'")
     @GetMapping(value = "/folders", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
@@ -113,5 +118,12 @@ public class DocumentController {
     @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public void download(@PathVariable UUID id, @PathVariable UUID versionId) { bindService.download(id, versionId); }
+
+    @ULog("'恢复文档版本'")
+    @PutMapping(value = "/{id}/versions/{versionId}/current", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
+    public void restoreVersion(@PathVariable UUID id, @PathVariable UUID versionId) {
+        bindService.restoreVersion(id, versionId);
+    }
 
 }

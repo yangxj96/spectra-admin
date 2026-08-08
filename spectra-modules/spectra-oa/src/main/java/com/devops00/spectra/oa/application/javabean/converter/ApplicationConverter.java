@@ -23,6 +23,7 @@ import org.mapstruct.Mapper;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
+import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 
@@ -36,4 +37,9 @@ public interface ApplicationConverter {
     ApplicationTypeVO toTypeVO(ApplicationType source);
 
     List<ApplicationTypeVO> toTypeVOList(List<ApplicationType> source);
+
+    ApplicationType toTypeEntity(ApplicationTypeSaveFrom source);
+
+    void updateTypeEntity(ApplicationTypeSaveFrom source,
+            @org.mapstruct.MappingTarget ApplicationType target);
 }
