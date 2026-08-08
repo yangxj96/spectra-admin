@@ -26,7 +26,7 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.starter.javabean.converter.UserOnlineConverter;
+import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;

@@ -19,14 +19,7 @@ package com.devops00.spectra.launch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
-
-import com.devops00.spectra.ai.AiModule;
-import com.devops00.spectra.core.CoreModule;
-import com.devops00.spectra.oa.OaModule;
-import com.devops00.spectra.upload.UploadModule;
-import com.devops00.spectra.workflow.WorkflowModule;
 
 import java.util.TimeZone;
 
@@ -38,7 +31,6 @@ import java.util.TimeZone;
 @Slf4j
 @SpringBootApplication
 @EnableScheduling
-@Import({CoreModule.class, OaModule.class, AiModule.class, UploadModule.class, WorkflowModule.class})
 public class LaunchApplication {
 
     private LaunchApplication() {

@@ -9,18 +9,43 @@ Spectra Admin 是 Spectra 系统的**后端 API 服务**，同时为 Web 管理�
 - 开发端口：**4004**（通过 `.mise.local.toml` 中的 `SERVER_PORT` 设置）
 - 两个前端在开发环境均连接 `https://127.0.0.1:4004/`
 
-## 构建与运行
+## mise、构建与运行
 
-```bash
-# 构建（跳过测试以加快速度）
-./mvnw clean package -DskipTests
+`spectra-admin/mise.toml` 固定使用 Temurin JDK 25.0.2；Maven 使用项目自带 wrapper（3.9.12）。正常开发终端已经通过 PowerShell profile 激活 mise：
 
-# 本地运行（启动前端之前先启动此服务）
-./mvnw spring-boot:run -pl spectra-launch
-
-# 或运行构建好的 jar
-java -jar spectra-launch/target/spectra-launch-*.jar
+```powershell
+(&mise activate pwsh) | Out-String | Invoke-Expression
 ```
+
+新终端若未加载 profile，先执行上面的激活命令；之后在本目录直接执行后端流程。默认先打包，再运行 `spectra-launch` 的可执行 JAR：
+
+如果 mise 提示 `.mise.local.toml` 未被信任，在本目录执行一次 `mise trust`；仅信任本机配置，不要把其中的密钥复制到代码或文档中。
+
+```powershell
+# 在 spectra-admin/ 下执行
+.\mvnw.cmd clean package -DskipTests
+
+# 选择 repackage 生成的 JAR，不要选择 *.jar.original
+$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File | Select-Object -First 1
+java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
+    -Dspring.profiles.active=dev `
+    -jar $jar.FullName
+```
+
+项目 wrapper 已修复 PowerShell 在普通 `.m2` 目录上访问空 `Target[0]` 导致的 `Cannot index into a null array` 问题。正常用户终端不需要额外参数；如果 Codex/CI 沙箱把 Java 的 `user.home` 指向不可写目录，则将 Maven 本地仓库显式指向可写的临时目录：
+
+```powershell
+$mavenRepo = Join-Path $env:TEMP 'spectra-maven-repository'
+.\mvnw.cmd "-Dmaven.repo.local=$mavenRepo" clean package -DskipTests
+```
+
+`spectra-launch/pom.xml` 中的 `spring-boot-maven-plugin` 配置了 `repackage` 和 `LaunchApplication` 主类，因此 Maven `package` 是“编译后启动”的标准流程。当前版本产物为 `spectra-launch-0.0.18.jar`，版本变化后以 `target/` 中实际文件名为准。运行前需要 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量。
+
+IDEA 显示的 `java ... @C:\Users\yangx\AppData\Local\Temp\idea_arg_file... com.devops00.spectra.launch.LaunchApplication` 是 IDEA 对已编译 classpath 的直接启动命令；`@idea_arg_file...` 是临时参数文件，不是 Maven 编译命令。需要可重复的终端流程时使用上面的 `package` + JAR 方式。
+
+当前 `LaunchApplication` 不需要额外的 `@Import`。安全 starter 的 `SecurityAutoConfiguration` 会扫描 `com.devops00.spectra.security.starter.web`，`UserOnlineConverter` 放在该包范围内即可被其他模块运行时扫描到。
+
+IDEA 启动命令中的本机 HTTP/HTTPS 代理参数只在访问外部服务时按需添加，不是本地 API 启动的固定参数。
 
 ## 模块结构
 

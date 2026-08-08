@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.security.starter.javabean.converter;
+package com.devops00.spectra.security.starter.web.javabean.converter;
 
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
