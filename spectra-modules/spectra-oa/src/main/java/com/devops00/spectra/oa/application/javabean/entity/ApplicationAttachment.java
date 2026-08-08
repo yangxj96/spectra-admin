@@ -27,6 +27,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /// OA 申请附件关联。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)

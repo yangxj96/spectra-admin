@@ -53,6 +53,7 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
+    /// 查询公告列表。
     @ULog("'查询公告列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
@@ -60,6 +61,7 @@ public class NoticeController {
         return noticeService.page(page, params);
     }
 
+    /// 获取公告详情。
     @ULog("'获取公告详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
@@ -67,6 +69,7 @@ public class NoticeController {
         return noticeService.get(id);
     }
 
+    /// 创建公告草稿。
     @ULog("'创建公告草稿'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:INSERT')")
@@ -74,6 +77,7 @@ public class NoticeController {
         return noticeService.get(noticeService.createDraft(from).getId());
     }
 
+    /// 发布公告。
     @ULog("'发布公告'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
@@ -81,6 +85,7 @@ public class NoticeController {
         noticeService.publish(id);
     }
 
+    /// 撤回公告。
     @ULog("'撤回公告'")
     @PostMapping(value = "/{id}/revoke", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
@@ -88,6 +93,7 @@ public class NoticeController {
         noticeService.revoke(id);
     }
 
+    /// 标记公告已读。
     @ULog("'标记公告已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")

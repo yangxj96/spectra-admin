@@ -220,6 +220,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /// @param segments      仅在 segmentBased=true 时不为空
     /// @param hasDoubleStar 是否包含 "**" 通配
     /// @param regex         仅在 segmentBased=false 时不为空
+    /// 编译后的权限匹配模式。
     private record CompiledPermissionPattern(
             boolean segmentBased,
             String[] segments,
@@ -228,4 +229,3 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     ) {
     }
 }
-

@@ -39,17 +39,24 @@ import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseVO;
 /// @since 2026/8/7
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface PurchaseConverter {
+    /// 采购申请实体转视图对象。
     PurchaseVO toVO(Purchase source);
 
+    /// 采购保存入参转实体。
     Purchase toEntity(PurchaseSaveFrom source);
 
+    /// 使用保存入参更新采购实体。
     void updateEntity(PurchaseSaveFrom source, @MappingTarget Purchase target);
 
+    /// 采购明细入参转实体。
     PurchaseItem toItemEntity(PurchaseItemFrom source);
 
+    /// 采购明细实体转视图对象。
     PurchaseItemVO toItemVO(PurchaseItem source);
 
+    /// 采购收货单实体转视图对象。
     PurchaseReceiptVO toReceiptVO(PurchaseReceipt source);
 
+    /// 采购收货明细实体转视图对象。
     PurchaseReceiptItemVO toReceiptItemVO(PurchaseReceiptItem source);
 }

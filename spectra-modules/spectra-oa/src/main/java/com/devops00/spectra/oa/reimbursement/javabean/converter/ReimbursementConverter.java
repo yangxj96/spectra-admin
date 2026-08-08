@@ -40,21 +40,29 @@ import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 /// @since 2026/8/7
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ReimbursementConverter {
+    /// 报销单实体转视图对象。
     ReimbursementVO toVO(Reimbursement source);
 
+    /// 报销保存入参转实体。
     Reimbursement toEntity(ReimbursementSaveFrom source);
 
+    /// 使用保存入参更新报销实体。
     void updateEntity(ReimbursementSaveFrom source, @MappingTarget Reimbursement target);
 
+    /// 报销明细入参转实体。
     ReimbursementItem toItemEntity(ReimbursementItemFrom source);
 
+    /// 报销明细实体转视图对象。
     ReimbursementItemVO toItemVO(ReimbursementItem source);
 
+    /// 报销附件入参转通用附件实体。
     ApplicationAttachment toAttachmentEntity(ReimbursementAttachmentFrom source);
 
+    /// 通用附件实体转报销附件视图对象。
     @Mapping(target = "previewUrl", source = "fileId", qualifiedByName = "toPreviewUrl")
     ReimbursementAttachmentVO toAttachmentVO(ApplicationAttachment source);
 
+    /// 将文件 ID 转换为文件预览地址。
     @Named("toPreviewUrl")
     default String toPreviewUrl(java.util.UUID fileId) {
         return fileId == null ? null : "/api/file/upload/preview/" + fileId;

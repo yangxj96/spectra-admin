@@ -47,9 +47,12 @@ public interface MeetingService extends BaseService<Meeting> {
     /// @return 分页结果
     IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params);
 
+    /// 响应会议邀请。
     void respond(UUID meetingId, MeetingResponseFrom from);
 
+    /// 签到会议。
     void checkIn(UUID meetingId);
 
+    /// 保存会议纪要。
     void saveRecord(UUID meetingId, MeetingRecordFrom from);
 }

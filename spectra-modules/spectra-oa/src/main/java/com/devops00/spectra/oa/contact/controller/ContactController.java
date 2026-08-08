@@ -43,6 +43,7 @@ public class ContactController {
 
     private final ContactService contactService;
 
+    /// 分页查询通讯录。
     @ULog("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTACT:QUERY')")

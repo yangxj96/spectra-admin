@@ -22,6 +22,10 @@ import java.util.UUID;
 import lombok.Data;
 
 /// OA 申请响应。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class ApplicationVO {
     private UUID id;

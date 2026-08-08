@@ -8,6 +8,10 @@ import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
 
 /// 办公用品入库、领用、退库和盘点调整参数。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class SupplyOperationFrom {
     @DecimalMin(value = "0.001", message = "数量必须大于 0")

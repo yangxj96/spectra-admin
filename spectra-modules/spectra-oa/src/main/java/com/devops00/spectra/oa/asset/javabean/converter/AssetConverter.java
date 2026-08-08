@@ -39,19 +39,26 @@ import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
 /// @since 2026/8/8
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface AssetConverter {
+    /// 资产实体转视图对象。
     AssetVO toVO(Asset source);
 
+    /// 资产保存入参转实体。
     Asset toEntity(AssetSaveFrom source);
 
+    /// 使用保存入参更新资产实体。
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(AssetSaveFrom source, @MappingTarget Asset target);
 
+    /// 资产分类实体转视图对象。
     AssetCategoryVO toCategoryVO(AssetCategory source);
 
+    /// 资产分类保存入参转实体。
     AssetCategory toCategoryEntity(AssetCategorySaveFrom source);
 
+    /// 使用保存入参更新资产分类实体。
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateCategoryEntity(AssetCategorySaveFrom source, @MappingTarget AssetCategory target);
 
+    /// 资产操作实体转视图对象。
     AssetOperationVO toOperationVO(AssetOperation source);
 }

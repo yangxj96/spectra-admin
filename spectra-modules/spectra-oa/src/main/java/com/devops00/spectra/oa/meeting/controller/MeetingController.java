@@ -68,6 +68,7 @@ public class MeetingController {
         return bindService.page(page, params);
     }
 
+    /// 响应会议邀请。
     @ULog("'响应会议邀请'")
     @PostMapping(value = "/{id}/response", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
@@ -75,6 +76,7 @@ public class MeetingController {
         bindService.respond(id, from);
     }
 
+    /// 会议签到。
     @ULog("'会议签到'")
     @PostMapping(value = "/{id}/check-in", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
@@ -82,6 +84,7 @@ public class MeetingController {
         bindService.checkIn(id);
     }
 
+    /// 保存会议纪要。
     @ULog("'保存会议纪要'")
     @PostMapping(value = "/{id}/record", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")

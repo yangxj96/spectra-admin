@@ -28,38 +28,59 @@ import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 
 /// OA 通用申请生命周期服务。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 public interface ApplicationService {
+    /// 分页查询当前用户可见的申请。
     IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params);
 
+    /// 查询当前用户可见的申请详情。
     ApplicationVO get(UUID id);
 
+    /// 查询当前用户可发起的申请类型。
     List<ApplicationTypeVO> listTypes();
 
+    /// 查询全部启用的申请类型。
     List<ApplicationTypeVO> listAllTypes();
 
+    /// 创建申请类型。
     java.util.UUID createdType(ApplicationTypeSaveFrom from);
 
+    /// 修改申请类型。
     void modifyType(java.util.UUID id, ApplicationTypeSaveFrom from);
 
+    /// 删除申请类型。
     void deleteType(java.util.UUID id);
 
+    /// 创建业务申请草稿。
     Application createDraft(String typeCode, UUID bizId, String title);
 
+    /// 绑定申请关联的业务主键。
     void bindBizId(UUID id, UUID bizId);
 
+    /// 绑定申请对应的流程实例。
     void bindProcessInstance(UUID id, String processInstanceId);
 
+    /// 查询申请实体，不校验当前用户可见性。
     Application require(UUID id);
 
+    /// 查询并校验当前用户可见性的申请实体。
     Application requireVisible(UUID id);
 
+    /// 提交申请进入审批流程。
     void submit(UUID id);
 
+    /// 撤回审批中的申请。
     void withdraw(UUID id);
 
+    /// 取消申请。
     void cancel(UUID id);
 
+    /// 更新申请审批状态及原因。
     void updateStatus(UUID id, String status, String reason);
 
+    /// 统计当前用户指定状态的申请数量。
     long countMine(String status);
 }

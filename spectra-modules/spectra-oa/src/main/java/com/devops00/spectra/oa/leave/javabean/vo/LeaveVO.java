@@ -23,6 +23,10 @@ import java.util.UUID;
 import lombok.Data;
 
 /// 请假申请详情响应。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class LeaveVO {
     private UUID id;

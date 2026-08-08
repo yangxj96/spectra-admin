@@ -9,6 +9,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /// 办公用品 SKU 保存参数。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class SupplySaveFrom {
     private UUID id;

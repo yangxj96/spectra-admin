@@ -56,6 +56,7 @@ public class PurchaseController {
 
     private final PurchaseService purchaseService;
 
+    /// 创建采购申请草稿。
     @ULog("'创建采购申请草稿'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:INSERT')")
@@ -63,6 +64,7 @@ public class PurchaseController {
         return purchaseService.created(from);
     }
 
+    /// 修改采购申请草稿。
     @ULog("'修改采购申请草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
@@ -71,6 +73,7 @@ public class PurchaseController {
         purchaseService.modify(id, from);
     }
 
+    /// 分页查询采购申请。
     @ULog("'分页查询采购申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:QUERY')")
@@ -78,6 +81,7 @@ public class PurchaseController {
         return purchaseService.page(page, params);
     }
 
+    /// 查询采购申请详情。
     @ULog("'查询采购申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:QUERY')")
@@ -85,6 +89,7 @@ public class PurchaseController {
         return purchaseService.get(id);
     }
 
+    /// 提交采购申请审批。
     @ULog("'提交采购申请审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
@@ -92,6 +97,7 @@ public class PurchaseController {
         purchaseService.submit(id, from);
     }
 
+    /// 撤回采购申请。
     @ULog("'撤回采购申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
@@ -99,6 +105,7 @@ public class PurchaseController {
         purchaseService.withdraw(id);
     }
 
+    /// 取消采购申请。
     @ULog("'取消采购申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
@@ -106,6 +113,7 @@ public class PurchaseController {
         purchaseService.cancel(id);
     }
 
+    /// 登记采购执行。
     @ULog("'登记采购执行'")
     @PostMapping(value = "/{id}/execute", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:EXECUTE')")
@@ -113,6 +121,7 @@ public class PurchaseController {
         purchaseService.execute(id, from);
     }
 
+    /// 登记采购收货。
     @ULog("'登记采购收货'")
     @PostMapping(value = "/{id}/receipts", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:RECEIVE')")

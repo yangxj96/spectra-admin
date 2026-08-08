@@ -57,6 +57,7 @@ public class DocumentController {
 
     private final DocumentService bindService;
 
+    /// 分页查询文档。
     @ULog("'分页查询文档'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
@@ -64,61 +65,73 @@ public class DocumentController {
         return bindService.page(page, params);
     }
 
+    /// 查询文档详情。
     @ULog("'查询文档详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public DocumentVO get(@PathVariable UUID id) { return bindService.get(id); }
 
+    /// 创建文档。
     @ULog("'创建文档'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:INSERT')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody DocumentSaveFrom from) { return bindService.created(from); }
 
+    /// 修改文档。
     @ULog("'修改文档'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody DocumentSaveFrom from) { bindService.modify(id, from); }
 
+    /// 新增文档版本。
     @ULog("'新增文档版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
     public UUID addVersion(@PathVariable UUID id, @Validated @RequestBody DocumentVersionFrom from) { return bindService.addVersion(id, from); }
 
+    /// 查询文档版本。
     @ULog("'查询文档版本'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public List<DocumentVersionVO> versions(@PathVariable UUID id) { return bindService.versions(id); }
 
+    /// 发布文档。
     @ULog("'发布文档'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
     public void publish(@PathVariable UUID id) { bindService.publish(id); }
 
+    /// 归档文档。
     @ULog("'归档文档'")
     @PostMapping(value = "/{id}/archive", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")
     public void archive(@PathVariable UUID id) { bindService.archive(id); }
 
+    /// 查询文档目录。
     @ULog("'查询文档目录'")
     @GetMapping(value = "/folders", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public List<DocumentFolderVO> folders() { return bindService.folders(); }
 
+    /// 创建文档目录。
     @ULog("'创建文档目录'")
     @PostMapping(value = "/folders", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:INSERT')")
     public UUID createFolder(@Validated(Verify.Insert.class) @RequestBody DocumentFolderSaveFrom from) { return bindService.createFolder(from); }
 
+    /// 预览文档版本。
     @ULog("'预览文档版本'")
     @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public void preview(@PathVariable UUID id, @PathVariable UUID versionId) { bindService.preview(id, versionId); }
 
+    /// 下载文档版本。
     @ULog("'下载文档版本'")
     @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:QUERY')")
     public void download(@PathVariable UUID id, @PathVariable UUID versionId) { bindService.download(id, versionId); }
 
+    /// 恢复文档版本。
     @ULog("'恢复文档版本'")
     @PutMapping(value = "/{id}/versions/{versionId}/current", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_DOCUMENT:UPDATE')")

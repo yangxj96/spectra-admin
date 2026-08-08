@@ -27,6 +27,10 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
 /// 请假流程审批回调注册器。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Component
 @RequiredArgsConstructor
 public class LeaveApprovalCallback implements ApprovalCallback {

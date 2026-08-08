@@ -19,6 +19,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 /// 为每个 HTTP 请求建立并清理数据权限快照。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
 public class DataScopeContextFilter extends OncePerRequestFilter {

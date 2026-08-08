@@ -30,6 +30,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /// 请假申请业务明细。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)

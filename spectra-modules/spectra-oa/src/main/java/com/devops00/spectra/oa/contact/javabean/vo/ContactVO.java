@@ -11,6 +11,10 @@ import java.util.UUID;
 import lombok.Data;
 
 /// OA 通讯录公开信息。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class ContactVO {
 

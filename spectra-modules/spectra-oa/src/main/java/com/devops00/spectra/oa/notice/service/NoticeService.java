@@ -32,15 +32,21 @@ import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 /// @version 1.0
 /// @since 2026/8/7
 public interface NoticeService extends BaseService<Notice> {
+    /// 分页查询公告。
     IPage<NoticeVO> page(PageFrom page, NoticePageFrom params);
 
+    /// 查询公告详情。
     NoticeVO get(UUID id);
 
+    /// 创建公告草稿。
     Notice createDraft(NoticeCreateFrom from);
 
+    /// 发布公告。
     void publish(UUID id);
 
+    /// 撤回公告。
     void revoke(UUID id);
 
+    /// 标记公告已读。
     void markRead(UUID id);
 }

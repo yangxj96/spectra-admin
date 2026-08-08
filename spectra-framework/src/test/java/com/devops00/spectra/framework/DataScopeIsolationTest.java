@@ -26,6 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /// 数据隔离核心回归测试：上下文作用域、字段别名、空范围 fail-closed、关系 schema。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 class DataScopeIsolationTest {
 
     private static final UUID USER_ID = UUID.fromString("019bdfdd-b58d-7232-943f-af4141801ae3");

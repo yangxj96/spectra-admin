@@ -28,6 +28,11 @@ import com.devops00.spectra.oa.asset.service.AssetService;
 
 import lombok.RequiredArgsConstructor;
 
+/// 资产管理接口。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @RestController
 @RequestMapping("/oa/assets")
 @RequiredArgsConstructor
@@ -35,6 +40,7 @@ public class AssetController {
 
     private final AssetService assetService;
 
+    /// 创建资产。
     @ULog("'创建资产'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:INSERT')")
@@ -42,6 +48,7 @@ public class AssetController {
         return assetService.created(from);
     }
 
+    /// 修改资产。
     @ULog("'修改资产'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -50,6 +57,7 @@ public class AssetController {
         assetService.modify(id, from);
     }
 
+    /// 分页查询资产台账。
     @ULog("'分页查询资产台账'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -57,6 +65,7 @@ public class AssetController {
         return assetService.page(page, params);
     }
 
+    /// 查询资产详情。
     @ULog("'查询资产详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -64,6 +73,7 @@ public class AssetController {
         return assetService.get(id);
     }
 
+    /// 查询资产分类。
     @ULog("'查询资产分类'")
     @GetMapping(value = "/categories", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -71,6 +81,7 @@ public class AssetController {
         return assetService.categories();
     }
 
+    /// 创建资产分类。
     @ULog("'创建资产分类'")
     @PostMapping(value = "/categories", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:INSERT')")
@@ -78,6 +89,7 @@ public class AssetController {
         return assetService.createdCategory(from);
     }
 
+    /// 修改资产分类。
     @ULog("'修改资产分类'")
     @PutMapping(value = "/categories/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -86,6 +98,7 @@ public class AssetController {
         assetService.modifyCategory(id, from);
     }
 
+    /// 领用资产。
     @ULog("'资产领用'")
     @PostMapping(value = "/{id}/assign", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -93,6 +106,7 @@ public class AssetController {
         assetService.assign(id, from);
     }
 
+    /// 归还资产。
     @ULog("'资产归还'")
     @PostMapping(value = "/{id}/return", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -100,6 +114,7 @@ public class AssetController {
         assetService.returnAsset(id, from);
     }
 
+    /// 调拨资产。
     @ULog("'资产调拨'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -107,6 +122,7 @@ public class AssetController {
         assetService.transfer(id, from);
     }
 
+    /// 登记资产维修。
     @ULog("'资产维修'")
     @PostMapping(value = "/{id}/maintenance", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -114,6 +130,7 @@ public class AssetController {
         assetService.maintenance(id, from);
     }
 
+    /// 报废资产。
     @ULog("'资产报废'")
     @PostMapping(value = "/{id}/scrap", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -121,6 +138,7 @@ public class AssetController {
         assetService.scrap(id, from);
     }
 
+    /// 根据采购收货生成资产草稿。
     @ULog("'采购收货生成资产草稿'")
     @PostMapping(value = "/from-purchase", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:INSERT')")

@@ -35,25 +35,36 @@ import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 /// @version 1.0
 /// @since 2026/8/7
 public interface ReimbursementService extends BaseService<Reimbursement> {
+    /// 分页查询报销单。
     IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params);
 
+    /// 查询报销单详情。
     ReimbursementVO get(UUID id);
 
+    /// 创建报销单。
     UUID created(ReimbursementSaveFrom from);
 
+    /// 修改报销单。
     void modify(UUID id, ReimbursementSaveFrom from);
 
+    /// 提交报销单。
     void submit(UUID id, ReimbursementSubmitFrom from);
 
+    /// 撤回报销单。
     void withdraw(UUID id);
 
+    /// 取消报销单。
     void cancel(UUID id);
 
+    /// 登记报销付款。
     void markPaid(UUID id, ReimbursementPaymentFrom from);
 
+    /// 处理报销审批通过回调。
     void onApproved(String businessKey, Map<String, Object> variables);
 
+    /// 处理报销审批驳回回调。
     void onRejected(String businessKey, String reason);
 
+    /// 处理报销审批终止回调。
     void onTerminated(String businessKey, String reason);
 }

@@ -20,5 +20,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 
 /// OA 申请 Mapper。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 public interface ApplicationMapper extends BaseMapper<Application> {
 }

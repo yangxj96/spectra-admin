@@ -69,6 +69,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /// 请假业务闭环服务实现。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -424,6 +428,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         notificationService.send(dto);
     }
 
+    /// 解析后的请假时段和值班时长。
     private record ParsedLeave(String leaveTypeCode, Instant startTime, Instant endTime, BigDecimal durationHours) {
     }
 }

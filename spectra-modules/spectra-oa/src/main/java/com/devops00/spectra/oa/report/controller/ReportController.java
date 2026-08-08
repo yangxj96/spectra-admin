@@ -48,6 +48,7 @@ public class ReportController {
 
     private final DepartmentStatsService departmentStatsService;
 
+    /// 查询部门维度统计。
     @ULog("'查询部门维度统计'")
     @GetMapping(value = "/department", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
@@ -55,6 +56,7 @@ public class ReportController {
         return departmentStatsService.list(from);
     }
 
+    /// 导出部门维度统计。
     @ULog("'导出部门维度统计'")
     @GetMapping(value = "/department/export", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")

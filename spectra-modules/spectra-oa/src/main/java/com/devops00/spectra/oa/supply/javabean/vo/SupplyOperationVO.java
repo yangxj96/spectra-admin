@@ -8,6 +8,10 @@ import java.util.UUID;
 import lombok.Data;
 
 /// 办公用品库存变动记录响应。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class SupplyOperationVO {
     private UUID id;

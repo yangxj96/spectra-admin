@@ -52,6 +52,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /// OA 通用申请生命周期服务实现。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Slf4j
 @Service
 @RequiredArgsConstructor

@@ -9,6 +9,10 @@ package com.devops00.spectra.oa.leave.javabean.from;
 import lombok.Data;
 
 /// 请假提交审批参数。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class LeaveSubmitFrom {
 

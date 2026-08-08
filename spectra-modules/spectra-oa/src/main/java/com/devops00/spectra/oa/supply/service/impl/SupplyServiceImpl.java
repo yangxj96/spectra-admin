@@ -31,6 +31,10 @@ import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 
 /// 办公用品库存服务实现。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Service
 @RequiredArgsConstructor
 public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyItem> implements SupplyService {

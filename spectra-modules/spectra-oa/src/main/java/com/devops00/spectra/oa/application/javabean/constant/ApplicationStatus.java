@@ -17,6 +17,10 @@
 package com.devops00.spectra.oa.application.javabean.constant;
 
 /// 通用 OA 申请状态。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 public enum ApplicationStatus {
     DRAFT,
     IN_REVIEW,

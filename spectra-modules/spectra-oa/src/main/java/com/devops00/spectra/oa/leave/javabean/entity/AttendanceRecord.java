@@ -29,6 +29,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /// 审批通过后生成的考勤记录。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)

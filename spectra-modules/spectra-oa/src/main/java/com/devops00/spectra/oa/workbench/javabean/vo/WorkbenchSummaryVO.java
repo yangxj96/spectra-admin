@@ -23,6 +23,10 @@ import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 
 /// OA 工作台摘要。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class WorkbenchSummaryVO {
     private long todoCount;

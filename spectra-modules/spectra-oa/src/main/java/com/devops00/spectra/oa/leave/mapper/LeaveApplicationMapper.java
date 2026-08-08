@@ -20,5 +20,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;
 
 /// 请假明细 Mapper。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 public interface LeaveApplicationMapper extends BaseMapper<LeaveApplication> {
 }

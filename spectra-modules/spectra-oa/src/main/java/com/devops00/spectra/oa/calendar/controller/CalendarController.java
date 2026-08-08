@@ -54,6 +54,7 @@ public class CalendarController {
 
     private final CalendarService calendarService;
 
+    /// 查询日程列表。
     @ULog("'查询日程列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
@@ -61,6 +62,7 @@ public class CalendarController {
         return calendarService.page(page, params);
     }
 
+    /// 获取日程详情。
     @ULog("'获取日程详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
@@ -68,6 +70,7 @@ public class CalendarController {
         return calendarService.get(id);
     }
 
+    /// 创建日程。
     @ULog("'创建日程'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:INSERT')")
@@ -75,6 +78,7 @@ public class CalendarController {
         return calendarService.create(from);
     }
 
+    /// 更新日程。
     @ULog("'更新日程'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:UPDATE')")
@@ -82,6 +86,7 @@ public class CalendarController {
         return calendarService.update(id, from);
     }
 
+    /// 删除日程。
     @ULog("'删除日程'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CALENDAR:DELETE')")

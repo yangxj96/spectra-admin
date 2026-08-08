@@ -25,6 +25,10 @@ import org.springframework.context.annotation.ComponentScan;
 /// - **作者:** yangxj96
 /// - **版本:** 1.0
 /// - **始于:** 2025/11/11 00:00
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2025/11/11
 @ComponentScan("com.devops00.spectra.workflow")
 @MapperScan("com.devops00.spectra.workflow.**.mapper")
 public class WorkflowModule {

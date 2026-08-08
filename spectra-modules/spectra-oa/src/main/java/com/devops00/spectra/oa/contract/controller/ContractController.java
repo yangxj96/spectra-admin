@@ -59,6 +59,7 @@ public class ContractController {
 
     private final ContractService contractService;
 
+    /// 分页查询合同。
     @ULog("'分页查询合同'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
@@ -66,6 +67,7 @@ public class ContractController {
         return contractService.page(page, params);
     }
 
+    /// 查询合同详情。
     @ULog("'查询合同详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
@@ -73,6 +75,7 @@ public class ContractController {
         return contractService.get(id);
     }
 
+    /// 创建合同台账。
     @ULog("'创建合同台账'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:INSERT')")
@@ -80,6 +83,7 @@ public class ContractController {
         return contractService.created(from);
     }
 
+    /// 修改合同台账。
     @ULog("'修改合同台账'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -87,6 +91,7 @@ public class ContractController {
         contractService.modify(id, from);
     }
 
+    /// 删除合同台账。
     @ULog("'删除合同台账'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:DELETE')")
@@ -94,6 +99,7 @@ public class ContractController {
         contractService.deleteById(id);
     }
 
+    /// 新增合同版本。
     @ULog("'新增合同版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -101,6 +107,7 @@ public class ContractController {
         return contractService.addVersion(id, from);
     }
 
+    /// 查询合同版本。
     @ULog("'查询合同版本'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
@@ -108,6 +115,7 @@ public class ContractController {
         return contractService.versions(id);
     }
 
+    /// 创建合同履约节点。
     @ULog("'创建合同履约节点'")
     @PostMapping(value = "/{id}/milestones", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -115,6 +123,7 @@ public class ContractController {
         return contractService.createMilestone(id, from);
     }
 
+    /// 查询合同履约节点。
     @ULog("'查询合同履约节点'")
     @GetMapping(value = "/{id}/milestones", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
@@ -122,6 +131,7 @@ public class ContractController {
         return contractService.milestones(id);
     }
 
+    /// 更新合同履约节点。
     @ULog("'更新合同履约节点'")
     @PutMapping(value = "/{id}/milestones/{milestoneId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -130,6 +140,7 @@ public class ContractController {
         contractService.updateMilestone(id, milestoneId, from);
     }
 
+    /// 标记合同已签署。
     @ULog("'标记合同已签署'")
     @PostMapping(value = "/{id}/sign", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -137,6 +148,7 @@ public class ContractController {
         contractService.sign(id);
     }
 
+    /// 启用合同。
     @ULog("'启用合同'")
     @PostMapping(value = "/{id}/activate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -144,6 +156,7 @@ public class ContractController {
         contractService.activate(id);
     }
 
+    /// 终止合同。
     @ULog("'终止合同'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -151,6 +164,7 @@ public class ContractController {
         contractService.terminate(id);
     }
 
+    /// 归档合同。
     @ULog("'归档合同'")
     @PostMapping(value = "/{id}/archive", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -158,6 +172,7 @@ public class ContractController {
         contractService.archive(id);
     }
 
+    /// 执行合同履约提醒扫描。
     @ULog("'执行合同履约提醒扫描'")
     @PostMapping(value = "/reminders/run", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
@@ -165,6 +180,7 @@ public class ContractController {
         return contractService.sendDueMilestoneReminders();
     }
 
+    /// 预览合同版本。
     @ULog("'预览合同版本'")
     @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")
@@ -172,6 +188,7 @@ public class ContractController {
         contractService.preview(id, versionId);
     }
 
+    /// 下载合同版本。
     @ULog("'下载合同版本'")
     @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:QUERY')")

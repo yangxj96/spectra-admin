@@ -21,6 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 ///
 /// 除了从 mappedStatementId 推导实体，还按实际表名注册所有 `@DataScope` 实体。
 /// 这样 XML 自定义 SQL、别名或非标准 Mapper 命名无法绕过已声明的数据隔离。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Component
 public class DataScopeEntityRegistry {
 
@@ -34,6 +38,7 @@ public class DataScopeEntityRegistry {
         }
     }
 
+    /// 根据表名或带 schema 的表名查找数据权限元数据。
     public DataScope find(String tableName) {
         if (tableName == null) {
             return null;

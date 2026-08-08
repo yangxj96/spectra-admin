@@ -21,6 +21,10 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /// 请假申请保存参数。时间使用 ISO-8601 字符串。
+///
+/// @author yangxj96
+/// @version 1.0
+/// @since 2026/8/9
 @Data
 public class LeaveCreateFrom {
     @NotBlank(message = "请假类型不能为空")

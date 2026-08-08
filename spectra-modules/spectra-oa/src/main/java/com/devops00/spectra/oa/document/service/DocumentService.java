@@ -37,29 +37,42 @@ import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
 /// @version 1.0
 /// @since 2026/3/30 14:12
 public interface DocumentService extends BaseService<Document> {
+    /// 分页查询文档。
     IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params);
 
+    /// 查询文档详情。
     DocumentVO get(UUID id);
 
+    /// 创建文档。
     UUID created(DocumentSaveFrom from);
 
+    /// 修改文档。
     void modify(UUID id, DocumentSaveFrom from);
 
+    /// 新增文档版本。
     UUID addVersion(UUID id, DocumentVersionFrom from);
 
+    /// 查询文档版本列表。
     List<DocumentVersionVO> versions(UUID id);
 
+    /// 发布文档。
     void publish(UUID id);
 
+    /// 归档文档。
     void archive(UUID id);
 
+    /// 查询文档目录。
     List<DocumentFolderVO> folders();
 
+    /// 创建文档目录。
     UUID createFolder(DocumentFolderSaveFrom from);
 
+    /// 预览文档版本。
     void preview(UUID id, UUID versionId);
 
+    /// 下载文档版本。
     void download(UUID id, UUID versionId);
 
+    /// 恢复文档当前版本。
     void restoreVersion(UUID id, UUID versionId);
 }
