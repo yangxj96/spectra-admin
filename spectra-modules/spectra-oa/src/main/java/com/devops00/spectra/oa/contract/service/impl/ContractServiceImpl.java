@@ -42,6 +42,7 @@ import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
+import com.devops00.spectra.oa.contract.javabean.converter.ContractConverter;
 import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
 import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
 import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
@@ -86,6 +87,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
     private final NotificationService notificationService;
+    private final ContractConverter contractConverter;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -112,16 +114,16 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         wrapper.orderByDesc(Contract::getUpdatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<ContractVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(contractConverter::toVO).toList());
         return voPage;
     }
 
     @Override
     public ContractVO get(UUID id) {
         var contract = requireAccessible(id);
-        var vo = toVO(contract);
+        var vo = contractConverter.toVO(contract);
         var current = currentVersion(contract.getId());
-        vo.setCurrentVersion(current == null ? null : toVersionVO(current));
+        vo.setCurrentVersion(current == null ? null : contractConverter.toVersionVO(current));
         vo.setVersions(versions(id));
         vo.setMilestones(milestones(id));
         return vo;
@@ -132,7 +134,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     public UUID created(ContractSaveFrom from) {
         var user = requireCurrentUser();
         validateDates(from.getStartDate(), from.getEndDate());
-        var entity = new Contract();
+        var entity = contractConverter.toEntity(from);
         entity.setContractNo(generateContractNo());
         entity.setTitle(from.getTitle().trim());
         entity.setContractType(normalize(from.getContractType(), "OTHER"));
@@ -142,8 +144,6 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         entity.setDepartmentId(user.getDepartmentId());
         entity.setAmount(normalizeAmount(from.getAmount()));
         entity.setCurrency(normalize(from.getCurrency(), "CNY"));
-        entity.setStartDate(from.getStartDate());
-        entity.setEndDate(from.getEndDate());
         entity.setStatus(STATUS_DRAFT);
         entity.setSigningStatus(SIGNING_UNSIGNED);
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
@@ -163,14 +163,13 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             throw new DataSaveException("只有草稿合同可以修改");
         }
         validateDates(from.getStartDate(), from.getEndDate());
+        contractConverter.updateEntity(from, entity);
         entity.setTitle(from.getTitle().trim());
         entity.setContractType(normalize(from.getContractType(), "OTHER"));
         entity.setCounterpartyName(from.getCounterpartyName().trim());
         entity.setCounterpartyContact(trimToNull(from.getCounterpartyContact()));
         entity.setAmount(normalizeAmount(from.getAmount()));
         entity.setCurrency(normalize(from.getCurrency(), "CNY"));
-        entity.setStartDate(from.getStartDate());
-        entity.setEndDate(from.getEndDate());
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
         entity.setSummary(trimToNull(from.getSummary()));
         if (!updateById(entity)) {
@@ -233,7 +232,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return versionMapper.selectList(new LambdaQueryWrapper<ContractVersion>()
                         .eq(ContractVersion::getContractId, contract.getId())
                         .orderByDesc(ContractVersion::getVersionNo))
-                .stream().map(this::toVersionVO).toList();
+                .stream().map(contractConverter::toVersionVO).toList();
     }
 
     @Override
@@ -267,7 +266,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                         .eq(ContractMilestone::getContractId, contract.getId())
                         .orderByAsc(ContractMilestone::getDueDate)
                         .orderByAsc(ContractMilestone::getCreatedAt))
-                .stream().map(this::toMilestoneVO).toList();
+                .stream().map(contractConverter::toMilestoneVO).toList();
     }
 
     @Override
@@ -475,60 +474,6 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             throw new DataSaveException("当前用户组织信息不可用");
         }
         return user;
-    }
-
-    private ContractVO toVO(Contract source) {
-        var vo = new ContractVO();
-        vo.setId(source.getId());
-        vo.setContractNo(source.getContractNo());
-        vo.setTitle(source.getTitle());
-        vo.setContractType(source.getContractType());
-        vo.setCounterpartyName(source.getCounterpartyName());
-        vo.setCounterpartyContact(source.getCounterpartyContact());
-        vo.setOwnerId(source.getOwnerId());
-        vo.setDepartmentId(source.getDepartmentId());
-        vo.setAmount(source.getAmount());
-        vo.setCurrency(source.getCurrency());
-        vo.setStartDate(source.getStartDate());
-        vo.setEndDate(source.getEndDate());
-        vo.setStatus(source.getStatus());
-        vo.setSigningStatus(source.getSigningStatus());
-        vo.setSignedAt(source.getSignedAt());
-        vo.setVisibility(source.getVisibility());
-        vo.setSummary(source.getSummary());
-        vo.setCreatedAt(source.getCreatedAt());
-        vo.setUpdatedAt(source.getUpdatedAt());
-        return vo;
-    }
-
-    private ContractVersionVO toVersionVO(ContractVersion source) {
-        var vo = new ContractVersionVO();
-        vo.setId(source.getId());
-        vo.setVersionNo(source.getVersionNo());
-        vo.setFileId(source.getFileId());
-        vo.setFileName(source.getFileName());
-        vo.setFileSize(source.getFileSize());
-        vo.setContentType(source.getContentType());
-        vo.setVersionNote(source.getVersionNote());
-        vo.setCurrent(source.getCurrentVersion());
-        vo.setCreatedAt(source.getCreatedAt());
-        return vo;
-    }
-
-    private ContractMilestoneVO toMilestoneVO(ContractMilestone source) {
-        var vo = new ContractMilestoneVO();
-        vo.setId(source.getId());
-        vo.setContractId(source.getContractId());
-        vo.setName(source.getName());
-        vo.setMilestoneType(source.getMilestoneType());
-        vo.setDueDate(source.getDueDate());
-        vo.setStatus(source.getStatus());
-        vo.setAssigneeId(source.getAssigneeId());
-        vo.setCompletedAt(source.getCompletedAt());
-        vo.setReminderSentAt(source.getReminderSentAt());
-        vo.setRemark(source.getRemark());
-        vo.setCreatedAt(source.getCreatedAt());
-        return vo;
     }
 
     private String generateContractNo() {

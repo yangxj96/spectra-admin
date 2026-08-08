@@ -24,6 +24,7 @@ import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.oa.contact.javabean.converter.ContactConverter;
 import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
 import com.devops00.spectra.oa.contact.service.ContactService;
 
@@ -38,6 +39,7 @@ public class ContactServiceImpl implements ContactService {
 
     private final UserMapper userMapper;
     private final DepartmentMapper departmentMapper;
+    private final ContactConverter contactConverter;
 
     @Override
     public IPage<ContactVO> page(PageFrom page, String keyword) {
@@ -57,22 +59,13 @@ public class ContactServiceImpl implements ContactService {
                 : departmentMapper.selectByIds(departmentIds).stream()
                         .collect(Collectors.toMap(Department::getId, Function.identity()));
         var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
-        result.setRecords(users.getRecords().stream().map(user -> toVO(user, departments)).toList());
+        result.setRecords(users.getRecords().stream().map(user -> {
+            var vo = contactConverter.toVO(user);
+            var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
+            vo.setDepartmentName(department == null ? null
+                    : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
+            return vo;
+        }).toList());
         return result;
-    }
-
-    private ContactVO toVO(User user, Map<UUID, Department> departments) {
-        var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
-        var vo = new ContactVO();
-        vo.setId(user.getId());
-        vo.setUsername(user.getUsername());
-        vo.setRealName(user.getRealName());
-        vo.setAvatar(user.getAvatar());
-        vo.setPhone(user.getPhone());
-        vo.setEmail(user.getEmail());
-        vo.setDepartmentId(user.getDepartmentId());
-        vo.setDepartmentName(department == null ? null
-                : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
-        return vo;
     }
 }

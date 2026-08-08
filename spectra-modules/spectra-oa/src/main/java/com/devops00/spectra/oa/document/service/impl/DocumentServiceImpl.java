@@ -35,6 +35,7 @@ import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSend
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.oa.document.javabean.converter.DocumentConverter;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentFolder;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
@@ -79,6 +80,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final FileUploadFacade fileUploadFacade;
     private final NotificationService notificationService;
     private final UserService userService;
+    private final DocumentConverter documentConverter;
 
     @Override
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
@@ -104,13 +106,16 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         wrapper.orderByDesc(Document::getUpdatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<DocumentVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream()
+                .map(document -> documentConverter.toVO(document, currentVersion(document.getId())))
+                .toList());
         return voPage;
     }
 
     @Override
     public DocumentVO get(UUID id) {
-        return toVO(requireAccessible(id));
+        var document = requireAccessible(id);
+        return documentConverter.toVO(document, currentVersion(document.getId()));
     }
 
     @Override
@@ -120,10 +125,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
-        var entity = new Document();
+        var entity = documentConverter.toEntity(from);
         entity.setTitle(from.getTitle().trim());
-        entity.setSummary(from.getSummary());
-        entity.setFolderId(from.getFolderId());
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
         entity.setStatus(STATUS_DRAFT);
         entity.setOwnerId(user.getId());
@@ -138,9 +141,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public void modify(UUID id, DocumentSaveFrom from) {
         var entity = requireOwner(id);
+        documentConverter.updateEntity(from, entity);
         entity.setTitle(from.getTitle().trim());
-        entity.setSummary(from.getSummary());
-        entity.setFolderId(from.getFolderId());
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
         if (!updateById(entity)) {
             throw new DataSaveException("更新文档失败");
@@ -183,7 +185,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return versionMapper.selectList(new LambdaQueryWrapper<DocumentVersion>()
                         .eq(DocumentVersion::getDocumentId, document.getId())
                         .orderByDesc(DocumentVersion::getVersionNo))
-                .stream().map(this::toVersionVO).toList();
+                .stream().map(documentConverter::toVersionVO).toList();
     }
 
     @Override
@@ -230,7 +232,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
                                 .eq(DocumentFolder::getDepartmentId, user.getDepartmentId())))
                 .orderByAsc(DocumentFolder::getSort)
                 .orderByAsc(DocumentFolder::getName);
-        return folderMapper.selectList(wrapper).stream().map(this::toFolderVO).toList();
+        return folderMapper.selectList(wrapper).stream().map(documentConverter::toFolderVO).toList();
     }
 
     @Override
@@ -326,49 +328,6 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             throw new DataNotExistException("文档不存在或无权操作");
         }
         return entity;
-    }
-
-    private DocumentVO toVO(Document source) {
-        var vo = new DocumentVO();
-        vo.setId(source.getId());
-        vo.setFolderId(source.getFolderId());
-        vo.setDepartmentId(source.getDepartmentId());
-        vo.setTitle(source.getTitle());
-        vo.setSummary(source.getSummary());
-        vo.setStatus(source.getStatus());
-        vo.setVisibility(source.getVisibility());
-        vo.setOwnerId(source.getOwnerId());
-        vo.setPublishedAt(source.getPublishedAt());
-        vo.setCreatedAt(source.getCreatedAt());
-        vo.setUpdatedAt(source.getUpdatedAt());
-        var current = currentVersion(source.getId());
-        vo.setCurrentVersion(current == null ? null : toVersionVO(current));
-        return vo;
-    }
-
-    private DocumentVersionVO toVersionVO(DocumentVersion source) {
-        var vo = new DocumentVersionVO();
-        vo.setId(source.getId());
-        vo.setVersionNo(source.getVersionNo());
-        vo.setFileId(source.getFileId());
-        vo.setFileName(source.getFileName());
-        vo.setFileSize(source.getFileSize());
-        vo.setContentType(source.getContentType());
-        vo.setVersionNote(source.getVersionNote());
-        vo.setCurrent(source.getCurrentVersion());
-        vo.setCreatedAt(source.getCreatedAt());
-        return vo;
-    }
-
-    private DocumentFolderVO toFolderVO(DocumentFolder source) {
-        var vo = new DocumentFolderVO();
-        vo.setId(source.getId());
-        vo.setPid(source.getPid());
-        vo.setName(source.getName());
-        vo.setDepartmentId(source.getDepartmentId());
-        vo.setVisibility(source.getVisibility());
-        vo.setSort(source.getSort());
-        return vo;
     }
 
     private String normalizeVisibility(String value) {

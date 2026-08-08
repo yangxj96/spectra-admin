@@ -47,6 +47,7 @@ import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseMapper;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
+import com.devops00.spectra.oa.report.javabean.converter.DepartmentStatsConverter;
 import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import com.devops00.spectra.oa.report.service.DepartmentStatsService;
@@ -76,13 +77,19 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     private final SupplyItemMapper supplyItemMapper;
     private final ReimbursementMapper reimbursementMapper;
     private final PurchaseMapper purchaseMapper;
+    private final DepartmentStatsConverter departmentStatsConverter;
 
     @Override
     public List<DepartmentStatsVO> list(DepartmentStatsFrom from) {
         UUID departmentId = from == null ? null : from.getDepartmentId();
         Map<UUID, DepartmentStatsVO> result = departmentService.list().stream()
                 .filter(department -> departmentId == null || departmentId.equals(department.getId()))
-                .collect(Collectors.toMap(Department::getId, this::toVO, (left, right) -> left, HashMap::new));
+                .collect(Collectors.toMap(Department::getId, department -> {
+                    var vo = departmentStatsConverter.toVO(department);
+                    vo.setDepartmentName(department.getPath() == null
+                            ? department.getName() : department.getPath());
+                    return vo;
+                }, (left, right) -> left, HashMap::new));
 
         if (result.isEmpty() && departmentId != null) {
             return Collections.emptyList();
@@ -138,13 +145,6 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
             log.error("导出部门统计失败", exception);
             throw new DataSaveException("导出部门统计失败");
         }
-    }
-
-    private DepartmentStatsVO toVO(Department department) {
-        DepartmentStatsVO vo = new DepartmentStatsVO();
-        vo.setDepartmentId(department.getId());
-        vo.setDepartmentName(department.getPath() == null ? department.getName() : department.getPath());
-        return vo;
     }
 
     private boolean hasBusinessData(DepartmentStatsVO stats) {

@@ -14,36 +14,29 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.user.javabean.converter;
+package com.devops00.spectra.oa.notice.javabean.converter;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.user.javabean.entity.Role;
-import com.devops00.spectra.core.user.javabean.from.RoleFrom;
-import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.oa.notice.javabean.entity.Notice;
+import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
+import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 角色转换用的
+/// 公告对象转换器。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/7/16 00:00
+/// @since 2026/8/8
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
-public interface RoleConverter {
+public interface NoticeConverter {
 
-    /// 实体转分页VO
-    ///
-    /// @param source 实体
-    /// @return 分页实体
-    RoleVO toVO(Role source);
+    /// 公告实体转响应视图。
+    @Mapping(target = "read", ignore = true)
+    @Mapping(target = "readAt", ignore = true)
+    NoticeVO toVO(Notice source);
 
-    /// 保存入参转实体。
-    Role toEntity(RoleFrom source);
-
-    /// 分页实体转分页视图。
-    @Mapping(target = "pages", ignore = true)
-    Page<RoleVO> toVOPage(Page<Role> source);
-
+    /// 公告创建入参转实体。
+    Notice toEntity(NoticeCreateFrom source);
 }

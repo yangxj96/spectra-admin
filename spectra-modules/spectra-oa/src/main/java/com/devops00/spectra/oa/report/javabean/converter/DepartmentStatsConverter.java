@@ -14,36 +14,25 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.user.javabean.converter;
+package com.devops00.spectra.oa.report.javabean.converter;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.devops00.spectra.core.user.javabean.entity.Role;
-import com.devops00.spectra.core.user.javabean.from.RoleFrom;
-import com.devops00.spectra.core.user.javabean.vo.RoleVO;
+import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 角色转换用的
+/// 部门统计对象转换器。
 ///
 /// @author yangxj96
 /// @version 1.0
-/// @since 2025/7/16 00:00
+/// @since 2026/8/8
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
-public interface RoleConverter {
+public interface DepartmentStatsConverter {
 
-    /// 实体转分页VO
-    ///
-    /// @param source 实体
-    /// @return 分页实体
-    RoleVO toVO(Role source);
-
-    /// 保存入参转实体。
-    Role toEntity(RoleFrom source);
-
-    /// 分页实体转分页视图。
-    @Mapping(target = "pages", ignore = true)
-    Page<RoleVO> toVOPage(Page<Role> source);
-
+    /// 部门实体转统计视图，部门名称由 Service 按路径规则补充。
+    @Mapping(source = "id", target = "departmentId")
+    @Mapping(target = "departmentName", ignore = true)
+    DepartmentStatsVO toVO(Department source);
 }

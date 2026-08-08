@@ -37,6 +37,7 @@ import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSend
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.oa.notice.javabean.converter.NoticeConverter;
 import com.devops00.spectra.oa.notice.javabean.entity.Notice;
 import com.devops00.spectra.oa.notice.javabean.entity.NoticeReader;
 import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
@@ -61,6 +62,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private final NoticeReaderMapper noticeReaderMapper;
     private final NotificationService notificationService;
     private final UserService userService;
+    private final NoticeConverter noticeConverter;
 
     @Override
     @Transactional
@@ -89,7 +91,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         var result = this.page(page.toPage(), wrapper);
         activateDueNotices(result.getRecords());
         var voPage = new Page<NoticeVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;
     }
 
@@ -100,7 +102,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (userId == null || !isVisible(notice, userId)) {
             throw new DataNotExistException("公告不存在或无权访问");
         }
-        return toVO(notice);
+        return assembleView(notice);
     }
 
     @Override
@@ -115,16 +117,12 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if ("DEPARTMENT".equals(targetType) && from.getTargetDepartmentId() == null) {
             throw new DataSaveException("部门公告必须指定目标部门");
         }
-        var notice = new Notice();
-        notice.setTitle(from.getTitle());
-        notice.setSummary(from.getSummary());
-        notice.setContent(from.getContent());
+        var notice = noticeConverter.toEntity(from);
         notice.setStatus("DRAFT");
         notice.setTargetType(targetType);
-        notice.setTargetDepartmentId(from.getTargetDepartmentId());
         notice.setDepartmentId(user.getDepartmentId());
         notice.setPublisherId(userId);
-        notice.setRequiredRead(Boolean.TRUE.equals(from.getRequiredRead()));
+        notice.setRequiredRead(Boolean.TRUE.equals(notice.getRequiredRead()));
         notice.setPublishAt(parseTime(from.getPublishAt()));
         if (!this.save(notice)) {
             throw new DataSaveException("保存公告草稿失败");
@@ -187,19 +185,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         }
     }
 
-    private NoticeVO toVO(Notice notice) {
-        var vo = new NoticeVO();
-        vo.setId(notice.getId());
-        vo.setTitle(notice.getTitle());
-        vo.setSummary(notice.getSummary());
-        vo.setContent(notice.getContent());
-        vo.setStatus(notice.getStatus());
-        vo.setTargetType(notice.getTargetType());
-        vo.setTargetDepartmentId(notice.getTargetDepartmentId());
-        vo.setPublisherId(notice.getPublisherId());
-        vo.setPublishAt(notice.getPublishAt());
-        vo.setRequiredRead(notice.getRequiredRead());
-        vo.setCreatedAt(notice.getCreatedAt());
+    private NoticeVO assembleView(Notice notice) {
+        var vo = noticeConverter.toVO(notice);
         var userId = SecUtil.getCurrentUserId();
         if (userId != null) {
             var reader = noticeReaderMapper.selectOne(new LambdaQueryWrapper<NoticeReader>()

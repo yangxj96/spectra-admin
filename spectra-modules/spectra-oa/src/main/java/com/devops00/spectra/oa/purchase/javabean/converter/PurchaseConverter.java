@@ -17,6 +17,7 @@
 package com.devops00.spectra.oa.purchase.javabean.converter;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
 
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
@@ -24,6 +25,8 @@ import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseItem;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceiptItem;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseItemFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSaveFrom;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseItemVO;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseReceiptItemVO;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseReceiptVO;
@@ -37,6 +40,12 @@ import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseVO;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface PurchaseConverter {
     PurchaseVO toVO(Purchase source);
+
+    Purchase toEntity(PurchaseSaveFrom source);
+
+    void updateEntity(PurchaseSaveFrom source, @MappingTarget Purchase target);
+
+    PurchaseItem toItemEntity(PurchaseItemFrom source);
 
     PurchaseItemVO toItemVO(PurchaseItem source);
 

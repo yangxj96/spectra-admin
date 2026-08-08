@@ -76,7 +76,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         var tasks = taskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        var records = tasks.stream().map(this::toVO).toList();
+        var records = tasks.stream().map(this::assembleView).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -99,7 +99,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         var tasks = historicTaskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        var records = tasks.stream().map(this::toVO).toList();
+        var records = tasks.stream().map(this::assembleView).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -191,13 +191,13 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         return task;
     }
 
-    private TaskVO toVO(org.flowable.task.api.Task task) {
+    private TaskVO assembleView(org.flowable.task.api.Task task) {
         var vo = taskConverter.toVO(task);
         enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), false);
         return vo;
     }
 
-    private TaskVO toVO(org.flowable.task.api.history.HistoricTaskInstance task) {
+    private TaskVO assembleView(org.flowable.task.api.history.HistoricTaskInstance task) {
         var vo = taskConverter.fromHistoricTask(task);
         enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), true);
         return vo;

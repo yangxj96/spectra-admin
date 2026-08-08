@@ -56,7 +56,6 @@ import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPageFrom
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPaymentFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSaveFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSubmitFrom;
-import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementAttachmentVO;
 import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
@@ -128,7 +127,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         wrapper.orderByDesc(Reimbursement::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<ReimbursementVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;
     }
 
@@ -136,7 +135,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     public ReimbursementVO get(UUID id) {
         var entity = require(id);
         applicationService.requireVisible(entity.getApplicationId());
-        return toVO(entity);
+        return assembleView(entity);
     }
 
     @Override
@@ -148,10 +147,11 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("当前用户组织信息不可用");
         }
         var application = applicationService.createDraft(TYPE_CODE, null, "费用报销 - " + from.getPurpose());
-        var entity = new Reimbursement();
+        var entity = reimbursementConverter.toEntity(from);
         entity.setApplicationId(application.getId());
         entity.setDepartmentId(application.getDepartmentId());
-        apply(entity, from);
+        entity.setTotalAmount(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP));
+        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
         entity.setPaymentStatus(PAYMENT_PENDING);
         if (!this.save(entity)) {
             throw new DataSaveException("保存报销单失败");
@@ -169,7 +169,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         validate(from);
         var entity = require(id);
         var application = requireEditableApplication(entity);
-        apply(entity, from);
+        reimbursementConverter.updateEntity(from, entity);
+        entity.setTotalAmount(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP));
+        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
         if (!this.updateById(entity)) {
             throw new DataSaveException("更新报销单失败");
         }
@@ -292,16 +294,6 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         });
     }
 
-    private void apply(Reimbursement entity, ReimbursementSaveFrom from) {
-        entity.setPurpose(from.getPurpose());
-        entity.setExpenseStart(from.getExpenseStart());
-        entity.setExpenseEnd(from.getExpenseEnd());
-        entity.setTotalAmount(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP));
-        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
-        entity.setPayeeName(from.getPayeeName());
-        entity.setPayeeAccount(from.getPayeeAccount());
-    }
-
     private void replaceItems(Reimbursement entity, List<ReimbursementItemFrom> items) {
         itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>()
                 .eq(ReimbursementItem::getReimbursementId, entity.getId()));
@@ -315,12 +307,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("发票号码已被其他报销单使用");
         }
         var entities = items.stream().map(item -> {
-            var target = new ReimbursementItem();
+            var target = reimbursementConverter.toItemEntity(item);
             target.setReimbursementId(entity.getId());
             target.setDepartmentId(entity.getDepartmentId());
-            target.setExpenseDate(item.getExpenseDate());
-            target.setCategory(item.getCategory());
-            target.setDescription(item.getDescription());
             target.setAmount(item.getAmount().setScale(2, RoundingMode.HALF_UP));
             target.setTaxAmount(item.getTaxAmount().setScale(2, RoundingMode.HALF_UP));
             target.setInvoiceNo(StringUtils.hasText(item.getInvoiceNo()) ? item.getInvoiceNo().trim() : null);
@@ -342,17 +331,15 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         var unique = new LinkedHashMap<UUID, ReimbursementAttachmentFrom>();
         attachments.forEach(item -> unique.put(item.getFileId(), item));
         unique.values().forEach(item -> {
-            var attachment = new ApplicationAttachment();
+            var attachment = reimbursementConverter.toAttachmentEntity(item);
             attachment.setApplicationId(applicationId);
-            attachment.setFileId(item.getFileId());
-            attachment.setFileName(item.getFileName());
             if (attachmentMapper.insert(attachment) != 1) {
                 throw new DataSaveException("保存报销凭证失败");
             }
         });
     }
 
-    private ReimbursementVO toVO(Reimbursement entity) {
+    private ReimbursementVO assembleView(Reimbursement entity) {
         var application = applicationService.require(entity.getApplicationId());
         var vo = reimbursementConverter.toVO(entity);
         vo.setApplicationNo(application.getApplicationNo());
@@ -367,16 +354,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
                 .stream().map(reimbursementConverter::toItemVO).toList());
         vo.setAttachments(attachmentMapper.selectList(new LambdaQueryWrapper<ApplicationAttachment>()
                         .eq(ApplicationAttachment::getApplicationId, application.getId()))
-                .stream().map(this::toAttachmentVO).toList());
-        return vo;
-    }
-
-    private ReimbursementAttachmentVO toAttachmentVO(ApplicationAttachment source) {
-        var vo = new ReimbursementAttachmentVO();
-        vo.setId(source.getId());
-        vo.setFileId(source.getFileId());
-        vo.setFileName(source.getFileName());
-        vo.setPreviewUrl("/api/file/upload/preview/" + source.getFileId());
+                .stream().map(reimbursementConverter::toAttachmentVO).toList());
         return vo;
     }
 

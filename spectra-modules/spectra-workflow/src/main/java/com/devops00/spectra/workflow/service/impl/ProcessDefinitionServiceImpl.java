@@ -54,7 +54,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         var definitions = repositoryService.createProcessDefinitionQuery().list();
         var result = new ArrayList<ProcessDefinitionVO>();
         for (var definition : definitions) {
-            result.add(toVO(definition));
+            result.add(assembleView(definition));
         }
         return result;
     }
@@ -67,7 +67,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         if (definition == null) {
             throw new DataNotExistException("流程定义不存在: " + id);
         }
-        return toVO(definition);
+        return assembleView(definition);
     }
 
     @Override
@@ -162,11 +162,11 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         }
         log.info("流程定义部署成功: id={}, key={}, version={}",
                 definition.getId(), definition.getKey(), definition.getVersion());
-        return toVO(definition);
+        return assembleView(definition);
     }
 
     /// 实体转VO（含部署时间填充）
-    private ProcessDefinitionVO toVO(org.flowable.engine.repository.ProcessDefinition definition) {
+    private ProcessDefinitionVO assembleView(org.flowable.engine.repository.ProcessDefinition definition) {
         var vo = processConverter.toVO(definition);
         // 填充部署时间
         if (definition.getDeploymentId() != null) {

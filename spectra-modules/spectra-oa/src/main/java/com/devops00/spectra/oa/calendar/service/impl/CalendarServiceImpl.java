@@ -32,6 +32,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.oa.calendar.javabean.converter.CalendarConverter;
 import com.devops00.spectra.oa.calendar.javabean.entity.Calendar;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
@@ -50,6 +51,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calendar> implements CalendarService {
+
+    private final CalendarConverter calendarConverter;
 
     @Override
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
@@ -75,7 +78,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         }
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<CalendarVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(calendarConverter::toVO).toList());
         return voPage;
     }
 
@@ -83,7 +86,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
     public CalendarVO get(UUID id) {
         var calendar = require(id);
         ensureOwner(calendar);
-        return toVO(calendar);
+        return calendarConverter.toVO(calendar);
     }
 
     @Override
@@ -99,14 +102,18 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (!end.isAfter(start)) {
             throw new DataSaveException("日程结束时间必须晚于开始时间");
         }
-        var calendar = new Calendar();
+        var calendar = calendarConverter.toEntity(from);
         calendar.setOwnerId(userId);
         calendar.setDepartmentId(user.getDepartmentId());
-        apply(calendar, from, start, end);
+        calendar.setStartTime(start);
+        calendar.setEndTime(end);
+        calendar.setAllDay(Boolean.TRUE.equals(from.getAllDay()));
+        calendar.setEventType(StringUtils.hasText(from.getEventType()) ? from.getEventType() : "PERSONAL");
+        calendar.setVisibility(StringUtils.hasText(from.getVisibility()) ? from.getVisibility() : "PRIVATE");
         if (!this.save(calendar)) {
             throw new DataSaveException("保存日程失败");
         }
-        return toVO(calendar);
+        return calendarConverter.toVO(calendar);
     }
 
     @Override
@@ -119,11 +126,16 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (!end.isAfter(start)) {
             throw new DataSaveException("日程结束时间必须晚于开始时间");
         }
-        apply(calendar, from, start, end);
+        calendarConverter.updateEntity(from, calendar);
+        calendar.setStartTime(start);
+        calendar.setEndTime(end);
+        calendar.setAllDay(Boolean.TRUE.equals(from.getAllDay()));
+        calendar.setEventType(StringUtils.hasText(from.getEventType()) ? from.getEventType() : "PERSONAL");
+        calendar.setVisibility(StringUtils.hasText(from.getVisibility()) ? from.getVisibility() : "PRIVATE");
         if (!this.updateById(calendar)) {
             throw new DataSaveException("更新日程失败");
         }
-        return toVO(calendar);
+        return calendarConverter.toVO(calendar);
     }
 
     @Override
@@ -134,18 +146,6 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (!this.removeById(id)) {
             throw new DataSaveException("删除日程失败");
         }
-    }
-
-    private void apply(Calendar calendar, CalendarSaveFrom from, Instant start, Instant end) {
-        calendar.setTitle(from.getTitle());
-        calendar.setContent(from.getContent());
-        calendar.setStartTime(start);
-        calendar.setEndTime(end);
-        calendar.setAllDay(Boolean.TRUE.equals(from.getAllDay()));
-        calendar.setEventType(StringUtils.hasText(from.getEventType()) ? from.getEventType() : "PERSONAL");
-        calendar.setVisibility(StringUtils.hasText(from.getVisibility()) ? from.getVisibility() : "PRIVATE");
-        calendar.setLocation(from.getLocation());
-        calendar.setParticipantIds(from.getParticipantIds());
     }
 
     private Calendar require(UUID id) {
@@ -160,24 +160,6 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (!Objects.equals(calendar.getOwnerId(), SecUtil.getCurrentUserId())) {
             throw new DataNotExistException("日程不存在或无权访问");
         }
-    }
-
-    private CalendarVO toVO(Calendar source) {
-        var vo = new CalendarVO();
-        vo.setId(source.getId());
-        vo.setOwnerId(source.getOwnerId());
-        vo.setTitle(source.getTitle());
-        vo.setContent(source.getContent());
-        vo.setStartTime(source.getStartTime());
-        vo.setEndTime(source.getEndTime());
-        vo.setAllDay(source.getAllDay());
-        vo.setEventType(source.getEventType());
-        vo.setVisibility(source.getVisibility());
-        vo.setLocation(source.getLocation());
-        vo.setParticipantIds(source.getParticipantIds());
-        vo.setSourceType(source.getSourceType());
-        vo.setSourceId(source.getSourceId());
-        return vo;
     }
 
     private Instant parseTime(String value) {

@@ -43,7 +43,6 @@ import com.devops00.spectra.core.user.service.RoleService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,10 +73,9 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Transactional
     public void created(RoleFrom params) {
         validateScope(params.getScope(), params.getTargetIds());
-        Role role = new Role();
+        Role role = roleConverter.toEntity(params);
         // 生成一个角色 CODE
         role.setCode(IdWorker.get32UUID());
-        BeanUtils.copyProperties(params, role);
         // 保存角色范围
         this.save(role);
         syncRoleScope(role.getId(), params.getScope(), params.getTargetIds());
@@ -108,8 +106,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Transactional
     public void modify(RoleFrom params) {
         validateScope(params.getScope(), params.getTargetIds());
-        Role role = new Role();
-        BeanUtils.copyProperties(params, role);
+        Role role = roleConverter.toEntity(params);
         this.updateById(role);
         syncRoleScope(role.getId(), params.getScope(), params.getTargetIds());
     }
@@ -122,10 +119,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
                 .eq(null != params.getState(), Role::getState, params.getState())
                 .orderByAsc(Role::getCreatedAt);
         Page<Role> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
-        Page<RoleVO> result = new Page<>();
-        BeanUtils.copyProperties(db, result);
-        result.setRecords(db.getRecords().stream().map(roleConverter::toVO).toList());
-        return result;
+        return roleConverter.toVOPage(db);
     }
 
     @Override

@@ -66,13 +66,13 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         wrapper.orderByAsc(SupplyItem::getName).orderByAsc(SupplyItem::getSku);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<SupplyItemVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(item -> toVO(item, false)).toList());
+        voPage.setRecords(result.getRecords().stream().map(item -> assembleView(item, false)).toList());
         return voPage;
     }
 
     @Override
     public SupplyItemVO get(UUID id) {
-        return toVO(require(id), true);
+        return assembleView(require(id), true);
     }
 
     @Override
@@ -146,7 +146,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
                         .eq(SupplyItem::getStatus, STATUS_ACTIVE)
                         .apply("current_stock <= min_stock")
                         .orderByAsc(SupplyItem::getName))
-                .stream().map(item -> toVO(item, false)).toList();
+                .stream().map(item -> assembleView(item, false)).toList();
     }
 
     private void change(UUID id, String type, BigDecimal delta, SupplyOperationFrom from) {
@@ -237,7 +237,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         }
     }
 
-    private SupplyItemVO toVO(SupplyItem entity, boolean withOperations) {
+    private SupplyItemVO assembleView(SupplyItem entity, boolean withOperations) {
         var vo = supplyConverter.toVO(entity);
         vo.setLowStock(stock(entity).compareTo(entity.getMinStock() == null ? BigDecimal.ZERO : entity.getMinStock()) <= 0);
         if (withOperations) {

@@ -17,12 +17,20 @@
 package com.devops00.spectra.oa.reimbursement.javabean.converter;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.oa.application.javabean.entity.ApplicationAttachment;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementAttachmentFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementItemFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSaveFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementItemVO;
+import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementAttachmentVO;
 import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 
 /// 报销 MapStruct 转换器。
@@ -34,5 +42,21 @@ import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 public interface ReimbursementConverter {
     ReimbursementVO toVO(Reimbursement source);
 
+    Reimbursement toEntity(ReimbursementSaveFrom source);
+
+    void updateEntity(ReimbursementSaveFrom source, @MappingTarget Reimbursement target);
+
+    ReimbursementItem toItemEntity(ReimbursementItemFrom source);
+
     ReimbursementItemVO toItemVO(ReimbursementItem source);
+
+    ApplicationAttachment toAttachmentEntity(ReimbursementAttachmentFrom source);
+
+    @Mapping(target = "previewUrl", source = "fileId", qualifiedByName = "toPreviewUrl")
+    ReimbursementAttachmentVO toAttachmentVO(ApplicationAttachment source);
+
+    @Named("toPreviewUrl")
+    default String toPreviewUrl(java.util.UUID fileId) {
+        return fileId == null ? null : "/api/file/upload/preview/" + fileId;
+    }
 }

@@ -129,7 +129,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         wrapper.orderByDesc(Purchase::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<PurchaseVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;
     }
 
@@ -137,7 +137,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     public PurchaseVO get(UUID id) {
         var entity = require(id);
         applicationService.requireVisible(entity.getApplicationId());
-        return toVO(entity);
+        return assembleView(entity);
     }
 
     @Override
@@ -145,11 +145,12 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     public UUID created(PurchaseSaveFrom from) {
         validate(from);
         var application = applicationService.createDraft(TYPE_CODE, null, "采购申请 - " + from.getPurpose());
-        var entity = new Purchase();
+        var entity = purchaseConverter.toEntity(from);
         entity.setApplicationId(application.getId());
         entity.setDepartmentId(application.getDepartmentId());
         entity.setExecutionStatus(EXECUTION_NOT_STARTED);
-        apply(entity, from);
+        entity.setBudgetAmount(from.getBudgetAmount().setScale(2, RoundingMode.HALF_UP));
+        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
         if (!this.save(entity)) {
             throw new DataSaveException("保存采购申请失败");
         }
@@ -165,7 +166,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         validate(from);
         var entity = require(id);
         var application = requireEditableApplication(entity);
-        apply(entity, from);
+        purchaseConverter.updateEntity(from, entity);
+        entity.setBudgetAmount(from.getBudgetAmount().setScale(2, RoundingMode.HALF_UP));
+        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
         if (!this.updateById(entity)) {
             throw new DataSaveException("更新采购申请失败");
         }
@@ -388,27 +391,15 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
     }
 
-    private void apply(Purchase entity, PurchaseSaveFrom from) {
-        entity.setPurpose(from.getPurpose());
-        entity.setExpectedDate(from.getExpectedDate());
-        entity.setBudgetAmount(from.getBudgetAmount().setScale(2, RoundingMode.HALF_UP));
-        entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
-        entity.setSuggestedSupplier(from.getSuggestedSupplier());
-    }
-
     private void replaceItems(Purchase entity, List<PurchaseItemFrom> items) {
         itemMapper.delete(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, entity.getId()));
         items.forEach(item -> {
-            var target = new PurchaseItem();
+            var target = purchaseConverter.toItemEntity(item);
             target.setPurchaseId(entity.getId());
             target.setDepartmentId(entity.getDepartmentId());
-            target.setItemType(item.getItemType());
-            target.setItemName(item.getItemName());
-            target.setSpecification(item.getSpecification());
             target.setQuantity(item.getQuantity().setScale(3, RoundingMode.HALF_UP));
             target.setEstimatedUnitPrice(item.getEstimatedUnitPrice().setScale(2, RoundingMode.HALF_UP));
             target.setEstimatedAmount(item.getQuantity().multiply(item.getEstimatedUnitPrice()).setScale(2, RoundingMode.HALF_UP));
-            target.setPurpose(item.getPurpose());
             target.setReceivedQuantity(BigDecimal.ZERO.setScale(3));
             if (itemMapper.insert(target) != 1) {
                 throw new DataSaveException("保存采购明细失败");
@@ -420,7 +411,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         return itemMapper.updateById(item) == 1;
     }
 
-    private PurchaseVO toVO(Purchase entity) {
+    private PurchaseVO assembleView(Purchase entity) {
         var application = applicationService.require(entity.getApplicationId());
         var vo = purchaseConverter.toVO(entity);
         vo.setApplicationNo(application.getApplicationNo());
@@ -434,11 +425,11 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 .stream().map(purchaseConverter::toItemVO).toList());
         var receipts = receiptMapper.selectList(new LambdaQueryWrapper<PurchaseReceipt>()
                 .eq(PurchaseReceipt::getPurchaseId, entity.getId()).orderByDesc(PurchaseReceipt::getReceivedDate));
-        vo.setReceipts(receipts.stream().map(receipt -> toReceiptVO(receipt)).toList());
+        vo.setReceipts(receipts.stream().map(this::assembleReceiptView).toList());
         return vo;
     }
 
-    private PurchaseReceiptVO toReceiptVO(PurchaseReceipt receipt) {
+    private PurchaseReceiptVO assembleReceiptView(PurchaseReceipt receipt) {
         var vo = purchaseConverter.toReceiptVO(receipt);
         vo.setItems(receiptItemMapper.selectList(new LambdaQueryWrapper<PurchaseReceiptItem>()
                         .eq(PurchaseReceiptItem::getReceiptId, receipt.getId()))

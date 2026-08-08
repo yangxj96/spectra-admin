@@ -85,13 +85,13 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         wrapper.orderByDesc(Asset::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<AssetVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream().map(this::toVO).toList());
+        voPage.setRecords(result.getRecords().stream().map(this::assembleView).toList());
         return voPage;
     }
 
     @Override
     public AssetVO get(UUID id) {
-        return toVO(require(id));
+        return assembleView(require(id));
     }
 
     @Override
@@ -286,7 +286,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
                     .eq(Asset::getSourceReceiptId, receipt.getId())
                     .eq(Asset::getSourcePurchaseItemId, purchaseItem.getId()), false);
             if (existing != null) {
-                result.add(toVO(existing));
+                result.add(assembleView(existing));
                 continue;
             }
             var entity = new Asset();
@@ -309,7 +309,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
                 throw new DataSaveException("生成资产草稿失败");
             }
             saveInboundOperation(entity, receipt);
-            result.add(toVO(entity));
+            result.add(assembleView(entity));
         }
         return result;
     }
@@ -392,7 +392,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
     }
 
-    private AssetVO toVO(Asset entity) {
+    private AssetVO assembleView(Asset entity) {
         var vo = assetConverter.toVO(entity);
         if (entity.getCategoryId() != null) {
             var category = categoryMapper.selectById(entity.getCategoryId());

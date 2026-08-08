@@ -161,7 +161,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<LeaveVO>(result.getCurrent(), result.getSize(), result.getTotal());
         voPage.setRecords(result.getRecords().stream()
-                .map(detail -> toVO(detail, applicationService.require(detail.getApplicationId())))
+                .map(detail -> assembleView(detail, applicationService.require(detail.getApplicationId())))
                 .toList());
         return voPage;
     }
@@ -169,7 +169,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Override
     public LeaveVO get(UUID id) {
         var detail = requireDetail(id);
-        return toVO(detail, applicationService.requireVisible(detail.getApplicationId()));
+        return assembleView(detail, applicationService.requireVisible(detail.getApplicationId()));
     }
 
     @Override
@@ -335,7 +335,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return right.isAfter(left) ? Duration.between(left, right).toMinutes() : 0;
     }
 
-    private LeaveVO toVO(LeaveApplication detail, Application application) {
+    private LeaveVO assembleView(LeaveApplication detail, Application application) {
         var vo = leaveConverter.toVO(detail);
         vo.setApplicationNo(application.getApplicationNo());
         vo.setTitle(application.getTitle());
