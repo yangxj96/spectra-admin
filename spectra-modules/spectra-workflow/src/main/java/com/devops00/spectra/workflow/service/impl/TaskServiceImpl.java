@@ -63,11 +63,14 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     private final TaskConverter taskConverter;
 
     @Override
-    public IPage<TaskVO> todo(PageFrom page, String assignee) {
+    public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
         var taskQuery = flowableTaskService.createTaskQuery()
                 .taskAssignee(assignee)
                 .orderByTaskCreateTime()
                 .desc();
+        if (StringUtils.hasText(processDefinitionKey)) {
+            taskQuery.processDefinitionKey(processDefinitionKey);
+        }
 
         long total = taskQuery.count();
         var tasks = taskQuery
@@ -82,12 +85,15 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     }
 
     @Override
-    public IPage<TaskVO> done(PageFrom page, String assignee) {
+    public IPage<TaskVO> done(PageFrom page, String assignee, String processDefinitionKey) {
         var historicTaskQuery = historyService.createHistoricTaskInstanceQuery()
                 .taskAssignee(assignee)
                 .finished()
                 .orderByHistoricTaskInstanceEndTime()
                 .desc();
+        if (StringUtils.hasText(processDefinitionKey)) {
+            historicTaskQuery.processDefinitionKey(processDefinitionKey);
+        }
 
         long total = historicTaskQuery.count();
         var tasks = historicTaskQuery

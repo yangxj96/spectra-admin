@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
@@ -52,25 +53,29 @@ public class TaskController {
     /// 查询待办任务
     ///
     /// @param page 分页参数
+    /// @param processDefinitionKey 可选流程定义KEY
     /// @return 待办任务列表
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
-    public Object todo(PageFrom page) {
+    public Object todo(PageFrom page,
+                       @RequestParam(value = "process_definition_key", required = false) String processDefinitionKey) {
         String username = SecUtil.getCurrentUsername();
-        return taskService.todo(page, username);
+        return taskService.todo(page, username, processDefinitionKey);
     }
 
     /// 查询已办任务
     ///
     /// @param page 分页参数
+    /// @param processDefinitionKey 可选流程定义KEY
     /// @return 已办任务列表
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
-    public Object done(PageFrom page) {
+    public Object done(PageFrom page,
+                       @RequestParam(value = "process_definition_key", required = false) String processDefinitionKey) {
         String username = SecUtil.getCurrentUsername();
-        return taskService.done(page, username);
+        return taskService.done(page, username, processDefinitionKey);
     }
 
     /// 完成任务（审批通过）

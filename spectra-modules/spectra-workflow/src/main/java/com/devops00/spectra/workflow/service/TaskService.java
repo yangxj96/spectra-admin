@@ -30,16 +30,18 @@ public interface TaskService {
     /// 查询待办任务
     ///
     /// @param page     分页参数
-    /// @param assignee 任务处理人用户名
+    /// @param assignee             任务处理人用户名
+    /// @param processDefinitionKey 可选流程定义KEY
     /// @return 待办任务分页列表
-    IPage<TaskVO> todo(PageFrom page, String assignee);
+    IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey);
 
     /// 查询已办任务
     ///
     /// @param page     分页参数
-    /// @param assignee 任务处理人用户名
+    /// @param assignee             任务处理人用户名
+    /// @param processDefinitionKey 可选流程定义KEY
     /// @return 已办任务分页列表
-    IPage<TaskVO> done(PageFrom page, String assignee);
+    IPage<TaskVO> done(PageFrom page, String assignee, String processDefinitionKey);
 
     /// 完成任务（审批通过）
     ///
