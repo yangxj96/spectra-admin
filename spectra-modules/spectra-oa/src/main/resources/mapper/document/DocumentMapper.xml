@@ -18,18 +18,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.document.mapper.DocumentMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.document.javabean.entity.Document">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_document-->
-        <result column="folder_id" property="folderId"/>
-        <result column="title" property="title"/>
-        <result column="summary" property="summary"/>
-        <result column="status" property="status"/>
-        <result column="visibility" property="visibility"/>
-        <result column="owner_id" property="ownerId"/>
-        <result column="published_at" property="publishedAt"/>
+        <result column="folder_id"     property="folderId"/>
+        <result column="title"         property="title"/>
+        <result column="summary"       property="summary"/>
+        <result column="status"        property="status"/>
+        <result column="visibility"    property="visibility"/>
+        <result column="owner_id"      property="ownerId"/>
+        <result column="published_at"  property="publishedAt"/>
         <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->

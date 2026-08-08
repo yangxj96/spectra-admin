@@ -18,21 +18,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.upload.mapper.FileUploadTaskMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.upload.javabean.entity.FileUploadTask">
         <!--@mbg.generated-->
         <!--@Table spectra_upload.file_upload_task-->
-        <result column="upload_id"       property="uploadId"/>
-        <result column="filename"        property="filename"/>
-        <result column="hash"            property="hash"/>
-        <result column="size"            property="size"/>
-        <result column="chunk_size"      property="chunkSize"/>
-        <result column="total_chunks"    property="totalChunks"/>
-        <result column="storage_type"    property="storageType"/>
-        <result column="status"          property="status"/>
-        <result column="eid"             property="eid"/>
-        <result column="file_id"         property="fileId"/>
+        <result column="upload_id"    property="uploadId"/>
+        <result column="filename"     property="filename"/>
+        <result column="hash"         property="hash"/>
+        <result column="size"         property="size"/>
+        <result column="chunk_size"   property="chunkSize"/>
+        <result column="total_chunks" property="totalChunks"/>
+        <result column="storage_type" property="storageType"/>
+        <result column="status"       property="status"/>
+        <result column="eid"          property="eid"/>
+        <result column="file_id"      property="fileId"/>
     </resultMap>
     <!-- @formatter:on -->
 

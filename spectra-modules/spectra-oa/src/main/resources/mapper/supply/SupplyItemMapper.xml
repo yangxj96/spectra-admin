@@ -18,23 +18,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.supply.mapper.SupplyItemMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.supply.javabean.entity.SupplyItem">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_supply_item-->
-        <result column="category" property="category"/>
-        <result column="sku" property="sku"/>
-        <result column="name" property="name"/>
+        <result column="category"      property="category"/>
+        <result column="sku"           property="sku"/>
+        <result column="name"          property="name"/>
         <result column="specification" property="specification"/>
-        <result column="unit" property="unit"/>
+        <result column="unit"          property="unit"/>
         <result column="current_stock" property="currentStock"/>
-        <result column="min_stock" property="minStock"/>
-        <result column="status" property="status"/>
-        <result column="supplier" property="supplier"/>
-        <result column="location" property="location"/>
+        <result column="min_stock"     property="minStock"/>
+        <result column="status"        property="status"/>
+        <result column="supplier"      property="supplier"/>
+        <result column="location"      property="location"/>
         <result column="department_id" property="departmentId"/>
-        <result column="remark" property="remark"/>
+        <result column="remark"        property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 

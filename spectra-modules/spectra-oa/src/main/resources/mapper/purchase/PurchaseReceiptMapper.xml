@@ -18,17 +18,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_purchase_receipt-->
-        <result column="purchase_id" property="purchaseId"/>
-        <result column="receipt_no" property="receiptNo"/>
+        <result column="purchase_id"   property="purchaseId"/>
+        <result column="receipt_no"    property="receiptNo"/>
         <result column="received_date" property="receivedDate"/>
-        <result column="receiver_id" property="receiverId"/>
-        <result column="status" property="status"/>
-        <result column="remark" property="remark"/>
+        <result column="receiver_id"   property="receiverId"/>
+        <result column="status"        property="status"/>
+        <result column="remark"        property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 

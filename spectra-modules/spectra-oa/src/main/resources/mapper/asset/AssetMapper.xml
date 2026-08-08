@@ -18,31 +18,31 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.asset.mapper.AssetMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.asset.javabean.entity.Asset">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_asset-->
-        <result column="category_id" property="categoryId"/>
-        <result column="asset_no" property="assetNo"/>
-        <result column="name" property="name"/>
-        <result column="specification" property="specification"/>
-        <result column="serial_no" property="serialNo"/>
-        <result column="asset_type" property="assetType"/>
-        <result column="status" property="status"/>
-        <result column="quantity" property="quantity"/>
-        <result column="acquisition_date" property="acquisitionDate"/>
-        <result column="acquisition_amount" property="acquisitionAmount"/>
-        <result column="currency" property="currency"/>
-        <result column="supplier" property="supplier"/>
-        <result column="location" property="location"/>
-        <result column="department_id" property="departmentId"/>
-        <result column="custodian_id" property="custodianId"/>
-        <result column="warranty_until" property="warrantyUntil"/>
-        <result column="source_purchase_id" property="sourcePurchaseId"/>
-        <result column="source_receipt_id" property="sourceReceiptId"/>
+        <result column="category_id"             property="categoryId"/>
+        <result column="asset_no"                property="assetNo"/>
+        <result column="name"                    property="name"/>
+        <result column="specification"           property="specification"/>
+        <result column="serial_no"               property="serialNo"/>
+        <result column="asset_type"              property="assetType"/>
+        <result column="status"                  property="status"/>
+        <result column="quantity"                property="quantity"/>
+        <result column="acquisition_date"        property="acquisitionDate"/>
+        <result column="acquisition_amount"      property="acquisitionAmount"/>
+        <result column="currency"                property="currency"/>
+        <result column="supplier"                property="supplier"/>
+        <result column="location"                property="location"/>
+        <result column="department_id"           property="departmentId"/>
+        <result column="custodian_id"            property="custodianId"/>
+        <result column="warranty_until"          property="warrantyUntil"/>
+        <result column="source_purchase_id"      property="sourcePurchaseId"/>
+        <result column="source_receipt_id"       property="sourceReceiptId"/>
         <result column="source_purchase_item_id" property="sourcePurchaseItemId"/>
-        <result column="remark" property="remark"/>
+        <result column="remark"                  property="remark"/>
     </resultMap>
     <!-- @formatter:on -->
 

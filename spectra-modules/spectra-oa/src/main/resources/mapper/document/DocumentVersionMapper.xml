@@ -18,19 +18,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.document.mapper.DocumentVersionMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.document.javabean.entity.DocumentVersion">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_document_version-->
-        <result column="document_id" property="documentId"/>
-        <result column="version_no" property="versionNo"/>
-        <result column="file_id" property="fileId"/>
-        <result column="file_name" property="fileName"/>
-        <result column="file_size" property="fileSize"/>
+        <result column="document_id"  property="documentId"/>
+        <result column="version_no"   property="versionNo"/>
+        <result column="file_id"      property="fileId"/>
+        <result column="file_name"    property="fileName"/>
+        <result column="file_size"    property="fileSize"/>
         <result column="content_type" property="contentType"/>
         <result column="version_note" property="versionNote"/>
-        <result column="is_current" property="currentVersion"/>
+        <result column="is_current"   property="currentVersion"/>
     </resultMap>
     <!-- @formatter:on -->
 

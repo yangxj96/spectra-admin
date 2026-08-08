@@ -18,18 +18,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.application.javabean.entity.ApplicationType">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application_type-->
-        <result column="code" property="code"/>
-        <result column="name" property="name"/>
-        <result column="form_definition_id" property="formDefinitionId"/>
+        <result column="code"                   property="code"/>
+        <result column="name"                   property="name"/>
+        <result column="form_definition_id"     property="formDefinitionId"/>
         <result column="process_definition_key" property="processDefinitionKey"/>
-        <result column="enabled" property="enabled"/>
-        <result column="sort_order" property="sortOrder"/>
-        <result column="description" property="description"/>
+        <result column="enabled"                property="enabled"/>
+        <result column="sort_order"             property="sortOrder"/>
+        <result column="description"            property="description"/>
     </resultMap>
     <!-- @formatter:on -->
 

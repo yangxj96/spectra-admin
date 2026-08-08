@@ -18,17 +18,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.leave.mapper.AttendanceRecordMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.leave.javabean.entity.AttendanceRecord">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_attendance_record-->
-        <result column="application_id" property="applicationId"/>
-        <result column="user_id" property="userId"/>
+        <result column="application_id"  property="applicationId"/>
+        <result column="user_id"         property="userId"/>
         <result column="attendance_date" property="attendanceDate"/>
-        <result column="status" property="status"/>
-        <result column="source" property="source"/>
-        <result column="department_id" property="departmentId"/>
+        <result column="status"          property="status"/>
+        <result column="source"          property="source"/>
+        <result column="department_id"   property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 

@@ -18,19 +18,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_reimbursement_item-->
         <result column="reimbursement_id" property="reimbursementId"/>
-        <result column="department_id" property="departmentId"/>
-        <result column="expense_date" property="expenseDate"/>
-        <result column="category" property="category"/>
-        <result column="description" property="description"/>
-        <result column="amount" property="amount"/>
-        <result column="tax_amount" property="taxAmount"/>
-        <result column="invoice_no" property="invoiceNo"/>
+        <result column="department_id"    property="departmentId"/>
+        <result column="expense_date"     property="expenseDate"/>
+        <result column="category"         property="category"/>
+        <result column="description"      property="description"/>
+        <result column="amount"           property="amount"/>
+        <result column="tax_amount"       property="taxAmount"/>
+        <result column="invoice_no"       property="invoiceNo"/>
     </resultMap>
     <!-- @formatter:on -->
 

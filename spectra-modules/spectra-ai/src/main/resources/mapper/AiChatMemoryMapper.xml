@@ -18,11 +18,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.ai.mapper.AiChatMemoryMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                type="com.devops00.spectra.ai.javabean.entity.AiChatMemory">
         <!--@mbg.generated-->
         <!--@Table spectra_ai.ai_chat_memory-->
-        <id column="memory_id" property="memoryId"/>
+        <id     column="memory_id"  property="memoryId"/>
         <result column="messages"   property="messages"/>
         <result column="created_at" property="createdAt"/>
         <result column="updated_at" property="updatedAt"/>

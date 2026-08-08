@@ -18,14 +18,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.notice.mapper.NoticeReaderMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.notice.javabean.entity.NoticeReader">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_notice_reader-->
         <result column="notice_id" property="noticeId"/>
-        <result column="user_id" property="userId"/>
-        <result column="read_at" property="readAt"/>
+        <result column="user_id"   property="userId"/>
+        <result column="read_at"   property="readAt"/>
     </resultMap>
     <!-- @formatter:on -->
 

@@ -18,17 +18,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.system.mapper.MenuMapper">
     <!-- @formatter:off -->
-  <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
              extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
              type="com.devops00.spectra.core.system.javabean.entity.Menu">
       <!--@mbg.generated-->
       <!--@Table spectra_core.sys_menu-->
-      <result column="pid"        property="pid" />
-      <result column="icon"       property="icon" />
-      <result column="menu_type"  property="menuType" />
-      <result column="route_name" property="routeName" />
-      <result column="name"       property="name" />
-      <result column="sort"       property="sort" />
+      <result column="pid"        property="pid"/>
+      <result column="icon"       property="icon"/>
+      <result column="menu_type"  property="menuType"/>
+      <result column="route_name" property="routeName"/>
+      <result column="name"       property="name"/>
+      <result column="sort"       property="sort"/>
   </resultMap>
   <!-- @formatter:on -->
 

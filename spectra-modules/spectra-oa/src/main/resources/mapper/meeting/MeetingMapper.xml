@@ -18,21 +18,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.meeting.mapper.MeetingMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.meeting.javabean.entity.Meeting">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_meeting-->
-        <result column="title" property="title"/>
-        <result column="initiator_id" property="initiatorId"/>
-        <result column="start_time" property="startTime"/>
-        <result column="end_time" property="endTime"/>
-        <result column="location" property="location"/>
-        <result column="content" property="content"/>
-        <result column="status" property="status"/>
+        <result column="title"               property="title"/>
+        <result column="initiator_id"        property="initiatorId"/>
+        <result column="start_time"          property="startTime"/>
+        <result column="end_time"            property="endTime"/>
+        <result column="location"            property="location"/>
+        <result column="content"             property="content"/>
+        <result column="status"              property="status"/>
         <result column="process_instance_id" property="processInstanceId"/>
-        <result column="approval_status" property="approvalStatus"/>
-        <result column="department_id" property="departmentId"/>
+        <result column="approval_status"     property="approvalStatus"/>
+        <result column="department_id"       property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 

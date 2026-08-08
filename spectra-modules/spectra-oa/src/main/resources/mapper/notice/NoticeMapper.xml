@@ -18,21 +18,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.notice.mapper.NoticeMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.notice.javabean.entity.Notice">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_notice-->
-        <result column="department_id" property="departmentId"/>
-        <result column="title" property="title"/>
-        <result column="summary" property="summary"/>
-        <result column="content" property="content"/>
-        <result column="status" property="status"/>
-        <result column="target_type" property="targetType"/>
+        <result column="department_id"        property="departmentId"/>
+        <result column="title"                property="title"/>
+        <result column="summary"              property="summary"/>
+        <result column="content"              property="content"/>
+        <result column="status"               property="status"/>
+        <result column="target_type"          property="targetType"/>
         <result column="target_department_id" property="targetDepartmentId"/>
-        <result column="publisher_id" property="publisherId"/>
-        <result column="publish_at" property="publishAt"/>
-        <result column="required_read" property="requiredRead"/>
+        <result column="publisher_id"         property="publisherId"/>
+        <result column="publish_at"           property="publishAt"/>
+        <result column="required_read"        property="requiredRead"/>
     </resultMap>
     <!-- @formatter:on -->
 

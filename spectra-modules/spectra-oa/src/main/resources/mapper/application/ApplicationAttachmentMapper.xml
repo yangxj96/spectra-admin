@@ -18,14 +18,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.application.mapper.ApplicationAttachmentMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.application.javabean.entity.ApplicationAttachment">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application_attachment-->
         <result column="application_id" property="applicationId"/>
-        <result column="file_id" property="fileId"/>
-        <result column="file_name" property="fileName"/>
+        <result column="file_id"        property="fileId"/>
+        <result column="file_name"      property="fileName"/>
     </resultMap>
     <!-- @formatter:on -->
 

@@ -18,16 +18,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.meeting.mapper.MeetingParticipantMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_meeting_participant-->
-        <result column="meeting_id" property="meetingId"/>
-        <result column="user_id" property="userId"/>
-        <result column="role" property="role"/>
-        <result column="status" property="status"/>
-        <result column="check_in_at" property="checkInAt"/>
+        <result column="meeting_id"    property="meetingId"/>
+        <result column="user_id"       property="userId"/>
+        <result column="role"          property="role"/>
+        <result column="status"        property="status"/>
+        <result column="check_in_at"   property="checkInAt"/>
         <result column="department_id" property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->

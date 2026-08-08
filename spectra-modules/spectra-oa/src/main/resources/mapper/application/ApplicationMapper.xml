@@ -18,22 +18,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.application.mapper.ApplicationMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.application.javabean.entity.Application">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_application-->
-        <result column="application_no" property="applicationNo"/>
-        <result column="type_code" property="typeCode"/>
-        <result column="biz_id" property="bizId"/>
-        <result column="applicant_id" property="applicantId"/>
-        <result column="department_id" property="departmentId"/>
-        <result column="title" property="title"/>
-        <result column="status" property="status"/>
+        <result column="application_no"      property="applicationNo"/>
+        <result column="type_code"           property="typeCode"/>
+        <result column="biz_id"              property="bizId"/>
+        <result column="applicant_id"        property="applicantId"/>
+        <result column="department_id"       property="departmentId"/>
+        <result column="title"               property="title"/>
+        <result column="status"              property="status"/>
         <result column="process_instance_id" property="processInstanceId"/>
-        <result column="submitted_at" property="submittedAt"/>
-        <result column="completed_at" property="completedAt"/>
-        <result column="reject_reason" property="rejectReason"/>
+        <result column="submitted_at"        property="submittedAt"/>
+        <result column="completed_at"        property="completedAt"/>
+        <result column="reject_reason"       property="rejectReason"/>
     </resultMap>
     <!-- @formatter:on -->
 

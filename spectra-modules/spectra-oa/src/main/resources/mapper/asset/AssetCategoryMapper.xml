@@ -18,17 +18,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.asset.mapper.AssetCategoryMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.asset.javabean.entity.AssetCategory">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_asset_category-->
-        <result column="pid" property="pid"/>
-        <result column="code" property="code"/>
-        <result column="name" property="name"/>
-        <result column="asset_type" property="assetType"/>
-        <result column="sort" property="sort"/>
-        <result column="enabled" property="enabled"/>
+        <result column="pid"         property="pid"/>
+        <result column="code"        property="code"/>
+        <result column="name"        property="name"/>
+        <result column="asset_type"  property="assetType"/>
+        <result column="sort"        property="sort"/>
+        <result column="enabled"     property="enabled"/>
         <result column="description" property="description"/>
     </resultMap>
     <!-- @formatter:on -->

@@ -18,23 +18,23 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.user.mapper.UserMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.core.user.javabean.entity.User">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_user-->
-        <result column="username"  property="username"/>
-        <result column="avatar"    property="avatar"/>
-        <result column="status"    property="status"/>
-        <result column="real_name" property="realName"/>
-        <result column="gender"    property="gender"/>
-        <result column="birthday"  property="birthday"/>
-        <result column="phone"     property="phone"/>
-        <result column="email"     property="email"/>
-        <result column="country"   property="country"/>
-        <result column="city"      property="city"/>
-        <result column="language"  property="language"/>
-        <result column="timezone"  property="timezone"/>
+        <result column="username"      property="username"/>
+        <result column="avatar"        property="avatar"/>
+        <result column="status"        property="status"/>
+        <result column="real_name"     property="realName"/>
+        <result column="gender"        property="gender"/>
+        <result column="birthday"      property="birthday"/>
+        <result column="phone"         property="phone"/>
+        <result column="email"         property="email"/>
+        <result column="country"       property="country"/>
+        <result column="city"          property="city"/>
+        <result column="language"      property="language"/>
+        <result column="timezone"      property="timezone"/>
         <result column="department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->

@@ -18,16 +18,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.leave.javabean.entity.LeaveType">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_leave_type-->
-        <result column="code" property="code"/>
-        <result column="name" property="name"/>
-        <result column="unit" property="unit"/>
+        <result column="code"          property="code"/>
+        <result column="name"          property="name"/>
+        <result column="unit"          property="unit"/>
         <result column="default_hours" property="defaultHours"/>
-        <result column="enabled" property="enabled"/>
+        <result column="enabled"       property="enabled"/>
     </resultMap>
     <!-- @formatter:on -->
 

@@ -18,21 +18,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.core.notification.mapper.NotificationMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.core.notification.javabean.entity.Notification">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_notification-->
-        <result column="title" property="title"/>
-        <result column="content" property="content"/>
-        <result column="type" property="type"/>
-        <result column="sender_id" property="senderId"/>
+        <result column="title"       property="title"/>
+        <result column="content"     property="content"/>
+        <result column="type"        property="type"/>
+        <result column="sender_id"   property="senderId"/>
         <result column="sender_name" property="senderName"/>
-        <result column="link" property="link"/>
-        <result column="is_read" property="isRead"/>
-        <result column="read_at" property="readAt"/>
+        <result column="link"        property="link"/>
+        <result column="is_read"     property="isRead"/>
+        <result column="read_at"     property="readAt"/>
         <result column="receiver_id" property="receiverId"/>
-        <result column="extra" property="extra"/>
+        <result column="extra"       property="extra"/>
     </resultMap>
     <!-- @formatter:on -->
 

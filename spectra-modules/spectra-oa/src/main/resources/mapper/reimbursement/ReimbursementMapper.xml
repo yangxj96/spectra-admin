@@ -18,22 +18,22 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_reimbursement-->
         <result column="application_id" property="applicationId"/>
-        <result column="department_id" property="departmentId"/>
-        <result column="purpose" property="purpose"/>
-        <result column="expense_start" property="expenseStart"/>
-        <result column="expense_end" property="expenseEnd"/>
-        <result column="total_amount" property="totalAmount"/>
-        <result column="currency" property="currency"/>
-        <result column="payee_name" property="payeeName"/>
-        <result column="payee_account" property="payeeAccount"/>
+        <result column="department_id"  property="departmentId"/>
+        <result column="purpose"        property="purpose"/>
+        <result column="expense_start"  property="expenseStart"/>
+        <result column="expense_end"    property="expenseEnd"/>
+        <result column="total_amount"   property="totalAmount"/>
+        <result column="currency"       property="currency"/>
+        <result column="payee_name"     property="payeeName"/>
+        <result column="payee_account"  property="payeeAccount"/>
         <result column="payment_status" property="paymentStatus"/>
-        <result column="payment_at" property="paymentAt"/>
+        <result column="payment_at"     property="paymentAt"/>
         <result column="payment_remark" property="paymentRemark"/>
     </resultMap>
     <!-- @formatter:on -->

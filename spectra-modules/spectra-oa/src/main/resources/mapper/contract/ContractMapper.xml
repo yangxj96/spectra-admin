@@ -18,27 +18,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.devops00.spectra.oa.contract.mapper.ContractMapper">
     <!-- @formatter:off -->
-    <resultMap id="BaseResultMap"
+<resultMap id="BaseResultMap"
                extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
                type="com.devops00.spectra.oa.contract.javabean.entity.Contract">
         <!--@mbg.generated-->
         <!--@Table spectra_oa.oa_contract-->
-        <result column="contract_no" property="contractNo"/>
-        <result column="title" property="title"/>
-        <result column="contract_type" property="contractType"/>
-        <result column="counterparty_name" property="counterpartyName"/>
+        <result column="contract_no"          property="contractNo"/>
+        <result column="title"                property="title"/>
+        <result column="contract_type"        property="contractType"/>
+        <result column="counterparty_name"    property="counterpartyName"/>
         <result column="counterparty_contact" property="counterpartyContact"/>
-        <result column="owner_id" property="ownerId"/>
-        <result column="amount" property="amount"/>
-        <result column="currency" property="currency"/>
-        <result column="start_date" property="startDate"/>
-        <result column="end_date" property="endDate"/>
-        <result column="status" property="status"/>
-        <result column="signing_status" property="signingStatus"/>
-        <result column="signed_at" property="signedAt"/>
-        <result column="visibility" property="visibility"/>
-        <result column="summary" property="summary"/>
-        <result column="department_id" property="departmentId"/>
+        <result column="owner_id"             property="ownerId"/>
+        <result column="amount"               property="amount"/>
+        <result column="currency"             property="currency"/>
+        <result column="start_date"           property="startDate"/>
+        <result column="end_date"             property="endDate"/>
+        <result column="status"               property="status"/>
+        <result column="signing_status"       property="signingStatus"/>
+        <result column="signed_at"            property="signedAt"/>
+        <result column="visibility"           property="visibility"/>
+        <result column="summary"              property="summary"/>
+        <result column="department_id"        property="departmentId"/>
     </resultMap>
     <!-- @formatter:on -->
 
