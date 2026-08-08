@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveCreateFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeavePageFrom;
+import com.devops00.spectra.oa.leave.javabean.from.LeaveSubmitFrom;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 
 /// 请假业务闭环服务。
@@ -35,7 +36,7 @@ public interface LeaveService {
 
     LeaveVO get(UUID id);
 
-    void submit(UUID id);
+    void submit(UUID id, LeaveSubmitFrom from);
 
     void withdraw(UUID id);
 

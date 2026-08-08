@@ -26,6 +26,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
@@ -54,12 +55,14 @@ import com.devops00.spectra.oa.leave.javabean.entity.LeaveBalance;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveType;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveCreateFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeavePageFrom;
+import com.devops00.spectra.oa.leave.javabean.from.LeaveSubmitFrom;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 import com.devops00.spectra.oa.leave.mapper.AttendanceRecordMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveApplicationMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveBalanceMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper;
 import com.devops00.spectra.oa.leave.service.LeaveService;
+import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 
 import lombok.RequiredArgsConstructor;
@@ -113,7 +116,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void update(UUID id, LeaveCreateFrom from) {
         var detail = requireDetail(id);
-        var application = applicationService.require(detail.getApplicationId());
+        var application = requireApplicantApplication(detail);
         if (!(ApplicationStatus.DRAFT.name().equals(application.getStatus())
                 || ApplicationStatus.REJECTED.name().equals(application.getStatus()))) {
             throw new DataSaveException("当前状态不允许修改请假申请");
@@ -134,17 +137,25 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Override
     public IPage<LeaveVO> page(PageFrom page, LeavePageFrom params) {
         var wrapper = new LambdaQueryWrapper<LeaveApplication>();
-        if (StringUtils.hasText(params.getLeaveTypeCode())) {
-            wrapper.eq(LeaveApplication::getLeaveTypeCode, params.getLeaveTypeCode());
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        if (StringUtils.hasText(params.getStatus())) {
-            var applications = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
-                    .eq(Application::getStatus, params.getStatus()));
-            if (applications.isEmpty()) {
-                return new Page<LeaveVO>(page.getPageNum(), page.getPageSize(), 0);
-            }
-            wrapper.in(LeaveApplication::getApplicationId,
-                    applications.stream().map(Application::getId).toList());
+        var applicationWrapper = new LambdaQueryWrapper<Application>()
+                .eq(Application::getTypeCode, LEAVE_TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId())
+                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        if (params != null && StringUtils.hasText(params.getStatus())) {
+            applicationWrapper.eq(Application::getStatus, params.getStatus());
+        }
+        var applicationIds = applicationMapper.selectList(applicationWrapper).stream()
+                .map(Application::getId).toList();
+        if (applicationIds.isEmpty()) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.in(LeaveApplication::getApplicationId, applicationIds);
+        if (params != null && StringUtils.hasText(params.getLeaveTypeCode())) {
+            wrapper.eq(LeaveApplication::getLeaveTypeCode, params.getLeaveTypeCode());
         }
         wrapper.orderByDesc(LeaveApplication::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
@@ -158,14 +169,14 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Override
     public LeaveVO get(UUID id) {
         var detail = requireDetail(id);
-        return toVO(detail, applicationService.require(detail.getApplicationId()));
+        return toVO(detail, applicationService.requireVisible(detail.getApplicationId()));
     }
 
     @Override
     @Transactional
-    public void submit(UUID id) {
+    public void submit(UUID id, LeaveSubmitFrom from) {
         var detail = requireDetail(id);
-        var application = applicationService.require(detail.getApplicationId());
+        var application = requireApplicantApplication(detail);
         applicationService.submit(application.getId());
         reserveBalance(application.getApplicantId(), detail);
         var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
@@ -173,10 +184,18 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
             throw new DataSaveException("请假流程尚未配置");
         }
-        var variables = Map.<String, Object>of(
-                "applicantId", application.getApplicantId().toString(),
-                "leaveTypeCode", detail.getLeaveTypeCode(),
-                "durationHours", detail.getDurationHours().doubleValue());
+        var currentUser = SecUtil.getCurrentUser();
+        var applicant = currentUser == null ? null : currentUser.getUsername();
+        if (!StringUtils.hasText(applicant)) {
+            throw new DataSaveException("当前用户缺少流程用户名");
+        }
+        var approver = from == null ? null : from.getApproverUsername();
+        var variables = new java.util.LinkedHashMap<String, Object>();
+        variables.put("applicant", applicant);
+        variables.put("approver", StringUtils.hasText(approver) ? approver : applicant);
+        variables.put("applicantId", application.getApplicantId().toString());
+        variables.put("leaveTypeCode", detail.getLeaveTypeCode());
+        variables.put("durationHours", detail.getDurationHours().doubleValue());
         var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(),
                 variables);
         applicationService.bindProcessInstance(application.getId(), processId);
@@ -186,7 +205,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void withdraw(UUID id) {
         var detail = requireDetail(id);
-        var application = applicationService.require(detail.getApplicationId());
+        var application = requireApplicantApplication(detail);
         releaseReservedBalance(application.getApplicantId(), detail);
         applicationService.withdraw(application.getId());
         terminateProcess(application);
@@ -196,7 +215,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void cancel(UUID id) {
         var detail = requireDetail(id);
-        var application = applicationService.require(detail.getApplicationId());
+        var application = requireApplicantApplication(detail);
         if (ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             releaseReservedBalance(application.getApplicantId(), detail);
         }
@@ -249,6 +268,14 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             throw new DataNotExistException("请假申请不存在: " + id);
         }
         return detail;
+    }
+
+    private Application requireApplicantApplication(LeaveApplication detail) {
+        var application = applicationService.require(detail.getApplicationId());
+        if (!Objects.equals(application.getApplicantId(), SecUtil.getCurrentUserId())) {
+            throw new DataNotExistException("请假申请不存在或无权操作");
+        }
+        return application;
     }
 
     private Application requireApplication(String businessKey) {

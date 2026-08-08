@@ -2,34 +2,77 @@
  *  Copyright 2018-2026 yangxj96
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
  */
 
 package com.devops00.spectra.oa.contact.service.impl;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import com.devops00.spectra.common.base.BaseServiceImpl;
-import com.devops00.spectra.oa.contact.javabean.entity.Contact;
-import com.devops00.spectra.oa.contact.mapper.ContactMapper;
-import com.devops00.spectra.oa.contact.service.ContactService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-/// 通讯录主表-服务默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 11:56
-@Slf4j
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.system.javabean.entity.Department;
+import com.devops00.spectra.core.system.mapper.DepartmentMapper;
+import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
+import com.devops00.spectra.oa.contact.service.ContactService;
+
+import lombok.RequiredArgsConstructor;
+
+/// 通讯录直接复用系统用户和部门数据，不维护重复的 OA 联系人主表。
 @Service
-public class ContactServiceImpl extends BaseServiceImpl<ContactMapper, Contact> implements ContactService {
+@RequiredArgsConstructor
+public class ContactServiceImpl implements ContactService {
+
+    private static final short ENABLED = 1;
+
+    private final UserMapper userMapper;
+    private final DepartmentMapper departmentMapper;
+
+    @Override
+    public IPage<ContactVO> page(PageFrom page, String keyword) {
+        var wrapper = new LambdaQueryWrapper<User>().eq(User::getStatus, ENABLED);
+        if (StringUtils.hasText(keyword)) {
+            String value = keyword.trim();
+            wrapper.and(query -> query.like(User::getUsername, value)
+                    .or().like(User::getRealName, value)
+                    .or().like(User::getPhone, value)
+                    .or().like(User::getEmail, value));
+        }
+        wrapper.orderByAsc(User::getRealName).orderByAsc(User::getUsername);
+        var users = userMapper.selectPage(page.toPage(), wrapper);
+        var departmentIds = users.getRecords().stream().map(User::getDepartmentId)
+                .filter(Objects::nonNull).distinct().toList();
+        Map<UUID, Department> departments = departmentIds.isEmpty() ? Collections.emptyMap()
+                : departmentMapper.selectByIds(departmentIds).stream()
+                        .collect(Collectors.toMap(Department::getId, Function.identity()));
+        var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
+        result.setRecords(users.getRecords().stream().map(user -> toVO(user, departments)).toList());
+        return result;
+    }
+
+    private ContactVO toVO(User user, Map<UUID, Department> departments) {
+        var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
+        var vo = new ContactVO();
+        vo.setId(user.getId());
+        vo.setUsername(user.getUsername());
+        vo.setRealName(user.getRealName());
+        vo.setAvatar(user.getAvatar());
+        vo.setPhone(user.getPhone());
+        vo.setEmail(user.getEmail());
+        vo.setDepartmentId(user.getDepartmentId());
+        vo.setDepartmentName(department == null ? null
+                : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
+        return vo;
+    }
 }

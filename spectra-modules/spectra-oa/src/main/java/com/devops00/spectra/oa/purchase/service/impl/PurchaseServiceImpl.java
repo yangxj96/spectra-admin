@@ -101,23 +101,30 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     @Override
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
         var wrapper = new LambdaQueryWrapper<Purchase>();
-        if (StringUtils.hasText(params.getExecutionStatus())) {
+        var user = SecUtil.getCurrentUser();
+        if (user == null || user.getId() == null || user.getDepartmentId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        var applicationWrapper = new LambdaQueryWrapper<Application>()
+                .eq(Application::getTypeCode, TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId())
+                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        if (params != null && StringUtils.hasText(params.getStatus())) {
+            applicationWrapper.eq(Application::getStatus, params.getStatus());
+        }
+        var applicationIds = applicationMapper.selectList(applicationWrapper).stream()
+                .map(Application::getId).toList();
+        if (applicationIds.isEmpty()) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.in(Purchase::getApplicationId, applicationIds);
+        if (params != null && StringUtils.hasText(params.getExecutionStatus())) {
             wrapper.eq(Purchase::getExecutionStatus, params.getExecutionStatus());
         }
-        if (StringUtils.hasText(params.getKeyword())) {
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Purchase::getPurpose, params.getKeyword())
                     .or().like(Purchase::getSuggestedSupplier, params.getKeyword())
                     .or().like(Purchase::getOrderNo, params.getKeyword()));
-        }
-        if (StringUtils.hasText(params.getStatus())) {
-            var applicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
-                            .eq(Application::getTypeCode, TYPE_CODE)
-                            .eq(Application::getStatus, params.getStatus()))
-                    .stream().map(Application::getId).toList();
-            if (applicationIds.isEmpty()) {
-                return new Page<>(page.getPageNum(), page.getPageSize(), 0);
-            }
-            wrapper.in(Purchase::getApplicationId, applicationIds);
         }
         wrapper.orderByDesc(Purchase::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
@@ -128,7 +135,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
 
     @Override
     public PurchaseVO get(UUID id) {
-        return toVO(require(id));
+        var entity = require(id);
+        applicationService.requireVisible(entity.getApplicationId());
+        return toVO(entity);
     }
 
     @Override

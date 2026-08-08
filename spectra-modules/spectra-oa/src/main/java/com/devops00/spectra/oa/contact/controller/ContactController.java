@@ -20,13 +20,14 @@ package com.devops00.spectra.oa.contact.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.contact.javabean.entity.Contact;
+import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
 import com.devops00.spectra.oa.contact.service.ContactService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /// 通讯录主接口
@@ -40,13 +41,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class ContactController {
 
-    private final ContactService bindService;
+    private final ContactService contactService;
 
     @ULog("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTACT:QUERY')")
-    public IPage<Contact> page(PageFrom page) {
-        return bindService.page(page.toPage());
+    public IPage<ContactVO> page(PageFrom page, @RequestParam(required = false) String keyword) {
+        return contactService.page(page, keyword);
     }
 
 }

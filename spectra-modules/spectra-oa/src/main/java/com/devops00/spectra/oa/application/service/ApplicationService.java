@@ -51,6 +51,8 @@ public interface ApplicationService {
 
     Application require(UUID id);
 
+    Application requireVisible(UUID id);
+
     void submit(UUID id);
 
     void withdraw(UUID id);

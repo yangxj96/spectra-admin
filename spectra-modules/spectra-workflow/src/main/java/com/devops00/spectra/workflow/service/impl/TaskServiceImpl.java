@@ -22,9 +22,11 @@ import java.util.stream.Collectors;
 
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
+import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -54,6 +56,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     private final RepositoryService repositoryService;
 
+    private final RuntimeService runtimeService;
+
     private final WorkflowService workflowService;
 
     private final TaskConverter taskConverter;
@@ -69,7 +73,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         var tasks = taskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        var records = tasks.stream().map(taskConverter::toVO).toList();
+        var records = tasks.stream().map(this::toVO).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -89,7 +93,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         var tasks = historicTaskQuery
                 .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
-        var records = tasks.stream().map(taskConverter::fromHistoricTask).toList();
+        var records = tasks.stream().map(this::toVO).toList();
 
         Page<TaskVO> result = new Page<>(page.getPageNum(), page.getPageSize());
         result.setTotal(total);
@@ -99,13 +103,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void complete(String taskId, String comment) {
-        var task = flowableTaskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult();
-        if (task == null) {
-            throw new DataNotExistException("任务不存在: " + taskId);
-        }
+    public void complete(String taskId, String comment, String operator) {
+        var task = requireOwnedTask(taskId, operator);
 
         // 添加审批意见
         if (comment != null && !comment.isBlank()) {
@@ -124,13 +123,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void reject(String taskId, String comment) {
-        var task = flowableTaskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult();
-        if (task == null) {
-            throw new DataNotExistException("任务不存在: " + taskId);
-        }
+    public void reject(String taskId, String comment, String operator) {
+        var task = requireOwnedTask(taskId, operator);
 
         // 添加驳回意见
         if (comment != null && !comment.isBlank()) {
@@ -149,13 +143,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void transfer(String taskId, String targetUserId) {
-        var task = flowableTaskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult();
-        if (task == null) {
-            throw new DataNotExistException("任务不存在: " + taskId);
-        }
+    public void transfer(String taskId, String targetUserId, String operator) {
+        var task = requireOwnedTask(taskId, operator);
 
         // 转办：设置新的处理人
         flowableTaskService.setAssignee(taskId, targetUserId);
@@ -164,17 +153,69 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delegate(String taskId, String targetUserId) {
-        var task = flowableTaskService.createTaskQuery()
-                .taskId(taskId)
-                .singleResult();
-        if (task == null) {
-            throw new DataNotExistException("任务不存在: " + taskId);
-        }
+    public void delegate(String taskId, String targetUserId, String operator) {
+        var task = requireOwnedTask(taskId, operator);
 
         // 委派任务
         flowableTaskService.delegateTask(taskId, targetUserId);
         log.info("任务已委派: taskId={}, from={}, to={}", taskId, task.getAssignee(), targetUserId);
+    }
+
+    @Override
+    public boolean canAccessProcess(String processInstanceId, String username) {
+        if (!StringUtils.hasText(processInstanceId) || !StringUtils.hasText(username)) {
+            return false;
+        }
+        if (flowableTaskService.createTaskQuery().processInstanceId(processInstanceId)
+                .taskAssignee(username).count() > 0) {
+            return true;
+        }
+        return historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId)
+                .taskAssignee(username).count() > 0;
+    }
+
+    private org.flowable.task.api.Task requireOwnedTask(String taskId, String operator) {
+        if (!StringUtils.hasText(operator)) {
+            throw new DataNotExistException("任务不存在或无权处理: " + taskId);
+        }
+        var task = flowableTaskService.createTaskQuery().taskId(taskId).taskAssignee(operator).singleResult();
+        if (task == null) {
+            throw new DataNotExistException("任务不存在或无权处理: " + taskId);
+        }
+        return task;
+    }
+
+    private TaskVO toVO(org.flowable.task.api.Task task) {
+        var vo = taskConverter.toVO(task);
+        enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), false);
+        return vo;
+    }
+
+    private TaskVO toVO(org.flowable.task.api.history.HistoricTaskInstance task) {
+        var vo = taskConverter.fromHistoricTask(task);
+        enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), true);
+        return vo;
+    }
+
+    private void enrich(TaskVO vo, String processInstanceId, String processDefinitionId, boolean historic) {
+        var definition = repositoryService.createProcessDefinitionQuery()
+                .processDefinitionId(processDefinitionId).singleResult();
+        if (definition != null) {
+            vo.setProcessDefinitionKey(definition.getKey());
+        }
+        if (historic) {
+            var instance = historyService.createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstanceId).singleResult();
+            if (instance != null) {
+                vo.setBusinessKey(instance.getBusinessKey());
+            }
+        } else {
+            var instance = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(processInstanceId).singleResult();
+            if (instance != null) {
+                vo.setBusinessKey(instance.getBusinessKey());
+            }
+        }
     }
 
     /// 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。

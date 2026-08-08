@@ -44,24 +44,29 @@ public interface TaskService {
     /// 完成任务（审批通过）
     ///
     /// @param taskId  任务ID
-    /// @param comment 审批意见
-    void complete(String taskId, String comment);
+    /// @param comment  审批意见
+    /// @param operator 当前处理人用户名
+    void complete(String taskId, String comment, String operator);
 
     /// 驳回任务
     ///
     /// @param taskId  任务ID
-    /// @param comment 驳回意见
-    void reject(String taskId, String comment);
+    /// @param comment  驳回意见
+    /// @param operator 当前处理人用户名
+    void reject(String taskId, String comment, String operator);
 
     /// 转办任务
     ///
     /// @param taskId       任务ID
     /// @param targetUserId 目标用户用户名
-    void transfer(String taskId, String targetUserId);
+    void transfer(String taskId, String targetUserId, String operator);
 
     /// 委派任务
     ///
     /// @param taskId       任务ID
     /// @param targetUserId 目标用户用户名
-    void delegate(String taskId, String targetUserId);
+    void delegate(String taskId, String targetUserId, String operator);
+
+    /// 当前用户是否是该流程的当前或历史任务处理人。
+    boolean canAccessProcess(String processInstanceId, String username);
 }

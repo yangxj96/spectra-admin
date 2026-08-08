@@ -81,7 +81,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
-        taskService.complete(id, from.getComment());
+        taskService.complete(id, from.getComment(), SecUtil.getCurrentUsername());
     }
 
     /// 驳回任务
@@ -92,7 +92,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
-        taskService.reject(id, from.getComment());
+        taskService.reject(id, from.getComment(), SecUtil.getCurrentUsername());
     }
 
     /// 转办任务
@@ -103,7 +103,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
-        taskService.transfer(id, from.getTargetUserId());
+        taskService.transfer(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
     }
 
     /// 委派任务
@@ -114,6 +114,6 @@ public class TaskController {
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
     public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {
-        taskService.delegate(id, from.getTargetUserId());
+        taskService.delegate(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
     }
 }

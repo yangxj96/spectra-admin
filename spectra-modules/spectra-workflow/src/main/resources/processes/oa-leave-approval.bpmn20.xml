@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:flowable="http://flowable.org/bpmn"
+        targetNamespace="http://spectra.devops00.com/oa/leave">
+    <!-- 请假提交后直接进入审批人待办；审批结果由 OA 回调更新额度和考勤结果。 -->
+    <bpmn:process id="oa_leave_approval" name="请假审批" isExecutable="true">
+        <bpmn:startEvent id="start" name="开始"/>
+        <bpmn:userTask id="approve" name="请假审批" flowable:assignee="${approver}"/>
+        <bpmn:exclusiveGateway id="result" name="审批结果"/>
+        <bpmn:endEvent id="approved" name="审批通过"/>
+        <bpmn:endEvent id="rejected" name="审批驳回"/>
+        <bpmn:sequenceFlow id="start_to_approve" sourceRef="start" targetRef="approve"/>
+        <bpmn:sequenceFlow id="approve_to_result" sourceRef="approve" targetRef="result"/>
+        <bpmn:sequenceFlow id="result_to_approved" sourceRef="result" targetRef="approved">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == true}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+        <bpmn:sequenceFlow id="result_to_rejected" sourceRef="result" targetRef="rejected">
+            <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${approved == false}</bpmn:conditionExpression>
+        </bpmn:sequenceFlow>
+    </bpmn:process>
+</bpmn:definitions>

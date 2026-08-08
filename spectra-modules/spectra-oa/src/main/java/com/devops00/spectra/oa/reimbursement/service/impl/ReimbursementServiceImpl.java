@@ -134,7 +134,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
 
     @Override
     public ReimbursementVO get(UUID id) {
-        return toVO(require(id));
+        var entity = require(id);
+        applicationService.requireVisible(entity.getApplicationId());
+        return toVO(entity);
     }
 
     @Override

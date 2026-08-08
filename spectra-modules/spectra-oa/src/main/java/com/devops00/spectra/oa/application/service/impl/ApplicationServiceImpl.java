@@ -46,6 +46,7 @@ import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
 import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.workflow.service.TaskService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,6 +63,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationMapper applicationMapper;
     private final ApplicationConverter applicationConverter;
+    private final TaskService taskService;
 
     @Override
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
@@ -91,14 +93,24 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
 
     @Override
     public ApplicationVO get(UUID id) {
+        return applicationConverter.toVO(requireVisible(id));
+    }
+
+    @Override
+    public Application requireVisible(UUID id) {
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
-        if (user == null || user.getId() == null || user.getDepartmentId() == null
-                || (!user.getId().equals(entity.getApplicantId())
-                && !user.getDepartmentId().equals(entity.getDepartmentId()))) {
-            throw new DataNotExistException("OA 申请不存在或无权访问");
+        if (user != null && user.getId() != null && user.getDepartmentId() != null
+                && (user.getId().equals(entity.getApplicantId())
+                || user.getDepartmentId().equals(entity.getDepartmentId()))) {
+            return entity;
         }
-        return applicationConverter.toVO(entity);
+        String username = SecUtil.getCurrentUsername();
+        if (StringUtils.hasText(entity.getProcessInstanceId())
+                && taskService.canAccessProcess(entity.getProcessInstanceId(), username)) {
+            return entity;
+        }
+        throw new DataNotExistException("OA 申请不存在或无权访问");
     }
 
     @Override

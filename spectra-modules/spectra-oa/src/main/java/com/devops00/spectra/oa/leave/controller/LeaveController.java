@@ -33,6 +33,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveCreateFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeavePageFrom;
+import com.devops00.spectra.oa.leave.javabean.from.LeaveSubmitFrom;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 import com.devops00.spectra.oa.leave.service.LeaveService;
 
@@ -79,8 +80,8 @@ public class LeaveController {
     @ULog("'提交请假申请'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
-    public void submit(@PathVariable UUID id) {
-        leaveService.submit(id);
+    public void submit(@PathVariable UUID id, @RequestBody(required = false) LeaveSubmitFrom from) {
+        leaveService.submit(id, from);
     }
 
     @ULog("'撤回请假申请'")

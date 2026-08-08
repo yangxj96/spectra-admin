@@ -118,7 +118,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .singleResult();
 
         if (instance == null) {
-            throw new DataNotExistException("流程实例不存在: " + processInstanceId);
+            log.info("流程实例已结束，无需重复终止: processInstanceId={}, reason={}", processInstanceId, reason);
+            return;
         }
 
         var definition = repositoryService.createProcessDefinitionQuery()

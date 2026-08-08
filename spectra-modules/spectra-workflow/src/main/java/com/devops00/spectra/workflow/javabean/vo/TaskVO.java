@@ -45,6 +45,12 @@ public class TaskVO {
     /// 流程定义ID
     private String processDefinitionId;
 
+    /// 流程定义KEY
+    private String processDefinitionKey;
+
+    /// 业务KEY
+    private String businessKey;
+
     /// 任务创建时间
     private String createTime;
 

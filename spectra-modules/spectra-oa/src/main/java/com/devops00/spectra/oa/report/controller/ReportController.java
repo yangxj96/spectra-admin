@@ -17,14 +17,10 @@
 package com.devops00.spectra.oa.report.controller;
 
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
-import com.devops00.spectra.oa.report.javabean.entity.Report;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import com.devops00.spectra.oa.report.service.DepartmentStatsService;
-import com.devops00.spectra.oa.report.service.ReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -50,16 +46,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReportController {
 
-    private final ReportService bindService;
-
     private final DepartmentStatsService departmentStatsService;
-
-    @ULog("'分页查询报表'")
-    @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
-    public IPage<Report> page(PageFrom page) {
-        return bindService.page(page.toPage());
-    }
 
     @ULog("'查询部门维度统计'")
     @GetMapping(value = "/department", version = "1.0.0+")
