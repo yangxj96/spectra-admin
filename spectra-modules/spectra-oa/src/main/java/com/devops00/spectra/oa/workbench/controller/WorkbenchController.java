@@ -65,7 +65,7 @@ public class WorkbenchController {
             var page = new PageFrom();
             page.setPageSize(1L);
             page.setPageNum(1L);
-            result.setTodoCount(taskService.todo(page, SecUtil.getCurrentUsername()).getTotal());
+            result.setTodoCount(taskService.todo(page, SecUtil.getCurrentUsername(), null).getTotal());
         } catch (Exception exception) {
             log.warn("OA 工作台待办卡片加载失败", exception);
         }
