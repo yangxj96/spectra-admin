@@ -17,6 +17,7 @@
 package com.devops00.spectra.ai.controller;
 
 import com.devops00.spectra.ai.javabean.entity.AiConversation;
+import com.devops00.spectra.ai.javabean.from.AiConversationRenameFrom;
 import com.devops00.spectra.ai.javabean.vo.ChatMessageVO;
 import com.devops00.spectra.ai.service.AiConversationService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -24,12 +25,13 @@ import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -60,8 +62,8 @@ public class AiConversationController {
     @ULog("'重命名AI会话'")
     @PutMapping(value = "/{id}/title", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'AI:UPDATE')")
-    public void rename(@PathVariable UUID id, @RequestParam String title) {
-        conversationService.rename(id, SecUtil.getCurrentUserId(), title);
+    public void rename(@PathVariable UUID id, @Validated @ModelAttribute AiConversationRenameFrom from) {
+        conversationService.rename(id, SecUtil.getCurrentUserId(), from.getTitle());
     }
 
     /// 删除会话

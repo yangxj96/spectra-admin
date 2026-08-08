@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.workflow.javabean.from.ProcessInstanceTerminateFrom;
 import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
@@ -92,8 +93,8 @@ public class ProcessInstanceController {
     @ULog("'终止流程'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_INSTANCE:UPDATE')")
-    public void terminate(@PathVariable String id, @RequestBody Map<String, String> from) {
-        processInstanceService.terminate(id, from.get("reason"));
+    public void terminate(@PathVariable String id, @RequestBody ProcessInstanceTerminateFrom from) {
+        processInstanceService.terminate(id, from.getReason());
     }
 
     /// 获取流程图（高亮当前节点）

@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
@@ -31,6 +30,7 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
+import com.devops00.spectra.workflow.javabean.from.TaskPageFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskTransferFrom;
 import com.devops00.spectra.workflow.service.TaskService;
 
@@ -53,29 +53,27 @@ public class TaskController {
     /// 查询待办任务
     ///
     /// @param page 分页参数
-    /// @param processDefinitionKey 可选流程定义KEY
+    /// @param params 查询参数
     /// @return 待办任务列表
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
-    public Object todo(PageFrom page,
-                       @RequestParam(value = "process_definition_key", required = false) String processDefinitionKey) {
+    public Object todo(PageFrom page, TaskPageFrom params) {
         String username = SecUtil.getCurrentUsername();
-        return taskService.todo(page, username, processDefinitionKey);
+        return taskService.todo(page, username, params.getProcessDefinitionKey());
     }
 
     /// 查询已办任务
     ///
     /// @param page 分页参数
-    /// @param processDefinitionKey 可选流程定义KEY
+    /// @param params 查询参数
     /// @return 已办任务列表
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
-    public Object done(PageFrom page,
-                       @RequestParam(value = "process_definition_key", required = false) String processDefinitionKey) {
+    public Object done(PageFrom page, TaskPageFrom params) {
         String username = SecUtil.getCurrentUsername();
-        return taskService.done(page, username, processDefinitionKey);
+        return taskService.done(page, username, params.getProcessDefinitionKey());
     }
 
     /// 完成任务（审批通过）

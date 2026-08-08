@@ -2,9 +2,10 @@ package com.devops00.spectra.core.notification.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
+import com.devops00.spectra.core.notification.javabean.from.NotificationBatchDeleteFrom;
+import com.devops00.spectra.core.notification.javabean.from.NotificationBatchSendFrom;
 import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFrom;
+import com.devops00.spectra.core.notification.javabean.from.NotificationSendFrom;
 import com.devops00.spectra.core.notification.javabean.vo.NotificationVO;
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -14,8 +15,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /// 消息控制器
 ///
@@ -79,24 +78,24 @@ public class NotificationController {
     @ULog("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
-    public void batchDelete(@RequestBody List<java.util.UUID> ids) {
+    public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {
         var userId = SecUtil.getCurrentUserId();
-        notificationService.batchDelete(ids, userId);
+        notificationService.batchDelete(from.getIds(), userId);
     }
 
     /// 发送消息（内部调用）
     @ULog("'发送消息'")
     @PostMapping(value = "/send", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public void send(@Valid @RequestBody NotificationSendDTO dto) {
-        notificationService.send(dto);
+    public void send(@Valid @RequestBody NotificationSendFrom from) {
+        notificationService.send(from);
     }
 
     /// 批量发送消息（内部调用）
     @ULog("'批量发送消息'")
     @PostMapping(value = "/batch-send", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
-    public void batchSend(@Valid @RequestBody NotificationBatchSendDTO dto) {
-        notificationService.batchSend(dto);
+    public void batchSend(@Valid @RequestBody NotificationBatchSendFrom from) {
+        notificationService.batchSend(from);
     }
 }

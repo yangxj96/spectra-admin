@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionFrom;
+import com.devops00.spectra.core.system.javabean.from.RegionLazyFrom;
 import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
@@ -52,14 +53,13 @@ public class RegionController {
 
     /// 懒加载树
     ///
-    /// @param level 层级
-    /// @param id    父级ID
+    /// @param from 查询参数
     /// @return 根据条件获取的下级的列表
     @ULog("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
-    public List<RegionVO> lazyTree(Integer level, @RequestParam(value = "id", required = false) String id) {
-        return bindService.lazyTree(level, id);
+    public List<RegionVO> lazyTree(RegionLazyFrom from) {
+        return bindService.lazyTree(from.getLevel(), from.getId());
     }
 
     @ULog("'分页查询行政区划'")
