@@ -17,7 +17,7 @@
 package com.devops00.spectra.oa.reimbursement.javabean.vo;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -78,7 +78,7 @@ public class ReimbursementVO {
     private String paymentStatus;
 
     /// 支付时间。
-    private Instant paymentAt;
+    private LocalDateTime paymentAt;
 
     /// 支付备注。
     private String paymentRemark;
@@ -92,8 +92,8 @@ public class ReimbursementVO {
     /// 创建时间。
     private List<ReimbursementItemVO> items = List.of();
     private List<ReimbursementAttachmentVO> attachments = List.of();
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /// 更新时间。
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 }

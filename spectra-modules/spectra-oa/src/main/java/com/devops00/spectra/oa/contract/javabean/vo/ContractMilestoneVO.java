@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.contract.javabean.vo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -52,14 +52,14 @@ public class ContractMilestoneVO {
     private UUID assigneeId;
 
     /// 完成时间。
-    private Instant completedAt;
+    private LocalDateTime completedAt;
 
     /// 提醒发送时间。
-    private Instant reminderSentAt;
+    private LocalDateTime reminderSentAt;
 
     /// 备注。
     private String remark;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

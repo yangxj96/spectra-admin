@@ -17,7 +17,7 @@
 package com.devops00.spectra.oa.leave.javabean.vo;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Data;
@@ -52,10 +52,10 @@ public class LeaveVO {
     private String leaveTypeCode;
 
     /// 开始时间。
-    private Instant startTime;
+    private LocalDateTime startTime;
 
     /// 结束时间。
-    private Instant endTime;
+    private LocalDateTime endTime;
 
     /// 时长（小时）。
     private BigDecimal durationHours;
@@ -73,5 +73,5 @@ public class LeaveVO {
     private String rejectReason;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

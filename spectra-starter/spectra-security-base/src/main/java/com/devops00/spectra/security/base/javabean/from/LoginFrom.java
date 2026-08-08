@@ -17,35 +17,41 @@
 package com.devops00.spectra.security.base.javabean.from;
 
 import com.devops00.spectra.security.base.constant.LoginType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /// 登录入参
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/12/2 23:15
-public record LoginFrom(
-        /// 登录方式。
-        LoginType type,
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class LoginFrom {
 
-        /// 通用账号，可为用户名、邮箱或手机号。
-        String username,
+    /// 登录方式。
+    private LoginType type;
 
-        /// 账号密码。
-        String password,
+    /// 通用账号，可为用户名、邮箱或手机号。
+    private String username;
 
-        /// 验证码。
-        String captcha,
+    /// 账号密码。
+    private String password;
 
-        /// 手机验证码。
-        String smsCode,
+    /// 验证码。
+    private String captcha;
 
-        /// 邮箱验证码。
-        String emailCode,
+    /// 手机验证码。
+    private String smsCode;
 
-        /// OTP 验证码。
-        String principal,
+    /// 邮箱验证码。
+    private String emailCode;
 
-        /// 一次性密码。
-        String otp
-) {
+    /// OTP 验证码。
+    private String principal;
+
+    /// 一次性密码。
+    private String otp;
 }

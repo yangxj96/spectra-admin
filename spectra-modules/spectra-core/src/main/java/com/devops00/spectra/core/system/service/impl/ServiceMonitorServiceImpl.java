@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.service.impl;
 import com.devops00.spectra.core.system.javabean.vo.CPUInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
+import com.devops00.spectra.core.system.javabean.converter.JVMInfoConverter;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,12 @@ import java.util.*;
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     private static final String UNKNOWN = "Unknown";
+
+    private final JVMInfoConverter jvmInfoConverter;
+
+    public ServiceMonitorServiceImpl(JVMInfoConverter jvmInfoConverter) {
+        this.jvmInfoConverter = jvmInfoConverter;
+    }
 
     /// 过滤敏感属性,只保留常见属性,防止泄露
     ///
@@ -144,30 +151,13 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     @Override
     public JVMInfoVO getJVMInfo() {
         var runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        return JVMInfoVO.builder()
-                // 基础信息
-                .jvmName(runtimeMXBean.getVmName())
-                .jvmVendor(runtimeMXBean.getVmVendor())
-                .jvmVersion(runtimeMXBean.getVmVersion())
-                .jvmSpecName(runtimeMXBean.getSpecName())
-                .jvmSpecVersion(runtimeMXBean.getSpecVersion())
-                .jvmSpecVendor(runtimeMXBean.getSpecVendor())
-                // 运行时环境
-                .javaVersion(System.getProperty("java.version"))
-                .javaHome(System.getProperty("java.home"))
-                .javaVendor(System.getProperty("java.vendor"))
-                .javaVendorUrl(System.getProperty("java.vendor.url"))
-                // 启动信息
-                .startTime(new Date(runtimeMXBean.getStartTime()))
-                .pid(runtimeMXBean.getName())
-                .processId(runtimeMXBean.getName().split("@")[0])
-                // 启动参数
-                .jvmArguments(runtimeMXBean.getInputArguments())
-                // 系统属性
-                .systemProps(getFilteredProps())
-                // 运行时类路径
-                .classPath(runtimeMXBean.getClassPath())
-                .libraryPath(runtimeMXBean.getLibraryPath())
-                .build();
+        return jvmInfoConverter.toVO(
+                runtimeMXBean,
+                System.getProperty("java.version"),
+                System.getProperty("java.home"),
+                System.getProperty("java.vendor"),
+                System.getProperty("java.vendor.url"),
+                getFilteredProps()
+        );
     }
 }

@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.application.javabean.vo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Data;
@@ -57,14 +57,14 @@ public class ApplicationVO {
     private String processInstanceId;
 
     /// 提交时间。
-    private Instant submittedAt;
+    private LocalDateTime submittedAt;
 
     /// 完成时间。
-    private Instant completedAt;
+    private LocalDateTime completedAt;
 
     /// 驳回原因。
     private String rejectReason;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

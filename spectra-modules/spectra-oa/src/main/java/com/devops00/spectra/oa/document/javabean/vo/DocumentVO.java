@@ -10,7 +10,7 @@ package com.devops00.spectra.oa.document.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 文档展示对象。
@@ -45,13 +45,13 @@ public class DocumentVO {
     private UUID ownerId;
 
     /// 发布时间。
-    private Instant publishedAt;
+    private LocalDateTime publishedAt;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /// 更新时间。
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
     /// 当前版本字段。
     private DocumentVersionVO currentVersion;

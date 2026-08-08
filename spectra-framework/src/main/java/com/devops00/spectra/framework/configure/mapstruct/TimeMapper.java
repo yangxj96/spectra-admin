@@ -56,6 +56,14 @@ public class TimeMapper {
         return instant == null ? null : LocalDateTime.ofInstant(instant, getUserZoneId());
     }
 
+    /// Unix 时间戳转 LocalDateTime。
+    ///
+    /// @param epochMilli Unix 毫秒时间戳
+    /// @return {@link LocalDateTime}
+    public @Nullable LocalDateTime toLocalDateTime(@Nullable Long epochMilli) {
+        return epochMilli == null ? null : toLocalDateTime(Instant.ofEpochMilli(epochMilli));
+    }
+
     /// LocalDateTime 转 Instant
     ///
     /// @param localDateTime {@link LocalDateTime}

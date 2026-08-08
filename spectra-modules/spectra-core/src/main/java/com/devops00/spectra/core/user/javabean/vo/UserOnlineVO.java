@@ -19,7 +19,7 @@ package com.devops00.spectra.core.user.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 在线用户VO
@@ -47,7 +47,7 @@ public class UserOnlineVO {
     private String address;
 
     /// 登录时间字段。
-    private Instant loginTime;
+    private LocalDateTime loginTime;
 
     /// 访问令牌。
     private String token;

@@ -16,10 +16,12 @@
 
 package com.devops00.spectra.security.base.javabean.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /// 在线用户VO
 ///
@@ -28,6 +30,8 @@ import java.time.Instant;
 /// @since 2025/10/15 10:58
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserOnlineVO {
 
     /// 用户ID
@@ -49,7 +53,7 @@ public class UserOnlineVO {
     private String address;
 
     /// 登陆时间
-    private Instant loginTime;
+    private LocalDateTime loginTime;
 
     /// 关联的token
     private String token;

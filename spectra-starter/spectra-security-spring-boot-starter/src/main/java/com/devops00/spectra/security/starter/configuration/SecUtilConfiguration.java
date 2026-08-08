@@ -19,6 +19,7 @@ package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.starter.javabean.converter.UserOnlineConverter;
 import com.devops00.spectra.security.starter.holder.SecStrategyBridge;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -52,14 +53,16 @@ public class SecUtilConfiguration {
     /// @param om         Security使用的ObjectMapper
     /// @param redis      Security使用的RedisTemplate
     /// @param properties 安全配置
+    /// @param userOnlineConverter 在线用户转换器
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
     public RedisSecHolderStrategy redisSecHolderStrategy(
             @Qualifier("securityObjectMapper") ObjectMapper om,
             @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties
+            SecurityProperties properties,
+            UserOnlineConverter userOnlineConverter
     ) {
-        return new RedisSecHolderStrategy(om, redis, properties);
+        return new RedisSecHolderStrategy(om, redis, properties, userOnlineConverter);
     }
 
 }

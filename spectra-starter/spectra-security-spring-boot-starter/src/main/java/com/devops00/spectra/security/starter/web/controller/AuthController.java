@@ -72,7 +72,7 @@ public class AuthController {
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0+")
     public TokenVO login(@Validated @RequestBody LoginFrom params) {
-        String username = params.username() != null ? params.username() : "";
+        String username = params.getUsername() != null ? params.getUsername() : "";
 
         // 登录锁定检查
         if (SecUtil.isLockedOut(username)) {
@@ -103,7 +103,7 @@ public class AuthController {
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
     public void logout(@RequestBody(required = false) RefreshTokenFrom params) {
-        String refreshToken = params != null ? params.refreshToken() : null;
+        String refreshToken = params != null ? params.getRefreshToken() : null;
         var token = SecUtil.getCurrentToken();
 
         if (StrUtils.isNotBlank(token)) {
@@ -124,7 +124,7 @@ public class AuthController {
     @PostMapping(value = "/sms", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     public void sendSms(@Validated @RequestBody SmsCodeFrom params) {
-        authService.sendSmsCode(params.phone());
+        authService.sendSmsCode(params.getPhone());
     }
 
     /// 发送邮箱验证码
@@ -136,7 +136,7 @@ public class AuthController {
     @PostMapping(value = "/email", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     public void sendEmail(@Validated @RequestBody EmailCodeFrom params) {
-        authService.sendEmailCode(params.email());
+        authService.sendEmailCode(params.getEmail());
     }
 
     /// 刷新token
@@ -148,6 +148,6 @@ public class AuthController {
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0+")
     public TokenVO refresh(@Validated @RequestBody RefreshTokenFrom params) {
-        return SecUtil.refreshByRefreshToken(params.refreshToken());
+        return SecUtil.refreshByRefreshToken(params.getRefreshToken());
     }
 }

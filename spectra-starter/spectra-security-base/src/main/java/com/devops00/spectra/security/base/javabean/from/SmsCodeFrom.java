@@ -16,13 +16,20 @@
 
 package com.devops00.spectra.security.base.javabean.from;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /// 发送短信验证码入参
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/6/28
-public record SmsCodeFrom(
-        /// 手机号码。
-        String phone
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SmsCodeFrom {
+
+    /// 手机号码。
+    private String phone;
 }

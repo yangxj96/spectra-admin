@@ -46,26 +46,26 @@ public class LoginDispatcher {
     /// @return 登录结果
     public Authentication authenticate(LoginFrom request) {
 
-        return switch (request.type()) {
+        return switch (request.getType()) {
             case LoginType.PASSWORD -> authenticationManager.authenticate(
                     new UsernamePasswordCaptchaAuthenticationToken(
-                            request.username(),
-                            request.password(),
-                            request.captcha()
+                            request.getUsername(),
+                            request.getPassword(),
+                            request.getCaptcha()
                     )
             );
 
             case LoginType.SMS -> authenticationManager.authenticate(
                     new SmsAuthenticationToken(
-                            request.username(),
-                            request.smsCode()
+                            request.getUsername(),
+                            request.getSmsCode()
                     )
             );
 
             case LoginType.EMAIL -> authenticationManager.authenticate(
                     new EmailAuthenticationToken(
-                            request.username(),
-                            request.emailCode()
+                            request.getUsername(),
+                            request.getEmailCode()
                     )
             );
 

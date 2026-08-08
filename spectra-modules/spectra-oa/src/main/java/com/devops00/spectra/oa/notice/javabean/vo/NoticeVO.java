@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.notice.javabean.vo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Data;
@@ -54,7 +54,7 @@ public class NoticeVO {
     private UUID publisherId;
 
     /// 发布时间。
-    private Instant publishAt;
+    private LocalDateTime publishAt;
 
     /// 是否要求阅读。
     private Boolean requiredRead;
@@ -63,8 +63,8 @@ public class NoticeVO {
     private Boolean read;
 
     /// 阅读时间。
-    private Instant readAt;
+    private LocalDateTime readAt;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

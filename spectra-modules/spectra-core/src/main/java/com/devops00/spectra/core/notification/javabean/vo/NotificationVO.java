@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 消息响应VO
@@ -47,7 +47,7 @@ public class NotificationVO implements Serializable {
     private Boolean isRead;
 
     /// 阅读时间
-    private Instant readAt;
+    private LocalDateTime readAt;
 
     /// 接收者ID
     private UUID receiverId;
@@ -56,5 +56,5 @@ public class NotificationVO implements Serializable {
     private String extra;
 
     /// 创建时间
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

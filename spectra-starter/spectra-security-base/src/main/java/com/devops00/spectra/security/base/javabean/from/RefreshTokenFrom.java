@@ -16,13 +16,20 @@
 
 package com.devops00.spectra.security.base.javabean.from;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /// 刷新token入参
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/6/28
-public record RefreshTokenFrom(
-        /// 刷新令牌。
-        String refreshToken
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class RefreshTokenFrom {
+
+    /// 刷新令牌。
+    private String refreshToken;
 }

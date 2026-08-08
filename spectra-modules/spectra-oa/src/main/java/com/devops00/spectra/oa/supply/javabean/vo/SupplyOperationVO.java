@@ -1,7 +1,7 @@
 package com.devops00.spectra.oa.supply.javabean.vo;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -61,5 +61,5 @@ public class SupplyOperationVO {
     private String status;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

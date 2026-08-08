@@ -186,15 +186,13 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     }
 
     private NoticeVO assembleView(Notice notice) {
-        var vo = noticeConverter.toVO(notice);
         var userId = SecUtil.getCurrentUserId();
-        if (userId != null) {
-            var reader = noticeReaderMapper.selectOne(new LambdaQueryWrapper<NoticeReader>()
-                    .eq(NoticeReader::getNoticeId, notice.getId()).eq(NoticeReader::getUserId, userId));
-            vo.setRead(reader != null && reader.getReadAt() != null);
-            vo.setReadAt(reader == null ? null : reader.getReadAt());
+        if (userId == null) {
+            return noticeConverter.toVO(notice);
         }
-        return vo;
+        var reader = noticeReaderMapper.selectOne(new LambdaQueryWrapper<NoticeReader>()
+                .eq(NoticeReader::getNoticeId, notice.getId()).eq(NoticeReader::getUserId, userId));
+        return noticeConverter.toVO(notice, reader);
     }
 
     private boolean isVisible(Notice notice, UUID userId) {

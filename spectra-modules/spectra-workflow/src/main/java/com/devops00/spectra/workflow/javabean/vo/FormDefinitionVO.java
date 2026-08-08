@@ -18,7 +18,7 @@ package com.devops00.spectra.workflow.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 表单定义响应VO
@@ -60,9 +60,9 @@ public class FormDefinitionVO {
     private UUID createdBy;
 
     /// 创建时间
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /// 最后修改时间
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 
 }

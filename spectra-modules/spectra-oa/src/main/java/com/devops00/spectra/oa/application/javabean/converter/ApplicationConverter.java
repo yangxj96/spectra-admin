@@ -21,6 +21,7 @@ import java.util.List;
 import org.mapstruct.Mapper;
 
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
@@ -32,7 +33,7 @@ import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/9
-@Mapper(config = GlobalMapperConfig.class)
+@Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ApplicationConverter {
     /// 申请实体转视图对象。
     ApplicationVO toVO(Application source);

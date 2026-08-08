@@ -16,13 +16,20 @@
 
 package com.devops00.spectra.security.base.javabean.from;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 /// 发送邮箱验证码入参
 ///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/6/28
-public record EmailCodeFrom(
-        /// 邮箱地址。
-        String email
-) {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class EmailCodeFrom {
+
+    /// 邮箱地址。
+    private String email;
 }

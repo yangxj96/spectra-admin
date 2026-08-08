@@ -19,6 +19,7 @@ package com.devops00.spectra.oa.notice.javabean.converter;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.notice.javabean.entity.Notice;
+import com.devops00.spectra.oa.notice.javabean.entity.NoticeReader;
 import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
 import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import org.mapstruct.Mapper;
@@ -36,6 +37,13 @@ public interface NoticeConverter {
     @Mapping(target = "read", ignore = true)
     @Mapping(target = "readAt", ignore = true)
     NoticeVO toVO(Notice source);
+
+    /// 公告实体和阅读回执转响应视图。
+    @Mapping(target = "id", source = "source.id")
+    @Mapping(target = "createdAt", source = "source.createdAt")
+    @Mapping(target = "read", expression = "java(reader != null && reader.getReadAt() != null)")
+    @Mapping(target = "readAt", source = "reader.readAt")
+    NoticeVO toVO(Notice source, NoticeReader reader);
 
     /// 公告创建入参转实体。
     Notice toEntity(NoticeCreateFrom source);

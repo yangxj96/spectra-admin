@@ -17,7 +17,7 @@
 package com.devops00.spectra.oa.asset.javabean.vo;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -100,8 +100,8 @@ public class AssetVO {
 
     /// 创建时间。
     private List<AssetOperationVO> operations = List.of();
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 
     /// 更新时间。
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 }

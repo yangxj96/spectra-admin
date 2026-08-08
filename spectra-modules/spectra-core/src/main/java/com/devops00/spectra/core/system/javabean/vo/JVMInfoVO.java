@@ -16,10 +16,12 @@
 
 package com.devops00.spectra.core.system.javabean.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +32,8 @@ import java.util.Map;
 /// @since 2025/11/11 00:00
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class JVMInfoVO {
 
     /// JVM 名称：如 "OpenJDK 64-Bit Server VM"
@@ -63,7 +67,7 @@ public class JVMInfoVO {
     private String javaVendorUrl;
 
     /// 启动时间
-    private Date startTime;
+    private LocalDateTime startTime;
 
     /// "进程ID@主机名"，提取 PID
     private String pid;

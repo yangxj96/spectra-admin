@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.calendar.javabean.vo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Data;
@@ -42,10 +42,10 @@ public class CalendarVO {
     private String content;
 
     /// 开始时间。
-    private Instant startTime;
+    private LocalDateTime startTime;
 
     /// 结束时间。
-    private Instant endTime;
+    private LocalDateTime endTime;
 
     /// 是否全天。
     private Boolean allDay;

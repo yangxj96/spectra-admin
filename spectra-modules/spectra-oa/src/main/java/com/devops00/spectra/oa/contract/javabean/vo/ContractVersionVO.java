@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.contract.javabean.vo;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import lombok.Data;
@@ -54,5 +54,5 @@ public class ContractVersionVO {
     private Boolean current;
 
     /// 创建时间。
-    private Instant createdAt;
+    private LocalDateTime createdAt;
 }

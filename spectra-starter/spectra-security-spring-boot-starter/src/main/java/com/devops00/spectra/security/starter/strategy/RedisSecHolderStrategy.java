@@ -26,6 +26,7 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.starter.javabean.converter.UserOnlineConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -42,7 +43,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.*;
 
 /// Redis 方式存储 Token（简化版：5 个 key 覆盖全部场景）
@@ -59,16 +59,19 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     private final ObjectMapper om;
     private final RedisTemplate<String, Object> redis;
     private final SecurityProperties properties;
+    private final UserOnlineConverter userOnlineConverter;
 
 
     public RedisSecHolderStrategy(
             @Qualifier("securityObjectMapper") ObjectMapper om,
             @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties
+            SecurityProperties properties,
+            UserOnlineConverter userOnlineConverter
     ) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
+        this.userOnlineConverter = userOnlineConverter;
     }
 
     @Override
@@ -372,16 +375,14 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
                         ? om.convertValue(userObj, SecurityUser.class)
                         : null;
 
-                result.add(UserOnlineVO.builder()
-                        .token(token)
-                        .userId(Objects.toString(session.get("userId"), null))
-                        .username(su != null ? su.getUsername() : Objects.toString(session.get("username"), null))
-                        .clientType(Objects.toString(session.get("clientType"), null))
-                        .ip(Objects.toString(session.get("ip"), null))
-                        .loginTime(Instant.ofEpochMilli(
-                                Long.parseLong(Objects.toString(session.get("loginTime"), "0"))
-                        ))
-                        .build());
+                result.add(userOnlineConverter.toVO(
+                        Objects.toString(session.get("userId"), null),
+                        su != null ? su.getUsername() : Objects.toString(session.get("username"), null),
+                        Objects.toString(session.get("clientType"), null),
+                        Objects.toString(session.get("ip"), null),
+                        Long.parseLong(Objects.toString(session.get("loginTime"), "0")),
+                        token
+                ));
             }
         }
         return result;
