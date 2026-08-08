@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.purchase.javabean.from;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,7 +37,7 @@ public class PurchaseReceiptFrom {
 
     /// 收货日期。
     @NotNull(message = "收货日期不能为空")
-    private LocalDate receivedDate;
+    private String receivedDate;
 
     /// 接收人 ID。
     private UUID receiverId;

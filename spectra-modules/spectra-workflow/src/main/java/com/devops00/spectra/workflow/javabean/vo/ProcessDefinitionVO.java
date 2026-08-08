@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.workflow.javabean.vo;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -58,5 +60,5 @@ public class ProcessDefinitionVO {
     private String category;
 
     /// 部署时间
-    private String deploymentTime;
+    private LocalDateTime deploymentTime;
 }

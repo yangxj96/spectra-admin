@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.purchase.javabean.entity;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -50,7 +50,7 @@ public class PurchaseReceipt extends BaseEntity {
 
     /// 收货日期。
     @TableField("received_date")
-    private LocalDate receivedDate;
+    private Instant receivedDate;
 
     /// 接收人 ID。
     @TableField("receiver_id")

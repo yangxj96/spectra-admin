@@ -18,6 +18,7 @@ package com.devops00.spectra.workflow.service.impl;
 
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
 import com.devops00.spectra.workflow.javabean.from.DeployProcessFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionResourceVO;
@@ -48,6 +49,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     private final RepositoryService repositoryService;
     private final ProcessDiagramGenerator processDiagramGenerator;
     private final ProcessConverter processConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public List<ProcessDefinitionVO> listAll() {
@@ -174,7 +176,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                     .deploymentId(definition.getDeploymentId())
                     .singleResult();
             if (deployment != null && deployment.getDeploymentTime() != null) {
-                vo.setDeploymentTime(deployment.getDeploymentTime().toString());
+                vo.setDeploymentTime(timeMapper.toLocalDateTime(deployment.getDeploymentTime()));
             }
         }
         return vo;

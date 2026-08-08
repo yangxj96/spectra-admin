@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.workflow.javabean.vo;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,7 +54,7 @@ public class TaskVO {
     private String businessKey;
 
     /// 任务创建时间
-    private String createTime;
+    private LocalDateTime createTime;
 
     /// 任务描述
     private String description;

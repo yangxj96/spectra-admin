@@ -36,6 +36,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
@@ -91,6 +92,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     private final PurchaseItemMapper itemMapper;
     private final PurchaseReceiptMapper receiptMapper;
     private final PurchaseReceiptItemMapper receiptItemMapper;
+    private final TimeMapper timeMapper;
     private final ApplicationMapper applicationMapper;
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationService applicationService;
@@ -313,7 +315,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         receipt.setPurchaseId(id);
         receipt.setReceiptNo(StringUtils.hasText(from.getReceiptNo()) ? from.getReceiptNo()
                 : "GR" + Instant.now().toEpochMilli());
-        receipt.setReceivedDate(from.getReceivedDate());
+        receipt.setReceivedDate(timeMapper.toInstant(from.getReceivedDate()));
         receipt.setReceiverId(receiverId);
         receipt.setStatus(hasDifference ? RECEIPT_DIFFERENCE : allReceived ? RECEIPT_COMPLETE : RECEIPT_PARTIAL);
         receipt.setRemark(from.getRemark());

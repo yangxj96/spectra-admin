@@ -18,7 +18,6 @@ package com.devops00.spectra.oa.purchase.javabean.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -56,7 +55,7 @@ public class Purchase extends BaseEntity {
 
     /// 预计日期。
     @TableField("expected_date")
-    private LocalDate expectedDate;
+    private Instant expectedDate;
 
     /// 预算金额。
     @TableField("budget_amount")

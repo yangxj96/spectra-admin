@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.workflow.javabean.vo;
 
+import java.time.LocalDateTime;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,7 +51,7 @@ public class ProcessInstanceVO {
     private Boolean ended;
 
     /// 开始时间
-    private String startTime;
+    private LocalDateTime startTime;
 
     /// 启动人
     private String startUserId;

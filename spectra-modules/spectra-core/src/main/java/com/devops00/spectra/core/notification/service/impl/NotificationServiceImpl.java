@@ -15,6 +15,7 @@ import com.devops00.spectra.core.notification.javabean.from.NotificationQueryFro
 import com.devops00.spectra.core.notification.javabean.vo.NotificationVO;
 import com.devops00.spectra.core.notification.mapper.NotificationMapper;
 import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,7 @@ public class NotificationServiceImpl
         implements NotificationService {
 
     private final NotificationConverter notificationConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<NotificationVO> page(PageFrom page, NotificationQueryFrom params, UUID userId) {
@@ -63,17 +65,25 @@ public class NotificationServiceImpl
         }
 
         if (StringUtils.hasText(params.getStartTime())) {
-            wrapper.ge(Notification::getCreatedAt, Instant.parse(params.getStartTime()));
+            wrapper.ge(Notification::getCreatedAt, parseTime(params.getStartTime()));
         }
 
         if (StringUtils.hasText(params.getEndTime())) {
-            wrapper.le(Notification::getCreatedAt, Instant.parse(params.getEndTime()));
+            wrapper.le(Notification::getCreatedAt, parseTime(params.getEndTime()));
         }
 
         wrapper.orderByDesc(Notification::getCreatedAt);
 
         var result = this.page(pageParam, wrapper);
         return notificationConverter.toVOPage(result);
+    }
+
+    private Instant parseTime(String value) {
+        try {
+            return timeMapper.toInstant(value);
+        } catch (RuntimeException exception) {
+            throw new DataSaveException("消息时间格式不正确");
+        }
     }
 
     @Override

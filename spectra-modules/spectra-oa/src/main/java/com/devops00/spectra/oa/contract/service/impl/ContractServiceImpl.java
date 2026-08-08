@@ -39,6 +39,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
@@ -88,6 +89,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final FileUploadFacade fileUploadFacade;
     private final NotificationService notificationService;
     private final ContractConverter contractConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -133,8 +135,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public UUID created(ContractSaveFrom from) {
         var user = requireCurrentUser();
-        validateDates(from.getStartDate(), from.getEndDate());
         var entity = contractConverter.toEntity(from);
+        validateDates(entity.getStartDate(), entity.getEndDate());
         entity.setContractNo(generateContractNo());
         entity.setTitle(from.getTitle().trim());
         entity.setContractType(normalize(from.getContractType(), "OTHER"));
@@ -162,8 +164,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (!STATUS_DRAFT.equals(entity.getStatus())) {
             throw new DataSaveException("只有草稿合同可以修改");
         }
-        validateDates(from.getStartDate(), from.getEndDate());
         contractConverter.updateEntity(from, entity);
+        validateDates(entity.getStartDate(), entity.getEndDate());
         entity.setTitle(from.getTitle().trim());
         entity.setContractType(normalize(from.getContractType(), "OTHER"));
         entity.setCounterpartyName(from.getCounterpartyName().trim());
@@ -249,7 +251,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         milestone.setContractId(contract.getId());
         milestone.setName(from.getName().trim());
         milestone.setMilestoneType(normalize(from.getMilestoneType(), "OTHER"));
-        milestone.setDueDate(from.getDueDate());
+        milestone.setDueDate(timeMapper.toInstant(from.getDueDate()));
         milestone.setStatus("PENDING");
         milestone.setAssigneeId(from.getAssigneeId());
         milestone.setRemark(trimToNull(from.getRemark()));
@@ -280,7 +282,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         }
         milestone.setStatus(status);
         milestone.setCompletedAt("DONE".equals(status)
-                ? (from.getCompletedAt() == null ? Instant.now() : from.getCompletedAt()) : null);
+                ? (from.getCompletedAt() == null ? Instant.now() : timeMapper.toInstant(from.getCompletedAt())) : null);
         milestone.setRemark(trimToNull(from.getRemark()));
         if (milestoneMapper.updateById(milestone) != 1) {
             throw new DataSaveException("更新合同履约节点失败");
@@ -358,7 +360,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     @Transactional
     public int sendDueMilestoneReminders() {
-        var deadline = LocalDate.now(ZoneOffset.UTC).plusDays(3);
+        var deadline = timeMapper.toInstant(LocalDate.now(timeMapper.getUserZoneId()).plusDays(3));
         var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>()
                 .le(ContractMilestone::getDueDate, deadline)
                 .eq(ContractMilestone::getStatus, "PENDING")
@@ -481,7 +483,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                 + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
 
-    private void validateDates(LocalDate startDate, LocalDate endDate) {
+    private void validateDates(Instant startDate, Instant endDate) {
         if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
             throw new DataSaveException("合同到期日期不能早于生效日期");
         }

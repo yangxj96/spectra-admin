@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.oa.contract.javabean.from;
 
-import java.time.Instant;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -34,7 +32,7 @@ public class ContractMilestoneUpdateFrom {
     private String status;
 
     /// 完成时间。
-    private Instant completedAt;
+    private String completedAt;
 
     /// 备注。
     private String remark;

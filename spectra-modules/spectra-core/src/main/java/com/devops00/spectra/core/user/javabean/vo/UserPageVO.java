@@ -27,6 +27,7 @@ import lombok.ToString;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -101,5 +102,5 @@ public class UserPageVO implements Serializable {
     private List<String> targetIds;
 
     /// 创建时间
-    private String createdAt;
+    private LocalDateTime createdAt;
 }

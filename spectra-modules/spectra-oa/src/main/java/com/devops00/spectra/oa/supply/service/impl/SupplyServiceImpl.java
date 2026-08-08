@@ -1,7 +1,7 @@
 package com.devops00.spectra.oa.supply.service.impl;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +16,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.supply.javabean.converter.SupplyConverter;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyOperation;
@@ -47,6 +48,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
 
     private final SupplyOperationMapper operationMapper;
     private final SupplyConverter supplyConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<SupplyItemVO> page(PageFrom page, SupplyPageFrom params) {
@@ -176,7 +178,8 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         operation.setDepartmentId(from.getDepartmentId());
         operation.setUserId(from.getUserId());
         operation.setLocation(StringUtils.hasText(from.getLocation()) ? from.getLocation() : entity.getLocation());
-        operation.setOperationDate(from.getOperationDate() == null ? LocalDate.now() : from.getOperationDate());
+        operation.setOperationDate(from.getOperationDate() == null
+                ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
         operation.setReason(from.getReason());
         operation.setSourcePurchaseId(from.getSourcePurchaseId());
         operation.setSourceReceiptId(from.getSourceReceiptId());

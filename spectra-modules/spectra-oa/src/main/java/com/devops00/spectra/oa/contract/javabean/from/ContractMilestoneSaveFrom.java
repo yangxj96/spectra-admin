@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.contract.javabean.from;
 
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
@@ -40,7 +39,7 @@ public class ContractMilestoneSaveFrom {
 
     /// 到期日期。
     @NotNull(message = "履约节点日期不能为空")
-    private LocalDate dueDate;
+    private String dueDate;
 
     /// 负责人 ID。
     private UUID assigneeId;

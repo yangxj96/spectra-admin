@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalTime;
 import java.util.UUID;
 
 /// 通知设置Service实现
@@ -57,14 +56,6 @@ public class NotificationSettingServiceImpl
         }
 
         notificationSettingConverter.updateEntity(from, entity);
-
-        // 解析时间字符串
-        if (from.getDoNotDisturbStart() != null && !from.getDoNotDisturbStart().isEmpty()) {
-            entity.setDoNotDisturbStart(LocalTime.parse(from.getDoNotDisturbStart()));
-        }
-        if (from.getDoNotDisturbEnd() != null && !from.getDoNotDisturbEnd().isEmpty()) {
-            entity.setDoNotDisturbEnd(LocalTime.parse(from.getDoNotDisturbEnd()));
-        }
 
         if (!this.updateById(entity)) {
             throw new DataSaveException("更新消息设置失败");

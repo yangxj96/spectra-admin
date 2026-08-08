@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.asset.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -61,7 +60,7 @@ public class AssetSaveFrom {
     private BigDecimal quantity = BigDecimal.ONE;
 
     /// 购置日期。
-    private LocalDate acquisitionDate;
+    private String acquisitionDate;
 
     /// 购置金额。
     private BigDecimal acquisitionAmount = BigDecimal.ZERO;
@@ -82,7 +81,7 @@ public class AssetSaveFrom {
     private UUID custodianId;
 
     /// 保修截止日期。
-    private LocalDate warrantyUntil;
+    private String warrantyUntil;
 
     /// 备注。
     private String remark;

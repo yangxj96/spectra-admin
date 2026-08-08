@@ -17,8 +17,6 @@
 package com.devops00.spectra.oa.reimbursement.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -34,7 +32,7 @@ public class ReimbursementItemFrom {
 
     /// 费用日期。
     @NotNull(message = "费用日期不能为空")
-    private LocalDate expenseDate;
+    private String expenseDate;
 
     /// 分类。
     @NotBlank(message = "费用类别不能为空")

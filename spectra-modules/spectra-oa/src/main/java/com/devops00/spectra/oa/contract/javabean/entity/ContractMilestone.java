@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.contract.javabean.entity;
 
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -52,7 +51,7 @@ public class ContractMilestone extends BaseEntity {
 
     /// 到期日期。
     @TableField("due_date")
-    private LocalDate dueDate;
+    private Instant dueDate;
 
     /// 状态。
     @TableField("status")

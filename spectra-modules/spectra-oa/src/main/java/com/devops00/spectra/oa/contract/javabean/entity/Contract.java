@@ -27,7 +27,6 @@ import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 
 /// OA-合同表主表实体
@@ -76,11 +75,11 @@ public class Contract extends BaseEntity {
 
     /// 生效日期
     @TableField("start_date")
-    private LocalDate startDate;
+    private Instant startDate;
 
     /// 到期日期
     @TableField("end_date")
-    private LocalDate endDate;
+    private Instant endDate;
 
     /// 合同生命周期状态
     @TableField("status")

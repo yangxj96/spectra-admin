@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.reimbursement.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -41,11 +40,11 @@ public class ReimbursementSaveFrom {
 
     /// 费用开始日期。
     @NotNull(message = "费用开始日期不能为空")
-    private LocalDate expenseStart;
+    private String expenseStart;
 
     /// 费用结束日期。
     @NotNull(message = "费用结束日期不能为空")
-    private LocalDate expenseEnd;
+    private String expenseEnd;
 
     /// 总金额。
     @NotNull(message = "报销总额不能为空")

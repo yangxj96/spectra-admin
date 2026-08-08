@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.contract.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -56,10 +55,10 @@ public class ContractSaveFrom {
     private String currency = "CNY";
 
     /// 开始日期。
-    private LocalDate startDate;
+    private String startDate;
 
     /// 结束日期。
-    private LocalDate endDate;
+    private String endDate;
 
     /// 可见范围。
     private String visibility = "DEPARTMENT";

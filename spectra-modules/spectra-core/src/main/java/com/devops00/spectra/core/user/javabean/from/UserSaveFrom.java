@@ -26,7 +26,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -59,7 +58,7 @@ public class UserSaveFrom {
     private Integer gender;
 
     /// 生日
-    private LocalDate birthday;
+    private String birthday;
 
     /// 手机号码
     private String phone;

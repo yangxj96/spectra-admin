@@ -23,7 +23,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +41,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
@@ -92,6 +92,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     private final ProcessInstanceService processInstanceService;
     private final NotificationService notificationService;
     private final LeaveConverter leaveConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     @Transactional
@@ -301,8 +302,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
 
     private ParsedLeave parse(LeaveCreateFrom from) {
         try {
-            var start = Instant.parse(from.getStartTime());
-            var end = Instant.parse(from.getEndTime());
+            var start = timeMapper.toInstant(from.getStartTime());
+            var end = timeMapper.toInstant(from.getEndTime());
             if (!start.isBefore(end)) {
                 throw new DataSaveException("请假开始时间必须早于结束时间");
             }
@@ -317,8 +318,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     }
 
     private BigDecimal calculateBusinessHours(Instant start, Instant end) {
-        var cursor = start.atZone(ZoneOffset.UTC).toLocalDate();
-        var last = end.atZone(ZoneOffset.UTC).toLocalDate();
+        var zoneId = timeMapper.getUserZoneId();
+        var cursor = start.atZone(zoneId).toLocalDate();
+        var last = end.atZone(zoneId).toLocalDate();
         long minutes = 0;
         while (!cursor.isAfter(last)) {
             var day = cursor.getDayOfWeek();
@@ -332,8 +334,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     }
 
     private long overlapMinutes(Instant start, Instant end, LocalDate date, LocalTime from, LocalTime to) {
-        var windowStart = ZonedDateTime.of(date, from, ZoneOffset.UTC).toInstant();
-        var windowEnd = ZonedDateTime.of(date, to, ZoneOffset.UTC).toInstant();
+        var zoneId = timeMapper.getUserZoneId();
+        var windowStart = ZonedDateTime.of(date, from, zoneId).toInstant();
+        var windowEnd = ZonedDateTime.of(date, to, zoneId).toInstant();
         var left = start.isAfter(windowStart) ? start : windowStart;
         var right = end.isBefore(windowEnd) ? end : windowEnd;
         return right.isAfter(left) ? Duration.between(left, right).toMinutes() : 0;
@@ -388,21 +391,23 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return leaveBalanceMapper.selectOne(new LambdaQueryWrapper<LeaveBalance>()
                 .eq(LeaveBalance::getUserId, userId)
                 .eq(LeaveBalance::getLeaveTypeCode, detail.getLeaveTypeCode())
-                .eq(LeaveBalance::getYear, detail.getStartTime().atZone(ZoneOffset.UTC).getYear()));
+                .eq(LeaveBalance::getYear, detail.getStartTime().atZone(timeMapper.getUserZoneId()).getYear()));
     }
 
     private void createAttendanceRecords(Application application, LeaveApplication detail) {
-        var date = detail.getStartTime().atZone(ZoneOffset.UTC).toLocalDate();
-        var last = detail.getEndTime().atZone(ZoneOffset.UTC).toLocalDate();
+        var zoneId = timeMapper.getUserZoneId();
+        var date = detail.getStartTime().atZone(zoneId).toLocalDate();
+        var last = detail.getEndTime().atZone(zoneId).toLocalDate();
         while (!date.isAfter(last)) {
+            var attendanceDate = date.atStartOfDay(zoneId).toInstant();
             if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY
                     && attendanceRecordMapper.selectCount(new LambdaQueryWrapper<AttendanceRecord>()
                             .eq(AttendanceRecord::getApplicationId, application.getId())
-                            .eq(AttendanceRecord::getAttendanceDate, date)) == 0) {
+                            .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
                 var record = new AttendanceRecord();
                 record.setApplicationId(application.getId());
                 record.setUserId(application.getApplicantId());
-                record.setAttendanceDate(date);
+                record.setAttendanceDate(attendanceDate);
                 record.setStatus(ATTENDANCE_STATUS);
                 record.setSource(ATTENDANCE_SOURCE);
                 record.setDepartmentId(application.getDepartmentId());

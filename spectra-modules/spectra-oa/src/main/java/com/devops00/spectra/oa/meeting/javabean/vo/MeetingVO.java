@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 会议列表VO
@@ -44,10 +45,10 @@ public class MeetingVO {
     private String initiatorId;
 
     /// 开始时间
-    private String startTime;
+    private LocalDateTime startTime;
 
     /// 结束时间
-    private String endTime;
+    private LocalDateTime endTime;
 
     /// 会议地点
     private String location;
@@ -65,5 +66,5 @@ public class MeetingVO {
     private String processInstanceId;
 
     /// 创建时间
-    private String createdAt;
+    private LocalDateTime createdAt;
 }

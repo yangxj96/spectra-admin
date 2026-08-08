@@ -1,7 +1,6 @@
 package com.devops00.spectra.oa.supply.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import jakarta.validation.constraints.DecimalMin;
@@ -33,7 +32,7 @@ public class SupplyOperationFrom {
     private String location;
 
     /// 操作时间。
-    private LocalDate operationDate;
+    private String operationDate;
 
     /// 原因。
     private String reason;

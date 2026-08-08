@@ -7,6 +7,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.asset.javabean.converter.AssetConverter;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetCategory;
@@ -31,7 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -64,6 +65,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     private final PurchaseReceiptMapper receiptMapper;
     private final PurchaseReceiptItemMapper receiptItemMapper;
     private final AssetConverter assetConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<AssetVO> page(PageFrom page, AssetPageFrom params) {
@@ -372,7 +374,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         operation.setFromUserId(entity.getCustodianId());
         operation.setFromLocation(entity.getLocation());
         operation.setOperationDate(from == null || from.getOperationDate() == null
-                ? LocalDate.now() : from.getOperationDate());
+                ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
         operation.setReason(from == null ? null : from.getReason());
         operation.setStatus("COMPLETE");
         return operation;
@@ -389,7 +391,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         operation.setAssetId(entity.getId());
         operation.setOperationType(OP_INBOUND);
         operation.setToDepartmentId(entity.getDepartmentId());
-        operation.setOperationDate(receipt.getReceivedDate() == null ? LocalDate.now() : receipt.getReceivedDate());
+        operation.setOperationDate(receipt.getReceivedDate() == null ? Instant.now() : receipt.getReceivedDate());
         operation.setReason("采购收货单 " + receipt.getReceiptNo());
         operation.setStatus("COMPLETE");
         if (operationMapper.insert(operation) != 1) {

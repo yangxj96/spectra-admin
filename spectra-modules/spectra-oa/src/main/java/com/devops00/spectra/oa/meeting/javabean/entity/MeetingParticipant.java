@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /// OA-会议-参会人员表
@@ -70,7 +71,7 @@ public class MeetingParticipant extends BaseEntity {
 
     /// 是否确认/签到
     @TableField("check_in_at")
-    private String checkInAt;
+    private Instant checkInAt;
 
     /// 所属部门ID
     @TableField("department_id")

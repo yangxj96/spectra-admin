@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.purchase.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.validation.Valid;
@@ -41,7 +40,7 @@ public class PurchaseSaveFrom {
 
     /// 预计日期。
     @NotNull(message = "期望到货日期不能为空")
-    private LocalDate expectedDate;
+    private String expectedDate;
 
     /// 预算金额。
     @NotNull(message = "采购预算不能为空")

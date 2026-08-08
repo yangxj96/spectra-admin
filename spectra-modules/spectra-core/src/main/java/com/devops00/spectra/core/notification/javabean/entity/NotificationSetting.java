@@ -1,6 +1,6 @@
 package com.devops00.spectra.core.notification.javabean.entity;
 
-import java.time.LocalTime;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -54,9 +54,9 @@ public class NotificationSetting extends BaseEntity {
 
     /// 免打扰开始时间（如22:00:00）
     @TableField(value = "do_not_disturb_start")
-    private LocalTime doNotDisturbStart;
+    private Instant doNotDisturbStart;
 
     /// 免打扰结束时间（如08:00:00）
     @TableField(value = "do_not_disturb_end")
-    private LocalTime doNotDisturbEnd;
+    private Instant doNotDisturbEnd;
 }

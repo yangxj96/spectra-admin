@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /// OA-会议表主表实体
@@ -57,11 +58,11 @@ public class Meeting extends BaseEntity {
 
     /// 开始时间
     @TableField("start_time")
-    private String startTime;
+    private Instant startTime;
 
     /// 结束时间
     @TableField("end_time")
-    private String endTime;
+    private Instant endTime;
 
     /// 会议地点
     @TableField("location")

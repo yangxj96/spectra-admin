@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 /// 时间处理 mapper
@@ -62,6 +63,14 @@ public class TimeMapper {
     /// @return {@link LocalDateTime}
     public @Nullable LocalDateTime toLocalDateTime(@Nullable Long epochMilli) {
         return epochMilli == null ? null : toLocalDateTime(Instant.ofEpochMilli(epochMilli));
+    }
+
+    /// Date 转 LocalDateTime
+    ///
+    /// @param date {@link Date}
+    /// @return {@link LocalDateTime}
+    public @Nullable LocalDateTime toLocalDateTime(@Nullable Date date) {
+        return date == null ? null : toLocalDateTime(date.toInstant());
     }
 
     /// LocalDateTime 转 Instant
@@ -205,20 +214,52 @@ public class TimeMapper {
         return instant == null ? null : ISO_FORMATTER.format(instant.atZone(getUserZoneId()));
     }
 
-    /// IOS 8601格式字符串转换到Instant
+    /// ISO 8601格式字符串转换到Instant。
+    ///
+    /// 支持带偏移量/时区的日期时间、无时区日期时间、日期和时间字符串。
+    /// 无时区字符串按当前用户时区解释；日期默认当天开始，时间默认当前用户时区的当天。
     ///
     /// @param text IOS 8601 格式的字符串
     /// @return Instant
     public @Nullable Instant toInstant(@Nullable String text) {
         if (text == null || text.isBlank()) return null;
+
+        var value = text.trim();
         try {
-            // 优先解析带时区偏移的 ISO 8601 字符串
-            return OffsetDateTime.parse(text, ISO_FORMATTER).toInstant();
-        } catch (Exception e) {
-            // 降级处理：无时区信息的字符串，按用户当前时区解析
-            LocalDateTime ldt = LocalDateTime.parse(text, ISO_FORMATTER);
-            return ldt.atZone(getUserZoneId()).toInstant();
+            return ZonedDateTime.parse(value, ISO_FORMATTER).toInstant();
+        } catch (DateTimeParseException ignored) {
+            // 继续尝试其他 ISO 8601 形式。
         }
+        try {
+            return OffsetDateTime.parse(value, ISO_FORMATTER).toInstant();
+        } catch (DateTimeParseException ignored) {
+            // 继续尝试其他 ISO 8601 形式。
+        }
+        try {
+            return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                    .atZone(getUserZoneId())
+                    .toInstant();
+        } catch (DateTimeParseException ignored) {
+            // 继续尝试日期或时间形式。
+        }
+        try {
+            return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE)
+                    .atStartOfDay(getUserZoneId())
+                    .toInstant();
+        } catch (DateTimeParseException ignored) {
+            // 继续尝试时间形式。
+        }
+        try {
+            return OffsetTime.parse(value, DateTimeFormatter.ISO_OFFSET_TIME)
+                    .atDate(LocalDate.now(getUserZoneId()))
+                    .toInstant();
+        } catch (DateTimeParseException ignored) {
+            // 继续尝试无时区时间形式。
+        }
+        return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME)
+                .atDate(LocalDate.now(getUserZoneId()))
+                .atZone(getUserZoneId())
+                .toInstant();
     }
 
 }

@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.calendar.service.impl;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.Objects;
 
@@ -32,6 +31,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.calendar.javabean.converter.CalendarConverter;
 import com.devops00.spectra.oa.calendar.javabean.entity.Calendar;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
@@ -53,6 +53,7 @@ import lombok.RequiredArgsConstructor;
 public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calendar> implements CalendarService {
 
     private final CalendarConverter calendarConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
@@ -167,13 +168,9 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
             throw new DataSaveException("日程时间不能为空");
         }
         try {
-            return Instant.parse(value);
-        } catch (Exception ignored) {
-            try {
-                return OffsetDateTime.parse(value).toInstant();
-            } catch (Exception exception) {
-                throw new DataSaveException("日程时间格式不正确");
-            }
+            return timeMapper.toInstant(value);
+        } catch (RuntimeException exception) {
+            throw new DataSaveException("日程时间格式不正确");
         }
     }
 }

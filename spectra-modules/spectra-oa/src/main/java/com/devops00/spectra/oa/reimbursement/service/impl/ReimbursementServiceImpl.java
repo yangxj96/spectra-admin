@@ -37,6 +37,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
@@ -89,6 +90,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final ProcessInstanceService processInstanceService;
     private final NotificationService notificationService;
     private final ReimbursementConverter reimbursementConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
@@ -278,7 +280,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private void validate(ReimbursementSaveFrom from) {
-        if (from.getExpenseEnd().isBefore(from.getExpenseStart())) {
+        var expenseStart = timeMapper.toInstant(from.getExpenseStart());
+        var expenseEnd = timeMapper.toInstant(from.getExpenseEnd());
+        if (expenseEnd.isBefore(expenseStart)) {
             throw new DataSaveException("费用结束日期不能早于开始日期");
         }
         var total = from.getItems().stream().map(ReimbursementItemFrom::getAmount)
@@ -287,8 +291,8 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("报销总额必须等于费用明细合计");
         }
         from.getItems().forEach(item -> {
-            if (item.getExpenseDate().isBefore(from.getExpenseStart())
-                    || item.getExpenseDate().isAfter(from.getExpenseEnd())) {
+            var expenseDate = timeMapper.toInstant(item.getExpenseDate());
+            if (expenseDate.isBefore(expenseStart) || expenseDate.isAfter(expenseEnd)) {
                 throw new DataSaveException("费用日期必须在报销期间内");
             }
         });

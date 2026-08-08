@@ -17,7 +17,7 @@
 package com.devops00.spectra.oa.asset.javabean.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -74,7 +74,7 @@ public class Asset extends BaseEntity {
 
     /// 购置日期。
     @TableField("acquisition_date")
-    private LocalDate acquisitionDate;
+    private Instant acquisitionDate;
 
     /// 购置金额。
     @TableField("acquisition_amount")
@@ -102,7 +102,7 @@ public class Asset extends BaseEntity {
 
     /// 保修截止日期。
     @TableField("warranty_until")
-    private LocalDate warrantyUntil;
+    private Instant warrantyUntil;
 
     /// 来源采购单 ID。
     @TableField("source_purchase_id")

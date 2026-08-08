@@ -17,7 +17,7 @@
 package com.devops00.spectra.oa.asset.javabean.entity;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -73,7 +73,7 @@ public class AssetOperation extends BaseEntity {
 
     /// 操作时间。
     @TableField("operation_date")
-    private LocalDate operationDate;
+    private Instant operationDate;
 
     /// 原因。
     @TableField("reason")

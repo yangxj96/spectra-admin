@@ -20,8 +20,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-
 /// 更新当前用户信息入参
 ///
 /// @author yangxj96
@@ -39,7 +37,7 @@ public class UserProfileFrom {
     private Short gender;
 
     /// 生日
-    private LocalDate birthday;
+    private String birthday;
 
     /// 手机号
     private String phone;

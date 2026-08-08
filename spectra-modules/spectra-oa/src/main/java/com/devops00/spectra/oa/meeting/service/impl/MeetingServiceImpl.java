@@ -26,6 +26,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant;
@@ -62,6 +63,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final MeetingRecordMapper recordMapper;
     private final NotificationService notificationService;
     private final UserService userService;
+    private final TimeMapper timeMapper;
 
     @Override
     @Transactional
@@ -167,7 +169,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             throw new DataNotExistException("您不是该会议参与人");
         }
         participant.setStatus("checked_in");
-        participant.setCheckInAt(Instant.now().toString());
+        participant.setCheckInAt(Instant.now());
         participantMapper.updateById(participant);
     }
 
@@ -211,13 +213,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         var candidates = this.list(new LambdaQueryWrapper<Meeting>()
                 .eq(Meeting::getLocation, entity.getLocation())
                 .ne(Meeting::getStatus, com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
-        return candidates.stream().anyMatch(item -> {
-            try {
-                return start.isBefore(parse(item.getEndTime())) && end.isAfter(parse(item.getStartTime()));
-            } catch (RuntimeException ignored) {
-                return false;
-            }
-        });
+        return candidates.stream().anyMatch(item -> item.getStartTime() != null && item.getEndTime() != null
+                && start.isBefore(item.getEndTime()) && end.isAfter(item.getStartTime()));
     }
 
     private Instant parse(String value) {
@@ -225,8 +222,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             throw new DataSaveException("会议时间不能为空");
         }
         try {
-            return Instant.parse(value);
-        } catch (Exception ignored) {
+            return timeMapper.toInstant(value);
+        } catch (RuntimeException exception) {
             throw new DataSaveException("会议时间格式不正确");
         }
     }

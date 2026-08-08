@@ -18,7 +18,6 @@ package com.devops00.spectra.oa.reimbursement.javabean.entity;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -56,11 +55,11 @@ public class Reimbursement extends BaseEntity {
 
     /// 费用开始日期。
     @TableField("expense_start")
-    private LocalDate expenseStart;
+    private Instant expenseStart;
 
     /// 费用结束日期。
     @TableField("expense_end")
-    private LocalDate expenseEnd;
+    private Instant expenseEnd;
 
     /// 报销总金额。
     @TableField("total_amount")

@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.asset.javabean.from;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import lombok.Data;
@@ -40,7 +39,7 @@ public class AssetOperationFrom {
     private String toLocation;
 
     /// 操作时间。
-    private LocalDate operationDate;
+    private String operationDate;
 
     /// 原因。
     private String reason;

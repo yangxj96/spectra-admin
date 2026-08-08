@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.leave.javabean.entity;
 
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -50,7 +50,7 @@ public class AttendanceRecord extends BaseEntity {
 
     /// 考勤日期。
     @TableField("attendance_date")
-    private LocalDate attendanceDate;
+    private Instant attendanceDate;
 
     /// 状态。
     @TableField("status")

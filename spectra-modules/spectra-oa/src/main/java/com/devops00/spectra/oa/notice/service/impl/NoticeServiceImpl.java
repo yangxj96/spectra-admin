@@ -17,7 +17,6 @@
 package com.devops00.spectra.oa.notice.service.impl;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,6 +32,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
 import com.devops00.spectra.core.notification.service.NotificationService;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -63,6 +63,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private final NotificationService notificationService;
     private final UserService userService;
     private final NoticeConverter noticeConverter;
+    private final TimeMapper timeMapper;
 
     @Override
     @Transactional
@@ -264,9 +265,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             return Instant.now();
         }
         try {
-            return Instant.parse(value);
-        } catch (Exception ignored) {
-            return OffsetDateTime.parse(value).toInstant();
+            return timeMapper.toInstant(value);
+        } catch (RuntimeException exception) {
+            throw new DataSaveException("公告发布时间格式不正确");
         }
     }
 }
