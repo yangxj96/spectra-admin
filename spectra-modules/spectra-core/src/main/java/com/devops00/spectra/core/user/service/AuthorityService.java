@@ -50,5 +50,6 @@ public interface AuthorityService extends BaseService<Authority> {
     /// 获取权限树
     ///
     /// @return 权限树列表
-    @Nullable List<AuthorityTreeVO> tree();
+    @Nullable
+    List<AuthorityTreeVO> tree();
 }

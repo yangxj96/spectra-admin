@@ -31,5 +31,6 @@ public interface DictGroupService extends BaseService<DictGroup> {
     ///
     /// @param code 字典类型编码
     /// @return 字典类型
-    @Nullable DictGroup getByCode(String code);
+    @Nullable
+    DictGroup getByCode(String code);
 }

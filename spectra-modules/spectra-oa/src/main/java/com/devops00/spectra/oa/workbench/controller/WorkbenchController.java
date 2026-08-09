@@ -97,8 +97,7 @@ public class WorkbenchController {
             noticeParams.setStatus("PUBLISHED");
             var notices = noticeService.page(noticePage, noticeParams);
             result.setNotices(notices.getRecords());
-            result.setUnreadNoticeCount(notices.getRecords().stream()
-                    .filter(notice -> !Boolean.TRUE.equals(notice.getRead())).count());
+            result.setUnreadNoticeCount(notices.getRecords().stream().filter(notice -> !Boolean.TRUE.equals(notice.getRead())).count());
         } catch (Exception exception) {
             log.warn("OA 工作台公告卡片加载失败", exception);
         }

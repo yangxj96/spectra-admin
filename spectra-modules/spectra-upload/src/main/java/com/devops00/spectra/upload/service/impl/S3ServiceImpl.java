@@ -48,9 +48,7 @@ public class S3ServiceImpl implements S3Service {
     @Override
     public List<String> listAllObjects(String bucket) {
         List<String> keys = new ArrayList<>();
-        ListObjectsV2Request request = ListObjectsV2Request.builder()
-                .bucket(bucket)
-                .build();
+        ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucket).build();
         ListObjectsV2Response response;
         do {
             response = s3Client.listObjectsV2(request);
@@ -58,25 +56,17 @@ public class S3ServiceImpl implements S3Service {
             response.contents().forEach(s3Object -> {
                 keys.add(s3Object.key());
             });
-            request = request.toBuilder()
-                    .continuationToken(response.nextContinuationToken())
-                    .build();
+            request = request.toBuilder().continuationToken(response.nextContinuationToken()).build();
         } while (response.isTruncated());
         return keys;
     }
 
     @Override
     public String createUploadUrl(String bucket, String key) {
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .build();
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder().bucket(bucket).key(key).build();
 
-        PresignedPutObjectRequest presignedRequest =
-                presigner.presignPutObject(r -> r
-                        .signatureDuration(Duration.ofMinutes(10)) // 10分钟有效
-                        .putObjectRequest(putObjectRequest)
-                );
+        PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(r -> r.signatureDuration(Duration.ofMinutes(10)) // 10分钟有效
+                .putObjectRequest(putObjectRequest));
 
         return presignedRequest.url().toString();
     }

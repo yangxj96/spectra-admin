@@ -64,9 +64,9 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         }
         var wrapper = new LambdaQueryWrapper<Calendar>()
                 .and(q -> q.eq(Calendar::getOwnerId, userId)
-                        .or().eq(Calendar::getVisibility, "ALL")
-                        .or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT")
-                                .eq(Calendar::getDepartmentId, user.getDepartmentId())))
+                        .or()
+                        .eq(Calendar::getVisibility, "ALL")
+                        .or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT").eq(Calendar::getDepartmentId, user.getDepartmentId())))
                 .orderByAsc(Calendar::getStartTime);
         if (StringUtils.hasText(params.getKeyword())) {
             wrapper.like(Calendar::getTitle, params.getKeyword());

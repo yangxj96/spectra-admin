@@ -92,14 +92,8 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(UncategorizedSQLException.class)
     public R<Object> handleUncategorizedSQLException(UncategorizedSQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(
-                "{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]",
-                LogPrefix.PERSISTENCE.p(),
-                Objects.requireNonNull(e.getSQLException()).getSQLState(),
-                e.getSQLException().getErrorCode(),
-                e.getSQLException().getMessage(),
-                e
-        );
+        log.error("{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]", LogPrefix.PERSISTENCE.p(), Objects.requireNonNull(e.getSQLException()).getSQLState(),
+                e.getSQLException().getErrorCode(), e.getSQLException().getMessage(), e);
         return R.failure("数据库操作异常,请稍后重试");
     }
 
@@ -117,13 +111,7 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(SQLException.class)
     public R<Object> handleSQLException(SQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error(
-                "{}原始SQLException: SQL状态=[{}], 错误码=[{}], 信息=[{}]",
-                LogPrefix.PERSISTENCE.p(),
-                e.getSQLState(),
-                e.getErrorCode(),
-                e.getMessage(), e
-        );
+        log.error("{}原始SQLException: SQL状态=[{}], 错误码=[{}], 信息=[{}]", LogPrefix.PERSISTENCE.p(), e.getSQLState(), e.getErrorCode(), e.getMessage(), e);
         return R.failure("数据库操作失败,请稍后重试");
     }
 }

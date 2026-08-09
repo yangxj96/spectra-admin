@@ -50,8 +50,7 @@ public class SecurityProperties {
             // 图片预览接口
             "/file/preview/**",
             // 获取系统加密配置接口
-            "/system/crypto/config"
-    ));
+            "/system/crypto/config"));
 
     /// accessToken有效期（秒），默认5分钟
     private long accessTokenExpire = 300L;

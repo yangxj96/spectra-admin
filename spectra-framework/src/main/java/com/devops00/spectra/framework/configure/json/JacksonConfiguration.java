@@ -69,18 +69,14 @@ public class JacksonConfiguration {
             // 添加自定义序列化器
             javaTimeModule.addSerializer(LocalDateTime.class,
                     new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-            javaTimeModule.addSerializer(LocalDate.class,
-                    new LocalDateSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-            javaTimeModule.addSerializer(LocalTime.class,
-                    new LocalTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
+            javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
+            javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
 
             // 添加反序列化器
             javaTimeModule.addDeserializer(LocalDateTime.class,
                     new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-            javaTimeModule.addDeserializer(LocalDate.class,
-                    new LocalDateDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-            javaTimeModule.addDeserializer(LocalTime.class,
-                    new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
+            javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
+            javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
 
             // 旧时间的序列化
             // 理论上是非线程安全的,如果用不到传统time类,可以注释掉
@@ -91,10 +87,7 @@ public class JacksonConfiguration {
             log.debug(LogPrefix.SERIALIZATION.f("NON_NULL,SNAKE_CASE,MixIn"));
             // 构建详情
             builder.configureForJackson2();
-            builder.changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(
-                    JsonInclude.Include.NON_NULL,
-                    JsonInclude.Include.ALWAYS
-            ));
+            builder.changeDefaultPropertyInclusion(_ -> JsonInclude.Value.construct(JsonInclude.Include.NON_NULL, JsonInclude.Include.ALWAYS));
 
             // 限制数字最大长度，防止 GHSA-72hv-8253-57qq
             // .configure(JsonParser.Feature.ALLOW_NON_NUMERIC_NUMBERS, false)

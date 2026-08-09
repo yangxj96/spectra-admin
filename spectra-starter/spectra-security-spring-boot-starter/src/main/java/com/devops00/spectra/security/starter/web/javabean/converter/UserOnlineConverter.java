@@ -30,12 +30,5 @@ import org.mapstruct.Mapper;
 public interface UserOnlineConverter {
 
     /// Redis 会话数据转在线用户视图对象。
-    UserOnlineVO toVO(
-            String userId,
-            String username,
-            String clientType,
-            String ip,
-            Long loginTime,
-            String token
-    );
+    UserOnlineVO toVO(String userId, String username, String clientType, String ip, Long loginTime, String token);
 }

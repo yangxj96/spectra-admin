@@ -59,8 +59,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, Application>
-        implements ApplicationService {
+public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, Application> implements ApplicationService {
 
     private static final DateTimeFormatter APPLICATION_NO_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
 
@@ -76,8 +75,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        wrapper.and(query -> query.eq(Application::getApplicantId, user.getId())
-                .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        wrapper.and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
         if (params != null && StringUtils.hasText(params.getTypeCode())) {
             wrapper.eq(Application::getTypeCode, params.getTypeCode());
         }
@@ -85,8 +83,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
             wrapper.eq(Application::getStatus, params.getStatus());
         }
         if (params != null && StringUtils.hasText(params.getKeyword())) {
-            wrapper.and(query -> query.like(Application::getTitle, params.getKeyword())
-                    .or().like(Application::getApplicationNo, params.getKeyword()));
+            wrapper.and(
+                    query -> query.like(Application::getTitle, params.getKeyword()).or().like(Application::getApplicationNo, params.getKeyword()));
         }
         wrapper.orderByDesc(Application::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
@@ -104,14 +102,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     public Application requireVisible(UUID id) {
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
-        if (user != null && user.getId() != null && user.getDepartmentId() != null
-                && (user.getId().equals(entity.getApplicantId())
-                || user.getDepartmentId().equals(entity.getDepartmentId()))) {
+        if (user != null
+            && user.getId() != null
+            && user.getDepartmentId() != null
+            && (user.getId().equals(entity.getApplicantId()) || user.getDepartmentId().equals(entity.getDepartmentId()))) {
             return entity;
         }
         String username = SecUtil.getCurrentUsername();
-        if (StringUtils.hasText(entity.getProcessInstanceId())
-                && taskService.canAccessProcess(entity.getProcessInstanceId(), username)) {
+        if (StringUtils.hasText(entity.getProcessInstanceId()) && taskService.canAccessProcess(entity.getProcessInstanceId(), username)) {
             return entity;
         }
         throw new DataNotExistException("OA 申请不存在或无权访问");
@@ -119,25 +117,21 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
 
     @Override
     public List<ApplicationTypeVO> listTypes() {
-        var wrapper = new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getEnabled, true)
-                .orderByAsc(ApplicationType::getSortOrder);
+        var wrapper = new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getEnabled, true).orderByAsc(ApplicationType::getSortOrder);
         return applicationConverter.toTypeVOList(applicationTypeMapper.selectList(wrapper));
     }
 
     @Override
     public List<ApplicationTypeVO> listAllTypes() {
         return applicationConverter.toTypeVOList(applicationTypeMapper.selectList(
-                new LambdaQueryWrapper<ApplicationType>().orderByAsc(ApplicationType::getSortOrder)
-                        .orderByAsc(ApplicationType::getCode)));
+                new LambdaQueryWrapper<ApplicationType>().orderByAsc(ApplicationType::getSortOrder).orderByAsc(ApplicationType::getCode)));
     }
 
     @Override
     @Transactional
     public UUID createdType(ApplicationTypeSaveFrom from) {
         var code = normalizeTypeCode(from.getCode());
-        if (applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, code)) != null) {
+        if (applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, code)) != null) {
             throw new DataSaveException("申请类型编码已存在");
         }
         var entity = applicationConverter.toTypeEntity(from);
@@ -156,8 +150,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     public void modifyType(UUID id, ApplicationTypeSaveFrom from) {
         var entity = requireType(id);
         var code = normalizeTypeCode(from.getCode());
-        var duplicate = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, code).ne(ApplicationType::getId, id));
+        var duplicate = applicationTypeMapper
+                .selectOne(new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, code).ne(ApplicationType::getId, id));
         if (duplicate != null) {
             throw new DataSaveException("申请类型编码已存在");
         }
@@ -175,8 +169,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     @Transactional
     public void deleteType(UUID id) {
         var entity = requireType(id);
-        if (applicationMapper.selectCount(new LambdaQueryWrapper<Application>()
-                .eq(Application::getTypeCode, entity.getCode())) > 0) {
+        if (applicationMapper.selectCount(new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, entity.getCode())) > 0) {
             throw new DataSaveException("已有业务申请使用该类型，只能停用");
         }
         if (applicationTypeMapper.deleteById(entity) != 1) {
@@ -187,9 +180,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     @Override
     @Transactional
     public Application createDraft(String typeCode, UUID bizId, String title) {
-        var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, typeCode)
-                .eq(ApplicationType::getEnabled, true));
+        var type = applicationTypeMapper
+                .selectOne(new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, typeCode).eq(ApplicationType::getEnabled, true));
         if (type == null) {
             throw new DataNotExistException("申请类型不存在或已停用: " + typeCode);
         }
@@ -265,8 +257,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     @Transactional
     public void cancel(UUID id) {
         var entity = require(id);
-        if (ApplicationStatus.APPROVED.name().equals(entity.getStatus())
-                || ApplicationStatus.CANCELLED.name().equals(entity.getStatus())) {
+        if (ApplicationStatus.APPROVED.name().equals(entity.getStatus()) || ApplicationStatus.CANCELLED.name().equals(entity.getStatus())) {
             throw new DataSaveException("当前状态不允许取消");
         }
         updateStatus(id, ApplicationStatus.CANCELLED.name(), null);
@@ -278,7 +269,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var entity = require(id);
         var current = entity.getStatus();
         if (ApplicationStatus.IN_REVIEW.name().equals(status)
-                && !(ApplicationStatus.DRAFT.name().equals(current)
+            && !(ApplicationStatus.DRAFT.name().equals(current)
                 || ApplicationStatus.REJECTED.name().equals(current)
                 || ApplicationStatus.WITHDRAWN.name().equals(current))) {
             throw new DataSaveException("当前状态不允许提交");
@@ -290,8 +281,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         } else if (ApplicationStatus.REJECTED.name().equals(status)) {
             entity.setRejectReason(reason);
             entity.setCompletedAt(Instant.now());
-        } else if (ApplicationStatus.APPROVED.name().equals(status)
-                || ApplicationStatus.CANCELLED.name().equals(status)) {
+        } else if (ApplicationStatus.APPROVED.name().equals(status) || ApplicationStatus.CANCELLED.name().equals(status)) {
             entity.setCompletedAt(Instant.now());
         }
         if (!this.updateById(entity)) {

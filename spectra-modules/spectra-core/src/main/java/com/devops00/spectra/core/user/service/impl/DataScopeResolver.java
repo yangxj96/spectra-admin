@@ -93,9 +93,7 @@ public class DataScopeResolver implements DataScopeProvider {
         for (var role : roles) {
             RoleDataScope roleScope = roleDataScopeMapper.findByRoleId(role.getId());
             // 兼容旧版 sys_role.scope：迁移期间规范表为空时仍能正确继承角色范围。
-            DataScopeType roleType = roleScope != null && roleScope.getScopeType() != null
-                    ? roleScope.getScopeType()
-                    : role.getScope();
+            DataScopeType roleType = roleScope != null && roleScope.getScopeType() != null ? roleScope.getScopeType() : role.getScope();
             if (roleType == null) {
                 continue;
             }
@@ -107,15 +105,11 @@ public class DataScopeResolver implements DataScopeProvider {
 
             // 收集 CUSTOM 的目标部门
             if (roleType == DataScopeType.CUSTOM) {
-                var targets = roleDataScopeTargetMapper.selectList(
-                        new LambdaQueryWrapper<RoleDataScopeTarget>()
-                                .eq(RoleDataScopeTarget::getRoleId, role.getId())
-                                .isNull(RoleDataScopeTarget::getDeleted));
+                var targets = roleDataScopeTargetMapper.selectList(new LambdaQueryWrapper<RoleDataScopeTarget>()
+                        .eq(RoleDataScopeTarget::getRoleId, role.getId())
+                        .isNull(RoleDataScopeTarget::getDeleted));
                 if (targets != null) {
-                    targets.stream()
-                            .map(RoleDataScopeTarget::getTargetId)
-                            .filter(Objects::nonNull)
-                            .forEach(allTargetIds::add);
+                    targets.stream().map(RoleDataScopeTarget::getTargetId).filter(Objects::nonNull).forEach(allTargetIds::add);
                 }
             }
         }
@@ -138,10 +132,7 @@ public class DataScopeResolver implements DataScopeProvider {
             // 从 UserDataScopeTarget 查询
             var targets = userDataScopeTargetMapper.findByUserId(userId);
             if (targets != null) {
-                targetIds = targets.stream()
-                        .map(UserDataScopeTarget::getTargetId)
-                        .filter(Objects::nonNull)
-                        .toList();
+                targetIds = targets.stream().map(UserDataScopeTarget::getTargetId).filter(Objects::nonNull).toList();
             }
         }
 

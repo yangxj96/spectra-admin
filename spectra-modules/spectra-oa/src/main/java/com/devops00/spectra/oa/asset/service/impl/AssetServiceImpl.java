@@ -74,8 +74,10 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         if (params != null) {
             if (StringUtils.hasText(params.getKeyword())) {
                 wrapper.and(query -> query.like(Asset::getAssetNo, params.getKeyword())
-                        .or().like(Asset::getName, params.getKeyword())
-                        .or().like(Asset::getSerialNo, params.getKeyword()));
+                        .or()
+                        .like(Asset::getName, params.getKeyword())
+                        .or()
+                        .like(Asset::getSerialNo, params.getKeyword()));
             }
             if (StringUtils.hasText(params.getStatus())) {
                 wrapper.eq(Asset::getStatus, params.getStatus());
@@ -128,18 +130,15 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
 
     @Override
     public List<AssetCategoryVO> categories() {
-        return categoryMapper.selectList(new LambdaQueryWrapper<AssetCategory>()
-                        .eq(AssetCategory::getEnabled, true)
-                        .orderByAsc(AssetCategory::getSort)
-                        .orderByAsc(AssetCategory::getCode))
-                .stream().map(assetConverter::toCategoryVO).toList();
+        return categoryMapper.selectList(new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getEnabled, true)
+                .orderByAsc(AssetCategory::getSort)
+                .orderByAsc(AssetCategory::getCode)).stream().map(assetConverter::toCategoryVO).toList();
     }
 
     @Override
     @Transactional
     public UUID createdCategory(AssetCategorySaveFrom from) {
-        var duplicate = categoryMapper.selectOne(new LambdaQueryWrapper<AssetCategory>()
-                .eq(AssetCategory::getCode, from.getCode()));
+        var duplicate = categoryMapper.selectOne(new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCode, from.getCode()));
         if (duplicate != null) {
             throw new DataSaveException("资产分类编码已存在");
         }
@@ -163,9 +162,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         if (entity == null) {
             throw new DataNotExistException("资产分类不存在: " + id);
         }
-        var duplicate = categoryMapper.selectOne(new LambdaQueryWrapper<AssetCategory>()
-                .eq(AssetCategory::getCode, from.getCode())
-                .ne(AssetCategory::getId, id));
+        var duplicate = categoryMapper
+                .selectOne(new LambdaQueryWrapper<AssetCategory>().eq(AssetCategory::getCode, from.getCode()).ne(AssetCategory::getId, id));
         if (duplicate != null) {
             throw new DataSaveException("资产分类编码已存在");
         }
@@ -180,21 +178,19 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     public void assign(UUID id, AssetOperationFrom from) {
         var entity = require(id);
         ensureOperable(entity);
-        if (STATUS_IN_USE.equals(entity.getStatus()) && entity.getCustodianId() != null
-                && (from == null || from.getToUserId() == null
-                || !Objects.equals(entity.getCustodianId(), from.getToUserId()))) {
+        if (STATUS_IN_USE.equals(entity.getStatus())
+            && entity.getCustodianId() != null
+            && (from == null || from.getToUserId() == null || !Objects.equals(entity.getCustodianId(), from.getToUserId()))) {
             throw new DataSaveException("资产已被其他人员领用");
         }
         var operation = operation(entity, OP_ASSIGN, from);
-        operation.setToDepartmentId(from == null || from.getToDepartmentId() == null
-                ? entity.getDepartmentId() : from.getToDepartmentId());
+        operation.setToDepartmentId(from == null || from.getToDepartmentId() == null ? entity.getDepartmentId() : from.getToDepartmentId());
         var targetUserId = from == null || from.getToUserId() == null ? SecUtil.getCurrentUserId() : from.getToUserId();
         if (targetUserId == null) {
             throw new DataSaveException("领用人不能为空");
         }
         operation.setToUserId(targetUserId);
-        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation())
-                ? entity.getLocation() : from.getToLocation());
+        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation()) ? entity.getLocation() : from.getToLocation());
         entity.setDepartmentId(operation.getToDepartmentId());
         entity.setCustodianId(operation.getToUserId());
         entity.setLocation(operation.getToLocation());
@@ -211,8 +207,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         entity.setStatus(STATUS_IN_STOCK);
         entity.setCustodianId(null);
         operation.setToDepartmentId(entity.getDepartmentId());
-        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation())
-                ? entity.getLocation() : from.getToLocation());
+        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation()) ? entity.getLocation() : from.getToLocation());
         entity.setLocation(operation.getToLocation());
         saveOperation(entity, operation);
     }
@@ -223,12 +218,9 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         var entity = require(id);
         ensureOperable(entity);
         var operation = operation(entity, OP_TRANSFER, from);
-        operation.setToDepartmentId(from == null || from.getToDepartmentId() == null
-                ? entity.getDepartmentId() : from.getToDepartmentId());
-        operation.setToUserId(from == null || from.getToUserId() == null
-                ? entity.getCustodianId() : from.getToUserId());
-        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation())
-                ? entity.getLocation() : from.getToLocation());
+        operation.setToDepartmentId(from == null || from.getToDepartmentId() == null ? entity.getDepartmentId() : from.getToDepartmentId());
+        operation.setToUserId(from == null || from.getToUserId() == null ? entity.getCustodianId() : from.getToUserId());
+        operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation()) ? entity.getLocation() : from.getToLocation());
         entity.setDepartmentId(operation.getToDepartmentId());
         entity.setCustodianId(operation.getToUserId());
         entity.setLocation(operation.getToLocation());
@@ -248,7 +240,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         operation.setMaintenanceCost(from == null ? null : from.getMaintenanceCost());
         operation.setStatus(from != null && "COMPLETE".equalsIgnoreCase(from.getStatus()) ? "COMPLETE" : "STARTED");
         entity.setStatus("COMPLETE".equalsIgnoreCase(operation.getStatus())
-                ? entity.getCustodianId() == null ? STATUS_IN_STOCK : STATUS_IN_USE : STATUS_MAINTENANCE);
+                ? entity.getCustodianId() == null ? STATUS_IN_STOCK : STATUS_IN_USE
+                : STATUS_MAINTENANCE);
         saveOperation(entity, operation);
     }
 
@@ -276,12 +269,12 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         if (receipt == null || !from.getPurchaseId().equals(receipt.getPurchaseId())) {
             throw new DataNotExistException("采购收货单不存在或不属于该采购申请");
         }
-        var itemMap = purchaseItemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>()
-                        .eq(PurchaseItem::getPurchaseId, purchase.getId()))
-                .stream().collect(java.util.stream.Collectors.toMap(PurchaseItem::getId, item -> item));
+        var itemMap = purchaseItemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, purchase.getId()))
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(PurchaseItem::getId, item -> item));
         var result = new java.util.ArrayList<AssetVO>();
-        var receiptItems = receiptItemMapper.selectList(new LambdaQueryWrapper<PurchaseReceiptItem>()
-                .eq(PurchaseReceiptItem::getReceiptId, receipt.getId()));
+        var receiptItems = receiptItemMapper
+                .selectList(new LambdaQueryWrapper<PurchaseReceiptItem>().eq(PurchaseReceiptItem::getReceiptId, receipt.getId()));
         for (var receiptItem : receiptItems) {
             if (Boolean.FALSE.equals(receiptItem.getAccepted())) {
                 continue;
@@ -290,8 +283,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             if (purchaseItem == null || "SERVICE".equalsIgnoreCase(purchaseItem.getItemType())) {
                 continue;
             }
-            var existing = this.getOne(new LambdaQueryWrapper<Asset>()
-                    .eq(Asset::getSourceReceiptId, receipt.getId())
+            var existing = this.getOne(new LambdaQueryWrapper<Asset>().eq(Asset::getSourceReceiptId, receipt.getId())
                     .eq(Asset::getSourcePurchaseItemId, purchaseItem.getId()), false);
             if (existing != null) {
                 result.add(assembleView(existing));
@@ -306,7 +298,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             entity.setQuantity(receiptItem.getQuantity() == null ? BigDecimal.ONE : receiptItem.getQuantity());
             entity.setAcquisitionDate(receipt.getReceivedDate());
             entity.setAcquisitionAmount(purchaseItem.getEstimatedUnitPrice() == null
-                    ? BigDecimal.ZERO : purchaseItem.getEstimatedUnitPrice().multiply(entity.getQuantity()));
+                    ? BigDecimal.ZERO
+                    : purchaseItem.getEstimatedUnitPrice().multiply(entity.getQuantity()));
             entity.setCurrency("CNY");
             entity.setDepartmentId(purchase.getDepartmentId());
             entity.setSourcePurchaseId(purchase.getId());
@@ -374,8 +367,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         operation.setFromDepartmentId(entity.getDepartmentId());
         operation.setFromUserId(entity.getCustodianId());
         operation.setFromLocation(entity.getLocation());
-        operation.setOperationDate(from == null || from.getOperationDate() == null
-                ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
+        operation.setOperationDate(from == null || from.getOperationDate() == null ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
         operation.setReason(from == null ? null : from.getReason());
         operation.setStatus("COMPLETE");
         return operation;
@@ -408,8 +400,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
                 vo.setCategoryName(category.getName());
             }
         }
-        var operations = operationMapper.selectList(new LambdaQueryWrapper<AssetOperation>()
-                .eq(AssetOperation::getAssetId, entity.getId())
+        var operations = operationMapper.selectList(new LambdaQueryWrapper<AssetOperation>().eq(AssetOperation::getAssetId, entity.getId())
                 .orderByDesc(AssetOperation::getOperationDate)
                 .orderByDesc(AssetOperation::getCreatedAt));
         vo.setOperations(operations.stream().map(assetConverter::toOperationVO).toList());

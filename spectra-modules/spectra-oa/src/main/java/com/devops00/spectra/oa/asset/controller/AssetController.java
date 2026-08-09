@@ -52,8 +52,7 @@ public class AssetController {
     @ULog("'修改资产'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
-    public void update(@PathVariable UUID id,
-            @Validated(Verify.Update.class) @RequestBody AssetSaveFrom from) {
+    public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody AssetSaveFrom from) {
         assetService.modify(id, from);
     }
 
@@ -93,8 +92,7 @@ public class AssetController {
     @ULog("'修改资产分类'")
     @PutMapping(value = "/categories/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
-    public void updateCategory(@PathVariable UUID id,
-            @Validated(Verify.Update.class) @RequestBody AssetCategorySaveFrom from) {
+    public void updateCategory(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody AssetCategorySaveFrom from) {
         assetService.modifyCategory(id, from);
     }
 

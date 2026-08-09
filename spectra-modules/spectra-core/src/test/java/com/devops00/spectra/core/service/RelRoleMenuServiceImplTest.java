@@ -88,14 +88,8 @@ class RelRoleMenuServiceImplTest {
         var menuA = UUID.randomUUID();
         var menuB = UUID.randomUUID();
         var menuC = UUID.randomUUID();
-        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of(
-                new RelRoleMenu(roleId, menuA),
-                new RelRoleMenu(roleId, menuB)
-        ));
-        when(menuService.listByIds(anyCollection())).thenReturn(List.of(
-                menu(menuB, MenuType.MENU),
-                menu(menuC, MenuType.MENU)
-        ));
+        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of(new RelRoleMenu(roleId, menuA), new RelRoleMenu(roleId, menuB)));
+        when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(menuB, MenuType.MENU), menu(menuC, MenuType.MENU)));
 
         service.grant(roleId, new RoleMenuFrom(roleId, List.of(menuB, menuC)));
 
@@ -137,8 +131,7 @@ class RelRoleMenuServiceImplTest {
 
     @Test
     void grantShouldRejectDifferentRoleId() {
-        assertThrows(DataException.class,
-                () -> service.grant(UUID.randomUUID(), new RoleMenuFrom(UUID.randomUUID(), List.of())));
+        assertThrows(DataException.class, () -> service.grant(UUID.randomUUID(), new RoleMenuFrom(UUID.randomUUID(), List.of())));
     }
 
     @Test
@@ -147,10 +140,7 @@ class RelRoleMenuServiceImplTest {
         var directoryId = UUID.randomUUID();
         var menuId = UUID.randomUUID();
         when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of());
-        when(menuService.listByIds(anyCollection())).thenReturn(List.of(
-                menu(directoryId, MenuType.DIRECTORY),
-                menu(menuId, MenuType.MENU)
-        ));
+        when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(directoryId, MenuType.DIRECTORY), menu(menuId, MenuType.MENU)));
 
         service.grant(roleId, new RoleMenuFrom(roleId, List.of(directoryId, menuId)));
 
@@ -166,8 +156,7 @@ class RelRoleMenuServiceImplTest {
         var unknownId = UUID.randomUUID();
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(knownId, MenuType.MENU)));
 
-        assertThrows(DataNotExistException.class,
-                () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(knownId, unknownId))));
+        assertThrows(DataNotExistException.class, () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(knownId, unknownId))));
     }
 
     @Test
@@ -177,8 +166,7 @@ class RelRoleMenuServiceImplTest {
         deletedMenu.setDeleted(Instant.now());
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(deletedMenu));
 
-        assertThrows(DataNotExistException.class,
-                () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(deletedMenu.getId()))));
+        assertThrows(DataNotExistException.class, () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(deletedMenu.getId()))));
     }
 
     private static Menu menu(UUID id, MenuType type) {

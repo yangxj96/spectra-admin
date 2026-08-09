@@ -38,8 +38,7 @@ public class FileUploadServiceRegistry {
 
     /// 启动时候收集缓存
     public FileUploadServiceRegistry(List<FileUploadService> services) {
-        this.serviceMap = services.stream()
-                .collect(Collectors.toMap(FileUploadService::getType, v -> v));
+        this.serviceMap = services.stream().collect(Collectors.toMap(FileUploadService::getType, v -> v));
     }
 
     /// 根据类型获取上传服务

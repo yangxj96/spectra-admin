@@ -68,8 +68,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     private final DataScopeEntityRegistry dataScopeEntityRegistry;
 
-    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider,
-            DataScopeEntityRegistry dataScopeEntityRegistry) {
+    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider, DataScopeEntityRegistry dataScopeEntityRegistry) {
         this.dataScopeProvider = dataScopeProvider;
         this.dataScopeEntityRegistry = dataScopeEntityRegistry;
     }
@@ -87,9 +86,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
         // 尝试获取实体类上的 @DataScope 注解
         Class<?> entityClass = resolveEntityClass(mappedStatementId);
-        DataScope annotation = entityClass != null
-                ? entityClass.getAnnotation(DataScope.class)
-                : null;
+        DataScope annotation = entityClass != null ? entityClass.getAnnotation(DataScope.class) : null;
         // XML / 自动分页语句等场景可能无法从 mappedStatementId 推导实体，
         // 此时必须继续使用按表名注册的元数据，不能直接放弃隔离。
         if (annotation == null) {
@@ -158,8 +155,8 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
     }
 
     /// 构建结构维度条件（department_id / created_by）
-    private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName,
-            DataScopeProvider.EffectiveScope scope, UUID currentUserId) {
+    private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName, DataScopeProvider.EffectiveScope scope,
+            UUID currentUserId) {
         return switch (scope.getScopeType()) {
             case SELF -> {
                 // created_by = currentUserId
@@ -184,9 +181,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
                     yield eq;
                 }
                 ExpressionList<Expression> exprList = new ExpressionList<>(
-                        targetIds.stream()
-                                .map(id -> new StringValue(id.toString()))
-                                .collect(Collectors.toList()));
+                        targetIds.stream().map(id -> new StringValue(id.toString())).collect(Collectors.toList()));
                 in.setRightExpression(exprList);
                 yield in;
             }
@@ -257,9 +252,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
             // 尝试将 mapper 替换为 javabean/entity 查找实体类
             // 例如: core.user.mapper.UserMapper → core.user.javabean.entity.User
-            String entityPath = classPath
-                    .replace(".mapper.", ".javabean.entity.")
-                    .replace("Mapper", "");
+            String entityPath = classPath.replace(".mapper.", ".javabean.entity.").replace("Mapper", "");
 
             return Class.forName(entityPath);
         } catch (ClassNotFoundException e) {

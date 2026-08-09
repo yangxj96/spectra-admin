@@ -211,10 +211,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (targetIds.isEmpty()) {
             throw new DataException("用户至少需要关联一个角色");
         }
-        var activeRoleCount = roleMapper.selectCount(new LambdaQueryWrapper<Role>()
-                .in(Role::getId, targetIds)
-                .eq(Role::getState, Boolean.TRUE)
-                .isNull(Role::getDeleted));
+        var activeRoleCount = roleMapper
+                .selectCount(new LambdaQueryWrapper<Role>().in(Role::getId, targetIds).eq(Role::getState, Boolean.TRUE).isNull(Role::getDeleted));
         if (activeRoleCount != targetIds.size()) {
             throw new DataNotExistException("存在无效或禁用角色");
         }
@@ -239,13 +237,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         // 条件构建
-        var wrapper = new LambdaQueryWrapper<User>()
-                .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
+        var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
-                .in(params.getDepartmentId() != null,
-                        User::getDepartmentId,
-                        departmentService.getSelfAndDescendantIds(params.getDepartmentId())
-                )
+                .in(params.getDepartmentId() != null, User::getDepartmentId, departmentService.getSelfAndDescendantIds(params.getDepartmentId()))
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
 
         var db = this.page(page.toPage(), wrapper);
@@ -266,12 +260,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 vo.setDataScope(scope.getScopeType());
                 if (scope.getScopeType() == DataScopeType.CUSTOM) {
                     var targets = dataScopeTargetMapper.findByUserId(vo.getId());
-                    vo.setTargetIds(
-                            targets
-                                    .stream()
-                                    .map(target -> target.getTargetId().toString())
-                                    .toList()
-                    );
+                    vo.setTargetIds(targets.stream().map(target -> target.getTargetId().toString()).toList());
                 }
             }
         });
@@ -403,7 +392,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private boolean canManageGlobalScope() {
         var currentUser = SecUtil.getCurrentUser();
-        return currentUser != null && currentUser.getAuthorities().stream().anyMatch(authority ->
-                "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
+        return currentUser != null
+            && currentUser.getAuthorities()
+                    .stream()
+                    .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 }

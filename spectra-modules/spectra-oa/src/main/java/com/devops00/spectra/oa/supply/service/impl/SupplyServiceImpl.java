@@ -56,8 +56,10 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         if (params != null) {
             if (StringUtils.hasText(params.getKeyword())) {
                 wrapper.and(query -> query.like(SupplyItem::getSku, params.getKeyword())
-                        .or().like(SupplyItem::getName, params.getKeyword())
-                        .or().like(SupplyItem::getSpecification, params.getKeyword()));
+                        .or()
+                        .like(SupplyItem::getName, params.getKeyword())
+                        .or()
+                        .like(SupplyItem::getSpecification, params.getKeyword()));
             }
             if (StringUtils.hasText(params.getCategory())) {
                 wrapper.eq(SupplyItem::getCategory, params.getCategory());
@@ -148,11 +150,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
 
     @Override
     public List<SupplyItemVO> lowStock() {
-        return this.list(new LambdaQueryWrapper<SupplyItem>()
-                        .eq(SupplyItem::getStatus, STATUS_ACTIVE)
-                        .apply("current_stock <= min_stock")
-                        .orderByAsc(SupplyItem::getName))
-                .stream().map(item -> assembleView(item, false)).toList();
+        return this.list(new LambdaQueryWrapper<SupplyItem>().eq(SupplyItem::getStatus, STATUS_ACTIVE)
+                .apply("current_stock <= min_stock")
+                .orderByAsc(SupplyItem::getName)).stream().map(item -> assembleView(item, false)).toList();
     }
 
     private void change(UUID id, String type, BigDecimal delta, SupplyOperationFrom from) {
@@ -178,8 +178,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         operation.setDepartmentId(from.getDepartmentId());
         operation.setUserId(from.getUserId());
         operation.setLocation(StringUtils.hasText(from.getLocation()) ? from.getLocation() : entity.getLocation());
-        operation.setOperationDate(from.getOperationDate() == null
-                ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
+        operation.setOperationDate(from.getOperationDate() == null ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
         operation.setReason(from.getReason());
         operation.setSourcePurchaseId(from.getSourcePurchaseId());
         operation.setSourceReceiptId(from.getSourceReceiptId());
@@ -248,11 +247,13 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         var vo = supplyConverter.toVO(entity);
         vo.setLowStock(stock(entity).compareTo(entity.getMinStock() == null ? BigDecimal.ZERO : entity.getMinStock()) <= 0);
         if (withOperations) {
-            vo.setOperations(operationMapper.selectList(new LambdaQueryWrapper<SupplyOperation>()
-                            .eq(SupplyOperation::getSupplyId, entity.getId())
+            vo.setOperations(operationMapper
+                    .selectList(new LambdaQueryWrapper<SupplyOperation>().eq(SupplyOperation::getSupplyId, entity.getId())
                             .orderByDesc(SupplyOperation::getOperationDate)
                             .orderByDesc(SupplyOperation::getCreatedAt))
-                    .stream().map(supplyConverter::toOperationVO).toList());
+                    .stream()
+                    .map(supplyConverter::toOperationVO)
+                    .toList());
         }
         return vo;
     }

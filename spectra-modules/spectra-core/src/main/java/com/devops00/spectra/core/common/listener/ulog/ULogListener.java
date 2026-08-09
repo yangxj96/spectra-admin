@@ -64,10 +64,7 @@ public class ULogListener {
                 if (argsJson.length() > 10000) {
                     // 安全裁剪：动态计算长度，确保绝对不会越界崩溃
                     String safeSub = argsJson.substring(0, 10000);
-                    datum.setArgs(Map.of(
-                            "payload", "参数过长已自动截断",
-                            "raw_part", safeSub + "...(已截断)"
-                    ));
+                    datum.setArgs(Map.of("payload", "参数过长已自动截断", "raw_part", safeSub + "...(已截断)"));
                 } else {
                     List<Object> argList = om.readValue(argsJson, tf.constructCollectionType(List.class, Object.class));
                     datum.setArgs(Map.of("payload", argList));
@@ -89,18 +86,12 @@ public class ULogListener {
                 } else {
                     // 如果是标准的 JSON 数组（以 [ 开头），解析成 List，再包裹成 Map 写入
                     if (resultJson.startsWith("[")) {
-                        List<Object> resultList = om.readValue(
-                                resultJson,
-                                tf.constructCollectionType(List.class, Object.class)
-                        );
+                        List<Object> resultList = om.readValue(resultJson, tf.constructCollectionType(List.class, Object.class));
                         datum.setResult(Map.of("data", resultList)); // 👈 包裹进 Map 容器，完美迎合 jsonb 映射
                     }
                     // 如果是标准的 JSON 对象（以 { 开头），正常反序列化为 Map
                     else if (resultJson.startsWith("{")) {
-                        Map<String, Object> resultMap = om.readValue(
-                                resultJson,
-                                tf.constructMapType(Map.class, String.class, Object.class)
-                        );
+                        Map<String, Object> resultMap = om.readValue(resultJson, tf.constructMapType(Map.class, String.class, Object.class));
                         datum.setResult(resultMap);
                     }
                     // 如果是纯文本、数字或布尔值等基本类型

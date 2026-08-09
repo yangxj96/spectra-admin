@@ -38,7 +38,8 @@ public interface DataScopeProvider {
     /// 2. 多角色时取最大范围（GLOBAL > DEPT_AND_CHILDREN > DEPT > CUSTOM > SELF）
     /// 3. 所有 CUSTOM 的 targetIds 合并
     ///
-    /// @param userId 用户ID
+    /// @param userId
+    ///            用户ID
     /// @return 有效数据范围
     EffectiveScope resolve(UUID userId);
 

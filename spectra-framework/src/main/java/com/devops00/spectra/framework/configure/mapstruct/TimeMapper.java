@@ -77,8 +77,7 @@ public class TimeMapper {
     /// @param localDateTime {@link LocalDateTime}
     /// @return {@link Instant}
     public @Nullable Instant toInstant(@Nullable LocalDateTime localDateTime) {
-        return localDateTime == null ? null :
-                localDateTime.atZone(getUserZoneId()).toInstant();
+        return localDateTime == null ? null : localDateTime.atZone(getUserZoneId()).toInstant();
     }
 
     /// Instant 转 LocalDate
@@ -86,8 +85,7 @@ public class TimeMapper {
     /// @param instant {@link Instant}
     /// @return {@link LocalDate}
     public @Nullable LocalDate toLocalDate(@Nullable Instant instant) {
-        return instant == null ? null :
-                instant.atZone(getUserZoneId()).toLocalDate();
+        return instant == null ? null : instant.atZone(getUserZoneId()).toLocalDate();
     }
 
     /// LocalDate 转 Instant
@@ -95,8 +93,7 @@ public class TimeMapper {
     /// @param localDate {@link LocalDate}
     /// @return {@link Instant}
     public @Nullable Instant toInstant(@Nullable LocalDate localDate) {
-        return localDate == null ? null :
-                localDate.atStartOfDay(getUserZoneId()).toInstant();
+        return localDate == null ? null : localDate.atStartOfDay(getUserZoneId()).toInstant();
     }
 
     /// Instant 转 LocalTime
@@ -104,8 +101,7 @@ public class TimeMapper {
     /// @param instant {@link Instant}
     /// @return {@link LocalTime}
     public @Nullable LocalTime toLocalTime(@Nullable Instant instant) {
-        return instant == null ? null :
-                instant.atZone(getUserZoneId()).toLocalTime();
+        return instant == null ? null : instant.atZone(getUserZoneId()).toLocalTime();
     }
 
     /// LocalTime 转 Instant
@@ -114,11 +110,7 @@ public class TimeMapper {
     /// @param localTime {@link LocalTime}
     /// @return {@link Instant}
     public @Nullable Instant toInstant(@Nullable LocalTime localTime) {
-        return localTime == null ? null :
-                LocalDate.now(getUserZoneId())
-                        .atTime(localTime)
-                        .atZone(getUserZoneId())
-                        .toInstant();
+        return localTime == null ? null : LocalDate.now(getUserZoneId()).atTime(localTime).atZone(getUserZoneId()).toInstant();
     }
 
     /// Instant 转 ZonedDateTime
@@ -126,8 +118,7 @@ public class TimeMapper {
     /// @param instant {@link Instant}
     /// @return {@link ZonedDateTime}
     public @Nullable ZonedDateTime toZonedDateTime(@Nullable Instant instant) {
-        return instant == null ? null :
-                instant.atZone(getUserZoneId());
+        return instant == null ? null : instant.atZone(getUserZoneId());
     }
 
     /// ZonedDateTime 转 Instant
@@ -135,8 +126,7 @@ public class TimeMapper {
     /// @param zonedDateTime {@link ZonedDateTime}
     /// @return {@link Instant}
     public @Nullable Instant toInstant(@Nullable ZonedDateTime zonedDateTime) {
-        return zonedDateTime == null ? null :
-                zonedDateTime.toInstant();
+        return zonedDateTime == null ? null : zonedDateTime.toInstant();
     }
 
     /// Instant 转 OffsetDateTime
@@ -144,8 +134,7 @@ public class TimeMapper {
     /// @param instant {@link Instant}
     /// @return {@link OffsetDateTime}
     public @Nullable OffsetDateTime toOffsetDateTime(@Nullable Instant instant) {
-        return instant == null ? null :
-                instant.atZone(getUserZoneId()).toOffsetDateTime();
+        return instant == null ? null : instant.atZone(getUserZoneId()).toOffsetDateTime();
     }
 
     /// OffsetDateTime 转 Instant
@@ -153,8 +142,7 @@ public class TimeMapper {
     /// @param offsetDateTime {@link OffsetDateTime}
     /// @return {@link Instant}
     public @Nullable Instant toInstant(@Nullable OffsetDateTime offsetDateTime) {
-        return offsetDateTime == null ? null :
-                offsetDateTime.toInstant();
+        return offsetDateTime == null ? null : offsetDateTime.toInstant();
     }
 
     /// Instant 转 Date
@@ -236,29 +224,20 @@ public class TimeMapper {
             // 继续尝试其他 ISO 8601 形式。
         }
         try {
-            return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-                    .atZone(getUserZoneId())
-                    .toInstant();
+            return LocalDateTime.parse(value, DateTimeFormatter.ISO_LOCAL_DATE_TIME).atZone(getUserZoneId()).toInstant();
         } catch (DateTimeParseException ignored) {
             // 继续尝试日期或时间形式。
         }
         try {
-            return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE)
-                    .atStartOfDay(getUserZoneId())
-                    .toInstant();
+            return LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(getUserZoneId()).toInstant();
         } catch (DateTimeParseException ignored) {
             // 继续尝试时间形式。
         }
         try {
-            return OffsetTime.parse(value, DateTimeFormatter.ISO_OFFSET_TIME)
-                    .atDate(LocalDate.now(getUserZoneId()))
-                    .toInstant();
+            return OffsetTime.parse(value, DateTimeFormatter.ISO_OFFSET_TIME).atDate(LocalDate.now(getUserZoneId())).toInstant();
         } catch (DateTimeParseException ignored) {
             // 继续尝试无时区时间形式。
         }
-        return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME)
-                .atDate(LocalDate.now(getUserZoneId()))
-                .atZone(getUserZoneId())
-                .toInstant();
+        return LocalTime.parse(value, DateTimeFormatter.ISO_LOCAL_TIME).atDate(LocalDate.now(getUserZoneId())).atZone(getUserZoneId()).toInstant();
     }
 }

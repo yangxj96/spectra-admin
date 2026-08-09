@@ -69,8 +69,7 @@ class DataScopeIsolationTest {
 
     @Test
     void emptyCustomScopeProducesFalsePredicate() throws Exception {
-        Expression expression = invokeStructural(new Table("oa_meeting"),
-                TestResource.class.getAnnotation(DataScope.class),
+        Expression expression = invokeStructural(new Table("oa_meeting"), TestResource.class.getAnnotation(DataScope.class),
                 new DataScopeProvider.EffectiveScope(DataScopeType.CUSTOM, null, List.of()));
 
         assertEquals("1 = 0", expression.toString());
@@ -78,35 +77,23 @@ class DataScopeIsolationTest {
 
     @Test
     void relationUsesExplicitSchema() throws Exception {
-        Method method = DataScopeInnerInterceptor.class.getDeclaredMethod(
-                "buildRelationalExpression", Table.class, DataScope.class, UUID.class);
+        Method method = DataScopeInnerInterceptor.class.getDeclaredMethod("buildRelationalExpression", Table.class, DataScope.class, UUID.class);
         method.setAccessible(true);
-        Expression expression = (Expression) method.invoke(new DataScopeInnerInterceptor(null, null),
-                new Table("oa_meeting"), TestResource.class.getAnnotation(DataScope.class), USER_ID);
+        Expression expression = (Expression) method.invoke(new DataScopeInnerInterceptor(null, null), new Table("oa_meeting"),
+                TestResource.class.getAnnotation(DataScope.class), USER_ID);
 
         assertNotNull(expression);
         assertTrue(expression.toString().contains("spectra_oa.oa_meeting_participant"));
     }
 
-    private Expression invokeStructural(Table table, DataScope annotation,
-            DataScopeProvider.EffectiveScope scope) throws Exception {
-        Method method = DataScopeInnerInterceptor.class.getDeclaredMethod(
-                "buildStructuralExpression", Table.class, DataScope.class, String.class,
+    private Expression invokeStructural(Table table, DataScope annotation, DataScopeProvider.EffectiveScope scope) throws Exception {
+        Method method = DataScopeInnerInterceptor.class.getDeclaredMethod("buildStructuralExpression", Table.class, DataScope.class, String.class,
                 DataScopeProvider.EffectiveScope.class, UUID.class);
         method.setAccessible(true);
-        return (Expression) method.invoke(new DataScopeInnerInterceptor(null, null), table, annotation,
-                annotation.column(), scope, USER_ID);
+        return (Expression) method.invoke(new DataScopeInnerInterceptor(null, null), table, annotation, annotation.column(), scope, USER_ID);
     }
 
-    @DataScope(
-            column = "department_id",
-            ownerColumn = "owner_id",
-            relations = @DataScope.Relation(
-                    schema = "spectra_oa",
-                    table = "oa_meeting_participant",
-                    joinColumn = "meeting_id"
-            )
-    )
+    @DataScope(column = "department_id", ownerColumn = "owner_id", relations = @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id"))
     private static class TestResource {
     }
 }

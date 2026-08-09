@@ -107,15 +107,12 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        var applicationWrapper = new LambdaQueryWrapper<Application>()
-                .eq(Application::getTypeCode, TYPE_CODE)
-                .and(query -> query.eq(Application::getApplicantId, user.getId())
-                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        var applicationWrapper = new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
         if (params != null && StringUtils.hasText(params.getStatus())) {
             applicationWrapper.eq(Application::getStatus, params.getStatus());
         }
-        var applicationIds = applicationMapper.selectList(applicationWrapper).stream()
-                .map(Application::getId).toList();
+        var applicationIds = applicationMapper.selectList(applicationWrapper).stream().map(Application::getId).toList();
         if (applicationIds.isEmpty()) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -125,8 +122,10 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Purchase::getPurpose, params.getKeyword())
-                    .or().like(Purchase::getSuggestedSupplier, params.getKeyword())
-                    .or().like(Purchase::getOrderNo, params.getKeyword()));
+                    .or()
+                    .like(Purchase::getSuggestedSupplier, params.getKeyword())
+                    .or()
+                    .like(Purchase::getOrderNo, params.getKeyword()));
         }
         wrapper.orderByDesc(Purchase::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
@@ -183,8 +182,8 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     public void submit(UUID id, PurchaseSubmitFrom from) {
         var entity = require(id);
         var application = requireEditableApplication(entity);
-        var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, TYPE_CODE).eq(ApplicationType::getEnabled, true));
+        var type = applicationTypeMapper
+                .selectOne(new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, TYPE_CODE).eq(ApplicationType::getEnabled, true));
         if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
             throw new DataSaveException("采购流程尚未配置");
         }
@@ -241,8 +240,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (purchaserId == null) {
             throw new DataSaveException("采购执行人不能为空");
         }
-        var status = from == null || !StringUtils.hasText(from.getExecutionStatus())
-                ? EXECUTION_ORDERED : from.getExecutionStatus();
+        var status = from == null || !StringUtils.hasText(from.getExecutionStatus()) ? EXECUTION_ORDERED : from.getExecutionStatus();
         if (!EXECUTION_ORDERED.equals(status) && !EXECUTION_PARTIAL_RECEIVED.equals(status)) {
             throw new DataSaveException("采购执行状态不合法");
         }
@@ -250,8 +248,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (StringUtils.hasText(from == null ? null : from.getOrderNo())) {
             entity.setOrderNo(from.getOrderNo());
         }
-        entity.setExecutionStatus(EXECUTION_PARTIAL_RECEIVED.equals(entity.getExecutionStatus())
-                ? EXECUTION_PARTIAL_RECEIVED : status);
+        entity.setExecutionStatus(EXECUTION_PARTIAL_RECEIVED.equals(entity.getExecutionStatus()) ? EXECUTION_PARTIAL_RECEIVED : status);
         entity.setOrderedAt(entity.getOrderedAt() == null ? Instant.now() : entity.getOrderedAt());
         entity.setExecutionRemark(from == null ? null : from.getExecutionRemark());
         if (!this.updateById(entity)) {
@@ -275,8 +272,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (receiverId == null) {
             throw new DataSaveException("收货人不能为空");
         }
-        var purchaseItems = itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>()
-                .eq(PurchaseItem::getPurchaseId, id));
+        var purchaseItems = itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, id));
         var itemMap = purchaseItems.stream().collect(java.util.stream.Collectors.toMap(PurchaseItem::getId, item -> item));
         var receiptItems = new LinkedHashMap<UUID, PurchaseReceiptItemFrom>();
         from.getItems().forEach(item -> {
@@ -306,15 +302,13 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
         for (var purchaseItem : purchaseItems) {
             if (!receiptItems.containsKey(purchaseItem.getId())
-                    && (purchaseItem.getReceivedQuantity() == null
-                    || purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) < 0)) {
+                && (purchaseItem.getReceivedQuantity() == null || purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) < 0)) {
                 allReceived = false;
             }
         }
         var receipt = new PurchaseReceipt();
         receipt.setPurchaseId(id);
-        receipt.setReceiptNo(StringUtils.hasText(from.getReceiptNo()) ? from.getReceiptNo()
-                : "GR" + Instant.now().toEpochMilli());
+        receipt.setReceiptNo(StringUtils.hasText(from.getReceiptNo()) ? from.getReceiptNo() : "GR" + Instant.now().toEpochMilli());
         receipt.setReceivedDate(timeMapper.toInstant(from.getReceivedDate()));
         receipt.setReceiverId(receiverId);
         receipt.setStatus(hasDifference ? RECEIPT_DIFFERENCE : allReceived ? RECEIPT_COMPLETE : RECEIPT_PARTIAL);
@@ -344,8 +338,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (!this.updateById(entity)) {
             throw new DataSaveException("更新采购执行状态失败");
         }
-        sendNotification(application, allReceived ? "采购已全部收货" : "采购已部分收货",
-                allReceived ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
+        sendNotification(application, allReceived ? "采购已全部收货" : "采购已部分收货", allReceived ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
     }
 
     @Override
@@ -385,9 +378,11 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     }
 
     private void validate(PurchaseSaveFrom from) {
-        var estimate = from.getItems().stream()
+        var estimate = from.getItems()
+                .stream()
                 .map(item -> item.getQuantity().multiply(item.getEstimatedUnitPrice()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
         if (estimate.compareTo(from.getBudgetAmount().setScale(2, RoundingMode.HALF_UP)) > 0) {
             throw new DataSaveException("采购明细估价合计不能超过采购预算");
         }
@@ -422,20 +417,24 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         vo.setApplicantId(application.getApplicantId());
         vo.setProcessInstanceId(application.getProcessInstanceId());
         vo.setRejectReason(application.getRejectReason());
-        vo.setItems(itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>()
-                        .eq(PurchaseItem::getPurchaseId, entity.getId()).orderByAsc(PurchaseItem::getCreatedAt))
-                .stream().map(purchaseConverter::toItemVO).toList());
-        var receipts = receiptMapper.selectList(new LambdaQueryWrapper<PurchaseReceipt>()
-                .eq(PurchaseReceipt::getPurchaseId, entity.getId()).orderByDesc(PurchaseReceipt::getReceivedDate));
+        vo.setItems(itemMapper
+                .selectList(
+                        new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, entity.getId()).orderByAsc(PurchaseItem::getCreatedAt))
+                .stream()
+                .map(purchaseConverter::toItemVO)
+                .toList());
+        var receipts = receiptMapper.selectList(new LambdaQueryWrapper<PurchaseReceipt>().eq(PurchaseReceipt::getPurchaseId, entity.getId())
+                .orderByDesc(PurchaseReceipt::getReceivedDate));
         vo.setReceipts(receipts.stream().map(this::assembleReceiptView).toList());
         return vo;
     }
 
     private PurchaseReceiptVO assembleReceiptView(PurchaseReceipt receipt) {
         var vo = purchaseConverter.toReceiptVO(receipt);
-        vo.setItems(receiptItemMapper.selectList(new LambdaQueryWrapper<PurchaseReceiptItem>()
-                        .eq(PurchaseReceiptItem::getReceiptId, receipt.getId()))
-                .stream().map(purchaseConverter::toReceiptItemVO).toList());
+        vo.setItems(receiptItemMapper.selectList(new LambdaQueryWrapper<PurchaseReceiptItem>().eq(PurchaseReceiptItem::getReceiptId, receipt.getId()))
+                .stream()
+                .map(purchaseConverter::toReceiptItemVO)
+                .toList());
         return vo;
     }
 
@@ -449,8 +448,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
 
     private Application requireEditableApplication(Purchase entity) {
         var application = requireApplicantApplication(entity);
-        if (!ApplicationStatus.DRAFT.name().equals(application.getStatus())
-                && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
+        if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
             throw new DataSaveException("当前状态不允许修改或提交采购申请");
         }
         return application;

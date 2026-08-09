@@ -64,17 +64,13 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
-        var taskQuery = flowableTaskService.createTaskQuery()
-                .taskAssignee(assignee)
-                .orderByTaskCreateTime()
-                .desc();
+        var taskQuery = flowableTaskService.createTaskQuery().taskAssignee(assignee).orderByTaskCreateTime().desc();
         if (StringUtils.hasText(processDefinitionKey)) {
             taskQuery.processDefinitionKey(processDefinitionKey);
         }
 
         long total = taskQuery.count();
-        var tasks = taskQuery
-                .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
+        var tasks = taskQuery.listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
         var records = tasks.stream().map(this::assembleView).toList();
 
@@ -96,8 +92,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         }
 
         long total = historicTaskQuery.count();
-        var tasks = historicTaskQuery
-                .listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
+        var tasks = historicTaskQuery.listPage((int) ((page.getPageNum() - 1) * page.getPageSize()), (int) page.getPageSize().longValue());
 
         var records = tasks.stream().map(this::assembleView).toList();
 
@@ -172,12 +167,10 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         if (!StringUtils.hasText(processInstanceId) || !StringUtils.hasText(username)) {
             return false;
         }
-        if (flowableTaskService.createTaskQuery().processInstanceId(processInstanceId)
-                .taskAssignee(username).count() > 0) {
+        if (flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).taskAssignee(username).count() > 0) {
             return true;
         }
-        return historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId)
-                .taskAssignee(username).count() > 0;
+        return historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).taskAssignee(username).count() > 0;
     }
 
     private org.flowable.task.api.Task requireOwnedTask(String taskId, String operator) {
@@ -204,20 +197,17 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     }
 
     private void enrich(TaskVO vo, String processInstanceId, String processDefinitionId, boolean historic) {
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         if (definition != null) {
             vo.setProcessDefinitionKey(definition.getKey());
         }
         if (historic) {
-            var instance = historyService.createHistoricProcessInstanceQuery()
-                    .processInstanceId(processInstanceId).singleResult();
+            var instance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             if (instance != null) {
                 vo.setBusinessKey(instance.getBusinessKey());
             }
         } else {
-            var instance = runtimeService.createProcessInstanceQuery()
-                    .processInstanceId(processInstanceId).singleResult();
+            var instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
             if (instance != null) {
                 vo.setBusinessKey(instance.getBusinessKey());
             }
@@ -225,15 +215,12 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     }
 
     /// 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。
-    private void dispatchIfFinished(String processInstanceId, String processDefinitionId,
-            boolean approved, String reason) {
-        var historic = historyService.createHistoricProcessInstanceQuery()
-                .processInstanceId(processInstanceId).singleResult();
+    private void dispatchIfFinished(String processInstanceId, String processDefinitionId, boolean approved, String reason) {
+        var historic = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (historic == null || historic.getEndTime() == null) {
             return;
         }
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(processDefinitionId).singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         if (definition == null) {
             return;
         }
@@ -243,7 +230,9 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         }
         if (approved) {
             var variables = historyService.createHistoricVariableInstanceQuery()
-                    .processInstanceId(processInstanceId).list().stream()
+                    .processInstanceId(processInstanceId)
+                    .list()
+                    .stream()
                     .collect(Collectors.toMap(item -> item.getVariableName(), item -> item.getValue(), (left, right) -> right));
             callback.onApproved(historic.getBusinessKey(), variables);
         } else {

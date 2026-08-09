@@ -38,8 +38,7 @@ public class SHA256Utils {
     /// HMAC-SHA256
     public static String hmac(String input, String key) throws Exception {
         javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
-        javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(
-                key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
         mac.init(secretKey);
         byte[] hmacBytes = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
         return Base64.getEncoder().encodeToString(hmacBytes);

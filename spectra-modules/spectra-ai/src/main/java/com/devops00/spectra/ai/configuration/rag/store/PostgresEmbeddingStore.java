@@ -85,8 +85,7 @@ public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
         String sql = String.format(
                 "INSERT INTO %s (embedding_id, text, embedding, metadata) VALUES (?, ?, ?%s, ?::jsonb) " +
                         "ON CONFLICT (embedding_id) DO UPDATE SET text = EXCLUDED.text, embedding = EXCLUDED.embedding, metadata = EXCLUDED.metadata",
-                SCHEMA_TABLE, VECTOR_TYPE
-        );
+                SCHEMA_TABLE, VECTOR_TYPE);
 
         List<Object[]> batchArgs = new ArrayList<>();
 
@@ -136,21 +135,20 @@ public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
                         "WHERE (1 - (embedding %s ?%s)) >= ? " +
                         "ORDER BY embedding %s ?%s ASC " +
                         "LIMIT ?",
-                VECTOR_OP, VECTOR_TYPE, SCHEMA_TABLE, VECTOR_OP, VECTOR_TYPE, VECTOR_OP, VECTOR_TYPE
-        );
+                VECTOR_OP, VECTOR_TYPE, SCHEMA_TABLE, VECTOR_OP, VECTOR_TYPE, VECTOR_OP, VECTOR_TYPE);
 
         String vectorStr = queryEmbedding.vectorAsList().toString();
 
         List<EmbeddingMatch<TextSegment>> matches = jdbcTemplate.query(sql, (rs, _) -> {
-                    String embeddingId = rs.getString("embedding_id");
-                    String text = rs.getString("text");
-                    double score = rs.getDouble("score");
+            String embeddingId = rs.getString("embedding_id");
+            String text = rs.getString("text");
+            double score = rs.getDouble("score");
 
-                    // 后续扩展点：如果你的 metadata 里存了别的信息，可以进一步还原到 TextSegment 中
-                    TextSegment segment = TextSegment.from(text);
+            // 后续扩展点：如果你的 metadata 里存了别的信息，可以进一步还原到 TextSegment 中
+            TextSegment segment = TextSegment.from(text);
 
-                    return new EmbeddingMatch<>(score, embeddingId, queryEmbedding, segment);
-                },
+            return new EmbeddingMatch<>(score, embeddingId, queryEmbedding, segment);
+        },
                 vectorStr, vectorStr, minScore, vectorStr, maxResults);
 
         return new EmbeddingSearchResult<>(matches);

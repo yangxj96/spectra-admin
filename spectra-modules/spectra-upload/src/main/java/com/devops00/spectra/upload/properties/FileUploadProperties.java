@@ -41,11 +41,8 @@ public class FileUploadProperties {
     private UploadType defaultStorage = UploadType.LOCAL;
 
     /// 文件类型验证策略（扩展名校验已内置于 FileTypeValidator，无需配置）
-    private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(Arrays.asList(
-            TikaValidationStrategy.class,
-            MimeValidationStrategy.class,
-            MagicNumberValidationStrategy.class
-    ));
+    private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(
+            Arrays.asList(TikaValidationStrategy.class, MimeValidationStrategy.class, MagicNumberValidationStrategy.class));
 
     /// 分片大小,默认5M 5242880L
     private Long chunkSize = 5242880L;

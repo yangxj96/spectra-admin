@@ -33,14 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HistoryController {
 
     /*
-    👉 面向“查询 + 审计”
-    职责
-    历史任务
-    审批记录
-    流程轨迹
-    接口示例
-    GET /history/process-instances/{id}
-    GET /history/tasks
-    GET /history/activities
+     * 👉 面向“查询 + 审计” 职责 历史任务 审批记录 流程轨迹 接口示例 GET /history/process-instances/{id} GET
+     * /history/tasks GET /history/activities
      */
 }

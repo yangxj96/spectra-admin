@@ -35,8 +35,7 @@ class CommonExceptionAdviceTest {
 
     @Test
     void accessDeniedShouldReturnForbidden() throws Exception {
-        var method = CommonExceptionAdvice.class.getMethod(
-                "accessDeniedException", AccessDeniedException.class, HttpServletResponse.class);
+        var method = CommonExceptionAdvice.class.getMethod("accessDeniedException", AccessDeniedException.class, HttpServletResponse.class);
         var response = new MockHttpServletResponse();
 
         var result = (R<?>) method.invoke(new CommonExceptionAdvice(), new AccessDeniedException("Access Denied"), response);
@@ -48,12 +47,11 @@ class CommonExceptionAdviceTest {
 
     @Test
     void dataScopeViolationShouldReturnForbidden() throws Exception {
-        var method = CommonExceptionAdvice.class.getMethod(
-                "dataScopeViolationException", DataScopeViolationException.class, HttpServletResponse.class);
+        var method = CommonExceptionAdvice.class.getMethod("dataScopeViolationException", DataScopeViolationException.class,
+                HttpServletResponse.class);
         var response = new MockHttpServletResponse();
 
-        var result = (R<?>) method.invoke(new CommonExceptionAdvice(),
-                new DataScopeViolationException("missing scope"), response);
+        var result = (R<?>) method.invoke(new CommonExceptionAdvice(), new DataScopeViolationException("missing scope"), response);
 
         assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
         assertEquals(HttpServletResponse.SC_FORBIDDEN, result.getCode());

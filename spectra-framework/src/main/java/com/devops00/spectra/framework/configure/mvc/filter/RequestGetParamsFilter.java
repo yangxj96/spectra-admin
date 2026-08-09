@@ -48,8 +48,8 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
 
     @Override
     @NullMarked
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException,
-            IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
         log.debug(LogPrefix.WEB.f("开始处理请求参数下划线转小驼峰命名"));
         if (!request.getMethod().toUpperCase(Locale.getDefault()).equals("GET")) {
             log.debug(LogPrefix.WEB.f("非GET方法,跳过"));

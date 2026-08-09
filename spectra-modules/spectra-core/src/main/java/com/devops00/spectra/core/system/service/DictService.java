@@ -65,7 +65,8 @@ public interface DictService {
     /// 获取字典类型列表且转换为树
     ///
     /// @return 字典类型树
-    @Nullable List<DictGroupTreeVO> listDictGroupWrapTree();
+    @Nullable
+    List<DictGroupTreeVO> listDictGroupWrapTree();
 
     /// 根据字典类型编码获取字典数据列表
     ///

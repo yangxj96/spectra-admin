@@ -69,8 +69,7 @@ public class RedisConfiguration {
         Duration connectTimeout = redisProperties.getConnectTimeout();
 
         // 构建 SocketOptions
-        SocketOptions.Builder socketOptionsBuilder = SocketOptions.builder()
-                .keepAlive(true); // 建议开启 TCP KeepAlive
+        SocketOptions.Builder socketOptionsBuilder = SocketOptions.builder().keepAlive(true); // 建议开启 TCP KeepAlive
 
         // 设置 TCP 连接超时时间 (对应 connect-timeout)
         if (connectTimeout != null) {
@@ -78,15 +77,11 @@ public class RedisConfiguration {
         }
 
         // 构建 ClientOptions
-        ClientOptions.Builder clientOptionsBuilder = ClientOptions.builder()
-                .socketOptions(socketOptionsBuilder.build())
-                .autoReconnect(true); // 建议开启自动重连
+        ClientOptions.Builder clientOptionsBuilder = ClientOptions.builder().socketOptions(socketOptionsBuilder.build()).autoReconnect(true); // 建议开启自动重连
 
         // 设置命令执行超时时间 (对应 timeout)
         if (timeout != null) {
-            clientOptionsBuilder.timeoutOptions(io.lettuce.core.TimeoutOptions.builder()
-                    .fixedTimeout(timeout)
-                    .build());
+            clientOptionsBuilder.timeoutOptions(io.lettuce.core.TimeoutOptions.builder().fixedTimeout(timeout).build());
         }
 
         // 将配置应用到 RedisClient
@@ -110,8 +105,7 @@ public class RedisConfiguration {
         template.setKeySerializer(keySerializer);
         template.setHashKeySerializer(keySerializer);
 
-        JacksonJsonRedisSerializer<Object> valueSerializer =
-                new JacksonJsonRedisSerializer<>(om, Object.class);
+        JacksonJsonRedisSerializer<Object> valueSerializer = new JacksonJsonRedisSerializer<>(om, Object.class);
         template.setValueSerializer(valueSerializer);
         template.setHashValueSerializer(valueSerializer);
 

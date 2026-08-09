@@ -47,12 +47,6 @@ public interface JVMInfoConverter {
     @Mapping(target = "jvmArguments", source = "runtimeMXBean.inputArguments")
     @Mapping(target = "classPath", source = "runtimeMXBean.classPath")
     @Mapping(target = "libraryPath", source = "runtimeMXBean.libraryPath")
-    JVMInfoVO toVO(
-            RuntimeMXBean runtimeMXBean,
-            String javaVersion,
-            String javaHome,
-            String javaVendor,
-            String javaVendorUrl,
-            Map<String, String> systemProps
-    );
+    JVMInfoVO toVO(RuntimeMXBean runtimeMXBean, String javaVersion, String javaHome, String javaVendor, String javaVendorUrl,
+            Map<String, String> systemProps);
 }

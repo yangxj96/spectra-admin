@@ -63,12 +63,7 @@ public class RSAUtils {
     /// RSA-OAEP公钥加密（用于加密AES密钥）
     public static String encrypt(byte[] data, PublicKey publicKey) throws Exception {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        OAEPParameterSpec oaepSpec = new OAEPParameterSpec(
-                "SHA-256",
-                "MGF1",
-                MGF1ParameterSpec.SHA256,
-                PSource.PSpecified.DEFAULT
-        );
+        OAEPParameterSpec oaepSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
         cipher.init(Cipher.ENCRYPT_MODE, publicKey, oaepSpec);
         byte[] encrypted = cipher.doFinal(data);
         return Base64.getEncoder().encodeToString(encrypted);
@@ -77,12 +72,7 @@ public class RSAUtils {
     /// RSA-OAEP私钥解密
     public static byte[] decrypt(String encryptedData, PrivateKey privateKey) throws Exception {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-        OAEPParameterSpec oaepSpec = new OAEPParameterSpec(
-                "SHA-256",
-                "MGF1",
-                MGF1ParameterSpec.SHA256,
-                PSource.PSpecified.DEFAULT
-        );
+        OAEPParameterSpec oaepSpec = new OAEPParameterSpec("SHA-256", "MGF1", MGF1ParameterSpec.SHA256, PSource.PSpecified.DEFAULT);
         cipher.init(Cipher.DECRYPT_MODE, privateKey, oaepSpec);
         byte[] decoded = Base64.getDecoder().decode(encryptedData);
         return cipher.doFinal(decoded);

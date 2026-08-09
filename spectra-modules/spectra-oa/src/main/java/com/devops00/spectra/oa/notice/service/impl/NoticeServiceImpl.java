@@ -75,15 +75,13 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         }
         var wrapper = new LambdaQueryWrapper<Notice>()
                 .and(q -> q.eq(Notice::getPublisherId, userId)
-                        .or().eq(Notice::getStatus, "PUBLISHED")
-                        .or(w -> w.eq(Notice::getStatus, "SCHEDULED")
-                                .le(Notice::getPublishAt, Instant.now())))
+                        .or()
+                        .eq(Notice::getStatus, "PUBLISHED")
+                        .or(w -> w.eq(Notice::getStatus, "SCHEDULED").le(Notice::getPublishAt, Instant.now())))
                 .and(q -> q.eq(Notice::getTargetType, "ALL")
-                        .or(w -> w.eq(Notice::getTargetType, "DEPARTMENT")
-                                .eq(Notice::getTargetDepartmentId, currentUser.getDepartmentId())));
+                        .or(w -> w.eq(Notice::getTargetType, "DEPARTMENT").eq(Notice::getTargetDepartmentId, currentUser.getDepartmentId())));
         if (StringUtils.hasText(params.getKeyword())) {
-            wrapper.and(q -> q.like(Notice::getTitle, params.getKeyword())
-                    .or().like(Notice::getSummary, params.getKeyword()));
+            wrapper.and(q -> q.like(Notice::getTitle, params.getKeyword()).or().like(Notice::getSummary, params.getKeyword()));
         }
         if (StringUtils.hasText(params.getStatus())) {
             wrapper.eq(Notice::getStatus, params.getStatus());
@@ -172,8 +170,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (userId == null || !isVisible(notice, userId)) {
             throw new DataNotExistException("公告不存在或无权访问");
         }
-        var reader = noticeReaderMapper.selectOne(new LambdaQueryWrapper<NoticeReader>()
-                .eq(NoticeReader::getNoticeId, id).eq(NoticeReader::getUserId, userId));
+        var reader = noticeReaderMapper
+                .selectOne(new LambdaQueryWrapper<NoticeReader>().eq(NoticeReader::getNoticeId, id).eq(NoticeReader::getUserId, userId));
         if (reader == null) {
             reader = new NoticeReader();
             reader.setNoticeId(id);
@@ -191,8 +189,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (userId == null) {
             return noticeConverter.toVO(notice);
         }
-        var reader = noticeReaderMapper.selectOne(new LambdaQueryWrapper<NoticeReader>()
-                .eq(NoticeReader::getNoticeId, notice.getId()).eq(NoticeReader::getUserId, userId));
+        var reader = noticeReaderMapper
+                .selectOne(new LambdaQueryWrapper<NoticeReader>().eq(NoticeReader::getNoticeId, notice.getId()).eq(NoticeReader::getUserId, userId));
         return noticeConverter.toVO(notice, reader);
     }
 
@@ -210,8 +208,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             return true;
         }
         var user = userService.getById(userId);
-        return user != null && notice.getTargetDepartmentId() != null
-                && notice.getTargetDepartmentId().equals(user.getDepartmentId());
+        return user != null && notice.getTargetDepartmentId() != null && notice.getTargetDepartmentId().equals(user.getDepartmentId());
     }
 
     private void ensurePublisher(Notice notice) {
@@ -242,8 +239,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private void activateDueNotices(List<Notice> notices) {
         var now = Instant.now();
         notices.stream()
-                .filter(notice -> "SCHEDULED".equals(notice.getStatus())
-                        && notice.getPublishAt() != null && !notice.getPublishAt().isAfter(now))
+                .filter(notice -> "SCHEDULED".equals(notice.getStatus()) && notice.getPublishAt() != null && !notice.getPublishAt().isAfter(now))
                 .forEach(notice -> {
                     notice.setStatus("PUBLISHED");
                     if (this.updateById(notice)) {

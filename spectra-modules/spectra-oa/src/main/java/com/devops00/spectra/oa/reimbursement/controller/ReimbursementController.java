@@ -67,8 +67,7 @@ public class ReimbursementController {
     @ULog("'修改报销草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
-    public void update(@PathVariable UUID id,
-            @Validated(Verify.Update.class) @RequestBody ReimbursementSaveFrom from) {
+    public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ReimbursementSaveFrom from) {
         reimbursementService.modify(id, from);
     }
 
@@ -92,8 +91,7 @@ public class ReimbursementController {
     @ULog("'提交报销审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
-    public void submit(@PathVariable UUID id,
-            @RequestBody(required = false) ReimbursementSubmitFrom from) {
+    public void submit(@PathVariable UUID id, @RequestBody(required = false) ReimbursementSubmitFrom from) {
         reimbursementService.submit(id, from);
     }
 

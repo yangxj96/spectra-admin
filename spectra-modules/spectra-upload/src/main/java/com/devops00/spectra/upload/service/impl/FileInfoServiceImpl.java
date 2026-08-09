@@ -48,9 +48,7 @@ public class FileInfoServiceImpl extends BaseServiceImpl<FileInfoMapper, FileInf
 
     @Override
     public FileInfo findByHash(String hash) {
-        return lambdaQuery()
-                .eq(FileInfo::getHash, hash)
-                .one();
+        return lambdaQuery().eq(FileInfo::getHash, hash).one();
     }
 
     @Override

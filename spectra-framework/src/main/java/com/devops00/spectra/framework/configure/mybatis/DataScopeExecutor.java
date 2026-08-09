@@ -38,9 +38,10 @@ public class DataScopeExecutor {
 
     private void requireSystemOperator() {
         var user = SecUtil.getCurrentUser();
-        if (user == null || user.getAuthorities().stream().noneMatch(authority ->
-                "ROLE_DEV_OPS".equals(authority.getAuthority())
-                        || "*".equals(authority.getAuthority()))) {
+        if (user == null
+            || user.getAuthorities()
+                    .stream()
+                    .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()))) {
             throw new DataScopeViolationException("当前用户无权临时绕过数据隔离");
         }
     }

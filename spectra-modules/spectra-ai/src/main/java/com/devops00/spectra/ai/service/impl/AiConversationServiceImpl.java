@@ -49,8 +49,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AiConversationServiceImpl
-        extends BaseServiceImpl<AiConversationMapper, AiConversation>
-        implements AiConversationService {
+        extends
+            BaseServiceImpl<AiConversationMapper, AiConversation>
+        implements
+            AiConversationService {
 
     private final AiChatMemoryMapper chatMemoryMapper;
 
@@ -71,8 +73,7 @@ public class AiConversationServiceImpl
                 new LambdaQueryWrapper<AiConversation>()
                         .eq(AiConversation::getUserId, userId)
                         .isNull(AiConversation::getDeleted)
-                        .orderByDesc(AiConversation::getUpdatedAt)
-        );
+                        .orderByDesc(AiConversation::getUpdatedAt));
     }
 
     @Override

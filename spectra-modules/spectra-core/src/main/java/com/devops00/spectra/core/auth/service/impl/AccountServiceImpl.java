@@ -47,49 +47,37 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
 
     @Override
     public @Nullable Account getByLoginName(String loginName) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getLoginName, loginName)
-                .last("LIMIT 1");
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getLoginName, loginName).last("LIMIT 1");
         return this.getOne(wrapper);
     }
 
     @Override
     public Account getDefaultByUserId(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getUserId, userId)
-                .isNotNull(Account::getLoginName)
-                .last("LIMIT 1");
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getUserId, userId).isNotNull(Account::getLoginName).last("LIMIT 1");
         return this.getOne(wrapper);
     }
 
     @Override
     public @Nullable Account getByPhone(String phone) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getPhone, phone)
-                .last("LIMIT 1");
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getPhone, phone).last("LIMIT 1");
         return this.getOne(wrapper);
     }
 
     @Override
     public @Nullable Account getByEmail(String email) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getEmail, email)
-                .last("LIMIT 1");
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getEmail, email).last("LIMIT 1");
         return this.getOne(wrapper);
     }
 
     @Override
     public void deleteByUserId(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getUserId, userId);
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getUserId, userId);
         this.remove(wrapper);
     }
 
     @Override
     public List<Account> listByUserId(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<Account>()
-                .eq(Account::getUserId, userId)
-                .orderByAsc(Account::getType);
+        var wrapper = new LambdaQueryWrapper<Account>().eq(Account::getUserId, userId).orderByAsc(Account::getType);
         return this.list(wrapper);
     }
 

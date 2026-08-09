@@ -59,11 +59,7 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
         }
-        return lambdaQuery()
-                .in(BaseEntity::getId, ids)
-                .list()
-                .stream()
-                .collect(Collectors.toMap(BaseEntity::getId, Region::getFullName));
+        return lambdaQuery().in(BaseEntity::getId, ids).list().stream().collect(Collectors.toMap(BaseEntity::getId, Region::getFullName));
     }
 
     @Override
@@ -74,18 +70,14 @@ public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> imp
             pid = UUID.fromString(id);
         }
 
-        List<Region> regions = lambdaQuery()
-                .eq(Region::getLevel, RegionLevel.of(level))
-                .eq(pid != null, Region::getPid, pid)
-                .list();
+        List<Region> regions = lambdaQuery().eq(Region::getLevel, RegionLevel.of(level)).eq(pid != null, Region::getPid, pid).list();
         return converter.toVOList(regions);
     }
 
     @Override
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
         // 条件构建
-        var wrapper = new LambdaQueryWrapper<Region>()
-                .orderByAsc(Region::getCode);
+        var wrapper = new LambdaQueryWrapper<Region>().orderByAsc(Region::getCode);
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         return converter.toVOPage(db);

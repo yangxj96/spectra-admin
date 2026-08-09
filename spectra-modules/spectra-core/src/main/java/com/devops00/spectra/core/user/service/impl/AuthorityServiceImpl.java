@@ -99,8 +99,7 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
         if (this.count(new LambdaQueryWrapper<Authority>().eq(Authority::getPid, id)) > 0) {
             throw new DataException("存在子权限,不可删除");
         }
-        if (relRoleAuthorityMapper.selectCount(new LambdaQueryWrapper<RelRoleAuthority>()
-                .eq(RelRoleAuthority::getAuthorityId, id)) > 0) {
+        if (relRoleAuthorityMapper.selectCount(new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getAuthorityId, id)) > 0) {
             throw new DataException("权限已分配给角色,不可删除");
         }
         if (!this.removeById(id)) {

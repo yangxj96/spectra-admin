@@ -113,8 +113,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Override
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         LambdaQueryWrapper<Role> wrapper = new LambdaQueryWrapper<>();
-        wrapper
-                .like(StrUtils.isNotBlank(params.getName()), Role::getName, params.getName())
+        wrapper.like(StrUtils.isNotBlank(params.getName()), Role::getName, params.getName())
                 .eq(null != params.getState(), Role::getState, params.getState())
                 .orderByAsc(Role::getCreatedAt);
         Page<Role> db = this.page(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
@@ -126,15 +125,12 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         var wrapper = new LambdaQueryWrapper<Role>();
         wrapper.eq(Role::getState, Boolean.TRUE);
         //return roleConverter.toVOs(this.list(wrapper));
-        return this.list(wrapper).stream()
-                .map(roleConverter::toVO)
-                .toList();
+        return this.list(wrapper).stream().map(roleConverter::toVO).toList();
     }
 
     @Override
     public Role getSystemDefaultUserRole() {
-        var wrapper = new LambdaQueryWrapper<Role>()
-                .eq(Role::getCode, "ROLE_USER");
+        var wrapper = new LambdaQueryWrapper<Role>().eq(Role::getCode, "ROLE_USER");
         return this.getOne(wrapper);
     }
 
@@ -148,15 +144,13 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     }
 
     private void syncRoleScope(UUID roleId, DataScopeType type, List<UUID> targetIds) {
-        var current = roleDataScopeMapper.selectOne(new LambdaQueryWrapper<RoleDataScope>()
-                .eq(RoleDataScope::getRoleId, roleId)
-                .isNull(RoleDataScope::getDeleted));
+        var current = roleDataScopeMapper
+                .selectOne(new LambdaQueryWrapper<RoleDataScope>().eq(RoleDataScope::getRoleId, roleId).isNull(RoleDataScope::getDeleted));
         if (type == null) {
             if (current != null) {
                 roleDataScopeMapper.deleteById(current.getId());
             }
-            roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>()
-                    .eq(RoleDataScopeTarget::getRoleId, roleId));
+            roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>().eq(RoleDataScopeTarget::getRoleId, roleId));
             return;
         }
         if (current == null) {
@@ -166,8 +160,7 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         current.setScopeType(type);
         roleDataScopeMapper.insertOrUpdate(current);
 
-        roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>()
-                .eq(RoleDataScopeTarget::getRoleId, roleId));
+        roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>().eq(RoleDataScopeTarget::getRoleId, roleId));
         if (type == DataScopeType.CUSTOM) {
             var targets = targetIds.stream().map(targetId -> {
                 var target = new RoleDataScopeTarget();
@@ -182,7 +175,9 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
 
     private boolean canManageGlobalScope() {
         var currentUser = SecUtil.getCurrentUser();
-        return currentUser != null && currentUser.getAuthorities().stream().anyMatch(authority ->
-                "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
+        return currentUser != null
+            && currentUser.getAuthorities()
+                    .stream()
+                    .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 }

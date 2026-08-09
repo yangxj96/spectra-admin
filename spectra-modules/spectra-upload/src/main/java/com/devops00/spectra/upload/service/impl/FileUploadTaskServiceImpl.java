@@ -35,9 +35,6 @@ public class FileUploadTaskServiceImpl extends BaseServiceImpl<FileUploadTaskMap
 
     @Override
     public FileUploadTask findByUploadId(String uploadId) {
-        return lambdaQuery()
-                .eq(FileUploadTask::getUploadId, uploadId)
-                .oneOpt()
-                .orElseThrow(() -> new DataNotExistException("上传任务不存在"));
+        return lambdaQuery().eq(FileUploadTask::getUploadId, uploadId).oneOpt().orElseThrow(() -> new DataNotExistException("上传任务不存在"));
     }
 }

@@ -91,23 +91,13 @@ public class SecurityUserHelper {
         List<Role> roles = getUserRole(userId);
 
         if (CollUtils.isNotEmpty(roles)) {
-            authorities.addAll(
-                    roles.stream()
-                            .map(i -> new SimpleGrantedAuthority(i.getCode()))
-                            .toList()
-            );
+            authorities.addAll(roles.stream().map(i -> new SimpleGrantedAuthority(i.getCode())).toList());
 
-            List<UUID> roleIds = roles.stream()
-                    .map(Role::getId)
-                    .toList();
+            List<UUID> roleIds = roles.stream().map(Role::getId).toList();
 
             List<AuthorityVO> authorityVOs = getUserAuthority(roleIds);
             if (CollUtils.isNotEmpty(authorityVOs)) {
-                authorities.addAll(
-                        authorityVOs.stream()
-                                .map(i -> new SimpleGrantedAuthority(i.getCode()))
-                                .toList()
-                );
+                authorities.addAll(authorityVOs.stream().map(i -> new SimpleGrantedAuthority(i.getCode())).toList());
             }
         }
 
@@ -120,9 +110,7 @@ public class SecurityUserHelper {
     /// @return 角色列表
     public List<Role> getUserRole(UUID userId) {
         var roles = relUserRoleService.getRoles(userId);
-        return roles == null
-                ? Collections.emptyList()
-                : new ArrayList<>(roles);
+        return roles == null ? Collections.emptyList() : new ArrayList<>(roles);
     }
 
     /// 获取角色包含的权限信息
@@ -134,8 +122,6 @@ public class SecurityUserHelper {
             return Collections.emptyList();
         }
         var authorities = relRoleAuthorityService.get(roles);
-        return authorities == null
-                ? Collections.emptyList()
-                : ObjUtils.castList(new ArrayList<>(authorities), AuthorityVO.class);
+        return authorities == null ? Collections.emptyList() : ObjUtils.castList(new ArrayList<>(authorities), AuthorityVO.class);
     }
 }

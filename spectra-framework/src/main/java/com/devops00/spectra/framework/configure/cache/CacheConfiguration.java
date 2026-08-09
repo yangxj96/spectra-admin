@@ -63,17 +63,14 @@ public class CacheConfiguration {
 
         var valuePair = RedisSerializationContext.SerializationPair.fromSerializer(valueSerializer);
 
-        var defaultConfig =
-                RedisCacheConfiguration.defaultCacheConfig()
-                        .computePrefixWith(cacheName -> cacheName + ":")
-                        .serializeKeysWith(keyPair)
-                        .serializeValuesWith(valuePair)
-                        .disableCachingNullValues()
-                        .entryTtl(Duration.ofHours(1)); // 默认 TTL
+        var defaultConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .computePrefixWith(cacheName -> cacheName + ":")
+                .serializeKeysWith(keyPair)
+                .serializeValuesWith(valuePair)
+                .disableCachingNullValues()
+                .entryTtl(Duration.ofHours(1)); // 默认 TTL
 
-        return RedisCacheManager.builder(factory)
-                .cacheDefaults(defaultConfig)
-                .build();
+        return RedisCacheManager.builder(factory).cacheDefaults(defaultConfig).build();
     }
 
     /// 定义一个redis专用的ObjectMapper
@@ -90,17 +87,11 @@ public class CacheConfiguration {
 
         return om.rebuild()
                 // 替代 serializationInclusion
-                .changeDefaultPropertyInclusion(inclusion ->
-                        inclusion.withValueInclusion(JsonInclude.Include.ALWAYS)
-                )
+                .changeDefaultPropertyInclusion(inclusion -> inclusion.withValueInclusion(JsonInclude.Include.ALWAYS))
                 // 防止缓存结构变化炸掉
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 // 替代 activateDefaultTyping
-                .activateDefaultTypingAsProperty(
-                        ptv,
-                        DefaultTyping.NON_FINAL_AND_RECORDS,
-                        "@class"
-                )
+                .activateDefaultTypingAsProperty(ptv, DefaultTyping.NON_FINAL_AND_RECORDS, "@class")
                 .build();
     }
 }

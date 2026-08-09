@@ -36,10 +36,6 @@ public class DictGroupServiceImpl extends BaseServiceImpl<DictGroupMapper, DictG
 
     @Override
     public @Nullable DictGroup getByCode(String code) {
-        return this.getOne(
-                new LambdaQueryWrapper<DictGroup>()
-                        .eq(DictGroup::getCode, code)
-                        .last("LIMIT 1")
-        );
+        return this.getOne(new LambdaQueryWrapper<DictGroup>().eq(DictGroup::getCode, code).last("LIMIT 1"));
     }
 }

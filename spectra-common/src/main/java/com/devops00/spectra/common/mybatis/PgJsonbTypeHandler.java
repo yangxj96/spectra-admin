@@ -29,8 +29,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
 
-/// PostgreSQL JSONB 类型映射 (基于 Jackson 3)
-/// 完美解决 "字段类型为 jsonb 但表达式类型为 character varying" 的写入断层
+/// PostgreSQL JSONB 类型映射 (基于 Jackson 3) 完美解决 "字段类型为 jsonb 但表达式类型为 character
+/// varying" 的写入断层
 ///
 /// @author yangxj96
 /// @version 1.0

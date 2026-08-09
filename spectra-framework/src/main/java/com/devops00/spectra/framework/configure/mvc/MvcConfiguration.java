@@ -35,10 +35,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 /// @since 2025/6/14 00:00
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({
-        SystemProperties.class,
-        UserProperties.class
-})
+@EnableConfigurationProperties({SystemProperties.class, UserProperties.class})
 @RequiredArgsConstructor
 public class MvcConfiguration implements WebMvcConfigurer {
 
@@ -66,14 +63,9 @@ public class MvcConfiguration implements WebMvcConfigurer {
 
     @Override
     public void configureApiVersioning(@NonNull ApiVersionConfigurer configurer) {
-        log.debug(
-                "{}配置API版本号,默认请求头为{},默认版本号为{}",
-                LogPrefix.WEB.p(),
-                spectraProperties.getMvc().getApiHeader(),
-                spectraProperties.getMvc().getApiVersion()
-        );
-        configurer
-                .useRequestHeader(spectraProperties.getMvc().getApiHeader())
+        log.debug("{}配置API版本号,默认请求头为{},默认版本号为{}", LogPrefix.WEB.p(), spectraProperties.getMvc().getApiHeader(),
+                spectraProperties.getMvc().getApiVersion());
+        configurer.useRequestHeader(spectraProperties.getMvc().getApiHeader())
                 .setDefaultVersion(spectraProperties.getMvc().getApiVersion())
                 .detectSupportedVersions(true);
     }

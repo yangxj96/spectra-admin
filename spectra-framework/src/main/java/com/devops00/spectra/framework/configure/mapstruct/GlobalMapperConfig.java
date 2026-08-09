@@ -26,11 +26,6 @@ import org.mapstruct.ReportingPolicy;
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/1/9 14:47
-@MapperConfig(
-        componentModel = "spring",
-        injectionStrategy = InjectionStrategy.CONSTRUCTOR,
-        unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        builder = @Builder(disableBuilder = true)
-)
+@MapperConfig(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
 public interface GlobalMapperConfig {
 }

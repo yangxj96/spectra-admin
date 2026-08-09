@@ -27,9 +27,9 @@ import java.nio.charset.StandardCharsets;
 
 /// 字符串工具类，替代 Apache Commons Lang3 的 StringUtils。
 ///
-///  * 兼容 JDK 8+（包括 JDK 25）
-///  * 利用 Guava 处理 null/empty
-///  * 行为与 org.apache.commons.lang3.StringUtils 一致
+/// * 兼容 JDK 8+（包括 JDK 25）
+/// * 利用 Guava 处理 null/empty
+/// * 行为与 org.apache.commons.lang3.StringUtils 一致
 ///
 /// @author yangxj96
 /// @version 1.0
@@ -168,12 +168,15 @@ public final class StrUtils {
         return substringByByteWithEncoder(str, maxBytes, StandardCharsets.UTF_8);
     }
 
-    /// 将字符串转换为 camelCase 或 PascalCase 格式
-    /// > 前提：str 不得为 null（Servlet 参数名、配置 key 等场景天然满足）
+    /// 将字符串转换为 camelCase 或 PascalCase 格式 > 前提：str 不得为 null（Servlet 参数名、配置 key
+    /// 等场景天然满足）
     ///
-    /// @param str                   非 null 输入字符串（如 "user_first_name"）
-    /// @param capitalizeFirstLetter true → PascalCase ("UserName")，false → camelCase ("userName")
-    /// @param delimiter             分隔符（如 '_'）
+    /// @param str
+    ///            非 null 输入字符串（如 "user_first_name"）
+    /// @param capitalizeFirstLetter
+    ///            true → PascalCase ("UserName")，false → camelCase ("userName")
+    /// @param delimiter
+    ///            分隔符（如 '_'）
     /// @return 转换后的非 null 字符串
     public static String toCamelCase(String str, boolean capitalizeFirstLetter, char delimiter) {
         if (str.isEmpty()) {

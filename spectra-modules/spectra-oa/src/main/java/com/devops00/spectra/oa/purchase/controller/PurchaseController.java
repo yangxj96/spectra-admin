@@ -68,8 +68,7 @@ public class PurchaseController {
     @ULog("'修改采购申请草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
-    public void update(@PathVariable UUID id,
-            @Validated(Verify.Update.class) @RequestBody PurchaseSaveFrom from) {
+    public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody PurchaseSaveFrom from) {
         purchaseService.modify(id, from);
     }
 
@@ -125,8 +124,7 @@ public class PurchaseController {
     @ULog("'登记采购收货'")
     @PostMapping(value = "/{id}/receipts", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_PURCHASE:RECEIVE')")
-    public void receive(@PathVariable UUID id,
-            @Validated(Verify.Insert.class) @RequestBody PurchaseReceiptFrom from) {
+    public void receive(@PathVariable UUID id, @Validated(Verify.Insert.class) @RequestBody PurchaseReceiptFrom from) {
         purchaseService.receive(id, from);
     }
 }

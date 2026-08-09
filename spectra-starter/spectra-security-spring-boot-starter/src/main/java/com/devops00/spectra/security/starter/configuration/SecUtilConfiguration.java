@@ -54,12 +54,9 @@ public class SecUtilConfiguration {
     /// @param userOnlineConverter 在线用户转换器
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
-    public RedisSecHolderStrategy redisSecHolderStrategy(
-            @Qualifier("securityObjectMapper") ObjectMapper om,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties,
-            UserOnlineConverter userOnlineConverter
-    ) {
+    public RedisSecHolderStrategy redisSecHolderStrategy(@Qualifier("securityObjectMapper") ObjectMapper om,
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
+            UserOnlineConverter userOnlineConverter) {
         return new RedisSecHolderStrategy(om, redis, properties, userOnlineConverter);
     }
 }

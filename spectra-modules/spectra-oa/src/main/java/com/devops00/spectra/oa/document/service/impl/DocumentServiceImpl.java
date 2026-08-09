@@ -91,9 +91,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
         wrapper.and(query -> query.eq(Document::getOwnerId, userId)
-                .or().eq(Document::getVisibility, VISIBILITY_PUBLIC)
-                .or(q -> q.eq(Document::getVisibility, VISIBILITY_DEPARTMENT)
-                        .eq(Document::getDepartmentId, user.getDepartmentId())));
+                .or()
+                .eq(Document::getVisibility, VISIBILITY_PUBLIC)
+                .or(q -> q.eq(Document::getVisibility, VISIBILITY_DEPARTMENT).eq(Document::getDepartmentId, user.getDepartmentId())));
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.like(Document::getTitle, params.getKeyword());
         }
@@ -106,9 +106,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         wrapper.orderByDesc(Document::getUpdatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<DocumentVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream()
-                .map(document -> documentConverter.toVO(document, currentVersion(document.getId())))
-                .toList());
+        voPage.setRecords(result.getRecords().stream().map(document -> documentConverter.toVO(document, currentVersion(document.getId()))).toList());
         return voPage;
     }
 
@@ -157,9 +155,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         if (file == null || !"ACTIVE".equals(file.getStatus())) {
             throw new DataNotExistException("文件不存在或已失效");
         }
-        var latest = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, document.getId())
-                .orderByDesc(DocumentVersion::getVersionNo).last("limit 1"));
+        var latest = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
+                .orderByDesc(DocumentVersion::getVersionNo)
+                .last("limit 1"));
         var version = new DocumentVersion();
         version.setDocumentId(document.getId());
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
@@ -169,8 +167,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
         version.setVersionNote(from.getVersionNote());
         version.setCurrentVersion(true);
-        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, document.getId()).eq(DocumentVersion::getCurrentVersion, true)
+        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
+                .eq(DocumentVersion::getCurrentVersion, true)
                 .set(DocumentVersion::getCurrentVersion, false));
         if (versionMapper.insert(version) != 1) {
             throw new DataSaveException("保存文档版本失败");
@@ -182,10 +180,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Override
     public List<DocumentVersionVO> versions(UUID id) {
         var document = requireAccessible(id);
-        return versionMapper.selectList(new LambdaQueryWrapper<DocumentVersion>()
-                        .eq(DocumentVersion::getDocumentId, document.getId())
-                        .orderByDesc(DocumentVersion::getVersionNo))
-                .stream().map(documentConverter::toVersionVO).toList();
+        return versionMapper.selectList(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
+                .orderByDesc(DocumentVersion::getVersionNo)).stream().map(documentConverter::toVersionVO).toList();
     }
 
     @Override
@@ -228,8 +224,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         }
         var wrapper = new LambdaQueryWrapper<DocumentFolder>()
                 .and(query -> query.eq(DocumentFolder::getVisibility, VISIBILITY_PUBLIC)
-                        .or(q -> q.eq(DocumentFolder::getVisibility, VISIBILITY_DEPARTMENT)
-                                .eq(DocumentFolder::getDepartmentId, user.getDepartmentId())))
+                        .or(
+                                q -> q.eq(DocumentFolder::getVisibility, VISIBILITY_DEPARTMENT)
+                                        .eq(DocumentFolder::getDepartmentId, user.getDepartmentId())))
                 .orderByAsc(DocumentFolder::getSort)
                 .orderByAsc(DocumentFolder::getName);
         return folderMapper.selectList(wrapper).stream().map(documentConverter::toFolderVO).toList();
@@ -268,14 +265,12 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public void restoreVersion(UUID id, UUID versionId) {
         var document = requireOwner(id);
-        var version = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getId, versionId)
-                .eq(DocumentVersion::getDocumentId, document.getId()));
+        var version = versionMapper.selectOne(
+                new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getId, versionId).eq(DocumentVersion::getDocumentId, document.getId()));
         if (version == null) {
             throw new DataNotExistException("文档版本不存在");
         }
-        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, document.getId())
+        versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
                 .eq(DocumentVersion::getCurrentVersion, true)
                 .set(DocumentVersion::getCurrentVersion, false));
         version.setCurrentVersion(true);
@@ -286,8 +281,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private DocumentVersion requireVersion(UUID id, UUID versionId) {
         var document = requireAccessible(id);
-        DocumentVersion version = versionId == null ? currentVersion(document.getId()) : versionMapper.selectOne(
-                new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getId, versionId)
+        DocumentVersion version = versionId == null
+                ? currentVersion(document.getId())
+                : versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getId, versionId)
                         .eq(DocumentVersion::getDocumentId, document.getId()));
         if (version == null) {
             throw new DataNotExistException("文档版本不存在");
@@ -296,8 +292,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     }
 
     private DocumentVersion currentVersion(UUID id) {
-        return versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>()
-                .eq(DocumentVersion::getDocumentId, id).eq(DocumentVersion::getCurrentVersion, true).last("limit 1"));
+        return versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, id)
+                .eq(DocumentVersion::getCurrentVersion, true)
+                .last("limit 1"));
     }
 
     private Document require(UUID id) {
@@ -311,10 +308,11 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private Document requireAccessible(UUID id) {
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
-        if (user == null || user.getDepartmentId() == null
-                || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
+        if (user == null
+            || user.getDepartmentId() == null
+            || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
                 && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
-                && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
+                    && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
                 && !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
             throw new DataNotExistException("文档不存在或无权访问");
         }

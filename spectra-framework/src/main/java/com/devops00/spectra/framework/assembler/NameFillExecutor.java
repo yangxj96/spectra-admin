@@ -84,8 +84,7 @@ public class NameFillExecutor {
             sourceField.setAccessible(true);
 
             // 获取 Lookup Bean
-            NameLookup<?> lookup =
-                    applicationContext.getBean(fillName.lookup());
+            NameLookup<?> lookup = applicationContext.getBean(fillName.lookup());
 
             Class<?> idType = lookup.idType();
 
@@ -162,9 +161,7 @@ public class NameFillExecutor {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
-            throw new IllegalStateException(
-                    "sourceField 不存在: " + fieldName, e
-            );
+            throw new IllegalStateException("sourceField 不存在: " + fieldName, e);
         }
     }
 

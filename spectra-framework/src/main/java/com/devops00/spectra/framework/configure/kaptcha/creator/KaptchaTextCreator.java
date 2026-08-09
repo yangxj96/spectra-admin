@@ -50,19 +50,15 @@ public class KaptchaTextCreator extends DefaultTextCreator {
                     yield x + y;
                 }
             }
-            case 2 -> Math.abs(x - y);  // 可简化为表达式
+            case 2 -> Math.abs(x - y); // 可简化为表达式
             default -> throw new IllegalArgumentException("操作数越界: " + operands);
         };
 
         // 使用 StringBuilder 构建表达式
         var expression = switch (operands) {
             case 0 -> String.format("%s*%s", NUMBERS[x], NUMBERS[y]);
-            case 1 -> (x != 0 && y % x == 0) ?
-                    String.format("%s/%s", NUMBERS[y], NUMBERS[x]) :
-                    String.format("%s+%s", NUMBERS[x], NUMBERS[y]);
-            case 2 -> (x >= y) ?
-                    String.format("%s-%s", NUMBERS[x], NUMBERS[y]) :
-                    String.format("%s-%s", NUMBERS[y], NUMBERS[x]);
+            case 1 -> (x != 0 && y % x == 0) ? String.format("%s/%s", NUMBERS[y], NUMBERS[x]) : String.format("%s+%s", NUMBERS[x], NUMBERS[y]);
+            case 2 -> (x >= y) ? String.format("%s-%s", NUMBERS[x], NUMBERS[y]) : String.format("%s-%s", NUMBERS[y], NUMBERS[x]);
             default -> throw new IllegalStateException();
         };
 

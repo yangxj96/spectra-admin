@@ -68,11 +68,7 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyMap();
         }
-        return lambdaQuery()
-                .in(BaseEntity::getId, ids)
-                .list()
-                .stream()
-                .collect(Collectors.toMap(BaseEntity::getId, Department::getPath));
+        return lambdaQuery().in(BaseEntity::getId, ids).list().stream().collect(Collectors.toMap(BaseEntity::getId, Department::getPath));
     }
 
     @Override
@@ -125,10 +121,7 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
         }
 
         // 一次性查出所有部门（只查必要字段）
-        List<Department> allDepartments = list(
-                Wrappers.<Department>lambdaQuery()
-                        .select(Department::getId, Department::getPid)
-        );
+        List<Department> allDepartments = list(Wrappers.<Department>lambdaQuery().select(Department::getId, Department::getPid));
 
         if (allDepartments.isEmpty()) {
             return Collections.emptySet();
@@ -158,8 +151,7 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
 
         for (Department dept : list) {
             UUID parentId = dept.getPid();
-            map.computeIfAbsent(parentId, _ -> new ArrayList<>())
-                    .add(dept.getId());
+            map.computeIfAbsent(parentId, _ -> new ArrayList<>()).add(dept.getId());
         }
 
         return map;

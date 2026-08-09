@@ -51,23 +51,24 @@ public class ContactServiceImpl implements ContactService {
         if (StringUtils.hasText(keyword)) {
             String value = keyword.trim();
             wrapper.and(query -> query.like(User::getUsername, value)
-                    .or().like(User::getRealName, value)
-                    .or().like(User::getPhone, value)
-                    .or().like(User::getEmail, value));
+                    .or()
+                    .like(User::getRealName, value)
+                    .or()
+                    .like(User::getPhone, value)
+                    .or()
+                    .like(User::getEmail, value));
         }
         wrapper.orderByAsc(User::getRealName).orderByAsc(User::getUsername);
         var users = userMapper.selectPage(page.toPage(), wrapper);
-        var departmentIds = users.getRecords().stream().map(User::getDepartmentId)
-                .filter(Objects::nonNull).distinct().toList();
-        Map<UUID, Department> departments = departmentIds.isEmpty() ? Collections.emptyMap()
-                : departmentMapper.selectByIds(departmentIds).stream()
-                .collect(Collectors.toMap(Department::getId, Function.identity()));
+        var departmentIds = users.getRecords().stream().map(User::getDepartmentId).filter(Objects::nonNull).distinct().toList();
+        Map<UUID, Department> departments = departmentIds.isEmpty()
+                ? Collections.emptyMap()
+                : departmentMapper.selectByIds(departmentIds).stream().collect(Collectors.toMap(Department::getId, Function.identity()));
         var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
         result.setRecords(users.getRecords().stream().map(user -> {
             var vo = contactConverter.toVO(user);
             var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
-            vo.setDepartmentName(department == null ? null
-                    : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
+            vo.setDepartmentName(department == null ? null : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
             return vo;
         }).toList());
         return result;

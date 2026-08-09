@@ -53,19 +53,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var systemProps = System.getProperties();
         var filteredProps = new HashMap<String, String>();
         // 只保留常见的、非敏感的系统属性
-        List<String> includedKeys = Arrays.asList(
-                "os.name",
-                "os.version",
-                "os.arch",
-                "user.name",
-                "user.home",
-                "user.dir",
-                "file.separator",
-                "path.separator",
-                "line.separator",
-                "java.class.version",
-                "java.io.tmpdir"
-        );
+        List<String> includedKeys = Arrays.asList("os.name", "os.version", "os.arch", "user.name", "user.home", "user.dir", "file.separator",
+                "path.separator", "line.separator", "java.class.version", "java.io.tmpdir");
         for (String key : includedKeys) {
             String value = systemProps.getProperty(key);
             if (value != null) {
@@ -110,8 +99,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var memoryList = hardware.getMemory().getPhysicalMemory();
         if (memoryList.isEmpty()) {
             // 如果无法获取物理内存条信息（如在某些虚拟机中），提供一个默认信息
-            var unknown = RAMInfoVO.RAMSlot
-                    .builder()
+            var unknown = RAMInfoVO.RAMSlot.builder()
                     .slot(0)
                     .memoryType(UNKNOWN)
                     .clockSpeedHz(0L)
@@ -125,8 +113,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
         for (int i = 0; i < memoryList.size(); i++) {
             var memory = memoryList.get(i);
-            var unknown = RAMInfoVO.RAMSlot
-                    .builder()
+            var unknown = RAMInfoVO.RAMSlot.builder()
                     .slot(i + 1)
                     .memoryType(memory.getMemoryType())
                     .clockSpeedHz(memory.getClockSpeed())
@@ -150,13 +137,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     @Override
     public JVMInfoVO getJVMInfo() {
         var runtimeMXBean = ManagementFactory.getRuntimeMXBean();
-        return jvmInfoConverter.toVO(
-                runtimeMXBean,
-                System.getProperty("java.version"),
-                System.getProperty("java.home"),
-                System.getProperty("java.vendor"),
-                System.getProperty("java.vendor.url"),
-                getFilteredProps()
-        );
+        return jvmInfoConverter.toVO(runtimeMXBean, System.getProperty("java.version"), System.getProperty("java.home"),
+                System.getProperty("java.vendor"), System.getProperty("java.vendor.url"), getFilteredProps());
     }
 }

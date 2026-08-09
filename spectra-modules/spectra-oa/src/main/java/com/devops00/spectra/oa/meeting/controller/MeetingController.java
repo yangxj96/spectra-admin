@@ -88,8 +88,7 @@ public class MeetingController {
     @ULog("'保存会议纪要'")
     @PostMapping(value = "/{id}/record", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
-    public void saveRecord(@PathVariable java.util.UUID id,
-            @Validated @RequestBody MeetingRecordFrom from) {
+    public void saveRecord(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingRecordFrom from) {
         bindService.saveRecord(id, from);
     }
 }

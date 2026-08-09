@@ -45,7 +45,8 @@ public interface MenuService extends BaseService<Menu> {
     /// 生成树形菜单
     ///
     /// @return 生成的树形菜单
-    @Nullable List<MenuTreeVO> tree();
+    @Nullable
+    List<MenuTreeVO> tree();
 
     /// 获取当前用户的授权菜单树
     ///

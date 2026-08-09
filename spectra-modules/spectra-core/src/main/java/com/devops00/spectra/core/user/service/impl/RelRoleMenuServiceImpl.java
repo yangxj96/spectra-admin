@@ -71,10 +71,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         var targetIds = new HashSet<UUID>();
         if (CollUtils.isNotEmpty(requestedIds)) {
             var requestedMenus = menuService.listByIds(requestedIds);
-            var foundIds = requestedMenus.stream()
-                    .filter(menu -> menu.getDeleted() == null)
-                    .map(Menu::getId)
-                    .collect(Collectors.toSet());
+            var foundIds = requestedMenus.stream().filter(menu -> menu.getDeleted() == null).map(Menu::getId).collect(Collectors.toSet());
             if (!foundIds.containsAll(requestedIds)) {
                 throw new DataNotExistException("存在无效菜单");
             }
@@ -86,32 +83,25 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         }
 
         // 当前角色关联的菜单信息
-        var currentIds = relRoleMenuMapper.getByRoleId(roleId)
-                .stream()
-                .map(RelRoleMenu::getMenuId)
-                .collect(Collectors.toSet());
+        var currentIds = relRoleMenuMapper.getByRoleId(roleId).stream().map(RelRoleMenu::getMenuId).collect(Collectors.toSet());
 
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
         if (CollUtils.isNotEmpty(removeIds)) {
-            var wrapper = new LambdaQueryWrapper<RelRoleMenu>()
-                    .eq(RelRoleMenu::getRoleId, roleId)
-                    .in(RelRoleMenu::getMenuId, removeIds);
+            var wrapper = new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, roleId).in(RelRoleMenu::getMenuId, removeIds);
             relRoleMenuMapper.delete(wrapper);
         }
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
-        addIds.removeAll(currentIds);  // target - current = 新增
+        addIds.removeAll(currentIds); // target - current = 新增
         if (CollUtils.isNotEmpty(addIds)) {
-            List<RelRoleMenu> newMenu = addIds.stream()
-                    .map(addId -> {
-                        var datum = new RelRoleMenu();
-                        datum.setRoleId(roleId);
-                        datum.setMenuId(addId);
-                        return datum;
-                    })
-                    .collect(Collectors.toList());
+            List<RelRoleMenu> newMenu = addIds.stream().map(addId -> {
+                var datum = new RelRoleMenu();
+                datum.setRoleId(roleId);
+                datum.setMenuId(addId);
+                return datum;
+            }).collect(Collectors.toList());
             relRoleMenuMapper.insert(newMenu);
         }
     }

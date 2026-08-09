@@ -45,18 +45,14 @@ public class SecUtil {
     private static SecHolderStrategy getStrategy() {
         SecHolderStrategy s = strategy;
         if (s == null) {
-            throw new IllegalStateException(
-                    "SecUtil尚未初始化，请确保已加载对应的Security策略"
-            );
+            throw new IllegalStateException("SecUtil尚未初始化，请确保已加载对应的Security策略");
         }
         return s;
     }
 
     public static void setStrategy(SecHolderStrategy s) {
         if (strategy != null) {
-            throw new IllegalStateException(
-                    "SecHolderStrategy already initialized"
-            );
+            throw new IllegalStateException("SecHolderStrategy already initialized");
         }
         strategy = s;
     }

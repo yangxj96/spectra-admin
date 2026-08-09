@@ -61,7 +61,6 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return UsernamePasswordCaptchaAuthenticationToken.class
-                .isAssignableFrom(authentication);
+        return UsernamePasswordCaptchaAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }

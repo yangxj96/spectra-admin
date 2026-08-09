@@ -36,15 +36,11 @@ public class FileUploadChunkServiceImpl extends BaseServiceImpl<FileUploadChunkM
 
     @Override
     public List<FileUploadChunk> findByUploadId(String uploadId) {
-        return lambdaQuery()
-                .eq(FileUploadChunk::getUploadId, uploadId)
-                .list();
+        return lambdaQuery().eq(FileUploadChunk::getUploadId, uploadId).list();
     }
 
     @Override
     public int countByUploadId(String uploadId) {
-        return Math.toIntExact(lambdaQuery()
-                .eq(FileUploadChunk::getUploadId, uploadId)
-                .count());
+        return Math.toIntExact(lambdaQuery().eq(FileUploadChunk::getUploadId, uploadId).count());
     }
 }

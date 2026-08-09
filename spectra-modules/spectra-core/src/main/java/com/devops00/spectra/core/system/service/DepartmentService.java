@@ -57,7 +57,8 @@ public interface DepartmentService extends BaseService<Department> {
     /// 组织机构树形结构
     ///
     /// @return 组织机构树形结构数组
-    @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException;
+    @Nullable
+    List<DepartmentTreeVo> tree() throws IllegalAccessException;
 
     /// 获取自己包含下级的节点的ID
     ///

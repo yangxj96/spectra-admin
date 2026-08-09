@@ -24,9 +24,9 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationSettingServiceImpl
-        extends BaseServiceImpl<NotificationSettingMapper, NotificationSetting>
-        implements NotificationSettingService {
+public class NotificationSettingServiceImpl extends BaseServiceImpl<NotificationSettingMapper, NotificationSetting>
+        implements
+            NotificationSettingService {
 
     private final NotificationSettingConverter notificationSettingConverter;
 

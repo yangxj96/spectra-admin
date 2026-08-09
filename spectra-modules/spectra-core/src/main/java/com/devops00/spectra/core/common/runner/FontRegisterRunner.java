@@ -37,9 +37,7 @@ public class FontRegisterRunner implements ApplicationRunner {
 
     @Override
     public void run(@Nullable ApplicationArguments args) {
-        try (InputStream in =
-                FontRegisterRunner.class
-                        .getResourceAsStream("/fonts/Inter-Regular.ttf")) {
+        try (InputStream in = FontRegisterRunner.class.getResourceAsStream("/fonts/Inter-Regular.ttf")) {
 
             if (in == null) {
                 throw new IllegalStateException("Font not found: /fonts/Inter-Regular.ttf");
@@ -47,8 +45,7 @@ public class FontRegisterRunner implements ApplicationRunner {
 
             Font font = Font.createFont(Font.TRUETYPE_FONT, in);
 
-            GraphicsEnvironment ge =
-                    GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
             boolean success = ge.registerFont(font);
 

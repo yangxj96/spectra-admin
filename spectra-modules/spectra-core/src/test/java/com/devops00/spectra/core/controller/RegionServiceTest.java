@@ -75,11 +75,8 @@ public class RegionServiceTest {
 
     @Test
     void importCities() throws IOException {
-        var regionMap = regionService
-                .list(
-                        new LambdaQueryWrapper<Region>()
-                                .eq(Region::getLevel, RegionLevel.PROVINCES)
-                ).stream()
+        var regionMap = regionService.list(new LambdaQueryWrapper<Region>().eq(Region::getLevel, RegionLevel.PROVINCES))
+                .stream()
                 .collect(Collectors.toMap(Region::getCode, e -> e));
 
         // 读取 test/resources 下的文件
@@ -113,11 +110,8 @@ public class RegionServiceTest {
 
     @Test
     void importAreas() throws IOException {
-        var regionMap = regionService
-                .list(
-                        new LambdaQueryWrapper<Region>()
-                                .eq(Region::getLevel, RegionLevel.CITIES)
-                ).stream()
+        var regionMap = regionService.list(new LambdaQueryWrapper<Region>().eq(Region::getLevel, RegionLevel.CITIES))
+                .stream()
                 .collect(Collectors.toMap(Region::getCode, e -> e));
 
         // 读取 test/resources 下的文件
@@ -151,11 +145,8 @@ public class RegionServiceTest {
 
     @Test
     void importStreets() throws IOException {
-        var regionMap = regionService
-                .list(
-                        new LambdaQueryWrapper<Region>()
-                                .eq(Region::getLevel, RegionLevel.AREAS)
-                ).stream()
+        var regionMap = regionService.list(new LambdaQueryWrapper<Region>().eq(Region::getLevel, RegionLevel.AREAS))
+                .stream()
                 .collect(Collectors.toMap(Region::getCode, e -> e));
 
         // 读取 test/resources 下的文件
@@ -189,11 +180,8 @@ public class RegionServiceTest {
 
     @Test
     void importVillages() throws IOException {
-        var regionMap = regionService
-                .list(
-                        new LambdaQueryWrapper<Region>()
-                                .eq(Region::getLevel, RegionLevel.STREETS)
-                ).stream()
+        var regionMap = regionService.list(new LambdaQueryWrapper<Region>().eq(Region::getLevel, RegionLevel.STREETS))
+                .stream()
                 .collect(Collectors.toMap(Region::getCode, e -> e));
 
         // 读取 test/resources 下的文件

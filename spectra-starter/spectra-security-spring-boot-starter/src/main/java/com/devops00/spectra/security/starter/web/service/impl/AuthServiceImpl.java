@@ -42,20 +42,12 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void sendSmsCode(String phone) {
         // TODO: 调用短信服务发送验证码
-        redisTemplate.opsForValue().set(
-                RedisCacheKey.SMS_CODE + phone,
-                "1234",
-                Duration.ofMinutes(5)
-        );
+        redisTemplate.opsForValue().set(RedisCacheKey.SMS_CODE + phone, "1234", Duration.ofMinutes(5));
     }
 
     @Override
     public void sendEmailCode(String email) {
         // TODO: 调用邮件服务发送验证码
-        redisTemplate.opsForValue().set(
-                RedisCacheKey.EMAIL_CODE + email,
-                "1234",
-                Duration.ofMinutes(5)
-        );
+        redisTemplate.opsForValue().set(RedisCacheKey.EMAIL_CODE + email, "1234", Duration.ofMinutes(5));
     }
 }

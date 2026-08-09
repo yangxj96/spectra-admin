@@ -53,8 +53,7 @@ public class SecRedisConfiguration {
         template.setKeySerializer(keySerializer);
         template.setHashKeySerializer(keySerializer);
 
-        var valueSerializer =
-                new JacksonJsonRedisSerializer<>(om, Object.class);
+        var valueSerializer = new JacksonJsonRedisSerializer<>(om, Object.class);
         template.setValueSerializer(valueSerializer);
         template.setHashValueSerializer(valueSerializer);
 
@@ -74,10 +73,7 @@ public class SecRedisConfiguration {
         log.debug(LogPrefix.SECURITY.f("开始配置Redis值过期监听器"));
         var container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
-        container.addMessageListener(
-                listener,
-                new PatternTopic("__keyevent@*__:expired")
-        );
+        container.addMessageListener(listener, new PatternTopic("__keyevent@*__:expired"));
         return container;
     }
 }

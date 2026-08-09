@@ -77,11 +77,11 @@ public class AiConfiguration {
                 .chatMemoryProvider(chatMemoryProvider)
                 .systemMessageProvider(memoryId -> """
                         你是 Spectra 平台的 AI 助手。
-                        
+
                         ## 基本规则
                         - 始终使用简体中文回答
                         - 回答简洁直接，避免冗余
-                        
+
                         ## 能力边界
                         - 资料查询通过 Tool 工具和 RAG 知识库检索完成，不要编造数据
                         - 所有数据查询均在当前用户的权限范围内执行

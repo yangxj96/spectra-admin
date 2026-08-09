@@ -48,8 +48,7 @@ public class SupplyController {
     @ULog("'修改办公用品'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
-    public void update(@PathVariable UUID id,
-            @Validated(Verify.Update.class) @RequestBody SupplySaveFrom from) {
+    public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody SupplySaveFrom from) {
         supplyService.modify(id, from);
     }
 

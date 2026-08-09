@@ -96,13 +96,15 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         var wrapper = new LambdaQueryWrapper<Contract>();
         var user = requireCurrentUser();
         wrapper.and(query -> query.eq(Contract::getOwnerId, user.getId())
-                .or().eq(Contract::getVisibility, "PUBLIC")
-                .or(q -> q.eq(Contract::getVisibility, "DEPARTMENT")
-                        .eq(Contract::getDepartmentId, user.getDepartmentId())));
+                .or()
+                .eq(Contract::getVisibility, "PUBLIC")
+                .or(q -> q.eq(Contract::getVisibility, "DEPARTMENT").eq(Contract::getDepartmentId, user.getDepartmentId())));
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Contract::getContractNo, params.getKeyword())
-                    .or().like(Contract::getTitle, params.getKeyword())
-                    .or().like(Contract::getCounterpartyName, params.getKeyword()));
+                    .or()
+                    .like(Contract::getTitle, params.getKeyword())
+                    .or()
+                    .like(Contract::getCounterpartyName, params.getKeyword()));
         }
         if (params != null && StringUtils.hasText(params.getStatus())) {
             wrapper.eq(Contract::getStatus, params.getStatus());
@@ -205,9 +207,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (file == null || !"ACTIVE".equals(file.getStatus())) {
             throw new DataNotExistException("合同文件不存在或已失效");
         }
-        var latest = versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>()
-                .eq(ContractVersion::getContractId, contract.getId())
-                .orderByDesc(ContractVersion::getVersionNo).last("limit 1"));
+        var latest = versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getContractId, contract.getId())
+                .orderByDesc(ContractVersion::getVersionNo)
+                .last("limit 1"));
         var version = new ContractVersion();
         version.setContractId(contract.getId());
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
@@ -217,8 +219,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
         version.setVersionNote(trimToNull(from.getVersionNote()));
         version.setCurrentVersion(true);
-        versionMapper.update(null, new LambdaUpdateWrapper<ContractVersion>()
-                .eq(ContractVersion::getContractId, contract.getId())
+        versionMapper.update(null, new LambdaUpdateWrapper<ContractVersion>().eq(ContractVersion::getContractId, contract.getId())
                 .eq(ContractVersion::getCurrentVersion, true)
                 .set(ContractVersion::getCurrentVersion, false));
         if (versionMapper.insert(version) != 1) {
@@ -231,10 +232,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     public List<ContractVersionVO> versions(UUID id) {
         var contract = requireAccessible(id);
-        return versionMapper.selectList(new LambdaQueryWrapper<ContractVersion>()
-                        .eq(ContractVersion::getContractId, contract.getId())
-                        .orderByDesc(ContractVersion::getVersionNo))
-                .stream().map(contractConverter::toVersionVO).toList();
+        return versionMapper.selectList(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getContractId, contract.getId())
+                .orderByDesc(ContractVersion::getVersionNo)).stream().map(contractConverter::toVersionVO).toList();
     }
 
     @Override
@@ -264,11 +263,13 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     public List<ContractMilestoneVO> milestones(UUID id) {
         var contract = requireAccessible(id);
-        return milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>()
-                        .eq(ContractMilestone::getContractId, contract.getId())
+        return milestoneMapper
+                .selectList(new LambdaQueryWrapper<ContractMilestone>().eq(ContractMilestone::getContractId, contract.getId())
                         .orderByAsc(ContractMilestone::getDueDate)
                         .orderByAsc(ContractMilestone::getCreatedAt))
-                .stream().map(contractConverter::toMilestoneVO).toList();
+                .stream()
+                .map(contractConverter::toMilestoneVO)
+                .toList();
     }
 
     @Override
@@ -281,8 +282,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             throw new DataSaveException("履约节点状态不合法");
         }
         milestone.setStatus(status);
-        milestone.setCompletedAt("DONE".equals(status)
-                ? (from.getCompletedAt() == null ? Instant.now() : timeMapper.toInstant(from.getCompletedAt())) : null);
+        milestone.setCompletedAt(
+                "DONE".equals(status) ? (from.getCompletedAt() == null ? Instant.now() : timeMapper.toInstant(from.getCompletedAt())) : null);
         milestone.setRemark(trimToNull(from.getRemark()));
         if (milestoneMapper.updateById(milestone) != 1) {
             throw new DataSaveException("更新合同履约节点失败");
@@ -361,8 +362,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Transactional
     public int sendDueMilestoneReminders() {
         var deadline = timeMapper.toInstant(LocalDate.now(timeMapper.getUserZoneId()).plusDays(3));
-        var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>()
-                .le(ContractMilestone::getDueDate, deadline)
+        var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>().le(ContractMilestone::getDueDate, deadline)
                 .eq(ContractMilestone::getStatus, "PENDING")
                 .isNull(ContractMilestone::getReminderSentAt));
         var sent = 0;
@@ -375,8 +375,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             if (receiverId == null) {
                 continue;
             }
-            var claimed = milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>()
-                    .eq(ContractMilestone::getId, milestone.getId())
+            var claimed = milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())
                     .isNull(ContractMilestone::getReminderSentAt)
                     .set(ContractMilestone::getReminderSentAt, Instant.now()));
             if (claimed != 1) {
@@ -384,8 +383,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             }
             var notification = new NotificationSendDTO();
             notification.setTitle("合同履约节点即将到期");
-            notification.setContent("合同「" + contract.getTitle() + "」的履约节点「" + milestone.getName()
-                    + "」将于 " + milestone.getDueDate() + " 到期，请及时处理。");
+            notification.setContent("合同「" + contract.getTitle() + "」的履约节点「" + milestone.getName() + "」将于 " + milestone.getDueDate() + " 到期，请及时处理。");
             notification.setType("oa_contract_milestone");
             notification.setReceiverId(receiverId);
             notification.setLink("/oa/contract/" + contract.getId());
@@ -393,8 +391,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
                 notificationService.send(notification);
                 sent++;
             } catch (RuntimeException exception) {
-                milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>()
-                        .eq(ContractMilestone::getId, milestone.getId())
+                milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())
                         .set(ContractMilestone::getReminderSentAt, null));
                 log.warn("合同履约节点提醒发送失败: milestoneId={}", milestone.getId(), exception);
             }
@@ -414,8 +411,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
 
     private ContractVersion requireVersion(UUID id, UUID versionId) {
         var contract = requireAccessible(id);
-        ContractVersion version = versionId == null ? currentVersion(contract.getId()) : versionMapper.selectOne(
-                new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getId, versionId)
+        ContractVersion version = versionId == null
+                ? currentVersion(contract.getId())
+                : versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getId, versionId)
                         .eq(ContractVersion::getContractId, contract.getId()));
         if (version == null) {
             throw new DataNotExistException("合同版本不存在");
@@ -424,9 +422,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     }
 
     private ContractMilestone requireMilestone(UUID id, UUID milestoneId) {
-        var milestone = milestoneMapper.selectOne(new LambdaQueryWrapper<ContractMilestone>()
-                .eq(ContractMilestone::getId, milestoneId)
-                .eq(ContractMilestone::getContractId, id));
+        var milestone = milestoneMapper.selectOne(
+                new LambdaQueryWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestoneId).eq(ContractMilestone::getContractId, id));
         if (milestone == null) {
             throw new DataNotExistException("合同履约节点不存在");
         }
@@ -434,8 +431,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     }
 
     private ContractVersion currentVersion(UUID id) {
-        return versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>()
-                .eq(ContractVersion::getContractId, id)
+        return versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getContractId, id)
                 .eq(ContractVersion::getCurrentVersion, true)
                 .last("limit 1"));
     }
@@ -454,8 +450,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if ("PRIVATE".equals(entity.getVisibility()) && !Objects.equals(entity.getOwnerId(), user.getId())) {
             throw new DataNotExistException("合同不存在或无权访问");
         }
-        if ("DEPARTMENT".equals(entity.getVisibility())
-                && !Objects.equals(entity.getDepartmentId(), user.getDepartmentId())) {
+        if ("DEPARTMENT".equals(entity.getVisibility()) && !Objects.equals(entity.getDepartmentId(), user.getDepartmentId())) {
             throw new DataNotExistException("合同不存在或无权访问");
         }
         return entity;

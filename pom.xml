@@ -30,7 +30,7 @@
 
         <!-- 代码格式化与校验 -->
         <spotless.version>3.9.0</spotless.version>
-        <spotless.idea.binaryPath>idea</spotless.idea.binaryPath>
+        <spotless.eclipse.formatterPath>${maven.multiModuleProjectDirectory}/config/eclipse-java-formatter.xml</spotless.eclipse.formatterPath>
         <spotless.ratchetFrom>origin/master</spotless.ratchetFrom>
 
         <!-- 数据库 -->
@@ -173,18 +173,26 @@
                 <configuration>
                     <!-- 渐进启用：只校验相对基线分支发生变化的文件，避免重排整个历史代码。 -->
                     <ratchetFrom>${spotless.ratchetFrom}</ratchetFrom>
-                    <formats>
-                        <format>
-                            <includes>
-                                <include>src/**/*.java</include>
-                            </includes>
-                            <idea>
-                                <codeStyleSettingsPath>${maven.multiModuleProjectDirectory}/config/idea-code-style.xml</codeStyleSettingsPath>
-                                <withDefaults>false</withDefaults>
-                                <binaryPath>${spotless.idea.binaryPath}</binaryPath>
-                            </idea>
-                        </format>
-                    </formats>
+                    <java>
+                        <includes>
+                            <include>src/**/*.java</include>
+                        </includes>
+                        <!-- JDT 3.45 cannot format Java 25 Markdown doc comments in enum constant lists. -->
+                        <replace>
+                            <name>preserve Markdown doc comments</name>
+                            <search>///</search>
+                            <replacement>// SPECTRA_MARKDOWN_DOC</replacement>
+                        </replace>
+                        <eclipse>
+                            <file>${spotless.eclipse.formatterPath}</file>
+                        </eclipse>
+                        <replace>
+                            <name>restore Markdown doc comments</name>
+                            <search>// SPECTRA_MARKDOWN_DOC</search>
+                            <replacement>///</replacement>
+                        </replace>
+                        <trimTrailingWhitespace/>
+                    </java>
                 </configuration>
                 <executions>
                     <execution>

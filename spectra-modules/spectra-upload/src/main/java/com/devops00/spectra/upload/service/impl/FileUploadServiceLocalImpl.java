@@ -85,25 +85,15 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     private final ApplicationEventPublisher publisher;
 
-    public FileUploadServiceLocalImpl(
-            LocalProperties properties,
-            FileUploadProperties uploadProperties,
-            FileInfoService infoService,
-            FileUploadTaskService taskService,
-            FileUploadChunkService chunkService, ApplicationEventPublisher publisher
-    ) throws IOException {
+    public FileUploadServiceLocalImpl(LocalProperties properties, FileUploadProperties uploadProperties, FileInfoService infoService,
+            FileUploadTaskService taskService, FileUploadChunkService chunkService, ApplicationEventPublisher publisher) throws IOException {
         this.uploadProperties = uploadProperties;
         this.infoService = infoService;
         this.taskService = taskService;
         this.chunkService = chunkService;
         this.publisher = publisher;
 
-        log.debug(
-                "{}初始化本地存储位置,存储位置:{},临时文件位置:{}",
-                LogPrefix.STORAGE.p(),
-                properties.getUploadDir(),
-                properties.getUploadTempDir()
-        );
+        log.debug("{}初始化本地存储位置,存储位置:{},临时文件位置:{}", LogPrefix.STORAGE.p(), properties.getUploadDir(), properties.getUploadTempDir());
         this.root = Paths.get(properties.getUploadDir());
         if (!Files.exists(root)) {
             Files.createDirectories(root);
@@ -138,9 +128,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         boolean multipart = from.getSize() > chunkSize;
 
         // 计算分片数量
-        int totalChunks = multipart
-                ? (int) Math.ceil((double) from.getSize() / chunkSize)
-                : 1;
+        int totalChunks = multipart ? (int) Math.ceil((double) from.getSize() / chunkSize) : 1;
 
         // 创建上传任务
         String uploadId = UuidCreator.getTimeOrderedEpoch().toString();
@@ -335,9 +323,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             response.setContentType(contentType);
             // 设置为 inline（内联），告诉浏览器“能预览就预览，不能预览再下载”
             // 对文件名进行 URL 编码，防止中文或特殊字符在 Header 中乱码
-            String encodedFilename = URLEncoder
-                    .encode(file.getOriginalName(), StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20");
+            String encodedFilename = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + encodedFilename + "\"");
 
             // 设置文件大小，方便浏览器展示进度条
@@ -359,8 +345,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     @Override
     public InputStream openStream(FileInfo fileInfo) {
-        log.debug("{} 开始获取本地文件流, 文件ID: {}, 存储Key: {}",
-                LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
+        log.debug("{} 开始获取本地文件流, 文件ID: {}, 存储Key: {}", LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
 
         // 1. 获取文件在磁盘上的绝对路径
         Path filePath = buildFilePath(fileInfo.getFilename());
@@ -404,9 +389,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                 contentType = org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
             }
             response.setContentType(contentType);
-            String encodedFilename = URLEncoder
-                    .encode(file.getOriginalName(), StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20");
+            String encodedFilename = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
             response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFilename + "\"");
             response.setContentLengthLong(file.getSize());
             try (OutputStream out = response.getOutputStream()) {

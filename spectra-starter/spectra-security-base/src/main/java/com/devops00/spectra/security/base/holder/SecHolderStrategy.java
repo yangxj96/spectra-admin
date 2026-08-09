@@ -63,16 +63,20 @@ public interface SecHolderStrategy {
     List<UserOnlineVO> listOnlineUsers();
 
     /// 获取当前用户信息
-    @Nullable SecurityUser getCurrentUser();
+    @Nullable
+    SecurityUser getCurrentUser();
 
     /// 根据 token 获取用户信息
-    @Nullable SecurityUser getCurrentUser(String token);
+    @Nullable
+    SecurityUser getCurrentUser(String token);
 
     /// 获取当前 token
-    @Nullable String getCurrentToken();
+    @Nullable
+    String getCurrentToken();
 
     /// 获取当前用户 ID
-    @Nullable UUID getCurrentUserId();
+    @Nullable
+    UUID getCurrentUserId();
 
     /// 获取当前用户时区ID
     String getCurrentUserZoneId();

@@ -38,8 +38,7 @@ public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictIte
 
     @Override
     public List<DictItem> listByGid(UUID gid) {
-        var wrapper = new LambdaQueryWrapper<DictItem>()
-                .eq(DictItem::getGid, gid);
+        var wrapper = new LambdaQueryWrapper<DictItem>().eq(DictItem::getGid, gid);
         return this.list(wrapper);
     }
 }

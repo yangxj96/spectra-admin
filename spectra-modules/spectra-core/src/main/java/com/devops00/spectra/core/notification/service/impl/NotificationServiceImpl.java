@@ -35,9 +35,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NotificationServiceImpl
-        extends BaseServiceImpl<NotificationMapper, Notification>
-        implements NotificationService {
+public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper, Notification> implements NotificationService {
 
     private final NotificationConverter notificationConverter;
     private final TimeMapper timeMapper;
@@ -58,10 +56,7 @@ public class NotificationServiceImpl
         }
 
         if (StringUtils.hasText(params.getKeyword())) {
-            wrapper.and(w -> w
-                    .like(Notification::getTitle, params.getKeyword())
-                    .or()
-                    .like(Notification::getContent, params.getKeyword()));
+            wrapper.and(w -> w.like(Notification::getTitle, params.getKeyword()).or().like(Notification::getContent, params.getKeyword()));
         }
 
         if (StringUtils.hasText(params.getStartTime())) {
@@ -89,8 +84,7 @@ public class NotificationServiceImpl
     @Override
     public long getUnreadCount(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.eq(Notification::getReceiverId, userId)
-                .eq(Notification::getIsRead, false);
+        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false);
         return this.count(wrapper);
     }
 
@@ -116,8 +110,7 @@ public class NotificationServiceImpl
     @Transactional
     public void markAllAsRead(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.eq(Notification::getReceiverId, userId)
-                .eq(Notification::getIsRead, false);
+        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false);
 
         var entity = new Notification();
         entity.setIsRead(true);
@@ -145,8 +138,7 @@ public class NotificationServiceImpl
     @Transactional
     public void batchDelete(List<UUID> ids, UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.in(Notification::getId, ids)
-                .eq(Notification::getReceiverId, userId);
+        wrapper.in(Notification::getId, ids).eq(Notification::getReceiverId, userId);
 
         this.remove(wrapper);
         log.info("批量删除消息: count={}", ids.size());

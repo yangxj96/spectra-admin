@@ -48,14 +48,10 @@ public class SecJacksonConfiguration {
                         BasicPolymorphicTypeValidator.builder()
                                 .allowIfSubType(spectraSystemProperties.getPackagePrefix())
                                 .allowIfSubType("java.util")))
-                .activateDefaultTyping(
-                        BasicPolymorphicTypeValidator.builder()
-                                .allowIfSubType(spectraSystemProperties.getPackagePrefix())
-                                .allowIfSubType("java.util")
-                                .build(),
-                        DefaultTyping.NON_FINAL,
-                        JsonTypeInfo.As.PROPERTY
-                )
+                .activateDefaultTyping(BasicPolymorphicTypeValidator.builder()
+                        .allowIfSubType(spectraSystemProperties.getPackagePrefix())
+                        .allowIfSubType("java.util")
+                        .build(), DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY)
                 .build();
     }
 }

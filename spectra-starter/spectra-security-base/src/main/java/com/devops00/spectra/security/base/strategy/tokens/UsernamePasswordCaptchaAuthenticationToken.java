@@ -38,8 +38,7 @@ public class UsernamePasswordCaptchaAuthenticationToken extends AbstractAuthenti
     @Getter
     private final String captcha;
 
-    public UsernamePasswordCaptchaAuthenticationToken(
-            String username, String password, String captcha) {
+    public UsernamePasswordCaptchaAuthenticationToken(String username, String password, String captcha) {
         super(Collections.emptyList());
         this.username = username;
         this.password = password;

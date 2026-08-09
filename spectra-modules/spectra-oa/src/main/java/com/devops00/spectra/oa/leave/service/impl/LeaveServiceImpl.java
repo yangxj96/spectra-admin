@@ -76,8 +76,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, LeaveApplication>
-        implements LeaveService {
+public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, LeaveApplication> implements LeaveService {
 
     private static final String LEAVE_TYPE_CODE = "leave";
     private static final String ATTENDANCE_STATUS = "LEAVE";
@@ -99,8 +98,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     public UUID create(LeaveCreateFrom from) {
         var parsed = parse(from);
         var type = requireLeaveType(parsed.leaveTypeCode());
-        var application = applicationService.createDraft(LEAVE_TYPE_CODE, null,
-                "请假申请 - " + type.getName());
+        var application = applicationService.createDraft(LEAVE_TYPE_CODE, null, "请假申请 - " + type.getName());
         var detail = new LeaveApplication();
         detail.setApplicationId(application.getId());
         detail.setDepartmentId(application.getDepartmentId());
@@ -122,8 +120,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     public void update(UUID id, LeaveCreateFrom from) {
         var detail = requireDetail(id);
         var application = requireApplicantApplication(detail);
-        if (!(ApplicationStatus.DRAFT.name().equals(application.getStatus())
-                || ApplicationStatus.REJECTED.name().equals(application.getStatus()))) {
+        if (!(ApplicationStatus.DRAFT.name().equals(application.getStatus()) || ApplicationStatus.REJECTED.name().equals(application.getStatus()))) {
             throw new DataSaveException("当前状态不允许修改请假申请");
         }
         var parsed = parse(from);
@@ -146,15 +143,12 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        var applicationWrapper = new LambdaQueryWrapper<Application>()
-                .eq(Application::getTypeCode, LEAVE_TYPE_CODE)
-                .and(query -> query.eq(Application::getApplicantId, user.getId())
-                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        var applicationWrapper = new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, LEAVE_TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
         if (params != null && StringUtils.hasText(params.getStatus())) {
             applicationWrapper.eq(Application::getStatus, params.getStatus());
         }
-        var applicationIds = applicationMapper.selectList(applicationWrapper).stream()
-                .map(Application::getId).toList();
+        var applicationIds = applicationMapper.selectList(applicationWrapper).stream().map(Application::getId).toList();
         if (applicationIds.isEmpty()) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -165,9 +159,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         wrapper.orderByDesc(LeaveApplication::getCreatedAt);
         var result = this.page(page.toPage(), wrapper);
         var voPage = new Page<LeaveVO>(result.getCurrent(), result.getSize(), result.getTotal());
-        voPage.setRecords(result.getRecords().stream()
-                .map(detail -> assembleView(detail, applicationService.require(detail.getApplicationId())))
-                .toList());
+        voPage.setRecords(
+                result.getRecords().stream().map(detail -> assembleView(detail, applicationService.require(detail.getApplicationId()))).toList());
         return voPage;
     }
 
@@ -184,8 +177,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         var application = requireApplicantApplication(detail);
         applicationService.submit(application.getId());
         reserveBalance(application.getApplicantId(), detail);
-        var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, LEAVE_TYPE_CODE).eq(ApplicationType::getEnabled, true));
+        var type = applicationTypeMapper.selectOne(
+                new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, LEAVE_TYPE_CODE).eq(ApplicationType::getEnabled, true));
         if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
             throw new DataSaveException("请假流程尚未配置");
         }
@@ -201,8 +194,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         variables.put("applicantId", application.getApplicantId().toString());
         variables.put("leaveTypeCode", detail.getLeaveTypeCode());
         variables.put("durationHours", detail.getDurationHours().doubleValue());
-        var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(),
-                variables);
+        var processId = processInstanceService.start(type.getProcessDefinitionKey(), application.getId().toString(), variables);
         applicationService.bindProcessInstance(application.getId(), processId);
     }
 
@@ -292,8 +284,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     }
 
     private LeaveType requireLeaveType(String code) {
-        var type = leaveTypeMapper.selectOne(new LambdaQueryWrapper<LeaveType>()
-                .eq(LeaveType::getCode, code).eq(LeaveType::getEnabled, true));
+        var type = leaveTypeMapper.selectOne(new LambdaQueryWrapper<LeaveType>().eq(LeaveType::getCode, code).eq(LeaveType::getEnabled, true));
         if (type == null) {
             throw new DataNotExistException("请假类型不存在或已停用: " + code);
         }
@@ -388,8 +379,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     }
 
     private LeaveBalance findBalance(UUID userId, LeaveApplication detail) {
-        return leaveBalanceMapper.selectOne(new LambdaQueryWrapper<LeaveBalance>()
-                .eq(LeaveBalance::getUserId, userId)
+        return leaveBalanceMapper.selectOne(new LambdaQueryWrapper<LeaveBalance>().eq(LeaveBalance::getUserId, userId)
                 .eq(LeaveBalance::getLeaveTypeCode, detail.getLeaveTypeCode())
                 .eq(LeaveBalance::getYear, detail.getStartTime().atZone(timeMapper.getUserZoneId()).getYear()));
     }
@@ -400,10 +390,11 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         var last = detail.getEndTime().atZone(zoneId).toLocalDate();
         while (!date.isAfter(last)) {
             var attendanceDate = date.atStartOfDay(zoneId).toInstant();
-            if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY
-                    && attendanceRecordMapper.selectCount(new LambdaQueryWrapper<AttendanceRecord>()
-                    .eq(AttendanceRecord::getApplicationId, application.getId())
-                    .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
+            if (date.getDayOfWeek() != DayOfWeek.SATURDAY
+                && date.getDayOfWeek() != DayOfWeek.SUNDAY
+                && attendanceRecordMapper
+                        .selectCount(new LambdaQueryWrapper<AttendanceRecord>().eq(AttendanceRecord::getApplicationId, application.getId())
+                                .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
                 var record = new AttendanceRecord();
                 record.setApplicationId(application.getId());
                 record.setUserId(application.getApplicantId());

@@ -43,14 +43,12 @@ public class UploadServiceTest {
     private FileTypeService fileTypeService;
 
     private List<MagicRule> magic(String... hexList) {
-        return Arrays.stream(hexList)
-                .map(h -> {
-                    var r = new MagicRule();
-                    r.setBytes(h.toUpperCase());
-                    r.setOffset(0);
-                    return r;
-                })
-                .toList();
+        return Arrays.stream(hexList).map(h -> {
+            var r = new MagicRule();
+            r.setBytes(h.toUpperCase());
+            r.setOffset(0);
+            return r;
+        }).toList();
     }
 
     /// 初始化文件类型
@@ -64,11 +62,7 @@ public class UploadServiceTest {
             t.setName("JPEG");
             t.setExtension(List.of(".jpg", ".jpeg"));
             t.setMime(List.of("image/jpeg"));
-            t.setMagicRules(magic(
-                    "FFD8FFE0",
-                    "FFD8FFE1",
-                    "FFD8FFDB"
-            ));
+            t.setMagicRules(magic("FFD8FFE0", "FFD8FFE1", "FFD8FFDB"));
             t.setMaxSize(20L * 1024 * 1024); // 20MB
             t.setPreviewable(true);
             t.setAllowedUpload(true);
@@ -98,9 +92,8 @@ public class UploadServiceTest {
             t.setName("GIF");
             t.setExtension(List.of(".gif"));
             t.setMime(List.of("image/gif"));
-            t.setMagicRules(magic(
-                    "474946383761", // GIF87a
-                    "474946383961"  // GIF89a
+            t.setMagicRules(magic("474946383761", // GIF87a
+                    "474946383961" // GIF89a
             ));
             t.setMaxSize(10L * 1024 * 1024);
             t.setPreviewable(true);

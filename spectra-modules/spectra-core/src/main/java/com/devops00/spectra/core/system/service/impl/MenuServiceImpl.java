@@ -117,11 +117,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             parentId = parent.getPid();
         }
         if (params.getId() != null && params.getMenuType() == MenuType.MENU) {
-            var childCount = menuMapper.selectCount(
-                    new QueryWrapper<Menu>()
-                            .eq("pid", params.getId())
-                            .isNull("deleted")
-            );
+            var childCount = menuMapper.selectCount(new QueryWrapper<Menu>().eq("pid", params.getId()).isNull("deleted"));
             if (childCount > 0) {
                 throw new DataException("菜单节点不能拥有子节点");
             }
@@ -141,29 +137,17 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     @Override
     public List<MenuTreeVO> current(UUID userId) {
-        var roleIds = relUserRoleService.getRoles(userId)
-                .stream()
-                .filter(role -> Boolean.TRUE.equals(role.getState()))
-                .map(Role::getId)
-                .toList();
+        var roleIds = relUserRoleService.getRoles(userId).stream().filter(role -> Boolean.TRUE.equals(role.getState())).map(Role::getId).toList();
         if (CollUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
         }
 
-        var relations = roleMenuMapper.selectList(
-                new QueryWrapper<RelRoleMenu>()
-                        .in("role_id", roleIds)
-                        .isNull("deleted")
-        );
+        var relations = roleMenuMapper.selectList(new QueryWrapper<RelRoleMenu>().in("role_id", roleIds).isNull("deleted"));
         if (CollUtils.isEmpty(relations)) {
             return Collections.emptyList();
         }
 
-        var menus = menuMapper.selectList(
-                new QueryWrapper<Menu>()
-                        .isNotNull("menu_type")
-                        .isNull("deleted")
-        );
+        var menus = menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
         if (CollUtils.isEmpty(menus)) {
             return Collections.emptyList();
         }
@@ -180,9 +164,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             }
         }
 
-        var authorizedMenus = menus.stream()
-                .filter(menu -> includedIds.contains(menu.getId()))
-                .toList();
+        var authorizedMenus = menus.stream().filter(menu -> includedIds.contains(menu.getId())).toList();
         if (CollUtils.isEmpty(authorizedMenus)) {
             return Collections.emptyList();
         }
@@ -197,11 +179,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();
         }
-        return menuMapper.selectList(
-                        new QueryWrapper<Menu>()
-                                .in("id", relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList())
-                                .isNull("deleted")
-                )
+        return menuMapper.selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList()).isNull("deleted"))
                 .stream()
                 .filter(menu -> menu.getMenuType() == MenuType.MENU)
                 .toList();
@@ -217,10 +195,6 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     }
 
     private @Nullable Menu getActiveMenu(UUID id) {
-        return menuMapper.selectOne(
-                new QueryWrapper<Menu>()
-                        .eq("id", id)
-                        .isNull("deleted")
-        );
+        return menuMapper.selectOne(new QueryWrapper<Menu>().eq("id", id).isNull("deleted"));
     }
 }

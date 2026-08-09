@@ -40,9 +40,7 @@ public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileTyp
     @Override
     @Cacheable(cacheNames = "upload:fileType", key = "'allowed-ext'")
     public Set<String> findAllowedExtensions() {
-        var types = lambdaQuery()
-                .eq(FileType::getAllowedUpload, true)
-                .list();
+        var types = lambdaQuery().eq(FileType::getAllowedUpload, true).list();
         var extensions = new HashSet<String>();
         for (FileType type : types) {
             if (type.getExtension() != null) {
@@ -57,9 +55,7 @@ public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileTyp
     @Override
     @Cacheable(cacheNames = "upload:fileType", key = "'dangerous-ext'")
     public Set<String> findDangerousExtensions() {
-        var types = lambdaQuery()
-                .eq(FileType::getDangerous, true)
-                .list();
+        var types = lambdaQuery().eq(FileType::getDangerous, true).list();
         var extensions = new HashSet<String>();
         for (FileType type : types) {
             if (type.getExtension() != null) {
@@ -74,10 +70,7 @@ public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileTyp
     @Override
     @Cacheable(cacheNames = "upload:fileType", key = "'allowed-mime'")
     public Set<String> findAllowedMimes() {
-        var types = lambdaQuery()
-                .eq(FileType::getAllowedUpload, true)
-                .isNotNull(FileType::getMime)
-                .list();
+        var types = lambdaQuery().eq(FileType::getAllowedUpload, true).isNotNull(FileType::getMime).list();
         var mimes = new HashSet<String>();
         for (FileType type : types) {
             if (type.getMime() != null) {
@@ -92,10 +85,7 @@ public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileTyp
     @Override
     @Cacheable(cacheNames = "upload:fileType", key = "'dangerous-mime'")
     public Set<String> findDangerousMimes() {
-        var types = lambdaQuery()
-                .eq(FileType::getDangerous, true)
-                .isNotNull(FileType::getMime)
-                .list();
+        var types = lambdaQuery().eq(FileType::getDangerous, true).isNotNull(FileType::getMime).list();
         var mimes = new HashSet<String>();
         for (FileType type : types) {
             if (type.getMime() != null) {
@@ -110,9 +100,6 @@ public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileTyp
     @Override
     @Cacheable(cacheNames = "upload:fileType", key = "'dangerous-magic'")
     public List<FileType> findDangerousWithMagicRules() {
-        return lambdaQuery()
-                .eq(FileType::getDangerous, true)
-                .isNotNull(FileType::getMagicRules)
-                .list();
+        return lambdaQuery().eq(FileType::getDangerous, true).isNotNull(FileType::getMagicRules).list();
     }
 }

@@ -67,10 +67,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class DepartmentStatsServiceImpl implements DepartmentStatsService {
 
-    private static final String[] HEADERS = {
-            "部门", "资产条目数", "资产数量", "资产金额", "办公用品 SKU 数", "当前库存", "最低库存",
-            "报销单数", "报销金额", "采购申请数", "采购预算"
-    };
+    private static final String[] HEADERS = {"部门", "资产条目数", "资产数量", "资产金额", "办公用品 SKU 数", "当前库存", "最低库存", "报销单数", "报销金额", "采购申请数", "采购预算"};
 
     private final DepartmentService departmentService;
     private final AssetMapper assetMapper;
@@ -82,12 +79,12 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     @Override
     public List<DepartmentStatsVO> list(DepartmentStatsFrom from) {
         UUID departmentId = from == null ? null : from.getDepartmentId();
-        Map<UUID, DepartmentStatsVO> result = departmentService.list().stream()
+        Map<UUID, DepartmentStatsVO> result = departmentService.list()
+                .stream()
                 .filter(department -> departmentId == null || departmentId.equals(department.getId()))
                 .collect(Collectors.toMap(Department::getId, department -> {
                     var vo = departmentStatsConverter.toVO(department);
-                    vo.setDepartmentName(department.getPath() == null
-                            ? department.getName() : department.getPath());
+                    vo.setDepartmentName(department.getPath() == null ? department.getName() : department.getPath());
                     return vo;
                 }, (left, right) -> left, HashMap::new));
 
@@ -100,11 +97,11 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         mergeReimbursementStats(result, departmentId);
         mergePurchaseStats(result, departmentId);
 
-        return result.values().stream()
+        return result.values()
+                .stream()
                 // 只返回当前数据权限范围内确有业务数据的部门，避免聚合接口泄露无权部门名称。
                 .filter(this::hasBusinessData)
-                .sorted(Comparator.comparing(DepartmentStatsVO::getDepartmentName,
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .sorted(Comparator.comparing(DepartmentStatsVO::getDepartmentName, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
                 .toList();
     }
 
@@ -148,8 +145,7 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     }
 
     private boolean hasBusinessData(DepartmentStatsVO stats) {
-        return stats.getAssetCount() > 0 || stats.getSupplySkuCount() > 0 || stats.getReimbursementCount() > 0
-                || stats.getPurchaseCount() > 0;
+        return stats.getAssetCount() > 0 || stats.getSupplySkuCount() > 0 || stats.getReimbursementCount() > 0 || stats.getPurchaseCount() > 0;
     }
 
     private void mergeAssetStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
@@ -176,8 +172,8 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
 
     private void mergeReimbursementStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<Reimbursement> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS reimbursement_count",
-                "COALESCE(SUM(total_amount), 0) AS reimbursement_amount").groupBy("department_id");
+        wrapper.select("department_id", "COUNT(*) AS reimbursement_count", "COALESCE(SUM(total_amount), 0) AS reimbursement_amount")
+                .groupBy("department_id");
         reimbursementMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
             stats.setReimbursementCount(number(row, "reimbursement_count").longValue());
             stats.setReimbursementAmount(decimal(row, "reimbursement_amount"));
@@ -186,8 +182,7 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
 
     private void mergePurchaseStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<Purchase> wrapper = aggregateWrapper(departmentId);
-        wrapper.select("department_id", "COUNT(*) AS purchase_count", "COALESCE(SUM(budget_amount), 0) AS purchase_budget")
-                .groupBy("department_id");
+        wrapper.select("department_id", "COUNT(*) AS purchase_count", "COALESCE(SUM(budget_amount), 0) AS purchase_budget").groupBy("department_id");
         purchaseMapper.selectMaps(wrapper).forEach(row -> merge(result, row, stats -> {
             stats.setPurchaseCount(number(row, "purchase_count").longValue());
             stats.setPurchaseBudget(decimal(row, "purchase_budget"));
@@ -206,8 +201,7 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         return wrapper;
     }
 
-    private void merge(Map<UUID, DepartmentStatsVO> result, Map<String, Object> row,
-            Consumer<DepartmentStatsVO> consumer) {
+    private void merge(Map<UUID, DepartmentStatsVO> result, Map<String, Object> row, Consumer<DepartmentStatsVO> consumer) {
         UUID departmentId = uuid(row.get("department_id"));
         DepartmentStatsVO stats = result.get(departmentId);
         if (stats != null) {
@@ -222,7 +216,8 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
     private static Number number(Map<String, Object> row, String key) {
         Object value = row.get(key);
         if (value == null) {
-            value = row.entrySet().stream()
+            value = row.entrySet()
+                    .stream()
                     .filter(entry -> entry.getKey().toLowerCase(Locale.ROOT).equals(key))
                     .map(Map.Entry::getValue)
                     .findFirst()

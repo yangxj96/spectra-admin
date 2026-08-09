@@ -58,10 +58,7 @@ public class ProcessInstanceController {
     @PostMapping(value = "/start", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_INSTANCE:INSERT')")
     public String start(@Validated @RequestBody ProcessInstanceStartFrom from) {
-        return processInstanceService.start(
-                from.getProcessDefinitionKey(),
-                from.getBusinessKey(),
-                from.getVariables());
+        return processInstanceService.start(from.getProcessDefinitionKey(), from.getBusinessKey(), from.getVariables());
     }
 
     /// 查询流程状态

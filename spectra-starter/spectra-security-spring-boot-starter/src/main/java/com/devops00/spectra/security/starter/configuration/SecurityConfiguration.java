@@ -58,12 +58,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@Import({
-        SecJacksonConfiguration.class,
-        SecRedisConfiguration.class,
-        SecExConfiguration.class,
-        SecUtilConfiguration.class
-})
+@Import({SecJacksonConfiguration.class, SecRedisConfiguration.class, SecExConfiguration.class, SecUtilConfiguration.class})
 public class SecurityConfiguration {
 
     private final SecurityProperties properties;
@@ -109,8 +104,7 @@ public class SecurityConfiguration {
         log.debug("{}白名单:{}", LogPrefix.SECURITY.p(), whitelistPaths);
         log.debug(LogPrefix.SECURITY.f("关闭所有自带的认证方式,开放OPTIONS预检请求,开放白名单,其他接口全认证"));
         log.debug(LogPrefix.SECURITY.f("使用自定义的AuthenticationManager"));
-        http
-                .authenticationManager(authenticationManager)
+        http.authenticationManager(authenticationManager)
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 // 安全起见关闭所有自带登录和退出方案
@@ -127,24 +121,22 @@ public class SecurityConfiguration {
                 // 允许同源iframe
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 权限匹配
-                .authorizeHttpRequests(auth ->
-                        auth
-                                // 允许 ASYNC 调度
-                                .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
-                                // 预检请求必须放行
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                // 白名单路径放行
-                                .requestMatchers(whitelistPaths).permitAll()
-                                // 其余接口都需要认证
-                                .anyRequest().authenticated())
-        ;
+                .authorizeHttpRequests(auth -> auth
+                        // 允许 ASYNC 调度
+                        .dispatcherTypeMatchers(DispatcherType.ASYNC)
+                        .permitAll()
+                        // 预检请求必须放行
+                        .requestMatchers(HttpMethod.OPTIONS, "/**")
+                        .permitAll()
+                        // 白名单路径放行
+                        .requestMatchers(whitelistPaths)
+                        .permitAll()
+                        // 其余接口都需要认证
+                        .anyRequest()
+                        .authenticated());
 
         log.debug(LogPrefix.SECURITY.f("异常处理"));
-        http.exceptionHandling(ex ->
-                ex
-                        .authenticationEntryPoint(restAuthenticationEntryPoint)
-                        .accessDeniedHandler(restAccessDeniedHandler)
-        );
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint(restAuthenticationEntryPoint).accessDeniedHandler(restAccessDeniedHandler));
 
         return http.build();
     }

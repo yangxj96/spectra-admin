@@ -24,7 +24,8 @@ import java.io.Serializable;
 
 /// 响应
 ///
-/// @param <T> 具体类型
+/// @param <T>
+///            具体类型
 /// @author yangxj96
 /// @version 1.0
 /// @since 2025/6/14 00:00
@@ -46,7 +47,8 @@ public class R<T> implements Serializable {
 
     /// 自定义的构建方式
     ///
-    /// @param status http状态码
+    /// @param status
+    ///            http状态码
     public R(HttpStatus status) {
         this.code = status.value();
         this.msg = status.getReasonPhrase();
@@ -54,27 +56,17 @@ public class R<T> implements Serializable {
 
     /// 默认成功
     public static R<Object> success() {
-        return R.builder()
-                .code(HttpStatus.OK.value())
-                .msg(HttpStatus.OK.getReasonPhrase())
-                .build();
+        return R.builder().code(HttpStatus.OK.value()).msg(HttpStatus.OK.getReasonPhrase()).build();
     }
 
     /// 成功,有响应体
     public static <T> R<T> success(T data) {
-        return R.<T>builder()
-                .code(HttpStatus.OK.value())
-                .msg(HttpStatus.OK.getReasonPhrase())
-                .data(data)
-                .build();
+        return R.<T>builder().code(HttpStatus.OK.value()).msg(HttpStatus.OK.getReasonPhrase()).data(data).build();
     }
 
     /// 默认失败
     public static R<Object> failure() {
-        return R.builder()
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .msg(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
-                .build();
+        return R.builder().code(HttpStatus.INTERNAL_SERVER_ERROR.value()).msg(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()).build();
     }
 
     /// 失败,指定状态码
@@ -84,10 +76,7 @@ public class R<T> implements Serializable {
 
     /// 失败,自定消息
     public static R<Object> failure(String msg) {
-        return R.builder()
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .msg(msg)
-                .build();
+        return R.builder().code(HttpStatus.INTERNAL_SERVER_ERROR.value()).msg(msg).build();
     }
 
     /// 失败,指定状态码和消息

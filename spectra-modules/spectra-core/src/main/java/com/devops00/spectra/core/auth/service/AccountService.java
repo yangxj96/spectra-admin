@@ -36,7 +36,8 @@ public interface AccountService extends BaseService<Account> {
     ///
     /// @param loginName 登录用户名
     /// @return 账号信息，可能为null
-    @Nullable Account getByLoginName(String loginName);
+    @Nullable
+    Account getByLoginName(String loginName);
 
     /// 根据用户ID获取用户的默认账号
     ///
@@ -48,13 +49,15 @@ public interface AccountService extends BaseService<Account> {
     ///
     /// @param phone 手机号
     /// @return 账号信息，可能为null
-    @Nullable Account getByPhone(String phone);
+    @Nullable
+    Account getByPhone(String phone);
 
     /// 根据邮箱查询账号
     ///
     /// @param email 邮箱
     /// @return 账号信息，可能为null
-    @Nullable Account getByEmail(String email);
+    @Nullable
+    Account getByEmail(String email);
 
     /// 根据用户ID删除用户的所有登录方式
     ///

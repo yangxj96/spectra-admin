@@ -36,7 +36,8 @@ public enum LogPrefix {
     WEB("WEB"),
     PERSISTENCE("持久化"),
     REDIS("Redis"),
-    CACHE("缓存"),
+    CACHE(
+            "缓存"),
     LOG("日志"),
     AI("AI");
 

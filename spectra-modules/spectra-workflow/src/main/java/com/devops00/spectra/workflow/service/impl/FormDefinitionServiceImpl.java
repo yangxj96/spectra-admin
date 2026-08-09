@@ -51,8 +51,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMapper, FormDefinition>
-        implements FormDefinitionService {
+public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMapper, FormDefinition> implements FormDefinitionService {
 
     private final FormVersionMapper formVersionMapper;
     private final FormConverter formConverter;
@@ -81,11 +80,8 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         }
         var vo = formConverter.toVO(entity);
         // 查询当前版本内容
-        var version = formVersionMapper.selectOne(
-                new LambdaQueryWrapper<FormVersion>()
-                        .eq(FormVersion::getFormDefinitionId, id)
-                        .eq(FormVersion::getFormVersion, entity.getCurrentVersion())
-        );
+        var version = formVersionMapper.selectOne(new LambdaQueryWrapper<FormVersion>().eq(FormVersion::getFormDefinitionId, id)
+                .eq(FormVersion::getFormVersion, entity.getCurrentVersion()));
         if (version != null) {
             vo.setRuleJson(version.getRuleJson());
             vo.setOptionsJson(version.getOptionsJson());
@@ -149,10 +145,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
             throw new DataSaveException("删除表单定义失败");
         }
         // 级联删除版本
-        formVersionMapper.delete(
-                new LambdaQueryWrapper<FormVersion>()
-                        .eq(FormVersion::getFormDefinitionId, id)
-        );
+        formVersionMapper.delete(new LambdaQueryWrapper<FormVersion>().eq(FormVersion::getFormDefinitionId, id));
         log.info("删除表单定义及版本成功: id={}", id);
     }
 
@@ -185,21 +178,15 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
 
     @Override
     public List<FormVersionVO> getVersions(UUID id) {
-        var versions = formVersionMapper.selectList(
-                new LambdaQueryWrapper<FormVersion>()
-                        .eq(FormVersion::getFormDefinitionId, id)
-                        .orderByDesc(FormVersion::getFormVersion)
-        );
+        var versions = formVersionMapper
+                .selectList(new LambdaQueryWrapper<FormVersion>().eq(FormVersion::getFormDefinitionId, id).orderByDesc(FormVersion::getFormVersion));
         return versions.stream().map(formConverter::toVO).toList();
     }
 
     @Override
     public FormVersionVO getVersion(UUID id, Integer version) {
-        var entity = formVersionMapper.selectOne(
-                new LambdaQueryWrapper<FormVersion>()
-                        .eq(FormVersion::getFormDefinitionId, id)
-                        .eq(FormVersion::getFormVersion, version)
-        );
+        var entity = formVersionMapper
+                .selectOne(new LambdaQueryWrapper<FormVersion>().eq(FormVersion::getFormDefinitionId, id).eq(FormVersion::getFormVersion, version));
         if (entity == null) {
             throw new DataNotExistException("表单版本不存在");
         }

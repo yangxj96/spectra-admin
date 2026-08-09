@@ -69,13 +69,10 @@ public class StandardCacheKeyGenerator implements KeyGenerator {
     private String stableString(@Nullable Object param) {
         return switch (param) {
             case null -> "null";
-            case Collection<?> c -> c.stream()
-                    .map(String::valueOf)
-                    .sorted()
-                    .collect(Collectors.joining(","));
-            case Map<?, ?> map -> map.entrySet().stream()
-                    .sorted(Comparator.comparing(
-                            e -> String.valueOf(e.getKey())))
+            case Collection<?> c -> c.stream().map(String::valueOf).sorted().collect(Collectors.joining(","));
+            case Map<?, ?> map -> map.entrySet()
+                    .stream()
+                    .sorted(Comparator.comparing(e -> String.valueOf(e.getKey())))
                     .map(e -> e.getKey() + "=" + e.getValue())
                     .collect(Collectors.joining("&"));
             default -> String.valueOf(param);

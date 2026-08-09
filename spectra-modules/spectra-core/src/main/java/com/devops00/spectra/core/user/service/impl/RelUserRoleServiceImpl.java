@@ -60,37 +60,30 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
     @Override
     @Transactional
     public void revoke(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<RelUserRole>()
-                .eq(RelUserRole::getUserId, userId);
+        var wrapper = new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getUserId, userId);
         relUserRoleMapper.delete(wrapper);
     }
 
     @Override
     public void revoke(UUID userId, List<UUID> roleIds) {
-        var wrapper = new LambdaQueryWrapper<RelUserRole>()
-                .eq(RelUserRole::getUserId, userId)
-                .in(RelUserRole::getRoleId, roleIds);
+        var wrapper = new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getUserId, userId).in(RelUserRole::getRoleId, roleIds);
         relUserRoleMapper.delete(wrapper);
     }
 
     @Override
     public List<RelUserRole> getRelByRoleId(UUID roleId) {
-        var wrapper = new LambdaQueryWrapper<RelUserRole>()
-                .eq(RelUserRole::getRoleId, roleId);
+        var wrapper = new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getRoleId, roleId);
         return relUserRoleMapper.selectList(wrapper);
     }
 
     @Override
     public List<Role> getRoles(UUID userId) {
-        var wrapper = new LambdaQueryWrapper<RelUserRole>()
-                .eq(RelUserRole::getUserId, userId)
-                .isNull(RelUserRole::getDeleted);
+        var wrapper = new LambdaQueryWrapper<RelUserRole>().eq(RelUserRole::getUserId, userId).isNull(RelUserRole::getDeleted);
         List<RelUserRole> userRoles = relUserRoleMapper.selectList(wrapper);
         if (userRoles.isEmpty()) {
             return Collections.emptyList();
         }
-        return roleMapper.selectList(new LambdaQueryWrapper<Role>()
-                .in(Role::getId, userRoles.stream().map(RelUserRole::getRoleId).toList())
+        return roleMapper.selectList(new LambdaQueryWrapper<Role>().in(Role::getId, userRoles.stream().map(RelUserRole::getRoleId).toList())
                 .eq(Role::getState, Boolean.TRUE)
                 .isNull(Role::getDeleted));
     }

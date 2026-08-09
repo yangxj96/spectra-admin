@@ -71,24 +71,18 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
             authorityTreeVOS = new ArrayList<>();
         }
         from.setAuthorityIds(
-                TreeUtils.compressSelectedNodes(
-                        authorityTreeVOS,
-                        new HashSet<>(from.getAuthorityIds()),
-                        AuthorityTreeVO::getId
-                ).stream().toList()
-        );
+                TreeUtils.compressSelectedNodes(authorityTreeVOS, new HashSet<>(from.getAuthorityIds()), AuthorityTreeVO::getId).stream().toList());
         // 开始进入修改权限的具体执行方法
-        var currentIds = relRoleAuthorityMapper.getByRoleId(roleId)
-                .stream().map(RelRoleAuthority::getAuthorityId).collect(Collectors.toSet());
+        var currentIds = relRoleAuthorityMapper.getByRoleId(roleId).stream().map(RelRoleAuthority::getAuthorityId).collect(Collectors.toSet());
 
         var targetIds = new HashSet<>(from.getAuthorityIds());
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
         if (CollUtils.isNotEmpty(removeIds)) {
-            var wrapper = new LambdaQueryWrapper<RelRoleAuthority>()
-                    .eq(RelRoleAuthority::getRoleId, roleId)
-                    .in(RelRoleAuthority::getAuthorityId, removeIds);
+            var wrapper = new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getRoleId, roleId)
+                    .in(RelRoleAuthority::getAuthorityId,
+                            removeIds);
             relRoleAuthorityMapper.delete(wrapper);
         }
         // 计算新增且插入
@@ -96,10 +90,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         addIds.removeAll(currentIds); // target - current = 新增
         if (CollUtils.isNotEmpty(addIds)) {
             List<RelRoleAuthority> newRelations = addIds.stream()
-                    .map(addId -> RelRoleAuthority.builder()
-                            .roleId(roleId)
-                            .authorityId(addId)
-                            .build())
+                    .map(addId -> RelRoleAuthority.builder().roleId(roleId).authorityId(addId).build())
                     .collect(Collectors.toList());
             relRoleAuthorityMapper.insert(newRelations);
         }
@@ -121,10 +112,8 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     @Override
     public List<AuthorityVO> get(List<UUID> ids) {
-        List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.selectList(
-                new LambdaQueryWrapper<RelRoleAuthority>()
-                        .in(RelRoleAuthority::getRoleId, ids)
-        );
+        List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper
+                .selectList(new LambdaQueryWrapper<RelRoleAuthority>().in(RelRoleAuthority::getRoleId, ids));
         if (CollUtils.isEmpty(relRoleAuthorities)) {
             return new ArrayList<>();
         }

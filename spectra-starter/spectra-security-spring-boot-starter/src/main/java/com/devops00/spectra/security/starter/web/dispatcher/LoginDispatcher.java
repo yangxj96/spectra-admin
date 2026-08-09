@@ -46,27 +46,12 @@ public class LoginDispatcher {
     public Authentication authenticate(LoginFrom request) {
 
         return switch (request.getType()) {
-            case LoginType.PASSWORD -> authenticationManager.authenticate(
-                    new UsernamePasswordCaptchaAuthenticationToken(
-                            request.getUsername(),
-                            request.getPassword(),
-                            request.getCaptcha()
-                    )
-            );
+            case LoginType.PASSWORD -> authenticationManager
+                    .authenticate(new UsernamePasswordCaptchaAuthenticationToken(request.getUsername(), request.getPassword(), request.getCaptcha()));
 
-            case LoginType.SMS -> authenticationManager.authenticate(
-                    new SmsAuthenticationToken(
-                            request.getUsername(),
-                            request.getSmsCode()
-                    )
-            );
+            case LoginType.SMS -> authenticationManager.authenticate(new SmsAuthenticationToken(request.getUsername(), request.getSmsCode()));
 
-            case LoginType.EMAIL -> authenticationManager.authenticate(
-                    new EmailAuthenticationToken(
-                            request.getUsername(),
-                            request.getEmailCode()
-                    )
-            );
+            case LoginType.EMAIL -> authenticationManager.authenticate(new EmailAuthenticationToken(request.getUsername(), request.getEmailCode()));
 
             default -> throw new IllegalArgumentException("不支持的登录类型");
         };

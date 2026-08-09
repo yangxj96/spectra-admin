@@ -90,11 +90,7 @@ public class KaptchaServiceImpl implements KaptchaService {
         }
 
         // 存储到缓存中
-        redisTemplate.opsForValue().set(
-                RedisCacheKey.KAPTCHA + request.getSession().getId(),
-                code,
-                properties.getDuration()
-        );
+        redisTemplate.opsForValue().set(RedisCacheKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration());
 
         var out = response.getOutputStream();
         try (out) {

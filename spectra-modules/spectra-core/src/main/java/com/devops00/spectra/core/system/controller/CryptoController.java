@@ -59,9 +59,7 @@ public class CryptoController {
     @PreAuthorize("permitAll()")
     @GetMapping(value = "/config", version = "1.0.0+")
     public CryptoConfigVO getConfig() {
-        return new CryptoConfigVO(
-                cryptoKeyManager.isEnabled(),
-                cryptoKeyManager.getServerPublicKeyBase64());
+        return new CryptoConfigVO(cryptoKeyManager.isEnabled(), cryptoKeyManager.getServerPublicKeyBase64());
     }
 
     /// 获取客户端私钥（需登录）

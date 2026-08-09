@@ -51,6 +51,5 @@ public interface ApplicationConverter {
     ApplicationType toTypeEntity(ApplicationTypeSaveFrom source);
 
     /// 使用申请类型保存入参更新实体。
-    void updateTypeEntity(ApplicationTypeSaveFrom source,
-            @org.mapstruct.MappingTarget ApplicationType target);
+    void updateTypeEntity(ApplicationTypeSaveFrom source, @org.mapstruct.MappingTarget ApplicationType target);
 }

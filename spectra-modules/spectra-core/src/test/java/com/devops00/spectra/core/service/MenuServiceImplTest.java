@@ -88,11 +88,8 @@ class MenuServiceImplTest {
         var userMenu = menu(system.getId(), MenuType.MENU, "SystemUser", 1);
 
         when(relUserRoleService.getRoles(userId)).thenReturn(List.of(activeRoleA, inactiveRole, activeRoleB));
-        when(relRoleMenuMapper.selectList(any())).thenReturn(List.of(
-                new RelRoleMenu(activeRoleA.getId(), workflowMenu.getId()),
-                new RelRoleMenu(activeRoleB.getId(), workflowMenu.getId()),
-                new RelRoleMenu(activeRoleB.getId(), userMenu.getId())
-        ));
+        when(relRoleMenuMapper.selectList(any())).thenReturn(List.of(new RelRoleMenu(activeRoleA.getId(), workflowMenu.getId()),
+                new RelRoleMenu(activeRoleB.getId(), workflowMenu.getId()), new RelRoleMenu(activeRoleB.getId(), userMenu.getId())));
         when(menuMapper.selectList(any())).thenReturn(List.of(system, emptyRoot, workflow, workflowMenu, userMenu));
         when(menuConverter.toTreeVOList(any())).thenAnswer(invocation -> {
             List<Menu> menus = invocation.getArgument(0);
@@ -102,10 +99,8 @@ class MenuServiceImplTest {
         var result = service.current(userId);
 
         assertEquals(List.of(system.getId()), result.stream().map(MenuTreeVO::getId).toList());
-        assertEquals(List.of(userMenu.getId(), workflow.getId()),
-                result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
-        assertEquals(List.of(workflowMenu.getId()),
-                result.getFirst().getChildren().get(1).getChildren().stream().map(MenuTreeVO::getId).toList());
+        assertEquals(List.of(userMenu.getId(), workflow.getId()), result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
+        assertEquals(List.of(workflowMenu.getId()), result.getFirst().getChildren().get(1).getChildren().stream().map(MenuTreeVO::getId).toList());
         verify(relRoleMenuMapper).selectList(argThat(wrapper -> wrapper.getSqlSegment().contains("deleted")));
         verify(menuMapper).selectList(argThat(wrapper -> wrapper.getSqlSegment().contains("deleted")));
     }
@@ -231,10 +226,8 @@ class MenuServiceImplTest {
         var roleId = UUID.randomUUID();
         var directory = menu(null, MenuType.DIRECTORY, null, 0);
         var leaf = menu(directory.getId(), MenuType.MENU, "SystemUser", 0);
-        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of(
-                new RelRoleMenu(roleId, directory.getId()),
-                new RelRoleMenu(roleId, leaf.getId())
-        ));
+        when(relRoleMenuMapper.getByRoleId(roleId))
+                .thenReturn(List.of(new RelRoleMenu(roleId, directory.getId()), new RelRoleMenu(roleId, leaf.getId())));
         when(menuMapper.selectList(any())).thenReturn(List.of(directory, leaf));
 
         assertEquals(List.of(leaf), service.getByRelRoleId(roleId));

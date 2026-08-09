@@ -102,12 +102,12 @@ spectra-launch       → 应用入口，运行此模块
 
 ### 代码格式化与校验
 
-- 统一格式配置：`config/idea-code-style.xml`
+- 统一格式配置：`config/eclipse-java-formatter.xml`
 - Java 缩进：4 个空格，不使用 Tab
 - Java 右边距：150 列
 - Maven 格式化：`.\mvnw.cmd spotless:apply`
 - Maven 校验：`.\mvnw.cmd verify`
-- Spotless 使用 IDEA Formatter；如果 `idea` 不在 PATH 中，使用 `-Dspotless.idea.binaryPath` 指定 IDEA 可执行文件路径
+- Spotless 使用 Eclipse JDT Formatter，不依赖本机 IDEA 或其他 IDE 的可执行文件；IDEA 侧可导入同一份 Eclipse formatter XML 作为编辑器格式来源
 - 当前使用 `origin/master` 作为渐进校验基线；需要全量校验时使用 `-Dspotless.ratchetFrom=NONE`
 
 ## 测试

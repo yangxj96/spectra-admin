@@ -69,8 +69,7 @@ class RelUserRoleServiceImplTest {
         var userId = UUID.randomUUID();
         var role = new Role();
         role.setId(UUID.randomUUID());
-        when(relUserRoleMapper.selectList(any())).thenReturn(List.of(
-                RelUserRole.builder().userId(userId).roleId(role.getId()).build()));
+        when(relUserRoleMapper.selectList(any())).thenReturn(List.of(RelUserRole.builder().userId(userId).roleId(role.getId()).build()));
         when(roleMapper.selectList(any())).thenReturn(List.of(role));
 
         assertEquals(List.of(role), service.getRoles(userId));

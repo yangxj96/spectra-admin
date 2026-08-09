@@ -24,8 +24,7 @@ import java.lang.annotation.Target;
 
 /// 接口加解密标记
 ///
-/// 标记在 Controller 类或方法上，控制是否需要加密响应/解密请求。
-/// 方法级注解优先级高于类级注解。
+/// 标记在 Controller 类或方法上，控制是否需要加密响应/解密请求。 方法级注解优先级高于类级注解。
 ///
 /// @author yangxj96
 /// @version 1.0

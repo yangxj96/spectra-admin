@@ -150,12 +150,12 @@ public class ULogAspect {
         }
         // 依旧干净地过滤掉无法打包的 Web 核心基础对象
         return Arrays.stream(args)
-                .filter(arg -> arg != null && !(
-                        arg instanceof MultipartFile
-                                || arg instanceof HttpServletRequest
-                                || arg instanceof HttpServletResponse
-                                || arg instanceof org.springframework.validation.BindingResult
-                )).toArray();
+                .filter(arg -> arg != null
+                    && !(arg instanceof MultipartFile
+                        || arg instanceof HttpServletRequest
+                        || arg instanceof HttpServletResponse
+                        || arg instanceof org.springframework.validation.BindingResult))
+                .toArray();
     }
 
     /// 防御性提纯响应返回值，防止大对象溢出

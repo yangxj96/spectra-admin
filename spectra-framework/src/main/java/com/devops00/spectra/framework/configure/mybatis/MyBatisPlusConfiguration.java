@@ -66,8 +66,7 @@ public class MyBatisPlusConfiguration {
         // 数据权限必须先于分页插件处理原始查询。PaginationInnerInterceptor
         // 会在 willDoQuery 阶段生成 count SQL；若顺序反过来，count 查询会
         // 先执行而绕过数据权限谓词，导致分页总数发生越权。
-        var dataPermissionInterceptor = new DataPermissionInterceptor(
-                new DataScopeInnerInterceptor(dataScopeProvider, dataScopeEntityRegistry));
+        var dataPermissionInterceptor = new DataPermissionInterceptor(new DataScopeInnerInterceptor(dataScopeProvider, dataScopeEntityRegistry));
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);

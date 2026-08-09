@@ -39,8 +39,8 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException,
-            IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+            throws ServletException, IOException {
         String token = SecUtil.getCurrentToken();
         if (StrUtils.isNotBlank(token)) {
             SecurityUser user = SecUtil.getCurrentUser(token);

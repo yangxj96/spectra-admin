@@ -22,5 +22,6 @@ package com.devops00.spectra.framework.configure.kaptcha.enums;
 /// @version 1.0
 /// @since 2025/7/25 00:00
 public enum KaptchaType {
-    CHAT, MATH
+    CHAT,
+    MATH
 }

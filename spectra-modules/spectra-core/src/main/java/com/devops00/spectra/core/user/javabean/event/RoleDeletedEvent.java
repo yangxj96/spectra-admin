@@ -25,6 +25,5 @@ import java.util.UUID;
 /// @since 2025/11/11 00:00
 public record RoleDeletedEvent(
         /// 角色 ID。
-        UUID roleId
-) {
+        UUID roleId) {
 }

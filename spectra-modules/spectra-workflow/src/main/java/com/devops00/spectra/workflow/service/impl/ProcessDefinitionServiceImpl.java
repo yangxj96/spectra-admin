@@ -63,9 +63,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public ProcessDefinitionVO getDetail(String id) {
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(id)
-                .singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
         if (definition == null) {
             throw new DataNotExistException("流程定义不存在: " + id);
         }
@@ -74,9 +72,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public byte[] getDiagram(String id) {
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(id)
-                .singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
         if (definition == null) {
             throw new DataNotExistException("流程定义不存在: " + id);
         }
@@ -86,13 +82,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new DataNotExistException("无法获取流程模型: " + id);
         }
 
-        try (var diagramStream = processDiagramGenerator.generateDiagram(
-                model, "png",
-                Collections.emptyList(),
-                Collections.emptyList(),
-                "宋体", "宋体", "宋体",
-                this.getClass().getClassLoader(),
-                1.0, false)) {
+        try (var diagramStream = processDiagramGenerator.generateDiagram(model, "png", Collections.emptyList(), Collections.emptyList(), "宋体", "宋体",
+                "宋体", this.getClass().getClassLoader(), 1.0, false)) {
             if (diagramStream == null) {
                 throw new DataException("无法生成流程图: " + id);
             }
@@ -116,19 +107,15 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public ProcessDefinitionResourceVO getResource(String id) {
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(id)
-                .singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(id).singleResult();
         if (definition == null) {
             throw new DataNotExistException("流程定义不存在: " + id);
         }
-        try (var resource = repositoryService.getResourceAsStream(
-                definition.getDeploymentId(), definition.getResourceName())) {
+        try (var resource = repositoryService.getResourceAsStream(definition.getDeploymentId(), definition.getResourceName())) {
             if (resource == null) {
                 throw new DataNotExistException("无法获取流程资源: " + id);
             }
-            return new ProcessDefinitionResourceVO(
-                    new String(resource.readAllBytes(), StandardCharsets.UTF_8));
+            return new ProcessDefinitionResourceVO(new String(resource.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new DataException("读取流程资源失败: " + e.getMessage());
         }
@@ -151,19 +138,13 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             bpmnXml = bpmnXml.substring(1);
         }
         bpmnXml = bpmnXml.strip();
-        var deployment = deploymentBuilder
-                .addString("process.bpmn20.xml", bpmnXml)
-                .deploy();
+        var deployment = deploymentBuilder.addString("process.bpmn20.xml", bpmnXml).deploy();
 
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .deploymentId(deployment.getId())
-                .latestVersion()
-                .singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().deploymentId(deployment.getId()).latestVersion().singleResult();
         if (definition == null) {
             throw new DataException("部署成功但无法查询到流程定义");
         }
-        log.info("流程定义部署成功: id={}, key={}, version={}",
-                definition.getId(), definition.getKey(), definition.getVersion());
+        log.info("流程定义部署成功: id={}, key={}, version={}", definition.getId(), definition.getKey(), definition.getVersion());
         return assembleView(definition);
     }
 
@@ -172,9 +153,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         var vo = processConverter.toVO(definition);
         // 填充部署时间
         if (definition.getDeploymentId() != null) {
-            var deployment = repositoryService.createDeploymentQuery()
-                    .deploymentId(definition.getDeploymentId())
-                    .singleResult();
+            var deployment = repositoryService.createDeploymentQuery().deploymentId(definition.getDeploymentId()).singleResult();
             if (deployment != null && deployment.getDeploymentTime() != null) {
                 vo.setDeploymentTime(timeMapper.toLocalDateTime(deployment.getDeploymentTime()));
             }

@@ -85,36 +85,25 @@ class SystemControllerTest {
         root.setCode("*");
         authorityService.save(root);
 
-        List<Authority> children = List.of(
-                newAuthority("菜单权限", "MENU:*", root.getId()),
-                newAuthority("字典管理", "DICT:*", root.getId()),
-                newAuthority("部门管理", "DEPT:*", root.getId()),
-                newAuthority("用户管理", "USER:*", root.getId())
-        );
+        List<Authority> children = List.of(newAuthority("菜单权限", "MENU:*", root.getId()), newAuthority("字典管理", "DICT:*", root.getId()),
+                newAuthority("部门管理", "DEPT:*", root.getId()), newAuthority("用户管理", "USER:*", root.getId()));
 
         authorityService.saveBatch(children);
 
         // 3️⃣ 子权限的操作权限（第二层子节点）
-        Map<String, Authority> map = children.stream()
-                .collect(Collectors.toMap(Authority::getName, Function.identity()));
+        Map<String, Authority> map = children.stream().collect(Collectors.toMap(Authority::getName, Function.identity()));
 
-        List<Authority> ops = List.of(
-                newAuthority("菜单新增", "MENU:INSERT", map.get("菜单权限").getId()),
-                newAuthority("菜单修改", "MENU:UPDATE", map.get("菜单权限").getId()),
-                newAuthority("菜单删除", "MENU:DELETE", map.get("菜单权限").getId()),
+        List<Authority> ops = List.of(newAuthority("菜单新增", "MENU:INSERT", map.get("菜单权限").getId()),
+                newAuthority("菜单修改", "MENU:UPDATE", map.get("菜单权限").getId()), newAuthority("菜单删除", "MENU:DELETE", map.get("菜单权限").getId()),
 
-                newAuthority("字典新增", "DICT:INSERT", map.get("字典管理").getId()),
-                newAuthority("字典删除", "DICT:DELETE", map.get("字典管理").getId()),
+                newAuthority("字典新增", "DICT:INSERT", map.get("字典管理").getId()), newAuthority("字典删除", "DICT:DELETE", map.get("字典管理").getId()),
                 newAuthority("字典修改", "DICT:UPDATE", map.get("字典管理").getId()),
 
-                newAuthority("部门新增", "DEPT:INSERT", map.get("部门管理").getId()),
-                newAuthority("部门删除", "DEPT:DELETE", map.get("部门管理").getId()),
+                newAuthority("部门新增", "DEPT:INSERT", map.get("部门管理").getId()), newAuthority("部门删除", "DEPT:DELETE", map.get("部门管理").getId()),
                 newAuthority("部门修改", "DEPT:UPDATE", map.get("部门管理").getId()),
 
-                newAuthority("用户新增", "USER:INSERT", map.get("用户管理").getId()),
-                newAuthority("用户删除", "USER:DELETE", map.get("用户管理").getId()),
-                newAuthority("用户修改", "USER:UPDATE", map.get("用户管理").getId())
-        );
+                newAuthority("用户新增", "USER:INSERT", map.get("用户管理").getId()), newAuthority("用户删除", "USER:DELETE", map.get("用户管理").getId()),
+                newAuthority("用户修改", "USER:UPDATE", map.get("用户管理").getId()));
 
         authorityService.saveBatch(ops);
     }
@@ -122,12 +111,8 @@ class SystemControllerTest {
     /// 初始化角色
     @Test
     void initRoles() {
-        var roles = List.of(
-                newRole("运维管理员", "ROLE_DEV_OPS"),
-                newRole("系统管理员", "ROLE_ADMIN_SYSTEM"),
-                newRole("用户", "ROLE_USER"),
-                newRole("审计员", "ROLE_AUDIT")
-        );
+        var roles = List.of(newRole("运维管理员", "ROLE_DEV_OPS"), newRole("系统管理员", "ROLE_ADMIN_SYSTEM"), newRole("用户", "ROLE_USER"),
+                newRole("审计员", "ROLE_AUDIT"));
         roleService.saveBatch(roles);
     }
 
@@ -143,16 +128,13 @@ class SystemControllerTest {
     /// 初始化菜单
     @Test
     void initMenus() {
-        var roots = List.of(
-                newMenu(null, "首页", "icon-home", MenuType.MENU, "Dashboard", 0),
+        var roots = List.of(newMenu(null, "首页", "icon-home", MenuType.MENU, "Dashboard", 0),
                 newMenu(null, "系统监控", "icon-setting", MenuType.DIRECTORY, null, 2),
                 newMenu(null, "组件示例", "icon-setting", MenuType.DIRECTORY, null, 3),
-                newMenu(null, "系统管理", "icon-setting", MenuType.DIRECTORY, null, 4)
-        );
+                newMenu(null, "系统管理", "icon-setting", MenuType.DIRECTORY, null, 4));
         menuService.saveBatch(roots);
 
-        Map<String, Menu> map = roots.stream()
-                .collect(Collectors.toMap(Menu::getName, Function.identity()));
+        Map<String, Menu> map = roots.stream().collect(Collectors.toMap(Menu::getName, Function.identity()));
 
         var ops = List.of(
                 // 系统监控
@@ -174,8 +156,7 @@ class SystemControllerTest {
                 newMenu(map.get("系统管理").getId(), "字典管理", "icon-module", MenuType.MENU, "SystemDict", 0),
                 newMenu(map.get("系统管理").getId(), "行政区划", "icon-module", MenuType.MENU, "SystemRegion", 0),
                 newMenu(map.get("系统管理").getId(), "菜单管理", "icon-module", MenuType.MENU, "SystemMenu", 0),
-                newMenu(map.get("系统管理").getId(), "访问控制", "icon-module", MenuType.MENU, "SystemRBAC", 0)
-        );
+                newMenu(map.get("系统管理").getId(), "访问控制", "icon-module", MenuType.MENU, "SystemRBAC", 0));
 
         menuService.saveBatch(ops);
     }
@@ -184,31 +165,18 @@ class SystemControllerTest {
     void initRelRoleMenu() {
         var p = new RoleMenuFrom();
         p.setRoleId(UUID.fromString("019bdfad-ded6-731e-b27f-c4e7ca7b0d9d"));
-        p.setMenuIds(List.of(
-                UUID.fromString("019bdfc5-b220-7bd9-80d1-1a1db193c151"),
-                UUID.fromString("019bdfc5-b31f-7020-b678-35fae63c432c"),
-                UUID.fromString("019bdfc5-b328-7de0-9e8c-2ac0cc51969e"),
-                UUID.fromString("019bdfc5-b32a-7c31-bbff-3992be5fff64"),
-                UUID.fromString("019bdfc5-b32c-74e9-90ac-0540954c4e4a"),
-                UUID.fromString("019bdfc5-b347-75c0-bcac-98ed9e44cf93"),
-                UUID.fromString("019bdfc5-b34b-7619-8f37-b052e64e4e27"),
-                UUID.fromString("019bdfc5-b34d-74fd-8ad8-f2f7976634d1"),
-                UUID.fromString("019bdfc5-b350-7168-84d6-ffaaf874b6fc"),
-                UUID.fromString("019bdfc5-b352-7d24-b5af-8d0a0042a4f9"),
-                UUID.fromString("019bdfc5-b355-701e-99f2-7012b17490de"),
-                UUID.fromString("019bdfc5-b358-7794-adf1-b5cc9a3d5883"),
-                UUID.fromString("019bdfc5-b35a-7d3d-bf74-f903a795d7cd"),
-                UUID.fromString("019bdfc5-b35c-76f0-b622-34e11d75dd27"),
-                UUID.fromString("019bdfc5-b35d-7a55-b441-38f77a88036a"),
-                UUID.fromString("019bdfc5-b35e-71a2-9b71-c5ab8900f08f"),
-                UUID.fromString("019bdfc5-b35f-74b6-abe3-3816db511129"),
-                UUID.fromString("019bdfc5-b362-70a0-8cbd-53f96e96c64c"),
-                UUID.fromString("019bdfc5-b363-750f-8cd2-010b659463a8"),
-                UUID.fromString("019bdfc5-b365-7a12-b646-3a5c922bd6f9"),
-                UUID.fromString("019bdfc5-b367-7e26-9c50-620660e13019"),
-                UUID.fromString("019bdfc5-b36a-7700-b8c3-7c251f1f79a2"),
-                UUID.fromString("019bdfc5-b36d-72df-b7a7-6c82d9199988"),
-                UUID.fromString("019bdfc5-b36f-7e70-a79d-09c5facdf296"),
+        p.setMenuIds(List.of(UUID.fromString("019bdfc5-b220-7bd9-80d1-1a1db193c151"), UUID.fromString("019bdfc5-b31f-7020-b678-35fae63c432c"),
+                UUID.fromString("019bdfc5-b328-7de0-9e8c-2ac0cc51969e"), UUID.fromString("019bdfc5-b32a-7c31-bbff-3992be5fff64"),
+                UUID.fromString("019bdfc5-b32c-74e9-90ac-0540954c4e4a"), UUID.fromString("019bdfc5-b347-75c0-bcac-98ed9e44cf93"),
+                UUID.fromString("019bdfc5-b34b-7619-8f37-b052e64e4e27"), UUID.fromString("019bdfc5-b34d-74fd-8ad8-f2f7976634d1"),
+                UUID.fromString("019bdfc5-b350-7168-84d6-ffaaf874b6fc"), UUID.fromString("019bdfc5-b352-7d24-b5af-8d0a0042a4f9"),
+                UUID.fromString("019bdfc5-b355-701e-99f2-7012b17490de"), UUID.fromString("019bdfc5-b358-7794-adf1-b5cc9a3d5883"),
+                UUID.fromString("019bdfc5-b35a-7d3d-bf74-f903a795d7cd"), UUID.fromString("019bdfc5-b35c-76f0-b622-34e11d75dd27"),
+                UUID.fromString("019bdfc5-b35d-7a55-b441-38f77a88036a"), UUID.fromString("019bdfc5-b35e-71a2-9b71-c5ab8900f08f"),
+                UUID.fromString("019bdfc5-b35f-74b6-abe3-3816db511129"), UUID.fromString("019bdfc5-b362-70a0-8cbd-53f96e96c64c"),
+                UUID.fromString("019bdfc5-b363-750f-8cd2-010b659463a8"), UUID.fromString("019bdfc5-b365-7a12-b646-3a5c922bd6f9"),
+                UUID.fromString("019bdfc5-b367-7e26-9c50-620660e13019"), UUID.fromString("019bdfc5-b36a-7700-b8c3-7c251f1f79a2"),
+                UUID.fromString("019bdfc5-b36d-72df-b7a7-6c82d9199988"), UUID.fromString("019bdfc5-b36f-7e70-a79d-09c5facdf296"),
                 UUID.fromString("019bdfc5-b370-70ca-a33c-25044878eeda")
 
         ));
@@ -217,62 +185,44 @@ class SystemControllerTest {
 
     @Test
     void initDictGroup() {
-        var roots = List.of(
-                newDictGroup(null, "系统配置", "sys"),
-                newDictGroup(null, "OA相关", "oa")
-        );
+        var roots = List.of(newDictGroup(null, "系统配置", "sys"), newDictGroup(null, "OA相关", "oa"));
 
         dictGroupService.saveBatch(roots);
 
-        Map<String, DictGroup> map = roots.stream()
-                .collect(Collectors.toMap(DictGroup::getName, Function.identity()));
+        Map<String, DictGroup> map = roots.stream().collect(Collectors.toMap(DictGroup::getName, Function.identity()));
 
         var ops = List.of(
                 // OA相关
                 newDictGroup(map.get("OA相关").getId(), "流程分类", "dict_workflow_type"),
                 // 系统配置
-                newDictGroup(map.get("系统配置").getId(), "用户状态", "sys_user_state"),
-                newDictGroup(map.get("系统配置").getId(), "通用状态", "sys_common_state"),
+                newDictGroup(map.get("系统配置").getId(), "用户状态", "sys_user_state"), newDictGroup(map.get("系统配置").getId(), "通用状态", "sys_common_state"),
                 newDictGroup(map.get("系统配置").getId(), "组织机构类型", "sys_organization_type"),
-                newDictGroup(map.get("系统配置").getId(), "用户性别", "sys_user_gender"),
-                newDictGroup(map.get("系统配置").getId(), "时区", "sys_timezone"),
-                newDictGroup(map.get("系统配置").getId(), "语言", "sys_language"),
-                newDictGroup(map.get("系统配置").getId(), "邮箱后缀", "sys_email_suffix"),
-                newDictGroup(map.get("系统配置").getId(), "水印类型", "sys_watermark")
-        );
+                newDictGroup(map.get("系统配置").getId(), "用户性别", "sys_user_gender"), newDictGroup(map.get("系统配置").getId(), "时区", "sys_timezone"),
+                newDictGroup(map.get("系统配置").getId(), "语言", "sys_language"), newDictGroup(map.get("系统配置").getId(), "邮箱后缀", "sys_email_suffix"),
+                newDictGroup(map.get("系统配置").getId(), "水印类型", "sys_watermark"));
 
         dictGroupService.saveBatch(ops);
     }
 
     @Test
     void initDictItem() {
-        var groupMap = dictGroupService.list()
-                .stream()
-                .collect(Collectors.toMap(DictGroup::getName, e -> e));
+        var groupMap = dictGroupService.list().stream().collect(Collectors.toMap(DictGroup::getName, e -> e));
         var ops = List.of(
                 // 流程分类
-                newDictItem(groupMap.get("流程分类").getId(), "财务", "0"),
-                newDictItem(groupMap.get("流程分类").getId(), "人事", "1"),
+                newDictItem(groupMap.get("流程分类").getId(), "财务", "0"), newDictItem(groupMap.get("流程分类").getId(), "人事", "1"),
                 // 用户状态
-                newDictItem(groupMap.get("用户状态").getId(), "正常", "0"),
-                newDictItem(groupMap.get("用户状态").getId(), "冻结", "1"),
+                newDictItem(groupMap.get("用户状态").getId(), "正常", "0"), newDictItem(groupMap.get("用户状态").getId(), "冻结", "1"),
                 newDictItem(groupMap.get("用户状态").getId(), "封禁", "2"),
                 // 通用状态
-                newDictItem(groupMap.get("通用状态").getId(), "启用", "0"),
-                newDictItem(groupMap.get("通用状态").getId(), "禁用", "1"),
+                newDictItem(groupMap.get("通用状态").getId(), "启用", "0"), newDictItem(groupMap.get("通用状态").getId(), "禁用", "1"),
                 // 组织机构类型
-                newDictItem(groupMap.get("组织机构类型").getId(), "系统运维", "0"),
-                newDictItem(groupMap.get("组织机构类型").getId(), "集团总部", "1"),
-                newDictItem(groupMap.get("组织机构类型").getId(), "省级公司", "2"),
-                newDictItem(groupMap.get("组织机构类型").getId(), "市级公司", "3"),
-                newDictItem(groupMap.get("组织机构类型").getId(), "县级公司", "4"),
-                newDictItem(groupMap.get("组织机构类型").getId(), "部门", "5"),
+                newDictItem(groupMap.get("组织机构类型").getId(), "系统运维", "0"), newDictItem(groupMap.get("组织机构类型").getId(), "集团总部", "1"),
+                newDictItem(groupMap.get("组织机构类型").getId(), "省级公司", "2"), newDictItem(groupMap.get("组织机构类型").getId(), "市级公司", "3"),
+                newDictItem(groupMap.get("组织机构类型").getId(), "县级公司", "4"), newDictItem(groupMap.get("组织机构类型").getId(), "部门", "5"),
                 newDictItem(groupMap.get("组织机构类型").getId(), "科室/小组", "6"),
                 // 用户性别
-                newDictItem(groupMap.get("用户性别").getId(), "未知", "1"),
-                newDictItem(groupMap.get("用户性别").getId(), "男性", "2"),
-                newDictItem(groupMap.get("用户性别").getId(), "女性", "3"),
-                newDictItem(groupMap.get("用户性别").getId(), "人妖", "4"),
+                newDictItem(groupMap.get("用户性别").getId(), "未知", "1"), newDictItem(groupMap.get("用户性别").getId(), "男性", "2"),
+                newDictItem(groupMap.get("用户性别").getId(), "女性", "3"), newDictItem(groupMap.get("用户性别").getId(), "人妖", "4"),
                 newDictItem(groupMap.get("用户性别").getId(), "沃尔玛塑料袋", "5"),
                 // 时区
                 newDictItem(groupMap.get("时区").getId(), "国际日期变更线西", "Etc/GMT+12"),
@@ -285,38 +235,26 @@ class SystemControllerTest {
                 newDictItem(groupMap.get("时区").getId(), "美国东部时间", "America/New_York"),
                 newDictItem(groupMap.get("时区").getId(), "大西洋时间", "America/Halifax"),
                 newDictItem(groupMap.get("时区").getId(), "巴西时间（圣保罗）", "America/Sao_Paulo"),
-                newDictItem(groupMap.get("时区").getId(), "亚速尔群岛时间", "Atlantic/Azores"),
-                newDictItem(groupMap.get("时区").getId(), "协调世界时", "UTC"),
+                newDictItem(groupMap.get("时区").getId(), "亚速尔群岛时间", "Atlantic/Azores"), newDictItem(groupMap.get("时区").getId(), "协调世界时", "UTC"),
                 newDictItem(groupMap.get("时区").getId(), "中欧时间（柏林）", "Europe/Berlin"),
                 newDictItem(groupMap.get("时区").getId(), "东欧时间（雅典）", "Europe/Athens"),
-                newDictItem(groupMap.get("时区").getId(), "莫斯科时间", "Europe/Moscow"),
-                newDictItem(groupMap.get("时区").getId(), "印度标准时间", "Asia/Kolkata"),
+                newDictItem(groupMap.get("时区").getId(), "莫斯科时间", "Europe/Moscow"), newDictItem(groupMap.get("时区").getId(), "印度标准时间", "Asia/Kolkata"),
                 newDictItem(groupMap.get("时区").getId(), "中国标准时间(北京时间)", "Asia/Shanghai"),
                 newDictItem(groupMap.get("时区").getId(), "日本标准时间", "Asia/Tokyo"),
                 newDictItem(groupMap.get("时区").getId(), "澳大利亚东部时间", "Australia/Sydney"),
                 // 语言
-                newDictItem(groupMap.get("语言").getId(), "中文（简体）", "zh-CN"),
-                newDictItem(groupMap.get("语言").getId(), "中文（繁体）", "zh-TW"),
-                newDictItem(groupMap.get("语言").getId(), "英语", "en"),
-                newDictItem(groupMap.get("语言").getId(), "日语", "ja"),
-                newDictItem(groupMap.get("语言").getId(), "韩语", "ko"),
-                newDictItem(groupMap.get("语言").getId(), "法语", "fr"),
-                newDictItem(groupMap.get("语言").getId(), "德语", "de"),
-                newDictItem(groupMap.get("语言").getId(), "西班牙语", "es"),
-                newDictItem(groupMap.get("语言").getId(), "俄语", "ru"),
-                newDictItem(groupMap.get("语言").getId(), "葡萄牙语", "pt"),
-                newDictItem(groupMap.get("语言").getId(), "意大利语", "it"),
-                newDictItem(groupMap.get("语言").getId(), "阿拉伯语", "ar"),
+                newDictItem(groupMap.get("语言").getId(), "中文（简体）", "zh-CN"), newDictItem(groupMap.get("语言").getId(), "中文（繁体）", "zh-TW"),
+                newDictItem(groupMap.get("语言").getId(), "英语", "en"), newDictItem(groupMap.get("语言").getId(), "日语", "ja"),
+                newDictItem(groupMap.get("语言").getId(), "韩语", "ko"), newDictItem(groupMap.get("语言").getId(), "法语", "fr"),
+                newDictItem(groupMap.get("语言").getId(), "德语", "de"), newDictItem(groupMap.get("语言").getId(), "西班牙语", "es"),
+                newDictItem(groupMap.get("语言").getId(), "俄语", "ru"), newDictItem(groupMap.get("语言").getId(), "葡萄牙语", "pt"),
+                newDictItem(groupMap.get("语言").getId(), "意大利语", "it"), newDictItem(groupMap.get("语言").getId(), "阿拉伯语", "ar"),
                 newDictItem(groupMap.get("语言").getId(), "印地语", "hi"),
                 // 邮箱后缀
-                newDictItem(groupMap.get("邮箱后缀").getId(), "devops", "devops00.com"),
-                newDictItem(groupMap.get("邮箱后缀").getId(), "谷歌邮箱", "gmail.com"),
-                newDictItem(groupMap.get("邮箱后缀").getId(), "QQ邮箱", "qq.com"),
-                newDictItem(groupMap.get("邮箱后缀").getId(), "微软hotmail", "hotmail.com"),
+                newDictItem(groupMap.get("邮箱后缀").getId(), "devops", "devops00.com"), newDictItem(groupMap.get("邮箱后缀").getId(), "谷歌邮箱", "gmail.com"),
+                newDictItem(groupMap.get("邮箱后缀").getId(), "QQ邮箱", "qq.com"), newDictItem(groupMap.get("邮箱后缀").getId(), "微软hotmail", "hotmail.com"),
                 // 水印类型
-                newDictItem(groupMap.get("水印类型").getId(), "系统生成", "1"),
-                newDictItem(groupMap.get("水印类型").getId(), "固定值", "2")
-        );
+                newDictItem(groupMap.get("水印类型").getId(), "系统生成", "1"), newDictItem(groupMap.get("水印类型").getId(), "固定值", "2"));
 
         for (DictItem op : ops) {
             if (op.getGid() != null) {

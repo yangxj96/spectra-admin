@@ -106,8 +106,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                 if (participant == null) {
                     continue;
                 }
-                addParticipant(entity, participantId,
-                        StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
+                addParticipant(entity, participantId, StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
                         participant.getDepartmentId(), "pending");
                 receivers.add(participantId);
             }
@@ -182,8 +181,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (meeting == null || !userId.toString().equals(meeting.getInitiatorId())) {
             throw new DataNotExistException("只有会议发起人可以维护纪要");
         }
-        var record = recordMapper.selectOne(new LambdaQueryWrapper<MeetingRecord>()
-                .eq(MeetingRecord::getMeetingId, meetingId));
+        var record = recordMapper.selectOne(new LambdaQueryWrapper<MeetingRecord>().eq(MeetingRecord::getMeetingId, meetingId));
         if (record == null) {
             record = new MeetingRecord();
             record.setMeetingId(meetingId);
@@ -211,11 +209,14 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (!StringUtils.hasText(entity.getLocation())) {
             return false;
         }
-        var candidates = this.list(new LambdaQueryWrapper<Meeting>()
-                .eq(Meeting::getLocation, entity.getLocation())
-                .ne(Meeting::getStatus, com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
-        return candidates.stream().anyMatch(item -> item.getStartTime() != null && item.getEndTime() != null
-                && start.isBefore(item.getEndTime()) && end.isAfter(item.getStartTime()));
+        var candidates = this.list(new LambdaQueryWrapper<Meeting>().eq(Meeting::getLocation, entity.getLocation())
+                .ne(Meeting::getStatus,
+                        com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
+        return candidates.stream()
+                .anyMatch(item -> item.getStartTime() != null
+                    && item.getEndTime() != null
+                    && start.isBefore(item.getEndTime())
+                    && end.isAfter(item.getStartTime()));
     }
 
     private Instant parse(String value) {

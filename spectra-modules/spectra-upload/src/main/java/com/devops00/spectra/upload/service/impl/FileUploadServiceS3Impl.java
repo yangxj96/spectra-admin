@@ -160,14 +160,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
                     .contentType(file.getContentType())
                     .build();
 
-            s3Client.putObject(
-                    putObjectRequest,
-                    RequestBody
-                            .fromInputStream(
-                                    file.getInputStream(),
-                                    file.getSize()
-                            )
-            );
+            s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         } catch (IOException e) {
             throw new FileUploadException("S3单文件上传失败");
         }
@@ -278,9 +271,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
             String s3UploadId = getS3UploadIdFromTask(task);
 
             // 4. 发起远程 S3 端的合拢
-            CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder()
-                    .parts(completedParts)
-                    .build();
+            CompletedMultipartUpload completedMultipartUpload = CompletedMultipartUpload.builder().parts(completedParts).build();
 
             CompleteMultipartUploadRequest completeMultipartUploadRequest = CompleteMultipartUploadRequest.builder()
                     .bucket(s3Properties.getBucket())
@@ -323,10 +314,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         HttpServletResponse response = attributes.getResponse();
 
         // 302 重定向架构核心：内存计算安全的短效授权链接
-        GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-                .bucket(s3Properties.getBucket())
-                .key(file.getFilename())
-                .build();
+        GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(s3Properties.getBucket()).key(file.getFilename()).build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
                 // 10分钟后该链接自动失效
@@ -345,8 +333,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
     @Override
     public InputStream openStream(FileInfo fileInfo) {
-        log.debug("{} 开始获取 S3 文件流, 文件ID: {}, 存储Key: {}",
-                LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
+        log.debug("{} 开始获取 S3 文件流, 文件ID: {}, 存储Key: {}", LogPrefix.STORAGE.p(), fileInfo.getId(), fileInfo.getFilename());
         try {
             // 1. 构建 S3 获取对象的请求
             GetObjectRequest getObjectRequest = GetObjectRequest.builder()
@@ -374,9 +361,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         }
         HttpServletResponse response = attributes.getResponse();
 
-        String encodedFilename = java.net.URLEncoder
-                .encode(file.getOriginalName(), java.nio.charset.StandardCharsets.UTF_8)
-                .replaceAll("\\+", "%20");
+        String encodedFilename = java.net.URLEncoder.encode(file.getOriginalName(), java.nio.charset.StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getBucket())

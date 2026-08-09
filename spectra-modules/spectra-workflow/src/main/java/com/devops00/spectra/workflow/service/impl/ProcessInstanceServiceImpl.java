@@ -60,20 +60,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     public String start(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
         try {
             // 1. 防重复启动
-            long count = runtimeService.createProcessInstanceQuery()
-                    .processInstanceBusinessKey(businessKey)
-                    .count();
+            long count = runtimeService.createProcessInstanceQuery().processInstanceBusinessKey(businessKey).count();
 
             if (count > 0) {
                 throw new DataException("流程已存在: " + businessKey);
             }
 
             // 2. 启动流程
-            ProcessInstance instance = runtimeService.startProcessInstanceByKey(
-                    processDefinitionKey,
-                    businessKey,
-                    variables
-            );
+            ProcessInstance instance = runtimeService.startProcessInstanceByKey(processDefinitionKey, businessKey, variables);
 
             log.info("流程已启动: processInstanceId={}, businessKey={}", instance.getId(), businessKey);
             return instance.getId();
@@ -85,9 +79,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public ProcessInstanceVO getStatus(String processInstanceId) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (instance == null) {
             throw new DataNotExistException("流程实例不存在: " + processInstanceId);
@@ -98,9 +90,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public Map<String, Object> getVariables(String processInstanceId) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (instance == null) {
             throw new DataNotExistException("流程实例不存在: " + processInstanceId);
@@ -111,17 +101,14 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public void terminate(String processInstanceId, String reason) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (instance == null) {
             log.info("流程实例已结束，无需重复终止: processInstanceId={}, reason={}", processInstanceId, reason);
             return;
         }
 
-        var definition = repositoryService.createProcessDefinitionQuery()
-                .processDefinitionId(instance.getProcessDefinitionId()).singleResult();
+        var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(instance.getProcessDefinitionId()).singleResult();
         runtimeService.deleteProcessInstance(processInstanceId, reason);
         if (definition != null) {
             ApprovalCallback callback = workflowService.getCallback(definition.getKey());
@@ -134,9 +121,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     @Override
     public byte[] getDiagram(String processInstanceId) {
-        ProcessInstance instance = runtimeService.createProcessInstanceQuery()
-                .processInstanceId(processInstanceId)
-                .singleResult();
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (instance == null) {
             throw new DataNotExistException("流程实例不存在: " + processInstanceId);
@@ -152,13 +137,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         }
 
         // 使用 ProcessDiagramGenerator 生成流程图（高亮当前节点）
-        try (var diagramStream = processDiagramGenerator.generateDiagram(
-                model, "png",
-                activeActivityIds,
-                Collections.emptyList(),
-                "宋体", "宋体", "宋体",
-                this.getClass().getClassLoader(),
-                1.0, false)) {
+        try (var diagramStream = processDiagramGenerator.generateDiagram(model, "png", activeActivityIds, Collections.emptyList(), "宋体", "宋体", "宋体",
+                this.getClass().getClassLoader(), 1.0, false)) {
             if (diagramStream == null) {
                 throw new DataException("无法生成流程图: " + processInstanceId);
             }

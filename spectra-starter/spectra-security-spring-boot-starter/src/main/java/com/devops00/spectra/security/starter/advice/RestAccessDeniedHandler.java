@@ -44,8 +44,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
     }
 
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response,
-            AccessDeniedException e) throws IOException {
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
 

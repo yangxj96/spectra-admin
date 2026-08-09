@@ -48,15 +48,8 @@ public class S3Configuration {
                 .endpointOverride(URI.create(properties.getEndpoint()))
                 .region(Region.of(properties.getRegion()))
                 .credentialsProvider(
-                        StaticCredentialsProvider.create(
-                                AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey())
-                        )
-                )
-                .serviceConfiguration(
-                        software.amazon.awssdk.services.s3.S3Configuration.builder()
-                                .pathStyleAccessEnabled(true)
-                                .build()
-                )
+                        StaticCredentialsProvider.create(AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey())))
+                .serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder().pathStyleAccessEnabled(true).build())
                 .build();
     }
 
@@ -65,14 +58,9 @@ public class S3Configuration {
         return S3Presigner.builder()
                 .endpointOverride(URI.create(properties.getEndpoint()))
                 .region(Region.US_EAST_1) // S3兼容必须填
-                .credentialsProvider(StaticCredentialsProvider
-                        .create(AwsBasicCredentials
-                                .create(properties.getAccessKey(), properties.getSecretKey())))
-                .serviceConfiguration(
-                        software.amazon.awssdk.services.s3.S3Configuration.builder()
-                                .pathStyleAccessEnabled(true)
-                                .build()
-                )
+                .credentialsProvider(
+                        StaticCredentialsProvider.create(AwsBasicCredentials.create(properties.getAccessKey(), properties.getSecretKey())))
+                .serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder().pathStyleAccessEnabled(true).build())
                 .build();
     }
 }

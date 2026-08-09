@@ -136,12 +136,9 @@ public class DictServiceImpl implements DictService {
     @Override
     public @Nullable List<DictGroupTreeVO> listDictGroupWrapTree() {
         // 不能是内置字段,也不能是隐藏字段
-        var wrapper = new LambdaQueryWrapper<DictGroup>()
-                .eq(DictGroup::getState, Boolean.TRUE)
-                .eq(DictGroup::getHide, Boolean.FALSE);
+        var wrapper = new LambdaQueryWrapper<DictGroup>().eq(DictGroup::getState, Boolean.TRUE).eq(DictGroup::getHide, Boolean.FALSE);
         var menus = groupService.list(wrapper);
-        return new TreeBuilder<>(dictGroupConverter.toTreeVOList(menus))
-                .buildTree(Common.PID);
+        return new TreeBuilder<>(dictGroupConverter.toTreeVOList(menus)).buildTree(Common.PID);
     }
 
     @Override

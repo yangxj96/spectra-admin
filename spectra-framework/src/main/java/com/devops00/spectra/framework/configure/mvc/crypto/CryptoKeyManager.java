@@ -51,21 +51,12 @@ public class CryptoKeyManager {
     private final JdbcTemplate jdbcTemplate;
 
     /// 不可变密钥容器，volatile 原子替换保证线程安全
-    private record CryptoKeys(
-            boolean enabled,
-            @Nullable PublicKey serverPublicKey,
-            @Nullable PrivateKey serverPrivateKey,
-            @Nullable PublicKey clientPublicKey,
-            @Nullable PrivateKey clientPrivateKey
-    ) {
+    private record CryptoKeys(boolean enabled, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
+            @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey) {
 
         /// 检查密钥完整性（启用时四个密钥必须全部存在）
         boolean isComplete() {
-            return enabled
-                    && serverPublicKey != null
-                    && serverPrivateKey != null
-                    && clientPublicKey != null
-                    && clientPrivateKey != null;
+            return enabled && serverPublicKey != null && serverPrivateKey != null && clientPublicKey != null && clientPrivateKey != null;
         }
     }
 
@@ -154,8 +145,7 @@ public class CryptoKeyManager {
     /// 从 sys_config 读取单个配置值
     private java.util.Optional<String> getConfigValue(String key) {
         try {
-            List<String> results = jdbcTemplate.queryForList(
-                    "SELECT value FROM spectra_core.sys_config WHERE key = ? AND deleted IS NULL",
+            List<String> results = jdbcTemplate.queryForList("SELECT value FROM spectra_core.sys_config WHERE key = ? AND deleted IS NULL",
                     String.class, key);
             return results.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(results.getFirst());
         } catch (Exception e) {

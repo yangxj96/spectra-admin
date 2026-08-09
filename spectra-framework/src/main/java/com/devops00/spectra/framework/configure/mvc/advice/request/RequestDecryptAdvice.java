@@ -78,8 +78,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     // redis
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om,
-            RedisTemplate<String, Object> redisTemplate) {
+    public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om, RedisTemplate<String, Object> redisTemplate) {
         this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
         this.redisTemplate = redisTemplate;
@@ -87,8 +86,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     }
 
     @Override
-    public boolean supports(MethodParameter methodParameter, Type targetType,
-            Class<? extends HttpMessageConverter<?>> converterType) {
+    public boolean supports(MethodParameter methodParameter, Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
         // 检查加解密是否启用
         if (!cryptoKeyManager.isEnabled()) {
             return false;
@@ -111,8 +109,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
                 return methodAnno.value();
             }
 
-            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(
-                    method.getDeclaringClass(), Encrypt.class);
+            Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
                 if (!classAnno.value()) {
                     log.debug("{}跳过请求解密: @Encrypt(false) on {}", LogPrefix.WEB.p(), method.getDeclaringClass().getSimpleName());
@@ -125,8 +122,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     }
 
     @Override
-    public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage,
-            MethodParameter parameter, Type targetType,
+    public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
         byte[] bodyBytes = inputMessage.getBody().readAllBytes();
 
@@ -155,8 +151,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             long start = System.currentTimeMillis();
             String decryptedJson = decrypt(node);
             log.debug("{}请求解密完成, 耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
-            return new DecryptedHttpInputMessage(inputMessage,
-                    decryptedJson.getBytes(StandardCharsets.UTF_8));
+            return new DecryptedHttpInputMessage(inputMessage, decryptedJson.getBytes(StandardCharsets.UTF_8));
         } catch (EncryptException e) {
             throw e;
         } catch (Exception e) {
@@ -166,15 +161,13 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     }
 
     @Override
-    public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
-            MethodParameter parameter, Type targetType,
+    public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 
     @Override
-    public Object handleEmptyBody(Object body, HttpInputMessage inputMessage,
-            MethodParameter parameter, Type targetType,
+    public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
             Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
@@ -203,8 +196,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         if (node.has("signature")) {
             long t1 = System.currentTimeMillis();
             String signature = node.get("signature").asString();
-            String signContent = String.format("data=%s&nonce=%s&timestamp=%d",
-                    encryptedData, nonce != null ? nonce : "", timestamp);
+            String signContent = String.format("data=%s&nonce=%s&timestamp=%d", encryptedData, nonce != null ? nonce : "", timestamp);
             boolean valid = RSAUtils.verify(signContent, signature, clientPublicKey);
             if (!valid) {
                 throw new EncryptException("请求签名验证失败，数据可能被篡改");
@@ -221,8 +213,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         // 防重放：Nonce 去重（Redis 缓存）
         if (nonce != null && !nonce.isEmpty()) {
             String nonceKey = NONCE_PREFIX + nonce;
-            Boolean success = redisTemplate.opsForValue()
-                    .setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS));
+            Boolean success = redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS));
             if (Boolean.FALSE.equals(success)) {
                 throw new EncryptException("重复请求（nonce 已使用）");
             }

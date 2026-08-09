@@ -60,12 +60,9 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     private final SecurityProperties properties;
     private final UserOnlineConverter userOnlineConverter;
 
-    public RedisSecHolderStrategy(
-            @Qualifier("securityObjectMapper") ObjectMapper om,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties,
-            UserOnlineConverter userOnlineConverter
-    ) {
+    public RedisSecHolderStrategy(@Qualifier("securityObjectMapper") ObjectMapper om,
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
+            UserOnlineConverter userOnlineConverter) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
@@ -369,18 +366,12 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
                 }
 
                 Object userObj = session.get("user");
-                SecurityUser su = userObj != null
-                        ? om.convertValue(userObj, SecurityUser.class)
-                        : null;
+                SecurityUser su = userObj != null ? om.convertValue(userObj, SecurityUser.class) : null;
 
-                result.add(userOnlineConverter.toVO(
-                        Objects.toString(session.get("userId"), null),
+                result.add(userOnlineConverter.toVO(Objects.toString(session.get("userId"), null),
                         su != null ? su.getUsername() : Objects.toString(session.get("username"), null),
-                        Objects.toString(session.get("clientType"), null),
-                        Objects.toString(session.get("ip"), null),
-                        Long.parseLong(Objects.toString(session.get("loginTime"), "0")),
-                        token
-                ));
+                        Objects.toString(session.get("clientType"), null), Objects.toString(session.get("ip"), null),
+                        Long.parseLong(Objects.toString(session.get("loginTime"), "0")), token));
             }
         }
         return result;
@@ -518,18 +509,26 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         String lower = ua.toLowerCase();
 
         // 小程序识别：微信/支付宝/抖音等小程序环境
-        if (lower.contains("miniprogram") || lower.contains("miniprogramenv")
-                || lower.contains("wechat") || lower.contains("alipay")
-                || lower.contains("bytedance") || lower.contains("toutiao")) {
+        if (lower.contains("miniprogram")
+            || lower.contains("miniprogramenv")
+            || lower.contains("wechat")
+            || lower.contains("alipay")
+            || lower.contains("bytedance")
+            || lower.contains("toutiao")) {
             return ClientType.MINI;
         }
 
         // APP识别：UniApp（含 uni-app / html5plus 标识）及原生App（含移动端SDK标识）
-        if (lower.contains("uni-app") || lower.contains("uniapp")
-                || lower.contains("html5plus") || lower.contains("uts")
-                || lower.contains("okhttp") || lower.contains("retrofit")
-                || lower.contains("af-android-sdk") || lower.contains("alibc")
-                || lower.contains("flutter") || lower.contains("reactnative")) {
+        if (lower.contains("uni-app")
+            || lower.contains("uniapp")
+            || lower.contains("html5plus")
+            || lower.contains("uts")
+            || lower.contains("okhttp")
+            || lower.contains("retrofit")
+            || lower.contains("af-android-sdk")
+            || lower.contains("alibc")
+            || lower.contains("flutter")
+            || lower.contains("reactnative")) {
             return ClientType.APP;
         }
 

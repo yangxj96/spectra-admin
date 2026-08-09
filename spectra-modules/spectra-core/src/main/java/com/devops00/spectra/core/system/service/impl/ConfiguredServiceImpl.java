@@ -64,8 +64,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     @Override
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         // 条件构建
-        var wrapper = new LambdaQueryWrapper<Configured>()
-                .like(StrUtils.isNotBlank(params.getKey()), Configured::getKey, params.getKey());
+        var wrapper = new LambdaQueryWrapper<Configured>().like(StrUtils.isNotBlank(params.getKey()), Configured::getKey, params.getKey());
         // 查询并转换相关内容
         var db = this.page(page.toPage(), wrapper);
         return configuredConverter.toVOPage(db);
@@ -74,8 +73,7 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     @Override
     @Transactional
     public void upsert(String key, String value, ConfiguredValueType type, String remarks) {
-        var existing = this.getOne(
-                new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
+        var existing = this.getOne(new LambdaQueryWrapper<Configured>().eq(Configured::getKey, key));
         if (existing != null) {
             existing.setValue(value);
             existing.setType(type);

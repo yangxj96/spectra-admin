@@ -33,15 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ModelController {
 
     /*
-    职责
-    保存流程 JSON（非部署态）
-    schema 管理
-    草稿
-    接口示例
-    POST /models
-    PUT  /models/{id}
-    GET  /models/{id}
-    GET  /models
-    DELETE /models/{id}
+     * 职责 保存流程 JSON（非部署态） schema 管理 草稿 接口示例 POST /models PUT /models/{id} GET
+     * /models/{id} GET /models DELETE /models/{id}
      */
 }

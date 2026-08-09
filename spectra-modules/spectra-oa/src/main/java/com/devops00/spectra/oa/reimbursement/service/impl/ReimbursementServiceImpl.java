@@ -75,8 +75,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMapper, Reimbursement>
-        implements ReimbursementService {
+public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMapper, Reimbursement> implements ReimbursementService {
 
     private static final String TYPE_CODE = "reimbursement";
     private static final String PAYMENT_PENDING = "PENDING";
@@ -99,10 +98,8 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
-        var visibleApplications = new LambdaQueryWrapper<Application>()
-                .eq(Application::getTypeCode, TYPE_CODE)
-                .and(query -> query.eq(Application::getApplicantId, user.getId())
-                        .or().eq(Application::getDepartmentId, user.getDepartmentId()));
+        var visibleApplications = new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, TYPE_CODE)
+                .and(query -> query.eq(Application::getApplicantId, user.getId()).or().eq(Application::getDepartmentId, user.getDepartmentId()));
         var applicationIds = applicationMapper.selectList(visibleApplications).stream().map(Application::getId).toList();
         if (applicationIds.isEmpty()) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
@@ -112,15 +109,13 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             wrapper.eq(Reimbursement::getPaymentStatus, params.getPaymentStatus());
         }
         if (params != null && StringUtils.hasText(params.getKeyword())) {
-            wrapper.and(query -> query.like(Reimbursement::getPurpose, params.getKeyword())
-                    .or().like(Reimbursement::getPayeeName, params.getKeyword()));
+            wrapper.and(
+                    query -> query.like(Reimbursement::getPurpose, params.getKeyword()).or().like(Reimbursement::getPayeeName, params.getKeyword()));
         }
         if (params != null && StringUtils.hasText(params.getStatus())) {
-            var statusApplicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>()
-                            .eq(Application::getTypeCode, TYPE_CODE)
-                            .in(Application::getId, applicationIds)
-                            .eq(Application::getStatus, params.getStatus()))
-                    .stream().map(Application::getId).toList();
+            var statusApplicationIds = applicationMapper.selectList(new LambdaQueryWrapper<Application>().eq(Application::getTypeCode, TYPE_CODE)
+                    .in(Application::getId, applicationIds)
+                    .eq(Application::getStatus, params.getStatus())).stream().map(Application::getId).toList();
             if (statusApplicationIds.isEmpty()) {
                 return new Page<>(page.getPageNum(), page.getPageSize(), 0);
             }
@@ -186,8 +181,8 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     public void submit(UUID id, ReimbursementSubmitFrom from) {
         var entity = require(id);
         var application = requireEditableApplication(entity);
-        var type = applicationTypeMapper.selectOne(new LambdaQueryWrapper<ApplicationType>()
-                .eq(ApplicationType::getCode, TYPE_CODE).eq(ApplicationType::getEnabled, true));
+        var type = applicationTypeMapper
+                .selectOne(new LambdaQueryWrapper<ApplicationType>().eq(ApplicationType::getCode, TYPE_CODE).eq(ApplicationType::getEnabled, true));
         if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
             throw new DataSaveException("报销流程尚未配置");
         }
@@ -285,8 +280,12 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         if (expenseEnd.isBefore(expenseStart)) {
             throw new DataSaveException("费用结束日期不能早于开始日期");
         }
-        var total = from.getItems().stream().map(ReimbursementItemFrom::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).setScale(2, RoundingMode.HALF_UP);
+        var total = from.getItems()
+                .stream()
+                .map(ReimbursementItemFrom::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2,
+                        RoundingMode.HALF_UP);
         if (total.compareTo(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP)) != 0) {
             throw new DataSaveException("报销总额必须等于费用明细合计");
         }
@@ -299,15 +298,13 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private void replaceItems(Reimbursement entity, List<ReimbursementItemFrom> items) {
-        itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>()
-                .eq(ReimbursementItem::getReimbursementId, entity.getId()));
-        var invoiceNos = items.stream().map(ReimbursementItemFrom::getInvoiceNo)
-                .filter(StringUtils::hasText).map(String::trim).toList();
+        itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>().eq(ReimbursementItem::getReimbursementId, entity.getId()));
+        var invoiceNos = items.stream().map(ReimbursementItemFrom::getInvoiceNo).filter(StringUtils::hasText).map(String::trim).toList();
         if (invoiceNos.size() != new HashSet<>(invoiceNos).size()) {
             throw new DataSaveException("同一报销单不能重复使用发票号码");
         }
-        if (!invoiceNos.isEmpty() && itemMapper.selectCount(new LambdaQueryWrapper<ReimbursementItem>()
-                .in(ReimbursementItem::getInvoiceNo, invoiceNos)) > 0) {
+        if (!invoiceNos.isEmpty()
+            && itemMapper.selectCount(new LambdaQueryWrapper<ReimbursementItem>().in(ReimbursementItem::getInvoiceNo, invoiceNos)) > 0) {
             throw new DataSaveException("发票号码已被其他报销单使用");
         }
         var entities = items.stream().map(item -> {
@@ -327,8 +324,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private void replaceAttachments(UUID applicationId, List<ReimbursementAttachmentFrom> attachments) {
-        attachmentMapper.delete(new LambdaQueryWrapper<ApplicationAttachment>()
-                .eq(ApplicationAttachment::getApplicationId, applicationId));
+        attachmentMapper.delete(new LambdaQueryWrapper<ApplicationAttachment>().eq(ApplicationAttachment::getApplicationId, applicationId));
         if (attachments == null || attachments.isEmpty()) {
             return;
         }
@@ -353,12 +349,13 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         vo.setProcessInstanceId(application.getProcessInstanceId());
         vo.setRejectReason(application.getRejectReason());
         vo.setPayeeAccountMasked(mask(entity.getPayeeAccount()));
-        vo.setItems(itemMapper.selectList(new LambdaQueryWrapper<ReimbursementItem>()
-                        .eq(ReimbursementItem::getReimbursementId, entity.getId()).orderByAsc(ReimbursementItem::getExpenseDate))
-                .stream().map(reimbursementConverter::toItemVO).toList());
-        vo.setAttachments(attachmentMapper.selectList(new LambdaQueryWrapper<ApplicationAttachment>()
-                        .eq(ApplicationAttachment::getApplicationId, application.getId()))
-                .stream().map(reimbursementConverter::toAttachmentVO).toList());
+        vo.setItems(itemMapper.selectList(new LambdaQueryWrapper<ReimbursementItem>().eq(ReimbursementItem::getReimbursementId, entity.getId())
+                .orderByAsc(ReimbursementItem::getExpenseDate)).stream().map(reimbursementConverter::toItemVO).toList());
+        vo.setAttachments(attachmentMapper
+                .selectList(new LambdaQueryWrapper<ApplicationAttachment>().eq(ApplicationAttachment::getApplicationId, application.getId()))
+                .stream()
+                .map(reimbursementConverter::toAttachmentVO)
+                .toList());
         return vo;
     }
 
@@ -372,8 +369,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
 
     private Application requireEditableApplication(Reimbursement entity) {
         var application = requireApplicantApplication(entity);
-        if (!ApplicationStatus.DRAFT.name().equals(application.getStatus())
-                && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
+        if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
             throw new DataSaveException("当前状态不允许修改或提交报销单");
         }
         return application;

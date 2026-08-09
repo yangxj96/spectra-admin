@@ -38,13 +38,7 @@ import java.util.UUID;
 @ToString
 @TableName(value = "oa_meeting", schema = "spectra_oa")
 @DataScope(relations = {
-        @DataScope.Relation(
-                schema = "spectra_oa",
-                table = "oa_meeting_participant",
-                joinColumn = "meeting_id",
-                userColumn = "user_id"
-        )
-})
+        @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id", userColumn = "user_id")})
 public class Meeting extends BaseEntity {
 
     /// 会议标题

@@ -50,13 +50,12 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /// key: 原始权限表达式，如 "order:*:read"
     ///
     /// value: 预编译表示，例如分段结构或 regex Pattern
-    private static final Map<String, CompiledPermissionPattern> CACHE =
-            Collections.synchronizedMap(new LinkedHashMap<>(128, 0.75f, true) {
-                @Override
-                protected boolean removeEldestEntry(Map.Entry<String, CompiledPermissionPattern> eldest) {
-                    return size() > MAX_CACHE;
-                }
-            });
+    private static final Map<String, CompiledPermissionPattern> CACHE = Collections.synchronizedMap(new LinkedHashMap<>(128, 0.75f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<String, CompiledPermissionPattern> eldest) {
+            return size() > MAX_CACHE;
+        }
+    });
 
     /// Security自定义配置
     private final SecurityProperties securityProperties;
@@ -85,10 +84,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
             result = new CompiledPermissionPattern(true, segments, hasDoubleStar, null);
         } else {
             // URL 或其他结构，使用 regex fallback
-            String regex = expr
-                    .replace(".", "\\.")
-                    .replace("**", ".*")
-                    .replace("*", "[^/]+");
+            String regex = expr.replace(".", "\\.").replace("**", ".*").replace("*", "[^/]+");
 
             result = new CompiledPermissionPattern(false, null, false, Pattern.compile("^" + regex + "$"));
         }
@@ -220,11 +216,6 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /// @param hasDoubleStar 是否包含 "**" 通配
     /// @param regex         仅在 segmentBased=false 时不为空
     /// 编译后的权限匹配模式。
-    private record CompiledPermissionPattern(
-            boolean segmentBased,
-            String[] segments,
-            boolean hasDoubleStar,
-            Pattern regex
-    ) {
+    private record CompiledPermissionPattern(boolean segmentBased, String[] segments, boolean hasDoubleStar, Pattern regex) {
     }
 }
