@@ -1,77 +1,88 @@
 # Spectra Admin
 
-> Spectra 全栈系统的后端 API 服务，基于 Spring Boot 4 + Java 25。
+> Spectra 的后端 API 服务，同时为 `spectra-ui` 和 `spectra-app` 提供接口。基于 Java 25、Spring Boot 4.1、PostgreSQL、Redis 和 Maven 多模块构建。
 
-## 技术栈
+## 模块
 
-| 技术 | 版本 | 说明 |
-|---|---|---|
-| Java | 25 | Temurin LTS |
-| Spring Boot | 4.1.0 | 核心框架 |
-| Spring Security | 7.1.0 | 权限认证 |
-| MyBatis-Plus | 3.5.15 | ORM |
-| MapStruct | 1.6.3 | 实体映射 |
-| PostgreSQL | 18 | 数据库 |
-| Redis + JetCache | 2.7.8 | 缓存 |
-| LangChain4j | 1.16.3 | AI 集成 |
-| Flowable | — | 工作流引擎 |
-
-## 模块结构
-
-```
-spectra-admin/
-├── spectra-config/      ← 统一配置文件（application-*.yml）
-├── spectra-common/      ← DTO/Entity 基类/工具类
-├── spectra-framework/   ← MVC/JSON/缓存/Redis/MyBatis 配置
-├── spectra-modules/     ← 业务模块
-│   ├── spectra-core/    ← 用户/角色/权限/菜单/部门/字典/区域/日志
-│   ├── spectra-oa/      ← OA 办公（资产/考勤/日历/通讯录/合同/文档/会议/公告/报表）
-│   ├── spectra-upload/  ← 文件上传（本地 + S3，分片上传）
-│   ├── spectra-workflow/← 工作流（Flowable 流程引擎）
-│   └── spectra-ai/      ← AI 集成（LangChain4j + RAG）
-├── spectra-starter/     ← 自动配置 Starter（Security/Log/AI）
-└── spectra-launch/      ← 启动入口（Spring Boot Application）
-```
-
-## 常用命令
-
-```bash
-# 构建
-./mvnw clean package -DskipTests
-
-# 启动（默认端口 4004）
-./mvnw spring-boot:run -pl spectra-launch
-```
-
-## 配置
-
-通过 `.mise.local.toml` 管理环境变量，复制 `.mise.local.toml.example` 为 `.mise.local.toml` 后填入：
-
-| 变量 | 说明 |
+| 模块 | 职责 |
 |---|---|
-| DB_URL / DB_USERNAME / DB_PASSWORD | PostgreSQL 连接 |
-| REDIS_HOST / REDIS_PORT | Redis 连接 |
-| S3_* | 对象存储配置 |
-| AI_* / RAG_* | AI 模型配置 |
-| SSL_* | 证书配置 |
+| `spectra-config` | 集中管理 `application-*.yml` 配置 |
+| `spectra-common` | DTO、Entity 基类、公共工具和共享依赖 |
+| `spectra-framework` | MVC、JSON、MyBatis-Plus、Redis、缓存和接口加解密 |
+| `spectra-starter` | Security、日志和 AI 自动配置 Starter |
+| `spectra-modules/spectra-core` | 用户、账号、角色权限、组织、菜单、字典、区域、配置、日志和消息中心 |
+| `spectra-modules/spectra-upload` | 本地/S3 文件存储和分片上传 |
+| `spectra-modules/spectra-workflow` | Flowable 流程定义、实例、任务、表单和审批能力 |
+| `spectra-modules/spectra-oa` | 通用申请、请假、公告、日程、会议、文档、合同、报销、采购、资产、用品和报表 |
+| `spectra-modules/spectra-ai` | LangChain4j、AI 会话和 RAG 集成 |
+| `spectra-launch` | Spring Boot 启动入口和可执行 JAR 打包 |
 
-## 文档
+模块的详细设计、接口和数据模型统一维护在 Spectra 根工作区的 `docs/`，不在各 Maven 子模块重复维护 README。
 
-项目文档统一维护在根仓库 [spectra-docs](https://github.com/yangxj96/spectra-docs)：
+## 环境要求
 
-| 文档 | 路径 |
+| 工具 | 版本/要求 |
 |---|---|
-| 架构分层 | `docs/10-后端/10-架构分层.md` |
+| Java | Temurin 25.0.2 |
+| Maven | 3.9.12，使用项目自带 Wrapper |
+| PostgreSQL | 18 |
+| Redis | 本地开发必需 |
+
+复制 `.mise.local.toml.example` 为 `.mise.local.toml`，配置数据库、Redis、S3、SSL、AI 和 RAG 所需的本机环境变量。该文件包含凭据，不得提交。
+
+## 构建与校验
+
+以下命令从 `spectra-admin/` 执行；Unix 环境将 `mvnw.cmd` 换为 `./mvnw`。
+
+```powershell
+# 渐进格式检查/格式化
+.\mvnw.cmd spotless:check
+.\mvnw.cmd spotless:apply
+
+# 全量格式检查；PowerShell 中系统属性需要加引号
+.\mvnw.cmd spotless:check "-Dspotless.ratchetFrom=NONE"
+
+# 测试与完整打包
+.\mvnw.cmd test
+.\mvnw.cmd clean package -DskipTests
+```
+
+## 启动
+
+先完成 Maven 打包，再运行 `spectra-launch` 生成的 Spring Boot 可执行 JAR：
+
+```powershell
+$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File |
+    Where-Object { $_.Name -notlike '*.jar.original' } |
+    Select-Object -First 1
+
+java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
+    -Dspring.profiles.active=dev `
+    -jar $jar.FullName
+```
+
+默认开发端口为 `4004`，API 上下文为 `/api`。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
+
+## 文档入口
+
+在 Spectra 根工作区中查看：
+
+| 内容 | 路径 |
+|---|---|
+| 后端架构 | `docs/10-后端/10-架构分层.md` |
 | 用户与权限 | `docs/10-后端/20-用户与权限.md` |
 | 系统管理 | `docs/10-后端/30-系统管理.md` |
 | OA 模块 | `docs/10-后端/40-OA模块.md` |
+| 文件上传 | `docs/10-后端/50-文件上传.md` |
 | 工作流 | `docs/10-后端/60-工作流.md` |
 | AI 模块 | `docs/10-后端/70-AI模块.md` |
 | 基础设施 | `docs/10-后端/80-基础设施.md` |
 | API 总览 | `docs/10-后端/90-API总览.md` |
-| 建表 SQL | `docs/20-知识库/30-数据模型/` |
-| 初始化数据 | `docs/20-知识库/30-数据模型/33-初始化数据.sql` |
-| 部署运维 | `docs/20-知识库/60-部署运维/` |
+| 数据模型 | `docs/30-数据模型/` |
+| 建表 SQL | `docs/sql/` |
+| 环境与命令 | `docs/50-开发指南/` |
+
+在线文档：[https://www.devops00.com/spectra-admin/](https://www.devops00.com/spectra-admin/)
 
 ## 许可证
 

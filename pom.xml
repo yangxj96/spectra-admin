@@ -177,20 +177,9 @@
                         <includes>
                             <include>src/**/*.java</include>
                         </includes>
-                        <!-- JDT 3.45 cannot format Java 25 Markdown doc comments in enum constant lists. -->
-                        <replace>
-                            <name>preserve Markdown doc comments</name>
-                            <search>///</search>
-                            <replacement>// SPECTRA_MARKDOWN_DOC</replacement>
-                        </replace>
                         <eclipse>
                             <file>${spotless.eclipse.formatterPath}</file>
                         </eclipse>
-                        <replace>
-                            <name>restore Markdown doc comments</name>
-                            <search>// SPECTRA_MARKDOWN_DOC</search>
-                            <replacement>///</replacement>
-                        </replace>
                         <trimTrailingWhitespace/>
                     </java>
                 </configuration>

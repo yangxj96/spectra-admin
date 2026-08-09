@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("/workflow/history")
+@RequestMapping("/workflow/model")
 @RequiredArgsConstructor
 public class ModelController {
 

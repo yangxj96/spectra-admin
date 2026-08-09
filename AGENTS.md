@@ -98,7 +98,7 @@ spectra-launch       → 应用入口，运行此模块
 - **Java 25** Temurin 发行版
 - **MapStruct 依赖顺序**：mapstruct → lombok → mapstruct-processor（不可重排，否则编译失败）
 - **版本属性**：pom.xml 中使用 `${revision}`，由 `flatten-maven-plugin` 展平
-- **注释**：使用三斜杠（`///`）注释，非 Javadoc 块注释；每个 Java 文件必须包含 Apache License 2.0 头部
+- **注释**：使用传统 Javadoc 块注释（`/** ... */`）及 Javadoc/HTML 语法，不使用三斜杠 Markdown 文档注释；每个 Java 文件必须包含 Apache License 2.0 头部
 
 ### 代码格式化与校验
 
@@ -108,16 +108,16 @@ spectra-launch       → 应用入口，运行此模块
 - Maven 格式化：`.\mvnw.cmd spotless:apply`
 - Maven 校验：`.\mvnw.cmd verify`
 - Spotless 使用 Eclipse JDT Formatter，不依赖本机 IDEA 或其他 IDE 的可执行文件；IDEA 侧可导入同一份 Eclipse formatter XML 作为编辑器格式来源
-- 当前使用 `origin/master` 作为渐进校验基线；需要全量校验时使用 `-Dspotless.ratchetFrom=NONE`
+- 当前使用 `origin/master` 作为渐进校验基线；需要全量校验时执行 `\.\mvnw.cmd spotless:check "-Dspotless.ratchetFrom=NONE"`。PowerShell 中必须给该系统属性加引号，避免 Maven 将其误解析为生命周期阶段
 
 ## 测试
 
-```bash
+```powershell
 # 运行全部测试
-./mvnw test
+.\mvnw.cmd test
 
 # 运行指定模块的测试
-./mvnw test -pl spectra-common
+.\mvnw.cmd test -pl spectra-common
 ```
 
 spectra-launch 模块当前无测试文件。
