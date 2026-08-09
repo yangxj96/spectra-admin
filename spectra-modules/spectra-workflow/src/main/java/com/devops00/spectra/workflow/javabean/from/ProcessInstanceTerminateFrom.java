@@ -18,14 +18,18 @@ package com.devops00.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/// 流程实例终止请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 流程实例终止请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ProcessInstanceTerminateFrom {
 
-    /// 终止原因
+    /**
+     * 终止原因
+     */
     private String reason;
 }

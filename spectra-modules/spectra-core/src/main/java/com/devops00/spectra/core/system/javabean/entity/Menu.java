@@ -29,11 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 菜单表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -44,27 +46,39 @@ public class Menu extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     @TableField(value = "pid")
     private UUID pid;
 
-    /// 图标
+    /**
+     * 图标
+     */
     @TableField(value = "icon")
     private String icon;
 
-    /// 菜单节点类型
+    /**
+     * 菜单节点类型
+     */
     @TableField(value = "menu_type")
     private MenuType menuType;
 
-    /// 对应前端命名路由
+    /**
+     * 对应前端命名路由
+     */
     @TableField(value = "route_name")
     private String routeName;
 
-    /// 名称
+    /**
+     * 名称
+     */
     @TableField(value = "name")
     private String name;
 
-    /// 排序
+    /**
+     * 排序
+     */
     @TableField(value = "sort")
     private Integer sort;
 }

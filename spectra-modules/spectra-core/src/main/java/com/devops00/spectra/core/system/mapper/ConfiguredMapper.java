@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import org.apache.ibatis.annotations.Mapper;
 
-/// 系统配置Mapper层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/6 00:00
+/**
+ * 系统配置Mapper层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/6 00:00
+ */
 @Mapper
 public interface ConfiguredMapper extends BaseMapper<Configured> {
 }

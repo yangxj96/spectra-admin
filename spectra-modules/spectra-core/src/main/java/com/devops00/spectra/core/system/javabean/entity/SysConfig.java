@@ -27,11 +27,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 系统配置表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/9/18 00:00
+/**
+ * 系统配置表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/9/18 00:00
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -42,15 +44,21 @@ public class SysConfig extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 配置key
+    /**
+     * 配置key
+     */
     @TableField(value = "key")
     private String key;
 
-    /// 配置VALUE
+    /**
+     * 配置VALUE
+     */
     @TableField(value = "value")
     private String value;
 
-    /// 备注说明
+    /**
+     * 备注说明
+     */
     @TableField(value = "remarks")
     private String remarks;
 }

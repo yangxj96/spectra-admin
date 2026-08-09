@@ -21,38 +21,58 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 合同文件版本视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同文件版本视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ContractVersionVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 版本号。
+    /**
+     * 版本号。
+     */
     private Integer versionNo;
 
-    /// 文件 ID。
+    /**
+     * 文件 ID。
+     */
     private UUID fileId;
 
-    /// 文件名称。
+    /**
+     * 文件名称。
+     */
     private String fileName;
 
-    /// 文件大小。
+    /**
+     * 文件大小。
+     */
     private Long fileSize;
 
-    /// 内容类型。
+    /**
+     * 内容类型。
+     */
     private String contentType;
 
-    /// 版本说明。
+    /**
+     * 版本说明。
+     */
     private String versionNote;
 
-    /// 当前值。
+    /**
+     * 当前值。
+     */
     private Boolean current;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 }

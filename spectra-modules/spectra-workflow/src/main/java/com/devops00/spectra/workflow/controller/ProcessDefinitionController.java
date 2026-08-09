@@ -31,13 +31,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/// 工作流-流程定义
-///
-/// 面向"设计器 + 运维"
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 工作流-流程定义
+ *
+ * 面向"设计器 + 运维"
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/workflow/process-definitions")
@@ -46,7 +48,9 @@ public class ProcessDefinitionController {
 
     private final ProcessDefinitionService processDefinitionService;
 
-    /// 获取所有的流程定义
+    /**
+     * 获取所有的流程定义
+     */
     @ULog("'查询流程定义列表'")
     @GetMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
@@ -54,7 +58,9 @@ public class ProcessDefinitionController {
         return processDefinitionService.listAll();
     }
 
-    /// 获取流程定义详情
+    /**
+     * 获取流程定义详情
+     */
     @ULog("'查询流程定义详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
@@ -62,7 +68,9 @@ public class ProcessDefinitionController {
         return processDefinitionService.getDetail(id);
     }
 
-    /// 获取流程定义图
+    /**
+     * 获取流程定义图
+     */
     @ULog("'获取流程定义图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
@@ -70,7 +78,9 @@ public class ProcessDefinitionController {
         return processDefinitionService.getDiagram(id);
     }
 
-    /// 挂起流程定义
+    /**
+     * 挂起流程定义
+     */
     @ULog("'挂起流程定义'")
     @PostMapping(value = "/{id}/suspend", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:UPDATE')")
@@ -78,7 +88,9 @@ public class ProcessDefinitionController {
         processDefinitionService.suspend(id);
     }
 
-    /// 激活流程定义
+    /**
+     * 激活流程定义
+     */
     @ULog("'激活流程定义'")
     @PostMapping(value = "/{id}/activate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:UPDATE')")
@@ -86,7 +98,9 @@ public class ProcessDefinitionController {
         processDefinitionService.activate(id);
     }
 
-    /// 获取流程定义的 BPMN XML 源码
+    /**
+     * 获取流程定义的 BPMN XML 源码
+     */
     @ULog("'获取流程定义BPMN资源'")
     @GetMapping(value = "/{id}/resource", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
@@ -94,7 +108,9 @@ public class ProcessDefinitionController {
         return processDefinitionService.getResource(id);
     }
 
-    /// 部署流程定义（新增或更新版本）
+    /**
+     * 部署流程定义（新增或更新版本）
+     */
     @XssCleanIgnore
     @ULog("'部署流程定义'")
     @PostMapping(value = "/deploy", version = "1.0.0+")

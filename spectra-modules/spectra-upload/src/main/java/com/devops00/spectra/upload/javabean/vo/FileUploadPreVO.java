@@ -20,26 +20,38 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/// 文件上传-预处理-VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/1 16:42
+/**
+ * 文件上传-预处理-VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/1 16:42
+ */
 @Data
 public class FileUploadPreVO {
 
-    /// 文件是否已经存在，存在就不在继续了
+    /**
+     * 文件是否已经存在，存在就不在继续了
+     */
     private boolean exists;
 
-    /// 文件ID
+    /**
+     * 文件ID
+     */
     private UUID fileId;
 
-    /// 是否需要分片
+    /**
+     * 是否需要分片
+     */
     private boolean multipart;
 
-    /// 文件上传ID
+    /**
+     * 文件上传ID
+     */
     private String uploadId;
 
-    /// 分片大小
+    /**
+     * 分片大小
+     */
     private long chunkSize;
 }

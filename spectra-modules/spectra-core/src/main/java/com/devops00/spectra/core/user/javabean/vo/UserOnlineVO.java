@@ -22,33 +22,49 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// 在线用户VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 在线用户VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @Builder
 public class UserOnlineVO {
 
-    /// 用户 ID。
+    /**
+     * 用户 ID。
+     */
     private UUID userId;
 
-    /// 用户名。
+    /**
+     * 用户名。
+     */
     private String username;
 
-    /// 登录类型字段。
+    /**
+     * 登录类型字段。
+     */
     private String loginType;
 
-    /// IP 地址。
+    /**
+     * IP 地址。
+     */
     private String ip;
 
-    /// 地址。
+    /**
+     * 地址。
+     */
     private String address;
 
-    /// 登录时间字段。
+    /**
+     * 登录时间字段。
+     */
     private LocalDateTime loginTime;
 
-    /// 访问令牌。
+    /**
+     * 访问令牌。
+     */
     private String token;
 }

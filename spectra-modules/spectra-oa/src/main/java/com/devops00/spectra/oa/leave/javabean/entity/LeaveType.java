@@ -26,34 +26,46 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 请假类型配置。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假类型配置。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_leave_type", schema = "spectra_oa")
 public class LeaveType extends BaseEntity {
 
-    /// 编码。
+    /**
+     * 编码。
+     */
     @TableField("code")
     private String code;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     @TableField("name")
     private String name;
 
-    /// 单位。
+    /**
+     * 单位。
+     */
     @TableField("unit")
     private String unit;
 
-    /// 默认时长。
+    /**
+     * 默认时长。
+     */
     @TableField("default_hours")
     private BigDecimal defaultHours;
 
-    /// 是否启用。
+    /**
+     * 是否启用。
+     */
     @TableField("enabled")
     private Boolean enabled;
 }

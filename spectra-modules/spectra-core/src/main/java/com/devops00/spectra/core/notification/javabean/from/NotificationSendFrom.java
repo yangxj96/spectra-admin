@@ -20,11 +20,13 @@ import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/// 发送消息请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 发送消息请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NotificationSendFrom extends NotificationSendDTO {

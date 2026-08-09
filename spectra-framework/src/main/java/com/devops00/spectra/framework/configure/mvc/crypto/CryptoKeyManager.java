@@ -29,14 +29,16 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.List;
 
-/// 加解密密钥管理器
-///
-/// 从 sys_config 表读取 RSA 密钥配置，缓存到内存中供请求处理使用。
-/// 密钥变更后调用 refresh() 重新加载，无需重启服务。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/13
+/**
+ * 加解密密钥管理器
+ *
+ * 从 sys_config 表读取 RSA 密钥配置，缓存到内存中供请求处理使用。
+ * 密钥变更后调用 refresh() 重新加载，无需重启服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/13
+ */
 @Slf4j
 @Component
 @NullMarked
@@ -50,17 +52,23 @@ public class CryptoKeyManager {
 
     private final JdbcTemplate jdbcTemplate;
 
-    /// 不可变密钥容器，volatile 原子替换保证线程安全
+    /**
+     * 不可变密钥容器，volatile 原子替换保证线程安全
+     */
     private record CryptoKeys(boolean enabled, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
             @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey) {
 
-        /// 检查密钥完整性（启用时四个密钥必须全部存在）
+        /**
+         * 检查密钥完整性（启用时四个密钥必须全部存在）
+         */
         boolean isComplete() {
             return enabled && serverPublicKey != null && serverPrivateKey != null && clientPublicKey != null && clientPrivateKey != null;
         }
     }
 
-    /// 当前密钥缓存（volatile 原子替换）
+    /**
+     * 当前密钥缓存（volatile 原子替换）
+     */
     private volatile CryptoKeys keys = new CryptoKeys(false, null, null, null, null);
 
     public CryptoKeyManager(JdbcTemplate jdbcTemplate) {
@@ -73,7 +81,9 @@ public class CryptoKeyManager {
         refresh();
     }
 
-    /// 从 sys_config 重新加载密钥到内存
+    /**
+     * 从 sys_config 重新加载密钥到内存
+     */
     public synchronized void refresh() {
         try {
             boolean enabled = Boolean.parseBoolean(getConfigValue(CONFIG_ENABLED).orElse("false"));
@@ -107,42 +117,58 @@ public class CryptoKeyManager {
         }
     }
 
-    /// 是否启用接口加解密（需 enabled=true 且密钥完整）
+    /**
+     * 是否启用接口加解密（需 enabled=true 且密钥完整）
+     */
     public boolean isEnabled() {
         return keys.isComplete();
     }
 
-    /// 获取服务端公钥
+    /**
+     * 获取服务端公钥
+     */
     public @Nullable PublicKey getServerPublicKey() {
         return keys.serverPublicKey();
     }
 
-    /// 获取服务端私钥
+    /**
+     * 获取服务端私钥
+     */
     public @Nullable PrivateKey getServerPrivateKey() {
         return keys.serverPrivateKey();
     }
 
-    /// 获取客户端公钥
+    /**
+     * 获取客户端公钥
+     */
     public @Nullable PublicKey getClientPublicKey() {
         return keys.clientPublicKey();
     }
 
-    /// 获取客户端私钥
+    /**
+     * 获取客户端私钥
+     */
     public @Nullable PrivateKey getClientPrivateKey() {
         return keys.clientPrivateKey();
     }
 
-    /// 获取服务端公钥 Base64 字符串
+    /**
+     * 获取服务端公钥 Base64 字符串
+     */
     public @Nullable String getServerPublicKeyBase64() {
         return getConfigValue(CONFIG_SERVER_PUBLIC_KEY).orElse(null);
     }
 
-    /// 获取客户端私钥 Base64 字符串
+    /**
+     * 获取客户端私钥 Base64 字符串
+     */
     public @Nullable String getClientPrivateKeyBase64() {
         return getConfigValue(CONFIG_CLIENT_PRIVATE_KEY).orElse(null);
     }
 
-    /// 从 sys_config 读取单个配置值
+    /**
+     * 从 sys_config 读取单个配置值
+     */
     private java.util.Optional<String> getConfigValue(String key) {
         try {
             List<String> results = jdbcTemplate.queryForList("SELECT value FROM spectra_core.sys_config WHERE key = ? AND deleted IS NULL",

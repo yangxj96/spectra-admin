@@ -20,23 +20,33 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 采购执行登记参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购执行登记参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseExecuteFrom {
 
-    /// 采购人 ID。
+    /**
+     * 采购人 ID。
+     */
     private UUID purchaserId;
 
-    /// 订单编号。
+    /**
+     * 订单编号。
+     */
     private String orderNo;
 
-    /// 执行状态。
+    /**
+     * 执行状态。
+     */
     private String executionStatus;
 
-    /// 执行备注。
+    /**
+     * 执行备注。
+     */
     private String executionRemark;
 }

@@ -29,11 +29,13 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-/// 用户名密码登录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/17 23:37
+/**
+ * 用户名密码登录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/17 23:37
+ */
 @Service
 @NullMarked
 public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticationProvider {

@@ -27,11 +27,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.UUID;
 
-/// 字典(字典数据)业务层-实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典(字典数据)业务层-实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Slf4j
 @Service
 public class DictItemServiceImpl extends BaseServiceImpl<DictItemMapper, DictItem> implements DictItemService {

@@ -19,10 +19,12 @@ package com.devops00.spectra.ai.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.ai.javabean.entity.AiConversation;
 
-/// AI 会话 Mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话 Mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public interface AiConversationMapper extends BaseMapper<AiConversation> {
 }

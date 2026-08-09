@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.user.javabean.entity.Authority;
 import org.apache.ibatis.annotations.Mapper;
 
-/// 权限mapper层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 权限mapper层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Mapper
 public interface AuthorityMapper extends BaseMapper<Authority> {
 

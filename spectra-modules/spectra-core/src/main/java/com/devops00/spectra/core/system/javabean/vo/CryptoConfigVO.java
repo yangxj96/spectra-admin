@@ -23,11 +23,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 
-/// 加解密配置响应
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/14
+/**
+ * 加解密配置响应
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/14
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,9 +38,13 @@ public class CryptoConfigVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 是否启用加解密
+    /**
+     * 是否启用加解密
+     */
     private Boolean enabled;
 
-    /// 服务端公钥（Base64）
+    /**
+     * 服务端公钥（Base64）
+     */
     private String serverPublicKey;
 }

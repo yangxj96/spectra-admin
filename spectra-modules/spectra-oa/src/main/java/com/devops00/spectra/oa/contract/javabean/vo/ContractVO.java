@@ -24,72 +24,114 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 合同台账视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同台账视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ContractVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 合同编号。
+    /**
+     * 合同编号。
+     */
     private String contractNo;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 合同类型字段。
+    /**
+     * 合同类型字段。
+     */
     private String contractType;
 
-    /// 对方名称。
+    /**
+     * 对方名称。
+     */
     private String counterpartyName;
 
-    /// 对方联系人。
+    /**
+     * 对方联系人。
+     */
     private String counterpartyContact;
 
-    /// 所有者 ID。
+    /**
+     * 所有者 ID。
+     */
     private UUID ownerId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 金额。
+    /**
+     * 金额。
+     */
     private BigDecimal amount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency;
 
-    /// 开始日期。
+    /**
+     * 开始日期。
+     */
     private LocalDate startDate;
 
-    /// 结束日期。
+    /**
+     * 结束日期。
+     */
     private LocalDate endDate;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 签署状态。
+    /**
+     * 签署状态。
+     */
     private String signingStatus;
 
-    /// 签署时间。
+    /**
+     * 签署时间。
+     */
     private LocalDateTime signedAt;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility;
 
-    /// 摘要。
+    /**
+     * 摘要。
+     */
     private String summary;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 
-    /// 更新时间。
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
 
-    /// 当前版本字段。
+    /**
+     * 当前版本字段。
+     */
     private ContractVersionVO currentVersion;
     private List<ContractVersionVO> versions = List.of();
     private List<ContractMilestoneVO> milestones = List.of();

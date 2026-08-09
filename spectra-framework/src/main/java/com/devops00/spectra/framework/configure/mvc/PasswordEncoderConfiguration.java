@@ -23,11 +23,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-/// 密码加密器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/29 11:34
+/**
+ * 密码加密器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/29 11:34
+ */
 @Slf4j
 @Configuration
 public class PasswordEncoderConfiguration {

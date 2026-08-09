@@ -26,22 +26,28 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/// Security 静态工具类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/10 09:19
+/**
+ * Security 静态工具类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/10 09:19
+ */
 @NullMarked
 public class SecUtil {
 
-    /// 具体业务持有者
+    /**
+     * 具体业务持有者
+     */
     @Nullable
     private static volatile SecHolderStrategy strategy;
 
     private SecUtil() {
     }
 
-    /// 内部调用获取 Holder
+    /**
+     * 内部调用获取 Holder
+     */
     private static SecHolderStrategy getStrategy() {
         SecHolderStrategy s = strategy;
         if (s == null) {
@@ -61,17 +67,23 @@ public class SecUtil {
         SecUtil.strategy = holder;
     }
 
-    /// 登录（默认 WEB 端）
+    /**
+     * 登录（默认 WEB 端）
+     */
     public static TokenVO login(SecurityUser su) {
         return getStrategy().createToken(su);
     }
 
-    /// 登出指定 token
+    /**
+     * 登出指定 token
+     */
     public static void logout(String token) {
         getStrategy().deleteToken(token);
     }
 
-    /// 登出当前用户
+    /**
+     * 登出当前用户
+     */
     public static void logout() {
         var token = getStrategy().getCurrentToken();
         if (token == null) {
@@ -80,72 +92,100 @@ public class SecUtil {
         logout(token);
     }
 
-    /// 根据刷新token登出
+    /**
+     * 根据刷新token登出
+     */
     public static void logoutByRefreshToken(String refreshToken) {
         getStrategy().deleteByRefreshToken(refreshToken);
     }
 
-    /// 踢出用户所有端
+    /**
+     * 踢出用户所有端
+     */
     public static void kick(UUID id) {
         getStrategy().deleteByUserId(id);
     }
 
-    /// 刷新 token（活跃续期）
+    /**
+     * 刷新 token（活跃续期）
+     */
     public static void refreshToken(String token) {
         getStrategy().refreshToken(token);
     }
 
-    /// 根据刷新token签发新的token对
+    /**
+     * 根据刷新token签发新的token对
+     */
     public static TokenVO refreshByRefreshToken(String refreshToken) {
         return getStrategy().refreshByRefreshToken(refreshToken);
     }
 
-    /// 记录登录失败
+    /**
+     * 记录登录失败
+     */
     public static void recordLoginFail(String username) {
         getStrategy().recordLoginFail(username);
     }
 
-    /// 检查是否被锁定
+    /**
+     * 检查是否被锁定
+     */
     public static boolean isLockedOut(String username) {
         return getStrategy().isLockedOut(username);
     }
 
-    /// 清除登录失败计数
+    /**
+     * 清除登录失败计数
+     */
     public static void clearLoginFail(String username) {
         getStrategy().clearLoginFail(username);
     }
 
-    /// 获取在线用户列表
+    /**
+     * 获取在线用户列表
+     */
     public static List<UserOnlineVO> online() {
         return getStrategy().listOnlineUsers();
     }
 
-    /// 根据 token 获取用户信息
+    /**
+     * 根据 token 获取用户信息
+     */
     public static @Nullable SecurityUser getCurrentUser(String token) {
         return getStrategy().getCurrentUser(token);
     }
 
-    /// 获取当前请求的用户信息
+    /**
+     * 获取当前请求的用户信息
+     */
     public static @Nullable SecurityUser getCurrentUser() {
         return getStrategy().getCurrentUser();
     }
 
-    /// 获取当前用户的 token
+    /**
+     * 获取当前用户的 token
+     */
     public static @Nullable String getCurrentToken() {
         return getStrategy().getCurrentToken();
     }
 
-    /// 获取当前用户 ID
+    /**
+     * 获取当前用户 ID
+     */
     public static @Nullable UUID getCurrentUserId() {
         return getStrategy().getCurrentUserId();
     }
 
-    /// 获取当前用户时区ID
+    /**
+     * 获取当前用户时区ID
+     */
     public static String getCurrentUserZoneId() {
         return getStrategy().getCurrentUserZoneId();
     }
 
-    /// 获取当前用户名
+    /**
+     * 获取当前用户名
+     */
     public static String getCurrentUsername() {
         return getStrategy().getCurrentUsername();
     }

@@ -20,40 +20,60 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 更新当前用户信息入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 更新当前用户信息入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfileFrom {
 
-    /// 真实姓名
+    /**
+     * 真实姓名
+     */
     private String realName;
 
-    /// 性别
+    /**
+     * 性别
+     */
     private Short gender;
 
-    /// 生日
+    /**
+     * 生日
+     */
     private String birthday;
 
-    /// 手机号
+    /**
+     * 手机号
+     */
     private String phone;
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     private String email;
 
-    /// 国家
+    /**
+     * 国家
+     */
     private String country;
 
-    /// 城市
+    /**
+     * 城市
+     */
     private String city;
 
-    /// 语言
+    /**
+     * 语言
+     */
     private String language;
 
-    /// 时区
+    /**
+     * 时区
+     */
     private String timezone;
 }

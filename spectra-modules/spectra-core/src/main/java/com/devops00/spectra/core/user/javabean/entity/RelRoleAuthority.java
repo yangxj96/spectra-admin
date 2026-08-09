@@ -29,11 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 角色关联权限中间表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 角色关联权限中间表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -45,11 +47,15 @@ public class RelRoleAuthority extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 角色ID
+    /**
+     * 角色ID
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
-    /// 权限ID
+    /**
+     * 权限ID
+     */
     @TableField(value = "authority_id")
     private UUID authorityId;
 }

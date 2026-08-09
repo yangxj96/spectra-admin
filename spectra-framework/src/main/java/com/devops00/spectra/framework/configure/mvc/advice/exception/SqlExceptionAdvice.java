@@ -35,22 +35,28 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-/// SQL相关错误处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * SQL相关错误处理
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 @Slf4j
 @NullMarked
 @Order(-100)
 @RestControllerAdvice
 public class SqlExceptionAdvice {
 
-    /// 处理唯一键冲突异常
-    ///
-    /// @param e        错误信息
-    /// @param response 响应
-    /// @return 格式化为正常响应返回
+    /**
+     * 处理唯一键冲突异常
+     *
+     * @param e
+     *            错误信息
+     * @param response
+     *            响应
+     * @return 格式化为正常响应返回
+     */
     @ExceptionHandler(DuplicateKeyException.class)
     public R<Object> handleDuplicateKeyException(DuplicateKeyException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -68,11 +74,15 @@ public class SqlExceptionAdvice {
         return R.failure(errorMessage);
     }
 
-    /// 处理 SQL 语法错误
-    ///
-    /// @param e        错误信息
-    /// @param response 响应
-    /// @return 格式化为正常响应返回
+    /**
+     * 处理 SQL 语法错误
+     *
+     * @param e
+     *            错误信息
+     * @param response
+     *            响应
+     * @return 格式化为正常响应返回
+     */
     @ExceptionHandler(BadSqlGrammarException.class)
     public R<Object> handleBadSqlGrammarException(BadSqlGrammarException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -80,7 +90,9 @@ public class SqlExceptionAdvice {
         return R.failure("请求的数据查询异常,请联系管理员");
     }
 
-    /// 处理其他数据完整性违规（如外键、非空等）
+    /**
+     * 处理其他数据完整性违规（如外键、非空等）
+     */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public R<Object> handleDataIntegrityViolation(DataIntegrityViolationException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -88,7 +100,9 @@ public class SqlExceptionAdvice {
         return R.failure("数据不符合规则,请检查输入内容");
     }
 
-    /// 处理未分类的 JDBC 异常（如连接问题、驱动错误等）
+    /**
+     * 处理未分类的 JDBC 异常（如连接问题、驱动错误等）
+     */
     @ExceptionHandler(UncategorizedSQLException.class)
     public R<Object> handleUncategorizedSQLException(UncategorizedSQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -97,7 +111,9 @@ public class SqlExceptionAdvice {
         return R.failure("数据库操作异常,请稍后重试");
     }
 
-    /// 【兜底】捕获所有Spring数据访问异常（包括未显式处理的）
+    /**
+     * 【兜底】捕获所有Spring数据访问异常（包括未显式处理的）
+     */
     @ExceptionHandler(DataAccessException.class)
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -105,9 +121,11 @@ public class SqlExceptionAdvice {
         return R.failure("系统内部错误,请联系管理员");
     }
 
-    /// 【兜底】捕获原始SQLException（如未通过Spring异常翻译的场景）
-    ///
-    /// 注意：大多数情况下,Spring会将SQLException翻译为DataAccessException
+    /**
+     * 【兜底】捕获原始SQLException（如未通过Spring异常翻译的场景）
+     *
+     * 注意：大多数情况下,Spring会将SQLException翻译为DataAccessException
+     */
     @ExceptionHandler(SQLException.class)
     public R<Object> handleSQLException(SQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

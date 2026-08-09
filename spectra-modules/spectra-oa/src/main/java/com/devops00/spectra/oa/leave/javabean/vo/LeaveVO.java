@@ -22,56 +22,88 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 请假申请详情响应。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假申请详情响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class LeaveVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     private UUID applicationId;
 
-    /// 申请编号。
+    /**
+     * 申请编号。
+     */
     private String applicationNo;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 申请人 ID。
+    /**
+     * 申请人 ID。
+     */
     private UUID applicantId;
 
-    /// 请假类型编码。
+    /**
+     * 请假类型编码。
+     */
     private String leaveTypeCode;
 
-    /// 开始时间。
+    /**
+     * 开始时间。
+     */
     private LocalDateTime startTime;
 
-    /// 结束时间。
+    /**
+     * 结束时间。
+     */
     private LocalDateTime endTime;
 
-    /// 时长（小时）。
+    /**
+     * 时长（小时）。
+     */
     private BigDecimal durationHours;
 
-    /// 原因。
+    /**
+     * 原因。
+     */
     private String reason;
 
-    /// 联系地址。
+    /**
+     * 联系地址。
+     */
     private String contactAddress;
 
-    /// 流程实例 ID。
+    /**
+     * 流程实例 ID。
+     */
     private String processInstanceId;
 
-    /// 驳回原因。
+    /**
+     * 驳回原因。
+     */
     private String rejectReason;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 }

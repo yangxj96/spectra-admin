@@ -28,43 +28,62 @@ import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import java.util.List;
 import java.util.UUID;
 
-/// 行政区域Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/30 13:57
+/**
+ * 行政区域Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/30 13:57
+ */
 public interface RegionService extends BaseService<Region> {
 
-    /// 懒加载树
-    ///
-    /// @param level 层级
-    /// @param id    父级ID
-    /// @return 根据条件获取的下级的列表
+    /**
+     * 懒加载树
+     *
+     * @param level
+     *            层级
+     * @param id
+     *            父级ID
+     * @return 根据条件获取的下级的列表
+     */
     List<RegionVO> lazyTree(Integer level, String id);
 
-    /// 分页查询行政区划
-    ///
-    /// @param page   分页信息
-    /// @param params 过滤参数
-    /// @return 分页响应信息
+    /**
+     * 分页查询行政区划
+     *
+     * @param page
+     *            分页信息
+     * @param params
+     *            过滤参数
+     * @return 分页响应信息
+     */
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
     RegionPathVO getPath(UUID id);
 
-    /// 新增行政区划
-    ///
-    /// @param params 行政区划信息
-    /// @return 新增后的行政区划信息
+    /**
+     * 新增行政区划
+     *
+     * @param params
+     *            行政区划信息
+     * @return 新增后的行政区划信息
+     */
     RegionVO created(RegionFrom params);
 
-    /// 修改行政区划
-    ///
-    /// @param params 行政区划信息
-    /// @return 修改后的行政区划信息
+    /**
+     * 修改行政区划
+     *
+     * @param params
+     *            行政区划信息
+     * @return 修改后的行政区划信息
+     */
     RegionVO modify(RegionFrom params);
 
-    /// 根据ID删除行政区划
-    ///
-    /// @param id 行政区划ID
+    /**
+     * 根据ID删除行政区划
+     *
+     * @param id
+     *            行政区划ID
+     */
     void deleteById(UUID id);
 }

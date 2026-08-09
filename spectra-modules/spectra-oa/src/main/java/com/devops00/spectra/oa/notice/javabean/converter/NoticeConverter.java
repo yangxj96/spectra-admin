@@ -25,26 +25,34 @@ import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 公告对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 公告对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface NoticeConverter {
 
-    /// 公告实体转响应视图。
+    /**
+     * 公告实体转响应视图。
+     */
     @Mapping(target = "read", ignore = true)
     @Mapping(target = "readAt", ignore = true)
     NoticeVO toVO(Notice source);
 
-    /// 公告实体和阅读回执转响应视图。
+    /**
+     * 公告实体和阅读回执转响应视图。
+     */
     @Mapping(target = "id", source = "source.id")
     @Mapping(target = "createdAt", source = "source.createdAt")
     @Mapping(target = "read", expression = "java(reader != null && reader.getReadAt() != null)")
     @Mapping(target = "readAt", source = "reader.readAt")
     NoticeVO toVO(Notice source, NoticeReader reader);
 
-    /// 公告创建入参转实体。
+    /**
+     * 公告创建入参转实体。
+     */
     Notice toEntity(NoticeCreateFrom source);
 }

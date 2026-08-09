@@ -28,11 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 采购明细。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购明细。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -40,43 +42,63 @@ import lombok.Setter;
 @DataScope
 public class PurchaseItem extends BaseEntity {
 
-    /// 采购单 ID。
+    /**
+     * 采购单 ID。
+     */
     @TableField("purchase_id")
     private UUID purchaseId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 明细类型字段。
+    /**
+     * 明细类型字段。
+     */
     @TableField("item_type")
     private String itemType;
 
-    /// 明细名称字段。
+    /**
+     * 明细名称字段。
+     */
     @TableField("item_name")
     private String itemName;
 
-    /// 规格。
+    /**
+     * 规格。
+     */
     @TableField("specification")
     private String specification;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     @TableField("quantity")
     private BigDecimal quantity;
 
-    /// 预计单价。
+    /**
+     * 预计单价。
+     */
     @TableField("estimated_unit_price")
     private BigDecimal estimatedUnitPrice;
 
-    /// 预计金额。
+    /**
+     * 预计金额。
+     */
     @TableField("estimated_amount")
     private BigDecimal estimatedAmount;
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     @TableField("purpose")
     private String purpose;
 
-    /// 实收数量。
+    /**
+     * 实收数量。
+     */
     @TableField("received_quantity")
     private BigDecimal receivedQuantity;
 }

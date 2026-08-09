@@ -23,11 +23,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 
-/// 客户端私钥响应
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/14
+/**
+ * 客户端私钥响应
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/14
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,6 +38,8 @@ public class CryptoClientKeyVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 客户端私钥（Base64）
+    /**
+     * 客户端私钥（Base64）
+     */
     private String privateKey;
 }

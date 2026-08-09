@@ -23,11 +23,13 @@ import com.devops00.spectra.core.system.service.SysConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/// 系统配置表-业务实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/9/18 00:00
+/**
+ * 系统配置表-业务实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/9/18 00:00
+ */
 @Slf4j
 @Service
 public class SysConfigServiceImpl extends BaseServiceImpl<SysConfigMapper, SysConfig> implements SysConfigService {

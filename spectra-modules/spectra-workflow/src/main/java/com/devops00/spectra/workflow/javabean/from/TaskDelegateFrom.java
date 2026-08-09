@@ -18,14 +18,18 @@ package com.devops00.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/// 任务委派请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 任务委派请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class TaskDelegateFrom {
 
-    /// 目标用户用户名
+    /**
+     * 目标用户用户名
+     */
     private String targetUserId;
 }

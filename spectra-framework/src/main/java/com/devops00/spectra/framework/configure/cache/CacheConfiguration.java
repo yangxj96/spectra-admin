@@ -38,11 +38,13 @@ import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
 import java.time.Duration;
 
-/// 缓存配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/2 17:17
+/**
+ * 缓存配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/2 17:17
+ */
 @Slf4j
 @EnableCaching
 @Configuration
@@ -51,7 +53,9 @@ public class CacheConfiguration {
 
     private final SystemProperties systemProperties;
 
-    /// 缓存管理器
+    /**
+     * 缓存管理器
+     */
     @Bean
     public RedisCacheManager redisCacheManager(@Qualifier("redisObjectMapper") ObjectMapper om, RedisConnectionFactory factory) {
         log.debug(LogPrefix.CACHE.f("配置RedisCacheManager"));
@@ -73,7 +77,9 @@ public class CacheConfiguration {
         return RedisCacheManager.builder(factory).cacheDefaults(defaultConfig).build();
     }
 
-    /// 定义一个redis专用的ObjectMapper
+    /**
+     * 定义一个redis专用的ObjectMapper
+     */
     @Bean("redisObjectMapper")
     public ObjectMapper redisObjectMapper(ObjectMapper om) {
         log.debug(LogPrefix.SERIALIZATION.f("开始配置缓存使用的ObjectMapper"));

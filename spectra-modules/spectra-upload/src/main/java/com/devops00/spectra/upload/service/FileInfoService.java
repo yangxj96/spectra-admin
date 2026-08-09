@@ -25,31 +25,45 @@ import com.devops00.spectra.upload.javabean.vo.FileInfoVO;
 
 import java.util.UUID;
 
-/// 文件信息服务
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 11:35
+/**
+ * 文件信息服务
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 11:35
+ */
 public interface FileInfoService extends BaseService<FileInfo> {
 
-    /// 根据hash值查询文件是否已经上穿过
-    ///
-    /// @param hash hash值
-    /// @return 文件信息，可能为null
+    /**
+     * 根据hash值查询文件是否已经上穿过
+     *
+     * @param hash
+     *            hash值
+     * @return 文件信息，可能为null
+     */
     FileInfo findByHash(String hash);
 
-    /// 增加引用计数
+    /**
+     * 增加引用计数
+     */
     void incrRefCount(UUID id);
 
-    /// 分页查询文件列表
-    ///
-    /// @param page   分页参数
-    /// @param params 查询参数
-    /// @return 分页结果
+    /**
+     * 分页查询文件列表
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询参数
+     * @return 分页结果
+     */
     IPage<FileInfoVO> page(PageFrom page, FilePageFrom params);
 
-    /// 根据ID删除文件(软删除)
-    ///
-    /// @param id 文件ID
+    /**
+     * 根据ID删除文件(软删除)
+     *
+     * @param id
+     *            文件ID
+     */
     void deleteById(UUID id);
 }

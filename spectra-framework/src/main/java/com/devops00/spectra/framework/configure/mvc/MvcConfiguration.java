@@ -28,11 +28,13 @@ import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-/// mvc配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * mvc配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Configuration
 @EnableConfigurationProperties({SystemProperties.class, UserProperties.class})

@@ -24,16 +24,20 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/// 工作流业务层实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 工作流业务层实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @Service
 public class WorkflowServiceImpl implements WorkflowService {
 
-    /// 回调注册表：流程定义KEY -> 回调实现
+    /**
+     * 回调注册表：流程定义KEY -> 回调实现
+     */
     private final Map<String, ApprovalCallback> callbackRegistry = new ConcurrentHashMap<>();
 
     @Override

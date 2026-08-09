@@ -21,22 +21,30 @@ import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 
 import java.util.List;
 
-/// 部门维度统计服务。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 部门维度统计服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 public interface DepartmentStatsService {
 
-    /// 查询部门维度统计。
-    ///
-    /// @param from 查询条件
-    /// @return 统计列表
+    /**
+     * 查询部门维度统计。
+     *
+     * @param from
+     *            查询条件
+     * @return 统计列表
+     */
     List<DepartmentStatsVO> list(DepartmentStatsFrom from);
 
-    /// 导出部门维度统计 Excel。
-    ///
-    /// @param from 查询条件
-    /// @return xlsx 文件内容
+    /**
+     * 导出部门维度统计 Excel。
+     *
+     * @param from
+     *            查询条件
+     * @return xlsx 文件内容
+     */
     byte[] export(DepartmentStatsFrom from);
 }

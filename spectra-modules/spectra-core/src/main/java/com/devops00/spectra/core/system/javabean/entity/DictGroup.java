@@ -30,11 +30,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 字典-字典类型
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典-字典类型
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -45,32 +47,46 @@ public class DictGroup extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     @Nullable
     @TableField(value = "pid")
     private UUID pid;
 
-    /// 字典名称
+    /**
+     * 字典名称
+     */
     @TableField(value = "name")
     private String name;
 
-    /// 字典编码
+    /**
+     * 字典编码
+     */
     @TableField(value = "code")
     private String code;
 
-    /// 字典状态
+    /**
+     * 字典状态
+     */
     @TableField(value = "state")
     private Boolean state;
 
-    /// 备注
+    /**
+     * 备注
+     */
     @TableField(value = "remark")
     private String remark;
 
-    /// 是否内置字段,为true则不允许他进行修改删除操作
+    /**
+     * 是否内置字段,为true则不允许他进行修改删除操作
+     */
     @TableField(value = "builtin")
     private Boolean builtin;
 
-    /// 是否隐藏,为true则前端不可见
+    /**
+     * 是否隐藏,为true则前端不可见
+     */
     @TableField(value = "hide")
     private Boolean hide;
 }

@@ -40,11 +40,13 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/// 用户角色关联服务测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 用户角色关联服务测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 @ExtendWith(MockitoExtension.class)
 class RelUserRoleServiceImplTest {
 

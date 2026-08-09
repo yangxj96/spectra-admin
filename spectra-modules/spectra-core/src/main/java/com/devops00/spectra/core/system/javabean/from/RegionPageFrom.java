@@ -20,16 +20,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 行政区划分页查询入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/6 00:00
+/**
+ * 行政区划分页查询入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/6 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegionPageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String str;
 }

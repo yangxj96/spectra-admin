@@ -24,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.web.multipart.MultipartFile;
 
-/// 文件类型验证策略-根据文件 MIME 类型验证
-///
-/// @author yangxj96
-/// @version 2.0
-/// @since 2025/6/19 00:00
+/**
+ * 文件类型验证策略-根据文件 MIME 类型验证
+ *
+ * @author yangxj96
+ * @version 2.0
+ * @since 2025/6/19 00:00
+ */
 @Slf4j
 @RequiredArgsConstructor
 public class MimeValidationStrategy implements FileTypeValidationStrategy {

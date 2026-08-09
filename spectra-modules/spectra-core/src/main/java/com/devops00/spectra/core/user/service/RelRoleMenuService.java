@@ -22,27 +22,39 @@ import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
 import java.util.List;
 import java.util.UUID;
 
-/// 关联服务-角色和菜单
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 关联服务-角色和菜单
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface RelRoleMenuService {
 
-    /// 授予角色菜单
-    ///
-    /// @param roleId 角色ID
-    /// @param from   角色关联菜单信息
+    /**
+     * 授予角色菜单
+     *
+     * @param roleId
+     *            角色ID
+     * @param from
+     *            角色关联菜单信息
+     */
     void grant(UUID roleId, RoleMenuFrom from);
 
-    /// 撤销角色菜单
-    ///
-    /// @param roleId 角色ID
+    /**
+     * 撤销角色菜单
+     *
+     * @param roleId
+     *            角色ID
+     */
     void revoke(UUID roleId);
 
-    /// 获取角色菜单
-    ///
-    /// @param roleId 角色ID
-    /// @return 菜单列表
+    /**
+     * 获取角色菜单
+     *
+     * @param roleId
+     *            角色ID
+     * @return 菜单列表
+     */
     List<MenuVO> get(UUID roleId);
 }

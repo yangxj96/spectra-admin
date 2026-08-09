@@ -24,84 +24,134 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 资产台账响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产台账响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 分类 ID。
+    /**
+     * 分类 ID。
+     */
     private UUID categoryId;
 
-    /// 分类名称。
+    /**
+     * 分类名称。
+     */
     private String categoryName;
 
-    /// 资产编号。
+    /**
+     * 资产编号。
+     */
     private String assetNo;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     private String name;
 
-    /// 规格。
+    /**
+     * 规格。
+     */
     private String specification;
 
-    /// 序列号。
+    /**
+     * 序列号。
+     */
     private String serialNo;
 
-    /// 资产类型。
+    /**
+     * 资产类型。
+     */
     private String assetType;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     private BigDecimal quantity;
 
-    /// 购置日期。
+    /**
+     * 购置日期。
+     */
     private LocalDate acquisitionDate;
 
-    /// 购置金额。
+    /**
+     * 购置金额。
+     */
     private BigDecimal acquisitionAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency;
 
-    /// 供应商。
+    /**
+     * 供应商。
+     */
     private String supplier;
 
-    /// 位置。
+    /**
+     * 位置。
+     */
     private String location;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 保管人 ID。
+    /**
+     * 保管人 ID。
+     */
     private UUID custodianId;
 
-    /// 保修截止日期。
+    /**
+     * 保修截止日期。
+     */
     private LocalDate warrantyUntil;
 
-    /// 来源采购单 ID。
+    /**
+     * 来源采购单 ID。
+     */
     private UUID sourcePurchaseId;
 
-    /// 来源收货单 ID。
+    /**
+     * 来源收货单 ID。
+     */
     private UUID sourceReceiptId;
 
-    /// 来源采购明细 ID。
+    /**
+     * 来源采购明细 ID。
+     */
     private UUID sourcePurchaseItemId;
 
-    /// 备注。
+    /**
+     * 备注。
+     */
     private String remark;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private List<AssetOperationVO> operations = List.of();
     private LocalDateTime createdAt;
 
-    /// 更新时间。
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
 }

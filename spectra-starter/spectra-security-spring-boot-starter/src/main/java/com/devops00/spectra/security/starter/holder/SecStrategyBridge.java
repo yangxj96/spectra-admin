@@ -19,11 +19,13 @@ package com.devops00.spectra.security.starter.holder;
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.holder.SecUtil;
 
-/// sec策略桥接器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/5 01:13
+/**
+ * sec策略桥接器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/5 01:13
+ */
 public class SecStrategyBridge {
 
     public SecStrategyBridge(SecHolderStrategy strategy) {

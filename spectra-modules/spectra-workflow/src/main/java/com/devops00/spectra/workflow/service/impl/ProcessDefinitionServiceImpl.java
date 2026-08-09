@@ -36,11 +36,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/// 流程定义Service实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 流程定义Service实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -148,7 +150,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
         return assembleView(definition);
     }
 
-    /// 实体转VO（含部署时间填充）
+    /**
+     * 实体转VO（含部署时间填充）
+     */
     private ProcessDefinitionVO assembleView(org.flowable.engine.repository.ProcessDefinition definition) {
         var vo = processConverter.toVO(definition);
         // 填充部署时间

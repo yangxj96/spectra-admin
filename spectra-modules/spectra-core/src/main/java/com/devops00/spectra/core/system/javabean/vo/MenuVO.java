@@ -23,34 +23,50 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 菜单VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 菜单VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuVO {
 
-    /// 数据id.
+    /**
+     * 数据id.
+     */
     private UUID id;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private UUID pid;
 
-    /// 图标
+    /**
+     * 图标
+     */
     private String icon;
 
-    /// 菜单节点类型
+    /**
+     * 菜单节点类型
+     */
     private MenuType menuType;
 
-    /// 对应前端命名路由
+    /**
+     * 对应前端命名路由
+     */
     private String routeName;
 
-    /// 名称
+    /**
+     * 名称
+     */
     private String name;
 
-    /// 排序
+    /**
+     * 排序
+     */
     private Integer sort;
 }

@@ -12,20 +12,28 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/// 文档分页查询条件。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 文档分页查询条件。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DocumentPageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 目录 ID。
+    /**
+     * 目录 ID。
+     */
     private UUID folderId;
 }

@@ -24,46 +24,70 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// 会议列表VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 会议列表VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MeetingVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 会议标题
+    /**
+     * 会议标题
+     */
     private String title;
 
-    /// 发起人ID
+    /**
+     * 发起人ID
+     */
     private String initiatorId;
 
-    /// 开始时间
+    /**
+     * 开始时间
+     */
     private LocalDateTime startTime;
 
-    /// 结束时间
+    /**
+     * 结束时间
+     */
     private LocalDateTime endTime;
 
-    /// 会议地点
+    /**
+     * 会议地点
+     */
     private String location;
 
-    /// 会议内容/议题
+    /**
+     * 会议内容/议题
+     */
     private String content;
 
-    /// 会议业务状态
+    /**
+     * 会议业务状态
+     */
     private MeetingStatus status;
 
-    /// 工作流审核状态
+    /**
+     * 工作流审核状态
+     */
     private MeetingStatus approvalStatus;
 
-    /// 工作流审核实例ID
+    /**
+     * 工作流审核实例ID
+     */
     private String processInstanceId;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 }

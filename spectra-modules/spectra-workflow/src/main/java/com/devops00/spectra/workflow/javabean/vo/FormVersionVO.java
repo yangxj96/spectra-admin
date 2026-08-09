@@ -21,35 +21,53 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// 表单版本响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 表单版本响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class FormVersionVO {
 
-    /// 版本ID
+    /**
+     * 版本ID
+     */
     private UUID id;
 
-    /// 关联表单定义ID
+    /**
+     * 关联表单定义ID
+     */
     private UUID formDefinitionId;
 
-    /// 版本号
+    /**
+     * 版本号
+     */
     private Integer formVersion;
 
-    /// form-create规则JSON
+    /**
+     * form-create规则JSON
+     */
     private String ruleJson;
 
-    /// form-create配置JSON
+    /**
+     * form-create配置JSON
+     */
     private String optionsJson;
 
-    /// form-create完整输出
+    /**
+     * form-create完整输出
+     */
     private String formJson;
 
-    /// 创建人
+    /**
+     * 创建人
+     */
     private UUID createdBy;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 }

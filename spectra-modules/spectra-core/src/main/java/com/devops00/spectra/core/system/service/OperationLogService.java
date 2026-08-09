@@ -19,10 +19,12 @@ package com.devops00.spectra.core.system.service;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 
-/// 操作日志service层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 操作日志service层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public interface OperationLogService extends BaseService<OperationLog> {
 }

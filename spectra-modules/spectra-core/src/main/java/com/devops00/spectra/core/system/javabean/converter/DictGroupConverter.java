@@ -25,29 +25,40 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 字典Mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典Mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface DictGroupConverter {
 
-    /// 字典类型入参转实体
-    ///
-    /// @param source 字典类型入参
-    /// @return 转换后的实体
+    /**
+     * 字典类型入参转实体
+     *
+     * @param source
+     *            字典类型入参
+     * @return 转换后的实体
+     */
     DictGroup toEntity(DictGroupFrom source);
 
-    /// 字典类型转字典树类型
-    ///
-    /// @param source 字典类型
-    /// @return 字典类型
+    /**
+     * 字典类型转字典树类型
+     *
+     * @param source
+     *            字典类型
+     * @return 字典类型
+     */
     DictGroupTreeVO toTreeVO(DictGroup source);
 
-    /// 字典类型转字典树类型列表
-    ///
-    /// @param source 字典类型
-    /// @return 字典类型
+    /**
+     * 字典类型转字典树类型列表
+     *
+     * @param source
+     *            字典类型
+     * @return 字典类型
+     */
     List<DictGroupTreeVO> toTreeVOList(List<DictGroup> source);
 }

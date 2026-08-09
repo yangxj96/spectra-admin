@@ -37,11 +37,13 @@ import reactor.core.publisher.Flux;
 
 import java.util.regex.Pattern;
 
-/// 响应结果统一修改
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 响应结果统一修改
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @NullMarked
 @Order(Ordered.HIGHEST_PRECEDENCE + 1)
@@ -96,11 +98,15 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
         return R.success(body);
     }
 
-    /// 空body处理
-    ///
-    /// @param request  请求
-    /// @param response 响应
-    /// @return 结果
+    /**
+     * 空body处理
+     *
+     * @param request
+     *            请求
+     * @param response
+     *            响应
+     * @return 结果
+     */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {
         R<Object> r;
         // 如果能获取到响应则直接响应

@@ -44,11 +44,13 @@ import tools.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.*;
 
-/// Redis 方式存储 Token（简化版：5 个 key 覆盖全部场景）
-///
-/// @author yangxj96
-/// @version 2.0
-/// @since 2025/12/11 10:06
+/**
+ * Redis 方式存储 Token（简化版：5 个 key 覆盖全部场景）
+ *
+ * @author yangxj96
+ * @version 2.0
+ * @since 2025/12/11 10:06
+ */
 @Slf4j
 @NullMarked
 public class RedisSecHolderStrategy implements SecHolderStrategy {
@@ -457,7 +459,9 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     // ==================== 内部辅助 ====================
 
-    /// 刷新 session / user-client / user-tokens 三个 key 的 TTL
+    /**
+     * 刷新 session / user-client / user-tokens 三个 key 的 TTL
+     */
     private void refreshTTL(String token, String userId, String clientType) {
         Duration accessTtl = Duration.ofSeconds(properties.getAccessTokenExpire());
         Duration refreshTtl = Duration.ofSeconds(properties.getRefreshTokenExpire());
@@ -466,7 +470,9 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         redis.expire(AuthRedisKey.USER_TOKENS.format(userId), refreshTtl);
     }
 
-    /// 构造 TokenVO
+    /**
+     * 构造 TokenVO
+     */
     private TokenVO buildTokenVO(SecurityUser user, String token, String refreshToken) {
         var roles = new ArrayList<String>();
         var authorities = new ArrayList<String>();
@@ -489,7 +495,9 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
                 .build();
     }
 
-    /// 从 HTTP 请求自动解析 ClientType
+    /**
+     * 从 HTTP 请求自动解析 ClientType
+     */
     private ClientType resolveClientType() {
         HttpServletRequest request = this.getHttpServletRequest();
         if (request == null) {

@@ -32,11 +32,13 @@ import tools.jackson.databind.type.TypeFactory;
 import java.util.List;
 import java.util.Map;
 
-/// 日志消息监听器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/3 00:00
+/**
+ * 日志消息监听器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/3 00:00
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

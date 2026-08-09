@@ -26,34 +26,48 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 采购申请保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购申请保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseSaveFrom {
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     @NotBlank(message = "采购事由不能为空")
     private String purpose;
 
-    /// 预计日期。
+    /**
+     * 预计日期。
+     */
     @NotNull(message = "期望到货日期不能为空")
     private String expectedDate;
 
-    /// 预算金额。
+    /**
+     * 预算金额。
+     */
     @NotNull(message = "采购预算不能为空")
     @DecimalMin(value = "0.01", message = "采购预算必须大于 0")
     private BigDecimal budgetAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency = "CNY";
 
-    /// 建议供应商。
+    /**
+     * 建议供应商。
+     */
     private String suggestedSupplier;
 
-    /// 明细列表。
+    /**
+     * 明细列表。
+     */
     @NotEmpty(message = "至少填写一条采购明细")
     @Valid
     private List<PurchaseItemFrom> items;

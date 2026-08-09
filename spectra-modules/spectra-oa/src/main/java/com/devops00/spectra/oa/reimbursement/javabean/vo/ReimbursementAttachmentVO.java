@@ -20,23 +20,33 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 报销凭证附件响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销凭证附件响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementAttachmentVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 文件 ID。
+    /**
+     * 文件 ID。
+     */
     private UUID fileId;
 
-    /// 文件名称。
+    /**
+     * 文件名称。
+     */
     private String fileName;
 
-    /// 预览地址。
+    /**
+     * 预览地址。
+     */
     private String previewUrl;
 }

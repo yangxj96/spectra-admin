@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/// 消息Service实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 消息Service实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -190,7 +192,9 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
         log.info("批量发送消息成功: type={}, count={}", dto.getType(), dto.getReceiverIds().size());
     }
 
-    /// 将Map转换为JSON字符串
+    /**
+     * 将Map转换为JSON字符串
+     */
     private String convertExtraToJson(Map<String, Object> extra) {
         try {
             return new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(extra);

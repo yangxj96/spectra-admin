@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 读取配置异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/1 00:00
+/**
+ * 读取配置异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/1 00:00
+ */
 public class ReadPropertiesException extends SpectraException {
 
     public ReadPropertiesException(String message) {

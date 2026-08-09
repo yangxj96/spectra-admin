@@ -18,14 +18,18 @@ package com.devops00.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/// 工作流任务分页查询参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 工作流任务分页查询参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class TaskPageFrom {
 
-    /// 流程定义KEY
+    /**
+     * 流程定义KEY
+     */
     private String processDefinitionKey;
 }

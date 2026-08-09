@@ -32,11 +32,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-/// 文件操作相关控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/19 00:00
+/**
+ * 文件操作相关控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/19 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/file/upload")
@@ -46,7 +48,9 @@ public class FileController {
 
     private final FileUploadFacade bindService;
 
-    /// 文件上传预处理
+    /**
+     * 文件上传预处理
+     */
     @ULog("'文件上传预处理'")
     @PostMapping(value = "/pre", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'FILE:INSERT')")
@@ -54,9 +58,12 @@ public class FileController {
         return bindService.pre(from);
     }
 
-    /// 小文件直接保存
-    ///
-    /// @param from 文件直接保存的参数
+    /**
+     * 小文件直接保存
+     *
+     * @param from
+     *            文件直接保存的参数
+     */
     @ULog("'普通上传'")
     @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'FILE:INSERT')")
@@ -64,9 +71,12 @@ public class FileController {
         return bindService.upload(from);
     }
 
-    /// 上传切片
-    ///
-    /// @param from 文件分片上传参数
+    /**
+     * 上传切片
+     *
+     * @param from
+     *            文件分片上传参数
+     */
     @ULog("'分片上传'")
     @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'FILE:INSERT')")
@@ -74,9 +84,12 @@ public class FileController {
         return bindService.chunk(from);
     }
 
-    /// 请求合并
-    ///
-    /// @param uploadId 上传id
+    /**
+     * 请求合并
+     *
+     * @param uploadId
+     *            上传id
+     */
     @ULog("'分片上传'")
     @PostMapping(value = "/merge/{uploadId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'FILE:INSERT')")
@@ -84,9 +97,12 @@ public class FileController {
         return bindService.merge(uploadId);
     }
 
-    /// 附件预览
-    ///
-    /// @param id 文件ID
+    /**
+     * 附件预览
+     *
+     * @param id
+     *            文件ID
+     */
     @ULog("'附件预览'")
     @PreAuthorize("permitAll()")
     @GetMapping(value = "/preview/{id}", version = "1.0.0+")
@@ -94,9 +110,12 @@ public class FileController {
         bindService.preview(id);
     }
 
-    /// 下载文件
-    ///
-    /// @param id 文件ID
+    /**
+     * 下载文件
+     *
+     * @param id
+     *            文件ID
+     */
     @ULog("'下载文件'")
     @GetMapping(value = "/download/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'FILE:QUERY')")

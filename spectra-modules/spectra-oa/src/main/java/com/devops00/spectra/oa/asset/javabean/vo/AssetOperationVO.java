@@ -22,53 +22,83 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 资产生命周期操作响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产生命周期操作响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetOperationVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 资产 ID。
+    /**
+     * 资产 ID。
+     */
     private UUID assetId;
 
-    /// 操作类型。
+    /**
+     * 操作类型。
+     */
     private String operationType;
 
-    /// 原部门 ID。
+    /**
+     * 原部门 ID。
+     */
     private UUID fromDepartmentId;
 
-    /// 目标部门 ID。
+    /**
+     * 目标部门 ID。
+     */
     private UUID toDepartmentId;
 
-    /// 原用户 ID。
+    /**
+     * 原用户 ID。
+     */
     private UUID fromUserId;
 
-    /// 目标用户 ID。
+    /**
+     * 目标用户 ID。
+     */
     private UUID toUserId;
 
-    /// 原位置。
+    /**
+     * 原位置。
+     */
     private String fromLocation;
 
-    /// 目标位置。
+    /**
+     * 目标位置。
+     */
     private String toLocation;
 
-    /// 操作时间。
+    /**
+     * 操作时间。
+     */
     private LocalDate operationDate;
 
-    /// 原因。
+    /**
+     * 原因。
+     */
     private String reason;
 
-    /// 维修内容。
+    /**
+     * 维修内容。
+     */
     private String maintenanceContent;
 
-    /// 维修费用。
+    /**
+     * 维修费用。
+     */
     private BigDecimal maintenanceCost;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 }

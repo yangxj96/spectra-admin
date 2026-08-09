@@ -26,41 +26,58 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 菜单相关mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单相关mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface MenuConverter {
 
-    /// 实体转 树形实体VO
-    ///
-    /// @param source 实体
-    /// @return 树形实体VO
+    /**
+     * 实体转 树形实体VO
+     *
+     * @param source
+     *            实体
+     * @return 树形实体VO
+     */
     MenuTreeVO toTreeVO(Menu source);
 
-    /// 实体转 树形实体VO
-    ///
-    /// @param source 实体
-    /// @return 树形实体VO
+    /**
+     * 实体转 树形实体VO
+     *
+     * @param source
+     *            实体
+     * @return 树形实体VO
+     */
     List<MenuTreeVO> toTreeVOList(List<Menu> source);
 
-    /// 实体转VO
-    ///
-    /// @param source 实体
-    /// @return VO
+    /**
+     * 实体转VO
+     *
+     * @param source
+     *            实体
+     * @return VO
+     */
     MenuVO toVO(Menu source);
 
-    /// 实体转VO(列表)
-    ///
-    /// @param source 实体
-    /// @return VO
+    /**
+     * 实体转VO(列表)
+     *
+     * @param source
+     *            实体
+     * @return VO
+     */
     List<MenuVO> toVOList(List<Menu> source);
 
-    /// 保存入参转实体
-    ///
-    /// @param source 保存入参
-    /// @return 实体
+    /**
+     * 保存入参转实体
+     *
+     * @param source
+     *            保存入参
+     * @return 实体
+     */
     Menu toEntity(MenuSaveFrom source);
 }

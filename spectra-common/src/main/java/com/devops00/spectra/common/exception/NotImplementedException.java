@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 未实现错误
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/25 14:55
+/**
+ * 未实现错误
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/25 14:55
+ */
 public class NotImplementedException extends SpectraException {
 
     public NotImplementedException() {

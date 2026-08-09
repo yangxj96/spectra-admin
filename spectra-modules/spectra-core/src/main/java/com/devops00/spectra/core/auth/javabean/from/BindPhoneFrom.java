@@ -22,22 +22,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 绑定手机入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 绑定手机入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BindPhoneFrom {
 
-    /// 手机号
+    /**
+     * 手机号
+     */
     @NotBlank(message = "手机号不能为空")
     @Pattern(regexp = "^1[3-9]\\d{9}$", message = "手机号格式不正确")
     private String phone;
 
-    /// 验证码
+    /**
+     * 验证码
+     */
     @NotBlank(message = "验证码不能为空")
     private String code;
 }

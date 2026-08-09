@@ -26,11 +26,13 @@ import com.devops00.spectra.workflow.service.WorkflowService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
-/// 采购流程审批回调注册器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购流程审批回调注册器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Component
 @RequiredArgsConstructor
 public class PurchaseApprovalCallback implements ApprovalCallback {

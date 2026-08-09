@@ -24,13 +24,17 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
-/// Redis Key过期监听（日志记录，实际清理由业务层懒处理）
-///
-/// > 需要在 Redis 中开启 `notify-keyspace-events Ex`
-///
-/// @author yangxj96
-/// @version 2.0
-/// @since 2026/2/8 20:22
+/**
+ * Redis Key过期监听（日志记录，实际清理由业务层懒处理）
+ *
+ * <p>
+ * 需要在 Redis 中开启 {@code notify-keyspace-events Ex}
+ * </p>
+ *
+ * @author yangxj96
+ * @version 2.0
+ * @since 2026/2/8 20:22
+ */
 @Slf4j
 @Component
 public class SecurityRedisKeyExpirationListener implements MessageListener {

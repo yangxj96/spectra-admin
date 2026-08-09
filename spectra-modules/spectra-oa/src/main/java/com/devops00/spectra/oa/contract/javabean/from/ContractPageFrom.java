@@ -18,23 +18,33 @@ package com.devops00.spectra.oa.contract.javabean.from;
 
 import lombok.Data;
 
-/// 合同分页筛选参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同分页筛选参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ContractPageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 合同类型字段。
+    /**
+     * 合同类型字段。
+     */
     private String contractType;
 
-    /// 签署状态。
+    /**
+     * 签署状态。
+     */
     private String signingStatus;
 }

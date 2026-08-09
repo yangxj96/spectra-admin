@@ -19,11 +19,13 @@ package com.devops00.spectra.core.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.test.context.SpringBootTest;
 
-/// 认证单元测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/30 14:01
+/**
+ * 认证单元测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/30 14:01
+ */
 @Slf4j
 @SpringBootTest
 class AuthControllerTest {

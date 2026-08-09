@@ -25,34 +25,46 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/// 工作流-表单版本表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单版本表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "wf_form_version", schema = "spectra_workflow")
 public class FormVersion extends BaseEntity {
 
-    /// 关联表单定义ID
+    /**
+     * 关联表单定义ID
+     */
     @TableField("form_definition_id")
     private UUID formDefinitionId;
 
-    /// 版本号（同一表单下唯一）
+    /**
+     * 版本号（同一表单下唯一）
+     */
     @TableField("form_version")
     private Integer formVersion;
 
-    /// form-create规则JSON（组件定义）
+    /**
+     * form-create规则JSON（组件定义）
+     */
     @TableField("rule_json")
     private String ruleJson;
 
-    /// form-create配置JSON（表单属性）
+    /**
+     * form-create配置JSON（表单属性）
+     */
     @TableField("options_json")
     private String optionsJson;
 
-    /// form-create getJson()完整输出
+    /**
+     * form-create getJson()完整输出
+     */
     @TableField("form_json")
     private String formJson;
 }

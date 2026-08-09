@@ -23,38 +23,56 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/// 在线用户VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/10/15 10:58
+/**
+ * 在线用户VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/10/15 10:58
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserOnlineVO {
 
-    /// 用户ID
+    /**
+     * 用户ID
+     */
     private String userId;
 
-    /// 用户名
+    /**
+     * 用户名
+     */
     private String username;
 
-    /// 登陆类型
+    /**
+     * 登陆类型
+     */
     private String loginType;
 
-    /// 客户端类型
+    /**
+     * 客户端类型
+     */
     private String clientType;
 
-    /// IP
+    /**
+     * IP
+     */
     private String ip;
 
-    /// IP所在地
+    /**
+     * IP所在地
+     */
     private String address;
 
-    /// 登陆时间
+    /**
+     * 登陆时间
+     */
     private LocalDateTime loginTime;
 
-    /// 关联的token
+    /**
+     * 关联的token
+     */
     private String token;
 }

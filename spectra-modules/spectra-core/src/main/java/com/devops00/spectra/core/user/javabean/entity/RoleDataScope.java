@@ -28,11 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 角色数据范围
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/23 11:24
+/**
+ * 角色数据范围
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/23 11:24
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,11 +42,15 @@ import lombok.NoArgsConstructor;
 @TableName(value = "sys_role_data_scope", schema = "spectra_core")
 public class RoleDataScope extends BaseEntity {
 
-    /// 角色ID
+    /**
+     * 角色ID
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
-    /// 数据范围类型
+    /**
+     * 数据范围类型
+     */
     @TableField(value = "scope_type")
     private DataScopeType scopeType;
 }

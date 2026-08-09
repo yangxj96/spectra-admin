@@ -43,11 +43,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/// 组织机构业务层-实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/15 00:00
+/**
+ * 组织机构业务层-实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/15 00:00
+ */
 @Slf4j
 @Service
 @CacheConfig(cacheNames = "core:dept", keyGenerator = "standardCacheKeyGenerator")
@@ -145,7 +147,9 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
         return all;
     }
 
-    /// 构建 parentId -> childrenId 列表
+    /**
+     * 构建 parentId -> childrenId 列表
+     */
     private @NonNull Map<UUID, List<UUID>> buildChildrenMap(@NonNull List<Department> list) {
         Map<UUID, List<UUID>> map = new HashMap<>();
 
@@ -157,11 +161,16 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
         return map;
     }
 
-    /// 深度优先遍历（防止死循环）
-    ///
-    /// @param currentId   当前节点ID
-    /// @param childrenMap 子节点map
-    /// @param result      响应结果
+    /**
+     * 深度优先遍历（防止死循环）
+     *
+     * @param currentId
+     *            当前节点ID
+     * @param childrenMap
+     *            子节点map
+     * @param result
+     *            响应结果
+     */
     private void dfs(UUID currentId, Map<UUID, List<UUID>> childrenMap, @NonNull Set<UUID> result) {
 
         // 已访问过，直接返回（防止环）

@@ -16,11 +16,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-/// 通知设置Service实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 通知设置Service实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -63,7 +65,9 @@ public class NotificationSettingServiceImpl extends BaseServiceImpl<Notification
         log.info("更新消息设置成功: userId={}", userId);
     }
 
-    /// 创建默认设置
+    /**
+     * 创建默认设置
+     */
     private NotificationSetting createDefaultSetting(UUID userId) {
         var entity = new NotificationSetting();
         entity.setUserId(userId);

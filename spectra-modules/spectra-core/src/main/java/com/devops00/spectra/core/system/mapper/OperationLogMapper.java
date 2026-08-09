@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import org.apache.ibatis.annotations.Mapper;
 
-/// 操作日志mapper层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 操作日志mapper层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Mapper
 public interface OperationLogMapper extends BaseMapper<OperationLog> {
 }

@@ -10,11 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/// 通知设置控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 通知设置控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @RestController
 @RequestMapping("/notification/setting")
@@ -23,7 +25,9 @@ public class NotificationSettingController {
 
     private final NotificationSettingService notificationSettingService;
 
-    /// 获取消息设置
+    /**
+     * 获取消息设置
+     */
     @ULog("'查询消息设置'")
     @GetMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')")
@@ -32,7 +36,9 @@ public class NotificationSettingController {
         return notificationSettingService.getSetting(userId);
     }
 
-    /// 更新消息设置
+    /**
+     * 更新消息设置
+     */
     @ULog("'更新消息设置'")
     @PutMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')")

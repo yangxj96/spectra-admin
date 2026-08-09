@@ -21,18 +21,24 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 报销凭证附件参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销凭证附件参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementAttachmentFrom {
 
-    /// 文件 ID。
+    /**
+     * 文件 ID。
+     */
     @NotNull(message = "凭证文件不能为空")
     private UUID fileId;
 
-    /// 文件名称。
+    /**
+     * 文件名称。
+     */
     private String fileName;
 }

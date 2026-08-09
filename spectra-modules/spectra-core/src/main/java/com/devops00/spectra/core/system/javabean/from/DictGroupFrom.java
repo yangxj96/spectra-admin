@@ -25,36 +25,50 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 字典类型入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典类型入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DictGroupFrom {
 
-    /// 主键ID
+    /**
+     * 主键ID
+     */
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private UUID pid;
 
-    /// 字典名称
+    /**
+     * 字典名称
+     */
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
 
-    /// 字典编码
+    /**
+     * 字典编码
+     */
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String code;
 
-    /// 字典状态
+    /**
+     * 字典状态
+     */
     @NotNull(message = "字典类型名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Boolean state;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 }

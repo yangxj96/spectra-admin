@@ -31,11 +31,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-/// 邮箱验证码登录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/28
+/**
+ * 邮箱验证码登录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/28
+ */
 @Service
 @NullMarked
 public class LoginEmailProvider extends EmailAuthenticationProvider {

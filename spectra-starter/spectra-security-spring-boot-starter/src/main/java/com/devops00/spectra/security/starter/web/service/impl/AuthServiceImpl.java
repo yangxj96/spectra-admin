@@ -26,11 +26,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 
-/// 认证服务实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/28
+/**
+ * 认证服务实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/28
+ */
 @Slf4j
 @Service
 @NullMarked

@@ -37,11 +37,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
-/// AI 会话管理控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话管理控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -50,7 +52,9 @@ public class AiConversationController {
 
     private final AiConversationService conversationService;
 
-    /// 获取当前用户的会话列表
+    /**
+     * 获取当前用户的会话列表
+     */
     @ULog("'查询AI会话列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'AI:QUERY')")
@@ -58,7 +62,9 @@ public class AiConversationController {
         return conversationService.listByUser(SecUtil.getCurrentUserId());
     }
 
-    /// 重命名会话
+    /**
+     * 重命名会话
+     */
     @ULog("'重命名AI会话'")
     @PutMapping(value = "/{id}/title", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'AI:UPDATE')")
@@ -66,7 +72,9 @@ public class AiConversationController {
         conversationService.rename(id, SecUtil.getCurrentUserId(), from.getTitle());
     }
 
-    /// 删除会话
+    /**
+     * 删除会话
+     */
     @ULog("'删除AI会话'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'AI:DELETE')")
@@ -74,7 +82,9 @@ public class AiConversationController {
         conversationService.delete(id, SecUtil.getCurrentUserId());
     }
 
-    /// 获取对话历史消息
+    /**
+     * 获取对话历史消息
+     */
     @ULog("'查询AI对话历史'")
     @GetMapping(value = "/{id}/messages", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'AI:QUERY')")

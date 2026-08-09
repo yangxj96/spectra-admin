@@ -36,11 +36,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-/// SecurityUser构建工具
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/28
+/**
+ * SecurityUser构建工具
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/28
+ */
 @Component
 @NullMarked
 public class SecurityUserHelper {
@@ -61,10 +63,13 @@ public class SecurityUserHelper {
         this.dataScopeProvider = dataScopeProvider;
     }
 
-    /// 数据库用户实体转SpringSecurity使用的用户对象
-    ///
-    /// @param user 数据库用户实体
-    /// @return SpringSecurity的用户对象
+    /**
+     * 数据库用户实体转SpringSecurity使用的用户对象
+     *
+     * @param user
+     *            数据库用户实体
+     * @return SpringSecurity的用户对象
+     */
     public SecurityUser toSecurityUser(Object user) {
         if (!(user instanceof User u)) {
             throw new LoginException("用户信息不正常");
@@ -82,10 +87,13 @@ public class SecurityUserHelper {
         return securityUser;
     }
 
-    /// 构建用户权限列表
-    ///
-    /// @param userId 用户ID
-    /// @return 权限列表
+    /**
+     * 构建用户权限列表
+     *
+     * @param userId
+     *            用户ID
+     * @return 权限列表
+     */
     public List<SimpleGrantedAuthority> buildAuthorities(UUID userId) {
         var authorities = new ArrayList<SimpleGrantedAuthority>();
         List<Role> roles = getUserRole(userId);
@@ -104,19 +112,25 @@ public class SecurityUserHelper {
         return authorities;
     }
 
-    /// 获取用户角色信息
-    ///
-    /// @param userId 用户ID
-    /// @return 角色列表
+    /**
+     * 获取用户角色信息
+     *
+     * @param userId
+     *            用户ID
+     * @return 角色列表
+     */
     public List<Role> getUserRole(UUID userId) {
         var roles = relUserRoleService.getRoles(userId);
         return roles == null ? Collections.emptyList() : new ArrayList<>(roles);
     }
 
-    /// 获取角色包含的权限信息
-    ///
-    /// @param roles 角色ID列表
-    /// @return 权限列表
+    /**
+     * 获取角色包含的权限信息
+     *
+     * @param roles
+     *            角色ID列表
+     * @return 权限列表
+     */
     public List<AuthorityVO> getUserAuthority(List<UUID> roles) {
         if (roles.isEmpty()) {
             return Collections.emptyList();

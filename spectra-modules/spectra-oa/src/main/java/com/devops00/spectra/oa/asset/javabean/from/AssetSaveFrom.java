@@ -24,65 +24,101 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 资产入库或台账保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产入库或台账保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetSaveFrom {
 
-    /// 分类 ID。
+    /**
+     * 分类 ID。
+     */
     private UUID categoryId;
 
-    /// 资产编号。
+    /**
+     * 资产编号。
+     */
     private String assetNo;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     @NotBlank(message = "资产名称不能为空")
     private String name;
 
-    /// 规格。
+    /**
+     * 规格。
+     */
     private String specification;
 
-    /// 序列号。
+    /**
+     * 序列号。
+     */
     private String serialNo;
 
-    /// 资产类型。
+    /**
+     * 资产类型。
+     */
     private String assetType = "FIXED";
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     @NotNull(message = "资产数量不能为空")
     @DecimalMin(value = "0.001", message = "资产数量必须大于 0")
     private BigDecimal quantity = BigDecimal.ONE;
 
-    /// 购置日期。
+    /**
+     * 购置日期。
+     */
     private String acquisitionDate;
 
-    /// 购置金额。
+    /**
+     * 购置金额。
+     */
     private BigDecimal acquisitionAmount = BigDecimal.ZERO;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency = "CNY";
 
-    /// 供应商。
+    /**
+     * 供应商。
+     */
     private String supplier;
 
-    /// 位置。
+    /**
+     * 位置。
+     */
     private String location;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 保管人 ID。
+    /**
+     * 保管人 ID。
+     */
     private UUID custodianId;
 
-    /// 保修截止日期。
+    /**
+     * 保修截止日期。
+     */
     private String warrantyUntil;
 
-    /// 备注。
+    /**
+     * 备注。
+     */
     private String remark;
 }

@@ -28,11 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/// 菜单树形VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单树形VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,26 +43,42 @@ public class MenuTreeVO implements Tree<MenuTreeVO>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 数据id.
+    /**
+     * 数据id.
+     */
     private UUID id;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private UUID pid;
 
-    /// 图标
+    /**
+     * 图标
+     */
     private String icon;
 
-    /// 菜单节点类型
+    /**
+     * 菜单节点类型
+     */
     private MenuType menuType;
 
-    /// 对应前端命名路由
+    /**
+     * 对应前端命名路由
+     */
     private String routeName;
 
-    /// 名称
+    /**
+     * 名称
+     */
     private String name;
 
-    /// 排序
+    /**
+     * 排序
+     */
     private Integer sort;
-    /// 子级
+    /**
+     * 子级
+     */
     private List<MenuTreeVO> children = new ArrayList<>();
 }

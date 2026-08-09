@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.reimbursement.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 
-/// 报销主表 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销主表 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 public interface ReimbursementMapper extends BaseMapper<Reimbursement> {
 }

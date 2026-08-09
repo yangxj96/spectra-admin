@@ -19,23 +19,31 @@ package com.devops00.spectra.workflow.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 保存表单版本请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 保存表单版本请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class FormVersionSaveFrom {
 
-    /// form-create规则JSON（组件定义）
+    /**
+     * form-create规则JSON（组件定义）
+     */
     @NotBlank(message = "规则JSON不能为空")
     private String ruleJson;
 
-    /// form-create配置JSON（表单属性）
+    /**
+     * form-create配置JSON（表单属性）
+     */
     @NotBlank(message = "配置JSON不能为空")
     private String optionsJson;
 
-    /// form-create getJson()完整输出
+    /**
+     * form-create getJson()完整输出
+     */
     @NotBlank(message = "表单JSON不能为空")
     private String formJson;
 }

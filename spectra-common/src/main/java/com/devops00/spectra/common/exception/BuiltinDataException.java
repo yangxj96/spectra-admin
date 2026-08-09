@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 系统内置数据
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 系统内置数据
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public class BuiltinDataException extends DataException {
 
     public BuiltinDataException() {

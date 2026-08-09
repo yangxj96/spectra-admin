@@ -18,14 +18,18 @@ package com.devops00.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/// 任务完成请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 任务完成请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 public class TaskCompleteFrom {
 
-    /// 审批意见
+    /**
+     * 审批意见
+     */
     private String comment;
 }

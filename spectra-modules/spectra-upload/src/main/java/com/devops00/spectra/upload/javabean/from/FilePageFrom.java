@@ -21,19 +21,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 文件分页查询参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/4 16:00
+/**
+ * 文件分页查询参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/4 16:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class FilePageFrom {
 
-    /// 原始文件名(模糊搜索)
+    /**
+     * 原始文件名(模糊搜索)
+     */
     private String originalName;
 
-    /// 存储类型(LOCAL/S3)
+    /**
+     * 存储类型(LOCAL/S3)
+     */
     private UploadType storageType;
 }

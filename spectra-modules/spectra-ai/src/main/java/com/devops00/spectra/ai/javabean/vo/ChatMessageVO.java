@@ -21,19 +21,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 对话消息 VO（前端展示用）
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * 对话消息 VO（前端展示用）
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageVO {
 
-    /// 角色
+    /**
+     * 角色
+     */
     private ChatRole role;
 
-    /// 消息内容
+    /**
+     * 消息内容
+     */
     private String content;
 }

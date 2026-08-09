@@ -19,21 +19,29 @@ package com.devops00.spectra.framework.configure.json.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/// Jackson配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * Jackson配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.jackson")
 public class JacksonProperties {
 
-    /// LocalDateTime类序列化方式.
+    /**
+     * LocalDateTime类序列化方式.
+     */
     private String localDateTimeFormat = "yyyy-MM-dd HH:mm:ss";
 
-    /// LocalDate类序列化方式.
+    /**
+     * LocalDate类序列化方式.
+     */
     private String localDateFormat = "yyyy-MM-dd";
 
-    /// LocalTime类序列化方式.
+    /**
+     * LocalTime类序列化方式.
+     */
     private String localTimeFormat = "HH:mm:ss";
 }

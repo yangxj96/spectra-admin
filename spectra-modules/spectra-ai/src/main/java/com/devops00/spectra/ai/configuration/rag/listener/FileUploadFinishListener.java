@@ -39,11 +39,13 @@ import org.springframework.stereotype.Component;
 import java.io.InputStream;
 import java.util.List;
 
-/// 文件上传完成监听
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/15 17:29
+/**
+ * 文件上传完成监听
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/15 17:29
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

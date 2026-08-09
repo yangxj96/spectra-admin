@@ -40,11 +40,13 @@ import com.devops00.spectra.oa.leave.service.LeaveService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// OA 请假申请接口。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 请假申请接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/leave")
@@ -53,7 +55,9 @@ public class LeaveController {
 
     private final LeaveService leaveService;
 
-    /// 创建请假申请。
+    /**
+     * 创建请假申请。
+     */
     @ULog("'创建请假申请'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:INSERT')")
@@ -61,7 +65,9 @@ public class LeaveController {
         return leaveService.create(from);
     }
 
-    /// 修改请假申请。
+    /**
+     * 修改请假申请。
+     */
     @ULog("'修改请假申请'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
@@ -69,7 +75,9 @@ public class LeaveController {
         leaveService.update(id, from);
     }
 
-    /// 分页查询请假申请。
+    /**
+     * 分页查询请假申请。
+     */
     @ULog("'分页查询请假申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:QUERY')")
@@ -77,7 +85,9 @@ public class LeaveController {
         return leaveService.page(page, params);
     }
 
-    /// 查询请假申请详情。
+    /**
+     * 查询请假申请详情。
+     */
     @ULog("'查询请假申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:QUERY')")
@@ -85,7 +95,9 @@ public class LeaveController {
         return leaveService.get(id);
     }
 
-    /// 提交请假申请。
+    /**
+     * 提交请假申请。
+     */
     @ULog("'提交请假申请'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
@@ -93,7 +105,9 @@ public class LeaveController {
         leaveService.submit(id, from);
     }
 
-    /// 撤回请假申请。
+    /**
+     * 撤回请假申请。
+     */
     @ULog("'撤回请假申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
@@ -101,7 +115,9 @@ public class LeaveController {
         leaveService.withdraw(id);
     }
 
-    /// 取消请假申请。
+    /**
+     * 取消请假申请。
+     */
     @ULog("'取消请假申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")

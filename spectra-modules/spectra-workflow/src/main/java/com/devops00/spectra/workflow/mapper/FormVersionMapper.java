@@ -18,10 +18,12 @@ package com.devops00.spectra.workflow.mapper;
 
 import com.devops00.spectra.workflow.javabean.entity.FormVersion;
 
-/// 工作流-表单版本-mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单版本-mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 public interface FormVersionMapper extends com.baomidou.mybatisplus.core.mapper.BaseMapper<FormVersion> {
 }

@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.security.base.enums;
 
-/// Sec调用类型
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/19 23:24
+/**
+ * Sec调用类型
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/19 23:24
+ */
 public enum SecMode {
     REDIS,
     JWT

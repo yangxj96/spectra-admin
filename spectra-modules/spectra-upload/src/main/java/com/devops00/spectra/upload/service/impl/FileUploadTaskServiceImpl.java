@@ -24,11 +24,13 @@ import com.devops00.spectra.upload.service.FileUploadTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-/// 文件上传-上传任务 服务默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 11:10
+/**
+ * 文件上传-上传任务 服务默认实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 11:10
+ */
 @Slf4j
 @Service
 public class FileUploadTaskServiceImpl extends BaseServiceImpl<FileUploadTaskMapper, FileUploadTask> implements FileUploadTaskService {

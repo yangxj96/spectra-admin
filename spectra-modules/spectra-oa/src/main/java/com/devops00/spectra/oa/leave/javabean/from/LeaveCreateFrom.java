@@ -20,34 +20,48 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 请假申请保存参数。时间使用 ISO-8601 字符串。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假申请保存参数。时间使用 ISO-8601 字符串。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class LeaveCreateFrom {
 
-    /// 请假类型编码。
+    /**
+     * 请假类型编码。
+     */
     @NotBlank(message = "请假类型不能为空")
     private String leaveTypeCode;
 
-    /// 开始时间。
+    /**
+     * 开始时间。
+     */
     @NotBlank(message = "开始时间不能为空")
     private String startTime;
 
-    /// 结束时间。
+    /**
+     * 结束时间。
+     */
     @NotBlank(message = "结束时间不能为空")
     private String endTime;
 
-    /// 原因。
+    /**
+     * 原因。
+     */
     @NotBlank(message = "请假事由不能为空")
     private String reason;
 
-    /// 联系地址。
+    /**
+     * 联系地址。
+     */
     private String contactAddress;
 
-    /// 是否自动计算时长。
+    /**
+     * 是否自动计算时长。
+     */
     @NotNull(message = "请假时长不能为空")
     private Boolean calculateDuration = true;
 }

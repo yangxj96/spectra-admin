@@ -21,37 +21,55 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 登录入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/2 23:15
+/**
+ * 登录入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/2 23:15
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class LoginFrom {
 
-    /// 登录方式。
+    /**
+     * 登录方式。
+     */
     private LoginType type;
 
-    /// 通用账号，可为用户名、邮箱或手机号。
+    /**
+     * 通用账号，可为用户名、邮箱或手机号。
+     */
     private String username;
 
-    /// 账号密码。
+    /**
+     * 账号密码。
+     */
     private String password;
 
-    /// 验证码。
+    /**
+     * 验证码。
+     */
     private String captcha;
 
-    /// 手机验证码。
+    /**
+     * 手机验证码。
+     */
     private String smsCode;
 
-    /// 邮箱验证码。
+    /**
+     * 邮箱验证码。
+     */
     private String emailCode;
 
-    /// OTP 验证码。
+    /**
+     * OTP 验证码。
+     */
     private String principal;
 
-    /// 一次性密码。
+    /**
+     * 一次性密码。
+     */
     private String otp;
 }

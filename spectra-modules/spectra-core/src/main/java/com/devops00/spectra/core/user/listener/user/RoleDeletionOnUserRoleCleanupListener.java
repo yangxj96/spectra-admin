@@ -29,12 +29,16 @@ import org.springframework.transaction.event.TransactionalEventListener;
 import java.util.Collections;
 import java.util.UUID;
 
-/// 角色删除事件
-/// >用户-角色关联处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色删除事件
+ * <p>
+ * 用户-角色关联处理
+ * </p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -44,10 +48,15 @@ public class RoleDeletionOnUserRoleCleanupListener {
 
     private final RelUserRoleService relUserRoleService;
 
-    /// 角色删除事件监听器
-    /// <p>撤销关联的用户</p>
-    ///
-    /// @param event 角色删除事件实体
+    /**
+     * 角色删除事件监听器
+     * <p>
+     * 撤销关联的用户
+     * </p>
+     *
+     * @param event
+     *            角色删除事件实体
+     */
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
         log.debug("{}角色删除事件监听-用户角色关联关系:{}", LogPrefix.CORE.p(), event.roleId());

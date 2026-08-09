@@ -22,43 +22,65 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 流程定义响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 流程定义响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessDefinitionVO {
 
-    /// 流程ID
+    /**
+     * 流程ID
+     */
     private String id;
 
-    /// 流程key
+    /**
+     * 流程key
+     */
     private String key;
 
-    /// 流程名称
+    /**
+     * 流程名称
+     */
     private String name;
 
-    /// 流程版本
+    /**
+     * 流程版本
+     */
     private Integer version;
 
-    /// 部署ID
+    /**
+     * 部署ID
+     */
     private String deploymentId;
 
-    /// 资源名称
+    /**
+     * 资源名称
+     */
     private String resourceName;
 
-    /// 是否挂起
+    /**
+     * 是否挂起
+     */
     private Boolean suspended;
 
-    /// 流程描述
+    /**
+     * 流程描述
+     */
     private String description;
 
-    /// 流程分类
+    /**
+     * 流程分类
+     */
     private String category;
 
-    /// 部署时间
+    /**
+     * 部署时间
+     */
     private LocalDateTime deploymentTime;
 }

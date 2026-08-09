@@ -20,20 +20,28 @@ import lombok.Data;
 
 import java.util.Map;
 
-/// 启动流程实例请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 启动流程实例请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class ProcessInstanceStartFrom {
 
-    /// 流程定义KEY
+    /**
+     * 流程定义KEY
+     */
     private String processDefinitionKey;
 
-    /// 业务KEY
+    /**
+     * 业务KEY
+     */
     private String businessKey;
 
-    /// 流程变量
+    /**
+     * 流程变量
+     */
     private Map<String, Object> variables;
 }

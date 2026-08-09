@@ -26,11 +26,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-/// 登录认证token响应
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 登录认证token响应
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @ToString
 @Builder
@@ -41,25 +43,39 @@ public class TokenVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 登录类型
+    /**
+     * 登录类型
+     */
     private LoginType loginType;
 
-    /// 用户ID
+    /**
+     * 用户ID
+     */
     @JsonSerialize(using = ToStringSerializer.class)
     private UUID id;
 
-    /// 用户名
+    /**
+     * 用户名
+     */
     private String username;
 
-    /// 权限TOKEN
+    /**
+     * 权限TOKEN
+     */
     private String accessToken;
 
-    /// 刷新TOKEN
+    /**
+     * 刷新TOKEN
+     */
     private String refreshToken;
 
-    /// 权限列表
+    /**
+     * 权限列表
+     */
     private List<String> authorities;
 
-    /// 角色列表
+    /**
+     * 角色列表
+     */
     private List<String> roles;
 }

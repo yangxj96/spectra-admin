@@ -37,11 +37,13 @@ import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 工作流-任务相关
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 工作流-任务相关
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/workflow/tasks")
@@ -50,11 +52,15 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    /// 查询待办任务
-    ///
-    /// @param page   分页参数
-    /// @param params 查询参数
-    /// @return 待办任务列表
+    /**
+     * 查询待办任务
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询参数
+     * @return 待办任务列表
+     */
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
@@ -63,11 +69,15 @@ public class TaskController {
         return taskService.todo(page, username, params.getProcessDefinitionKey());
     }
 
-    /// 查询已办任务
-    ///
-    /// @param page   分页参数
-    /// @param params 查询参数
-    /// @return 已办任务列表
+    /**
+     * 查询已办任务
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询参数
+     * @return 已办任务列表
+     */
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
@@ -76,10 +86,14 @@ public class TaskController {
         return taskService.done(page, username, params.getProcessDefinitionKey());
     }
 
-    /// 完成任务（审批通过）
-    ///
-    /// @param id   任务ID
-    /// @param from 完成参数
+    /**
+     * 完成任务（审批通过）
+     *
+     * @param id
+     *            任务ID
+     * @param from
+     *            完成参数
+     */
     @ULog("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
@@ -87,10 +101,14 @@ public class TaskController {
         taskService.complete(id, from.getComment(), SecUtil.getCurrentUsername());
     }
 
-    /// 驳回任务
-    ///
-    /// @param id   任务ID
-    /// @param from 完成参数
+    /**
+     * 驳回任务
+     *
+     * @param id
+     *            任务ID
+     * @param from
+     *            完成参数
+     */
     @ULog("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
@@ -98,10 +116,14 @@ public class TaskController {
         taskService.reject(id, from.getComment(), SecUtil.getCurrentUsername());
     }
 
-    /// 转办任务
-    ///
-    /// @param id   任务ID
-    /// @param from 转办参数
+    /**
+     * 转办任务
+     *
+     * @param id
+     *            任务ID
+     * @param from
+     *            转办参数
+     */
     @ULog("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
@@ -109,10 +131,14 @@ public class TaskController {
         taskService.transfer(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
     }
 
-    /// 委派任务
-    ///
-    /// @param id   任务ID
-    /// @param from 委派参数
+    /**
+     * 委派任务
+     *
+     * @param id
+     *            任务ID
+     * @param from
+     *            委派参数
+     */
     @ULog("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")

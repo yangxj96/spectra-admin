@@ -28,11 +28,13 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// OA-文档表主表实体
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/5 23:53
+/**
+ * OA-文档表主表实体
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/5 23:53
+ */
 @Getter
 @Setter
 @ToString
@@ -40,35 +42,51 @@ import lombok.ToString;
 @DataScope
 public class Document extends BaseEntity {
 
-    /// 所属目录ID
+    /**
+     * 所属目录ID
+     */
     @TableField("folder_id")
     private UUID folderId;
 
-    /// 文档标题
+    /**
+     * 文档标题
+     */
     @TableField("title")
     private String title;
 
-    /// 文档摘要
+    /**
+     * 文档摘要
+     */
     @TableField("summary")
     private String summary;
 
-    /// 文档状态（DRAFT/PUBLISHED）
+    /**
+     * 文档状态（DRAFT/PUBLISHED）
+     */
     @TableField("status")
     private String status;
 
-    /// 可见范围（PUBLIC/DEPARTMENT/PRIVATE）
+    /**
+     * 可见范围（PUBLIC/DEPARTMENT/PRIVATE）
+     */
     @TableField("visibility")
     private String visibility;
 
-    /// 文档所有者
+    /**
+     * 文档所有者
+     */
     @TableField("owner_id")
     private UUID ownerId;
 
-    /// 发布时间
+    /**
+     * 发布时间
+     */
     @TableField("published_at")
     private Instant publishedAt;
 
-    /// 所属部门ID
+    /**
+     * 所属部门ID
+     */
     @TableField("department_id")
     private UUID departmentId;
 }

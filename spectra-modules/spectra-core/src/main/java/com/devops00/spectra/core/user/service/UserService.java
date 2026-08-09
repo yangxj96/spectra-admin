@@ -31,66 +31,101 @@ import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import java.util.List;
 import java.util.UUID;
 
-/// 用户service层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 用户service层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public interface UserService extends BaseService<User> {
 
-    /// 分页查询用户列表
-    ///
-    /// @param page   分页参数
-    /// @param params 查询条件参数
-    /// @return 分页结果
+    /**
+     * 分页查询用户列表
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询条件参数
+     * @return 分页结果
+     */
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException;
 
-    /// 创建用户
-    ///
-    /// @param params 请求参数
+    /**
+     * 创建用户
+     *
+     * @param params
+     *            请求参数
+     */
     void create(UserSaveFrom params);
 
-    /// 根据用户ID更新用户
-    ///
-    /// @param params 请求参数
+    /**
+     * 根据用户ID更新用户
+     *
+     * @param params
+     *            请求参数
+     */
     void modify(UserSaveFrom params);
 
-    /// 覆盖用户角色
-    ///
-    /// @param userId  用户ID
-    /// @param roleIds 角色ID列表
+    /**
+     * 覆盖用户角色
+     *
+     * @param userId
+     *            用户ID
+     * @param roleIds
+     *            角色ID列表
+     */
     void replaceRoles(UUID userId, List<UUID> roleIds);
 
-    /// 根据用户ID删除用户信息
-    ///
-    /// @param uid 用户ID
+    /**
+     * 根据用户ID删除用户信息
+     *
+     * @param uid
+     *            用户ID
+     */
     void deleteById(UUID uid);
 
-    /// 重置用户密码
-    ///
-    /// @param uid 用户ID
+    /**
+     * 重置用户密码
+     *
+     * @param uid
+     *            用户ID
+     */
     void passwordResetById(UUID uid);
 
-    /// 分页获取在线用户
-    ///
-    /// @return 获取到的数据
+    /**
+     * 分页获取在线用户
+     *
+     * @return 获取到的数据
+     */
     List<UserOnlineVO> online(PageFrom page);
 
-    /// 获取当前用户详情
-    ///
-    /// @param userId 用户ID
-    /// @return 用户详情
+    /**
+     * 获取当前用户详情
+     *
+     * @param userId
+     *            用户ID
+     * @return 用户详情
+     */
     UserProfileVO getProfile(UUID userId);
 
-    /// 更新当前用户信息
-    ///
-    /// @param userId 用户ID
-    /// @param params 更新参数
+    /**
+     * 更新当前用户信息
+     *
+     * @param userId
+     *            用户ID
+     * @param params
+     *            更新参数
+     */
     void updateProfile(UUID userId, UserProfileFrom params);
 
-    /// 修改当前用户密码
-    ///
-    /// @param userId 用户ID
-    /// @param params 修改密码参数
+    /**
+     * 修改当前用户密码
+     *
+     * @param userId
+     *            用户ID
+     * @param params
+     *            修改密码参数
+     */
     void changePassword(UUID userId, ChangePasswordFrom params);
 }

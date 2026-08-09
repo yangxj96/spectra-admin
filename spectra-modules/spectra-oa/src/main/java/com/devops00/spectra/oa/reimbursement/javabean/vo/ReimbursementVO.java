@@ -24,76 +24,120 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 费用报销响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 费用报销响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     private UUID applicationId;
 
-    /// 申请编号。
+    /**
+     * 申请编号。
+     */
     private String applicationNo;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 申请人 ID。
+    /**
+     * 申请人 ID。
+     */
     private UUID applicantId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     private String purpose;
 
-    /// 费用开始日期。
+    /**
+     * 费用开始日期。
+     */
     private LocalDate expenseStart;
 
-    /// 费用结束日期。
+    /**
+     * 费用结束日期。
+     */
     private LocalDate expenseEnd;
 
-    /// 总金额。
+    /**
+     * 总金额。
+     */
     private BigDecimal totalAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency;
 
-    /// 收款人姓名。
+    /**
+     * 收款人姓名。
+     */
     private String payeeName;
 
-    /// 脱敏收款账户。
+    /**
+     * 脱敏收款账户。
+     */
     private String payeeAccountMasked;
 
-    /// 支付状态。
+    /**
+     * 支付状态。
+     */
     private String paymentStatus;
 
-    /// 支付时间。
+    /**
+     * 支付时间。
+     */
     private LocalDateTime paymentAt;
 
-    /// 支付备注。
+    /**
+     * 支付备注。
+     */
     private String paymentRemark;
 
-    /// 流程实例 ID。
+    /**
+     * 流程实例 ID。
+     */
     private String processInstanceId;
 
-    /// 驳回原因。
+    /**
+     * 驳回原因。
+     */
     private String rejectReason;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private List<ReimbursementItemVO> items = List.of();
     private List<ReimbursementAttachmentVO> attachments = List.of();
     private LocalDateTime createdAt;
 
-    /// 更新时间。
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
 }

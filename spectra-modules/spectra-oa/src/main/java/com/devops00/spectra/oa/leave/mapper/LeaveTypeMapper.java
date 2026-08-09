@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.leave.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveType;
 
-/// 请假类型 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假类型 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 public interface LeaveTypeMapper extends BaseMapper<LeaveType> {
 }

@@ -20,28 +20,40 @@ import lombok.Data;
 
 import java.util.List;
 
-/// 文件上传状态
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/1 16:50
+/**
+ * 文件上传状态
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/1 16:50
+ */
 @Data
 public class FileUploadStatusVO {
 
-    /// 文件上传状态
-    ///
-    ///  INIT → UPLOADING → DONE → EXPIRED
+    /**
+     * 文件上传状态
+     *
+     * INIT → UPLOADING → DONE → EXPIRED
+     */
     private String status;
 
-    /// 已上传分片
+    /**
+     * 已上传分片
+     */
     private List<Integer> uploadedChunks;
 
-    /// 总分片数量
+    /**
+     * 总分片数量
+     */
     private Integer totalChunks;
 
-    /// 分片大小
+    /**
+     * 分片大小
+     */
     private Long chunkSize;
 
-    /// 完成状态
+    /**
+     * 完成状态
+     */
     private Boolean completed;
 }

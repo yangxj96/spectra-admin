@@ -21,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 面向“查询+审计”
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 15:12
+/**
+ * 面向“查询+审计”
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 15:12
+ */
 @Slf4j
 @RestController
 @RequestMapping("/workflow/history")

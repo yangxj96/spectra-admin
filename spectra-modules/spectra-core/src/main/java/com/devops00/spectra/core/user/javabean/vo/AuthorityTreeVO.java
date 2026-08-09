@@ -26,11 +26,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-/// 权限树形VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/11 00:00
+/**
+ * 权限树形VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -39,21 +41,33 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 权限ID
+    /**
+     * 权限ID
+     */
     private UUID id;
 
-    /// 权限父级ID
+    /**
+     * 权限父级ID
+     */
     private UUID pid;
 
-    /// 权限说明
+    /**
+     * 权限说明
+     */
     private String name;
 
-    /// 权限编码
+    /**
+     * 权限编码
+     */
     private String code;
 
-    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+    /**
+     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+     */
     private Integer sort = 0;
 
-    /// 子级
+    /**
+     * 子级
+     */
     private List<AuthorityTreeVO> children;
 }

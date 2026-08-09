@@ -28,11 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// OA 资产台账实体。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * OA 资产台账实体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -40,83 +42,123 @@ import lombok.Setter;
 @DataScope
 public class Asset extends BaseEntity {
 
-    /// 分类 ID。
+    /**
+     * 分类 ID。
+     */
     @TableField("category_id")
     private UUID categoryId;
 
-    /// 资产编号。
+    /**
+     * 资产编号。
+     */
     @TableField("asset_no")
     private String assetNo;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     @TableField("name")
     private String name;
 
-    /// 规格。
+    /**
+     * 规格。
+     */
     @TableField("specification")
     private String specification;
 
-    /// 序列号。
+    /**
+     * 序列号。
+     */
     @TableField("serial_no")
     private String serialNo;
 
-    /// 资产类型。
+    /**
+     * 资产类型。
+     */
     @TableField("asset_type")
     private String assetType;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     @TableField("status")
     private String status;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     @TableField("quantity")
     private BigDecimal quantity;
 
-    /// 购置日期。
+    /**
+     * 购置日期。
+     */
     @TableField("acquisition_date")
     private Instant acquisitionDate;
 
-    /// 购置金额。
+    /**
+     * 购置金额。
+     */
     @TableField("acquisition_amount")
     private BigDecimal acquisitionAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     @TableField("currency")
     private String currency;
 
-    /// 供应商。
+    /**
+     * 供应商。
+     */
     @TableField("supplier")
     private String supplier;
 
-    /// 位置。
+    /**
+     * 位置。
+     */
     @TableField("location")
     private String location;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 保管人 ID。
+    /**
+     * 保管人 ID。
+     */
     @TableField("custodian_id")
     private UUID custodianId;
 
-    /// 保修截止日期。
+    /**
+     * 保修截止日期。
+     */
     @TableField("warranty_until")
     private Instant warrantyUntil;
 
-    /// 来源采购单 ID。
+    /**
+     * 来源采购单 ID。
+     */
     @TableField("source_purchase_id")
     private UUID sourcePurchaseId;
 
-    /// 来源收货单 ID。
+    /**
+     * 来源收货单 ID。
+     */
     @TableField("source_receipt_id")
     private UUID sourceReceiptId;
 
-    /// 来源采购明细 ID。
+    /**
+     * 来源采购明细 ID。
+     */
     @TableField("source_purchase_item_id")
     private UUID sourcePurchaseItemId;
 
-    /// 备注。
+    /**
+     * 备注。
+     */
     @TableField("remark")
     private String remark;
 }

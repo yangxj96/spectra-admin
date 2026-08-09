@@ -53,11 +53,13 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/// 角色菜单关联服务测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 角色菜单关联服务测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"unchecked", "rawtypes"})
 class RelRoleMenuServiceImplTest {

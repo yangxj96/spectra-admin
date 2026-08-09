@@ -65,11 +65,13 @@ import com.devops00.spectra.upload.service.impl.FileUploadFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 合同台账服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同台账服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

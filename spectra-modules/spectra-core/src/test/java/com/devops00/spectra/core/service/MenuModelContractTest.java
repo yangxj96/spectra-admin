@@ -30,11 +30,13 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/// 菜单模型收缩契约测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 菜单模型收缩契约测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 class MenuModelContractTest {
 
     private static final Set<String> LEGACY_FIELDS = Set.of("path", "component", "layout", "hide", "metadata");

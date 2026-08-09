@@ -57,11 +57,13 @@ import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 部门维度统计服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 部门维度统计服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

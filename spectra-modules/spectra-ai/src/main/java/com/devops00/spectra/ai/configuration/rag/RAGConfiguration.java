@@ -30,11 +30,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import tools.jackson.databind.ObjectMapper;
 
-/// RAG向量库配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/11 17:44
+/**
+ * RAG向量库配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/11 17:44
+ */
 @EnableAsync
 @Configuration
 @RequiredArgsConstructor
@@ -43,18 +45,24 @@ public class RAGConfiguration {
 
     private final AiRAGProperties properties;
 
-    /// 配置向量存储器
-    ///
-    /// @param template JDBC连接
-    /// @param om       Jackson序列化
+    /**
+     * 配置向量存储器
+     *
+     * @param template
+     *            JDBC连接
+     * @param om
+     *            Jackson序列化
+     */
     @Bean
     public EmbeddingStore<TextSegment> embeddingStore(JdbcTemplate template, ObjectMapper om) {
         return new PostgresEmbeddingStore(template, om);
     }
 
-    /// 配置向量化（Embedding）模型：用于将文本片段及用户提问翻译成数学向量。
-    ///
-    /// 这里以阿里 DashScope 为例（组合拳模式：阿里生成向量，DeepSeek 负责聊天）。
+    /**
+     * 配置向量化（Embedding）模型：用于将文本片段及用户提问翻译成数学向量。
+     *
+     * 这里以阿里 DashScope 为例（组合拳模式：阿里生成向量，DeepSeek 负责聊天）。
+     */
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()

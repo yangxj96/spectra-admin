@@ -43,24 +43,26 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 
-/// MP执行的单表SQL拦截处理 — 自动注入数据范围 WHERE 条件
-///
-/// <h3>二维过滤</h3>
-/// <ul>
-/// <li><b>结构维度</b>：基于 department_id / created_by 等归属字段，根据用户数据范围类型过滤</li>
-/// <li><b>关系维度</b>：基于 {@link DataScope#relations()} 声明的多对多关联表</li>
-/// </ul>
-///
-/// <h3>跳过规则</h3>
-/// <ul>
-/// <li>{@link DataScope#ignore()} = true 的表不过滤</li>
-/// <li>GLOBAL 范围的用户不过滤</li>
-/// <li>缺少登录上下文时拒绝执行（fail-closed）</li>
-/// </ul>
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * MP执行的单表SQL拦截处理 — 自动注入数据范围 WHERE 条件
+ *
+ * <h3>二维过滤</h3>
+ * <ul>
+ * <li><b>结构维度</b>：基于 department_id / created_by 等归属字段，根据用户数据范围类型过滤</li>
+ * <li><b>关系维度</b>：基于 {@link DataScope#relations()} 声明的多对多关联表</li>
+ * </ul>
+ *
+ * <h3>跳过规则</h3>
+ * <ul>
+ * <li>{@link DataScope#ignore()} = true 的表不过滤</li>
+ * <li>GLOBAL 范围的用户不过滤</li>
+ * <li>缺少登录上下文时拒绝执行（fail-closed）</li>
+ * </ul>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Slf4j
 public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
@@ -131,7 +133,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         return new AndExpression(where, scopeExpression);
     }
 
-    /// 构建数据范围 SQL 表达式
+    /**
+     * 构建数据范围 SQL 表达式
+     */
     private Expression buildScopeExpression(Table table, DataScope annotation, DataScopeProvider.EffectiveScope scope) {
         String columnName = annotation != null ? annotation.column() : "department_id";
         UUID currentUserId = SecUtil.getCurrentUserId();
@@ -154,7 +158,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         return new OrExpression(structuralExpr, relationalExpr);
     }
 
-    /// 构建结构维度条件（department_id / created_by）
+    /**
+     * 构建结构维度条件（department_id / created_by）
+     */
     private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName, DataScopeProvider.EffectiveScope scope,
             UUID currentUserId) {
         return switch (scope.getScopeType()) {
@@ -189,7 +195,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         };
     }
 
-    /// 构建关系维度条件（关联表子查询）
+    /**
+     * 构建关系维度条件（关联表子查询）
+     */
     private Expression buildRelationalExpression(Table table, DataScope annotation, UUID currentUserId) {
         if (annotation == null || annotation.relations().length == 0) {
             return null;
@@ -234,11 +242,13 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         return combined;
     }
 
-    /// 从 MyBatis mappedStatementId 反推实体类
-    ///
-    /// mappedStatementId 格式:
-    /// com.devops00.spectra.core.user.mapper.UserMapper.selectById 尝试从 Mapper
-    /// 包路径推导对应的 Entity 包路径
+    /**
+     * 从 MyBatis mappedStatementId 反推实体类
+     *
+     * mappedStatementId 格式:
+     * com.devops00.spectra.core.user.mapper.UserMapper.selectById 尝试从 Mapper
+     * 包路径推导对应的 Entity 包路径
+     */
     private Class<?> resolveEntityClass(String mappedStatementId) {
         if (mappedStatementId == null) {
             return null;

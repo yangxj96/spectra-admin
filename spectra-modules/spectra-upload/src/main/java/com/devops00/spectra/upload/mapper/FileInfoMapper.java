@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import org.apache.ibatis.annotations.Mapper;
 
-/// 文件信息Mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/8 00:06
+/**
+ * 文件信息Mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/8 00:06
+ */
 @Mapper
 public interface FileInfoMapper extends BaseMapper<FileInfo> {
 

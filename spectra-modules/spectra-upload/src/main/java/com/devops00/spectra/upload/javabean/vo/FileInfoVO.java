@@ -26,40 +26,60 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 文件信息VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/4 16:00
+/**
+ * 文件信息VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/4 16:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileInfoVO implements Serializable {
 
-    /// 主键ID
+    /**
+     * 主键ID
+     */
     private UUID id;
 
-    /// 存储文件名(系统生成)
+    /**
+     * 存储文件名(系统生成)
+     */
     private String filename;
 
-    /// 原始文件名
+    /**
+     * 原始文件名
+     */
     private String originalName;
 
-    /// 文件类型(MIME)
+    /**
+     * 文件类型(MIME)
+     */
     private String contentType;
 
-    /// 文件大小(字节)
+    /**
+     * 文件大小(字节)
+     */
     private Long size;
 
-    /// 文件哈希
+    /**
+     * 文件哈希
+     */
     private String hash;
 
-    /// 存储类型(LOCAL/S3)
+    /**
+     * 存储类型(LOCAL/S3)
+     */
     private UploadType storageType;
 
-    /// 文件状态
+    /**
+     * 文件状态
+     */
     private String status;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 }

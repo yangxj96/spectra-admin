@@ -22,11 +22,13 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Collection;
 import java.util.Collections;
 
-/// 邮箱登录token参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/29 10:43
+/**
+ * 邮箱登录token参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/29 10:43
+ */
 public class EmailAuthenticationToken extends AbstractAuthenticationToken {
 
     private final Object principal;

@@ -19,24 +19,34 @@ package com.devops00.spectra.workflow.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 部署流程定义请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 部署流程定义请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class DeployProcessFrom {
 
-    /// BPMN XML 内容
+    /**
+     * BPMN XML 内容
+     */
     @NotBlank(message = "BPMN XML 内容不能为空")
     private String bpmnXml;
 
-    /// 流程名称（可选，为空时从 XML 解析）
+    /**
+     * 流程名称（可选，为空时从 XML 解析）
+     */
     private String name;
 
-    /// 流程 KEY（可选，为空时从 XML 解析）
+    /**
+     * 流程 KEY（可选，为空时从 XML 解析）
+     */
     private String key;
 
-    /// 流程分类（可选）
+    /**
+     * 流程分类（可选）
+     */
     private String category;
 }

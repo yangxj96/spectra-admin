@@ -23,13 +23,17 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 
-/// 请假申请 MapStruct 转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假申请 MapStruct 转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface LeaveConverter {
-    /// 请假申请实体转视图对象。
+    /**
+     * 请假申请实体转视图对象。
+     */
     LeaveVO toVO(LeaveApplication source);
 }

@@ -18,17 +18,23 @@ package com.devops00.spectra.oa.notice.javabean.from;
 
 import lombok.Data;
 
-/// 公告分页查询参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 公告分页查询参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class NoticePageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 }

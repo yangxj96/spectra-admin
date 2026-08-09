@@ -25,26 +25,34 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/// AI 会话元数据
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话元数据
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "ai_conversation", schema = "spectra_ai")
 public class AiConversation extends BaseEntity {
 
-    /// 所属用户 ID
+    /**
+     * 所属用户 ID
+     */
     @TableField("user_id")
     private UUID userId;
 
-    /// 会话标题
+    /**
+     * 会话标题
+     */
     @TableField("title")
     private String title;
 
-    /// 状态：active / archived
+    /**
+     * 状态：active / archived
+     */
     @TableField("status")
     private String status;
 }

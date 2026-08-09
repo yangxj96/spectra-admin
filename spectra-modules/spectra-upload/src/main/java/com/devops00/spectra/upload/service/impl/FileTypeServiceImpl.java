@@ -28,11 +28,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/// 文件类型服务实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/6 15:32
+/**
+ * 文件类型服务实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/6 15:32
+ */
 @Slf4j
 @Service
 public class FileTypeServiceImpl extends BaseServiceImpl<FileTypeMapper, FileType> implements FileTypeService {

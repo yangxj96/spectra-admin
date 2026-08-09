@@ -24,12 +24,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-/// 角色删除事件
-/// > 角色-权限关联处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色删除事件
+ * <p>
+ * 角色-权限关联处理
+ * </p>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

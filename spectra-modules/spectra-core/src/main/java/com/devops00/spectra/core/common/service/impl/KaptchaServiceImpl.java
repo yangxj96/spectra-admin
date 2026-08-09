@@ -32,11 +32,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
-/// 验证码服务默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * 验证码服务默认实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 @Slf4j
 @Service
 public class KaptchaServiceImpl implements KaptchaService {

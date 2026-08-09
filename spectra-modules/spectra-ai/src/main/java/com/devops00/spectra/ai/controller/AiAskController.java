@@ -39,11 +39,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/// Ai对话控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/26 10:35
+/**
+ * Ai对话控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/26 10:35
+ */
 @Slf4j
 @RestController
 @RequiredArgsConstructor

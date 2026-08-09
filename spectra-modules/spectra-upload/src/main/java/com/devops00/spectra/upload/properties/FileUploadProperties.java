@@ -28,28 +28,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/// 文件上传参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/19 00:00
+/**
+ * 文件上传参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/19 00:00
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.file.upload")
 public class FileUploadProperties {
 
-    /// 文件上传默认实现
+    /**
+     * 文件上传默认实现
+     */
     private UploadType defaultStorage = UploadType.LOCAL;
 
-    /// 文件类型验证策略（扩展名校验已内置于 FileTypeValidator，无需配置）
+    /**
+     * 文件类型验证策略（扩展名校验已内置于 FileTypeValidator，无需配置）
+     */
     private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(
             Arrays.asList(TikaValidationStrategy.class, MimeValidationStrategy.class, MagicNumberValidationStrategy.class));
 
-    /// 分片大小,默认5M 5242880L
+    /**
+     * 分片大小,默认5M 5242880L
+     */
     private Long chunkSize = 5242880L;
 
-    /// 是否启用白名单模式（仅允许 allowedUpload=true 的类型）
+    /**
+     * 是否启用白名单模式（仅允许 allowedUpload=true 的类型）
+     */
     private boolean whitelistEnabled = true;
 
-    /// 是否启用黑名单模式（拒绝 dangerous=true 的类型）
+    /**
+     * 是否启用黑名单模式（拒绝 dangerous=true 的类型）
+     */
     private boolean blacklistEnabled = true;
 }

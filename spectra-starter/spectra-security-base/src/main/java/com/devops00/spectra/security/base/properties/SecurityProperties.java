@@ -24,16 +24,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/// 权限配置相关内容
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/4 10:39
+/**
+ * 权限配置相关内容
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/4 10:39
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.security")
 public class SecurityProperties {
 
-    ///  验证白名单
+    /**
+     * 验证白名单
+     */
     private List<String> whitelists = new ArrayList<>(Arrays.asList(
             // 生成图形验证码
             "/common/kaptcha",
@@ -52,24 +56,38 @@ public class SecurityProperties {
             // 获取系统加密配置接口
             "/system/crypto/config"));
 
-    /// accessToken有效期（秒），默认5分钟
+    /**
+     * accessToken有效期（秒），默认5分钟
+     */
     private long accessTokenExpire = 300L;
 
-    /// refreshToken有效期（秒），默认7天
+    /**
+     * refreshToken有效期（秒），默认7天
+     */
     private long refreshTokenExpire = 604800L;
 
-    /// 超管角色名称
+    /**
+     * 超管角色名称
+     */
     private String administrators = "ROLE_DEV_OPS";
 
-    /// SecUtil工具当前类型
+    /**
+     * SecUtil工具当前类型
+     */
     private SecMode secMode = SecMode.REDIS;
 
-    /// 登录失败锁定：最大尝试次数
+    /**
+     * 登录失败锁定：最大尝试次数
+     */
     private int lockoutMaxAttempts = 5;
 
-    /// 登录失败锁定：锁定时长（秒），0=不锁定
+    /**
+     * 登录失败锁定：锁定时长（秒），0=不锁定
+     */
     private long lockoutSeconds = 300L;
 
-    /// Token自动续期间隔（秒），请求距上次续期超过此值才刷新
+    /**
+     * Token自动续期间隔（秒），请求距上次续期超过此值才刷新
+     */
     private long tokenRefreshInterval = 300L;
 }

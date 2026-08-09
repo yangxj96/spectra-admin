@@ -23,36 +23,50 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 报销费用明细参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销费用明细参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementItemFrom {
 
-    /// 费用日期。
+    /**
+     * 费用日期。
+     */
     @NotNull(message = "费用日期不能为空")
     private String expenseDate;
 
-    /// 分类。
+    /**
+     * 分类。
+     */
     @NotBlank(message = "费用类别不能为空")
     private String category;
 
-    /// 描述。
+    /**
+     * 描述。
+     */
     @NotBlank(message = "费用说明不能为空")
     private String description;
 
-    /// 金额。
+    /**
+     * 金额。
+     */
     @NotNull(message = "费用金额不能为空")
     @DecimalMin(value = "0.01", message = "费用金额必须大于 0")
     private BigDecimal amount;
 
-    /// 税额。
+    /**
+     * 税额。
+     */
     @NotNull(message = "税额不能为空")
     @DecimalMin(value = "0.00", message = "税额不能为负数")
     private BigDecimal taxAmount = BigDecimal.ZERO;
 
-    /// 发票编号。
+    /**
+     * 发票编号。
+     */
     private String invoiceNo;
 }

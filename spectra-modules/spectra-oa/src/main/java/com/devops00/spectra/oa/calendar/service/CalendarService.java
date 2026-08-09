@@ -26,24 +26,36 @@ import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 
-/// 日程业务服务。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 日程业务服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 public interface CalendarService extends BaseService<Calendar> {
-    /// 分页查询日程。
+    /**
+     * 分页查询日程。
+     */
     IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params);
 
-    /// 查询日程详情。
+    /**
+     * 查询日程详情。
+     */
     CalendarVO get(UUID id);
 
-    /// 创建日程。
+    /**
+     * 创建日程。
+     */
     CalendarVO create(CalendarSaveFrom from);
 
-    /// 修改日程。
+    /**
+     * 修改日程。
+     */
     CalendarVO update(UUID id, CalendarSaveFrom from);
 
-    /// 删除日程。
+    /**
+     * 删除日程。
+     */
     void delete(UUID id);
 }

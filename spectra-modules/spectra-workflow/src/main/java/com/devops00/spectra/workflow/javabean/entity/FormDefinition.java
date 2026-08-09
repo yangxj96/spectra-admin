@@ -23,34 +23,46 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/// 工作流-表单定义表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单定义表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "wf_form_definition", schema = "spectra_workflow")
 public class FormDefinition extends BaseEntity {
 
-    /// 表单名称
+    /**
+     * 表单名称
+     */
     @TableField("name")
     private String name;
 
-    /// 表单编码（唯一，用于程序引用）
+    /**
+     * 表单编码（唯一，用于程序引用）
+     */
     @TableField("code")
     private String code;
 
-    /// 当前版本号
+    /**
+     * 当前版本号
+     */
     @TableField("current_version")
     private Integer currentVersion;
 
-    /// 是否启用
+    /**
+     * 是否启用
+     */
     @TableField("active")
     private Boolean active;
 
-    /// 描述
+    /**
+     * 描述
+     */
     @TableField("description")
     private String description;
 }

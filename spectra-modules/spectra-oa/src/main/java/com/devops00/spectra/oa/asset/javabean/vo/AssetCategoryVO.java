@@ -21,41 +21,63 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 资产分类响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产分类响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetCategoryVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 父级 ID。
+    /**
+     * 父级 ID。
+     */
     private UUID pid;
 
-    /// 编码。
+    /**
+     * 编码。
+     */
     private String code;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     private String name;
 
-    /// 资产类型。
+    /**
+     * 资产类型。
+     */
     private String assetType;
 
-    /// 排序号。
+    /**
+     * 排序号。
+     */
     private Integer sort;
 
-    /// 是否启用。
+    /**
+     * 是否启用。
+     */
     private Boolean enabled;
 
-    /// 描述。
+    /**
+     * 描述。
+     */
     private String description;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 
-    /// 更新时间。
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
 }

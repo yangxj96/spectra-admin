@@ -27,11 +27,13 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-/// 行政区划转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/2 15:50
+/**
+ * 行政区划转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/2 15:50
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface RegionConverter {
 
@@ -43,10 +45,13 @@ public interface RegionConverter {
 
     void toEntity(RegionFrom source, @org.mapstruct.MappingTarget Region target);
 
-    /// 转换到分页的VO信息
-    ///
-    /// @param source 分页信息
-    /// @return IPAGE
+    /**
+     * 转换到分页的VO信息
+     *
+     * @param source
+     *            分页信息
+     * @return IPAGE
+     */
     @Mapping(target = "pages", ignore = true)
     Page<RegionVO> toVOPage(Page<Region> source);
 }

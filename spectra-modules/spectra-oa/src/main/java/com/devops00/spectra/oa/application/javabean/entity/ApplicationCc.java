@@ -26,22 +26,28 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// OA 申请抄送人关联。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请抄送人关联。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_application_cc", schema = "spectra_oa")
 public class ApplicationCc extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 用户 ID。
+    /**
+     * 用户 ID。
+     */
     @TableField("user_id")
     private UUID userId;
 }

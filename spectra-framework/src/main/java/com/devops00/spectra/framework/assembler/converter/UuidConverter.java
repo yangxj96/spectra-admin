@@ -18,11 +18,13 @@ package com.devops00.spectra.framework.assembler.converter;
 
 import java.util.UUID;
 
-/// UUID作为主键的转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/20 11:41
+/**
+ * UUID作为主键的转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/20 11:41
+ */
 public class UuidConverter implements IdConverter<UUID> {
 
     @Override

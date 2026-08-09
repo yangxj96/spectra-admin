@@ -8,14 +8,18 @@ package com.devops00.spectra.oa.leave.javabean.from;
 
 import lombok.Data;
 
-/// 请假提交审批参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假提交审批参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class LeaveSubmitFrom {
 
-    /// 审批人用户名；未填写时兼容单用户环境并回退到申请人。
+    /**
+     * 审批人用户名；未填写时兼容单用户环境并回退到申请人。
+     */
     private String approverUsername;
 }

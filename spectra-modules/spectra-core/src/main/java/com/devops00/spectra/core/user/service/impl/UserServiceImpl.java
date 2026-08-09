@@ -67,11 +67,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
-/// 用户service层-实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 用户service层-实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -346,11 +348,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         log.info("用户 {} 修改密码成功", userId);
     }
 
-    /// 更新用户数据范围
-    ///
-    /// @param userId    用户ID
-    /// @param type      权限范围类型
-    /// @param targetIds 自定义权限范围
+    /**
+     * 更新用户数据范围
+     *
+     * @param userId
+     *            用户ID
+     * @param type
+     *            权限范围类型
+     * @param targetIds
+     *            自定义权限范围
+     */
     private void updateUserScope(UUID userId, DataScopeType type, List<UUID> targetIds) {
         // null 表示继承角色范围，不能偷偷转换成 DEPT 覆盖角色。
         if (type == null) {

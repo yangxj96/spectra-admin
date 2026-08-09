@@ -26,47 +26,69 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 行政区域入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/2 16:00
+/**
+ * 行政区域入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/2 16:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RegionFrom {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
-    /// 区域名称
+    /**
+     * 区域名称
+     */
     @NotNull(message = "区域名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
 
-    /// 区域全称，如 北京市/北京市/东城区
+    /**
+     * 区域全称，如 北京市/北京市/东城区
+     */
     private String fullName;
 
-    /// 简称
+    /**
+     * 简称
+     */
     private String shortName;
 
-    /// 区域编码
+    /**
+     * 区域编码
+     */
     private String code;
 
-    /// 区域路径，如 /110000/110100/110101
+    /**
+     * 区域路径，如 /110000/110100/110101
+     */
     private String path;
 
-    /// 上级ID
+    /**
+     * 上级ID
+     */
     private UUID pid;
 
-    /// 行政区划层级:1省 2地级市 3县级 4乡级 5村级
+    /**
+     * 行政区划层级:1省 2地级市 3县级 4乡级 5村级
+     */
     @NotNull(message = "行政区划层级不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private RegionLevel level;
 
-    /// 状态：true-启用 false-停用
+    /**
+     * 状态：true-启用 false-停用
+     */
     private Boolean status;
 
-    /// 排序
+    /**
+     * 排序
+     */
     private Integer sort;
 }

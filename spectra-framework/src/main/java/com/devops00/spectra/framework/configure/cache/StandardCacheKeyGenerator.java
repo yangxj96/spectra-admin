@@ -31,11 +31,13 @@ import java.util.HexFormat;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/// 标准key生成器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/2 17:17
+/**
+ * 标准key生成器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/2 17:17
+ */
 @NullMarked
 @Component
 public class StandardCacheKeyGenerator implements KeyGenerator {

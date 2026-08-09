@@ -18,11 +18,13 @@ package com.devops00.spectra.security.base.exception;
 
 import org.springframework.security.authentication.BadCredentialsException;
 
-/// 登录异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/19 23:14
+/**
+ * 登录异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/19 23:14
+ */
 public class LoginException extends BadCredentialsException {
 
     public LoginException(String message) {

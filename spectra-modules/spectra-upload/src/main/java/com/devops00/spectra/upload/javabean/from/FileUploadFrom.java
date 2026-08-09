@@ -19,20 +19,28 @@ package com.devops00.spectra.upload.javabean.from;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-/// 文件保存参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/7 23:29
+/**
+ * 文件保存参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/7 23:29
+ */
 @Data
 public class FileUploadFrom {
 
-    /// 文件
+    /**
+     * 文件
+     */
     private MultipartFile file;
 
-    /// hash值
+    /**
+     * hash值
+     */
     private String hash;
 
-    /// 上传ID
+    /**
+     * 上传ID
+     */
     private String uploadId;
 }

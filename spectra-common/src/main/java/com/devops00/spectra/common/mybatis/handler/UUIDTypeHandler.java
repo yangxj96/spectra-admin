@@ -24,11 +24,13 @@ import org.apache.ibatis.type.MappedTypes;
 import java.sql.*;
 import java.util.UUID;
 
-/// UUID类型映射
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/16 09:43
+/**
+ * UUID类型映射
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/16 09:43
+ */
 @MappedTypes({UUID.class})
 @MappedJdbcTypes({JdbcType.OTHER})
 public class UUIDTypeHandler extends BaseTypeHandler<UUID> {

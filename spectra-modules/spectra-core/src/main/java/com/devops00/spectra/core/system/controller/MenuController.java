@@ -32,11 +32,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 菜单控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/menu")
@@ -48,9 +50,12 @@ public class MenuController {
         this.bindService = bindService;
     }
 
-    /// 新增菜单信息
-    ///
-    /// @param params 菜单信息
+    /**
+     * 新增菜单信息
+     *
+     * @param params
+     *            菜单信息
+     */
     @ULog("'新增菜单'")
     @PostMapping(value = "/created", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:INSERT')")
@@ -65,9 +70,12 @@ public class MenuController {
         bindService.deleteById(id);
     }
 
-    /// 修改菜单信息
-    ///
-    /// @param params 菜单信息
+    /**
+     * 修改菜单信息
+     *
+     * @param params
+     *            菜单信息
+     */
     @ULog("'修改菜单'")
     @PutMapping(value = "/modify", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:UPDATE')")
@@ -75,9 +83,11 @@ public class MenuController {
         bindService.modify(params);
     }
 
-    /// 获取树形菜单
-    ///
-    /// @return 构建的树形菜单
+    /**
+     * 获取树形菜单
+     *
+     * @return 构建的树形菜单
+     */
     @ULog(value = "'获取树形菜单'")
     @GetMapping(value = "/tree", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'MENU:QUERY')")
@@ -85,10 +95,13 @@ public class MenuController {
         return bindService.tree();
     }
 
-    /// 获取当前用户授权菜单树
-    ///
-    /// @param user 当前登录用户
-    /// @return 当前用户授权菜单树
+    /**
+     * 获取当前用户授权菜单树
+     *
+     * @param user
+     *            当前登录用户
+     * @return 当前用户授权菜单树
+     */
     @ULog(value = "'获取当前用户菜单'")
     @GetMapping(value = "/current", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")

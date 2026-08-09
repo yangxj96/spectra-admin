@@ -24,17 +24,23 @@ import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 
-/// 表单相关对象转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 表单相关对象转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface FormConverter {
 
-    /// 表单定义实体转VO
+    /**
+     * 表单定义实体转VO
+     */
     FormDefinitionVO toVO(FormDefinition source);
 
-    /// 表单版本实体转VO
+    /**
+     * 表单版本实体转VO
+     */
     FormVersionVO toVO(FormVersion source);
 }

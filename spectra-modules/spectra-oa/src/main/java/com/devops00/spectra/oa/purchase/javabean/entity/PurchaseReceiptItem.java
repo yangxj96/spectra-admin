@@ -28,11 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 采购收货明细。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购收货明细。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -40,23 +42,33 @@ import lombok.Setter;
 @DataScope
 public class PurchaseReceiptItem extends BaseEntity {
 
-    /// 收货单 ID。
+    /**
+     * 收货单 ID。
+     */
     @TableField("receipt_id")
     private UUID receiptId;
 
-    /// 采购明细 ID。
+    /**
+     * 采购明细 ID。
+     */
     @TableField("purchase_item_id")
     private UUID purchaseItemId;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     @TableField("quantity")
     private BigDecimal quantity;
 
-    /// 是否已接受。
+    /**
+     * 是否已接受。
+     */
     @TableField("accepted")
     private Boolean accepted;
 
-    /// 差异原因。
+    /**
+     * 差异原因。
+     */
     @TableField("difference_reason")
     private String differenceReason;
 }

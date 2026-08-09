@@ -22,16 +22,21 @@ import com.devops00.spectra.core.system.javabean.entity.DictItem;
 import java.util.List;
 import java.util.UUID;
 
-/// 字典(字典数据)业务层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典(字典数据)业务层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 public interface DictItemService extends BaseService<DictItem> {
 
-    /// 根据字典组ID查询字典数据列表
-    ///
-    /// @param gid 字典组ID
-    /// @return 字典数据列表
+    /**
+     * 根据字典组ID查询字典数据列表
+     *
+     * @param gid
+     *            字典组ID
+     * @return 字典数据列表
+     */
     List<DictItem> listByGid(UUID gid);
 }

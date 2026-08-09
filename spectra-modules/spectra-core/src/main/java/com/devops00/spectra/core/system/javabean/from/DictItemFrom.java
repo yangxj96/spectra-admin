@@ -25,43 +25,61 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 字典数据入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典数据入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DictItemFrom {
 
-    /// 主键ID
+    /**
+     * 主键ID
+     */
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
-    /// 字典类型ID
+    /**
+     * 字典类型ID
+     */
     @NotNull(message = "字典类型不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private UUID gid;
 
-    /// 标签
+    /**
+     * 标签
+     */
     @NotNull(message = "标签不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String label;
 
-    /// 值
+    /**
+     * 值
+     */
     @NotNull(message = "字典值不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String value;
 
-    /// 排序
+    /**
+     * 排序
+     */
     private Short sort;
 
-    /// 状态
+    /**
+     * 状态
+     */
     @NotNull(message = "字典状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private Short state;
 
-    /// 是否默认
+    /**
+     * 是否默认
+     */
     private Boolean defaultFlag;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 }

@@ -23,27 +23,35 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 修改密码入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 修改密码入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChangePasswordFrom {
 
-    /// 旧密码
+    /**
+     * 旧密码
+     */
     @NotBlank(message = "旧密码不能为空")
     private String oldPassword;
 
-    /// 新密码
+    /**
+     * 新密码
+     */
     @NotBlank(message = "新密码不能为空")
     @Size(min = 6, max = 20, message = "密码长度必须在6-20位之间")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,20}$", message = "密码必须包含大小写字母、数字和特殊字符（@$!%*?&）")
     private String newPassword;
 
-    /// 确认密码
+    /**
+     * 确认密码
+     */
     @NotBlank(message = "确认密码不能为空")
     private String verifyPassword;
 }

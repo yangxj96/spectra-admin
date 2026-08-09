@@ -20,16 +20,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 刷新token入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/28
+/**
+ * 刷新token入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/28
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefreshTokenFrom {
 
-    /// 刷新令牌。
+    /**
+     * 刷新令牌。
+     */
     private String refreshToken;
 }

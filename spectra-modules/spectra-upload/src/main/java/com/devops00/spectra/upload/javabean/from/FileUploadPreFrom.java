@@ -18,20 +18,28 @@ package com.devops00.spectra.upload.javabean.from;
 
 import lombok.Data;
 
-/// 文件上传预处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/7 22:59
+/**
+ * 文件上传预处理
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/7 22:59
+ */
 @Data
 public class FileUploadPreFrom {
 
-    /// 文件名称
+    /**
+     * 文件名称
+     */
     private String filename;
 
-    /// 文件大小
+    /**
+     * 文件大小
+     */
     private Long size;
 
-    /// 文件hash值
+    /**
+     * 文件hash值
+     */
     private String hash;
 }

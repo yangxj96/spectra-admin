@@ -22,40 +22,60 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 任务响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 任务响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class TaskVO {
 
-    /// 任务ID
+    /**
+     * 任务ID
+     */
     private String id;
 
-    /// 任务名称
+    /**
+     * 任务名称
+     */
     private String name;
 
-    /// 任务处理人
+    /**
+     * 任务处理人
+     */
     private String assignee;
 
-    /// 流程实例ID
+    /**
+     * 流程实例ID
+     */
     private String processInstanceId;
 
-    /// 流程定义ID
+    /**
+     * 流程定义ID
+     */
     private String processDefinitionId;
 
-    /// 流程定义KEY
+    /**
+     * 流程定义KEY
+     */
     private String processDefinitionKey;
 
-    /// 业务KEY
+    /**
+     * 业务KEY
+     */
     private String businessKey;
 
-    /// 任务创建时间
+    /**
+     * 任务创建时间
+     */
     private LocalDateTime createTime;
 
-    /// 任务描述
+    /**
+     * 任务描述
+     */
     private String description;
 }

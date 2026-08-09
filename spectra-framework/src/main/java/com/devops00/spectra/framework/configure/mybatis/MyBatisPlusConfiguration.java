@@ -33,17 +33,21 @@ import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.List;
 
-/// MyBatisPlus配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * MyBatisPlus配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Configuration
 @EnableTransactionManagement(rollbackOn = RollbackOn.ALL_EXCEPTIONS)
 public class MyBatisPlusConfiguration {
 
-    /// 使用ObjectProvider自动收集所有InnerInterceptor类型的Bean
+    /**
+     * 使用ObjectProvider自动收集所有InnerInterceptor类型的Bean
+     */
     @Resource
     private ObjectProvider<InnerInterceptor> innerInterceptors;
 
@@ -53,7 +57,9 @@ public class MyBatisPlusConfiguration {
     @Resource
     private DataScopeEntityRegistry dataScopeEntityRegistry;
 
-    /// 添加注释
+    /**
+     * 添加注释
+     */
     @Bean
     public MetaObjectHandler metaObjectHandler() {
         log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));

@@ -29,11 +29,13 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
-/// S3协议配置类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/31 13:59
+/**
+ * S3协议配置类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/31 13:59
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(S3Properties.class)

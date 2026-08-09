@@ -16,16 +16,22 @@
 
 package com.devops00.spectra.core.system.javabean.enums;
 
-/// 菜单节点类型
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 菜单节点类型
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 public enum MenuType {
 
-    /// 只负责组织下级节点的目录
+    /**
+     * 只负责组织下级节点的目录
+     */
     DIRECTORY,
 
-    /// 可以跳转到前端命名路由的菜单
+    /**
+     * 可以跳转到前端命名路由的菜单
+     */
     MENU
 }

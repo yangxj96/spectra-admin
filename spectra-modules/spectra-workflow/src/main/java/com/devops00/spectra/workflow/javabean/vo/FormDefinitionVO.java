@@ -21,47 +21,73 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// 表单定义响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 表单定义响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class FormDefinitionVO {
 
-    /// 表单定义ID
+    /**
+     * 表单定义ID
+     */
     private UUID id;
 
-    /// 表单名称
+    /**
+     * 表单名称
+     */
     private String name;
 
-    /// 表单编码
+    /**
+     * 表单编码
+     */
     private String code;
 
-    /// 当前版本号
+    /**
+     * 当前版本号
+     */
     private Integer currentVersion;
 
-    /// 是否启用
+    /**
+     * 是否启用
+     */
     private Boolean active;
 
-    /// 描述
+    /**
+     * 描述
+     */
     private String description;
 
-    /// form-create规则JSON（仅详情接口返回）
+    /**
+     * form-create规则JSON（仅详情接口返回）
+     */
     private String ruleJson;
 
-    /// form-create配置JSON（仅详情接口返回）
+    /**
+     * form-create配置JSON（仅详情接口返回）
+     */
     private String optionsJson;
 
-    /// form-create完整输出（仅详情接口返回）
+    /**
+     * form-create完整输出（仅详情接口返回）
+     */
     private String formJson;
 
-    /// 创建人
+    /**
+     * 创建人
+     */
     private UUID createdBy;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 
-    /// 最后修改时间
+    /**
+     * 最后修改时间
+     */
     private LocalDateTime updatedAt;
 }

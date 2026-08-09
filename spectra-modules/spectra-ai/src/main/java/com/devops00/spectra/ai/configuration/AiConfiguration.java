@@ -33,11 +33,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-/// Ai相关配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/9 16:51
+/**
+ * Ai相关配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/9 16:51
+ */
 @Configuration
 @RequiredArgsConstructor
 public class AiConfiguration {
@@ -54,7 +56,9 @@ public class AiConfiguration {
 
     private final PostgresChatMemoryStore chatMemoryStore;
 
-    /// 动态创建一个具备 RAG 能力的智能体
+    /**
+     * 动态创建一个具备 RAG 能力的智能体
+     */
     @Bean
     public SpectraAssistant assistant() {
         var contentRetriever = EmbeddingStoreContentRetriever.builder()

@@ -34,11 +34,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 工作流-表单定义接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单定义接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Slf4j
 @RestController
 @RequestMapping("/workflow/form-definitions")
@@ -47,7 +49,9 @@ public class FormDefinitionController {
 
     private final FormDefinitionService formDefinitionService;
 
-    /// 分页查询表单列表
+    /**
+     * 分页查询表单列表
+     */
     @ULog("'查询表单列表'")
     @GetMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
@@ -55,7 +59,9 @@ public class FormDefinitionController {
         return formDefinitionService.page(page, params);
     }
 
-    /// 查询表单详情（含当前版本内容）
+    /**
+     * 查询表单详情（含当前版本内容）
+     */
     @ULog("'查询表单详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
@@ -63,7 +69,9 @@ public class FormDefinitionController {
         return formDefinitionService.getDetail(id);
     }
 
-    /// 创建表单（同时创建版本1）
+    /**
+     * 创建表单（同时创建版本1）
+     */
     @ULog("'创建表单定义'")
     @PostMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
@@ -71,7 +79,9 @@ public class FormDefinitionController {
         formDefinitionService.created(from);
     }
 
-    /// 更新表单元数据
+    /**
+     * 更新表单元数据
+     */
     @ULog("'更新表单定义'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:UPDATE')")
@@ -79,7 +89,9 @@ public class FormDefinitionController {
         formDefinitionService.modify(id, from);
     }
 
-    /// 删除表单（级联删除版本）
+    /**
+     * 删除表单（级联删除版本）
+     */
     @ULog("'删除表单定义'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:DELETE')")
@@ -87,7 +99,9 @@ public class FormDefinitionController {
         formDefinitionService.deleteById(id);
     }
 
-    /// 保存新版本（版本号自增）
+    /**
+     * 保存新版本（版本号自增）
+     */
     @ULog("'保存表单新版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:INSERT')")
@@ -95,7 +109,9 @@ public class FormDefinitionController {
         formDefinitionService.saveVersion(id, from);
     }
 
-    /// 查询版本历史
+    /**
+     * 查询版本历史
+     */
     @ULog("'查询表单版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")
@@ -103,7 +119,9 @@ public class FormDefinitionController {
         return formDefinitionService.getVersions(id);
     }
 
-    /// 查询指定版本详情
+    /**
+     * 查询指定版本详情
+     */
     @ULog("'查询表单版本详情'")
     @GetMapping(value = "/{id}/versions/{version}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'WF_FORM:QUERY')")

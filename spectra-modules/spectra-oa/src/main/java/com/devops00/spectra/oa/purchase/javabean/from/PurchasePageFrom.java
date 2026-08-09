@@ -18,20 +18,28 @@ package com.devops00.spectra.oa.purchase.javabean.from;
 
 import lombok.Data;
 
-/// 采购申请分页筛选参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购申请分页筛选参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchasePageFrom {
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 执行状态。
+    /**
+     * 执行状态。
+     */
     private String executionStatus;
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 }

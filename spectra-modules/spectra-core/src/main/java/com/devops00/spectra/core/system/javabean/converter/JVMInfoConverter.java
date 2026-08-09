@@ -26,15 +26,19 @@ import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 
-/// JVM 信息 MapStruct 转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * JVM 信息 MapStruct 转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface JVMInfoConverter {
 
-    /// 运行时 JVM 信息转视图对象。
+    /**
+     * 运行时 JVM 信息转视图对象。
+     */
     @Mapping(target = "jvmName", source = "runtimeMXBean.vmName")
     @Mapping(target = "jvmVendor", source = "runtimeMXBean.vmVendor")
     @Mapping(target = "jvmVersion", source = "runtimeMXBean.vmVersion")

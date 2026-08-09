@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 采购申请主表。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购申请主表。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -41,55 +43,81 @@ import lombok.Setter;
 @DataScope
 public class Purchase extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     @TableField("purpose")
     private String purpose;
 
-    /// 预计日期。
+    /**
+     * 预计日期。
+     */
     @TableField("expected_date")
     private Instant expectedDate;
 
-    /// 预算金额。
+    /**
+     * 预算金额。
+     */
     @TableField("budget_amount")
     private BigDecimal budgetAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     @TableField("currency")
     private String currency;
 
-    /// 建议供应商。
+    /**
+     * 建议供应商。
+     */
     @TableField("suggested_supplier")
     private String suggestedSupplier;
 
-    /// 执行状态。
+    /**
+     * 执行状态。
+     */
     @TableField("execution_status")
     private String executionStatus;
 
-    /// 采购人 ID。
+    /**
+     * 采购人 ID。
+     */
     @TableField("purchaser_id")
     private UUID purchaserId;
 
-    /// 订单编号。
+    /**
+     * 订单编号。
+     */
     @TableField("order_no")
     private String orderNo;
 
-    /// 下单时间。
+    /**
+     * 下单时间。
+     */
     @TableField("ordered_at")
     private Instant orderedAt;
 
-    /// 完成时间。
+    /**
+     * 完成时间。
+     */
     @TableField("completed_at")
     private Instant completedAt;
 
-    /// 执行备注。
+    /**
+     * 执行备注。
+     */
     @TableField("execution_remark")
     private String executionRemark;
 }

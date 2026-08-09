@@ -18,12 +18,16 @@ package com.devops00.spectra.core.user.javabean.event;
 
 import java.util.UUID;
 
-/// 角色删除事件
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 角色删除事件
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public record RoleDeletedEvent(
-        /// 角色 ID。
+        /**
+         * 角色 ID。
+         */
         UUID roleId) {
 }

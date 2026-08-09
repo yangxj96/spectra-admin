@@ -26,11 +26,13 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-/// 文件信息转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/4 16:00
+/**
+ * 文件信息转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/4 16:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface FileInfoConverter {
 

@@ -24,11 +24,13 @@ import com.devops00.spectra.oa.contract.service.ContractService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 合同履约节点提醒任务。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 合同履约节点提醒任务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

@@ -25,40 +25,58 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 组织机构入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/14 00:00
+/**
+ * 组织机构入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/14 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepartmentFrom {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
-    /// 上级ID
+    /**
+     * 上级ID
+     */
     private UUID pid;
 
-    /// 名称
+    /**
+     * 名称
+     */
     private String name;
 
-    /// 编码
+    /**
+     * 编码
+     */
     @Null(message = "组织机构编码只能自动生成", groups = Verify.Insert.class)
     private String code;
 
-    /// 组织机构类型
+    /**
+     * 组织机构类型
+     */
     private Short type;
 
-    /// 行政区划ID
+    /**
+     * 行政区划ID
+     */
     private UUID regionId;
 
-    /// 排序字段
+    /**
+     * 排序字段
+     */
     private Integer sort;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 }

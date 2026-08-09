@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.constant;
 
-/// redis的key的规范
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * redis的key的规范
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface RedisKey {
 
     String getPattern();

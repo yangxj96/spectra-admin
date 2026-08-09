@@ -21,20 +21,28 @@ import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 
-/// 区域路径响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 区域路径响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 public class RegionPathVO {
 
-    /// ID 列表。
+    /**
+     * ID 列表。
+     */
     private List<UUID> ids;
 
-    /// 名称列表。
+    /**
+     * 名称列表。
+     */
     private List<String> names;
 
-    /// 全名。
+    /**
+     * 全名。
+     */
     private String fullName;
 }

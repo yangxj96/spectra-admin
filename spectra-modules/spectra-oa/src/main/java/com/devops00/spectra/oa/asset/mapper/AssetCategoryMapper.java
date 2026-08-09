@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.asset.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetCategory;
 
-/// 资产分类 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产分类 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 public interface AssetCategoryMapper extends BaseMapper<AssetCategory> {
 }

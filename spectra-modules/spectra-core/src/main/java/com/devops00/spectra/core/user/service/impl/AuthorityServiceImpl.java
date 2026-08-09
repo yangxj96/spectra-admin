@@ -40,11 +40,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-/// 权限service层-实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 权限service层-实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 @Service
 public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Authority> implements AuthorityService {

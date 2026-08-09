@@ -29,11 +29,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/// 上传service测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/8 00:53
+/**
+ * 上传service测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/8 00:53
+ */
 @Slf4j
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
@@ -51,7 +53,9 @@ public class UploadServiceTest {
         }).toList();
     }
 
-    /// 初始化文件类型
+    /**
+     * 初始化文件类型
+     */
     @Test
     void initFileType() {
         var types = new ArrayList<FileType>();
@@ -136,7 +140,9 @@ public class UploadServiceTest {
         fileTypeService.saveBatch(types);
     }
 
-    /// 尝试读取文件类型
+    /**
+     * 尝试读取文件类型
+     */
     @Test
     void getFileType() {
         List<FileType> fileTypes = fileTypeService.list();

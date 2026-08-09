@@ -25,71 +25,111 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/// Token存储相关
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/11 10:06
+/**
+ * Token存储相关
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/11 10:06
+ */
 public interface SecHolderStrategy {
 
-    /// 获取定义的超管角色
+    /**
+     * 获取定义的超管角色
+     */
     String administrators();
 
-    /// 创建 token（默认 WEB 端）
+    /**
+     * 创建 token（默认 WEB 端）
+     */
     TokenVO createToken(SecurityUser user);
 
-    /// 创建 token，同端复用：同一用户同一端已有有效 token 则直接返回
+    /**
+     * 创建 token，同端复用：同一用户同一端已有有效 token 则直接返回
+     */
     TokenVO createToken(SecurityUser user, ClientType clientType);
 
-    /// 刷新 token TTL（活跃续期）
+    /**
+     * 刷新 token TTL（活跃续期）
+     */
     void refreshToken(String token);
 
-    /// 根据刷新token签发新的token对
+    /**
+     * 根据刷新token签发新的token对
+     */
     TokenVO refreshByRefreshToken(String refreshToken);
 
-    /// 删除单个 token
+    /**
+     * 删除单个 token
+     */
     void deleteToken(String token);
 
-    /// 根据刷新token删除
+    /**
+     * 根据刷新token删除
+     */
     void deleteByRefreshToken(String refreshToken);
 
-    /// 踢出用户所有端
+    /**
+     * 踢出用户所有端
+     */
     void deleteByUserId(UUID userId);
 
-    /// 踢出用户指定端
+    /**
+     * 踢出用户指定端
+     */
     void deleteByUserIdAndClient(String userId, ClientType clientType);
 
-    /// 获取在线用户列表
+    /**
+     * 获取在线用户列表
+     */
     List<UserOnlineVO> listOnlineUsers();
 
-    /// 获取当前用户信息
+    /**
+     * 获取当前用户信息
+     */
     @Nullable
     SecurityUser getCurrentUser();
 
-    /// 根据 token 获取用户信息
+    /**
+     * 根据 token 获取用户信息
+     */
     @Nullable
     SecurityUser getCurrentUser(String token);
 
-    /// 获取当前 token
+    /**
+     * 获取当前 token
+     */
     @Nullable
     String getCurrentToken();
 
-    /// 获取当前用户 ID
+    /**
+     * 获取当前用户 ID
+     */
     @Nullable
     UUID getCurrentUserId();
 
-    /// 获取当前用户时区ID
+    /**
+     * 获取当前用户时区ID
+     */
     String getCurrentUserZoneId();
 
-    /// 获取当前用户名
+    /**
+     * 获取当前用户名
+     */
     String getCurrentUsername();
 
-    /// 记录登录失败
+    /**
+     * 记录登录失败
+     */
     void recordLoginFail(String username);
 
-    /// 检查是否被锁定
+    /**
+     * 检查是否被锁定
+     */
     boolean isLockedOut(String username);
 
-    /// 清除登录失败计数
+    /**
+     * 清除登录失败计数
+     */
     void clearLoginFail(String username);
 }

@@ -18,17 +18,23 @@ package com.devops00.spectra.workflow.javabean.from;
 
 import lombok.Data;
 
-/// 表单分页查询条件
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 表单分页查询条件
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 public class FormPageFrom {
 
-    /// 表单名称（模糊查询）
+    /**
+     * 表单名称（模糊查询）
+     */
     private String name;
 
-    /// 是否启用
+    /**
+     * 是否启用
+     */
     private Boolean active;
 }

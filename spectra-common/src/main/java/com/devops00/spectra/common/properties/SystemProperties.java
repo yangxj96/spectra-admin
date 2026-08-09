@@ -22,66 +22,98 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.util.Collections;
 import java.util.List;
 
-/// 光谱平台相关配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/19 00:00
+/**
+ * 光谱平台相关配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/19 00:00
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.system")
 public class SystemProperties {
 
-    /// 基础文件位置,所有文件都会在这个目录下面进行存放
+    /**
+     * 基础文件位置,所有文件都会在这个目录下面进行存放
+     */
     private String baseDir = "files";
 
-    /// 指定包前缀,一部分地方在使用的时候**不得不固定写死代码**, 导致如果克隆代码后需要修改包名为自己公司或者自己使用的时候,
-    /// 可以直接修改这个配置,在需要写死的地方会直接使用这里, 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表,
-    /// 以下为没法直接使用这个属性进行修改的位置,
-    /// 1. com.devops00.spectra.framework.configure.MyBatisPlusConfiguration
-    /// 2. com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice
-    /// 3. com.devops00.spectra.framework.configure.mvc.advice.response.ResponseModifyAdvice
-    /// 4. com.devops00.spectra.launch.LaunchApplication
+    /**
+     * 指定包前缀,一部分地方在使用的时候<b>不得不固定写死代码</b>, 导致如果克隆代码后需要修改包名为自己公司或者自己使用的时候,
+     * 可以直接修改这个配置,在需要写死的地方会直接使用这里, 能使用拼接的位置都尽量进行了拼接,但是依旧会有一些位置无法拼接,则注明在下方列表,
+     * 以下为没法直接使用这个属性进行修改的位置,
+     * <ol>
+     * <li>com.devops00.spectra.framework.configure.MyBatisPlusConfiguration</li>
+     * <li>com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice</li>
+     * <li>com.devops00.spectra.framework.configure.mvc.advice.response.ResponseModifyAdvice</li>
+     * <li>com.devops00.spectra.launch.LaunchApplication</li>
+     * </ol>
+     */
     private String packagePrefix = "com.devops00.spectra";
 
-    /// mvc配置
+    /**
+     * mvc配置
+     */
     private SpectraMvc mvc = new SpectraMvc();
 
-    /// cors配置
+    /**
+     * cors配置
+     */
     private SpectraCors cors = new SpectraCors();
 
-    /// MVC相关配置
+    /**
+     * MVC相关配置
+     */
     @Data
     public static class SpectraMvc {
 
-        /// api版本号请求头
+        /**
+         * api版本号请求头
+         */
         private String apiHeader = "Api-Version";
 
-        /// 默认API版本号
+        /**
+         * 默认API版本号
+         */
         private String apiVersion = "1.0.0";
     }
 
-    /// CORS相关配置
+    /**
+     * CORS相关配置
+     */
     @Data
     public static class SpectraCors {
 
-        /// 指定的路径
+        /**
+         * 指定的路径
+         */
         private String mapping = "/**";
 
-        /// 指定允许的源
+        /**
+         * 指定允许的源
+         */
         private List<String> originPatterns = Collections.singletonList("*");
 
-        /// 指定允许的方法
+        /**
+         * 指定允许的方法
+         */
         private List<String> methods = Collections.singletonList("*");
 
-        /// 指定运行的头信息
+        /**
+         * 指定运行的头信息
+         */
         private List<String> headers = Collections.singletonList("*");
 
-        /// 是否支持凭证
+        /**
+         * 是否支持凭证
+         */
         private Boolean credentials = Boolean.TRUE;
 
-        /// 预检后缓存策略时长,单位为妙
-        ///
-        /// 默认一小时
+        /**
+         * 预检后缓存策略时长,单位为妙
+         *
+         * 默认一小时
+         */
         private Long maxAge = 3600L;
     }
 }

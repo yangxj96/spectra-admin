@@ -16,11 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-/// 消息控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 消息控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @RestController
 @RequestMapping("/notification")
@@ -29,7 +31,9 @@ public class NotificationController {
 
     private final NotificationService notificationService;
 
-    /// 获取消息列表
+    /**
+     * 获取消息列表
+     */
     @ULog("'查询消息列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
@@ -38,7 +42,9 @@ public class NotificationController {
         return notificationService.page(page, params, userId);
     }
 
-    /// 获取未读数量
+    /**
+     * 获取未读数量
+     */
     @ULog("'获取未读消息数'")
     @GetMapping(value = "/unread-count", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
@@ -47,7 +53,9 @@ public class NotificationController {
         return notificationService.getUnreadCount(userId);
     }
 
-    /// 标记单条已读
+    /**
+     * 标记单条已读
+     */
     @ULog("'标记消息已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
@@ -56,7 +64,9 @@ public class NotificationController {
         notificationService.markAsRead(id, userId);
     }
 
-    /// 全部标记已读
+    /**
+     * 全部标记已读
+     */
     @ULog("'全部标记已读'")
     @PutMapping(value = "/read-all", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
@@ -65,7 +75,9 @@ public class NotificationController {
         notificationService.markAllAsRead(userId);
     }
 
-    /// 删除消息
+    /**
+     * 删除消息
+     */
     @ULog("'删除消息'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
@@ -74,7 +86,9 @@ public class NotificationController {
         notificationService.deleteById(id, userId);
     }
 
-    /// 批量删除
+    /**
+     * 批量删除
+     */
     @ULog("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
@@ -83,7 +97,9 @@ public class NotificationController {
         notificationService.batchDelete(from.getIds(), userId);
     }
 
-    /// 发送消息（内部调用）
+    /**
+     * 发送消息（内部调用）
+     */
     @ULog("'发送消息'")
     @PostMapping(value = "/send", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -91,7 +107,9 @@ public class NotificationController {
         notificationService.send(from);
     }
 
-    /// 批量发送消息（内部调用）
+    /**
+     * 批量发送消息（内部调用）
+     */
     @ULog("'批量发送消息'")
     @PostMapping(value = "/batch-send", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

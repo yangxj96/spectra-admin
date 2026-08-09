@@ -28,11 +28,13 @@ import lombok.ToString;
 import java.time.Instant;
 import java.util.UUID;
 
-/// OA-会议表主表实体
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/5 23:53
+/**
+ * OA-会议表主表实体
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/5 23:53
+ */
 @Getter
 @Setter
 @ToString
@@ -41,43 +43,63 @@ import java.util.UUID;
         @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id", userColumn = "user_id")})
 public class Meeting extends BaseEntity {
 
-    /// 会议标题
+    /**
+     * 会议标题
+     */
     @TableField("title")
     private String title;
 
-    /// 发起人
+    /**
+     * 发起人
+     */
     @TableField("initiator_id")
     private String initiatorId;
 
-    /// 开始时间
+    /**
+     * 开始时间
+     */
     @TableField("start_time")
     private Instant startTime;
 
-    /// 结束时间
+    /**
+     * 结束时间
+     */
     @TableField("end_time")
     private Instant endTime;
 
-    /// 会议地点
+    /**
+     * 会议地点
+     */
     @TableField("location")
     private String location;
 
-    /// 会议内容/议题
+    /**
+     * 会议内容/议题
+     */
     @TableField("content")
     private String content;
 
-    /// 会议业务状态
+    /**
+     * 会议业务状态
+     */
     @TableField("status")
     private MeetingStatus status;
 
-    /// 工作流审核实例ID
+    /**
+     * 工作流审核实例ID
+     */
     @TableField("process_instance_id")
     private String processInstanceId;
 
-    /// 工作流审核状态
+    /**
+     * 工作流审核状态
+     */
     @TableField("approval_status")
     private MeetingStatus approvalStatus;
 
-    /// 所属部门ID
+    /**
+     * 所属部门ID
+     */
     @TableField("department_id")
     private UUID departmentId;
 }

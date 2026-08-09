@@ -19,15 +19,19 @@ package com.devops00.spectra.workflow;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 
-/// 工作流模块
-///
-/// - **作者:** yangxj96
-/// - **版本:** 1.0
-/// - **始于:** 2025/11/11 00:00
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11
+/**
+ * 工作流模块
+ *
+ * <ul>
+ * <li><b>作者:</b> yangxj96</li>
+ * <li><b>版本:</b> 1.0</li>
+ * <li><b>始于:</b> 2025/11/11 00:00</li>
+ * </ul>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11
+ */
 @ComponentScan("com.devops00.spectra.workflow")
 @MapperScan("com.devops00.spectra.workflow.**.mapper")
 public class WorkflowModule {

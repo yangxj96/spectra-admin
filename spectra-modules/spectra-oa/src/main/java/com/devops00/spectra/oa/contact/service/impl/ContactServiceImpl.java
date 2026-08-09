@@ -30,11 +30,13 @@ import com.devops00.spectra.oa.contact.service.ContactService;
 
 import lombok.RequiredArgsConstructor;
 
-/// 通讯录直接复用系统用户和部门数据，不维护重复的 OA 联系人主表。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 通讯录直接复用系统用户和部门数据，不维护重复的 OA 联系人主表。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Service
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {

@@ -32,21 +32,25 @@ import java.util.Properties;
 
 import static com.google.code.kaptcha.Constants.*;
 
-/// 验证码配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/25 00:00
+/**
+ * 验证码配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/25 00:00
+ */
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(KaptchaProperties.class)
 public class KaptchaConfiguration {
 
-    ///
-    /// 图片验证码
-    ///
-    /// @return `Producer`对象
-    ///
+    /**
+     *
+     * 图片验证码
+     *
+     * @return {@code Producer}对象
+     *
+     */
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "chat")
     public Producer kaptchaProducer() throws Exception {
@@ -79,11 +83,13 @@ public class KaptchaConfiguration {
         return defaultKaptcha;
     }
 
-    ///
-    /// 算术验证码
-    ///
-    /// @return `Producer`对象
-    ///
+    /**
+     *
+     * 算术验证码
+     *
+     * @return {@code Producer}对象
+     *
+     */
     @Bean
     @ConditionalOnProperty(name = "spectra.kaptcha.type", havingValue = "math")
     public DefaultKaptcha getKaptchaBeanMath() throws Exception {

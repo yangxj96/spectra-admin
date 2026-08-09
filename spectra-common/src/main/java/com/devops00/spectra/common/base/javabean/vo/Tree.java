@@ -21,32 +21,46 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/// 所有树形结构 VO 的通用接口
-///
-/// @param <T>
-///            具体类型
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025-6-14 00:00
+/**
+ * 所有树形结构 VO 的通用接口
+ *
+ * @param <T>
+ *            具体类型
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025-6-14 00:00
+ */
 public interface Tree<T> {
 
-    /// 获取ID
+    /**
+     * 获取ID
+     */
     UUID getId();
 
-    /// 设置ID
+    /**
+     * 设置ID
+     */
     void setId(UUID id);
 
-    /// 获取父级ID
+    /**
+     * 获取父级ID
+     */
     @Nullable
     UUID getPid();
 
-    /// 设置父级ID
+    /**
+     * 设置父级ID
+     */
     void setPid(@Nullable UUID pid);
 
-    /// 获取下级
+    /**
+     * 获取下级
+     */
     @Nullable
     List<T> getChildren();
 
-    /// 设置下级
+    /**
+     * 设置下级
+     */
     void setChildren(@Nullable List<T> children);
 }

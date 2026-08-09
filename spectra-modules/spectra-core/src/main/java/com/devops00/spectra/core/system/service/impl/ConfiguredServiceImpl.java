@@ -34,11 +34,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-/// 系统配置Service层默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/6 00:00
+/**
+ * 系统配置Service层默认实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/6 00:00
+ */
 @Slf4j
 @Service
 public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Configured> implements ConfiguredService {

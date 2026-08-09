@@ -23,11 +23,13 @@ import com.devops00.spectra.upload.properties.LocalProperties;
 
 import lombok.RequiredArgsConstructor;
 
-/// 本地上传配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/31 13:59
+/**
+ * 本地上传配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/31 13:59
+ */
 @Configuration
 @RequiredArgsConstructor
 @EnableConfigurationProperties(LocalProperties.class)

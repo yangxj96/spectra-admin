@@ -50,11 +50,13 @@ import com.devops00.spectra.security.base.holder.SecUtil;
 
 import lombok.RequiredArgsConstructor;
 
-/// 公告业务服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 公告业务服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Service
 @RequiredArgsConstructor
 public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> implements NoticeService {

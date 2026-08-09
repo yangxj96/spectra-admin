@@ -20,16 +20,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 系统配置分页查询入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/6 00:00
+/**
+ * 系统配置分页查询入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/6 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ConfiguredPageFrom {
 
-    /// 系统配置的key,模糊查询
+    /**
+     * 系统配置的key,模糊查询
+     */
     private String key;
 }

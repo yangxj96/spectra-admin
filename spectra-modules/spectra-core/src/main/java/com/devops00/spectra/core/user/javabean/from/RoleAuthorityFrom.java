@@ -25,21 +25,27 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-/// 角色关联权限入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 角色关联权限入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleAuthorityFrom {
 
-    /// 角色ID
+    /**
+     * 角色ID
+     */
     @NotNull(message = "角色ID不能为空")
     private UUID roleId;
 
-    /// 权限ID列表
+    /**
+     * 权限ID列表
+     */
     @NotNull(message = "权限列表不能为空")
     @Size(min = 1, message = "权限列表至少需要一个权限ID")
     private List<UUID> authorityIds;

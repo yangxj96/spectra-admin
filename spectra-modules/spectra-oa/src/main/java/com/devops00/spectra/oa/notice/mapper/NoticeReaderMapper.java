@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.notice.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.notice.javabean.entity.NoticeReader;
 
-/// 公告阅读回执 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 公告阅读回执 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 public interface NoticeReaderMapper extends BaseMapper<NoticeReader> {
 }

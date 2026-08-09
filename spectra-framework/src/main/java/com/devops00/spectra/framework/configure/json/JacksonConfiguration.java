@@ -41,11 +41,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.TimeZone;
 
-/// jackson 相关配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * jackson 相关配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @Configuration
 @EnableConfigurationProperties(JacksonProperties.class)

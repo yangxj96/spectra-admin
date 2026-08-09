@@ -25,11 +25,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-/// S3协议测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/31 01:32
+/**
+ * S3协议测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/31 01:32
+ */
 @Slf4j
 @SpringBootTest(classes = UploadTestApplication.class)
 public class S3ServiceTest {

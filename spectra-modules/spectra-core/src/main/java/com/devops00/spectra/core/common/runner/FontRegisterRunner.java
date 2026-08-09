@@ -26,11 +26,13 @@ import org.springframework.stereotype.Component;
 import java.awt.*;
 import java.io.InputStream;
 
-/// 字体注册Runner
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/14 14:10
+/**
+ * 字体注册Runner
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/14 14:10
+ */
 @Slf4j
 @Component
 public class FontRegisterRunner implements ApplicationRunner {

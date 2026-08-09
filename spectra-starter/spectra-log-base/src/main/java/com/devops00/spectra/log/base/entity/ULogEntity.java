@@ -25,46 +25,68 @@ import org.jspecify.annotations.Nullable;
 import java.io.Serializable;
 import java.util.UUID;
 
-/// 切面中存储的数据的实体
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/27 00:00
+/**
+ * 切面中存储的数据的实体
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/27 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ULogEntity implements Serializable {
 
-    /// 日志类型
+    /**
+     * 日志类型
+     */
     private SysLogType type;
 
-    /// 操作说明
+    /**
+     * 操作说明
+     */
     private String explain;
 
-    /// 请求参数
+    /**
+     * 请求参数
+     */
     @Nullable
     private Object args;
 
-    /// 请求IP
+    /**
+     * 请求IP
+     */
     private String ip;
 
-    /// 请求方法
+    /**
+     * 请求方法
+     */
     private String method;
 
-    /// 请求URL
+    /**
+     * 请求URL
+     */
     private String url;
 
-    /// 响应状态
+    /**
+     * 响应状态
+     */
     private Short status;
 
-    /// 响应内容
+    /**
+     * 响应内容
+     */
     @Nullable
     private Object result;
 
-    /// 耗时
+    /**
+     * 耗时
+     */
     private Long timeCost;
 
-    /// 当前用户ID
+    /**
+     * 当前用户ID
+     */
     @Nullable
     private UUID currentId;
 }

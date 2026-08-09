@@ -20,25 +20,33 @@ import com.devops00.spectra.core.system.javabean.vo.CPUInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
 
-/// 服务器信息监控
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 服务器信息监控
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface ServiceMonitorService {
 
-    /// 获取服务器CPU信息
-    ///
-    /// @return 服务器CPU信息
+    /**
+     * 获取服务器CPU信息
+     *
+     * @return 服务器CPU信息
+     */
     CPUInfoVO getCPUInfo();
 
-    /// 获取服务器内存信息
-    ///
-    /// @return 服务器内存信息
+    /**
+     * 获取服务器内存信息
+     *
+     * @return 服务器内存信息
+     */
     RAMInfoVO getRAMInfo();
 
-    /// 获取JVM信息
-    ///
-    /// @return JVM信息
+    /**
+     * 获取JVM信息
+     *
+     * @return JVM信息
+     */
     JVMInfoVO getJVMInfo();
 }

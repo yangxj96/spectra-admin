@@ -23,11 +23,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.TimeZone;
 
-/// 启动类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/23 00:00
+/**
+ * 启动类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/23 00:00
+ */
 @Slf4j
 @SpringBootApplication
 @EnableScheduling

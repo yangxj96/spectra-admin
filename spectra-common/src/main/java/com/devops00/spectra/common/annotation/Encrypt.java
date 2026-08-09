@@ -22,21 +22,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/// 接口加解密标记
-///
-/// 标记在 Controller 类或方法上，控制是否需要加密响应/解密请求。 方法级注解优先级高于类级注解。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 接口加解密标记
+ *
+ * 标记在 Controller 类或方法上，控制是否需要加密响应/解密请求。 方法级注解优先级高于类级注解。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Encrypt {
 
-    /// true=需要加密请求, false=显式不加密请求
+    /**
+     * true=需要加密请求, false=显式不加密请求
+     */
     boolean value() default true;
 
-    /// true=需要加密响应, false=显式不加密响应
+    /**
+     * true=需要加密响应, false=显式不加密响应
+     */
     boolean response() default true;
 }

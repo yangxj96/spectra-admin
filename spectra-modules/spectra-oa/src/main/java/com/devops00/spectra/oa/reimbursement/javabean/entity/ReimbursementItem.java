@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 费用报销明细。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 费用报销明细。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -41,35 +43,51 @@ import lombok.Setter;
 @DataScope
 public class ReimbursementItem extends BaseEntity {
 
-    /// 报销单 ID。
+    /**
+     * 报销单 ID。
+     */
     @TableField("reimbursement_id")
     private UUID reimbursementId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 费用日期。
+    /**
+     * 费用日期。
+     */
     @TableField("expense_date")
     private Instant expenseDate;
 
-    /// 费用类别。
+    /**
+     * 费用类别。
+     */
     @TableField("category")
     private String category;
 
-    /// 费用描述。
+    /**
+     * 费用描述。
+     */
     @TableField("description")
     private String description;
 
-    /// 费用金额。
+    /**
+     * 费用金额。
+     */
     @TableField("amount")
     private BigDecimal amount;
 
-    /// 税额。
+    /**
+     * 税额。
+     */
     @TableField("tax_amount")
     private BigDecimal taxAmount;
 
-    /// 发票号码。
+    /**
+     * 发票号码。
+     */
     @TableField("invoice_no")
     private String invoiceNo;
 }

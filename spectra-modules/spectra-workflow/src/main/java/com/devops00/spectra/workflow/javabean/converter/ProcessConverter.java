@@ -25,18 +25,24 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 流程相关对象转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 流程相关对象转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ProcessConverter {
 
-    /// 流程定义实体转VO（deploymentTime 需在 Service 层单独填充）
+    /**
+     * 流程定义实体转VO（deploymentTime 需在 Service 层单独填充）
+     */
     @Mapping(target = "deploymentTime", ignore = true)
     ProcessDefinitionVO toVO(ProcessDefinition source);
 
-    /// 流程实例实体转VO
+    /**
+     * 流程实例实体转VO
+     */
     ProcessInstanceVO toVO(ProcessInstance source);
 }

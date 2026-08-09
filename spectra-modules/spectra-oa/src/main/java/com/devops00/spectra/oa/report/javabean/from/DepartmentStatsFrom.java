@@ -20,14 +20,18 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 部门维度统计查询参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 部门维度统计查询参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DepartmentStatsFrom {
 
-    /// 指定部门；为空时查询全部部门。
+    /**
+     * 指定部门；为空时查询全部部门。
+     */
     private UUID departmentId;
 }

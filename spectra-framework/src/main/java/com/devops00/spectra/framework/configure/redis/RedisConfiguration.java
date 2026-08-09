@@ -35,11 +35,13 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 
-/// Redis配置类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * Redis配置类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
@@ -49,8 +51,10 @@ public class RedisConfiguration {
 
     private final DataRedisProperties redisProperties;
 
-    /// 配置原生 RedisClient Bean
-    /// 用于满足 LettuceClientAdapter.of() 的需求
+    /**
+     * 配置原生 RedisClient Bean
+     * 用于满足 LettuceClientAdapter.of() 的需求
+     */
     @Bean
     public RedisClient redisClient() {
         log.debug(LogPrefix.REDIS.f("正在构建原生 RedisClient，地址: {}"), redisProperties.getUrl());
@@ -90,10 +94,13 @@ public class RedisConfiguration {
         return client;
     }
 
-    /// 自定义redisTemplate
-    ///
-    /// @param factory redis连接工程
-    /// @return RedisTemplate<String, Object>
+    /**
+     * 自定义redisTemplate
+     *
+     * @param factory
+     *            redis连接工程
+     * @return RedisTemplate<String, Object>
+     */
     @Bean
     @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {

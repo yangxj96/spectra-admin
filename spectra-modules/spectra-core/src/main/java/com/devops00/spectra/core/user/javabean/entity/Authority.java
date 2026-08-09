@@ -29,11 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 权限表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 权限表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -45,15 +47,21 @@ public class Authority extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 父级ID,用于构建树形结构
+    /**
+     * 父级ID,用于构建树形结构
+     */
     @TableField(value = "pid")
     private UUID pid;
 
-    /// 权限名称
+    /**
+     * 权限名称
+     */
     @TableField(value = "name")
     private String name;
 
-    /// 编码
+    /**
+     * 编码
+     */
     @TableField(value = "code")
     private String code;
 }

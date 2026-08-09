@@ -28,11 +28,13 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-/// 组织机构树形
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/14 00:00
+/**
+ * 组织机构树形
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/14 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -41,37 +43,59 @@ public class DepartmentTreeVo implements Tree<DepartmentTreeVo>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 上级ID
+    /**
+     * 上级ID
+     */
     private UUID pid;
 
-    /// 名称
+    /**
+     * 名称
+     */
     private String name;
 
-    /// 编码
+    /**
+     * 编码
+     */
     private String code;
 
-    /// 组织机构类型
+    /**
+     * 组织机构类型
+     */
     private Short type;
 
-    /// 行政区划ID
+    /**
+     * 行政区划ID
+     */
     private UUID regionId;
 
-    /// 行政区划名称
+    /**
+     * 行政区划名称
+     */
     @NameFill(lookup = RegionServiceImpl.class, sourceField = "regionId")
     private String regionName;
 
-    /// 路径
+    /**
+     * 路径
+     */
     private String path;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 
-    /// tree必备字段,进行排序用
+    /**
+     * tree必备字段,进行排序用
+     */
     private Integer sort;
 
-    /// 下级菜单
+    /**
+     * 下级菜单
+     */
     private List<DepartmentTreeVo> children;
 }

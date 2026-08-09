@@ -22,37 +22,55 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 流程实例响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 流程实例响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessInstanceVO {
 
-    /// 流程实例ID
+    /**
+     * 流程实例ID
+     */
     private String id;
 
-    /// 流程定义ID
+    /**
+     * 流程定义ID
+     */
     private String processDefinitionId;
 
-    /// 流程定义KEY
+    /**
+     * 流程定义KEY
+     */
     private String processDefinitionKey;
 
-    /// 业务KEY
+    /**
+     * 业务KEY
+     */
     private String businessKey;
 
-    /// 是否挂起
+    /**
+     * 是否挂起
+     */
     private Boolean suspended;
 
-    /// 是否已完成
+    /**
+     * 是否已完成
+     */
     private Boolean ended;
 
-    /// 开始时间
+    /**
+     * 开始时间
+     */
     private LocalDateTime startTime;
 
-    /// 启动人
+    /**
+     * 启动人
+     */
     private String startUserId;
 }

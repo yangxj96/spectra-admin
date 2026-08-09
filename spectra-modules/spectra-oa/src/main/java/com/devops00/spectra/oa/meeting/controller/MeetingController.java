@@ -39,11 +39,13 @@ import com.devops00.spectra.oa.meeting.service.MeetingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 会议主接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/5 23:23
+/**
+ * 会议主接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/5 23:23
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/meeting")
@@ -52,7 +54,9 @@ public class MeetingController {
 
     private final MeetingService bindService;
 
-    /// 创建一个会议
+    /**
+     * 创建一个会议
+     */
     @ULog("'创建会议'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:INSERT')")
@@ -60,7 +64,9 @@ public class MeetingController {
         bindService.created(from);
     }
 
-    /// 分页查询会议
+    /**
+     * 分页查询会议
+     */
     @ULog("'分页查询会议'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:QUERY')")
@@ -68,7 +74,9 @@ public class MeetingController {
         return bindService.page(page, params);
     }
 
-    /// 响应会议邀请。
+    /**
+     * 响应会议邀请。
+     */
     @ULog("'响应会议邀请'")
     @PostMapping(value = "/{id}/response", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
@@ -76,7 +84,9 @@ public class MeetingController {
         bindService.respond(id, from);
     }
 
-    /// 会议签到。
+    /**
+     * 会议签到。
+     */
     @ULog("'会议签到'")
     @PostMapping(value = "/{id}/check-in", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")
@@ -84,7 +94,9 @@ public class MeetingController {
         bindService.checkIn(id);
     }
 
-    /// 保存会议纪要。
+    /**
+     * 保存会议纪要。
+     */
     @ULog("'保存会议纪要'")
     @PostMapping(value = "/{id}/record", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_MEETING:UPDATE')")

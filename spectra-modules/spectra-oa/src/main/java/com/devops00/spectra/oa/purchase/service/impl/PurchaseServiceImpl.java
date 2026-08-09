@@ -70,11 +70,13 @@ import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 采购申请业务闭环服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购申请业务闭环服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

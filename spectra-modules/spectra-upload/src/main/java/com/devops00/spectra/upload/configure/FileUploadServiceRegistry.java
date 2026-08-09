@@ -25,23 +25,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/// 文件上传服务注册
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/06/27 00:00
+/**
+ * 文件上传服务注册
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/06/27 00:00
+ */
 @Component
 public class FileUploadServiceRegistry {
 
-    /// 支持的上传服务
+    /**
+     * 支持的上传服务
+     */
     private final Map<UploadType, FileUploadService> serviceMap;
 
-    /// 启动时候收集缓存
+    /**
+     * 启动时候收集缓存
+     */
     public FileUploadServiceRegistry(List<FileUploadService> services) {
         this.serviceMap = services.stream().collect(Collectors.toMap(FileUploadService::getType, v -> v));
     }
 
-    /// 根据类型获取上传服务
+    /**
+     * 根据类型获取上传服务
+     */
     public FileUploadService getByType(UploadType type) {
         FileUploadService service = serviceMap.get(type);
         if (service == null) {

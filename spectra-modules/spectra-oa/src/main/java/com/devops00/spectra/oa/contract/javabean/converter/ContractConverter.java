@@ -29,27 +29,39 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-/// 合同对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ContractConverter {
 
-    /// 合同实体转视图。
+    /**
+     * 合同实体转视图。
+     */
     ContractVO toVO(Contract source);
 
-    /// 合同版本实体转视图。
+    /**
+     * 合同版本实体转视图。
+     */
     @Mapping(source = "currentVersion", target = "current")
     ContractVersionVO toVersionVO(ContractVersion source);
 
-    /// 合同履约节点实体转视图。
+    /**
+     * 合同履约节点实体转视图。
+     */
     ContractMilestoneVO toMilestoneVO(ContractMilestone source);
 
-    /// 合同保存入参转实体。
+    /**
+     * 合同保存入参转实体。
+     */
     Contract toEntity(ContractSaveFrom source);
 
-    /// 使用合同保存入参更新实体。
+    /**
+     * 使用合同保存入参更新实体。
+     */
     void updateEntity(ContractSaveFrom source, @MappingTarget Contract target);
 }

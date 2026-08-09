@@ -21,28 +21,32 @@ import com.devops00.spectra.common.base.javabean.vo.Tree;
 import java.util.*;
 import java.util.function.Function;
 
-/// 树形工具类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 树形工具类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public class TreeUtils {
 
     private TreeUtils() {
         // 工具类禁止实例化
     }
 
-    /// 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点
-    ///
-    /// @param tree
-    ///            树的根节点列表
-    /// @param selectedIds
-    ///            用户选中的节点ID集合
-    /// @param idExtractor
-    ///            提取节点ID的函数（如 AuthorityTreeVO::getId）
-    /// @param <T>
-    ///            实现 Tree<T> 的具体类型
-    /// @return 压缩处理后的选中ID集合
+    /**
+     * 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点
+     *
+     * @param tree
+     *            树的根节点列表
+     * @param selectedIds
+     *            用户选中的节点ID集合
+     * @param idExtractor
+     *            提取节点ID的函数（如 AuthorityTreeVO::getId）
+     * @param <T>
+     *            实现 Tree<T> 的具体类型
+     * @return 压缩处理后的选中ID集合
+     */
     public static <T extends Tree<T>> Set<UUID> compressSelectedNodes(List<T> tree, Set<UUID> selectedIds, Function<T, UUID> idExtractor) {
         var result = new HashSet<UUID>();
         for (T node : tree) {
@@ -53,7 +57,9 @@ public class TreeUtils {
         return result;
     }
 
-    /// 递归收集压缩后的节点ID
+    /**
+     * 递归收集压缩后的节点ID
+     */
     private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<UUID> selectedIds, Function<T, UUID> idExtractor, Set<UUID> result) {
 
         if (node == null)

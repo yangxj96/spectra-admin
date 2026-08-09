@@ -19,15 +19,19 @@ package com.devops00.spectra.ai.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// AI 会话重命名请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * AI 会话重命名请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AiConversationRenameFrom {
 
-    /// 会话标题
+    /**
+     * 会话标题
+     */
     @NotBlank(message = "会话标题不能为空")
     private String title;
 }

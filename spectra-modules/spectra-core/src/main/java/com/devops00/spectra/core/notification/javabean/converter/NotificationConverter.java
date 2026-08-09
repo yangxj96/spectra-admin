@@ -8,18 +8,24 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 消息mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 消息mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface NotificationConverter {
 
-    /// 实体转VO
+    /**
+     * 实体转VO
+     */
     NotificationVO toVO(Notification source);
 
-    /// 分页转换
+    /**
+     * 分页转换
+     */
     @Mapping(target = "pages", ignore = true)
     Page<NotificationVO> toVOPage(Page<Notification> source);
 }

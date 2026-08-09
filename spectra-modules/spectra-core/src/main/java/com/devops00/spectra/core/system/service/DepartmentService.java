@@ -26,47 +26,67 @@ import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
-/// 组织机构业务层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/15 00:00
+/**
+ * 组织机构业务层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/15 00:00
+ */
 public interface DepartmentService extends BaseService<Department> {
 
-    /// 新增组织机构
-    ///
-    /// @param from 请求入参
+    /**
+     * 新增组织机构
+     *
+     * @param from
+     *            请求入参
+     */
     void created(DepartmentFrom from);
 
-    /// 根据ID删除组织机构
-    ///
-    /// @param id ID
+    /**
+     * 根据ID删除组织机构
+     *
+     * @param id
+     *            ID
+     */
     void deleteById(UUID id);
 
-    /// 编辑组织机构
-    ///
-    /// @param from 请求入参
+    /**
+     * 编辑组织机构
+     *
+     * @param from
+     *            请求入参
+     */
     void modify(DepartmentFrom from);
 
-    /// 计算组织机构路径
-    ///
-    /// @param id 组织机构ID
-    /// @return 组织机构路径
+    /**
+     * 计算组织机构路径
+     *
+     * @param id
+     *            组织机构ID
+     * @return 组织机构路径
+     */
     String generatePath(UUID id);
 
-    /// 组织机构树形结构
-    ///
-    /// @return 组织机构树形结构数组
+    /**
+     * 组织机构树形结构
+     *
+     * @return 组织机构树形结构数组
+     */
     @Nullable
     List<DepartmentTreeVo> tree() throws IllegalAccessException;
 
-    /// 获取自己包含下级的节点的ID
-    ///
-    /// @return id列表
+    /**
+     * 获取自己包含下级的节点的ID
+     *
+     * @return id列表
+     */
     Collection<UUID> getSelfAndDescendantIds(UUID departmentId);
 
-    /// 获取所有下级部门 ID（不包含自己）
-    ///
-    /// @return id列表
+    /**
+     * 获取所有下级部门 ID（不包含自己）
+     *
+     * @return id列表
+     */
     Collection<UUID> getDescendantIds(UUID departmentId);
 }

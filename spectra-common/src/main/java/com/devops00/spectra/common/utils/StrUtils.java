@@ -25,46 +25,63 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.StandardCharsets;
 
-/// 字符串工具类，替代 Apache Commons Lang3 的 StringUtils。
-///
-/// * 兼容 JDK 8+（包括 JDK 25）
-/// * 利用 Guava 处理 null/empty
-/// * 行为与 org.apache.commons.lang3.StringUtils 一致
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 字符串工具类，替代 Apache Commons Lang3 的 StringUtils。
+ *
+ * <ul>
+ * <li>兼容 JDK 8+（包括 JDK 25）</li>
+ * <li>利用 Guava 处理 null/empty</li>
+ * <li>行为与 org.apache.commons.lang3.StringUtils 一致</li>
+ * </ul>
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public final class StrUtils {
 
     private StrUtils() {
         // 工具类禁止实例化
     }
 
-    /// 判断字符串是否为 null 或 ""
+    /**
+     * 判断字符串是否为 null 或 ""
+     */
     public static boolean isEmpty(@Nullable String str) {
         return Strings.isNullOrEmpty(str);
     }
 
-    /// 判断字符串是否非 null 且非 ""
+    /**
+     * 判断字符串是否非 null 且非 ""
+     */
     public static boolean isNotEmpty(@Nullable String str) {
         return !isEmpty(str);
     }
 
-    /// 判断字符串是否为 null、"" 或仅由空白字符组成（如空格、制表符、换行符等）
+    /**
+     * 判断字符串是否为 null、"" 或仅由空白字符组成（如空格、制表符、换行符等）
+     */
     public static boolean isBlank(@Nullable String str) {
         return str == null || str.isBlank();
     }
 
-    /// 判断字符串是否非 null、非 "" 且包含非空白字符
+    /**
+     * 判断字符串是否非 null、非 "" 且包含非空白字符
+     */
     public static boolean isNotBlank(@Nullable String str) {
         return !isBlank(str);
     }
 
-    /// 安全截取子串 [start, end)
-    ///
-    /// - 若 str 为 null，返回 null
-    /// - 自动处理越界（不会抛 IndexOutOfBoundsException）
-    /// - 行为等同于 org.apache.commons.lang3.StringUtils.substring(str, start, end)
+    /**
+     * 安全截取子串 [start, end)
+     *
+     * <ul>
+     * <li>若 str 为 null，返回 null</li>
+     * <li>自动处理越界（不会抛 IndexOutOfBoundsException）</li>
+     * <li>行为等同于 org.apache.commons.lang3.StringUtils.substring(str, start,
+     * end)</li>
+     * </ul>
+     */
     public static @Nullable String substring(@Nullable String str, int start, int end) {
         if (str == null) {
             return null;
@@ -92,17 +109,23 @@ public final class StrUtils {
         return str.substring(start, end);
     }
 
-    /// 按「最大字节数」安全截取（方案一:逐字符计算）
-    ///
-    /// 适用场景：
-    /// - 数据库 VARCHAR(n) 按字节限制
-    /// - 中文 / 英文 / 数字混合
-    /// - 业务系统首选（稳定、可读性好）
-    ///
-    /// 特性：
-    /// - 不会截断半个中文字符
-    /// - 超出 maxBytes 自动停止
-    /// - str 为 null 时返回 null
+    /**
+     * 按「最大字节数」安全截取（方案一:逐字符计算）
+     *
+     * 适用场景：
+     * <ul>
+     * <li>数据库 VARCHAR(n) 按字节限制</li>
+     * <li>中文 / 英文 / 数字混合</li>
+     * <li>业务系统首选（稳定、可读性好）</li>
+     * </ul>
+     *
+     * 特性：
+     * <ul>
+     * <li>不会截断半个中文字符</li>
+     * <li>超出 maxBytes 自动停止</li>
+     * <li>str 为 null 时返回 null</li>
+     * </ul>
+     */
     public static @Nullable String substringByByte(@Nullable String str, int maxBytes, Charset charset) {
         if (str == null) {
             return null;
@@ -129,22 +152,30 @@ public final class StrUtils {
         return str.substring(0, endIndex);
     }
 
-    /// UTF-8 快捷方法（最常用）
+    /**
+     * UTF-8 快捷方法（最常用）
+     */
     public static @Nullable String substringByByteUtf8(@Nullable String str, int maxBytes) {
         return substringByByte(str, maxBytes, StandardCharsets.UTF_8);
     }
 
-    /// 按「最大字节数」安全截取（方案二:CharsetEncoder）
-    ///
-    /// 适用场景：
-    /// - 高并发 / 大文本
-    /// - 对编码行为要求极严格
-    /// - 通用基础组件
-    ///
-    /// 特性：
-    /// - 由 CharsetEncoder 保证字符完整性
-    /// - 性能略优于逐字符方式
-    /// - 实现更底层、更专业
+    /**
+     * 按「最大字节数」安全截取（方案二:CharsetEncoder）
+     *
+     * 适用场景：
+     * <ul>
+     * <li>高并发 / 大文本</li>
+     * <li>对编码行为要求极严格</li>
+     * <li>通用基础组件</li>
+     * </ul>
+     *
+     * 特性：
+     * <ul>
+     * <li>由 CharsetEncoder 保证字符完整性</li>
+     * <li>性能略优于逐字符方式</li>
+     * <li>实现更底层、更专业</li>
+     * </ul>
+     */
     public static @Nullable String substringByByteWithEncoder(@Nullable String str, int maxBytes, Charset charset) {
         if (str == null) {
             return null;
@@ -163,21 +194,25 @@ public final class StrUtils {
         return charset.decode(byteBuffer).toString();
     }
 
-    /// UTF-8 Encoder 快捷方法
+    /**
+     * UTF-8 Encoder 快捷方法
+     */
     public static @Nullable String substringByByteUtf8WithEncoder(@Nullable String str, int maxBytes) {
         return substringByByteWithEncoder(str, maxBytes, StandardCharsets.UTF_8);
     }
 
-    /// 将字符串转换为 camelCase 或 PascalCase 格式 > 前提：str 不得为 null（Servlet 参数名、配置 key
-    /// 等场景天然满足）
-    ///
-    /// @param str
-    ///            非 null 输入字符串（如 "user_first_name"）
-    /// @param capitalizeFirstLetter
-    ///            true → PascalCase ("UserName")，false → camelCase ("userName")
-    /// @param delimiter
-    ///            分隔符（如 '_'）
-    /// @return 转换后的非 null 字符串
+    /**
+     * 将字符串转换为 camelCase 或 PascalCase 格式 > 前提：str 不得为 null（Servlet 参数名、配置 key
+     * 等场景天然满足）
+     *
+     * @param str
+     *            非 null 输入字符串（如 "user_first_name"）
+     * @param capitalizeFirstLetter
+     *            true → PascalCase ("UserName")，false → camelCase ("userName")
+     * @param delimiter
+     *            分隔符（如 '_'）
+     * @return 转换后的非 null 字符串
+     */
     public static String toCamelCase(String str, boolean capitalizeFirstLetter, char delimiter) {
         if (str.isEmpty()) {
             return str;

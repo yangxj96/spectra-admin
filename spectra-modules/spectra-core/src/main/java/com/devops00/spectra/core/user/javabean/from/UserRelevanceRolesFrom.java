@@ -25,21 +25,27 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-/// 用户关联角色
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/15 00:00
+/**
+ * 用户关联角色
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/15 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRelevanceRolesFrom {
 
-    /// 用户ID
+    /**
+     * 用户ID
+     */
     @NotNull(message = "用户ID不能为空")
     private UUID userId;
 
-    /// 角色列表
+    /**
+     * 角色列表
+     */
     @NotNull(message = "需要关联的角色ID列表不能为空")
     @Size(min = 1, message = "至少需要关联一个角色")
     private List<UUID> roleIds;

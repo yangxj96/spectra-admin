@@ -24,17 +24,22 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.UUID;
 
-/// 角色关联权限中间表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 角色关联权限中间表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Mapper
 public interface RelRoleAuthorityMapper extends BaseMapper<RelRoleAuthority> {
 
-    /// 根据角色ID获取关联权限信息
-    ///
-    /// @param roleId 角色ID
-    /// @return 关联权限信息
+    /**
+     * 根据角色ID获取关联权限信息
+     *
+     * @param roleId
+     *            角色ID
+     * @return 关联权限信息
+     */
     List<RelRoleAuthority> getByRoleId(@Param("roleId") UUID roleId);
 }

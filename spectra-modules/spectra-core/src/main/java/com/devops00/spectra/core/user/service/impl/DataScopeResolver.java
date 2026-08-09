@@ -44,11 +44,13 @@ import com.devops00.spectra.core.user.service.RelUserRoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 数据范围解析器 — 计算用户的有效数据范围
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 数据范围解析器 — 计算用户的有效数据范围
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Slf4j
 @Component
 @NullMarked
@@ -117,7 +119,9 @@ public class DataScopeResolver implements DataScopeProvider {
         return buildScope(effectiveType, departmentId, allTargetIds);
     }
 
-    /// 根据范围类型构建完整 EffectiveScope
+    /**
+     * 根据范围类型构建完整 EffectiveScope
+     */
     private EffectiveScope buildScope(DataScopeType scopeType, UUID departmentId, UUID userId) {
         List<UUID> targetIds = new ArrayList<>();
 
@@ -139,7 +143,9 @@ public class DataScopeResolver implements DataScopeProvider {
         return new EffectiveScope(scopeType, departmentId, targetIds);
     }
 
-    /// 根据范围类型构建完整 EffectiveScope（角色合并场景）
+    /**
+     * 根据范围类型构建完整 EffectiveScope（角色合并场景）
+     */
     private EffectiveScope buildScope(DataScopeType scopeType, UUID departmentId, List<UUID> targetIds) {
         if (scopeType == DataScopeType.DEPT && departmentId != null) {
             targetIds = List.of(departmentId);
@@ -151,9 +157,11 @@ public class DataScopeResolver implements DataScopeProvider {
         return new EffectiveScope(scopeType, departmentId, targetIds);
     }
 
-    /// 比较两个范围类型的优先级（数字越小范围越大）
-    ///
-    /// GLOBAL(0) > DEPT_AND_CHILDREN(3) > DEPT(2) > CUSTOM(4) > SELF(1)
+    /**
+     * 比较两个范围类型的优先级（数字越小范围越大）
+     *
+     * GLOBAL(0) > DEPT_AND_CHILDREN(3) > DEPT(2) > CUSTOM(4) > SELF(1)
+     */
     private int comparePriority(DataScopeType a, DataScopeType b) {
         return Integer.compare(priority(a), priority(b));
     }

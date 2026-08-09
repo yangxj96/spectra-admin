@@ -19,22 +19,32 @@ package com.devops00.spectra.security.base.constant;
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
-///
-/// 登录方式支持
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/2 23:14
-///
+/**
+ *
+ * 登录方式支持
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/2 23:14
+ *
+ */
 @Getter
 public enum LoginType implements IEnum<Integer> {
-    /// 账号密码
+    /**
+     * 账号密码
+     */
     PASSWORD(1, "password"),
-    /// 手机验证码
+    /**
+     * 手机验证码
+     */
     SMS(2, "sms"),
-    /// 扫码
+    /**
+     * 扫码
+     */
     OTP(3, "OTP"),
-    /// 邮件验证码登录
+    /**
+     * 邮件验证码登录
+     */
     EMAIL(4, "email"),;
 
     private final Integer value;

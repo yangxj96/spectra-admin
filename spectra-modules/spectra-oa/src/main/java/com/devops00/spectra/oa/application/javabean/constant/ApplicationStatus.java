@@ -16,27 +16,41 @@
 
 package com.devops00.spectra.oa.application.javabean.constant;
 
-/// 通用 OA 申请状态。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 通用 OA 申请状态。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 public enum ApplicationStatus {
-    /// 草稿。
+    /**
+     * 草稿。
+     */
     DRAFT,
 
-    /// 审批中。
+    /**
+     * 审批中。
+     */
     IN_REVIEW,
 
-    /// 已通过。
+    /**
+     * 已通过。
+     */
     APPROVED,
 
-    /// 已驳回。
+    /**
+     * 已驳回。
+     */
     REJECTED,
 
-    /// 已撤回。
+    /**
+     * 已撤回。
+     */
     WITHDRAWN,
 
-    /// 已取消。
+    /**
+     * 已取消。
+     */
     CANCELLED
 }

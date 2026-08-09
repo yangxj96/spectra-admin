@@ -20,55 +20,87 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 
-/// 任务管理Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 任务管理Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 public interface TaskService {
 
-    /// 查询待办任务
-    ///
-    /// @param page                 分页参数
-    /// @param assignee             任务处理人用户名
-    /// @param processDefinitionKey 可选流程定义KEY
-    /// @return 待办任务分页列表
+    /**
+     * 查询待办任务
+     *
+     * @param page
+     *            分页参数
+     * @param assignee
+     *            任务处理人用户名
+     * @param processDefinitionKey
+     *            可选流程定义KEY
+     * @return 待办任务分页列表
+     */
     IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey);
 
-    /// 查询已办任务
-    ///
-    /// @param page                 分页参数
-    /// @param assignee             任务处理人用户名
-    /// @param processDefinitionKey 可选流程定义KEY
-    /// @return 已办任务分页列表
+    /**
+     * 查询已办任务
+     *
+     * @param page
+     *            分页参数
+     * @param assignee
+     *            任务处理人用户名
+     * @param processDefinitionKey
+     *            可选流程定义KEY
+     * @return 已办任务分页列表
+     */
     IPage<TaskVO> done(PageFrom page, String assignee, String processDefinitionKey);
 
-    /// 完成任务（审批通过）
-    ///
-    /// @param taskId   任务ID
-    /// @param comment  审批意见
-    /// @param operator 当前处理人用户名
+    /**
+     * 完成任务（审批通过）
+     *
+     * @param taskId
+     *            任务ID
+     * @param comment
+     *            审批意见
+     * @param operator
+     *            当前处理人用户名
+     */
     void complete(String taskId, String comment, String operator);
 
-    /// 驳回任务
-    ///
-    /// @param taskId   任务ID
-    /// @param comment  驳回意见
-    /// @param operator 当前处理人用户名
+    /**
+     * 驳回任务
+     *
+     * @param taskId
+     *            任务ID
+     * @param comment
+     *            驳回意见
+     * @param operator
+     *            当前处理人用户名
+     */
     void reject(String taskId, String comment, String operator);
 
-    /// 转办任务
-    ///
-    /// @param taskId       任务ID
-    /// @param targetUserId 目标用户用户名
+    /**
+     * 转办任务
+     *
+     * @param taskId
+     *            任务ID
+     * @param targetUserId
+     *            目标用户用户名
+     */
     void transfer(String taskId, String targetUserId, String operator);
 
-    /// 委派任务
-    ///
-    /// @param taskId       任务ID
-    /// @param targetUserId 目标用户用户名
+    /**
+     * 委派任务
+     *
+     * @param taskId
+     *            任务ID
+     * @param targetUserId
+     *            目标用户用户名
+     */
     void delegate(String taskId, String targetUserId, String operator);
 
-    /// 当前用户是否是该流程的当前或历史任务处理人。
+    /**
+     * 当前用户是否是该流程的当前或历史任务处理人。
+     */
     boolean canAccessProcess(String processInstanceId, String username);
 }

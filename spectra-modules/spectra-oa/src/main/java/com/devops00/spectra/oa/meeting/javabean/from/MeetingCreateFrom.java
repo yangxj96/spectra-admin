@@ -23,37 +23,53 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-/// 会议创建
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 15:24
+/**
+ * 会议创建
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 15:24
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MeetingCreateFrom {
 
-    /// 会议标题
+    /**
+     * 会议标题
+     */
     @NotBlank(message = "会议标题不能为空")
     private String title;
 
-    /// 发起人
+    /**
+     * 发起人
+     */
     private String initiatorId;
 
-    /// 开始时间
+    /**
+     * 开始时间
+     */
     @NotBlank(message = "开始时间不能为空")
     private String startTime;
 
-    /// 结束时间
+    /**
+     * 结束时间
+     */
     @NotBlank(message = "结束时间不能为空")
     private String endTime;
 
-    /// 会议地点
+    /**
+     * 会议地点
+     */
     private String location;
 
-    /// 会议内容/议题
+    /**
+     * 会议内容/议题
+     */
     private String content;
 
-    /// 参会人员列表
+    /**
+     * 参会人员列表
+     */
     private List<MeetingParticipantFrom> participants;
 }

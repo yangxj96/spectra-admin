@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.purchase.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;
 
-/// 采购收货批次 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购收货批次 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 public interface PurchaseReceiptMapper extends BaseMapper<PurchaseReceipt> {
 }

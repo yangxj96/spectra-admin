@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 实体更新异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 实体更新异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public class EntityUpdateException extends DataException {
 
     public EntityUpdateException() {

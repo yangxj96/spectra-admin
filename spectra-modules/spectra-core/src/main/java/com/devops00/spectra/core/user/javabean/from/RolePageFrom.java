@@ -21,21 +21,27 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.jspecify.annotations.Nullable;
 
-/// 角色分页查询
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色分页查询
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RolePageFrom {
 
-    /// 角色名称
+    /**
+     * 角色名称
+     */
     @Nullable
     private String name;
 
-    /// 角色状态
+    /**
+     * 角色状态
+     */
     @Nullable
     private Boolean state;
 }

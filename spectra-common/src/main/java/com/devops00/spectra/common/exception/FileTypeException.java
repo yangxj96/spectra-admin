@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 文件类型异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 文件类型异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public class FileTypeException extends SpectraException {
 
     public FileTypeException() {

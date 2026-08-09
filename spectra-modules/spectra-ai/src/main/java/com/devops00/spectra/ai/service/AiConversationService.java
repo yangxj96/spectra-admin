@@ -23,25 +23,37 @@ import com.devops00.spectra.common.base.BaseService;
 import java.util.List;
 import java.util.UUID;
 
-/// AI 会话管理 Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话管理 Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public interface AiConversationService extends BaseService<AiConversation> {
 
-    /// 创建新会话
+    /**
+     * 创建新会话
+     */
     UUID create(UUID userId, String firstMessage);
 
-    /// 获取当前用户的会话列表
+    /**
+     * 获取当前用户的会话列表
+     */
     List<AiConversation> listByUser(UUID userId);
 
-    /// 重命名会话
+    /**
+     * 重命名会话
+     */
     void rename(UUID conversationId, UUID userId, String title);
 
-    /// 删除会话（同时清理消息存储）
+    /**
+     * 删除会话（同时清理消息存储）
+     */
     void delete(UUID conversationId, UUID userId);
 
-    /// 获取对话历史消息
+    /**
+     * 获取对话历史消息
+     */
     List<ChatMessageVO> getMessages(UUID conversationId, UUID userId);
 }

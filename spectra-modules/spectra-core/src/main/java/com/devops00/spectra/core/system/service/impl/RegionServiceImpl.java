@@ -39,11 +39,13 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/// 行政区域实现Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/30 13:57
+/**
+ * 行政区域实现Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/30 13:57
+ */
 @Slf4j
 @Service
 public class RegionServiceImpl extends BaseServiceImpl<RegionMapper, Region> implements RegionService, NameLookup<UUID> {

@@ -30,19 +30,24 @@ import org.springframework.data.redis.serializer.JacksonJsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import tools.jackson.databind.ObjectMapper;
 
-/// Security专用Redis配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/9 00:39
+/**
+ * Security专用Redis配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/9 00:39
+ */
 @Slf4j
 @Configuration
 public class SecRedisConfiguration {
 
-    /// 自定义redisTemplate
-    ///
-    /// @param factory redis连接工程
-    /// @return 自定义配置的[RedisTemplate]
+    /**
+     * 自定义redisTemplate
+     *
+     * @param factory
+     *            redis连接工程
+     * @return 自定义配置的[RedisTemplate]
+     */
     @Bean("securityRedisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, @Qualifier("securityObjectMapper") ObjectMapper om) {
         log.debug(LogPrefix.SECURITY.f("开始配置Security使用的RedisTemplate"));
@@ -61,13 +66,17 @@ public class SecRedisConfiguration {
         return template;
     }
 
-    /// Security自定义Redis监听KEY事件
+    /**
+     * Security自定义Redis监听KEY事件
+     */
     @Bean
     public SecurityRedisKeyExpirationListener securityRedisKeyExpirationListener() {
         return new SecurityRedisKeyExpirationListener();
     }
 
-    /// Redis消息监听bean
+    /**
+     * Redis消息监听bean
+     */
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(RedisConnectionFactory factory, SecurityRedisKeyExpirationListener listener) {
         log.debug(LogPrefix.SECURITY.f("开始配置Redis值过期监听器"));

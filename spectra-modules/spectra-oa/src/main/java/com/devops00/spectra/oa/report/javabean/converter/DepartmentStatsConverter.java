@@ -23,15 +23,19 @@ import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 部门统计对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 部门统计对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface DepartmentStatsConverter {
 
-    /// 部门实体转统计视图，部门名称由 Service 按路径规则补充。
+    /**
+     * 部门实体转统计视图，部门名称由 Service 按路径规则补充。
+     */
     @Mapping(source = "id", target = "departmentId")
     @Mapping(target = "departmentName", ignore = true)
     DepartmentStatsVO toVO(Department source);

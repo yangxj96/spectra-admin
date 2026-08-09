@@ -23,15 +23,19 @@ import org.flowable.spring.boot.EngineConfigurationConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/// 工作流配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/18 14:53
+/**
+ * 工作流配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/18 14:53
+ */
 @Configuration
 public class WorkflowConfiguration {
 
-    /// 配置流程引擎
+    /**
+     * 配置流程引擎
+     */
     @Bean
     public EngineConfigurationConfigurer<SpringProcessEngineConfiguration> processEngineConfigurer() {
         return configuration -> {
@@ -46,7 +50,9 @@ public class WorkflowConfiguration {
         };
     }
 
-    /// 配置流程图生成器
+    /**
+     * 配置流程图生成器
+     */
     @Bean
     public ProcessDiagramGenerator processDiagramGenerator() {
         return new DefaultProcessDiagramGenerator();

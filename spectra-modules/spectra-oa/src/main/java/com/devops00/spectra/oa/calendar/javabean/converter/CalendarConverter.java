@@ -25,23 +25,31 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-/// 日程对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 日程对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface CalendarConverter {
 
-    /// 日程实体转响应视图。
+    /**
+     * 日程实体转响应视图。
+     */
     CalendarVO toVO(Calendar source);
 
-    /// 日程保存入参转实体，时间由 Service 完成校验后填充。
+    /**
+     * 日程保存入参转实体，时间由 Service 完成校验后填充。
+     */
     @Mapping(target = "startTime", ignore = true)
     @Mapping(target = "endTime", ignore = true)
     Calendar toEntity(CalendarSaveFrom source);
 
-    /// 使用日程保存入参更新实体，时间由 Service 完成校验后填充。
+    /**
+     * 使用日程保存入参更新实体，时间由 Service 完成校验后填充。
+     */
     @Mapping(target = "startTime", ignore = true)
     @Mapping(target = "endTime", ignore = true)
     void updateEntity(CalendarSaveFrom source, @MappingTarget Calendar target);

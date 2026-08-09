@@ -21,35 +21,53 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 资产领用、归还、调拨、维修和报废操作参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产领用、归还、调拨、维修和报废操作参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetOperationFrom {
 
-    /// 目标部门 ID。
+    /**
+     * 目标部门 ID。
+     */
     private UUID toDepartmentId;
 
-    /// 目标用户 ID。
+    /**
+     * 目标用户 ID。
+     */
     private UUID toUserId;
 
-    /// 目标位置。
+    /**
+     * 目标位置。
+     */
     private String toLocation;
 
-    /// 操作时间。
+    /**
+     * 操作时间。
+     */
     private String operationDate;
 
-    /// 原因。
+    /**
+     * 原因。
+     */
     private String reason;
 
-    /// 维修内容。
+    /**
+     * 维修内容。
+     */
     private String maintenanceContent;
 
-    /// 维修费用。
+    /**
+     * 维修费用。
+     */
     private BigDecimal maintenanceCost;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 }

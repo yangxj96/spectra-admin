@@ -21,18 +21,24 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/// Ai对话请求入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/26 12:19
+/**
+ * Ai对话请求入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/26 12:19
+ */
 @Data
 public class AiAskFrom {
 
-    /// 会话 ID（为空时自动创建新会话）
+    /**
+     * 会话 ID（为空时自动创建新会话）
+     */
     private UUID conversationId;
 
-    /// 问题消息
+    /**
+     * 问题消息
+     */
     @NotBlank(message = "消息内容不能为空")
     private String message;
 }

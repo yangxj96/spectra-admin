@@ -22,15 +22,19 @@ import lombok.Data;
 import java.util.List;
 import java.util.UUID;
 
-/// 批量删除消息请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 批量删除消息请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class NotificationBatchDeleteFrom {
 
-    /// 消息ID列表
+    /**
+     * 消息ID列表
+     */
     @NotEmpty(message = "消息ID不能为空")
     private List<UUID> ids;
 }

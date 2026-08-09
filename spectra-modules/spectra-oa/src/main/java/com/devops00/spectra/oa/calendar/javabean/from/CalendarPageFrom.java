@@ -18,20 +18,28 @@ package com.devops00.spectra.oa.calendar.javabean.from;
 
 import lombok.Data;
 
-/// 日程分页查询参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 日程分页查询参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class CalendarPageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 
-    /// 开始时间。
+    /**
+     * 开始时间。
+     */
     private String startTime;
 
-    /// 结束时间。
+    /**
+     * 结束时间。
+     */
     private String endTime;
 }

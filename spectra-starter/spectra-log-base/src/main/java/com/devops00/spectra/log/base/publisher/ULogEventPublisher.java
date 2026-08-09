@@ -19,11 +19,13 @@ package com.devops00.spectra.log.base.publisher;
 import com.devops00.spectra.log.base.entity.ULogEntity;
 import org.springframework.context.ApplicationEventPublisher;
 
-/// 日志消息发送器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/3 00:00
+/**
+ * 日志消息发送器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/3 00:00
+ */
 public record ULogEventPublisher(ApplicationEventPublisher publisher) {
 
     public void save(ULogEntity entity) {

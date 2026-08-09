@@ -25,18 +25,22 @@ import com.devops00.spectra.oa.supply.service.SupplyService;
 
 import lombok.RequiredArgsConstructor;
 
-/// 办公用品库存接口。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 办公用品库存接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @RestController
 @RequestMapping("/oa/supplies")
 @RequiredArgsConstructor
 public class SupplyController {
     private final SupplyService supplyService;
 
-    /// 创建办公用品。
+    /**
+     * 创建办公用品。
+     */
     @ULog("'创建办公用品'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:INSERT')")
@@ -44,7 +48,9 @@ public class SupplyController {
         return supplyService.created(from);
     }
 
-    /// 修改办公用品。
+    /**
+     * 修改办公用品。
+     */
     @ULog("'修改办公用品'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -52,7 +58,9 @@ public class SupplyController {
         supplyService.modify(id, from);
     }
 
-    /// 分页查询办公用品库存。
+    /**
+     * 分页查询办公用品库存。
+     */
     @ULog("'分页查询办公用品库存'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -60,7 +68,9 @@ public class SupplyController {
         return supplyService.page(page, params);
     }
 
-    /// 查询办公用品详情。
+    /**
+     * 查询办公用品详情。
+     */
     @ULog("'查询办公用品详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -68,7 +78,9 @@ public class SupplyController {
         return supplyService.get(id);
     }
 
-    /// 查询低库存办公用品。
+    /**
+     * 查询低库存办公用品。
+     */
     @ULog("'查询低库存办公用品'")
     @GetMapping(value = "/low-stock", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
@@ -76,7 +88,9 @@ public class SupplyController {
         return supplyService.lowStock();
     }
 
-    /// 办公用品入库。
+    /**
+     * 办公用品入库。
+     */
     @ULog("'办公用品入库'")
     @PostMapping(value = "/{id}/inbound", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -84,7 +98,9 @@ public class SupplyController {
         supplyService.inbound(id, from);
     }
 
-    /// 办公用品领用。
+    /**
+     * 办公用品领用。
+     */
     @ULog("'办公用品领用'")
     @PostMapping(value = "/{id}/issue", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -92,7 +108,9 @@ public class SupplyController {
         supplyService.issue(id, from);
     }
 
-    /// 办公用品退库。
+    /**
+     * 办公用品退库。
+     */
     @ULog("'办公用品退库'")
     @PostMapping(value = "/{id}/return", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
@@ -100,7 +118,9 @@ public class SupplyController {
         supplyService.returnStock(id, from);
     }
 
-    /// 办公用品盘点调整。
+    /**
+     * 办公用品盘点调整。
+     */
     @ULog("'办公用品盘点调整'")
     @PostMapping(value = "/{id}/adjust", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")

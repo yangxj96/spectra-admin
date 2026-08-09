@@ -22,30 +22,44 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 采购收货批次响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购收货批次响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseReceiptVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 收货单号。
+    /**
+     * 收货单号。
+     */
     private String receiptNo;
 
-    /// 收货日期。
+    /**
+     * 收货日期。
+     */
     private LocalDate receivedDate;
 
-    /// 接收人 ID。
+    /**
+     * 接收人 ID。
+     */
     private UUID receiverId;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 备注。
+    /**
+     * 备注。
+     */
     private String remark;
     private List<PurchaseReceiptItemVO> items = List.of();
 }

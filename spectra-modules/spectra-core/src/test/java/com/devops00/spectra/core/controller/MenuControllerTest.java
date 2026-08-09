@@ -28,11 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-/// 菜单控制器测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 菜单控制器测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 class MenuControllerTest {
 
     @Test

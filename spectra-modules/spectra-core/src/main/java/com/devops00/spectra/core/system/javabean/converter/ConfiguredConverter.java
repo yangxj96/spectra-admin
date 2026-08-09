@@ -24,24 +24,32 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 系统配置Mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/6 00:00
+/**
+ * 系统配置Mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/6 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ConfiguredConverter {
 
-    /// 数据库实体转VO
-    ///
-    /// @param source 数据库实体
-    /// @return VO
+    /**
+     * 数据库实体转VO
+     *
+     * @param source
+     *            数据库实体
+     * @return VO
+     */
     ConfiguredVO toVO(Configured source);
 
-    /// 转换到分页的VO信息
-    ///
-    /// @param source 分页信息
-    /// @return IPAGE
+    /**
+     * 转换到分页的VO信息
+     *
+     * @param source
+     *            分页信息
+     * @return IPAGE
+     */
     @Mapping(target = "pages", ignore = true)
     Page<ConfiguredVO> toVOPage(Page<Configured> source);
 }

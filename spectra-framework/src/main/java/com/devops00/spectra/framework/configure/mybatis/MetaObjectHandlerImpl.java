@@ -25,29 +25,43 @@ import org.apache.ibatis.reflection.MetaObject;
 
 import java.time.Instant;
 
-/// 元数据填充实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 元数据填充实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
-    /// 主键ID
+    /**
+     * 主键ID
+     */
     private static final String ID = "id";
-    /// 创建人
+    /**
+     * 创建人
+     */
     private static final String CREATED_BY = "createdBy";
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private static final String CREATED_AT = "createdAt";
 
-    /// 更新人
+    /**
+     * 更新人
+     */
     private static final String UPDATED_BY = "updatedBy";
 
-    /// 更新时间
+    /**
+     * 更新时间
+     */
     private static final String UPDATED_AT = "updatedAt";
 
-    /// 统一部门归属字段（存在于带部门隔离的实体中）
+    /**
+     * 统一部门归属字段（存在于带部门隔离的实体中）
+     */
     private static final String DEPARTMENT_ID = "departmentId";
 
     @Override

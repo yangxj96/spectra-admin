@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.DictGroup;
 import org.apache.ibatis.annotations.Mapper;
 
-/// 字典(字典类型)mapper层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典(字典类型)mapper层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Mapper
 public interface DictGroupMapper extends BaseMapper<DictGroup> {
 }

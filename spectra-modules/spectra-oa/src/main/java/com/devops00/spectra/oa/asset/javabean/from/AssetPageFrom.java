@@ -20,26 +20,38 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 资产台账分页查询参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产台账分页查询参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetPageFrom {
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 分类 ID。
+    /**
+     * 分类 ID。
+     */
     private UUID categoryId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 保管人 ID。
+    /**
+     * 保管人 ID。
+     */
     private UUID custodianId;
 }

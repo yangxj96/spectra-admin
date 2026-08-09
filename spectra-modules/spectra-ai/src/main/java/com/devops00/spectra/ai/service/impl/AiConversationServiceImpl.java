@@ -40,11 +40,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/// AI 会话管理 Service 实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 会话管理 Service 实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor

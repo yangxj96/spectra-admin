@@ -48,11 +48,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 
-/// Security功能配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/9 00:35
+/**
+ * Security功能配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/9 00:35
+ */
 @Slf4j
 @Configuration
 @EnableWebSecurity
@@ -67,13 +69,17 @@ public class SecurityConfiguration {
 
     private final AccessDeniedHandler restAccessDeniedHandler;
 
-    /// SpringSecurity 自定义的权限评估器
+    /**
+     * SpringSecurity 自定义的权限评估器
+     */
     @Bean
     public SpectraPermissionEvaluator spectraPermissionEvaluator() {
         return new SpectraPermissionEvaluator(properties);
     }
 
-    /// 主认证管理器
+    /**
+     * 主认证管理器
+     */
     @Bean
     @Primary
     public AuthenticationManager authenticationManager(ObjectProvider<AuthenticationProvider> providersProvider) {
@@ -82,7 +88,9 @@ public class SecurityConfiguration {
         return new ProviderManager(providers);
     }
 
-    /// 注解方法中的EL表达式认证处理器
+    /**
+     * 注解方法中的EL表达式认证处理器
+     */
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
         log.debug(LogPrefix.SECURITY.f("开启注解方法中的EL表达式认证处理器"));
@@ -91,10 +99,13 @@ public class SecurityConfiguration {
         return handler;
     }
 
-    /// Spring Security核心过滤器
-    ///
-    /// @param http `HttpSecurity`
-    /// @return Security过滤器链
+    /**
+     * Spring Security核心过滤器
+     *
+     * @param http
+     *            {@code HttpSecurity}
+     * @return Security过滤器链
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) {
         log.debug(LogPrefix.SECURITY.f("配置核心过滤器"));

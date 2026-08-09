@@ -20,17 +20,23 @@ import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 
 import java.util.Random;
 
-/// 验证码文本生成器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/25 00:00
+/**
+ * 验证码文本生成器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/25 00:00
+ */
 public class KaptchaTextCreator extends DefaultTextCreator {
 
-    /// 包含的数字
+    /**
+     * 包含的数字
+     */
     private static final String[] NUMBERS = "0,1,2,3,4,5,6,7,8,9,10".split(",");
 
-    /// 随机数种子
+    /**
+     * 随机数种子
+     */
     private static final Random random = new Random();
 
     @Override

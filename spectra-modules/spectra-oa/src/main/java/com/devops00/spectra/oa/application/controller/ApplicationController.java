@@ -42,11 +42,13 @@ import com.devops00.spectra.oa.application.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// OA 通用申请接口。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 通用申请接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/applications")
@@ -55,7 +57,9 @@ public class ApplicationController {
 
     private final ApplicationService applicationService;
 
-    /// 分页查询 OA 申请。
+    /**
+     * 分页查询 OA 申请。
+     */
     @ULog("'分页查询 OA 申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
@@ -63,7 +67,9 @@ public class ApplicationController {
         return applicationService.page(page, params);
     }
 
-    /// 查询 OA 申请详情。
+    /**
+     * 查询 OA 申请详情。
+     */
     @ULog("'查询 OA 申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
@@ -71,7 +77,9 @@ public class ApplicationController {
         return applicationService.get(id);
     }
 
-    /// 查询 OA 申请类型。
+    /**
+     * 查询 OA 申请类型。
+     */
     @ULog("'查询 OA 申请类型'")
     @GetMapping(value = "/types", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
@@ -79,7 +87,9 @@ public class ApplicationController {
         return applicationService.listTypes();
     }
 
-    /// 查询全部 OA 申请类型配置。
+    /**
+     * 查询全部 OA 申请类型配置。
+     */
     @ULog("'查询全部 OA 申请类型配置'")
     @GetMapping(value = "/types/all", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:QUERY')")
@@ -87,7 +97,9 @@ public class ApplicationController {
         return applicationService.listAllTypes();
     }
 
-    /// 创建 OA 申请类型配置。
+    /**
+     * 创建 OA 申请类型配置。
+     */
     @ULog("'创建 OA 申请类型配置'")
     @PostMapping(value = "/types", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:INSERT')")
@@ -95,7 +107,9 @@ public class ApplicationController {
         return applicationService.createdType(from);
     }
 
-    /// 修改 OA 申请类型配置。
+    /**
+     * 修改 OA 申请类型配置。
+     */
     @ULog("'修改 OA 申请类型配置'")
     @org.springframework.web.bind.annotation.PutMapping(value = "/types/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:UPDATE')")
@@ -103,7 +117,9 @@ public class ApplicationController {
         applicationService.modifyType(id, from);
     }
 
-    /// 删除 OA 申请类型配置。
+    /**
+     * 删除 OA 申请类型配置。
+     */
     @ULog("'删除 OA 申请类型配置'")
     @DeleteMapping(value = "/types/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:DELETE')")
@@ -111,7 +127,9 @@ public class ApplicationController {
         applicationService.deleteType(id);
     }
 
-    /// 撤回 OA 申请。
+    /**
+     * 撤回 OA 申请。
+     */
     @ULog("'撤回 OA 申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:UPDATE')")
@@ -119,7 +137,9 @@ public class ApplicationController {
         applicationService.withdraw(id);
     }
 
-    /// 取消 OA 申请。
+    /**
+     * 取消 OA 申请。
+     */
     @ULog("'取消 OA 申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_APPLICATION:UPDATE')")

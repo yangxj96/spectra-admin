@@ -22,20 +22,26 @@ import org.intellij.lang.annotations.Language;
 
 import java.lang.annotation.*;
 
-/// 操作日志记录注解
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 操作日志记录注解
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ULog {
 
-    ///  默认值
+    /**
+     * 默认值
+     */
     @Language("SpEL")
     String value() default "未填写操作说明";
 
-    /// 日志类型
+    /**
+     * 日志类型
+     */
     SysLogType type() default SysLogType.GENERAL;
 }

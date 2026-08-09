@@ -25,29 +25,40 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 组织机构的数据转换使用
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/14 00:00
+/**
+ * 组织机构的数据转换使用
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/14 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface OrganizationConverter {
 
-    /// 实体转树形
-    ///
-    /// @param source 实体
-    /// @return 树形
+    /**
+     * 实体转树形
+     *
+     * @param source
+     *            实体
+     * @return 树形
+     */
     DepartmentTreeVo toTreeVO(Department source);
 
-    /// 实体转树形(列表)
-    ///
-    /// @param source 实体
-    /// @return 树形
+    /**
+     * 实体转树形(列表)
+     *
+     * @param source
+     *            实体
+     * @return 树形
+     */
     List<DepartmentTreeVo> toTreeVOList(List<Department> source);
 
-    /// 入参转实体
-    ///
-    /// @param source 入参
-    /// @return 实体
+    /**
+     * 入参转实体
+     *
+     * @param source
+     *            入参
+     * @return 实体
+     */
     Department toEntity(DepartmentFrom source);
 }

@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 通讯录主接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/5 23:22
+/**
+ * 通讯录主接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/5 23:22
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/contact")
@@ -42,7 +44,9 @@ public class ContactController {
 
     private final ContactService contactService;
 
-    /// 分页查询通讯录。
+    /**
+     * 分页查询通讯录。
+     */
     @ULog("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTACT:QUERY')")

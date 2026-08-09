@@ -23,35 +23,49 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 采购明细保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购明细保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseItemFrom {
 
-    /// 明细类型字段。
+    /**
+     * 明细类型字段。
+     */
     @NotBlank(message = "采购类型不能为空")
     private String itemType;
 
-    /// 明细名称字段。
+    /**
+     * 明细名称字段。
+     */
     @NotBlank(message = "物品或服务名称不能为空")
     private String itemName;
 
-    /// 规格。
+    /**
+     * 规格。
+     */
     private String specification;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     @NotNull(message = "采购数量不能为空")
     @DecimalMin(value = "0.001", message = "采购数量必须大于 0")
     private BigDecimal quantity;
 
-    /// 预计单价。
+    /**
+     * 预计单价。
+     */
     @NotNull(message = "估价单价不能为空")
     @DecimalMin(value = "0.00", message = "估价单价不能为负数")
     private BigDecimal estimatedUnitPrice;
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     private String purpose;
 }

@@ -21,26 +21,38 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 采购收货明细响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购收货明细响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseReceiptItemVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 采购明细 ID。
+    /**
+     * 采购明细 ID。
+     */
     private UUID purchaseItemId;
 
-    /// 数量。
+    /**
+     * 数量。
+     */
     private BigDecimal quantity;
 
-    /// 是否已接受。
+    /**
+     * 是否已接受。
+     */
     private Boolean accepted;
 
-    /// 差异原因。
+    /**
+     * 差异原因。
+     */
     private String differenceReason;
 }

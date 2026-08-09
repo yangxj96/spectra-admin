@@ -27,11 +27,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-/// AI使用的部门相关工具
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/18 17:56
+/**
+ * AI使用的部门相关工具
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/18 17:56
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -39,9 +41,12 @@ public class AiDeptTool implements AiToolMarker {
 
     private final DepartmentService departmentService;
 
-    /// 获取所有部门信息
-    ///
-    /// @param memoryId 复合记忆标识
+    /**
+     * 获取所有部门信息
+     *
+     * @param memoryId
+     *            复合记忆标识
+     */
     @Tool("获取所有部门信息")
     public String getAllDepartments(@ToolMemoryId AiMemoryId memoryId) {
         return ToolExecutor.execute(memoryId.token(), _ -> {

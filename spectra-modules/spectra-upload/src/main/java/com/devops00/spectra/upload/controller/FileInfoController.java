@@ -29,11 +29,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-/// 文件信息管理控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/4 16:00
+/**
+ * 文件信息管理控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/4 16:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/file/info")
@@ -43,14 +45,18 @@ public class FileInfoController {
 
     private final FileInfoService fileInfoService;
 
-    /// 分页查询文件列表
+    /**
+     * 分页查询文件列表
+     */
     @ULog("'分页查询文件列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     public IPage<FileInfoVO> page(PageFrom page, FilePageFrom params) {
         return fileInfoService.page(page, params);
     }
 
-    /// 删除文件(软删除)
+    /**
+     * 删除文件(软删除)
+     */
     @ULog("'删除文件'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     public void deleteById(@PathVariable UUID id) {

@@ -36,24 +36,32 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.KeyPair;
 
-/// 加解密密钥管理接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 加解密密钥管理接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Slf4j
 @RestController
 @RequestMapping("/system/crypto")
 @RequiredArgsConstructor
 public class CryptoController {
 
-    /// CryptoKey管理服务
+    /**
+     * CryptoKey管理服务
+     */
     private final CryptoKeyManager cryptoKeyManager;
 
-    /// 系统配置服务
+    /**
+     * 系统配置服务
+     */
     private final ConfiguredService configuredService;
 
-    /// 获取加解密配置（前端初始化调用）
+    /**
+     * 获取加解密配置（前端初始化调用）
+     */
     @ULog("'获取加解密配置'")
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
@@ -62,7 +70,9 @@ public class CryptoController {
         return new CryptoConfigVO(cryptoKeyManager.isEnabled(), cryptoKeyManager.getServerPublicKeyBase64());
     }
 
-    /// 获取客户端私钥（需登录）
+    /**
+     * 获取客户端私钥（需登录）
+     */
     @ULog("'获取客户端私钥'")
     @Encrypt(response = false)
     @GetMapping(value = "/keypair/client-private", version = "1.0.0+")
@@ -71,7 +81,9 @@ public class CryptoController {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
     }
 
-    /// 生成新的 RSA 密钥对
+    /**
+     * 生成新的 RSA 密钥对
+     */
     @ULog("'生成RSA密钥对'")
     @PostMapping(value = "/keypair/generate", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -102,7 +114,9 @@ public class CryptoController {
         }
     }
 
-    /// 手动重新加载密钥
+    /**
+     * 手动重新加载密钥
+     */
     @ULog("'重新加载加解密密钥'")
     @PostMapping(value = "/keypair/refresh", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

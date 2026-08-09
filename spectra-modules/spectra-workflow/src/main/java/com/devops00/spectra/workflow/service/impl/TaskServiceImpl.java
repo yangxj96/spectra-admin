@@ -40,11 +40,13 @@ import com.devops00.spectra.workflow.service.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 任务管理Service实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 任务管理Service实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -214,7 +216,9 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         }
     }
 
-    /// 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。
+    /**
+     * 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。
+     */
     private void dispatchIfFinished(String processInstanceId, String processDefinitionId, boolean approved, String reason) {
         var historic = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         if (historic == null || historic.getEndTime() == null) {

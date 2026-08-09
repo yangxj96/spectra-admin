@@ -24,11 +24,13 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
-/// SpringSecurity配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/2 17:31
+/**
+ * SpringSecurity配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/2 17:31
+ */
 @Slf4j
 @AutoConfiguration
 @EnableConfigurationProperties(SecurityProperties.class)

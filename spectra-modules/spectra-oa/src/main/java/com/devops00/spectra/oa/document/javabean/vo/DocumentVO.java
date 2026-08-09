@@ -13,47 +13,73 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/// 文档展示对象。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 文档展示对象。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DocumentVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 目录 ID。
+    /**
+     * 目录 ID。
+     */
     private UUID folderId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 摘要。
+    /**
+     * 摘要。
+     */
     private String summary;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility;
 
-    /// 所有者 ID。
+    /**
+     * 所有者 ID。
+     */
     private UUID ownerId;
 
-    /// 发布时间。
+    /**
+     * 发布时间。
+     */
     private LocalDateTime publishedAt;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 
-    /// 更新时间。
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
 
-    /// 当前版本字段。
+    /**
+     * 当前版本字段。
+     */
     private DocumentVersionVO currentVersion;
 }

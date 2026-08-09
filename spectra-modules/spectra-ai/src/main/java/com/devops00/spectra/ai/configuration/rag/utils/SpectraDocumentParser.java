@@ -37,11 +37,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-/// 文档解析器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/15 17:29
+/**
+ * 文档解析器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/15 17:29
+ */
 @Slf4j
 public class SpectraDocumentParser implements DocumentParser {
 
@@ -93,7 +95,9 @@ public class SpectraDocumentParser implements DocumentParser {
         throw new UnsupportedOperationException("请调用带有文件名或后缀的方法parse(inputStream, filename)");
     }
 
-    /// 根据文件名后缀，智能路由到对应的专有高精度解析器，并注入增强元数据
+    /**
+     * 根据文件名后缀，智能路由到对应的专有高精度解析器，并注入增强元数据
+     */
     public Document parse(InputStream inputStream, String filename) {
         // 默认兜底后缀
         String suffix = "txt";
@@ -143,7 +147,9 @@ public class SpectraDocumentParser implements DocumentParser {
         return document;
     }
 
-    /// 构建基础元数据
+    /**
+     * 构建基础元数据
+     */
     private Metadata createBaseMetadata(String filename, String suffix) {
         Metadata metadata = new Metadata();
         metadata.put("file_name", filename != null ? filename : "unknown");
@@ -152,7 +158,9 @@ public class SpectraDocumentParser implements DocumentParser {
         return metadata;
     }
 
-    /// 为解析成功的 Document 注入和补充业务元数据
+    /**
+     * 为解析成功的 Document 注入和补充业务元数据
+     */
     private void enrichMetadata(Document document, String filename, String suffix) {
         Metadata metadata = document.metadata();
         if (!metadata.containsKey("file_name") && filename != null) {

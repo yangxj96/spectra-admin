@@ -20,11 +20,13 @@ import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSend
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/// 批量发送消息请求参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 批量发送消息请求参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class NotificationBatchSendFrom extends NotificationBatchSendDTO {

@@ -21,47 +21,73 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 部门维度 OA 业务统计结果。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 部门维度 OA 业务统计结果。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DepartmentStatsVO {
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 部门完整路径。
+    /**
+     * 部门完整路径。
+     */
     private String departmentName;
 
-    /// 资产数量。
+    /**
+     * 资产数量。
+     */
     private long assetCount;
 
-    /// 资产台账数量合计。
+    /**
+     * 资产台账数量合计。
+     */
     private BigDecimal assetQuantity = BigDecimal.ZERO;
 
-    /// 资产取得金额合计。
+    /**
+     * 资产取得金额合计。
+     */
     private BigDecimal assetValue = BigDecimal.ZERO;
 
-    /// 办公用品 SKU 数。
+    /**
+     * 办公用品 SKU 数。
+     */
     private long supplySkuCount;
 
-    /// 办公用品当前库存合计。
+    /**
+     * 办公用品当前库存合计。
+     */
     private BigDecimal supplyStock = BigDecimal.ZERO;
 
-    /// 办公用品最低库存合计。
+    /**
+     * 办公用品最低库存合计。
+     */
     private BigDecimal supplyMinStock = BigDecimal.ZERO;
 
-    /// 报销单数量。
+    /**
+     * 报销单数量。
+     */
     private long reimbursementCount;
 
-    /// 报销金额合计。
+    /**
+     * 报销金额合计。
+     */
     private BigDecimal reimbursementAmount = BigDecimal.ZERO;
 
-    /// 采购申请数量。
+    /**
+     * 采购申请数量。
+     */
     private long purchaseCount;
 
-    /// 采购预算合计。
+    /**
+     * 采购预算合计。
+     */
     private BigDecimal purchaseBudget = BigDecimal.ZERO;
 }

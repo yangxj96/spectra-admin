@@ -12,29 +12,43 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/// 文档目录展示对象。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 文档目录展示对象。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DocumentFolderVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 父级 ID。
+    /**
+     * 父级 ID。
+     */
     private UUID pid;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     private String name;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility;
 
-    /// 排序号。
+    /**
+     * 排序号。
+     */
     private Integer sort;
 }

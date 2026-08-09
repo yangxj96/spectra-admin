@@ -36,11 +36,13 @@ import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.common.utils.SHA256Utils;
 
-/// 加解密工具类单元测试（无需 Spring 上下文）
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 加解密工具类单元测试（无需 Spring 上下文）
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 class CryptoUtilsTest {
 
     private static PublicKey publicKey;
@@ -53,7 +55,9 @@ class CryptoUtilsTest {
         privateKey = keyPair.getPrivate();
     }
 
-    /// AES-GCM 正常加解密
+    /**
+     * AES-GCM 正常加解密
+     */
     @Test
     void testAesEncryptDecrypt() throws Exception {
         SecretKey aesKey = AESUtils.generateKey();
@@ -68,7 +72,9 @@ class CryptoUtilsTest {
         assertEquals(plaintext, decrypted);
     }
 
-    /// AES-GCM byte[] 密钥解密
+    /**
+     * AES-GCM byte[] 密钥解密
+     */
     @Test
     void testAesEncryptDecryptWithBytes() throws Exception {
         SecretKey aesKey = AESUtils.generateKey();
@@ -80,7 +86,9 @@ class CryptoUtilsTest {
         assertEquals(plaintext, decrypted);
     }
 
-    /// RSA-OAEP 加解密 AES 密钥
+    /**
+     * RSA-OAEP 加解密 AES 密钥
+     */
     @Test
     void testRsaEncryptDecrypt() throws Exception {
         SecretKey aesKey = AESUtils.generateKey();
@@ -93,7 +101,9 @@ class CryptoUtilsTest {
         assertArrayEquals(aesKeyBytes, decryptedKey);
     }
 
-    /// RSA 签名 + 验签
+    /**
+     * RSA 签名 + 验签
+     */
     @Test
     void testRsaSignVerify() throws Exception {
         String content = "data=hello&nonce=abc123&timestamp=1234567890";
@@ -103,7 +113,9 @@ class CryptoUtilsTest {
         assertTrue(RSAUtils.verify(content, signature, publicKey));
     }
 
-    /// RSA 验签失败（篡改数据）
+    /**
+     * RSA 验签失败（篡改数据）
+     */
     @Test
     void testRsaVerifyTamperedData() throws Exception {
         String content = "data=hello&nonce=abc123&timestamp=1234567890";
@@ -112,7 +124,9 @@ class CryptoUtilsTest {
         assertFalse(RSAUtils.verify("data=tampered&nonce=abc123&timestamp=1234567890", signature, publicKey));
     }
 
-    /// SHA256 摘要
+    /**
+     * SHA256 摘要
+     */
     @Test
     void testSha256Hash() throws Exception {
         String hash1 = SHA256Utils.hash("Hello");
@@ -124,7 +138,9 @@ class CryptoUtilsTest {
         assertEquals(64, hash1.length()); // SHA-256 输出 64 个 hex 字符
     }
 
-    /// HMAC-SHA256
+    /**
+     * HMAC-SHA256
+     */
     @Test
     void testHmacSha256() throws Exception {
         String hmac1 = SHA256Utils.hmac("Hello", "key1");
@@ -135,7 +151,9 @@ class CryptoUtilsTest {
         assertNotEquals(hmac1, hmac3);
     }
 
-    /// Nonce 生成
+    /**
+     * Nonce 生成
+     */
     @Test
     void testGenerateNonce() {
         String nonce1 = SHA256Utils.generateNonce();
@@ -145,7 +163,9 @@ class CryptoUtilsTest {
         assertNotEquals(nonce1, nonce2);
     }
 
-    /// 完整的混合加密流程：AES 加密数据 → RSA 加密 AES 密钥 → RSA 解密 AES 密钥 → AES 解密数据
+    /**
+     * 完整的混合加密流程：AES 加密数据 → RSA 加密 AES 密钥 → RSA 解密 AES 密钥 → AES 解密数据
+     */
     @Test
     void testFullMixedEncryptionRoundTrip() throws Exception {
         // 1. 生成 AES 密钥和 IV
@@ -177,7 +197,9 @@ class CryptoUtilsTest {
         assertEquals(originalData, decryptedData);
     }
 
-    /// IV 和 Hex 互转
+    /**
+     * IV 和 Hex 互转
+     */
     @Test
     void testIvHexConversion() {
         byte[] iv = AESUtils.generateIv();

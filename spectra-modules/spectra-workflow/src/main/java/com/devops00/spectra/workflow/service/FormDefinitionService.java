@@ -29,58 +29,88 @@ import com.devops00.spectra.workflow.javabean.vo.FormVersionVO;
 import java.util.List;
 import java.util.UUID;
 
-/// 工作流-表单定义Service
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单定义Service
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 public interface FormDefinitionService extends BaseService<FormDefinition> {
 
-    /// 分页查询表单列表
-    ///
-    /// @param page   分页参数
-    /// @param params 查询条件
-    /// @return 分页结果
+    /**
+     * 分页查询表单列表
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询条件
+     * @return 分页结果
+     */
     IPage<FormDefinitionVO> page(PageFrom page, FormPageFrom params);
 
-    /// 查询表单详情（含当前版本内容）
-    ///
-    /// @param id 表单定义ID
-    /// @return 表单详情
+    /**
+     * 查询表单详情（含当前版本内容）
+     *
+     * @param id
+     *            表单定义ID
+     * @return 表单详情
+     */
     FormDefinitionVO getDetail(UUID id);
 
-    /// 创建表单（同时创建版本1）
-    ///
-    /// @param from 创建参数
+    /**
+     * 创建表单（同时创建版本1）
+     *
+     * @param from
+     *            创建参数
+     */
     void created(FormDefinitionSaveFrom from);
 
-    /// 更新表单元数据
-    ///
-    /// @param id   表单定义ID
-    /// @param from 更新参数
+    /**
+     * 更新表单元数据
+     *
+     * @param id
+     *            表单定义ID
+     * @param from
+     *            更新参数
+     */
     void modify(UUID id, FormDefinitionSaveFrom from);
 
-    /// 删除表单（级联删除版本）
-    ///
-    /// @param id 表单定义ID
+    /**
+     * 删除表单（级联删除版本）
+     *
+     * @param id
+     *            表单定义ID
+     */
     void deleteById(UUID id);
 
-    /// 保存新版本（版本号自增）
-    ///
-    /// @param id   表单定义ID
-    /// @param from 版本内容
+    /**
+     * 保存新版本（版本号自增）
+     *
+     * @param id
+     *            表单定义ID
+     * @param from
+     *            版本内容
+     */
     void saveVersion(UUID id, FormVersionSaveFrom from);
 
-    /// 查询版本历史
-    ///
-    /// @param id 表单定义ID
-    /// @return 版本列表
+    /**
+     * 查询版本历史
+     *
+     * @param id
+     *            表单定义ID
+     * @return 版本列表
+     */
     List<FormVersionVO> getVersions(UUID id);
 
-    /// 查询指定版本详情
-    ///
-    /// @param id      表单定义ID
-    /// @param version 版本号
-    /// @return 版本详情
+    /**
+     * 查询指定版本详情
+     *
+     * @param id
+     *            表单定义ID
+     * @param version
+     *            版本号
+     * @return 版本详情
+     */
     FormVersionVO getVersion(UUID id, Integer version);
 }

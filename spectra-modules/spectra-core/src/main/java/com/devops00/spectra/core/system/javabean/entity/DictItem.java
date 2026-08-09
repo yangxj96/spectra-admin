@@ -28,11 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 字典-字典数据
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典-字典数据
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
@@ -43,31 +45,45 @@ public class DictItem extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 字典类型ID
+    /**
+     * 字典类型ID
+     */
     @TableField(value = "gid")
     private UUID gid;
 
-    /// 标签
+    /**
+     * 标签
+     */
     @TableField(value = "label")
     private String label;
 
-    /// 值
+    /**
+     * 值
+     */
     @TableField(value = "value")
     private String value;
 
-    /// 排序
+    /**
+     * 排序
+     */
     @TableField(value = "sort")
     private Short sort;
 
-    /// 状态
+    /**
+     * 状态
+     */
     @TableField(value = "state")
     private Short state;
 
-    /// 是否默认
+    /**
+     * 是否默认
+     */
     @TableField(value = "default_flag")
     private Boolean defaultFlag;
 
-    /// 备注
+    /**
+     * 备注
+     */
     @TableField(value = "remark")
     private String remark;
 }

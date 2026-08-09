@@ -29,31 +29,46 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.UUID;
 
-/// 会仪表-服务
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 11:47
+/**
+ * 会仪表-服务
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 11:47
+ */
 public interface MeetingService extends BaseService<Meeting> {
 
-    /// 创建一个会议
-    ///
-    /// @param from 入参
+    /**
+     * 创建一个会议
+     *
+     * @param from
+     *            入参
+     */
     void created(MeetingCreateFrom from);
 
-    /// 分页查询会议
-    ///
-    /// @param page   分页参数
-    /// @param params 查询参数
-    /// @return 分页结果
+    /**
+     * 分页查询会议
+     *
+     * @param page
+     *            分页参数
+     * @param params
+     *            查询参数
+     * @return 分页结果
+     */
     IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params);
 
-    /// 响应会议邀请。
+    /**
+     * 响应会议邀请。
+     */
     void respond(UUID meetingId, MeetingResponseFrom from);
 
-    /// 签到会议。
+    /**
+     * 签到会议。
+     */
     void checkIn(UUID meetingId);
 
-    /// 保存会议纪要。
+    /**
+     * 保存会议纪要。
+     */
     void saveRecord(UUID meetingId, MeetingRecordFrom from);
 }

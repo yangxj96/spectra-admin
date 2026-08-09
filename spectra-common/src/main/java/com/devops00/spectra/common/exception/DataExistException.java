@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 数据存在异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 数据存在异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public class DataExistException extends DataException {
 
     public DataExistException() {

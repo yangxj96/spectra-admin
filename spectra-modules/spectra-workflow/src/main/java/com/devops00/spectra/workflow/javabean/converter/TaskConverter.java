@@ -23,19 +23,25 @@ import org.flowable.task.api.history.HistoricTaskInstance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 任务相关对象转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/18
+/**
+ * 任务相关对象转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/18
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface TaskConverter {
 
-    /// Flowable Task 转 TaskVO
+    /**
+     * Flowable Task 转 TaskVO
+     */
     @Mapping(source = "createTime", target = "createTime")
     TaskVO toVO(org.flowable.task.api.Task source);
 
-    /// 历史任务实例转 TaskVO（startTime 作为 createTime）
+    /**
+     * 历史任务实例转 TaskVO（startTime 作为 createTime）
+     */
     @Mapping(source = "startTime", target = "createTime")
     TaskVO fromHistoricTask(HistoricTaskInstance source);
 }

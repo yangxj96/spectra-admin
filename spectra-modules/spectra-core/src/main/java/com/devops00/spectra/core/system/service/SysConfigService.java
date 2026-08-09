@@ -19,11 +19,13 @@ package com.devops00.spectra.core.system.service;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.SysConfig;
 
-/// 系统配置表-业务接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/9/18 00:00
+/**
+ * 系统配置表-业务接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/9/18 00:00
+ */
 public interface SysConfigService extends BaseService<SysConfig> {
 
 }

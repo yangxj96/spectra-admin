@@ -19,29 +19,43 @@ package com.devops00.spectra.upload.javabean.from;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-/// 文件分片上传参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/7 23:18
+/**
+ * 文件分片上传参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/7 23:18
+ */
 @Data
 public class FileUploadChunkFrom {
 
-    /// 需要上传的文件
+    /**
+     * 需要上传的文件
+     */
     private MultipartFile file;
 
-    /// 上传ID
+    /**
+     * 上传ID
+     */
     private String uploadId;
 
-    /// 文件名称
+    /**
+     * 文件名称
+     */
     private String fileName;
 
-    /// hash值
+    /**
+     * hash值
+     */
     private String hash;
 
-    /// 总分片数
+    /**
+     * 总分片数
+     */
     private Integer count;
 
-    /// 当前idx
+    /**
+     * 当前idx
+     */
     private Integer index;
 }

@@ -26,26 +26,34 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// OA 申请附件关联。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请附件关联。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_application_attachment", schema = "spectra_oa")
 public class ApplicationAttachment extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 文件 ID。
+    /**
+     * 文件 ID。
+     */
     @TableField("file_id")
     private UUID fileId;
 
-    /// 文件名称。
+    /**
+     * 文件名称。
+     */
     @TableField("file_name")
     private String fileName;
 }

@@ -28,48 +28,70 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-/// 用户mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/15 00:00
+/**
+ * 用户mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/15 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface UserConverter {
 
-    /// 实体转分页VO
-    ///
-    /// @param source 实体
-    /// @return 分页实体
+    /**
+     * 实体转分页VO
+     *
+     * @param source
+     *            实体
+     * @return 分页实体
+     */
     UserPageVO toVO(User source);
 
-    /// 入参vo转实体
-    ///
-    /// @param source 入参vo
-    /// @return 实体
+    /**
+     * 入参vo转实体
+     *
+     * @param source
+     *            入参vo
+     * @return 实体
+     */
     User toEntity(UserSaveFrom source);
 
-    /// 转换为分页VO
-    ///
-    /// @param source 入参
-    /// @return 分页的VO
+    /**
+     * 转换为分页VO
+     *
+     * @param source
+     *            入参
+     * @return 分页的VO
+     */
     @Mapping(target = "pages", ignore = true)
     Page<UserPageVO> toVOPage(Page<User> source);
 
-    /// 使用params更新现有的user实体
-    ///
-    /// @param source 更新的参数
-    /// @param target 现有的实体
+    /**
+     * 使用params更新现有的user实体
+     *
+     * @param source
+     *            更新的参数
+     * @param target
+     *            现有的实体
+     */
     void updateUser(UserSaveFrom source, @MappingTarget User target);
 
-    /// 实体转用户详情VO
-    ///
-    /// @param source 实体
-    /// @return 用户详情VO
+    /**
+     * 实体转用户详情VO
+     *
+     * @param source
+     *            实体
+     * @return 用户详情VO
+     */
     UserProfileVO toProfileVO(User source);
 
-    /// 使用params更新现有的user实体（个人中心）
-    ///
-    /// @param source 更新的参数
-    /// @param target 现有的实体
+    /**
+     * 使用params更新现有的user实体（个人中心）
+     *
+     * @param source
+     *            更新的参数
+     * @param target
+     *            现有的实体
+     */
     void updateProfile(UserProfileFrom source, @MappingTarget User target);
 }

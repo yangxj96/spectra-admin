@@ -39,11 +39,13 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/// 关联服务-角色和菜单
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 关联服务-角色和菜单
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @Service
 public class RelRoleMenuServiceImpl implements RelRoleMenuService {

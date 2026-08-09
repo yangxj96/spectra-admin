@@ -18,10 +18,12 @@ package com.devops00.spectra.workflow.mapper;
 
 import com.devops00.spectra.workflow.javabean.entity.FormDefinition;
 
-/// 工作流-表单定义-mapper
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 工作流-表单定义-mapper
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 public interface FormDefinitionMapper extends com.baomidou.mybatisplus.core.mapper.BaseMapper<FormDefinition> {
 }

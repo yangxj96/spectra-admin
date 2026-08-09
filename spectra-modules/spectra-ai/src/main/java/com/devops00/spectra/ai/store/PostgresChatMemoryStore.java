@@ -28,11 +28,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/// 基于 PostgreSQL 的 ChatMemoryStore 实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * 基于 PostgreSQL 的 ChatMemoryStore 实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Component
 @RequiredArgsConstructor
 public class PostgresChatMemoryStore implements ChatMemoryStore {

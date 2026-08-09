@@ -18,18 +18,26 @@ package com.devops00.spectra.security.base.constant;
 
 import lombok.Getter;
 
-/// 客户端类型（登录端）
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/26
+/**
+ * 客户端类型（登录端）
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/26
+ */
 @Getter
 public enum ClientType {
-    /// Web浏览器
+    /**
+     * Web浏览器
+     */
     WEB("web", "Web端"),
-    /// 移动App
+    /**
+     * 移动App
+     */
     APP("app", "App端"),
-    /// 小程序
+    /**
+     * 小程序
+     */
     MINI("mini", "小程序");
 
     private final String name;
@@ -40,7 +48,9 @@ public enum ClientType {
         this.description = description;
     }
 
-    /// 根据名称解析，未匹配默认 WEB
+    /**
+     * 根据名称解析，未匹配默认 WEB
+     */
     public static ClientType fromName(String name) {
         if (name == null || name.isBlank()) {
             return WEB;

@@ -59,11 +59,13 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/// 文件上传服务-S3协议
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 10:59
+/**
+ * 文件上传服务-S3协议
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 10:59
+ */
 @Slf4j
 @RequiredArgsConstructor
 @Service("fileUploadServiceS3Impl")
@@ -381,9 +383,11 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         log.debug("{} 触发 S3 302 下载分流成功, 文件 ID: {}", LogPrefix.STORAGE.p(), file.getId());
     }
 
-    /// 辅助小工具：由于跨方法需要用到 S3 的 uploadId，
-    /// 你可以在本地设计中通过在 `file_upload_task` 表增加字段保存它，
-    /// 或是临时拼装在某个非关键字段里（如存放在备注或扩展字段）。
+    /**
+     * 辅助小工具：由于跨方法需要用到 S3 的 uploadId，
+     * 你可以在本地设计中通过在 {@code file_upload_task} 表增加字段保存它，
+     * 或是临时拼装在某个非关键字段里（如存放在备注或扩展字段）。
+     */
     private String getS3UploadIdFromTask(FileUploadTask task) {
         if (task.getEid() == null || task.getEid().isBlank()) {
             throw new DataException("该任务缺少 S3 端的 MultipartUploadId (eid)");

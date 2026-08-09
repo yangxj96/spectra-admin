@@ -20,14 +20,18 @@ import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 
-/// 通用常量
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 通用常量
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public final class Common {
 
-    /// 默认的PID
+    /**
+     * 默认的PID
+     */
     @Nullable
     public static final UUID PID = null;
 

@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.asset.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetOperation;
 
-/// 资产生命周期操作 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 资产生命周期操作 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 public interface AssetOperationMapper extends BaseMapper<AssetOperation> {
 }

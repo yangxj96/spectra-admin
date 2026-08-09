@@ -26,39 +26,61 @@ import com.devops00.spectra.oa.leave.javabean.from.LeavePageFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveSubmitFrom;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
 
-/// 请假业务闭环服务。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假业务闭环服务。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 public interface LeaveService {
-    /// 创建请假申请。
+    /**
+     * 创建请假申请。
+     */
     UUID create(LeaveCreateFrom from);
 
-    /// 修改请假申请。
+    /**
+     * 修改请假申请。
+     */
     void update(UUID id, LeaveCreateFrom from);
 
-    /// 分页查询请假申请。
+    /**
+     * 分页查询请假申请。
+     */
     IPage<LeaveVO> page(PageFrom page, LeavePageFrom params);
 
-    /// 查询请假申请详情。
+    /**
+     * 查询请假申请详情。
+     */
     LeaveVO get(UUID id);
 
-    /// 提交请假申请。
+    /**
+     * 提交请假申请。
+     */
     void submit(UUID id, LeaveSubmitFrom from);
 
-    /// 撤回请假申请。
+    /**
+     * 撤回请假申请。
+     */
     void withdraw(UUID id);
 
-    /// 取消请假申请。
+    /**
+     * 取消请假申请。
+     */
     void cancel(UUID id);
 
-    /// 处理请假审批通过回调。
+    /**
+     * 处理请假审批通过回调。
+     */
     void onApproved(String businessKey, Map<String, Object> variables);
 
-    /// 处理请假审批驳回回调。
+    /**
+     * 处理请假审批驳回回调。
+     */
     void onRejected(String businessKey, String reason);
 
-    /// 处理请假审批终止回调。
+    /**
+     * 处理请假审批终止回调。
+     */
     void onTerminated(String businessKey, String reason);
 }

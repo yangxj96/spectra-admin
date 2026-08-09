@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 费用报销主表。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 费用报销主表。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -41,51 +43,75 @@ import lombok.Setter;
 @DataScope
 public class Reimbursement extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 报销用途。
+    /**
+     * 报销用途。
+     */
     @TableField("purpose")
     private String purpose;
 
-    /// 费用开始日期。
+    /**
+     * 费用开始日期。
+     */
     @TableField("expense_start")
     private Instant expenseStart;
 
-    /// 费用结束日期。
+    /**
+     * 费用结束日期。
+     */
     @TableField("expense_end")
     private Instant expenseEnd;
 
-    /// 报销总金额。
+    /**
+     * 报销总金额。
+     */
     @TableField("total_amount")
     private BigDecimal totalAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     @TableField("currency")
     private String currency;
 
-    /// 收款人姓名。
+    /**
+     * 收款人姓名。
+     */
     @TableField("payee_name")
     private String payeeName;
 
-    /// 收款账户。
+    /**
+     * 收款账户。
+     */
     @TableField("payee_account")
     private String payeeAccount;
 
-    /// 支付状态。
+    /**
+     * 支付状态。
+     */
     @TableField("payment_status")
     private String paymentStatus;
 
-    /// 支付时间。
+    /**
+     * 支付时间。
+     */
     @TableField("payment_at")
     private Instant paymentAt;
 
-    /// 支付备注。
+    /**
+     * 支付备注。
+     */
     @TableField("payment_remark")
     private String paymentRemark;
 }

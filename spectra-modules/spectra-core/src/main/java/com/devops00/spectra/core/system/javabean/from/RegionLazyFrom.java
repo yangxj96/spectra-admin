@@ -18,17 +18,23 @@ package com.devops00.spectra.core.system.javabean.from;
 
 import lombok.Data;
 
-/// 行政区划懒加载查询参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 行政区划懒加载查询参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class RegionLazyFrom {
 
-    /// 层级
+    /**
+     * 层级
+     */
     private Integer level;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private String id;
 }

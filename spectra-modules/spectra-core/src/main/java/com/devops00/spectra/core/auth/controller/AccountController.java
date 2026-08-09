@@ -31,11 +31,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 账号绑定控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 账号绑定控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Slf4j
 @RestController
 @RequestMapping("/account")
@@ -44,7 +46,9 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    /// 获取当前用户绑定的账号列表
+    /**
+     * 获取当前用户绑定的账号列表
+     */
     @ULog("'获取账号绑定列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ACCOUNT:QUERY')")
@@ -64,7 +68,9 @@ public class AccountController {
         }).toList();
     }
 
-    /// 绑定手机号
+    /**
+     * 绑定手机号
+     */
     @ULog("'绑定手机号'")
     @PostMapping(value = "/bindPhone", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
@@ -73,7 +79,9 @@ public class AccountController {
         accountService.bindPhone(userId, params.getPhone(), params.getCode());
     }
 
-    /// 绑定邮箱
+    /**
+     * 绑定邮箱
+     */
     @ULog("'绑定邮箱'")
     @PostMapping(value = "/bindEmail", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
@@ -82,7 +90,9 @@ public class AccountController {
         accountService.bindEmail(userId, params.getEmail(), params.getCode());
     }
 
-    /// 解绑账号
+    /**
+     * 解绑账号
+     */
     @ULog("'解绑账号'")
     @DeleteMapping(value = "/unbind/{accountId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ACCOUNT:UPDATE')")
@@ -91,7 +101,9 @@ public class AccountController {
         accountService.unbind(userId, accountId);
     }
 
-    /// 根据账号类型获取显示名称
+    /**
+     * 根据账号类型获取显示名称
+     */
     private String getLoginName(com.devops00.spectra.core.auth.javabean.entity.Account account) {
         return switch (account.getType()) {
             case PASSWORD -> account.getLoginName();

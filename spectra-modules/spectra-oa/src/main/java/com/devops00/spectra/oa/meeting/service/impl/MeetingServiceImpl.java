@@ -50,11 +50,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-/// 会议业务服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 会议业务服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Service
 @RequiredArgsConstructor
 public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> implements MeetingService {

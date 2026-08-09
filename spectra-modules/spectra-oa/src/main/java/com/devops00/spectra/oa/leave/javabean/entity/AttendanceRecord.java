@@ -28,11 +28,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 审批通过后生成的考勤记录。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 审批通过后生成的考勤记录。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -40,27 +42,39 @@ import lombok.Setter;
 @DataScope
 public class AttendanceRecord extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 用户 ID。
+    /**
+     * 用户 ID。
+     */
     @TableField("user_id")
     private UUID userId;
 
-    /// 考勤日期。
+    /**
+     * 考勤日期。
+     */
     @TableField("attendance_date")
     private Instant attendanceDate;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     @TableField("status")
     private String status;
 
-    /// 来源。
+    /**
+     * 来源。
+     */
     @TableField("source")
     private String source;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 }

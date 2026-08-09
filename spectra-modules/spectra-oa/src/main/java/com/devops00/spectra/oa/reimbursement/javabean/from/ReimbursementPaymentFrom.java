@@ -18,14 +18,18 @@ package com.devops00.spectra.oa.reimbursement.javabean.from;
 
 import lombok.Data;
 
-/// 报销付款登记参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销付款登记参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementPaymentFrom {
 
-    /// 支付备注。
+    /**
+     * 支付备注。
+     */
     private String paymentRemark;
 }

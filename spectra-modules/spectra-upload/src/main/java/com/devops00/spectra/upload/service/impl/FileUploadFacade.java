@@ -39,11 +39,13 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.util.UUID;
 
-/// 对外门面
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 10:59
+/**
+ * 对外门面
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 10:59
+ */
 @Service
 @RequiredArgsConstructor
 public class FileUploadFacade {
@@ -58,7 +60,9 @@ public class FileUploadFacade {
 
     private final FileTypeValidator fileTypeValidator;
 
-    /// 预处理
+    /**
+     * 预处理
+     */
     public FileUploadPreVO pre(FileUploadPreFrom from) {
         if (!fileTypeValidator.validateFilename(from.getFilename())) {
             throw new FileUploadException("文件类型不允许");
@@ -66,7 +70,9 @@ public class FileUploadFacade {
         return registry.getByType(properties.getDefaultStorage()).pre(from);
     }
 
-    /// 直接上传
+    /**
+     * 直接上传
+     */
     public FileUploadVO upload(FileUploadFrom from) {
         if (!fileTypeValidator.validate(from.getFile())) {
             throw new FileUploadException("文件类型验证不通过");
@@ -74,19 +80,25 @@ public class FileUploadFacade {
         return registry.getByType(properties.getDefaultStorage()).upload(from);
     }
 
-    /// 分片上传
+    /**
+     * 分片上传
+     */
     public FileUploadChunkVO chunk(FileUploadChunkFrom from) {
         // 分片任务没存储上传类型，因为上传都是用默认，只有下载才寻要根据数据库选择
         return registry.getByType(properties.getDefaultStorage()).chunk(from);
     }
 
-    /// 合并
+    /**
+     * 合并
+     */
     public FileUploadVO merge(String uploadId) {
         UploadType type = getTypeFromTask(uploadId);
         return registry.getByType(type).merge(uploadId);
     }
 
-    /// 从任务表获取类型
+    /**
+     * 从任务表获取类型
+     */
     private UploadType getTypeFromTask(String uploadId) {
         FileUploadTask task = fileUploadTaskService.findByUploadId(uploadId);
         if (task == null) {
@@ -95,9 +107,12 @@ public class FileUploadFacade {
         return task.getStorageType();
     }
 
-    /// 文件预览
-    ///
-    /// @param id 文件ID
+    /**
+     * 文件预览
+     *
+     * @param id
+     *            文件ID
+     */
     public void preview(UUID id) {
         FileInfo info = fileInfoService.getById(id);
         if (info == null) {
@@ -110,9 +125,12 @@ public class FileUploadFacade {
         }
     }
 
-    /// 根据文件信息读取文件返回输入流
-    ///
-    /// @param fileInfo 文件信息
+    /**
+     * 根据文件信息读取文件返回输入流
+     *
+     * @param fileInfo
+     *            文件信息
+     */
     public InputStream openStream(FileInfo fileInfo) {
         return switch (fileInfo.getStorageType()) {
             case LOCAL -> registry.getByType(UploadType.LOCAL).openStream(fileInfo);
@@ -120,9 +138,12 @@ public class FileUploadFacade {
         };
     }
 
-    /// 下载文件
-    ///
-    /// @param id 文件ID
+    /**
+     * 下载文件
+     *
+     * @param id
+     *            文件ID
+     */
     public void download(UUID id) {
         FileInfo info = fileInfoService.getById(id);
         if (info == null) {

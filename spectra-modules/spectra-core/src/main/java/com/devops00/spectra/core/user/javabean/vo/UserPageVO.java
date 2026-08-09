@@ -31,11 +31,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-/// 用户分页的VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 用户分页的VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @ToString
 @AllArgsConstructor
@@ -45,61 +47,99 @@ public class UserPageVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 姓名
+    /**
+     * 姓名
+     */
     private String username;
 
-    /// 头像
+    /**
+     * 头像
+     */
     private String avatar;
 
-    /// 用户状态
+    /**
+     * 用户状态
+     */
     private Short status;
 
-    /// 真实姓名
+    /**
+     * 真实姓名
+     */
     private String realName;
 
-    /// 性别
+    /**
+     * 性别
+     */
     private Short gender;
 
-    /// 生日
+    /**
+     * 生日
+     */
     private LocalDate birthday;
 
-    /// 手机号
+    /**
+     * 手机号
+     */
     private String phone;
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     private String email;
 
-    /// 国家
+    /**
+     * 国家
+     */
     private String country;
 
-    /// 城市
+    /**
+     * 城市
+     */
     private String city;
 
-    /// 语言
+    /**
+     * 语言
+     */
     private String language;
 
-    /// 时区
+    /**
+     * 时区
+     */
     private String timezone;
 
-    /// 角色列表
+    /**
+     * 角色列表
+     */
     private List<RoleVO> roles;
 
-    /// 组织机构ID
+    /**
+     * 组织机构ID
+     */
     private UUID departmentId;
 
-    /// 组织机构名称
+    /**
+     * 组织机构名称
+     */
     @NameFill(lookup = DepartmentServiceImpl.class, sourceField = "departmentId")
     private String departmentName;
 
-    /// 数据范围
+    /**
+     * 数据范围
+     */
     private DataScopeType dataScope;
 
-    /// 自定义时的目标ID列表
+    /**
+     * 自定义时的目标ID列表
+     */
     private List<String> targetIds;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     private LocalDateTime createdAt;
 }

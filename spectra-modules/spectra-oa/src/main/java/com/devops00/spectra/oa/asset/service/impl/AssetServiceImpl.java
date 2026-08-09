@@ -38,11 +38,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-/// 资产管理业务服务实现。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 资产管理业务服务实现。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Service
 @RequiredArgsConstructor
 public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implements AssetService {

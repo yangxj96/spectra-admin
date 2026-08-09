@@ -34,11 +34,13 @@ import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Base64;
 
-/// 国密加解密测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/2 17:05
+/**
+ * 国密加解密测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/2 17:05
+ */
 @Slf4j
 @SpringBootTest
 public class GuoMiUtilTest {
@@ -85,7 +87,9 @@ public class GuoMiUtilTest {
         System.out.println("Nonce: " + SHA256Utils.generateNonce());
     }
 
-    /// 解密测试
+    /**
+     * 解密测试
+     */
     @Test
     void decrypt() throws Exception {
         var str = """

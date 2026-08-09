@@ -18,22 +18,32 @@ package com.devops00.spectra.core.common.service;
 
 import java.io.IOException;
 
-/// 验证码服务
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * 验证码服务
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 public interface KaptchaService {
 
-    /// 生成验证码
+    /**
+     * 生成验证码
+     */
     void generate() throws IOException;
 
-    /// 是否检查
+    /**
+     * 是否检查
+     */
     Boolean isCheck();
 
-    /// 获取验证码
+    /**
+     * 获取验证码
+     */
     String getKaptchaCode();
 
-    /// 根据session id删除验证码
+    /**
+     * 根据session id删除验证码
+     */
     void deleteBySessionId();
 }

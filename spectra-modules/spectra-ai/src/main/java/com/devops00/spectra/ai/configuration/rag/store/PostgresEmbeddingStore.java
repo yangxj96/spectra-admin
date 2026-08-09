@@ -31,13 +31,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/// PGSQL向量数据库存储操作
-///
-/// 配置向量存储器：绑定到 PgSQL 独立的 ai_rag schema 中
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/11 17:49
+/**
+ * PGSQL向量数据库存储操作
+ *
+ * 配置向量存储器：绑定到 PgSQL 独立的 ai_rag schema 中
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/11 17:49
+ */
 @Slf4j
 public class PostgresEmbeddingStore implements EmbeddingStore<TextSegment> {
 

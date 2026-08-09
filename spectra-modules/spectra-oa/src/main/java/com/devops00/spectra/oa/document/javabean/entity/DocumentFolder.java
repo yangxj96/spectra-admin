@@ -16,11 +16,13 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/// OA 文档目录实体。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * OA 文档目录实体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @ToString
@@ -28,23 +30,33 @@ import java.util.UUID;
 @DataScope
 public class DocumentFolder extends BaseEntity {
 
-    /// 父级 ID。
+    /**
+     * 父级 ID。
+     */
     @TableField("pid")
     private UUID pid;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     @TableField("name")
     private String name;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     @TableField("visibility")
     private String visibility;
 
-    /// 排序号。
+    /**
+     * 排序号。
+     */
     @TableField("sort")
     private Integer sort;
 }

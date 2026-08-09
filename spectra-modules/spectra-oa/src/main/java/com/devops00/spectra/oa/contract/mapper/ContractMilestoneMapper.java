@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.contract.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
 
-/// 合同履约节点 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同履约节点 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 public interface ContractMilestoneMapper extends BaseMapper<ContractMilestone> {
 }

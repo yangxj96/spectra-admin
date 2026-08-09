@@ -27,11 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/// 字典类型树VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典类型树VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,30 +42,48 @@ public class DictGroupTreeVO implements Tree<DictGroupTreeVO>, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 数据id.
+    /**
+     * 数据id.
+     */
     private UUID id;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private UUID pid;
 
-    /// 字典名称
+    /**
+     * 字典名称
+     */
     private String name;
 
-    /// 字典编码
+    /**
+     * 字典编码
+     */
     private String code;
 
-    /// 字典状态
+    /**
+     * 字典状态
+     */
     private Boolean state;
 
-    /// 是否内置
+    /**
+     * 是否内置
+     */
     private Boolean builtin;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 
-    /// tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+    /**
+     * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
+     */
     private Integer sort = 0;
 
-    /// 子级
+    /**
+     * 子级
+     */
     private List<DictGroupTreeVO> children = new ArrayList<>();
 }

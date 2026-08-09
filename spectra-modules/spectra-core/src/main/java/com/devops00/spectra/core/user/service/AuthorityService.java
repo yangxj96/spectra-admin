@@ -25,31 +25,44 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/// 权限service层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 权限service层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface AuthorityService extends BaseService<Authority> {
 
-    /// 创建权限
+    /**
+     * 创建权限
+     */
     void created(AuthoritySaveFrom from);
 
-    /// 修改权限
+    /**
+     * 修改权限
+     */
     void modify(AuthoritySaveFrom from);
 
-    /// 删除权限
+    /**
+     * 删除权限
+     */
     void deleteById(UUID id);
 
-    /// 根据角色ID获取角色关联的权限
-    ///
-    /// @param id 角色ID
-    /// @return 关联的权限
+    /**
+     * 根据角色ID获取角色关联的权限
+     *
+     * @param id
+     *            角色ID
+     * @return 关联的权限
+     */
     List<Authority> getByRelRoleId(UUID id);
 
-    /// 获取权限树
-    ///
-    /// @return 权限树列表
+    /**
+     * 获取权限树
+     *
+     * @return 权限树列表
+     */
     @Nullable
     List<AuthorityTreeVO> tree();
 }

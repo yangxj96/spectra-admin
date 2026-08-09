@@ -22,33 +22,48 @@ import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
 import java.util.List;
 import java.util.UUID;
 
-/// 关联服务-用户和权限
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 关联服务-用户和权限
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface RelRoleAuthorityService {
 
-    /// 授予角色权限
-    ///
-    /// @param roleId 角色ID
-    /// @param from   权限关联信息
+    /**
+     * 授予角色权限
+     *
+     * @param roleId
+     *            角色ID
+     * @param from
+     *            权限关联信息
+     */
     void grant(UUID roleId, RoleAuthorityFrom from);
 
-    /// 撤销角色权限
-    ///
-    /// @param roleId 角色ID
+    /**
+     * 撤销角色权限
+     *
+     * @param roleId
+     *            角色ID
+     */
     void revoke(UUID roleId);
 
-    /// 获取角色权限
-    ///
-    /// @param roleId 角色ID
-    /// @return 权限列表
+    /**
+     * 获取角色权限
+     *
+     * @param roleId
+     *            角色ID
+     * @return 权限列表
+     */
     List<AuthorityVO> get(UUID roleId);
 
-    /// 获取角色权限
-    ///
-    /// @param ids 角色ID列表
-    /// @return 权限列表,已去重
+    /**
+     * 获取角色权限
+     *
+     * @param ids
+     *            角色ID列表
+     * @return 权限列表,已去重
+     */
     List<AuthorityVO> get(List<UUID> ids);
 }

@@ -41,11 +41,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-/// 字典操作业务层实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典操作业务层实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Slf4j
 @Service
 public class DictServiceImpl implements DictService {

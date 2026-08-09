@@ -19,23 +19,27 @@ package com.devops00.spectra.oa.meeting.javabean.constant;
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
-/// 会议状态
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 14:30
+/**
+ * 会议状态
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 14:30
+ */
 @Getter
 public enum MeetingStatus implements IEnum<String> {
 
-    /// 草稿。
-    /// 已安排。
-    /// 进行中。
-    /// 已结束。
-    /// 已取消。
-    /// 审批中。
-    /// 已通过。
-    /// 已驳回。
-    /// 状态
+    /**
+     * 草稿。
+     * 已安排。
+     * 进行中。
+     * 已结束。
+     * 已取消。
+     * 审批中。
+     * 已通过。
+     * 已驳回。
+     * 状态
+     */
     DRAFT("draft", "草稿"),
     SCHEDULED("scheduled", "已安排"),
     ONGOING("ongoing", "进行中"),
@@ -46,7 +50,9 @@ public enum MeetingStatus implements IEnum<String> {
     REJECTED("rejected", "已驳回");
     private final String code;
 
-    /// 说明
+    /**
+     * 说明
+     */
     private final String name;
 
     MeetingStatus(String code, String name) {

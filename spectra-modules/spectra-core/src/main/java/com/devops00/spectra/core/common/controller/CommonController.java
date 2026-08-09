@@ -26,11 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 
-/// 通用的一些接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/25 00:00
+/**
+ * 通用的一些接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/25 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/common")
@@ -42,7 +44,9 @@ public class CommonController {
         this.kaptchaService = kaptchaService;
     }
 
-    /// 获取验证码
+    /**
+     * 获取验证码
+     */
     @ULog("'获取验证码'")
     @GetMapping(value = "/kaptcha", version = "1.0.0+")
     @PreAuthorize("permitAll()")

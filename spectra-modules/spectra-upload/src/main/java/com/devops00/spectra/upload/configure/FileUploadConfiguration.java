@@ -33,11 +33,13 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.ArrayList;
 
-/// 文件上传类型验证需要的相关配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/06/27 00:00
+/**
+ * 文件上传类型验证需要的相关配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/06/27 00:00
+ */
 @Slf4j
 @NullMarked
 @Configuration
@@ -49,9 +51,11 @@ public class FileUploadConfiguration {
 
     private final FileTypeService fileTypeService;
 
-    /// 文件类型验证策略管理器
-    ///
-    /// @return 文件策略验证管理器
+    /**
+     * 文件类型验证策略管理器
+     *
+     * @return 文件策略验证管理器
+     */
     @Bean
     public FileTypeValidator fileTypeValidator() {
         log.debug(LogPrefix.STORAGE.f("载入文件类型验证策略管理器"));

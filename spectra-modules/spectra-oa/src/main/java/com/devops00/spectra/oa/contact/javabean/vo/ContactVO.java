@@ -10,35 +10,53 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// OA 通讯录公开信息。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 通讯录公开信息。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class ContactVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 用户名。
+    /**
+     * 用户名。
+     */
     private String username;
 
-    /// 真实姓名。
+    /**
+     * 真实姓名。
+     */
     private String realName;
 
-    /// 头像。
+    /**
+     * 头像。
+     */
     private String avatar;
 
-    /// 手机号。
+    /**
+     * 手机号。
+     */
     private String phone;
 
-    /// 邮箱。
+    /**
+     * 邮箱。
+     */
     private String email;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 部门名称字段。
+    /**
+     * 部门名称字段。
+     */
     private String departmentName;
 }

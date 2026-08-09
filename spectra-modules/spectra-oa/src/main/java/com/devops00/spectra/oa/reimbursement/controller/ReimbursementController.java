@@ -42,11 +42,13 @@ import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 费用报销接口。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 费用报销接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/reimbursements")
@@ -55,7 +57,9 @@ public class ReimbursementController {
 
     private final ReimbursementService reimbursementService;
 
-    /// 创建报销草稿。
+    /**
+     * 创建报销草稿。
+     */
     @ULog("'创建报销草稿'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:INSERT')")
@@ -63,7 +67,9 @@ public class ReimbursementController {
         return reimbursementService.created(from);
     }
 
-    /// 修改报销草稿。
+    /**
+     * 修改报销草稿。
+     */
     @ULog("'修改报销草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
@@ -71,7 +77,9 @@ public class ReimbursementController {
         reimbursementService.modify(id, from);
     }
 
-    /// 分页查询报销单。
+    /**
+     * 分页查询报销单。
+     */
     @ULog("'分页查询报销单'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:QUERY')")
@@ -79,7 +87,9 @@ public class ReimbursementController {
         return reimbursementService.page(page, params);
     }
 
-    /// 查询报销详情。
+    /**
+     * 查询报销详情。
+     */
     @ULog("'查询报销详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:QUERY')")
@@ -87,7 +97,9 @@ public class ReimbursementController {
         return reimbursementService.get(id);
     }
 
-    /// 提交报销审批。
+    /**
+     * 提交报销审批。
+     */
     @ULog("'提交报销审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
@@ -95,7 +107,9 @@ public class ReimbursementController {
         reimbursementService.submit(id, from);
     }
 
-    /// 撤回报销申请。
+    /**
+     * 撤回报销申请。
+     */
     @ULog("'撤回报销申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
@@ -103,7 +117,9 @@ public class ReimbursementController {
         reimbursementService.withdraw(id);
     }
 
-    /// 取消报销申请。
+    /**
+     * 取消报销申请。
+     */
     @ULog("'取消报销申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:UPDATE')")
@@ -111,7 +127,9 @@ public class ReimbursementController {
         reimbursementService.cancel(id);
     }
 
-    /// 登记报销付款。
+    /**
+     * 登记报销付款。
+     */
     @ULog("'登记报销付款'")
     @PostMapping(value = "/{id}/payment", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_REIMBURSEMENT:PAYMENT')")

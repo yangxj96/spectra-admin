@@ -29,11 +29,13 @@ import oshi.hardware.PhysicalMemory;
 import java.lang.management.ManagementFactory;
 import java.util.*;
 
-/// 服务器信息监控
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 服务器信息监控
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @Service
 public class ServiceMonitorServiceImpl implements ServiceMonitorService {
@@ -46,9 +48,11 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         this.jvmInfoConverter = jvmInfoConverter;
     }
 
-    /// 过滤敏感属性,只保留常见属性,防止泄露
-    ///
-    /// @return 属性 map
+    /**
+     * 过滤敏感属性,只保留常见属性,防止泄露
+     *
+     * @return 属性 map
+     */
     private static Map<String, String> getFilteredProps() {
         var systemProps = System.getProperties();
         var filteredProps = new HashMap<String, String>();

@@ -39,11 +39,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/// 认证处理器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/17 23:28
+/**
+ * 认证处理器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/17 23:28
+ */
 @Slf4j
 @RestController
 @RequestMapping("/auth")
@@ -58,10 +60,13 @@ public class AuthController {
         this.authService = authService;
     }
 
-    /// 用户登陆
-    ///
-    /// @param params [LoginFrom]登陆入参
-    /// @return 成功响应token,失败抛出异常
+    /**
+     * 用户登陆
+     *
+     * @param params
+     *            [LoginFrom]登陆入参
+     * @return 成功响应token,失败抛出异常
+     */
     @ULog(value = "'用户[' + #params.username + ']进行登陆'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
@@ -89,7 +94,9 @@ public class AuthController {
         }
     }
 
-    /// 用户退出登陆
+    /**
+     * 用户退出登陆
+     */
     @ULog(value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']登出系统'", type = SysLogType.SAFETY)
     @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
@@ -107,7 +114,9 @@ public class AuthController {
         }
     }
 
-    /// 发送短信验证码
+    /**
+     * 发送短信验证码
+     */
     @ULog(value = "'发送短信验证码至[' + #params.phone + ']'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/sms", version = "1.0.0+")
@@ -116,7 +125,9 @@ public class AuthController {
         authService.sendSmsCode(params.getPhone());
     }
 
-    /// 发送邮箱验证码
+    /**
+     * 发送邮箱验证码
+     */
     @ULog(value = "'发送邮箱验证码至[' + #params.email + ']'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/email", version = "1.0.0+")
@@ -125,7 +136,9 @@ public class AuthController {
         authService.sendEmailCode(params.getEmail());
     }
 
-    /// 刷新token
+    /**
+     * 刷新token
+     */
     @ULog(value = "'刷新token'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")

@@ -23,46 +23,68 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 合同台账保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同台账保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ContractSaveFrom {
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     @NotBlank(message = "合同标题不能为空")
     private String title;
 
-    /// 合同类型字段。
+    /**
+     * 合同类型字段。
+     */
     @NotBlank(message = "合同类型不能为空")
     private String contractType;
 
-    /// 对方名称。
+    /**
+     * 对方名称。
+     */
     @NotBlank(message = "相对方名称不能为空")
     private String counterpartyName;
 
-    /// 对方联系人。
+    /**
+     * 对方联系人。
+     */
     private String counterpartyContact;
 
-    /// 金额。
+    /**
+     * 金额。
+     */
     @NotNull(message = "合同金额不能为空")
     @DecimalMin(value = "0.00", message = "合同金额不能小于 0")
     private BigDecimal amount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency = "CNY";
 
-    /// 开始日期。
+    /**
+     * 开始日期。
+     */
     private String startDate;
 
-    /// 结束日期。
+    /**
+     * 结束日期。
+     */
     private String endDate;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility = "DEPARTMENT";
 
-    /// 摘要。
+    /**
+     * 摘要。
+     */
     private String summary;
 }

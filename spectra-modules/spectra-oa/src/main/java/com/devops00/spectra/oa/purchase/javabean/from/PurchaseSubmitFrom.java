@@ -18,14 +18,18 @@ package com.devops00.spectra.oa.purchase.javabean.from;
 
 import lombok.Data;
 
-/// 采购审批提交参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 采购审批提交参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class PurchaseSubmitFrom {
 
-    /// 审批人用户名。
+    /**
+     * 审批人用户名。
+     */
     private String approverUsername;
 }

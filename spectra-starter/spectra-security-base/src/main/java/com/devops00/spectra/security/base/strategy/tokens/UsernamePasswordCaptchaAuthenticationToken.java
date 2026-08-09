@@ -21,20 +21,28 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 import java.util.Collections;
 
-/// 用户名密码+验证码登录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/29 10:55
+/**
+ * 用户名密码+验证码登录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/29 10:55
+ */
 public class UsernamePasswordCaptchaAuthenticationToken extends AbstractAuthenticationToken {
 
-    ///  用户名
+    /**
+     * 用户名
+     */
     private final String username;
 
-    /// 密码
+    /**
+     * 密码
+     */
     private final String password;
 
-    /// 验证码
+    /**
+     * 验证码
+     */
     @Getter
     private final String captcha;
 

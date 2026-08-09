@@ -20,16 +20,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 流程定义资源响应VO（BPMN XML）
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/17
+/**
+ * 流程定义资源响应VO（BPMN XML）
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/17
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProcessDefinitionResourceVO {
 
-    /// BPMN XML 内容
+    /**
+     * BPMN XML 内容
+     */
     private String bpmnXml;
 }

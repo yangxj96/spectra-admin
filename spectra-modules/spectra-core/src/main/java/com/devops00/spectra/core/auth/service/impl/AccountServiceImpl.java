@@ -35,11 +35,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-/// 账号服务默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/11 17:05
+/**
+ * 账号服务默认实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/11 17:05
+ */
 @Slf4j
 @Service
 @NullMarked

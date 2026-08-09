@@ -34,11 +34,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 行政区划相关接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/30 15:32
+/**
+ * 行政区划相关接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/30 15:32
+ */
 @Slf4j
 @RestController
 @RequestMapping("/region")
@@ -50,10 +52,13 @@ public class RegionController {
         this.bindService = regionService;
     }
 
-    /// 懒加载树
-    ///
-    /// @param from 查询参数
-    /// @return 根据条件获取的下级的列表
+    /**
+     * 懒加载树
+     *
+     * @param from
+     *            查询参数
+     * @return 根据条件获取的下级的列表
+     */
     @ULog("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
@@ -75,10 +80,13 @@ public class RegionController {
         return bindService.getPath(id);
     }
 
-    /// 新增行政区划
-    ///
-    /// @param params 行政区划信息
-    /// @return 新增后的行政区划信息
+    /**
+     * 新增行政区划
+     *
+     * @param params
+     *            行政区划信息
+     * @return 新增后的行政区划信息
+     */
     @ULog("'新增行政区划'")
     @PostMapping(value = "/created", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -86,10 +94,13 @@ public class RegionController {
         return bindService.created(params);
     }
 
-    /// 修改行政区划
-    ///
-    /// @param params 行政区划信息
-    /// @return 修改后的行政区划信息
+    /**
+     * 修改行政区划
+     *
+     * @param params
+     *            行政区划信息
+     * @return 修改后的行政区划信息
+     */
     @ULog("'修改行政区划'")
     @PutMapping(value = "/modify", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -97,9 +108,12 @@ public class RegionController {
         return bindService.modify(params);
     }
 
-    /// 根据ID删除行政区划
-    ///
-    /// @param id 行政区划ID
+    /**
+     * 根据ID删除行政区划
+     *
+     * @param id
+     *            行政区划ID
+     */
     @ULog("'删除行政区划'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

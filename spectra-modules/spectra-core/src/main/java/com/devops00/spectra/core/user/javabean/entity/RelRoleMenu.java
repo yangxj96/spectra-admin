@@ -28,11 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 角色关联菜单中间表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 角色关联菜单中间表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,11 +45,15 @@ public class RelRoleMenu extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 角色ID
+    /**
+     * 角色ID
+     */
     @TableField(value = "role_id")
     private UUID roleId;
 
-    /// 菜单ID
+    /**
+     * 菜单ID
+     */
     @TableField(value = "menu_id")
     private UUID menuId;
 }

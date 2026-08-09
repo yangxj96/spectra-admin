@@ -26,11 +26,13 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/// 当前用户详情响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 当前用户详情响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -39,51 +41,83 @@ public class UserProfileVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 用户ID
+    /**
+     * 用户ID
+     */
     private UUID id;
 
-    /// 用户名
+    /**
+     * 用户名
+     */
     private String username;
 
-    /// 真实姓名
+    /**
+     * 真实姓名
+     */
     private String realName;
 
-    /// 头像
+    /**
+     * 头像
+     */
     private String avatar;
 
-    /// 状态
+    /**
+     * 状态
+     */
     private Short status;
 
-    /// 性别
+    /**
+     * 性别
+     */
     private Short gender;
 
-    /// 生日
+    /**
+     * 生日
+     */
     private LocalDate birthday;
 
-    /// 手机号
+    /**
+     * 手机号
+     */
     private String phone;
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     private String email;
 
-    /// 国家
+    /**
+     * 国家
+     */
     private String country;
 
-    /// 城市
+    /**
+     * 城市
+     */
     private String city;
 
-    /// 语言
+    /**
+     * 语言
+     */
     private String language;
 
-    /// 时区
+    /**
+     * 时区
+     */
     private String timezone;
 
-    /// 部门ID
+    /**
+     * 部门ID
+     */
     private UUID departmentId;
 
-    /// 部门名称
+    /**
+     * 部门名称
+     */
     private String departmentName;
 
-    /// 角色列表
+    /**
+     * 角色列表
+     */
     private List<RoleVO> roles;
 }

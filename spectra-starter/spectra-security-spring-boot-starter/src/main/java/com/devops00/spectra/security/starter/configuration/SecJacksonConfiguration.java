@@ -28,11 +28,13 @@ import tools.jackson.databind.DefaultTyping;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
 
-/// Security配置Jackson
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/15 14:42
+/**
+ * Security配置Jackson
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/15 14:42
+ */
 @Slf4j
 @Configuration
 public class SecJacksonConfiguration {

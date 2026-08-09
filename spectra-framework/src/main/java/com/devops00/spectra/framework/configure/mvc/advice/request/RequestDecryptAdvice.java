@@ -46,27 +46,35 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Duration;
 
-/// 请求体解密 Advice
-///
-/// 在 MessageConverter 反序列化之前拦截请求，
-/// 自动检测加密请求并解密后放行。
-/// 支持验签、防重放攻击（时间窗口 + Nonce 去重）。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 请求体解密 Advice
+ *
+ * 在 MessageConverter 反序列化之前拦截请求，
+ * 自动检测加密请求并解密后放行。
+ * 支持验签、防重放攻击（时间窗口 + Nonce 去重）。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Slf4j
 @NullMarked
 @ControllerAdvice
 public class RequestDecryptAdvice implements RequestBodyAdvice {
 
-    /// 加密请求标记头
+    /**
+     * 加密请求标记头
+     */
     private static final String ENCRYPTED_HEADER = "X-Encrypted";
 
-    /// 防重放时间窗口（秒）
+    /**
+     * 防重放时间窗口（秒）
+     */
     private static final long REPLAY_WINDOW_SECONDS = 300;
 
-    /// Redis nonce 缓存前缀
+    /**
+     * Redis nonce 缓存前缀
+     */
     private static final String NONCE_PREFIX = "crypto:nonce:";
 
     // jackson序列化
@@ -172,12 +180,16 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         return body;
     }
 
-    /// 判断请求体是否为加密格式（同时包含 data、key、iv 三个字段）
+    /**
+     * 判断请求体是否为加密格式（同时包含 data、key、iv 三个字段）
+     */
     private boolean isEncryptedBody(JsonNode node) {
         return node.has("data") && node.has("key") && node.has("iv");
     }
 
-    /// 解密加密请求体（含验签 + 防重放）
+    /**
+     * 解密加密请求体（含验签 + 防重放）
+     */
     private String decrypt(JsonNode node) throws Exception {
         String encryptedData = node.get("data").asString();
         String encryptedKey = node.get("key").asString();
@@ -233,7 +245,9 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         return decrypted;
     }
 
-    /// 可替换 body 的 HttpInputMessage 包装类
+    /**
+     * 可替换 body 的 HttpInputMessage 包装类
+     */
     private static class DecryptedHttpInputMessage implements HttpInputMessage {
 
         private final HttpHeaders headers;

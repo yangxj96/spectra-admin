@@ -29,11 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 角色表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -44,27 +46,39 @@ public class Role extends BaseEntity {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 名称
+    /**
+     * 名称
+     */
     @TableField(value = "name")
     private String name;
 
-    /// 编码
+    /**
+     * 编码
+     */
     @TableField(value = "code", insertStrategy = FieldStrategy.NOT_NULL, updateStrategy = FieldStrategy.NEVER)
     private String code;
 
-    /// 状态
+    /**
+     * 状态
+     */
     @TableField(value = "state")
     private Boolean state;
 
-    /// 范围
+    /**
+     * 范围
+     */
     @TableField(value = "scope")
     private DataScopeType scope;
 
-    /// 是否内置字段,为true则不允许他进行修改删除操作
+    /**
+     * 是否内置字段,为true则不允许他进行修改删除操作
+     */
     @TableField(value = "builtin")
     private Boolean builtin;
 
-    /// 备注
+    /**
+     * 备注
+     */
     @TableField(value = "remark")
     private String remark;
 }

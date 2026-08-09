@@ -21,11 +21,13 @@ import org.mapstruct.InjectionStrategy;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.ReportingPolicy;
 
-/// mapstruct全局配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/9 14:47
+/**
+ * mapstruct全局配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/9 14:47
+ */
 @MapperConfig(componentModel = "spring", injectionStrategy = InjectionStrategy.CONSTRUCTOR, unmappedTargetPolicy = ReportingPolicy.IGNORE, builder = @Builder(disableBuilder = true))
 public interface GlobalMapperConfig {
 }

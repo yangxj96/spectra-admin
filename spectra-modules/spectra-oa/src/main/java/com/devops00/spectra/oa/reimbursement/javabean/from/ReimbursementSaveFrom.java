@@ -26,47 +26,67 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 报销单保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销单保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementSaveFrom {
 
-    /// 用途。
+    /**
+     * 用途。
+     */
     @NotBlank(message = "报销事由不能为空")
     private String purpose;
 
-    /// 费用开始日期。
+    /**
+     * 费用开始日期。
+     */
     @NotNull(message = "费用开始日期不能为空")
     private String expenseStart;
 
-    /// 费用结束日期。
+    /**
+     * 费用结束日期。
+     */
     @NotNull(message = "费用结束日期不能为空")
     private String expenseEnd;
 
-    /// 总金额。
+    /**
+     * 总金额。
+     */
     @NotNull(message = "报销总额不能为空")
     @DecimalMin(value = "0.01", message = "报销总额必须大于 0")
     private BigDecimal totalAmount;
 
-    /// 币种。
+    /**
+     * 币种。
+     */
     private String currency = "CNY";
 
-    /// 收款人姓名。
+    /**
+     * 收款人姓名。
+     */
     @NotBlank(message = "收款人不能为空")
     private String payeeName;
 
-    /// 收款账户。
+    /**
+     * 收款账户。
+     */
     private String payeeAccount;
 
-    /// 明细列表。
+    /**
+     * 明细列表。
+     */
     @NotEmpty(message = "至少填写一条费用明细")
     @Valid
     private List<ReimbursementItemFrom> items;
 
-    /// 附件列表。
+    /**
+     * 附件列表。
+     */
     @Valid
     private List<ReimbursementAttachmentFrom> attachments;
 }

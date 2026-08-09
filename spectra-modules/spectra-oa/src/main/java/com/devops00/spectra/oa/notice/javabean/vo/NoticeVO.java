@@ -21,50 +21,78 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 公告响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 公告响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class NoticeVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 摘要。
+    /**
+     * 摘要。
+     */
     private String summary;
 
-    /// 内容。
+    /**
+     * 内容。
+     */
     private String content;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 目标类型字段。
+    /**
+     * 目标类型字段。
+     */
     private String targetType;
 
-    /// 目标部门 ID。
+    /**
+     * 目标部门 ID。
+     */
     private UUID targetDepartmentId;
 
-    /// 发布人 ID。
+    /**
+     * 发布人 ID。
+     */
     private UUID publisherId;
 
-    /// 发布时间。
+    /**
+     * 发布时间。
+     */
     private LocalDateTime publishAt;
 
-    /// 是否要求阅读。
+    /**
+     * 是否要求阅读。
+     */
     private Boolean requiredRead;
 
-    /// 是否已读。
+    /**
+     * 是否已读。
+     */
     private Boolean read;
 
-    /// 阅读时间。
+    /**
+     * 阅读时间。
+     */
     private LocalDateTime readAt;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 }

@@ -59,20 +59,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/// 文件上传服务-本地上传
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 10:59
+/**
+ * 文件上传服务-本地上传
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 10:59
+ */
 @Slf4j
 @NullMarked
 @Service("fileUploadServiceLocalImpl")
 public class FileUploadServiceLocalImpl implements FileUploadService {
 
-    /// 本地文件管理的根文件路径
+    /**
+     * 本地文件管理的根文件路径
+     */
     private final Path root;
 
-    /// 本地文件管理的临时文件路径
+    /**
+     * 本地文件管理的临时文件路径
+     */
     private final Path temp;
 
     private final FileUploadProperties uploadProperties;
@@ -404,12 +410,15 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         }
     }
 
-    /// 构建文件保存路径
-    ///
-    /// 文件名本身包含年月目录前缀（例如 202608/uuid.png），因此这里直接相对根目录解析，
-    /// 避免再次拼接年月目录导致实际保存路径变成 202608/202608/uuid.png。
-    ///
-    /// @param filename 文件名称（可包含相对目录）
+    /**
+     * 构建文件保存路径
+     *
+     * 文件名本身包含年月目录前缀（例如 202608/uuid.png），因此这里直接相对根目录解析，
+     * 避免再次拼接年月目录导致实际保存路径变成 202608/202608/uuid.png。
+     *
+     * @param filename
+     *            文件名称（可包含相对目录）
+     */
     private Path buildFilePath(String filename) {
         Path filePath = root.resolve(filename).normalize();
         if (!filePath.startsWith(root)) {
@@ -427,16 +436,22 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         return filePath;
     }
 
-    /// 构建临时文件路径
-    ///
-    /// @param uploadId 文件ID
+    /**
+     * 构建临时文件路径
+     *
+     * @param uploadId
+     *            文件ID
+     */
     private Path buildTempDir(String uploadId) {
         return temp.resolve(uploadId);
     }
 
-    /// 构建上传响应VO
-    ///
-    /// @param url 地址
+    /**
+     * 构建上传响应VO
+     *
+     * @param url
+     *            地址
+     */
     private FileUploadVO buildUploadVO(String url, java.util.UUID fileId) {
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
@@ -444,9 +459,12 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         return vo;
     }
 
-    /// 构建分片上传响应VO
-    ///
-    /// @param chunkNumber 分片序号
+    /**
+     * 构建分片上传响应VO
+     *
+     * @param chunkNumber
+     *            分片序号
+     */
     private FileUploadChunkVO buildChunkVO(int chunkNumber) {
         FileUploadChunkVO vo = new FileUploadChunkVO();
         vo.setChunkNumber(chunkNumber);

@@ -13,24 +13,34 @@ import lombok.Data;
 
 import java.util.UUID;
 
-/// 文档保存入参。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 文档保存入参。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class DocumentSaveFrom {
 
-    /// 目录 ID。
+    /**
+     * 目录 ID。
+     */
     private UUID folderId;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     @NotBlank(message = "文档标题不能为空")
     private String title;
 
-    /// 摘要。
+    /**
+     * 摘要。
+     */
     private String summary;
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility = "DEPARTMENT";
 }

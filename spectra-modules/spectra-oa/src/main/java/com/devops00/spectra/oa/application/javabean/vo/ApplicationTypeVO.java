@@ -20,35 +20,53 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// OA 申请类型响应。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请类型响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class ApplicationTypeVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 编码。
+    /**
+     * 编码。
+     */
     private String code;
 
-    /// 名称。
+    /**
+     * 名称。
+     */
     private String name;
 
-    /// 表单定义 ID。
+    /**
+     * 表单定义 ID。
+     */
     private UUID formDefinitionId;
 
-    /// 流程定义 Key。
+    /**
+     * 流程定义 Key。
+     */
     private String processDefinitionKey;
 
-    /// 是否启用。
+    /**
+     * 是否启用。
+     */
     private Boolean enabled;
 
-    /// 排序序号。
+    /**
+     * 排序序号。
+     */
     private Integer sortOrder;
 
-    /// 描述。
+    /**
+     * 描述。
+     */
     private String description;
 }

@@ -23,11 +23,13 @@ import lombok.NoArgsConstructor;
 import java.io.Serial;
 import java.io.Serializable;
 
-/// RSA 密钥对生成响应
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/14
+/**
+ * RSA 密钥对生成响应
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/14
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -36,15 +38,23 @@ public class CryptoKeyPairVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 服务端公钥（Base64）
+    /**
+     * 服务端公钥（Base64）
+     */
     private String serverPublicKey;
 
-    /// 服务端私钥（Base64）
+    /**
+     * 服务端私钥（Base64）
+     */
     private String serverPrivateKey;
 
-    /// 客户端公钥（Base64）
+    /**
+     * 客户端公钥（Base64）
+     */
     private String clientPublicKey;
 
-    /// 客户端私钥（Base64）
+    /**
+     * 客户端私钥（Base64）
+     */
     private String clientPrivateKey;
 }

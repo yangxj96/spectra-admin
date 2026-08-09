@@ -25,20 +25,28 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 会议javabean转换器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 15:29
+/**
+ * 会议javabean转换器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 15:29
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface MeetingConverter {
 
-    /// 入参转实体
+    /**
+     * 入参转实体
+     */
     Meeting toEntity(MeetingCreateFrom source);
 
-    /// 实体转VO
+    /**
+     * 实体转VO
+     */
     MeetingVO toVO(Meeting source);
 
-    /// 实体列表转VO列表
+    /**
+     * 实体列表转VO列表
+     */
     List<MeetingVO> toVOList(List<Meeting> source);
 }

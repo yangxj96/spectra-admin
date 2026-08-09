@@ -16,22 +16,31 @@
 
 package com.devops00.spectra.workflow.service;
 
-/// 工作流业务层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 工作流业务层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public interface WorkflowService {
 
-    /// 注册审批回调
-    ///
-    /// @param processDefinitionKey 流程定义KEY
-    /// @param callback             审批回调实现
+    /**
+     * 注册审批回调
+     *
+     * @param processDefinitionKey
+     *            流程定义KEY
+     * @param callback
+     *            审批回调实现
+     */
     void registerCallback(String processDefinitionKey, ApprovalCallback callback);
 
-    /// 获取审批回调
-    ///
-    /// @param processDefinitionKey 流程定义KEY
-    /// @return 审批回调实现，未注册时返回null
+    /**
+     * 获取审批回调
+     *
+     * @param processDefinitionKey
+     *            流程定义KEY
+     * @return 审批回调实现，未注册时返回null
+     */
     ApprovalCallback getCallback(String processDefinitionKey);
 }

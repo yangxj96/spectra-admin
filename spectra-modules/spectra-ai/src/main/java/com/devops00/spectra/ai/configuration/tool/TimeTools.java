@@ -30,18 +30,23 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
-/// 用户工具类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/9 16:36
+/**
+ * 用户工具类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/9 16:36
+ */
 @Slf4j
 @Component
 public class TimeTools implements AiToolMarker {
 
-    /// 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
-    ///
-    /// @param memoryId 复合记忆标识
+    /**
+     * 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
+     *
+     * @param memoryId
+     *            复合记忆标识
+     */
     @Tool("获取当前日期和时间，返回标准的ISO 8601格式字符串")
     public String getCurrentDateTimeISO(@ToolMemoryId AiMemoryId memoryId) {
         return ToolExecutor.execute(memoryId.token(), _ -> {

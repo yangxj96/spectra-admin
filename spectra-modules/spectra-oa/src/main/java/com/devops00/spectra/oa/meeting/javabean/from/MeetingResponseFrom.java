@@ -19,15 +19,19 @@ package com.devops00.spectra.oa.meeting.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 会议邀请响应参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 会议邀请响应参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class MeetingResponseFrom {
 
-    /// 会议响应状态。
+    /**
+     * 会议响应状态。
+     */
     @NotBlank(message = "会议响应不能为空")
     private String status;
 }

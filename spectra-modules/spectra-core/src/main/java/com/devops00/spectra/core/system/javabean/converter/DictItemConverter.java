@@ -25,31 +25,42 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
-/// 字典Mapstruct
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/18 00:00
+/**
+ * 字典Mapstruct
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/18 00:00
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface DictItemConverter {
 
-    ///
-    /// 字典数据入参转实体
-    ///
-    /// @param source 字典数据入参
-    /// @return 转换后的实体
-    ///
+    /**
+     *
+     * 字典数据入参转实体
+     *
+     * @param source
+     *            字典数据入参
+     * @return 转换后的实体
+     *
+     */
     DictItem toEntity(DictItemFrom source);
 
-    /// 字典数据转字典数据VO
-    ///
-    /// @param source 字典数据
-    /// @return 字典数据VO
+    /**
+     * 字典数据转字典数据VO
+     *
+     * @param source
+     *            字典数据
+     * @return 字典数据VO
+     */
     DictItemVO toVO(DictItem source);
 
-    /// 字典数据转字典数据VO(列表)
-    ///
-    /// @param source 字典数据
-    /// @return 字典数据VO(列表)
+    /**
+     * 字典数据转字典数据VO(列表)
+     *
+     * @param source
+     *            字典数据
+     * @return 字典数据VO(列表)
+     */
     List<DictItemVO> toVOList(List<DictItem> source);
 }

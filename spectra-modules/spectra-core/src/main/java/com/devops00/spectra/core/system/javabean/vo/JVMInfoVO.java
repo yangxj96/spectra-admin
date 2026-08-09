@@ -25,65 +25,101 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-/// JVM信息
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * JVM信息
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class JVMInfoVO {
 
-    /// JVM 名称：如 "OpenJDK 64-Bit Server VM"
+    /**
+     * JVM 名称：如 "OpenJDK 64-Bit Server VM"
+     */
     private String jvmName;
 
-    /// 供应商：如 "Oracle Corporation", "Eclipse Foundation"
+    /**
+     * 供应商：如 "Oracle Corporation", "Eclipse Foundation"
+     */
     private String jvmVendor;
 
-    /// 版本：如 "17.0.8+7-LTS", "25.382-b05"
+    /**
+     * 版本：如 "17.0.8+7-LTS", "25.382-b05"
+     */
     private String jvmVersion;
 
-    /// JVM 规范名称：通常是 "Java Virtual Machine Specification"
+    /**
+     * JVM 规范名称：通常是 "Java Virtual Machine Specification"
+     */
     private String jvmSpecName;
 
-    /// JVM 规范版本：如 "17"
+    /**
+     * JVM 规范版本：如 "17"
+     */
     private String jvmSpecVersion;
 
-    /// JVM 规范供应商
+    /**
+     * JVM 规范供应商
+     */
     private String jvmSpecVendor;
 
-    /// Java 版本（同 jvmVersion 略有不同）
+    /**
+     * Java 版本（同 jvmVersion 略有不同）
+     */
     private String javaVersion;
 
-    /// JVM 安装路径
+    /**
+     * JVM 安装路径
+     */
     private String javaHome;
 
-    /// JAVA供应商
+    /**
+     * JAVA供应商
+     */
     private String javaVendor;
 
-    /// 供应商网址
+    /**
+     * 供应商网址
+     */
     private String javaVendorUrl;
 
-    /// 启动时间
+    /**
+     * 启动时间
+     */
     private LocalDateTime startTime;
 
-    /// "进程ID@主机名"，提取 PID
+    /**
+     * "进程ID@主机名"，提取 PID
+     */
     private String pid;
 
-    /// 进程ID
+    /**
+     * 进程ID
+     */
     private String processId;
 
-    /// 启动参数
+    /**
+     * 启动参数
+     */
     private List<String> jvmArguments;
 
-    /// 系统属性
+    /**
+     * 系统属性
+     */
     private Map<String, String> systemProps;
 
-    /// 运行时类路径
+    /**
+     * 运行时类路径
+     */
     private String classPath;
 
-    /// 本地库路径
+    /**
+     * 本地库路径
+     */
     private String libraryPath;
 }

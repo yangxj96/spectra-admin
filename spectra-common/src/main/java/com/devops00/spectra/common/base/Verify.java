@@ -16,18 +16,24 @@
 
 package com.devops00.spectra.common.base;
 
-/// 验证分组
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 验证分组
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public class Verify {
 
-    /// 校验新增分组
+    /**
+     * 校验新增分组
+     */
     public interface Insert {
     }
 
-    /// 校验修改分组
+    /**
+     * 校验修改分组
+     */
     public interface Update {
     }
 }

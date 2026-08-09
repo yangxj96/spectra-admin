@@ -29,11 +29,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// GB/T 2260的行政区域数据表
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/1/30 11:45
+/**
+ * GB/T 2260的行政区域数据表
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/1/30 11:45
+ */
 @Data
 @Builder
 @EqualsAndHashCode(callSuper = true)
@@ -42,39 +44,57 @@ import lombok.NoArgsConstructor;
 @TableName(value = "sys_region", schema = "spectra_core")
 public class Region extends BaseEntity {
 
-    /// 区域名称
+    /**
+     * 区域名称
+     */
     @TableField(value = "name")
     private String name;
 
-    /// 区域全称，如 北京市/北京市/东城区
+    /**
+     * 区域全称，如 北京市/北京市/东城区
+     */
     @TableField(value = "full_name")
     private String fullName;
 
-    /// 简称
+    /**
+     * 简称
+     */
     @TableField(value = "short_name")
     private String shortName;
 
-    /// 区域编码
+    /**
+     * 区域编码
+     */
     @TableField(value = "code")
     private String code;
 
-    /// 区域路径，如 /110000/110100/110101
+    /**
+     * 区域路径，如 /110000/110100/110101
+     */
     @TableField(value = "path")
     private String path;
 
-    /// 上级ID
+    /**
+     * 上级ID
+     */
     @TableField(value = "pid")
     private UUID pid;
 
-    /// 行政区划层级:1省 2地级市 3县级 4乡级 5村级
+    /**
+     * 行政区划层级:1省 2地级市 3县级 4乡级 5村级
+     */
     @TableField(value = "level")
     private RegionLevel level;
 
-    /// 状态：true-启用 false-停用
+    /**
+     * 状态：true-启用 false-停用
+     */
     @TableField(value = "status")
     private Boolean status;
 
-    /// 排序
+    /**
+     * 排序
+     */
     @TableField(value = "sort")
     private Integer sort;
 }

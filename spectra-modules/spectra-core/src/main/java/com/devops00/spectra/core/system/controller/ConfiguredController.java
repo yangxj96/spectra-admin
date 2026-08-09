@@ -28,11 +28,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-/// 系统配置控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 系统配置控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/configured")
@@ -44,11 +46,14 @@ public class ConfiguredController {
         this.bindService = bindService;
     }
 
-    /// 修改系统配置
-    ///
-    /// 只能修改值和说明
-    ///
-    /// @param params 修改参数入参实体
+    /**
+     * 修改系统配置
+     *
+     * 只能修改值和说明
+     *
+     * @param params
+     *            修改参数入参实体
+     */
     @ULog("'修改系统配置'")
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

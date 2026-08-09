@@ -47,11 +47,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/// 响应内容加密
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/3 10:40
+/**
+ * 响应内容加密
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/3 10:40
+ */
 @Slf4j
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice

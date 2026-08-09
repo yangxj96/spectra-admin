@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 验证码相关异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * 验证码相关异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 public class KaptchaException extends SpectraException {
 
     public KaptchaException() {

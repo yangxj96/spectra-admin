@@ -18,14 +18,18 @@ package com.devops00.spectra.oa.contact.javabean.from;
 
 import lombok.Data;
 
-/// 通讯录分页查询参数
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 通讯录分页查询参数
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class ContactPageFrom {
 
-    /// 搜索关键字
+    /**
+     * 搜索关键字
+     */
     private String keyword;
 }

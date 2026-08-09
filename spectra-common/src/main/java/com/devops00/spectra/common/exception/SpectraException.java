@@ -18,11 +18,13 @@ package com.devops00.spectra.common.exception;
 
 import java.io.Serial;
 
-/// 光谱平台基础异常
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 光谱平台基础异常
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 public class SpectraException extends RuntimeException {
 
     @Serial

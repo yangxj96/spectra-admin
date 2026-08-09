@@ -24,21 +24,27 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import tools.jackson.databind.ObjectMapper;
 
-/// Security异常配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/9 00:35
+/**
+ * Security异常配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/9 00:35
+ */
 @Configuration
 public class SecExConfiguration {
 
-    /// 身份认证异常
+    /**
+     * 身份认证异常
+     */
     @Bean
     public AuthenticationEntryPoint restAuthenticationEntryPoint(ObjectMapper om) {
         return new RestAuthenticationEntryPoint(om);
     }
 
-    /// 权限不足异常
+    /**
+     * 权限不足异常
+     */
     @Bean
     public AccessDeniedHandler restAccessDeniedHandler(ObjectMapper om) {
         return new RestAccessDeniedHandler(om);

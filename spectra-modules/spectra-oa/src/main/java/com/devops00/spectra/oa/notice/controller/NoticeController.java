@@ -40,11 +40,13 @@ import com.devops00.spectra.oa.notice.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/// 公告中心接口。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 公告中心接口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/notice")
@@ -53,7 +55,9 @@ public class NoticeController {
 
     private final NoticeService noticeService;
 
-    /// 查询公告列表。
+    /**
+     * 查询公告列表。
+     */
     @ULog("'查询公告列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
@@ -61,7 +65,9 @@ public class NoticeController {
         return noticeService.page(page, params);
     }
 
-    /// 获取公告详情。
+    /**
+     * 获取公告详情。
+     */
     @ULog("'获取公告详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:QUERY')")
@@ -69,7 +75,9 @@ public class NoticeController {
         return noticeService.get(id);
     }
 
-    /// 创建公告草稿。
+    /**
+     * 创建公告草稿。
+     */
     @ULog("'创建公告草稿'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:INSERT')")
@@ -77,7 +85,9 @@ public class NoticeController {
         return noticeService.get(noticeService.createDraft(from).getId());
     }
 
-    /// 发布公告。
+    /**
+     * 发布公告。
+     */
     @ULog("'发布公告'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
@@ -85,7 +95,9 @@ public class NoticeController {
         noticeService.publish(id);
     }
 
-    /// 撤回公告。
+    /**
+     * 撤回公告。
+     */
     @ULog("'撤回公告'")
     @PostMapping(value = "/{id}/revoke", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")
@@ -93,7 +105,9 @@ public class NoticeController {
         noticeService.revoke(id);
     }
 
-    /// 标记公告已读。
+    /**
+     * 标记公告已读。
+     */
     @ULog("'标记公告已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_NOTICE:UPDATE')")

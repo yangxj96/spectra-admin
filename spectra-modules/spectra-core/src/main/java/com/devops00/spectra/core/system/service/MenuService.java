@@ -25,43 +25,62 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/// 菜单service层
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单service层
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public interface MenuService extends BaseService<Menu> {
 
-    /// 创建菜单
-    ///
-    /// @param params 菜单信息
+    /**
+     * 创建菜单
+     *
+     * @param params
+     *            菜单信息
+     */
     void created(MenuSaveFrom params);
 
-    /// 修改菜单信息
-    ///
-    /// @param params 修改参数
+    /**
+     * 修改菜单信息
+     *
+     * @param params
+     *            修改参数
+     */
     void modify(MenuSaveFrom params);
 
-    /// 生成树形菜单
-    ///
-    /// @return 生成的树形菜单
+    /**
+     * 生成树形菜单
+     *
+     * @return 生成的树形菜单
+     */
     @Nullable
     List<MenuTreeVO> tree();
 
-    /// 获取当前用户的授权菜单树
-    ///
-    /// @param userId 用户ID
-    /// @return 当前用户授权菜单树
+    /**
+     * 获取当前用户的授权菜单树
+     *
+     * @param userId
+     *            用户ID
+     * @return 当前用户授权菜单树
+     */
     List<MenuTreeVO> current(UUID userId);
 
-    /// 根据角色ID获取角色关联的菜单
-    ///
-    /// @param id 角色ID
-    /// @return 关联的菜单
+    /**
+     * 根据角色ID获取角色关联的菜单
+     *
+     * @param id
+     *            角色ID
+     * @return 关联的菜单
+     */
     List<Menu> getByRelRoleId(UUID id);
 
-    /// 根据ID删除菜单
-    ///
-    /// @param id 菜单ID
+    /**
+     * 根据ID删除菜单
+     *
+     * @param id
+     *            菜单ID
+     */
     void deleteById(UUID id);
 }

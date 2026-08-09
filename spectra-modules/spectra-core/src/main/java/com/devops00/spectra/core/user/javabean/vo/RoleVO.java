@@ -24,11 +24,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.UUID;
 
-/// 角色响应VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色响应VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,24 +39,38 @@ public class RoleVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 名称
+    /**
+     * 名称
+     */
     private String name;
 
-    /// 状态
+    /**
+     * 状态
+     */
     private Boolean state;
 
-    /// 编码
+    /**
+     * 编码
+     */
     private String code;
 
-    /// 范围
+    /**
+     * 范围
+     */
     private Integer scope;
 
-    /// 是否内置
+    /**
+     * 是否内置
+     */
     private Boolean builtin;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 }

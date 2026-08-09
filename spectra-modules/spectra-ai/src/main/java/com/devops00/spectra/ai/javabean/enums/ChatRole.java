@@ -18,20 +18,28 @@ package com.devops00.spectra.ai.javabean.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/// 对话消息角色枚举
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * 对话消息角色枚举
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 public enum ChatRole {
 
-    /// 用户消息。
+    /**
+     * 用户消息。
+     */
     USER,
 
-    /// 助手消息。
+    /**
+     * 助手消息。
+     */
     ASSISTANT,
 
-    /// 系统消息。
+    /**
+     * 系统消息。
+     */
     SYSTEM;
 
     @JsonValue

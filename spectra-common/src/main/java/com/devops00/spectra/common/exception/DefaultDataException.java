@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.common.exception;
 
-/// 系统默认数据
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 系统默认数据
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 public class DefaultDataException extends DataException {
 
     public DefaultDataException() {

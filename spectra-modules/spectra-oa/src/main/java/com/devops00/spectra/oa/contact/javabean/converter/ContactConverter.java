@@ -23,15 +23,19 @@ import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-/// 通讯录对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 通讯录对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ContactConverter {
 
-    /// 用户实体转通讯录视图，部门名称由 Service 根据批量查询结果补充。
+    /**
+     * 用户实体转通讯录视图，部门名称由 Service 根据批量查询结果补充。
+     */
     @Mapping(target = "departmentName", ignore = true)
     ContactVO toVO(User source);
 }

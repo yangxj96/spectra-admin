@@ -22,21 +22,29 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.time.Duration;
 
-/// 验证码生成相关配置
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/25 00:00
+/**
+ * 验证码生成相关配置
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/25 00:00
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.kaptcha")
 public class KaptchaProperties {
 
-    /// 登录是否验证.
+    /**
+     * 登录是否验证.
+     */
     private Boolean verify = Boolean.TRUE;
 
-    /// 是什么类型的验证码.
+    /**
+     * 是什么类型的验证码.
+     */
     private KaptchaType type = KaptchaType.MATH;
 
-    /// 验证码存储时长,默认1分钟.
+    /**
+     * 验证码存储时长,默认1分钟.
+     */
     private Duration duration = Duration.ofMinutes(1);
 }

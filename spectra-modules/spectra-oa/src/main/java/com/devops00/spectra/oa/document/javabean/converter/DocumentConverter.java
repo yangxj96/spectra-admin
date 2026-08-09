@@ -29,31 +29,43 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-/// 文档相关对象转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 文档相关对象转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface DocumentConverter {
 
-    /// 文档实体转详情视图。
+    /**
+     * 文档实体转详情视图。
+     */
     @Mapping(target = "id", source = "document.id")
     @Mapping(target = "createdAt", source = "document.createdAt")
     @Mapping(target = "updatedAt", source = "document.updatedAt")
     @Mapping(target = "currentVersion", source = "version")
     DocumentVO toVO(Document document, DocumentVersion version);
 
-    /// 文档版本实体转视图。
+    /**
+     * 文档版本实体转视图。
+     */
     @Mapping(target = "current", source = "currentVersion")
     DocumentVersionVO toVersionVO(DocumentVersion source);
 
-    /// 文档目录实体转视图。
+    /**
+     * 文档目录实体转视图。
+     */
     DocumentFolderVO toFolderVO(DocumentFolder source);
 
-    /// 保存入参转文档实体。
+    /**
+     * 保存入参转文档实体。
+     */
     Document toEntity(DocumentSaveFrom source);
 
-    /// 使用保存入参更新文档实体。
+    /**
+     * 使用保存入参更新文档实体。
+     */
     void updateEntity(DocumentSaveFrom source, @MappingTarget Document target);
 }

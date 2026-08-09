@@ -21,11 +21,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 面向“流程控制能力”
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/3/30 15:11
+/**
+ * 面向“流程控制能力”
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/3/30 15:11
+ */
 @Slf4j
 @RestController
 @RequestMapping("/workflow/runtime")

@@ -15,46 +15,64 @@ import lombok.ToString;
 
 import java.util.UUID;
 
-/// OA 文档版本实体。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * OA 文档版本实体。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "oa_document_version", schema = "spectra_oa")
 public class DocumentVersion extends BaseEntity {
 
-    /// 文档 ID。
+    /**
+     * 文档 ID。
+     */
     @TableField("document_id")
     private UUID documentId;
 
-    /// 版本号。
+    /**
+     * 版本号。
+     */
     @TableField("version_no")
     private Integer versionNo;
 
-    /// 文件 ID。
+    /**
+     * 文件 ID。
+     */
     @TableField("file_id")
     private UUID fileId;
 
-    /// 文件名称。
+    /**
+     * 文件名称。
+     */
     @TableField("file_name")
     private String fileName;
 
-    /// 文件大小。
+    /**
+     * 文件大小。
+     */
     @TableField("file_size")
     private Long fileSize;
 
-    /// 内容类型。
+    /**
+     * 内容类型。
+     */
     @TableField("content_type")
     private String contentType;
 
-    /// 版本说明。
+    /**
+     * 版本说明。
+     */
     @TableField("version_note")
     private String versionNote;
 
-    /// 当前版本字段。
+    /**
+     * 当前版本字段。
+     */
     @TableField("is_current")
     private Boolean currentVersion;
 }

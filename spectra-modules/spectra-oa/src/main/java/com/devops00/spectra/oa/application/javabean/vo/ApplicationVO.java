@@ -21,50 +21,78 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// OA 申请响应。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请响应。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class ApplicationVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 申请编号。
+    /**
+     * 申请编号。
+     */
     private String applicationNo;
 
-    /// 类型编码。
+    /**
+     * 类型编码。
+     */
     private String typeCode;
 
-    /// 业务 ID。
+    /**
+     * 业务 ID。
+     */
     private UUID bizId;
 
-    /// 申请人 ID。
+    /**
+     * 申请人 ID。
+     */
     private UUID applicantId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     private UUID departmentId;
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     private String title;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 流程实例 ID。
+    /**
+     * 流程实例 ID。
+     */
     private String processInstanceId;
 
-    /// 提交时间。
+    /**
+     * 提交时间。
+     */
     private LocalDateTime submittedAt;
 
-    /// 完成时间。
+    /**
+     * 完成时间。
+     */
     private LocalDateTime completedAt;
 
-    /// 驳回原因。
+    /**
+     * 驳回原因。
+     */
     private String rejectReason;
 
-    /// 创建时间。
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 }

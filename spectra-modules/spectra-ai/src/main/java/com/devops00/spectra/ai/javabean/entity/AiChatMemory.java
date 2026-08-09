@@ -26,30 +26,40 @@ import lombok.ToString;
 
 import java.time.Instant;
 
-/// AI 对话消息持久化记录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/26
+/**
+ * AI 对话消息持久化记录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/26
+ */
 @Getter
 @Setter
 @ToString
 @TableName(value = "ai_chat_memory", schema = "spectra_ai")
 public class AiChatMemory {
 
-    /// 会话 ID（= ai_conversation.id::text）
+    /**
+     * 会话 ID（= ai_conversation.id::text）
+     */
     @TableId(value = "memory_id", type = IdType.INPUT)
     private String memoryId;
 
-    /// 序列化的消息 JSON
+    /**
+     * 序列化的消息 JSON
+     */
     @TableField("messages")
     private String messages;
 
-    /// 创建时间
+    /**
+     * 创建时间
+     */
     @TableField("created_at")
     private Instant createdAt;
 
-    /// 更新时间
+    /**
+     * 更新时间
+     */
     @TableField("updated_at")
     private Instant updatedAt;
 }

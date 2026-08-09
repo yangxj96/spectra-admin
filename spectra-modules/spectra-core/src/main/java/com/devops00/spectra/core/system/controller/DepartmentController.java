@@ -30,11 +30,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
-/// 组织机构控制器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/14 00:00
+/**
+ * 组织机构控制器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/14 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/department")
@@ -46,9 +48,12 @@ public class DepartmentController {
         this.bindService = bindService;
     }
 
-    /// 新增组织机构
-    ///
-    /// @param from 请求入参
+    /**
+     * 新增组织机构
+     *
+     * @param from
+     *            请求入参
+     */
     @ULog("'新增组织机构'")
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
@@ -56,9 +61,12 @@ public class DepartmentController {
         bindService.created(from);
     }
 
-    /// 删除组织机构
-    ///
-    /// @param id 组织机构ID
+    /**
+     * 删除组织机构
+     *
+     * @param id
+     *            组织机构ID
+     */
     @ULog("'删除组织机构'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:DELETE')")
@@ -66,9 +74,12 @@ public class DepartmentController {
         bindService.deleteById(id);
     }
 
-    /// 编辑组织机构
-    ///
-    /// @param from 请求入参
+    /**
+     * 编辑组织机构
+     *
+     * @param from
+     *            请求入参
+     */
     @ULog("'编辑组织机构'")
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:UPDATE')")
@@ -76,9 +87,11 @@ public class DepartmentController {
         bindService.modify(from);
     }
 
-    /// 组织机构树形结构
-    ///
-    /// @return 组织机构树形结构数组
+    /**
+     * 组织机构树形结构
+     *
+     * @return 组织机构树形结构数组
+     */
     @ULog("'获取组织机构树形列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:QUERY')")

@@ -19,39 +19,59 @@ package com.devops00.spectra.oa.calendar.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 日程保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 日程保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class CalendarSaveFrom {
 
-    /// 标题。
+    /**
+     * 标题。
+     */
     @NotBlank(message = "日程标题不能为空")
     private String title;
 
-    /// 内容。
+    /**
+     * 内容。
+     */
     private String content;
 
-    /// 开始时间。
+    /**
+     * 开始时间。
+     */
     private String startTime;
 
-    /// 结束时间。
+    /**
+     * 结束时间。
+     */
     private String endTime;
 
-    /// 是否全天。
+    /**
+     * 是否全天。
+     */
     private Boolean allDay = false;
 
-    /// 事件类型字段。
+    /**
+     * 事件类型字段。
+     */
     private String eventType = "PERSONAL";
 
-    /// 可见范围。
+    /**
+     * 可见范围。
+     */
     private String visibility = "PRIVATE";
 
-    /// 位置。
+    /**
+     * 位置。
+     */
     private String location;
 
-    /// 参与人 ID 列表。
+    /**
+     * 参与人 ID 列表。
+     */
     private String participantIds;
 }

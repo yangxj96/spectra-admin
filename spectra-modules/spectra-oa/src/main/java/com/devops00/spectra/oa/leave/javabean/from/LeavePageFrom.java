@@ -18,17 +18,23 @@ package com.devops00.spectra.oa.leave.javabean.from;
 
 import lombok.Data;
 
-/// 请假申请分页条件。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假申请分页条件。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class LeavePageFrom {
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 请假类型编码。
+    /**
+     * 请假类型编码。
+     */
     private String leaveTypeCode;
 }

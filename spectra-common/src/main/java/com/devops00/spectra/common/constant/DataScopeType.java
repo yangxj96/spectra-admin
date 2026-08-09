@@ -20,11 +20,13 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
-/// 数据范围类型
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/28 18:00
+/**
+ * 数据范围类型
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/28 18:00
+ */
 @Getter
 public enum DataScopeType {
 

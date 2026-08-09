@@ -42,11 +42,13 @@ import lombok.extern.slf4j.Slf4j;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 
-/// OA 工作台摘要接口。复用现有 Dashboard，不新增工作台页面路由。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 工作台摘要接口。复用现有 Dashboard，不新增工作台页面路由。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Slf4j
 @RestController
 @RequestMapping("/oa/workbench")
@@ -60,7 +62,9 @@ public class WorkbenchController {
     private final CalendarService calendarService;
     private final MeetingService meetingService;
 
-    /// 查询 OA 工作台摘要。
+    /**
+     * 查询 OA 工作台摘要。
+     */
     @ULog("'查询 OA 工作台摘要'")
     @GetMapping(value = "/summary", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_WORKBENCH:QUERY')")

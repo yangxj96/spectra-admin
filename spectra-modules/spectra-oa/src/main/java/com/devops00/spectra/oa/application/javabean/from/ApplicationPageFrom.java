@@ -18,20 +18,28 @@ package com.devops00.spectra.oa.application.javabean.from;
 
 import lombok.Data;
 
-/// OA 申请分页筛选条件。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请分页筛选条件。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class ApplicationPageFrom {
 
-    /// 类型编码。
+    /**
+     * 类型编码。
+     */
     private String typeCode;
 
-    /// 状态。
+    /**
+     * 状态。
+     */
     private String status;
 
-    /// 搜索关键字。
+    /**
+     * 搜索关键字。
+     */
     private String keyword;
 }

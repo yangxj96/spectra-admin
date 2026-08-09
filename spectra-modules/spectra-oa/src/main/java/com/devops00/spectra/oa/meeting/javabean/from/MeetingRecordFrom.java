@@ -19,15 +19,19 @@ package com.devops00.spectra.oa.meeting.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-/// 会议纪要保存参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 会议纪要保存参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class MeetingRecordFrom {
 
-    /// 会议纪要内容。
+    /**
+     * 会议纪要内容。
+     */
     @NotBlank(message = "会议纪要内容不能为空")
     private String content;
 }

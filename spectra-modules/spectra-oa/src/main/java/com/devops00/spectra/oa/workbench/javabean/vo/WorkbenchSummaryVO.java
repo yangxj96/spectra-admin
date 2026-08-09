@@ -24,39 +24,59 @@ import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 import com.devops00.spectra.oa.meeting.javabean.vo.MeetingVO;
 
-/// OA 工作台摘要。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 工作台摘要。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Data
 public class WorkbenchSummaryVO {
 
-    /// 待办数量。
+    /**
+     * 待办数量。
+     */
     private long todoCount;
 
-    /// 未读通知数量。
+    /**
+     * 未读通知数量。
+     */
     private long unreadNotificationCount;
 
-    /// 草稿数量。
+    /**
+     * 草稿数量。
+     */
     private long draftCount;
 
-    /// 审批中数量。
+    /**
+     * 审批中数量。
+     */
     private long inReviewCount;
 
-    /// 已通过数量。
+    /**
+     * 已通过数量。
+     */
     private long approvedCount;
 
-    /// 已驳回数量。
+    /**
+     * 已驳回数量。
+     */
     private long rejectedCount;
 
-    /// 未读公告数量。
+    /**
+     * 未读公告数量。
+     */
     private long unreadNoticeCount;
 
-    /// 今日日程数量。
+    /**
+     * 今日日程数量。
+     */
     private long todayCalendarCount;
 
-    /// 待开始会议数量。
+    /**
+     * 待开始会议数量。
+     */
     private long upcomingMeetingCount;
     private List<NoticeVO> notices = List.of();
     private List<CalendarVO> calendarItems = List.of();

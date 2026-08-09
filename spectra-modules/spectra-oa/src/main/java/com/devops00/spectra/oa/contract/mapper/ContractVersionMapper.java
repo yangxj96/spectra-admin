@@ -19,10 +19,12 @@ package com.devops00.spectra.oa.contract.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
 
-/// 合同版本 Mapper。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 合同版本 Mapper。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 public interface ContractVersionMapper extends BaseMapper<ContractVersion> {
 }

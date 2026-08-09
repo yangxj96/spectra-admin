@@ -20,19 +20,25 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 会议分页查询入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/11
+/**
+ * 会议分页查询入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/11
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class MeetingPageFrom {
 
-    /// 会议标题（模糊搜索）
+    /**
+     * 会议标题（模糊搜索）
+     */
     private String title;
 
-    /// 会议状态
+    /**
+     * 会议状态
+     */
     private String status;
 }

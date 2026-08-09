@@ -26,21 +26,27 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/// 业务异常拦截
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/2/19 23:24
+/**
+ * 业务异常拦截
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/2/19 23:24
+ */
 @Slf4j
 @Order(-50)
 @RestControllerAdvice
 public class LoginExceptionAdvice {
 
-    /// 登陆失败拦截
-    ///
-    /// @param e        [LoginException]错误信息
-    /// @param response [HttpServletResponse]响应对象
-    /// @return 通用响应对象
+    /**
+     * 登陆失败拦截
+     *
+     * @param e
+     *            [LoginException]错误信息
+     * @param response
+     *            [HttpServletResponse]响应对象
+     * @return 通用响应对象
+     */
     @ExceptionHandler(LoginException.class)
     public R<Object> handleLoginException(LoginException e, HttpServletResponse response) {
         response.setStatus(HttpStatus.UNAUTHORIZED.value());

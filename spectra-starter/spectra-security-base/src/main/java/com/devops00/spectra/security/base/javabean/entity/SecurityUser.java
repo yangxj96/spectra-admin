@@ -30,69 +30,105 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.*;
 
-/// 用DTO传输类
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/2 17:55
+/**
+ * 用DTO传输类
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/2 17:55
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
 
-    ///  用户ID
+    /**
+     * 用户ID
+     */
     private UUID id;
 
-    /// 姓名
+    /**
+     * 姓名
+     */
     private String name;
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     private String email;
 
-    /// 头像
+    /**
+     * 头像
+     */
     private String avatar;
 
-    /// 所属组织机构ID
+    /**
+     * 所属组织机构ID
+     */
     private String organizationId;
 
-    /// 有效数据范围类型
+    /**
+     * 有效数据范围类型
+     */
     @Nullable
     private DataScopeType dataScopeType;
 
-    /// 所属部门ID
+    /**
+     * 所属部门ID
+     */
     @Nullable
     private UUID departmentId;
 
-    /// 数据范围目标部门（DEPT/DEPT_AND_CHILDREN/CUSTOM 时填充）
+    /**
+     * 数据范围目标部门（DEPT/DEPT_AND_CHILDREN/CUSTOM 时填充）
+     */
     @Nullable
     private List<UUID> dataScopeTargetIds;
 
-    /// 用户密码
+    /**
+     * 用户密码
+     */
     private String password;
 
-    /// 用户状态
+    /**
+     * 用户状态
+     */
     private Short state;
 
-    /// 时区
+    /**
+     * 时区
+     */
     private String timezone;
 
-    /// 是否启用。
+    /**
+     * 是否启用。
+     */
     private boolean enabled = true;
 
-    /// 账户是否未过期。
+    /**
+     * 账户是否未过期。
+     */
     private boolean accountNonExpired = true;
 
-    /// 账户是否未锁定。
+    /**
+     * 账户是否未锁定。
+     */
     private boolean accountNonLocked = true;
 
-    /// 凭证是否未过期。
+    /**
+     * 凭证是否未过期。
+     */
     private boolean credentialsNonExpired = true;
 
-    /// 扩展数据字段。
+    /**
+     * 扩展数据字段。
+     */
     @Nullable
     private transient Map<String, Object> extraData;
 
-    /// 简易权限处理,主要是为了序列化的问题
+    /**
+     * 简易权限处理,主要是为了序列化的问题
+     */
     private List<SimpleGrantedAuthority> authorities;
 
     @Override

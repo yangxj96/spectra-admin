@@ -28,22 +28,28 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-/// 验证码相关错误处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/28 00:00
+/**
+ * 验证码相关错误处理
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/28 00:00
+ */
 @Slf4j
 @NullMarked
 @Order(-100)
 @RestControllerAdvice
 public class KaptchaExceptionAdvice {
 
-    /// 验证码不匹配
-    ///
-    /// @param e        错误信息
-    /// @param response 响应
-    /// @return 格式化为正常响应返回
+    /**
+     * 验证码不匹配
+     *
+     * @param e
+     *            错误信息
+     * @param response
+     *            响应
+     * @return 格式化为正常响应返回
+     */
     @ExceptionHandler(KaptchaNotMatchException.class)
     public R<Object> kaptchaNotMatchException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
@@ -51,11 +57,15 @@ public class KaptchaExceptionAdvice {
         return R.failure("验证码不匹配");
     }
 
-    /// 验证码过期
-    ///
-    /// @param e        错误信息
-    /// @param response 响应
-    /// @return 格式化为正常响应返回
+    /**
+     * 验证码过期
+     *
+     * @param e
+     *            错误信息
+     * @param response
+     *            响应
+     * @return 格式化为正常响应返回
+     */
     @ExceptionHandler(KaptchaExpiresException.class)
     public R<Object> kaptchaExpiresException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());

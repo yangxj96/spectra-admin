@@ -20,16 +20,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 发送短信验证码入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/6/28
+/**
+ * 发送短信验证码入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/6/28
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class SmsCodeFrom {
 
-    /// 手机号码。
+    /**
+     * 手机号码。
+     */
     private String phone;
 }

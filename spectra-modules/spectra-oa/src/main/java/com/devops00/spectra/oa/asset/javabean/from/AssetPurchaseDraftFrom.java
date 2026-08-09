@@ -21,22 +21,30 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-/// 根据采购收货生成资产入库草稿参数。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/8
+/**
+ * 根据采购收货生成资产入库草稿参数。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/8
+ */
 @Data
 public class AssetPurchaseDraftFrom {
 
-    /// 采购单 ID。
+    /**
+     * 采购单 ID。
+     */
     @NotNull(message = "采购申请不能为空")
     private UUID purchaseId;
 
-    /// 收货单 ID。
+    /**
+     * 收货单 ID。
+     */
     @NotNull(message = "采购收货单不能为空")
     private UUID receiptId;
 
-    /// 分类 ID。
+    /**
+     * 分类 ID。
+     */
     private UUID categoryId;
 }

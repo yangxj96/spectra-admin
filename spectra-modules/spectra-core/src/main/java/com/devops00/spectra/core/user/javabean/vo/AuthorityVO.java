@@ -22,25 +22,35 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 权限VO
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 权限VO
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthorityVO {
 
-    /// 数据id.
+    /**
+     * 数据id.
+     */
     private UUID id;
 
-    /// 父级 ID。
+    /**
+     * 父级 ID。
+     */
     private UUID pid;
 
-    /// 权限名称
+    /**
+     * 权限名称
+     */
     private String name;
 
-    /// 编码
+    /**
+     * 编码
+     */
     private String code;
 }

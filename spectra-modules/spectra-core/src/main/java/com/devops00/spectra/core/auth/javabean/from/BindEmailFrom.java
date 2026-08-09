@@ -22,22 +22,28 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/// 绑定邮箱入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/19
+/**
+ * 绑定邮箱入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/19
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class BindEmailFrom {
 
-    /// 邮箱
+    /**
+     * 邮箱
+     */
     @NotBlank(message = "邮箱不能为空")
     @Email(message = "邮箱格式不正确")
     private String email;
 
-    /// 验证码
+    /**
+     * 验证码
+     */
     @NotBlank(message = "验证码不能为空")
     private String code;
 }

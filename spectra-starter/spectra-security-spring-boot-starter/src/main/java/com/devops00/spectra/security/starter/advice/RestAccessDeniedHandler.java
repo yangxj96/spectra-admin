@@ -28,11 +28,13 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-/// 权限错误处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/8 14:45
+/**
+ * 权限错误处理
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/8 14:45
+ */
 @Component
 @NullMarked
 public class RestAccessDeniedHandler implements AccessDeniedHandler {

@@ -29,42 +29,58 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-/// 菜单保存接口
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 菜单保存接口
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuSaveFrom {
 
-    /// 数据id
+    /**
+     * 数据id
+     */
     @NotNull(message = "ID不能为空", groups = Verify.Update.class)
     @Null(message = "新增时不能有ID存在", groups = Verify.Insert.class)
     private UUID id;
 
-    /// 父级ID
+    /**
+     * 父级ID
+     */
     private UUID pid;
 
-    /// 图标
+    /**
+     * 图标
+     */
     @NotNull(message = "图标不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String icon;
 
-    /// 菜单节点类型
+    /**
+     * 菜单节点类型
+     */
     @NotNull(message = "菜单类型不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     @JsonAlias("menuType")
     private MenuType menuType;
 
-    /// 对应前端命名路由
+    /**
+     * 对应前端命名路由
+     */
     @JsonAlias("routeName")
     private String routeName;
 
-    /// 名称
+    /**
+     * 名称
+     */
     @NotBlank(message = "菜单名称不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private String name;
 
-    /// 排序
+    /**
+     * 排序
+     */
     @NotNull(message = "排序不能为空", groups = {Verify.Insert.class, Verify.Update.class, Default.class})
     private Integer sort;
 }

@@ -20,15 +20,17 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 
-/// RESTFul 接口公用service层
-///
-/// @param <M>
-///            子类对应的mapper
-/// @param <O>
-///            子类对应的实体
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025-6-14 00:00
+/**
+ * RESTFul 接口公用service层
+ *
+ * @param <M>
+ *            子类对应的mapper
+ * @param <O>
+ *            子类对应的实体
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025-6-14 00:00
+ */
 @Slf4j
 public class BaseServiceImpl<M extends BaseMapper<O>, O extends BaseEntity> extends ServiceImpl<M, O> implements BaseService<O> {
 

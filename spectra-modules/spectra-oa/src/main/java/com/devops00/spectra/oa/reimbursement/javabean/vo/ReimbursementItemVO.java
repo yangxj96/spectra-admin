@@ -22,32 +22,48 @@ import java.util.UUID;
 
 import lombok.Data;
 
-/// 报销明细响应视图。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/7
+/**
+ * 报销明细响应视图。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/7
+ */
 @Data
 public class ReimbursementItemVO {
 
-    /// 主键 ID。
+    /**
+     * 主键 ID。
+     */
     private UUID id;
 
-    /// 费用日期。
+    /**
+     * 费用日期。
+     */
     private LocalDate expenseDate;
 
-    /// 分类。
+    /**
+     * 分类。
+     */
     private String category;
 
-    /// 描述。
+    /**
+     * 描述。
+     */
     private String description;
 
-    /// 金额。
+    /**
+     * 金额。
+     */
     private BigDecimal amount;
 
-    /// 税额。
+    /**
+     * 税额。
+     */
     private BigDecimal taxAmount;
 
-    /// 发票编号。
+    /**
+     * 发票编号。
+     */
     private String invoiceNo;
 }

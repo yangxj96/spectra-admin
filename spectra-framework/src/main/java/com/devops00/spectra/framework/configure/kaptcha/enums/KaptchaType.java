@@ -16,11 +16,13 @@
 
 package com.devops00.spectra.framework.configure.kaptcha.enums;
 
-/// 验证码类型
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/7/25 00:00
+/**
+ * 验证码类型
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/7/25 00:00
+ */
 public enum KaptchaType {
     CHAT,
     MATH

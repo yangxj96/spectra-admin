@@ -28,34 +28,48 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 import java.util.UUID;
 
-/// 角色操作入参
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/14 00:00
+/**
+ * 角色操作入参
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/14 00:00
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoleFrom {
 
-    /// 角色ID
+    /**
+     * 角色ID
+     */
     @Null(message = "新增不能指定角色ID", groups = Verify.Insert.class)
     @NotNull(message = "角色ID不能为空", groups = Verify.Update.class)
     private UUID id;
 
-    /// 角色名称
+    /**
+     * 角色名称
+     */
     @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
 
-    /// 范围
+    /**
+     * 范围
+     */
     private DataScopeType scope;
 
-    /// CUSTOM 范围目标部门
+    /**
+     * CUSTOM 范围目标部门
+     */
     private List<UUID> targetIds;
 
-    /// 状态
+    /**
+     * 状态
+     */
     private Boolean state;
 
-    /// 备注
+    /**
+     * 备注
+     */
     private String remark;
 }

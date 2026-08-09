@@ -27,11 +27,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-/// 服务器信息监控
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/11/11 00:00
+/**
+ * 服务器信息监控
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/11/11 00:00
+ */
 @Slf4j
 @RestController
 @RequestMapping("/service/monitor")
@@ -43,9 +45,11 @@ public class ServiceMonitorController {
         this.bindService = bindService;
     }
 
-    /// 获取服务器 CPU 信息
-    ///
-    /// @return CPU 信息
+    /**
+     * 获取服务器 CPU 信息
+     *
+     * @return CPU 信息
+     */
     @ULog("'获取CPU信息'")
     @GetMapping(value = "/getCPUInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")
@@ -53,9 +57,11 @@ public class ServiceMonitorController {
         return bindService.getCPUInfo();
     }
 
-    /// 获取服务器内存信息
-    ///
-    /// @return 内存信息
+    /**
+     * 获取服务器内存信息
+     *
+     * @return 内存信息
+     */
     @ULog("'获取内存信息'")
     @GetMapping(value = "/getRAMInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")
@@ -63,9 +69,11 @@ public class ServiceMonitorController {
         return bindService.getRAMInfo();
     }
 
-    /// 获取服务器内存信息
-    ///
-    /// @return 内存信息
+    /**
+     * 获取服务器内存信息
+     *
+     * @return 内存信息
+     */
     @ULog("'获取JVM信息'")
     @GetMapping(value = "/getJVMInfo", version = "1.0.0+")
     @PreAuthorize("hasRole(@sec.administrators())")

@@ -31,11 +31,13 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-/// 认证错误处理
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/8 14:43
+/**
+ * 认证错误处理
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/8 14:43
+ */
 @Component
 @NullMarked
 public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

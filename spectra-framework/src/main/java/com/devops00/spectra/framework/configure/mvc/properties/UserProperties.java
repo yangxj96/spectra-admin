@@ -19,15 +19,19 @@ package com.devops00.spectra.framework.configure.mvc.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-/// 用户配置相关
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/6/16 00:00
+/**
+ * 用户配置相关
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/6/16 00:00
+ */
 @Data
 @ConfigurationProperties(prefix = "spectra.user")
 public class UserProperties {
 
-    /// 默认密码
+    /**
+     * 默认密码
+     */
     private String defaultPassword;
 }

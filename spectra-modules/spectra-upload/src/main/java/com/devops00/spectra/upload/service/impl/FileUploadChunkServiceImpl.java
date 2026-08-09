@@ -25,11 +25,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-/// 文件分片信息服务默认实现
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/4/2 11:47
+/**
+ * 文件分片信息服务默认实现
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/4/2 11:47
+ */
 @Slf4j
 @Service
 public class FileUploadChunkServiceImpl extends BaseServiceImpl<FileUploadChunkMapper, FileUploadChunk> implements FileUploadChunkService {

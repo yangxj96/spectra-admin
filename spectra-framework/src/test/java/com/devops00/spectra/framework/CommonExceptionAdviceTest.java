@@ -26,11 +26,13 @@ import org.springframework.security.access.AccessDeniedException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/// 通用异常处理测试
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/7/30
+/**
+ * 通用异常处理测试
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/7/30
+ */
 class CommonExceptionAdviceTest {
 
     @Test

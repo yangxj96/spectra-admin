@@ -28,11 +28,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-/// 用户数据范围
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/23 11:24
+/**
+ * 用户数据范围
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/23 11:24
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -40,11 +42,15 @@ import lombok.NoArgsConstructor;
 @TableName(value = "sys_user_data_scope", schema = "spectra_core")
 public class UserDataScope extends BaseEntity {
 
-    /// 用户ID
+    /**
+     * 用户ID
+     */
     @TableField(value = "user_id")
     private UUID userId;
 
-    /// 数据范围类型
+    /**
+     * 数据范围类型
+     */
     @TableField(value = "scope_type")
     private DataScopeType scopeType;
 }

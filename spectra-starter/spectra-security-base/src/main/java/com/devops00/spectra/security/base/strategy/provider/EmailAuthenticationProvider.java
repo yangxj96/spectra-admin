@@ -24,11 +24,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 
-/// 邮箱登录
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/29 10:46
+/**
+ * 邮箱登录
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/29 10:46
+ */
 @Slf4j
 @NullMarked
 public abstract class EmailAuthenticationProvider implements BasicAuthenticationProvider {

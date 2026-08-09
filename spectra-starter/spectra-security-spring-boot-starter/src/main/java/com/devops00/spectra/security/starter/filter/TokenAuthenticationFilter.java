@@ -30,11 +30,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/// token鉴权过滤器
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2025/12/2 23:45
+/**
+ * token鉴权过滤器
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2025/12/2 23:45
+ */
 @NullMarked
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 

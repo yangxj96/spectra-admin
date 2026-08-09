@@ -29,11 +29,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/// 请假申请业务明细。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * 请假申请业务明细。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true)
@@ -41,35 +43,51 @@ import lombok.Setter;
 @DataScope
 public class LeaveApplication extends BaseEntity {
 
-    /// 申请 ID。
+    /**
+     * 申请 ID。
+     */
     @TableField("application_id")
     private UUID applicationId;
 
-    /// 部门 ID。
+    /**
+     * 部门 ID。
+     */
     @TableField("department_id")
     private UUID departmentId;
 
-    /// 请假类型编码。
+    /**
+     * 请假类型编码。
+     */
     @TableField("leave_type_code")
     private String leaveTypeCode;
 
-    /// 开始时间。
+    /**
+     * 开始时间。
+     */
     @TableField("start_time")
     private Instant startTime;
 
-    /// 结束时间。
+    /**
+     * 结束时间。
+     */
     @TableField("end_time")
     private Instant endTime;
 
-    /// 时长（小时）。
+    /**
+     * 时长（小时）。
+     */
     @TableField("duration_hours")
     private BigDecimal durationHours;
 
-    /// 原因。
+    /**
+     * 原因。
+     */
     @TableField("reason")
     private String reason;
 
-    /// 联系地址。
+    /**
+     * 联系地址。
+     */
     @TableField("contact_address")
     private String contactAddress;
 }

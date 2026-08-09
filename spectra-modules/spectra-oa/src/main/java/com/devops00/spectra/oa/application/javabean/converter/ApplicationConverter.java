@@ -28,28 +28,42 @@ import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 
-/// OA 申请 MapStruct 转换器。
-///
-/// @author yangxj96
-/// @version 1.0
-/// @since 2026/8/9
+/**
+ * OA 申请 MapStruct 转换器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/9
+ */
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface ApplicationConverter {
-    /// 申请实体转视图对象。
+    /**
+     * 申请实体转视图对象。
+     */
     ApplicationVO toVO(Application source);
 
-    /// 申请实体列表转视图列表。
+    /**
+     * 申请实体列表转视图列表。
+     */
     List<ApplicationVO> toVOList(List<Application> source);
 
-    /// 申请类型实体转视图对象。
+    /**
+     * 申请类型实体转视图对象。
+     */
     ApplicationTypeVO toTypeVO(ApplicationType source);
 
-    /// 申请类型实体列表转视图列表。
+    /**
+     * 申请类型实体列表转视图列表。
+     */
     List<ApplicationTypeVO> toTypeVOList(List<ApplicationType> source);
 
-    /// 申请类型保存入参转实体。
+    /**
+     * 申请类型保存入参转实体。
+     */
     ApplicationType toTypeEntity(ApplicationTypeSaveFrom source);
 
-    /// 使用申请类型保存入参更新实体。
+    /**
+     * 使用申请类型保存入参更新实体。
+     */
     void updateTypeEntity(ApplicationTypeSaveFrom source, @org.mapstruct.MappingTarget ApplicationType target);
 }
