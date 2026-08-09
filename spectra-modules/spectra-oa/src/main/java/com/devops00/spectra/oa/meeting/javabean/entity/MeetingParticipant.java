@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
@@ -76,5 +75,4 @@ public class MeetingParticipant extends BaseEntity {
     /// 所属部门ID
     @TableField("department_id")
     private UUID departmentId;
-
 }

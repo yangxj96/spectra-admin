@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.configuration.rag;
 
-
 import com.devops00.spectra.ai.configuration.rag.store.PostgresEmbeddingStore;
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import dev.langchain4j.data.segment.TextSegment;

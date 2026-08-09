@@ -51,7 +51,8 @@ public class KaptchaServiceImpl implements KaptchaService {
 
     private final HttpServletResponse response;
 
-    public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties, RedisTemplate<String, Object> redisTemplate, HttpServletRequest request, HttpServletResponse response) {
+    public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties, RedisTemplate<String, Object> redisTemplate,
+            HttpServletRequest request, HttpServletResponse response) {
         this.kaptchaProducer = kaptchaProducer;
         this.properties = properties;
         this.redisTemplate = redisTemplate;

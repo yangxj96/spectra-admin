@@ -51,7 +51,6 @@ public class KaptchaExceptionAdvice {
         return R.failure("验证码不匹配");
     }
 
-
     /// 验证码过期
     ///
     /// @param e        错误信息
@@ -63,5 +62,4 @@ public class KaptchaExceptionAdvice {
         log.error("{}验证码过期,{}", LogPrefix.KAPTCHA.p(), e.getMessage(), e);
         return R.failure("验证码过期");
     }
-
 }

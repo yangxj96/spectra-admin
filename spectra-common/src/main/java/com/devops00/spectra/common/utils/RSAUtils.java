@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.utils;
 
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
@@ -116,5 +115,4 @@ public class RSAUtils {
     public static String getPrivateKeyBase64(PrivateKey privateKey) {
         return Base64.getEncoder().encodeToString(privateKey.getEncoded());
     }
-
 }

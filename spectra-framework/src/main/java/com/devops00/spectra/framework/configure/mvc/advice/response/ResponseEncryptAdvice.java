@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.mvc.advice.response;
 
-
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.AESUtils;
@@ -97,7 +96,8 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             Encrypt methodAnno = AnnotatedElementUtils.findMergedAnnotation(method, Encrypt.class);
             if (methodAnno != null) {
                 if (!methodAnno.value() || !methodAnno.response()) {
-                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), methodAnno.value(), methodAnno.response(), method.getName());
+                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), methodAnno.value(), methodAnno.response(),
+                            method.getName());
                 }
                 return methodAnno.value() && methodAnno.response();
             }
@@ -105,7 +105,8 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             Encrypt classAnno = AnnotatedElementUtils.findMergedAnnotation(method.getDeclaringClass(), Encrypt.class);
             if (classAnno != null) {
                 if (!classAnno.value() || !classAnno.response()) {
-                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(), method.getDeclaringClass().getSimpleName());
+                    log.debug("{}跳过响应加密: @Encrypt(value={},response={}) on {}", LogPrefix.WEB.p(), classAnno.value(), classAnno.response(),
+                            method.getDeclaringClass().getSimpleName());
                 }
                 return classAnno.value() && classAnno.response();
             }
@@ -122,11 +123,11 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public @Nullable Object beforeBodyWrite(@Nullable Object body,
-                                            MethodParameter returnType,
-                                            MediaType contentType,
-                                            Class<? extends HttpMessageConverter<?>> converterType,
-                                            ServerHttpRequest request,
-                                            ServerHttpResponse response) {
+            MethodParameter returnType,
+            MediaType contentType,
+            Class<? extends HttpMessageConverter<?>> converterType,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
         // 第一：流式直接放行
         if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
                 || body instanceof Flux
@@ -197,5 +198,4 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             throw new com.devops00.spectra.common.exception.EncryptException("响应加密失败", e);
         }
     }
-
 }

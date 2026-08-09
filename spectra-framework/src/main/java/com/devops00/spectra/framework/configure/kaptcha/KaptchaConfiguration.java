@@ -122,5 +122,4 @@ public class KaptchaConfiguration {
         defaultKaptcha.setConfig(config);
         return defaultKaptcha;
     }
-
 }

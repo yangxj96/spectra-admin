@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.controller;
 
-
 import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.service.FileTypeService;
@@ -153,5 +152,4 @@ public class UploadControllerTest {
             log.debug(fileType.toString());
         }
     }
-
 }

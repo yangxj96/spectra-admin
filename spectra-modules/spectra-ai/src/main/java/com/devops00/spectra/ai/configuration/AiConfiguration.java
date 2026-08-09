@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.configuration;
 
-
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.store.PostgresChatMemoryStore;
 import dev.langchain4j.data.segment.TextSegment;
@@ -92,5 +91,4 @@ public class AiConfiguration {
                 .contentRetriever(contentRetriever)
                 .build();
     }
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.annotation;
 
-
 import java.lang.annotation.*;
 
 /// 数据范围注解 — 声明实体如何参与数据权限过滤
@@ -57,12 +56,16 @@ public @interface DataScope {
     @interface Relation {
         /// 关联表所在 schema。为空时使用当前连接的 search_path。
         String schema() default "";
+
         /// 关联表名
         String table();
+
         /// 关联表中指向本实体的外键字段
         String joinColumn();
+
         /// 关联表中的用户标识字段
         String userColumn() default "user_id";
+
         /// 主表用于 IN 匹配的列名（默认 id，MeetingRecord 等关联需用 meeting_id）
         String mainColumn() default "id";
     }

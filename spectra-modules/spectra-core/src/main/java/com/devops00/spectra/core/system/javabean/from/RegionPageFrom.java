@@ -32,5 +32,4 @@ public class RegionPageFrom {
 
     /// 搜索关键字。
     private String str;
-
 }

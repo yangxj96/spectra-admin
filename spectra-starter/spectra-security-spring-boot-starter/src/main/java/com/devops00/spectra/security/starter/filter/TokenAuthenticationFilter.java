@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.filter;
 
-
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
@@ -40,7 +39,8 @@ import java.io.IOException;
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException,
+            IOException {
         String token = SecUtil.getCurrentToken();
         if (StrUtils.isNotBlank(token)) {
             SecurityUser user = SecUtil.getCurrentUser(token);
@@ -55,5 +55,4 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         }
         chain.doFilter(request, response);
     }
-
 }

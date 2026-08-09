@@ -226,7 +226,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     /// 流程完成后按流程定义分发一次业务回调。回调实现按业务状态保证幂等。
     private void dispatchIfFinished(String processInstanceId, String processDefinitionId,
-                                    boolean approved, String reason) {
+            boolean approved, String reason) {
         var historic = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(processInstanceId).singleResult();
         if (historic == null || historic.getEndTime() == null) {

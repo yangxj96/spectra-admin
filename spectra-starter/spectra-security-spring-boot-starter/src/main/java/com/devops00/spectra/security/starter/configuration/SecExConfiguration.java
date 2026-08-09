@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
-
 import com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler;
 import com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
@@ -44,5 +43,4 @@ public class SecExConfiguration {
     public AccessDeniedHandler restAccessDeniedHandler(ObjectMapper om) {
         return new RestAccessDeniedHandler(om);
     }
-
 }

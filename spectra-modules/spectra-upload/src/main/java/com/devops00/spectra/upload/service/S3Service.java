@@ -32,5 +32,4 @@ public interface S3Service {
     /// @param bucket 桶
     /// @param key    key
     String createUploadUrl(String bucket, String key);
-
 }

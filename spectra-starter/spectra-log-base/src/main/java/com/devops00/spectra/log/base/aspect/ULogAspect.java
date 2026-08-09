@@ -94,7 +94,8 @@ public class ULogAspect {
         }
     }
 
-    private void executeLogSafely(ProceedingJoinPoint point, ULog annotation, @Nullable Exception e, @Nullable Object result, long timeCost, String preParsedExplain) {
+    private void executeLogSafely(ProceedingJoinPoint point, ULog annotation, @Nullable Exception e, @Nullable Object result, long timeCost,
+            String preParsedExplain) {
         try {
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes == null) {
@@ -135,7 +136,6 @@ public class ULogAspect {
             // 6. 异步发布事件
             datum.setCurrentId(SecUtil.getCurrentUserId());
             publisher.save(datum);
-
         } catch (Exception ex) {
             // AOP 本身绝对不能向外抛出任何异常，绝不能因为记录日志失败而导致原本成功的业务回滚
             log.error("ULog 切面内部发生防御性崩溃: {}", ex.getMessage(), ex);

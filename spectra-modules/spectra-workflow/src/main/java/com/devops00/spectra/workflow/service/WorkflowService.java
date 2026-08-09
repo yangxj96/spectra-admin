@@ -26,7 +26,7 @@ public interface WorkflowService {
     /// 注册审批回调
     ///
     /// @param processDefinitionKey 流程定义KEY
-    /// @param callback            审批回调实现
+    /// @param callback             审批回调实现
     void registerCallback(String processDefinitionKey, ApprovalCallback callback);
 
     /// 获取审批回调

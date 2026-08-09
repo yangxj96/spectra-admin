@@ -77,5 +77,4 @@ public class Region extends BaseEntity {
     /// 排序
     @TableField(value = "sort")
     private Integer sort;
-
 }

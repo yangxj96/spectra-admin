@@ -33,5 +33,4 @@ public class FileUploadVO {
 
     /// 文件主键，供业务表建立附件关联
     private UUID fileId;
-
 }

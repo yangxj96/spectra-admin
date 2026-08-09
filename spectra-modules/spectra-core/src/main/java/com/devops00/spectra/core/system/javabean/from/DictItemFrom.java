@@ -64,5 +64,4 @@ public class DictItemFrom {
 
     /// 备注
     private String remark;
-
 }

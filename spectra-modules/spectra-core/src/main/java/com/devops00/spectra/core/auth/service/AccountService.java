@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.auth.service;
 
-
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
 import org.jspecify.annotations.NullMarked;
@@ -71,20 +70,20 @@ public interface AccountService extends BaseService<Account> {
     /// 绑定手机号
     ///
     /// @param userId 用户ID
-    /// @param phone 手机号
-    /// @param code 验证码
+    /// @param phone  手机号
+    /// @param code   验证码
     void bindPhone(UUID userId, String phone, String code);
 
     /// 绑定邮箱
     ///
     /// @param userId 用户ID
-    /// @param email 邮箱
-    /// @param code 验证码
+    /// @param email  邮箱
+    /// @param code   验证码
     void bindEmail(UUID userId, String email, String code);
 
     /// 解绑账号
     ///
-    /// @param userId 用户ID
+    /// @param userId    用户ID
     /// @param accountId 账号ID
     void unbind(UUID userId, UUID accountId);
 }

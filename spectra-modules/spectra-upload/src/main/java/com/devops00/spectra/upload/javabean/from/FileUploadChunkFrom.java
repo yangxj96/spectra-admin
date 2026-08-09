@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.from;
 
-
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,5 +44,4 @@ public class FileUploadChunkFrom {
 
     /// 当前idx
     private Integer index;
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.ai.tools;
 
-
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
 import com.devops00.spectra.ai.base.AiMemoryId;
@@ -50,5 +49,4 @@ public class AiDeptTool implements AiToolMarker {
             return departmentService.list();
         });
     }
-
 }

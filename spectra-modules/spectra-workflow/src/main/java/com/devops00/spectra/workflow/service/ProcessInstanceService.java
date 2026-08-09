@@ -57,7 +57,7 @@ public interface ProcessInstanceService {
     /// 终止流程
     ///
     /// @param processInstanceId 流程实例ID
-    /// @param reason           终止原因
+    /// @param reason            终止原因
     void terminate(String processInstanceId, String reason);
 
     /// 获取流程图（高亮当前节点）

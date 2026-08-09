@@ -63,5 +63,4 @@ public class MenuTreeVO implements Tree<MenuTreeVO>, Serializable {
     private Integer sort;
     /// 子级
     private List<MenuTreeVO> children = new ArrayList<>();
-
 }

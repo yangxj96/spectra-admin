@@ -30,5 +30,4 @@ public class UserProperties {
 
     /// 默认密码
     private String defaultPassword;
-
 }

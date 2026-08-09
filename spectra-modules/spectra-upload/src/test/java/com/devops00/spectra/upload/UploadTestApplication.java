@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload;
 
-
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 

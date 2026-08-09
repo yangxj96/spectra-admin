@@ -48,5 +48,4 @@ public class FormDefinitionSaveFrom {
     /// form-create完整输出
     @NotBlank(message = "表单JSON不能为空")
     private String formJson;
-
 }

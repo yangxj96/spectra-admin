@@ -186,5 +186,4 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
             dfs(childId, childrenMap, result);
         }
     }
-
 }

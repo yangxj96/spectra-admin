@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.from;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,5 +44,4 @@ public class MeetingParticipantFrom {
     /// |attendee|参会人|
     /// |optional|可选参会人|
     private String role;
-
 }

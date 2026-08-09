@@ -71,11 +71,11 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(@Nullable Object body,
-                                  MethodParameter returnType,
-                                  MediaType contentType,
-                                  Class<? extends HttpMessageConverter<?>> converterType,
-                                  ServerHttpRequest request,
-                                  ServerHttpResponse response) {
+            MethodParameter returnType,
+            MediaType contentType,
+            Class<? extends HttpMessageConverter<?>> converterType,
+            ServerHttpRequest request,
+            ServerHttpResponse response) {
 
         // 第一优先级：流式直接放行
         if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
@@ -134,5 +134,4 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
         }
         return r;
     }
-
 }

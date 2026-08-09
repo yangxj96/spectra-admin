@@ -60,5 +60,4 @@ public class CPUInfoVO {
 
     /// 最大支持频率
     private String maxFrequencyGhz;
-
 }

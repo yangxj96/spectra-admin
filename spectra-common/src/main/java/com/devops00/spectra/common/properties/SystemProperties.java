@@ -60,9 +60,7 @@ public class SystemProperties {
 
         /// 默认API版本号
         private String apiVersion = "1.0.0";
-
     }
-
 
     /// CORS相关配置
     @Data
@@ -88,6 +86,4 @@ public class SystemProperties {
         /// 默认一小时
         private Long maxAge = 3600L;
     }
-
-
 }

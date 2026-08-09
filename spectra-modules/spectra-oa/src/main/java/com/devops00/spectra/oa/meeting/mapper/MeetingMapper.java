@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 

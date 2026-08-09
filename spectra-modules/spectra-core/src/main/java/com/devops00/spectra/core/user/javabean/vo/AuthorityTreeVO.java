@@ -56,5 +56,4 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
 
     /// 子级
     private List<AuthorityTreeVO> children;
-
 }

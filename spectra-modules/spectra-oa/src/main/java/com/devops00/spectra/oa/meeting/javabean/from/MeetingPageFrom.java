@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.from;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

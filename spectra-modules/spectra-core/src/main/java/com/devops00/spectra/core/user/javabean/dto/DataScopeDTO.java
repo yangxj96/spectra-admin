@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.user.javabean.dto;
 
-
 import com.devops00.spectra.common.constant.DataScopeType;
 import lombok.Data;
 
@@ -36,5 +35,4 @@ public class DataScopeDTO {
 
     /// 部门目标ID
     List<UUID> targets;
-
 }

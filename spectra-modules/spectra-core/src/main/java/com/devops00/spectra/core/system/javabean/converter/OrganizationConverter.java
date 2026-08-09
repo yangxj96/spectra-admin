@@ -50,6 +50,5 @@ public interface OrganizationConverter {
     /// @param source 入参
     /// @return 实体
     Department toEntity(DepartmentFrom source);
-
 }
 

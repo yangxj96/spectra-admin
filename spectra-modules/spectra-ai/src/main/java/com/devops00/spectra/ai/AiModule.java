@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai;
 
-
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.ComponentScan;
 

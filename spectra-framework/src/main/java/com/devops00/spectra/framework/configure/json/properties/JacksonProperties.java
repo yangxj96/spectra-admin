@@ -36,5 +36,4 @@ public class JacksonProperties {
 
     /// LocalTime类序列化方式.
     private String localTimeFormat = "HH:mm:ss";
-
 }

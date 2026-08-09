@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.constant;
 
-
 import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
@@ -34,5 +33,4 @@ public final class Common {
 
     private Common() {
     }
-
 }

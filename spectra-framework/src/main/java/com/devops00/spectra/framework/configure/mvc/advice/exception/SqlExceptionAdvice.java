@@ -103,7 +103,6 @@ public class SqlExceptionAdvice {
         return R.failure("数据库操作异常,请稍后重试");
     }
 
-
     /// 【兜底】捕获所有Spring数据访问异常（包括未显式处理的）
     @ExceptionHandler(DataAccessException.class)
     public R<Object> handleDataAccessException(DataAccessException e, HttpServletResponse response) {
@@ -127,5 +126,4 @@ public class SqlExceptionAdvice {
         );
         return R.failure("数据库操作失败,请稍后重试");
     }
-
 }

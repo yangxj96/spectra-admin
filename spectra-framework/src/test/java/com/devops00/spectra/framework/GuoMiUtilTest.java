@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework;
 
-
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.common.utils.SHA256Utils;
@@ -128,7 +127,5 @@ public class GuoMiUtilTest {
         byte[] iv = AESUtils.hexToIv(ivHex);
         String decryptedData = AESUtils.decrypt(encryptedData, decryptedAesKey, iv);
         System.out.println("解密后的业务数据: " + decryptedData);
-
     }
-
 }

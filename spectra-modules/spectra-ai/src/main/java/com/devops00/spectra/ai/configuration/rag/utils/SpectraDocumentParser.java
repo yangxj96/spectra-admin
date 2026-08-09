@@ -126,7 +126,6 @@ public class SpectraDocumentParser implements DocumentParser {
                 HtmlToTextDocumentTransformer transformer = new HtmlToTextDocumentTransformer();
                 document = transformer.transform(document);
             }
-
         } catch (Exception e) {
             log.error("{} 底层解析器 [{}] 解析文件 [{}] 发生核心崩溃", LogPrefix.AI.p(), delegate.getClass().getSimpleName(), filename, e);
             throw new DataException("文档物理结构损坏，解析失败");

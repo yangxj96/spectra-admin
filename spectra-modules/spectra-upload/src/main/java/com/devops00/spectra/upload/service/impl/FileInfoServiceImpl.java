@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseServiceImpl;
@@ -77,5 +76,4 @@ public class FileInfoServiceImpl extends BaseServiceImpl<FileInfoMapper, FileInf
     public void deleteById(UUID id) {
         this.removeById(id);
     }
-
 }

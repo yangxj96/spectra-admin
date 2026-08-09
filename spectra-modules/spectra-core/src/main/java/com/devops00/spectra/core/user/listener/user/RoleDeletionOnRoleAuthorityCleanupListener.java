@@ -37,11 +37,9 @@ public class RoleDeletionOnRoleAuthorityCleanupListener {
 
     private final RelRoleAuthorityService relRoleAuthorityService;
 
-
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
         log.debug("{}角色删除事件监听-角色权限关联关系:{}", LogPrefix.CORE.p(), event.roleId());
         relRoleAuthorityService.revoke(event.roleId());
     }
-
 }

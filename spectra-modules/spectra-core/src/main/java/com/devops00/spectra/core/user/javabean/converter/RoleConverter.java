@@ -45,5 +45,4 @@ public interface RoleConverter {
     /// 分页实体转分页视图。
     @Mapping(target = "pages", ignore = true)
     Page<RoleVO> toVOPage(Page<Role> source);
-
 }

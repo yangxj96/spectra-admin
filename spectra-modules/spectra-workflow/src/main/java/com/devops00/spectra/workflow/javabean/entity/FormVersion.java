@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.workflow.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
@@ -56,5 +55,4 @@ public class FormVersion extends BaseEntity {
     /// form-create getJson()完整输出
     @TableField("form_json")
     private String formJson;
-
 }

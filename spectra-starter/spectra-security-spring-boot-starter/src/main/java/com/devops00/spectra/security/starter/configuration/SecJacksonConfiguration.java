@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SystemProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -59,5 +58,4 @@ public class SecJacksonConfiguration {
                 )
                 .build();
     }
-
 }

@@ -110,5 +110,4 @@ public class FormDefinitionController {
     public FormVersionVO getVersion(@PathVariable UUID id, @PathVariable Integer version) {
         return formDefinitionService.getVersion(id, version);
     }
-
 }

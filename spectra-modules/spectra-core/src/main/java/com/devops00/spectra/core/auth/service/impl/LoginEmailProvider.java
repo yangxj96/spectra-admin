@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.auth.service.AccountService;
@@ -51,7 +50,8 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private String currentEmail;
 
-    public LoginEmailProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService, SecurityUserHelper securityUserHelper) {
+    public LoginEmailProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
+            SecurityUserHelper securityUserHelper) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
         this.accountService = accountService;

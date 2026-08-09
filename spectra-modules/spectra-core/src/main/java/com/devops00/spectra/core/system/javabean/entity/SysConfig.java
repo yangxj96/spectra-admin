@@ -53,5 +53,4 @@ public class SysConfig extends BaseEntity {
     /// 备注说明
     @TableField(value = "remarks")
     private String remarks;
-
 }

@@ -85,5 +85,4 @@ public class DepartmentController {
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();
     }
-
 }

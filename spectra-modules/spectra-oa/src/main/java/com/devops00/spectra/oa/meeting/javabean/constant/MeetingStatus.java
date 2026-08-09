@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.constant;
 
-
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 

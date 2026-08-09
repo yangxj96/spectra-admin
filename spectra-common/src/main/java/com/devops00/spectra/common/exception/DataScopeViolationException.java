@@ -26,5 +26,4 @@ public class DataScopeViolationException extends SpectraException {
     public DataScopeViolationException(String message) {
         super(message);
     }
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.exception;
 
-
 import org.springframework.security.authentication.BadCredentialsException;
 
 /// 登录异常

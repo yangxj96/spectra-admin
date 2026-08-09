@@ -57,5 +57,4 @@ public class UserOnlineVO {
 
     /// 关联的token
     private String token;
-
 }

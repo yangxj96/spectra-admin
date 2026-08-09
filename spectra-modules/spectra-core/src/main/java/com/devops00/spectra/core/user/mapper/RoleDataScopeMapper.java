@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.user.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.user.javabean.entity.RoleDataScope;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,5 +36,4 @@ public interface RoleDataScopeMapper extends BaseMapper<RoleDataScope> {
     /// @param roleId 角色ID
     /// @return 数据范围信息
     RoleDataScope findByRoleId(@Param("roleId") UUID roleId);
-
 }

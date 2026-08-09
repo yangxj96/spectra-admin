@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.constant;
 
-
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
@@ -43,6 +42,4 @@ public enum UploadType implements IEnum<String> {
         this.value = value;
         this.name = name;
     }
-
-
 }

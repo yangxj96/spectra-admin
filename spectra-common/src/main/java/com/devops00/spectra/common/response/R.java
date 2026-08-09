@@ -94,5 +94,4 @@ public class R<T> implements Serializable {
     public static R<Object> failure(HttpStatus status, String msg) {
         return R.builder().code(status.value()).msg(msg).build();
     }
-
 }

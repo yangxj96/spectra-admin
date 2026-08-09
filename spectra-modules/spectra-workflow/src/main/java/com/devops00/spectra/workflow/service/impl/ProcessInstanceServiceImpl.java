@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
-
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.workflow.javabean.converter.ProcessConverter;
@@ -78,7 +77,6 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
             log.info("流程已启动: processInstanceId={}, businessKey={}", instance.getId(), businessKey);
             return instance.getId();
-
         } catch (Exception e) {
             // 3. 统一异常
             throw new DataException("启动流程失败: " + e.getMessage());

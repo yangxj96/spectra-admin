@@ -61,5 +61,4 @@ public class DepartmentFrom {
 
     /// 备注
     private String remark;
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.workflow.configuration;
 
-
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.spring.SpringProcessEngineConfiguration;

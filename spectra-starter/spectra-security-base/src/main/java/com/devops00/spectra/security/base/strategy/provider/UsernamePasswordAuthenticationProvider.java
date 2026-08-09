@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.strategy.provider;
 
-
 import com.devops00.spectra.security.base.strategy.tokens.UsernamePasswordCaptchaAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.workflow.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,5 +43,4 @@ public class HistoryController {
     GET /history/tasks
     GET /history/activities
      */
-
 }

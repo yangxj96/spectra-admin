@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.constant;
 
-
 import com.baomidou.mybatisplus.annotation.IEnum;
 import lombok.Getter;
 
@@ -64,5 +63,4 @@ public enum RegionLevel implements IEnum<Integer> {
     public Integer getValue() {
         return this.level;
     }
-
 }

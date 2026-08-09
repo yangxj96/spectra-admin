@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import org.apache.ibatis.annotations.Mapper;
 
-
 /// 系统配置Mapper层
 ///
 /// @author yangxj96

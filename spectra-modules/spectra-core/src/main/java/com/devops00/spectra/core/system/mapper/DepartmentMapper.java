@@ -23,7 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.UUID;
 
-
 /// 组织机构Mapper
 ///
 /// @author yangxj96

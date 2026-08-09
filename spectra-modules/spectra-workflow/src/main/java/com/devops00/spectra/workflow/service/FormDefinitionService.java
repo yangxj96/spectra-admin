@@ -83,5 +83,4 @@ public interface FormDefinitionService extends BaseService<FormDefinition> {
     /// @param version 版本号
     /// @return 版本详情
     FormVersionVO getVersion(UUID id, Integer version);
-
 }

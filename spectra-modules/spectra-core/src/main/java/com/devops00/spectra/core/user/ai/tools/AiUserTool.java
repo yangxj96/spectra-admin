@@ -49,5 +49,4 @@ public class AiUserTool implements AiToolMarker {
             return userService.list();
         });
     }
-
 }

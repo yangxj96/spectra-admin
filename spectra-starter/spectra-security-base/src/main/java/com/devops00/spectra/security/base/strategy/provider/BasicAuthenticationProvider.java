@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.strategy.provider;
 
-
 import org.springframework.security.authentication.AuthenticationProvider;
 
 /// 基础的认证适配器

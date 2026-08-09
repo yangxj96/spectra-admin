@@ -68,5 +68,4 @@ public interface DepartmentService extends BaseService<Department> {
     ///
     /// @return id列表
     Collection<UUID> getDescendantIds(UUID departmentId);
-
 }

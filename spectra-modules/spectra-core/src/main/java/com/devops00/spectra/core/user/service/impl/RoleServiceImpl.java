@@ -68,7 +68,6 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
 
     private final RoleDataScopeTargetMapper roleDataScopeTargetMapper;
 
-
     @Override
     @Transactional
     public void created(RoleFrom params) {

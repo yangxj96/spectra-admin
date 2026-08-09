@@ -26,5 +26,4 @@ public class DefaultDataException extends DataException {
     public DefaultDataException() {
         super("系统默认数据");
     }
-
 }

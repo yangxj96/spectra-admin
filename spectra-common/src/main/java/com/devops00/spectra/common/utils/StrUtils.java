@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.utils;
 
-
 import com.google.common.base.Strings;
 import org.jspecify.annotations.Nullable;
 

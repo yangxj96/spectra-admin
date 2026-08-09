@@ -41,7 +41,6 @@ public class S3Configuration {
 
     private final S3Properties properties;
 
-
     @Bean
     public S3Client s3Client() {
 

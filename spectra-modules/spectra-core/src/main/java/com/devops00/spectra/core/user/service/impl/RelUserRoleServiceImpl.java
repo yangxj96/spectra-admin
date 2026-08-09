@@ -94,6 +94,4 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
                 .eq(Role::getState, Boolean.TRUE)
                 .isNull(Role::getDeleted));
     }
-
-
 }

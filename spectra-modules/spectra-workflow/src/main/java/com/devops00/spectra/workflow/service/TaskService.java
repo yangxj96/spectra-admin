@@ -29,7 +29,7 @@ public interface TaskService {
 
     /// 查询待办任务
     ///
-    /// @param page     分页参数
+    /// @param page                 分页参数
     /// @param assignee             任务处理人用户名
     /// @param processDefinitionKey 可选流程定义KEY
     /// @return 待办任务分页列表
@@ -37,7 +37,7 @@ public interface TaskService {
 
     /// 查询已办任务
     ///
-    /// @param page     分页参数
+    /// @param page                 分页参数
     /// @param assignee             任务处理人用户名
     /// @param processDefinitionKey 可选流程定义KEY
     /// @return 已办任务分页列表
@@ -45,14 +45,14 @@ public interface TaskService {
 
     /// 完成任务（审批通过）
     ///
-    /// @param taskId  任务ID
+    /// @param taskId   任务ID
     /// @param comment  审批意见
     /// @param operator 当前处理人用户名
     void complete(String taskId, String comment, String operator);
 
     /// 驳回任务
     ///
-    /// @param taskId  任务ID
+    /// @param taskId   任务ID
     /// @param comment  驳回意见
     /// @param operator 当前处理人用户名
     void reject(String taskId, String comment, String operator);

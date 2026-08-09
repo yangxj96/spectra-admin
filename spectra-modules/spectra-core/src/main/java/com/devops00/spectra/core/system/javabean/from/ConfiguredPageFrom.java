@@ -32,5 +32,4 @@ public class ConfiguredPageFrom {
 
     /// 系统配置的key,模糊查询
     private String key;
-
 }

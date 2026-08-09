@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
 import com.devops00.spectra.common.exception.DataNotExistException;
@@ -304,7 +303,6 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         }
     }
 
-
     @Override
     public void preview(FileInfo file) {
         // 从当前线程的上下文中获取请求属性
@@ -471,5 +469,4 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         vo.setChunkNumber(chunkNumber);
         return vo;
     }
-
 }

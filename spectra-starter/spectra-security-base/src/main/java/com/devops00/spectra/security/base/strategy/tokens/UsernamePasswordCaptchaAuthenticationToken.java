@@ -56,5 +56,4 @@ public class UsernamePasswordCaptchaAuthenticationToken extends AbstractAuthenti
     public Object getPrincipal() {
         return username;
     }
-
 }

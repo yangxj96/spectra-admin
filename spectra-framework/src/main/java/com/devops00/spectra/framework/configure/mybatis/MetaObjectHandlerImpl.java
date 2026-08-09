@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.mybatis;
 
-
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -50,7 +49,6 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
 
     /// 统一部门归属字段（存在于带部门隔离的实体中）
     private static final String DEPARTMENT_ID = "departmentId";
-
 
     @Override
     public void insertFill(MetaObject metaObject) {
@@ -90,5 +88,4 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
     }
-
 }

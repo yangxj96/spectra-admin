@@ -89,7 +89,7 @@ class DataScopeIsolationTest {
     }
 
     private Expression invokeStructural(Table table, DataScope annotation,
-                                         DataScopeProvider.EffectiveScope scope) throws Exception {
+            DataScopeProvider.EffectiveScope scope) throws Exception {
         Method method = DataScopeInnerInterceptor.class.getDeclaredMethod(
                 "buildStructuralExpression", Table.class, DataScope.class, String.class,
                 DataScopeProvider.EffectiveScope.class, UUID.class);

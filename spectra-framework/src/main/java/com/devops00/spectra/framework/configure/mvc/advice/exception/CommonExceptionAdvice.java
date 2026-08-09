@@ -78,7 +78,6 @@ public class CommonExceptionAdvice {
         return R.failure("未找到资源");
     }
 
-
     /// 未进行功能实现异常
     ///
     /// @param e        错误信息
@@ -172,5 +171,4 @@ public class CommonExceptionAdvice {
         log.error("{}兜底异常处理,{}", LogPrefix.WEB.p(), e.getMessage(), e);
         return R.failure("系统内部错误,请联系管理员");
     }
-
 }

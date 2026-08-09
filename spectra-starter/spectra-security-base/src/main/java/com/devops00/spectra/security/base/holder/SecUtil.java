@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.holder;
 
-
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
@@ -38,7 +37,6 @@ public class SecUtil {
     /// 具体业务持有者
     @Nullable
     private static volatile SecHolderStrategy strategy;
-
 
     private SecUtil() {
     }

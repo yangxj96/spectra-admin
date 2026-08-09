@@ -100,6 +100,16 @@ spectra-launch       → 应用入口，运行此模块
 - **版本属性**：pom.xml 中使用 `${revision}`，由 `flatten-maven-plugin` 展平
 - **注释**：使用三斜杠（`///`）注释，非 Javadoc 块注释；每个 Java 文件必须包含 Apache License 2.0 头部
 
+### 代码格式化与校验
+
+- 统一格式配置：`config/idea-code-style.xml`
+- Java 缩进：4 个空格，不使用 Tab
+- Java 右边距：150 列
+- Maven 格式化：`.\mvnw.cmd spotless:apply`
+- Maven 校验：`.\mvnw.cmd verify`
+- Spotless 使用 IDEA Formatter；如果 `idea` 不在 PATH 中，使用 `-Dspotless.idea.binaryPath` 指定 IDEA 可执行文件路径
+- 当前使用 `origin/master` 作为渐进校验基线；需要全量校验时使用 `-Dspotless.ratchetFrom=NONE`
+
 ## 测试
 
 ```bash

@@ -67,5 +67,4 @@ public @interface NameFill {
     /// 该字段必须存在于当前 VO 类中，
     /// 且其类型需与 lookup.idType() 返回的类型一致。
     String sourceField();
-
 }

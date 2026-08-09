@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.strategy.tokens;
 
-
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -57,6 +56,4 @@ public class EmailAuthenticationToken extends AbstractAuthenticationToken {
     public Object getPrincipal() {
         return principal;
     }
-
-
 }

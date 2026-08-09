@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.eval;
 
-
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;

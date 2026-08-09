@@ -30,5 +30,4 @@ public class KaptchaException extends SpectraException {
     public KaptchaException(String message) {
         super(message);
     }
-
 }

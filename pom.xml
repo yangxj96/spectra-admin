@@ -28,6 +28,11 @@
         <!-- 项目版本 -->
         <revision>0.0.18</revision>
 
+        <!-- 代码格式化与校验 -->
+        <spotless.version>3.9.0</spotless.version>
+        <spotless.idea.binaryPath>idea</spotless.idea.binaryPath>
+        <spotless.ratchetFrom>origin/master</spotless.ratchetFrom>
+
         <!-- 数据库 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
         <!-- 工具包 -->
@@ -160,6 +165,36 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>${spotless.version}</version>
+                <configuration>
+                    <!-- 渐进启用：只校验相对基线分支发生变化的文件，避免重排整个历史代码。 -->
+                    <ratchetFrom>${spotless.ratchetFrom}</ratchetFrom>
+                    <formats>
+                        <format>
+                            <includes>
+                                <include>src/**/*.java</include>
+                            </includes>
+                            <idea>
+                                <codeStyleSettingsPath>${maven.multiModuleProjectDirectory}/config/idea-code-style.xml</codeStyleSettingsPath>
+                                <withDefaults>false</withDefaults>
+                                <binaryPath>${spotless.idea.binaryPath}</binaryPath>
+                            </idea>
+                        </format>
+                    </formats>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>spotless-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>

@@ -36,5 +36,4 @@ public class FilePageFrom {
 
     /// 存储类型(LOCAL/S3)
     private UploadType storageType;
-
 }

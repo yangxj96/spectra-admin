@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.properties;
 
-
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -34,5 +33,4 @@ public class LocalProperties {
 
     /// 上传文件的时候临时文件路径
     private String uploadTempDir = "temp";
-
 }

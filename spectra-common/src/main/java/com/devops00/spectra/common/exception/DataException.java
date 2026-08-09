@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.exception;
 
-
 /// 系统数据异常
 ///
 /// @author yangxj96

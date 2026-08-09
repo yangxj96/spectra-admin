@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.cache;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SystemProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -77,7 +76,6 @@ public class CacheConfiguration {
                 .build();
     }
 
-
     /// 定义一个redis专用的ObjectMapper
     @Bean("redisObjectMapper")
     public ObjectMapper redisObjectMapper(ObjectMapper om) {
@@ -105,5 +103,4 @@ public class CacheConfiguration {
                 )
                 .build();
     }
-
 }

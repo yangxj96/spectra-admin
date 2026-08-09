@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.from;
 
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;

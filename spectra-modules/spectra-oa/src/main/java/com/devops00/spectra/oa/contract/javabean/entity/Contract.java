@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.contract.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;

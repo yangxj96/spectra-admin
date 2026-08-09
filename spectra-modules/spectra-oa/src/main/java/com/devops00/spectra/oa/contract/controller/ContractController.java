@@ -136,7 +136,7 @@ public class ContractController {
     @PutMapping(value = "/{id}/milestones/{milestoneId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'OA_CONTRACT:UPDATE')")
     public void updateMilestone(@PathVariable UUID id, @PathVariable UUID milestoneId,
-                                @Validated @RequestBody ContractMilestoneUpdateFrom from) {
+            @Validated @RequestBody ContractMilestoneUpdateFrom from) {
         contractService.updateMilestone(id, milestoneId, from);
     }
 

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.exception;
 
-
 /// 未实现错误
 ///
 /// @author yangxj96
@@ -31,5 +30,4 @@ public class NotImplementedException extends SpectraException {
     public NotImplementedException(String message) {
         super(message);
     }
-
 }

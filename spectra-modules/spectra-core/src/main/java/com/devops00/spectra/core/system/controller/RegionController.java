@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.controller;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
@@ -107,5 +106,4 @@ public class RegionController {
     public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
     }
-
 }

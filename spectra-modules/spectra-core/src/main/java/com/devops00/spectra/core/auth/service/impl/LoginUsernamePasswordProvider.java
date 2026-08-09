@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.common.service.KaptchaService;
@@ -49,7 +48,8 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
 
     private final SecurityUserHelper securityUserHelper;
 
-    public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService, AccountService accountService, PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
+    public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService, AccountService accountService,
+            PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
         this.kaptchaService = kaptchaService;
         this.userService = userService;
         this.accountService = accountService;

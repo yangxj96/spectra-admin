@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
-
 import lombok.Data;
 
 import java.util.UUID;
@@ -43,5 +42,4 @@ public class FileUploadPreVO {
 
     /// 分片大小
     private long chunkSize;
-
 }

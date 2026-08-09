@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.javabean.from;
 
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -36,5 +35,4 @@ public class AiAskFrom {
     /// 问题消息
     @NotBlank(message = "消息内容不能为空")
     private String message;
-
 }

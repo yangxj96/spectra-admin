@@ -54,12 +54,12 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
     private final AuthorityService authorityService;
 
-    public RelRoleAuthorityServiceImpl(AuthorityConverter authorityConverter, RelRoleAuthorityMapper relRoleAuthorityMapper, AuthorityService authorityService) {
+    public RelRoleAuthorityServiceImpl(AuthorityConverter authorityConverter, RelRoleAuthorityMapper relRoleAuthorityMapper,
+            AuthorityService authorityService) {
         this.authorityConverter = authorityConverter;
         this.relRoleAuthorityMapper = relRoleAuthorityMapper;
         this.authorityService = authorityService;
     }
-
 
     @Override
     @Transactional
@@ -132,6 +132,4 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
         var coll = authorityService.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
         return authorityConverter.toVOList(coll);
     }
-
-
 }

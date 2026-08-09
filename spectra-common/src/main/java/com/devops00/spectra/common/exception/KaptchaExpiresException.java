@@ -30,5 +30,4 @@ public class KaptchaExpiresException extends KaptchaException {
     public KaptchaExpiresException(String message) {
         super(message);
     }
-
 }

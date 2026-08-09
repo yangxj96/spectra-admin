@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework;
 
-
 import org.springframework.context.annotation.ComponentScan;
 
 /// 基础设施模块

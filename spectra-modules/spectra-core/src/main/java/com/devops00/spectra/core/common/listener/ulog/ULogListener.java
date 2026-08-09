@@ -119,5 +119,4 @@ public class ULogListener {
 
         logService.save(datum);
     }
-
 }

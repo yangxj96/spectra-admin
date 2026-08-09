@@ -34,7 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 /// 系统配置Service层默认实现
 ///
 /// @author yangxj96
@@ -49,7 +48,6 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
     public ConfiguredServiceImpl(ConfiguredConverter configuredConverter) {
         this.configuredConverter = configuredConverter;
     }
-
 
     @Override
     @Transactional
@@ -92,5 +90,4 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
             this.save(entity);
         }
     }
-
 }

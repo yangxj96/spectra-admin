@@ -66,5 +66,4 @@ public class DictGroupTreeVO implements Tree<DictGroupTreeVO>, Serializable {
 
     /// 子级
     private List<DictGroupTreeVO> children = new ArrayList<>();
-
 }

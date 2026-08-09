@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.javabean.converter;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Configured;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
@@ -45,5 +44,4 @@ public interface ConfiguredConverter {
     /// @return IPAGE
     @Mapping(target = "pages", ignore = true)
     Page<ConfiguredVO> toVOPage(Page<Configured> source);
-
 }

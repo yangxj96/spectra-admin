@@ -47,5 +47,4 @@ public class CryptoKeyPairVO implements Serializable {
 
     /// 客户端私钥（Base64）
     private String clientPrivateKey;
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.ObjUtils;
@@ -54,7 +53,8 @@ public class SecurityUserHelper {
 
     private final DataScopeProvider dataScopeProvider;
 
-    public SecurityUserHelper(RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, AuthConverter authConverter, DataScopeProvider dataScopeProvider) {
+    public SecurityUserHelper(RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, AuthConverter authConverter,
+            DataScopeProvider dataScopeProvider) {
         this.relRoleAuthorityService = relRoleAuthorityService;
         this.relUserRoleService = relUserRoleService;
         this.authConverter = authConverter;

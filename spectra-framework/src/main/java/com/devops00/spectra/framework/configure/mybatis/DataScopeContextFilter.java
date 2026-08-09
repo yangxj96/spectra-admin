@@ -29,7 +29,7 @@ public class DataScopeContextFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
         DataScopeContextHolder.beginRequest();
         try {
             filterChain.doFilter(request, response);

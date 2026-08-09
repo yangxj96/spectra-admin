@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.configuration.rag.listener;
 
-
 import com.devops00.spectra.ai.configuration.rag.utils.SpectraDocumentParser;
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.constant.LogPrefix;
@@ -107,5 +106,4 @@ public class FileUploadFinishListener {
             log.error("{}文件 [{}] RAG 索引构建失败", LogPrefix.AI.p(), fileInfo.getId(), e);
         }
     }
-
 }

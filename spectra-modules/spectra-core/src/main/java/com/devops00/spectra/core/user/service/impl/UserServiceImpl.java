@@ -99,7 +99,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final NameFillExecutor fillExecutor;
 
-
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
@@ -358,7 +357,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         log.info("用户 {} 修改密码成功", userId);
     }
 
-
     /// 更新用户数据范围
     ///
     /// @param userId    用户ID
@@ -401,8 +399,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             }
             dataScopeTargetMapper.insert(targets);
         }
-
-
     }
 
     private boolean canManageGlobalScope() {

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.assembler;
 
-
 import com.devops00.spectra.framework.assembler.converter.IdConverter;
 import com.devops00.spectra.framework.assembler.converter.UuidConverter;
 

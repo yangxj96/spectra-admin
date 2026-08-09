@@ -62,5 +62,4 @@ public class ConfiguredController {
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);
     }
-
 }

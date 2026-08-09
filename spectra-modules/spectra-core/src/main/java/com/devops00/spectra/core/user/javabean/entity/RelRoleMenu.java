@@ -50,5 +50,4 @@ public class RelRoleMenu extends BaseEntity {
     /// 菜单ID
     @TableField(value = "menu_id")
     private UUID menuId;
-
 }

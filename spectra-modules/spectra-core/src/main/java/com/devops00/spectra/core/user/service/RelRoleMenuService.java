@@ -45,5 +45,4 @@ public interface RelRoleMenuService {
     /// @param roleId 角色ID
     /// @return 菜单列表
     List<MenuVO> get(UUID roleId);
-
 }

@@ -40,5 +40,4 @@ public interface FileInfoConverter {
 
     @Mapping(target = "pages", ignore = true)
     Page<FileInfoVO> toVOPage(Page<FileInfo> source);
-
 }

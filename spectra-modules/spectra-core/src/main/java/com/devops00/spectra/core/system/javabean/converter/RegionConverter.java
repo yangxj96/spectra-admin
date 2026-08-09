@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.javabean.converter;
 
-
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.javabean.from.RegionFrom;
@@ -36,9 +35,7 @@ import java.util.List;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface RegionConverter {
 
-
     RegionVO toVO(Region source);
-
 
     List<RegionVO> toVOList(List<Region> source);
 
@@ -52,5 +49,4 @@ public interface RegionConverter {
     /// @return IPAGE
     @Mapping(target = "pages", ignore = true)
     Page<RegionVO> toVOPage(Page<Region> source);
-
 }

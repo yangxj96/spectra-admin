@@ -29,5 +29,4 @@ public class SecStrategyBridge {
     public SecStrategyBridge(SecHolderStrategy strategy) {
         SecUtil.setStrategy(strategy);
     }
-
 }

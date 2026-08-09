@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.mapstruct;
 
-
 import com.devops00.spectra.security.base.holder.SecUtil;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
@@ -222,7 +221,8 @@ public class TimeMapper {
     /// @param text IOS 8601 格式的字符串
     /// @return Instant
     public @Nullable Instant toInstant(@Nullable String text) {
-        if (text == null || text.isBlank()) return null;
+        if (text == null || text.isBlank())
+            return null;
 
         var value = text.trim();
         try {
@@ -261,5 +261,4 @@ public class TimeMapper {
                 .atZone(getUserZoneId())
                 .toInstant();
     }
-
 }

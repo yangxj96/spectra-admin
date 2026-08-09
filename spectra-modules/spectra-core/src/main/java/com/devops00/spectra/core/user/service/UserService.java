@@ -57,7 +57,7 @@ public interface UserService extends BaseService<User> {
 
     /// 覆盖用户角色
     ///
-    /// @param userId 用户ID
+    /// @param userId  用户ID
     /// @param roleIds 角色ID列表
     void replaceRoles(UUID userId, List<UUID> roleIds);
 
@@ -93,5 +93,4 @@ public interface UserService extends BaseService<User> {
     /// @param userId 用户ID
     /// @param params 修改密码参数
     void changePassword(UUID userId, ChangePasswordFrom params);
-
 }

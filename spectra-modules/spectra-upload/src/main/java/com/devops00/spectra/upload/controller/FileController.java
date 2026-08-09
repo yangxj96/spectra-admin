@@ -103,5 +103,4 @@ public class FileController {
     public void download(@PathVariable UUID id) {
         bindService.download(id);
     }
-
 }

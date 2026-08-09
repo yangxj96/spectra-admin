@@ -61,7 +61,7 @@ public class ContactServiceImpl implements ContactService {
                 .filter(Objects::nonNull).distinct().toList();
         Map<UUID, Department> departments = departmentIds.isEmpty() ? Collections.emptyMap()
                 : departmentMapper.selectByIds(departmentIds).stream()
-                        .collect(Collectors.toMap(Department::getId, Function.identity()));
+                .collect(Collectors.toMap(Department::getId, Function.identity()));
         var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
         result.setRecords(users.getRecords().stream().map(user -> {
             var vo = contactConverter.toVO(user);

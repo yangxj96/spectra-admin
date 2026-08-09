@@ -31,5 +31,4 @@ public class FormPageFrom {
 
     /// 是否启用
     private Boolean active;
-
 }

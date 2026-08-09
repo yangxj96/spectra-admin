@@ -43,5 +43,4 @@ public class RoleAuthorityFrom {
     @NotNull(message = "权限列表不能为空")
     @Size(min = 1, message = "权限列表至少需要一个权限ID")
     private List<UUID> authorityIds;
-
 }

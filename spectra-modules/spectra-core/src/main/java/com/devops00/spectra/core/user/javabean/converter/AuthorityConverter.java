@@ -63,5 +63,4 @@ public interface AuthorityConverter {
     /// @param source 权限列表
     /// @return 树形vo
     List<AuthorityTreeVO> toTreeVOList(List<Authority> source);
-
 }

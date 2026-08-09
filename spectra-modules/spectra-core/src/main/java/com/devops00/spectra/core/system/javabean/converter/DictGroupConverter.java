@@ -50,6 +50,4 @@ public interface DictGroupConverter {
     /// @param source 字典类型
     /// @return 字典类型
     List<DictGroupTreeVO> toTreeVOList(List<DictGroup> source);
-
-
 }

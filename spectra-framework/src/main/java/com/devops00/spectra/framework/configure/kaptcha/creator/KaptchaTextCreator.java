@@ -68,5 +68,4 @@ public class KaptchaTextCreator extends DefaultTextCreator {
 
         return expression + "=?@" + result;
     }
-
 }

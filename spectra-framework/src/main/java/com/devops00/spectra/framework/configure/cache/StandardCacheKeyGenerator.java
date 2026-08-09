@@ -61,7 +61,6 @@ public class StandardCacheKeyGenerator implements KeyGenerator {
             }
 
             return HexFormat.of().formatHex(md.digest()).substring(0, 16);
-
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 not available", e);
         }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.service;
 
-
 import com.devops00.spectra.core.common.service.IpLocationService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -41,5 +40,4 @@ public class IpLocationServiceTest {
         var region = ipLocationService.getCityEn("106.60.114.81", 3);
         log.atInfo().log("当前地址:{}", region);
     }
-
 }

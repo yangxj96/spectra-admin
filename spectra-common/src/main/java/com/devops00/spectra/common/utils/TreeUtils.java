@@ -52,10 +52,12 @@ public class TreeUtils {
     /// 递归收集压缩后的节点ID
     private static <T extends Tree<T>> boolean collectCompressedIds(T node, Set<UUID> selectedIds, Function<T, UUID> idExtractor, Set<UUID> result) {
 
-        if (node == null) return false;
+        if (node == null)
+            return false;
 
         var nodeId = idExtractor.apply(node);
-        if (nodeId == null) return false;
+        if (nodeId == null)
+            return false;
 
         var children = node.getChildren();
 
@@ -99,5 +101,4 @@ public class TreeUtils {
 
         return allChildrenSelected && selectedIds.contains(nodeId);
     }
-
 }

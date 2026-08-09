@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service;
 
-
 import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import com.devops00.spectra.upload.javabean.entity.FileType;
 import jakarta.annotation.Resource;
@@ -39,7 +38,6 @@ import java.util.List;
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
 public class UploadServiceTest {
-
 
     @Resource
     private FileTypeService fileTypeService;
@@ -145,7 +143,6 @@ public class UploadServiceTest {
         fileTypeService.saveBatch(types);
     }
 
-
     /// 尝试读取文件类型
     @Test
     void getFileType() {
@@ -154,6 +151,4 @@ public class UploadServiceTest {
             log.debug(fileType.toString());
         }
     }
-
-
 }

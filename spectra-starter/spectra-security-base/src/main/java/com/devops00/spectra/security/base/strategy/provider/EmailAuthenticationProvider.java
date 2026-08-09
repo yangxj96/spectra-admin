@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.strategy.provider;
 
-
 import com.devops00.spectra.security.base.strategy.tokens.EmailAuthenticationToken;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -62,5 +61,4 @@ public abstract class EmailAuthenticationProvider implements BasicAuthentication
     public boolean supports(Class<?> authentication) {
         return EmailAuthenticationToken.class.isAssignableFrom(authentication);
     }
-
 }

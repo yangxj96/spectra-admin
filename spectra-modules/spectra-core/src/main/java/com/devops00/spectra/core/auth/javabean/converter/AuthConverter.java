@@ -35,5 +35,4 @@ public interface AuthConverter {
     /// @param source 用户信息
     /// @return 转换结果
     SecurityUser toSecurityUser(User source);
-
 }

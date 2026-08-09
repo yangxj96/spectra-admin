@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.base;
 
-
 /// 基础mapper
 ///
 /// @author yangxj96

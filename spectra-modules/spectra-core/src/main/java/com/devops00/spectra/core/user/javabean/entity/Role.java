@@ -67,5 +67,4 @@ public class Role extends BaseEntity {
     /// 备注
     @TableField(value = "remark")
     private String remark;
-
 }

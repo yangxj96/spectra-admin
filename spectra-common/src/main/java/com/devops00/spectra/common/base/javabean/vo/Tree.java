@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.base.javabean.vo;
 
-
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;

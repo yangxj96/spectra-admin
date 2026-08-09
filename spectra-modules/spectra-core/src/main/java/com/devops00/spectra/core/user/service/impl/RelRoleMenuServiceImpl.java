@@ -60,7 +60,6 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         this.menuService = menuService;
     }
 
-
     @Override
     @Transactional
     public void grant(UUID roleId, RoleMenuFrom from) {
@@ -130,5 +129,4 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
         return menuConverter.toVOList(menus);
     }
-
 }

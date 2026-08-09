@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.web.controller;
 
-
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -53,7 +52,6 @@ public class AuthController {
     private final LoginDispatcher loginDispatcher;
 
     private final AuthService authService;
-
 
     public AuthController(LoginDispatcher loginDispatcher, AuthService authService) {
         this.loginDispatcher = loginDispatcher;

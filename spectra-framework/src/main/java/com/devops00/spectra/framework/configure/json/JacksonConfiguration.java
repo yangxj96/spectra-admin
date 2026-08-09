@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.json;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.framework.configure.json.properties.JacksonProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;

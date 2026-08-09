@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.service;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;

@@ -58,13 +58,13 @@ public class DictServiceImpl implements DictService {
 
     private final DictItemService dataService;
 
-    public DictServiceImpl(DictGroupConverter dictGroupConverter, DictItemConverter dictItemConverter, DictGroupService groupService, DictItemService dataService) {
+    public DictServiceImpl(DictGroupConverter dictGroupConverter, DictItemConverter dictItemConverter, DictGroupService groupService,
+            DictItemService dataService) {
         this.dictGroupConverter = dictGroupConverter;
         this.dictItemConverter = dictItemConverter;
         this.groupService = groupService;
         this.dataService = dataService;
     }
-
 
     @Override
     @Transactional

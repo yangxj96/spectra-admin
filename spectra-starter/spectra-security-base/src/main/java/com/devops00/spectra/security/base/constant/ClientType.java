@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.constant;
 
-
 import lombok.Getter;
 
 /// 客户端类型（登录端）

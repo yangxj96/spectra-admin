@@ -62,13 +62,12 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     private final RelUserRoleService relUserRoleService;
 
     public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
-                           RelUserRoleService relUserRoleService) {
+            RelUserRoleService relUserRoleService) {
         this.menuMapper = menuMapper;
         this.menuConverter = menuConverter;
         this.roleMenuMapper = roleMenuMapper;
         this.relUserRoleService = relUserRoleService;
     }
-
 
     @Override
     @Transactional

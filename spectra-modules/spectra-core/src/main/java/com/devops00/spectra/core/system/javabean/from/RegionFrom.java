@@ -69,5 +69,4 @@ public class RegionFrom {
 
     /// 排序
     private Integer sort;
-
 }

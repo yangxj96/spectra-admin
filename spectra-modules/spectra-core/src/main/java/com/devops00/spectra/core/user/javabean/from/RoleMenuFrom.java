@@ -41,5 +41,4 @@ public class RoleMenuFrom {
     /// 菜单ID列表
     @NotNull(message = "菜单列表不能为null")
     private List<@NotNull(message = "菜单ID不能为null") UUID> menuIds;
-
 }

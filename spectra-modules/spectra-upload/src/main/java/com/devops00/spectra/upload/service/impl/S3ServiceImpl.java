@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.devops00.spectra.upload.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,7 +61,6 @@ public class S3ServiceImpl implements S3Service {
             request = request.toBuilder()
                     .continuationToken(response.nextContinuationToken())
                     .build();
-
         } while (response.isTruncated());
         return keys;
     }

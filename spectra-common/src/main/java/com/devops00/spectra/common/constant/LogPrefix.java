@@ -55,5 +55,4 @@ public enum LogPrefix {
     public String f(String message) {
         return p() + message;
     }
-
 }

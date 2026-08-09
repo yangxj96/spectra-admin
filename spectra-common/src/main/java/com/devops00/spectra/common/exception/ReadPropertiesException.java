@@ -26,5 +26,4 @@ public class ReadPropertiesException extends SpectraException {
     public ReadPropertiesException(String message) {
         super(message);
     }
-
 }

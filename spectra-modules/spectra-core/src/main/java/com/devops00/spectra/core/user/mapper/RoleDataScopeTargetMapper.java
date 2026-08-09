@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.user.mapper;
 
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.user.javabean.entity.RoleDataScopeTarget;
 import org.apache.ibatis.annotations.Mapper;

@@ -57,5 +57,4 @@ public interface RelUserRoleService {
     /// @param userId 角色ID
     /// @return 用户角色列表
     List<Role> getRoles(UUID userId);
-
 }

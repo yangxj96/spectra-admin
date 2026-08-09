@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
-
 import lombok.Data;
 
 import java.util.List;
@@ -45,5 +44,4 @@ public class FileUploadStatusVO {
 
     /// 完成状态
     private Boolean completed;
-
 }

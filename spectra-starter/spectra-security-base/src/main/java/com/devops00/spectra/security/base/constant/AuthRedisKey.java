@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.constant;
 
-
 import com.devops00.spectra.common.constant.RedisKey;
 
 /// 登录需要存储的key的枚举

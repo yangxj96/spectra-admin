@@ -41,5 +41,4 @@ public class CryptoConfigVO implements Serializable {
 
     /// 服务端公钥（Base64）
     private String serverPublicKey;
-
 }

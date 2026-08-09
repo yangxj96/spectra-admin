@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.web.dispatcher;
 
-
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
 import com.devops00.spectra.security.base.strategy.tokens.EmailAuthenticationToken;
@@ -72,5 +71,4 @@ public class LoginDispatcher {
             default -> throw new IllegalArgumentException("不支持的登录类型");
         };
     }
-
 }

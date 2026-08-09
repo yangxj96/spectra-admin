@@ -402,8 +402,8 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             var attendanceDate = date.atStartOfDay(zoneId).toInstant();
             if (date.getDayOfWeek() != DayOfWeek.SATURDAY && date.getDayOfWeek() != DayOfWeek.SUNDAY
                     && attendanceRecordMapper.selectCount(new LambdaQueryWrapper<AttendanceRecord>()
-                            .eq(AttendanceRecord::getApplicationId, application.getId())
-                            .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
+                    .eq(AttendanceRecord::getApplicationId, application.getId())
+                    .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
                 var record = new AttendanceRecord();
                 record.setApplicationId(application.getId());
                 record.setUserId(application.getApplicantId());

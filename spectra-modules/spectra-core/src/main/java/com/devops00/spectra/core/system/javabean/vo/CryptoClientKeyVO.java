@@ -38,5 +38,4 @@ public class CryptoClientKeyVO implements Serializable {
 
     /// 客户端私钥（Base64）
     private String privateKey;
-
 }

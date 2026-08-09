@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.contact.controller;
 
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -50,5 +49,4 @@ public class ContactController {
     public IPage<ContactVO> page(PageFrom page, ContactPageFrom params) {
         return contactService.page(page, params.getKeyword());
     }
-
 }

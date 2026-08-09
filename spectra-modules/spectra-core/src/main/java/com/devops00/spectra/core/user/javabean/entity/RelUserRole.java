@@ -52,5 +52,4 @@ public class RelUserRole extends BaseEntity {
     /// 角色ID
     @TableField(value = "role_id")
     private UUID roleId;
-
 }

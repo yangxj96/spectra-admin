@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service;
 
-
 import com.devops00.spectra.upload.UploadTestApplication;
 import com.devops00.spectra.upload.properties.S3Properties;
 import lombok.extern.slf4j.Slf4j;

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.starter.listener.SecurityRedisKeyExpirationListener;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +80,4 @@ public class SecRedisConfiguration {
         );
         return container;
     }
-
-
 }

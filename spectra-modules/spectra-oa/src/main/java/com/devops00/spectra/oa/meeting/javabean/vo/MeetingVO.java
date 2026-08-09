@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.meeting.javabean.vo;
 
-
 import com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;

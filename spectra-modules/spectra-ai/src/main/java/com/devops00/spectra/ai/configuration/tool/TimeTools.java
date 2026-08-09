@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.configuration.tool;
 
-
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
 import com.devops00.spectra.ai.base.AiMemoryId;
@@ -52,5 +51,4 @@ public class TimeTools implements AiToolMarker {
             return now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         });
     }
-
 }

@@ -36,5 +36,4 @@ public interface KaptchaService {
 
     /// 根据session id删除验证码
     void deleteBySessionId();
-
 }

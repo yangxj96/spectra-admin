@@ -51,5 +51,4 @@ public class UserOnlineVO {
 
     /// 访问令牌。
     private String token;
-
 }

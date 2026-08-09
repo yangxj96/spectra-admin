@@ -44,7 +44,6 @@ public class RoleDeletionOnUserRoleCleanupListener {
 
     private final RelUserRoleService relUserRoleService;
 
-
     /// 角色删除事件监听器
     /// <p>撤销关联的用户</p>
     ///
@@ -74,5 +73,4 @@ public class RoleDeletionOnUserRoleCleanupListener {
             relUserRoleService.revoke(userId, Collections.singletonList(event.roleId()));
         }
     }
-
 }

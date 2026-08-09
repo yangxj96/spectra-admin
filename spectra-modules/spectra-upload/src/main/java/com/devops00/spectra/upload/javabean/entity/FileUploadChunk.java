@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
@@ -50,5 +49,4 @@ public class FileUploadChunk extends BaseEntity {
     /// 分片大小(字节)
     @TableField(value = "size")
     private Long size;
-
 }

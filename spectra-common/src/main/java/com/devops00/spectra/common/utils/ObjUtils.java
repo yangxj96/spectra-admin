@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.utils;
 
-
 import com.google.common.collect.Maps;
 import org.jspecify.annotations.NullMarked;
 
@@ -36,7 +35,6 @@ public final class ObjUtils {
     private ObjUtils() {
         // 工具类禁止实例化
     }
-
 
     /// obj转list
     ///
@@ -108,7 +106,6 @@ public final class ObjUtils {
         return result;
     }
 
-
     /// Object 转换为 Map String Object
     ///
     /// @param obj 对象
@@ -116,6 +113,4 @@ public final class ObjUtils {
     public static Map<String, Object> castStrObjMap(Object obj) {
         return castMap(obj, String.class, Object.class);
     }
-
-
 }

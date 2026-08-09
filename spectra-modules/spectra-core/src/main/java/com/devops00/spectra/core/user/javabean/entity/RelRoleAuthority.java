@@ -52,5 +52,4 @@ public class RelRoleAuthority extends BaseEntity {
     /// 权限ID
     @TableField(value = "authority_id")
     private UUID authorityId;
-
 }

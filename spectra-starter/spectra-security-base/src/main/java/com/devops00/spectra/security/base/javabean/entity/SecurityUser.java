@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.javabean.entity;
 
-
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -111,5 +110,4 @@ public class SecurityUser implements UserDetails {
     public void setUsername(String username) {
         this.setEmail(username);
     }
-
 }

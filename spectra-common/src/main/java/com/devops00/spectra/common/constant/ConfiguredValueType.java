@@ -46,5 +46,4 @@ public enum ConfiguredValueType implements IEnum<Integer> {
     public Integer getValue() {
         return this.value;
     }
-
 }

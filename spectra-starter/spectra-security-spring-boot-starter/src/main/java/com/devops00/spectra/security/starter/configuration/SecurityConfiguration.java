@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.eval.SpectraPermissionEvaluator;
@@ -73,13 +72,11 @@ public class SecurityConfiguration {
 
     private final AccessDeniedHandler restAccessDeniedHandler;
 
-
     /// SpringSecurity 自定义的权限评估器
     @Bean
     public SpectraPermissionEvaluator spectraPermissionEvaluator() {
         return new SpectraPermissionEvaluator(properties);
     }
-
 
     /// 主认证管理器
     @Bean
@@ -151,6 +148,4 @@ public class SecurityConfiguration {
 
         return http.build();
     }
-
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.mapper.FileTypeMapper;

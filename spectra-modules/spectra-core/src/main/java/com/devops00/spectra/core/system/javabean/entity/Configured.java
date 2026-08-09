@@ -59,5 +59,4 @@ public class Configured extends BaseEntity {
     /// 备注说明
     @TableField(value = "remarks")
     private String remarks;
-
 }

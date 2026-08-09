@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.strategy;
 
-
 import com.devops00.spectra.common.utils.IpUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.security.base.constant.AuthRedisKey;
@@ -60,7 +59,6 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     private final RedisTemplate<String, Object> redis;
     private final SecurityProperties properties;
     private final UserOnlineConverter userOnlineConverter;
-
 
     public RedisSecHolderStrategy(
             @Qualifier("securityObjectMapper") ObjectMapper om,
@@ -483,9 +481,12 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         var authorities = new ArrayList<String>();
         for (GrantedAuthority ga : user.getAuthorities()) {
             String a = ga.getAuthority();
-            if (a == null) continue;
-            if (a.startsWith("ROLE")) roles.add(a);
-            else authorities.add(a);
+            if (a == null)
+                continue;
+            if (a.startsWith("ROLE"))
+                roles.add(a);
+            else
+                authorities.add(a);
         }
         return TokenVO.builder()
                 .id(user.getId())
@@ -537,22 +538,26 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     private @Nullable String getTokenFromSecurityContext() {
         var auth = this.getSecurityContextAuthentication();
-        if (auth == null) return null;
+        if (auth == null)
+            return null;
         var cred = auth.getCredentials();
         return cred instanceof String s ? s : null;
     }
 
     private @Nullable String getTokenFromHttpRequest() {
         HttpServletRequest request = this.getHttpServletRequest();
-        if (request == null) return null;
+        if (request == null)
+            return null;
         var bearer = request.getHeader("authorization");
-        if (bearer == null || !bearer.startsWith("Bearer ")) return null;
+        if (bearer == null || !bearer.startsWith("Bearer "))
+            return null;
         return bearer.substring(7);
     }
 
     private @Nullable SecurityUser getUserFromSecurityContext() {
         var auth = this.getSecurityContextAuthentication();
-        if (auth == null) return null;
+        if (auth == null)
+            return null;
         var p = auth.getPrincipal();
         return p instanceof SecurityUser su ? su : null;
     }

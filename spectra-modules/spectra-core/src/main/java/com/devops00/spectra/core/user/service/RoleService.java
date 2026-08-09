@@ -64,5 +64,4 @@ public interface RoleService extends BaseService<Role> {
     ///
     /// @return 角色信息
     Role getSystemDefaultUserRole();
-
 }

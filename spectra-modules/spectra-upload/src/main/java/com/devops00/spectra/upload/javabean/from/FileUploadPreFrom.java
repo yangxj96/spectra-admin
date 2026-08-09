@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.from;
 
-
 import lombok.Data;
 
 /// 文件上传预处理
@@ -35,5 +34,4 @@ public class FileUploadPreFrom {
 
     /// 文件hash值
     private String hash;
-
 }

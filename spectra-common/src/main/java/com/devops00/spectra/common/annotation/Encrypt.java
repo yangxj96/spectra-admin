@@ -40,5 +40,4 @@ public @interface Encrypt {
 
     /// true=需要加密响应, false=显式不加密响应
     boolean response() default true;
-
 }

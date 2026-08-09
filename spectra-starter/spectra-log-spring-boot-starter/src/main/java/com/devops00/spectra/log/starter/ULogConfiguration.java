@@ -51,5 +51,4 @@ public class ULogConfiguration {
         log.debug(LogPrefix.LOG.f("载入ULogAspect"));
         return new ULogAspect();
     }
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.base.holder;
 
-
 import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
@@ -89,5 +88,4 @@ public interface SecHolderStrategy {
 
     /// 清除登录失败计数
     void clearLoginFail(String username);
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.advice;
 
-
 import com.devops00.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -46,7 +45,7 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response,
-                       AccessDeniedException e) throws IOException {
+            AccessDeniedException e) throws IOException {
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.setContentType("application/json;charset=UTF-8");
 
@@ -54,5 +53,4 @@ public class RestAccessDeniedHandler implements AccessDeniedHandler {
 
         response.getWriter().write(om.writeValueAsString(body));
     }
-
 }

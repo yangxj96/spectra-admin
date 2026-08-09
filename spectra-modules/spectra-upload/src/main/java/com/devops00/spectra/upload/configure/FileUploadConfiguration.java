@@ -71,5 +71,4 @@ public class FileUploadConfiguration {
         }
         return new FileTypeValidator(strategies, fileTypeService, wl, bl);
     }
-
 }

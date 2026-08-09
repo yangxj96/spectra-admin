@@ -29,8 +29,10 @@ public record AiMemoryId(String conversationId, String token) {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof AiMemoryId that)) return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof AiMemoryId that))
+            return false;
         return conversationId.equals(that.conversationId);
     }
 

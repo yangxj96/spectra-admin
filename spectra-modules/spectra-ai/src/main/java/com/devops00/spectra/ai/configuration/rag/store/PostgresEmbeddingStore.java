@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.configuration.rag.store;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;

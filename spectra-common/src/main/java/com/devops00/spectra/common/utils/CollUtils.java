@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.utils;
 
-
 import org.jspecify.annotations.Nullable;
 
 import java.util.Collection;
@@ -80,5 +79,4 @@ public final class CollUtils {
     public static int size(@Nullable Map<?, ?> map) {
         return map == null ? 0 : map.size();
     }
-
 }

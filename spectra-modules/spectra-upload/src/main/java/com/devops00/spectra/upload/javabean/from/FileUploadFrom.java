@@ -35,5 +35,4 @@ public class FileUploadFrom {
 
     /// 上传ID
     private String uploadId;
-
 }

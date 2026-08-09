@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
@@ -67,5 +66,4 @@ public class FileInfo extends BaseEntity {
     /// 引用计数(用于秒传共享文件)
     @TableField(value = "ref_count")
     private Integer refCount;
-
 }

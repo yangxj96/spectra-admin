@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.event;
 
-
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -36,5 +35,4 @@ public class FileUploadFinishEvent extends ApplicationEvent {
         super(source);
         this.fileId = fileId;
     }
-
 }

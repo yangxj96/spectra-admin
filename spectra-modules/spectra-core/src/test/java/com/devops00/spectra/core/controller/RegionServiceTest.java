@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.controller;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.core.system.javabean.entity.Region;
@@ -74,7 +73,6 @@ public class RegionServiceTest {
         }
     }
 
-
     @Test
     void importCities() throws IOException {
         var regionMap = regionService
@@ -108,7 +106,6 @@ public class RegionServiceTest {
                 datum.setSort(0);
 
                 regions.add(datum);
-
             }
             regionService.saveBatch(regions, 500);
         }
@@ -227,5 +224,4 @@ public class RegionServiceTest {
             regionService.saveBatch(regions, 500);
         }
     }
-
 }

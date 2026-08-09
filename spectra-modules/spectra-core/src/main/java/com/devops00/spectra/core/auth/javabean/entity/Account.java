@@ -88,5 +88,4 @@ public class Account extends BaseEntity {
     /// 用于临时账号（如扫码未确认）
     @TableField(value = "expires_at")
     private Instant expiresAt;
-
 }

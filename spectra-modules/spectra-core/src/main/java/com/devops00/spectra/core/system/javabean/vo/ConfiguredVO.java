@@ -55,5 +55,4 @@ public class ConfiguredVO implements Serializable {
 
     /// 备注说明
     private String remarks;
-
 }

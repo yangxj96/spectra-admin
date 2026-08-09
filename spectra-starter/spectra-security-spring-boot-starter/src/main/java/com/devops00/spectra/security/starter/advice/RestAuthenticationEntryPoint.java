@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.advice;
 
-
 import com.devops00.spectra.common.response.R;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,7 +48,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
-                         AuthenticationException e) throws IOException {
+            AuthenticationException e) throws IOException {
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
@@ -63,5 +62,4 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         var body = om.writeValueAsString(R.failure(HttpStatus.UNAUTHORIZED, message));
         response.getWriter().write(body);
     }
-
 }

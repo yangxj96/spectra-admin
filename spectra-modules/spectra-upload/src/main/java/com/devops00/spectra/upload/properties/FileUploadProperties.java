@@ -55,5 +55,4 @@ public class FileUploadProperties {
 
     /// 是否启用黑名单模式（拒绝 dangerous=true 的类型）
     private boolean blacklistEnabled = true;
-
 }

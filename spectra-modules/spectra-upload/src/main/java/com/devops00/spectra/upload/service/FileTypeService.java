@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service;
 
-
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.upload.javabean.entity.FileType;
 
@@ -54,5 +53,4 @@ public interface FileTypeService extends BaseService<FileType> {
     ///
     /// @return 含 magicRules 的危险类型列表
     List<FileType> findDangerousWithMagicRules();
-
 }

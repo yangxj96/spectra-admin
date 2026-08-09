@@ -30,5 +30,4 @@ public class KaptchaNotMatchException extends KaptchaException {
     public KaptchaNotMatchException(String message) {
         super(message);
     }
-
 }

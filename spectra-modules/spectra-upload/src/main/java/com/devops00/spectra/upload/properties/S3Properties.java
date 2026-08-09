@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.properties;
 
-
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -40,5 +39,4 @@ public class S3Properties {
     private String bucket;
 
     private Integer previewMinutes = 10;
-
 }

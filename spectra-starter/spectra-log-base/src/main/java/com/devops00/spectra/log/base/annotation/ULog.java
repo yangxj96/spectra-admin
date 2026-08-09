@@ -38,5 +38,4 @@ public @interface ULog {
 
     /// 日志类型
     SysLogType type() default SysLogType.GENERAL;
-
 }

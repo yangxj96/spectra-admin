@@ -124,7 +124,6 @@ public class AuthorityServiceImpl extends BaseServiceImpl<AuthorityMapper, Autho
         }
     }
 
-
     @Override
     public List<Authority> getByRelRoleId(UUID id) {
         List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper.getByRoleId(id);

@@ -50,5 +50,4 @@ public class UserDataScopeTarget extends BaseEntity {
     /// 目标类型
     @TableField(value = "target_type")
     private Integer targetType;
-
 }

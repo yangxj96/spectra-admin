@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
@@ -358,7 +357,6 @@ public class FileUploadServiceS3Impl implements FileUploadService {
             // 2. 调用 S3 客户端获取输入流
             // s3Client.getObject() 返回的是 ResponseInputStream，它继承了 InputStream
             return s3Client.getObject(getObjectRequest);
-
         } catch (NoSuchKeyException e) {
             log.error("{} S3 中未找到指定文件: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
             throw new DataNotExistException("文件在云存储中不存在");
@@ -407,5 +405,4 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         }
         return task.getEid();
     }
-
 }

@@ -72,5 +72,4 @@ public class ServiceMonitorController {
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();
     }
-
 }

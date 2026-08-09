@@ -71,7 +71,5 @@ public class RAMInfoVO {
 
         /// 容量，单位 GB。
         private String capacityGB;
-
     }
-
 }

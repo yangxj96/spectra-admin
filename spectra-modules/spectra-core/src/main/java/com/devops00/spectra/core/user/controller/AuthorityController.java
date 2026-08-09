@@ -73,5 +73,4 @@ public class AuthorityController {
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();
     }
-
 }

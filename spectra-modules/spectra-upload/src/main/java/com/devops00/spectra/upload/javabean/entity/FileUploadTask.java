@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
@@ -77,5 +76,4 @@ public class FileUploadTask extends BaseEntity {
     /// 关联文件ID（上传完成后生成）
     @TableField(value = "file_id")
     private UUID fileId;
-
 }

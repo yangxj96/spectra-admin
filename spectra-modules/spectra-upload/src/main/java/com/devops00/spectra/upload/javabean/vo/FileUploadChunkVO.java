@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
-
 import lombok.Data;
 
 /// 分片上传的上传结果
@@ -27,11 +26,9 @@ import lombok.Data;
 @Data
 public class FileUploadChunkVO {
 
-
     /// 分片编号
     private int chunkNumber;
 
     /// 标签 S3 / OSS 必须
     private String etag;
-
 }

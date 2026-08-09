@@ -47,5 +47,4 @@ public class UserDataScope extends BaseEntity {
     /// 数据范围类型
     @TableField(value = "scope_type")
     private DataScopeType scopeType;
-
 }

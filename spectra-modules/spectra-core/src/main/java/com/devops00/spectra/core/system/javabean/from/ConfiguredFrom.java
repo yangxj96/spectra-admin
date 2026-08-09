@@ -44,5 +44,4 @@ public class ConfiguredFrom {
 
     /// 备注说明
     private String remarks;
-
 }

@@ -82,7 +82,6 @@ public interface FileUploadService {
     /// @param file 文件信息
     void download(FileInfo file);
 
-
     /// 生成带年月前缀的系统唯一文件名 (例如: "202606/019eca58-xxxx...")
     ///
     /// @param filename 源文件名称
@@ -101,7 +100,8 @@ public interface FileUploadService {
     ///
     /// @param file 文件对象
     default String getSuffix(@Nullable MultipartFile file) {
-        if (file == null) return "";
+        if (file == null)
+            return "";
         return getSuffix(file.getOriginalFilename());
     }
 
@@ -109,12 +109,12 @@ public interface FileUploadService {
     ///
     /// @param filename 文件名称
     default String getSuffix(@Nullable String filename) {
-        if (filename == null) return "";
+        if (filename == null)
+            return "";
         int index = filename.lastIndexOf(".");
         if (index == -1 || index == filename.length() - 1) {
             return "";
         }
         return filename.substring(index);
     }
-
 }

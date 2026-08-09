@@ -13,6 +13,7 @@ import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
 import org.apache.ibatis.annotations.Mapper;
 
 /// 文档版本 Mapper。
+///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7

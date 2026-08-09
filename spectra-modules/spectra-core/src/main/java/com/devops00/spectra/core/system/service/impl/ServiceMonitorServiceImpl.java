@@ -96,7 +96,6 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .maxFrequencyHz(maxFreq)
                 .maxFrequencyGhz(maxFreq > 0 ? String.format("%.2f GHz", maxFreq / 1e9) : "N/A")
                 .build();
-
     }
 
     @Override

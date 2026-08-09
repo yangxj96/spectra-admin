@@ -33,5 +33,4 @@ public interface SpectraAssistant {
     /// @param memoryId 复合记忆标识（conversationId + token）
     /// @param message  问题内容
     TokenStream stream(@MemoryId AiMemoryId memoryId, @UserMessage String message);
-
 }

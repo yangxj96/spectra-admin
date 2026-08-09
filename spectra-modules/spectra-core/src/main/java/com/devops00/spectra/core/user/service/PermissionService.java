@@ -23,5 +23,4 @@ package com.devops00.spectra.core.user.service;
 /// @since 2025/11/11 00:00
 public interface PermissionService {
 
-
 }

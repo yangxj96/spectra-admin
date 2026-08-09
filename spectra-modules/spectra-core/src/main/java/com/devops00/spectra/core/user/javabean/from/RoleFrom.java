@@ -58,5 +58,4 @@ public class RoleFrom {
 
     /// 备注
     private String remark;
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.exception.DataNotExistException;

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.ai.properties;
 
-
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -47,5 +46,4 @@ public class AiRAGProperties {
 
     /// 相邻知识切片之间的重叠 Token 数量（对应 splitter 的第二个参数）
     private int maxOverlapSize = 30;
-
 }

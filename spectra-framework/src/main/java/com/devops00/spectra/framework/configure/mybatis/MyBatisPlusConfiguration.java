@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.RollbackOn;
 
 import java.util.List;
 
-
 /// MyBatisPlus配置
 ///
 /// @author yangxj96
@@ -53,7 +52,6 @@ public class MyBatisPlusConfiguration {
 
     @Resource
     private DataScopeEntityRegistry dataScopeEntityRegistry;
-
 
     /// 添加注释
     @Bean
@@ -88,5 +86,4 @@ public class MyBatisPlusConfiguration {
         interceptors.forEach(interceptor::addInnerInterceptor);
         return interceptor;
     }
-
 }

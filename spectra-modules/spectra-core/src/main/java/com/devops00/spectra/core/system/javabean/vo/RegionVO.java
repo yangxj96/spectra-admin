@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.javabean.vo;
 
-
 import com.devops00.spectra.common.constant.RegionLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -64,5 +63,4 @@ public class RegionVO implements Serializable {
 
     /// 排序
     private Integer sort;
-
 }

@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.constant;
 
-
 /// Redis缓存的key
 ///
 /// @author yangxj96

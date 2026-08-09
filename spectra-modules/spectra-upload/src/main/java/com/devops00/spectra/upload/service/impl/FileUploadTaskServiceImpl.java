@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.upload.javabean.entity.FileUploadTask;
@@ -41,5 +40,4 @@ public class FileUploadTaskServiceImpl extends BaseServiceImpl<FileUploadTaskMap
                 .oneOpt()
                 .orElseThrow(() -> new DataNotExistException("上传任务不存在"));
     }
-
 }

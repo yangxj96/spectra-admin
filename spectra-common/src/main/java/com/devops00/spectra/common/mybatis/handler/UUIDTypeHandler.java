@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.mybatis.handler;
 
-
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedJdbcTypes;
@@ -53,5 +52,4 @@ public class UUIDTypeHandler extends BaseTypeHandler<UUID> {
     public UUID getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         return cs.getObject(columnIndex, UUID.class);
     }
-
 }

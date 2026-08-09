@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.system.service;
 
-
 import com.devops00.spectra.core.system.javabean.from.DictGroupFrom;
 import com.devops00.spectra.core.system.javabean.from.DictItemFrom;
 import com.devops00.spectra.core.system.javabean.vo.DictGroupTreeVO;
@@ -73,5 +72,4 @@ public interface DictService {
     /// @param code 字典类型编码
     /// @return 字典数据列表
     List<DictItemVO> listDictDataByGroupCode(String code);
-
 }

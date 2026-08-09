@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.document.javabean.entity;
 
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.util.UUID;
 import java.time.Instant;
 

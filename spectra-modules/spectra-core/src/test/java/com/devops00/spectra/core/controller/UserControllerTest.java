@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.controller;
 
-
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.service.UserService;
 import com.github.f4b6a3.uuid.UuidCreator;
@@ -54,6 +53,4 @@ class UserControllerTest {
 
         Assertions.assertTrue(true, "测试完成");
     }
-
-
 }

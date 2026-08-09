@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.framework.configure.mvc;
 
-
 import com.devops00.spectra.common.constant.LogPrefix;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -38,5 +37,4 @@ public class PasswordEncoderConfiguration {
         log.debug(LogPrefix.WEB.f("配置PasswordEncoder"));
         return new BCryptPasswordEncoder();
     }
-
 }

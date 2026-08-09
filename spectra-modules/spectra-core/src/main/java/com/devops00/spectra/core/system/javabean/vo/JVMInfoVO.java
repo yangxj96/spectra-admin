@@ -86,5 +86,4 @@ public class JVMInfoVO {
 
     /// 本地库路径
     private String libraryPath;
-
 }

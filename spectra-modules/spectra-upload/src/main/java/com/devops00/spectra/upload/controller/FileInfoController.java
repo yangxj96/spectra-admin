@@ -56,5 +56,4 @@ public class FileInfoController {
     public void deleteById(@PathVariable UUID id) {
         fileInfoService.deleteById(id);
     }
-
 }

@@ -30,5 +30,4 @@ public class BuiltinDataException extends DataException {
     public BuiltinDataException(String message) {
         super(message);
     }
-
 }

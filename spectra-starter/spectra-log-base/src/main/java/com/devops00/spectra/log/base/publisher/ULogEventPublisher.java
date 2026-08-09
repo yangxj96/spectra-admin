@@ -29,5 +29,4 @@ public record ULogEventPublisher(ApplicationEventPublisher publisher) {
     public void save(ULogEntity entity) {
         publisher.publishEvent(entity);
     }
-
 }

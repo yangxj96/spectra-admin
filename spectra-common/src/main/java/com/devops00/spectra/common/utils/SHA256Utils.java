@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.common.utils;
 
-
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -61,5 +60,4 @@ public class SHA256Utils {
         }
         return sb.toString();
     }
-
 }

@@ -51,5 +51,4 @@ public enum LoginType implements IEnum<Integer> {
     public Integer getValue() {
         return this.value;
     }
-
 }

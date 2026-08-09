@@ -326,7 +326,6 @@ class SystemControllerTest {
         }
 
         dictItemService.saveBatch(ops);
-
     }
 
     @Test
@@ -408,5 +407,4 @@ class SystemControllerTest {
         auth.setPid(pid);
         return auth;
     }
-
 }

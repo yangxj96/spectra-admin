@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /// 文档展示对象。
+///
 /// @author yangxj96
 /// @version 1.0
 /// @since 2026/8/7

@@ -79,7 +79,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     private final RedisTemplate<String, Object> redisTemplate;
 
     public RequestDecryptAdvice(CryptoKeyManager cryptoKeyManager, ObjectMapper om,
-                                RedisTemplate<String, Object> redisTemplate) {
+            RedisTemplate<String, Object> redisTemplate) {
         this.cryptoKeyManager = cryptoKeyManager;
         this.om = om;
         this.redisTemplate = redisTemplate;
@@ -88,7 +88,7 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     @Override
     public boolean supports(MethodParameter methodParameter, Type targetType,
-                            Class<? extends HttpMessageConverter<?>> converterType) {
+            Class<? extends HttpMessageConverter<?>> converterType) {
         // 检查加解密是否启用
         if (!cryptoKeyManager.isEnabled()) {
             return false;
@@ -126,8 +126,8 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage,
-                                           MethodParameter parameter, Type targetType,
-                                           Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
+            MethodParameter parameter, Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
         byte[] bodyBytes = inputMessage.getBody().readAllBytes();
 
         // 优先检查 X-Encrypted 请求头
@@ -167,15 +167,15 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage,
-                                MethodParameter parameter, Type targetType,
-                                Class<? extends HttpMessageConverter<?>> converterType) {
+            MethodParameter parameter, Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 
     @Override
     public Object handleEmptyBody(Object body, HttpInputMessage inputMessage,
-                                  MethodParameter parameter, Type targetType,
-                                  Class<? extends HttpMessageConverter<?>> converterType) {
+            MethodParameter parameter, Type targetType,
+            Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 

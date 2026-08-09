@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.oa.report.controller;
 
-
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
@@ -67,5 +66,4 @@ public class ReportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''" + filename)
                 .body(departmentStatsService.export(from));
     }
-
 }

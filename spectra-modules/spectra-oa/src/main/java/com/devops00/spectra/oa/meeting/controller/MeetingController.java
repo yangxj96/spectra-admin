@@ -92,5 +92,4 @@ public class MeetingController {
             @Validated @RequestBody MeetingRecordFrom from) {
         bindService.saveRecord(id, from);
     }
-
 }
