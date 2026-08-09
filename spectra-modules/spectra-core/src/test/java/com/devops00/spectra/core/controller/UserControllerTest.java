@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -34,6 +35,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * @since 2025/12/11 17:49
  */
 @Slf4j
+@Disabled("手工管理员数据初始化脚本，不应由常规测试自动修改开发数据库")
 @SpringBootTest
 class UserControllerTest {
 

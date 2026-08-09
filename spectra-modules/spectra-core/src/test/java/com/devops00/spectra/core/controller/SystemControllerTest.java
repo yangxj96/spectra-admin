@@ -32,6 +32,7 @@ import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
 import com.devops00.spectra.core.user.service.RoleService;
 import jakarta.annotation.Resource;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.StopWatch;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2025/12/11 17:49
  */
+@Disabled("手工系统初始化脚本，不应由常规测试自动修改开发数据库")
 @SpringBootTest
 class SystemControllerTest {
 

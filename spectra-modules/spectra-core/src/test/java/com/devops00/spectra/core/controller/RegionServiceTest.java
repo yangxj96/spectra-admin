@@ -22,6 +22,7 @@ import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.service.RegionService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
  * @since 2026/1/30 14:01
  */
 @Slf4j
+@Disabled("手工行政区划数据导入脚本，不应由常规测试自动修改开发数据库")
 @SpringBootTest
 public class RegionServiceTest {
 

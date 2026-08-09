@@ -221,5 +221,41 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>security-audit</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.owasp</groupId>
+                        <artifactId>dependency-check-maven</artifactId>
+                        <version>12.2.2</version>
+                        <inherited>false</inherited>
+                        <configuration>
+                            <failBuildOnCVSS>7.0</failBuildOnCVSS>
+                            <failOnError>true</failOnError>
+                            <formats>
+                                <format>HTML</format>
+                                <format>JSON</format>
+                                <format>SARIF</format>
+                            </formats>
+                            <skipTestScope>true</skipTestScope>
+                            <versionCheckEnabled>false</versionCheckEnabled>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>dependency-vulnerability-gate</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>aggregate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
 
 </project>

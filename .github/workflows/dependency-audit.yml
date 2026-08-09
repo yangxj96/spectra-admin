@@ -1,0 +1,58 @@
+name: Backend dependency audit
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: "23 18 * * 1"
+    pull_request:
+        paths:
+            - "pom.xml"
+            - "**/pom.xml"
+            - ".mvn/**"
+            - "mvnw.cmd"
+            - ".github/workflows/dependency-audit.yml"
+
+permissions:
+    contents: read
+
+jobs:
+    dependency-check:
+        runs-on: windows-latest
+        timeout-minutes: 45
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Set up Java 25
+              uses: actions/setup-java@v4
+              with:
+                  distribution: temurin
+                  java-version: "25"
+                  cache: maven
+
+            - name: Cache OWASP vulnerability database
+              uses: actions/cache@v4
+              with:
+                  path: ~/.m2/repository/org/owasp/dependency-check-data
+                  key: dependency-check-${{ runner.os }}-${{ hashFiles('**/pom.xml') }}
+                  restore-keys: |
+                      dependency-check-${{ runner.os }}-
+
+            - name: Run dependency vulnerability gate
+              shell: pwsh
+              env:
+                  NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+              run: |
+                  $auditArgs = @("-Psecurity-audit", "verify", "-DskipTests")
+                  if ($env:NVD_API_KEY) {
+                      $auditArgs += "-DnvdApiKey=$env:NVD_API_KEY"
+                  }
+                  .\mvnw.cmd @auditArgs
+
+            - name: Upload dependency reports
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dependency-check-reports
+                  path: target/dependency-check-report.*
+                  if-no-files-found: warn

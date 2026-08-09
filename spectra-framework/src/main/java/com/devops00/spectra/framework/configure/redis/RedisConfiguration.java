@@ -57,7 +57,8 @@ public class RedisConfiguration {
      */
     @Bean
     public RedisClient redisClient() {
-        log.debug(LogPrefix.REDIS.f("正在构建原生 RedisClient，地址: {}"), redisProperties.getUrl());
+        // 连接 URL 可能包含密码，日志中禁止输出完整地址。
+        log.debug(LogPrefix.REDIS.f("正在构建原生 RedisClient"));
 
         // 1. 构建 ClientResources (可选配置，如线程池、事件循环等)
         // 如果不需要特殊定制，可以传 null 使用默认配置

@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import com.devops00.spectra.core.system.service.OperationLogService;
 import com.devops00.spectra.log.base.entity.ULogEntity;
+import com.devops00.spectra.log.base.utils.AuditLogSanitizer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -62,14 +63,16 @@ public class ULogListener {
         if (entity.getArgs() != null) {
             try {
                 String argsJson = om.writeValueAsString(entity.getArgs());
+                List<Object> argList = om.readValue(argsJson, tf.constructCollectionType(List.class, Object.class));
+                List<Object> sanitizedArgs = AuditLogSanitizer.sanitizeList(argList);
+                String sanitizedArgsJson = om.writeValueAsString(sanitizedArgs);
 
-                if (argsJson.length() > 10000) {
+                if (sanitizedArgsJson.length() > 10000) {
                     // 安全裁剪：动态计算长度，确保绝对不会越界崩溃
-                    String safeSub = argsJson.substring(0, 10000);
+                    String safeSub = sanitizedArgsJson.substring(0, 10000);
                     datum.setArgs(Map.of("payload", "参数过长已自动截断", "raw_part", safeSub + "...(已截断)"));
                 } else {
-                    List<Object> argList = om.readValue(argsJson, tf.constructCollectionType(List.class, Object.class));
-                    datum.setArgs(Map.of("payload", argList));
+                    datum.setArgs(Map.of("payload", sanitizedArgs));
                 }
             } catch (Exception ex) {
                 log.warn("{}异步序列化入参失败: {}", LogPrefix.LOG.p(), ex.getMessage());
@@ -81,25 +84,32 @@ public class ULogListener {
         if (entity.getResult() != null) {
             try {
                 String resultJson = om.writeValueAsString(entity.getResult());
+                List<Object> resultList = null;
+                Map<String, Object> resultMap = null;
+                Object scalarResult = null;
 
-                if (resultJson.length() > 10000) {
-                    String safeSub = resultJson.substring(0, Math.min(resultJson.length(), 10000));
-                    datum.setResult(Map.of("payload", "响应体过长已自动截断", "raw_part", safeSub + "...(已截断)"));
+                if (resultJson.startsWith("[")) {
+                    List<Object> parsed = om.readValue(resultJson, tf.constructCollectionType(List.class, Object.class));
+                    resultList = AuditLogSanitizer.sanitizeList(parsed);
+                } else if (resultJson.startsWith("{")) {
+                    Map<String, Object> parsed = om.readValue(resultJson, tf.constructMapType(Map.class, String.class, Object.class));
+                    resultMap = AuditLogSanitizer.sanitizeMap(parsed);
                 } else {
-                    // 如果是标准的 JSON 数组（以 [ 开头），解析成 List，再包裹成 Map 写入
-                    if (resultJson.startsWith("[")) {
-                        List<Object> resultList = om.readValue(resultJson, tf.constructCollectionType(List.class, Object.class));
-                        datum.setResult(Map.of("data", resultList)); // 👈 包裹进 Map 容器，完美迎合 jsonb 映射
-                    }
-                    // 如果是标准的 JSON 对象（以 { 开头），正常反序列化为 Map
-                    else if (resultJson.startsWith("{")) {
-                        Map<String, Object> resultMap = om.readValue(resultJson, tf.constructMapType(Map.class, String.class, Object.class));
-                        datum.setResult(resultMap);
-                    }
-                    // 如果是纯文本、数字或布尔值等基本类型
-                    else {
-                        datum.setResult(Map.of("info", entity.getResult()));
-                    }
+                    scalarResult = AuditLogSanitizer.sanitize(entity.getResult());
+                }
+
+                Object sanitizedResult = resultList != null ? resultList : resultMap != null ? resultMap : scalarResult;
+                String sanitizedResultJson = om.writeValueAsString(sanitizedResult);
+
+                if (sanitizedResultJson.length() > 10000) {
+                    String safeSub = sanitizedResultJson.substring(0, 10000);
+                    datum.setResult(Map.of("payload", "响应体过长已自动截断", "raw_part", safeSub + "...(已截断)"));
+                } else if (resultList != null) {
+                    datum.setResult(Map.of("data", resultList));
+                } else if (resultMap != null) {
+                    datum.setResult(resultMap);
+                } else {
+                    datum.setResult(Map.of("info", scalarResult));
                 }
             } catch (Exception ex) {
                 log.warn("{}异步序列化响应出参失败: {}", LogPrefix.LOG.p(), ex.getMessage());

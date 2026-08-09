@@ -21,6 +21,7 @@ import com.devops00.spectra.upload.javabean.entity.FileType;
 import com.devops00.spectra.upload.service.FileTypeService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -57,6 +58,7 @@ public class UploadControllerTest {
     /**
      * 初始化文件类型
      */
+    @Disabled("手工文件类型初始化脚本，不应在自动测试中修改开发数据库")
     @Test
     void initFileType() {
         var types = new ArrayList<FileType>();
