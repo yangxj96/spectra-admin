@@ -1,39 +1,40 @@
-[tools]
-java = "temurin-25.0.2+10.0.LTS"
-
 [env]
-# 默认密码
-DEFAULT_PASSWORD = "admin123"
-# SSL配置
-SSL_PASSWORD = "xxx"
+# 仅用于隔离的本地开发环境；共享/生产环境必须更换
+DEFAULT_PASSWORD = "change-me"
+
+# 服务配置：首次启动默认使用 HTTP 4004
+SERVER_PORT = "4004"
+SERVER_SSL_ENABLED = "false"
+
+# 启用本地 HTTPS 时配置，证书默认路径为 files/ssl/keystore.p12
+SSL_PASSWORD = "change-me"
 SSL_TYPE = "PKCS12"
 SSL_ALIAS = "tomcat"
-# 数据库相关配置
-DB_URL = "jdbc:postgresql://localhost:5432/devops00_spectra_db"
+
+# PostgreSQL：必须改成当前机器真实可连接的值
+DB_URL = "jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db"
 DB_USERNAME = "postgres"
-DB_PASSWORD = "xxx"
-# Redis
+DB_PASSWORD = "change-me"
+
+# Redis：当前连接串要求密码认证
 REDIS_PORT = "6379"
 REDIS_HOST = "127.0.0.1"
 REDIS_DB = "0"
-REDIS_PASSWORD = "XXX"
-# 服务配置
-SERVER_PORT = "8080"
-# S3服务器
-S3_ENDPOINT= ""
-S3_ACCESS_KEY= ""
-S3_SECRET_KEY= ""
-S3_BUCKET= ""
-S3_REGION= ""
-# AI
-AI_KEY= ""
-AI_BASE_URL= ""
-AI_MODEL= ""
-# RAG
-RAG_KEY= ""
-RAG_BASE_URL= ""
-RAG_MODEL= ""
-# 接口加解密（默认关闭，启用时需设置 enabled=true 并填入 RSA 密钥对）
-SPECTRA_SYSTEM_SM_ENABLED = "false"
-SPECTRA_SYSTEM_SM_PUBLIC_KEY = ""
-SPECTRA_SYSTEM_SM_PRIVATE_KEY = ""
+REDIS_PASSWORD = "change-me"
+
+# S3：以下本机占位值可让配置完成绑定；使用上传功能前必须接入真实 S3/MinIO
+S3_ENDPOINT = "http://127.0.0.1:9000"
+S3_ACCESS_KEY = "local-placeholder"
+S3_SECRET_KEY = "local-placeholder"
+S3_BUCKET = "spectra-local"
+S3_REGION = "us-east-1"
+
+# AI：本机占位端点不会自动提供模型服务；调用 AI 功能前必须替换
+AI_KEY = "local-placeholder"
+AI_BASE_URL = "http://127.0.0.1:11434/v1"
+AI_MODEL = "local-placeholder"
+
+# RAG/Embedding：调用 RAG 前必须配置真实兼容端点和模型
+RAG_KEY = "local-placeholder"
+RAG_BASE_URL = "http://127.0.0.1:11434/v1"
+RAG_MODEL = "local-placeholder"

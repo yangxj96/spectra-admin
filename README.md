@@ -28,7 +28,13 @@
 | PostgreSQL | 18 |
 | Redis | 本地开发必需 |
 
-复制 `.mise.local.toml.example` 为 `.mise.local.toml`，配置数据库、Redis、S3、SSL、AI 和 RAG 所需的本机环境变量。该文件包含凭据，不得提交。
+复制 `.mise.local.toml.example` 为 `.mise.local.toml`。模板默认使用 HTTP 4004；数据库和 Redis 必须改成真实可连接的本机值，S3、AI 和 RAG 的占位地址只保证配置完整，使用相应功能前必须接入真实 Provider。该本机文件可能包含凭据，不得提交。
+
+```powershell
+Copy-Item .mise.local.toml.example .mise.local.toml
+```
+
+数据库初始化、前端联调和 HTTPS 可选配置见根工作区 `docs/50-开发指南/10-环境搭建.md`。
 
 ## 构建与校验
 
@@ -61,7 +67,7 @@ java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
     -jar $jar.FullName
 ```
 
-默认开发端口为 `4004`，API 上下文为 `/api`。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
+默认开发端口为 `4004`，API 上下文为 `/api`。示例配置首次启动地址是 `http://127.0.0.1:4004/api`；只有设置 `SERVER_SSL_ENABLED=true` 并提供 `files/ssl/keystore.p12` 后才使用 HTTPS。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
 
 ## 文档入口
 

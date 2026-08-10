@@ -7,7 +7,7 @@ Spectra Admin 是 Spectra 系统的**后端 API 服务**，同时为 Web 管理�
 - 技术栈：Java 25, Spring Boot 4, Maven 多模块
 - 启动入口：`com.devops00.spectra.launch.LaunchApplication`
 - 开发端口：**4004**（通过 `.mise.local.toml` 中的 `SERVER_PORT` 设置）
-- 两个前端在开发环境均连接 `https://127.0.0.1:4004/`
+- 新克隆模板默认使用 `http://127.0.0.1:4004/`；维护者本机启用证书后可覆盖为 HTTPS，两个前端必须保持同一协议和端口
 
 ## mise、构建与运行
 
@@ -26,7 +26,9 @@ Spectra Admin 是 Spectra 系统的**后端 API 服务**，同时为 Web 管理�
 .\mvnw.cmd clean package -DskipTests
 
 # 选择 repackage 生成的 JAR，不要选择 *.jar.original
-$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File | Select-Object -First 1
+$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File |
+    Where-Object { $_.Name -notlike '*.jar.original' } |
+    Select-Object -First 1
 java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
     -Dspring.profiles.active=dev `
     -jar $jar.FullName
@@ -39,9 +41,9 @@ $mavenRepo = Join-Path $env:TEMP 'spectra-maven-repository'
 .\mvnw.cmd "-Dmaven.repo.local=$mavenRepo" clean package -DskipTests
 ```
 
-`spectra-launch/pom.xml` 中的 `spring-boot-maven-plugin` 配置了 `repackage` 和 `LaunchApplication` 主类，因此 Maven `package` 是“编译后启动”的标准流程。当前版本产物为 `spectra-launch-0.0.18.jar`，版本变化后以 `target/` 中实际文件名为准。运行前需要 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量。
+`spectra-launch/pom.xml` 中的 `spring-boot-maven-plugin` 配置了 `repackage` 和 `LaunchApplication` 主类，因此 Maven `package` 是“编译后启动”的标准流程。产物版本会变化，始终按上面的通配符从 `target/` 选择非 `*.jar.original` 文件。运行前需要 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量。
 
-IDEA 显示的 `java ... @C:\Users\yangx\AppData\Local\Temp\idea_arg_file... com.devops00.spectra.launch.LaunchApplication` 是 IDEA 对已编译 classpath 的直接启动命令；`@idea_arg_file...` 是临时参数文件，不是 Maven 编译命令。需要可重复的终端流程时使用上面的 `package` + JAR 方式。
+IDEA 显示的 `java ... @<系统临时目录>\idea_arg_file... com.devops00.spectra.launch.LaunchApplication` 是 IDEA 对已编译 classpath 的直接启动命令；参数文件位置属于本机临时路径，不得复制进公共启动说明。需要可重复的终端流程时使用上面的 `package` + JAR 方式。
 
 当前 `LaunchApplication` 不需要额外的 `@Import`。安全 starter 的 `SecurityAutoConfiguration` 会扫描 `com.devops00.spectra.security.starter.web`，`UserOnlineConverter` 放在该包范围内即可被其他模块运行时扫描到。
 
@@ -75,11 +77,12 @@ spectra-launch       → 应用入口，运行此模块
 - `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL 连接
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` - Redis 连接
 - `DEFAULT_PASSWORD` - 默认用户密码
-- `SSL_*` - SSL 配置（可选）
-- `S3_*` - S3 存储配置
-- `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - AI 服务配置
-- `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - RAG 检索增强生成配置
-- `SPECTRA_SYSTEM_SM_ENABLED`, `SPECTRA_SYSTEM_SM_PUBLIC_KEY`, `SPECTRA_SYSTEM_SM_PRIVATE_KEY` - 接口加解密（默认关闭）
+- `SERVER_SSL_ENABLED`, `SSL_*` - SSL 配置（模板默认关闭 HTTPS）
+- `S3_*` - 启动时保留完整配置，使用上传功能前连接真实 S3/MinIO
+- `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - 启动时保留完整配置，使用 AI 前连接真实服务
+- `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - 启动时保留完整配置，使用 RAG 前连接真实服务并准备 pgvector
+
+接口加解密不再读取环境变量；开关和密钥由 `spectra_core.sys_config` 中的 `crypto.*` 配置通过管理 API 动态维护，默认关闭。
 
 需要运行的服务：PostgreSQL, Redis。
 
@@ -141,7 +144,7 @@ GitHub Actions 工作流：`.github/workflows/spectra-minimal-image.yml`
 
 ## 常见陷阱
 
-- `.mise.local.toml` 在 gitignore 中——运行时必须从 example 创建
+- `.mise.local.toml` 在 gitignore 中——新克隆必须从 example 创建；根工作区同名文件只是维护者可选覆盖，不是前置条件
 - 原生 JVM 参数：`--add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED`
 - PostgreSQL 默认端口 5432，Redis 默认端口 6379
 - 此处 API 变更会直接影响 `spectra-ui` 和 `spectra-app`——修改端点时需与前端协调
