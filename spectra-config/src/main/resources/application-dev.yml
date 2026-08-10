@@ -114,7 +114,7 @@ mica:
   xss:
     enabled: true
     path-patterns: /**
-    path-exclude-patterns: /workflow/process-definitions/deploy
+    path-exclude-patterns:
 
 # ==================== Flowable 工作流 ====================
 flowable:
