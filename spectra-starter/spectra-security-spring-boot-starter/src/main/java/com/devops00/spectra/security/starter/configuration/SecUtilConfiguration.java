@@ -43,8 +43,7 @@ public class SecUtilConfiguration {
     /**
      * SecUtil 工具桥接
      *
-     * @param strategy
-     *            具体策略
+     * @param strategy 具体策略
      */
     @Bean
     public SecStrategyBridge secStrategyBridge(SecHolderStrategy strategy) {
@@ -54,20 +53,19 @@ public class SecUtilConfiguration {
     /**
      * 使用Redis操作SecUtil具体业务的策略实现
      *
-     * @param om
-     *            Security使用的ObjectMapper
-     * @param redis
-     *            Security使用的RedisTemplate
-     * @param properties
-     *            安全配置
-     * @param userOnlineConverter
-     *            在线用户转换器
+     * @param om                  Security使用的ObjectMapper
+     * @param redis               Security使用的RedisTemplate
+     * @param properties          安全配置
+     * @param userOnlineConverter 在线用户转换器
      */
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
-    public RedisSecHolderStrategy redisSecHolderStrategy(@Qualifier("securityObjectMapper") ObjectMapper om,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
-            UserOnlineConverter userOnlineConverter) {
+    public RedisSecHolderStrategy redisSecHolderStrategy(
+            @Qualifier("securityObjectMapper") ObjectMapper om,
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+            SecurityProperties properties,
+            UserOnlineConverter userOnlineConverter
+    ) {
         return new RedisSecHolderStrategy(om, redis, properties, userOnlineConverter);
     }
 }

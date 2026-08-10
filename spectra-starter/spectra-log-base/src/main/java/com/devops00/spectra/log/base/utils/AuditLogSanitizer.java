@@ -39,8 +39,25 @@ public final class AuditLogSanitizer {
 
     public static final String REDACTED_VALUE = "***";
 
-    private static final Set<String> SENSITIVE_KEYS = Set.of("password", "passwd", "pwd", "authorization", "cookie", "setcookie", "credential",
-            "credentials", "captcha", "captchacode", "kaptcha", "verificationcode", "verifycode", "smscode", "emailcode", "otp", "totp");
+    private static final Set<String> SENSITIVE_KEYS = Set.of(
+            "password",
+            "passwd",
+            "pwd",
+            "authorization",
+            "cookie",
+            "setcookie",
+            "credential",
+            "credentials",
+            "captcha",
+            "captchacode",
+            "kaptcha",
+            "verificationcode",
+            "verifycode",
+            "smscode",
+            "emailcode",
+            "otp",
+            "totp"
+    );
 
     private static final Pattern URL_SECRET = Pattern.compile(
             "(?i)([?&](?:x-amz-signature|x-amz-credential|signature|token|access_token|refresh_token|api_key|apikey|secret)=)[^&#\\s]*");

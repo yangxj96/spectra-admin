@@ -63,10 +63,6 @@ public class SHA256Utils {
      * 字节数组转Hex
      */
     private static String bytesToHex(byte[] bytes) {
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
+        return AESUtils.getIvHex(bytes);
     }
 }

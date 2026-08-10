@@ -245,9 +245,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
     /**
      * 从 MyBatis mappedStatementId 反推实体类
      *
-     * mappedStatementId 格式:
-     * com.devops00.spectra.core.user.mapper.UserMapper.selectById 尝试从 Mapper
-     * 包路径推导对应的 Entity 包路径
+     * <p>mappedStatementId 格式:</p>
+     * <p>com.devops00.spectra.core.user.mapper.UserMapper.selectById 尝试从 Mapper</p>
+     * <p>包路径推导对应的 Entity 包路径</p>
      */
     private Class<?> resolveEntityClass(String mappedStatementId) {
         if (mappedStatementId == null) {
