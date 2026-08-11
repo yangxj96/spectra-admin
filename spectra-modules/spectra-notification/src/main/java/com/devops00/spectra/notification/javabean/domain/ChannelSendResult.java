@@ -14,24 +14,22 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification;
-
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+package com.devops00.spectra.notification.javabean.domain;
 
 /**
- * 统一通知模块入口
+ * 渠道发送结果；占位渠道不会伪造成功。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-@Configuration
-@ComponentScan("com.devops00.spectra.notification")
-@MapperScan("com.devops00.spectra.notification.mapper")
-@EnableConfigurationProperties(NotificationModuleProperties.class)
-public class NotificationModule {
+public record ChannelSendResult(
+        /** 投递结果状态。 */
+        String status,
+        /** 渠道供应商编码。 */
+        String providerCode,
+        /** 供应商返回的消息 ID。 */
+        String providerMessageId,
+        /** 供应商响应摘要。 */
+        String summary) {
 }

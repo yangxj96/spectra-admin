@@ -39,11 +39,17 @@ class NotificationSqlContractTest {
         assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request"));
         assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task"));
         assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery"));
-        assertTrue(schema.contains("uk_ntf_request_idempotency"));
-        assertTrue(schema.contains("uk_ntf_task_recipient_channel"));
-        assertTrue(schema.contains("tenant_id UUID NOT NULL"));
-        assertTrue(messages.contains("ON CONFLICT (tenant_id, idempotency_key) DO NOTHING"));
-        assertTrue(preferences.contains("ON CONFLICT (tenant_id, user_id, purpose, channel) DO UPDATE"));
+        assertTrue(schema.contains("UK_NTF_REQUEST_IDEMPOTENCY"));
+        assertTrue(schema.contains("UK_NTF_TASK_RECIPIENT_CHANNEL"));
+        assertTrue(schema.contains("created_by"));
+        assertTrue(schema.contains("notification_request_id"));
+        assertTrue(schema.contains("receiver_user_id"));
+        assertTrue(schema.contains("recipient_key_hash"));
+        assertTrue(schema.contains("attempt_no"));
+        assertTrue(schema.contains("is_read"));
+        assertTrue(schema.contains("tenant_id"));
+        assertTrue(messages.contains("ON CONFLICT DO NOTHING"));
+        assertTrue(preferences.contains("ON CONFLICT (tenant_id, user_id, purpose, channel) WHERE deleted IS NULL DO UPDATE"));
         assertTrue(tasks.contains("ALTER TABLE spectra_notification.ntf_task ADD COLUMN IF NOT EXISTS title"));
         assertTrue(tasks.contains("ALTER TABLE spectra_notification.ntf_task ADD COLUMN IF NOT EXISTS content"));
     }

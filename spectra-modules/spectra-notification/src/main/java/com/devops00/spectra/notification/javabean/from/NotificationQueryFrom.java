@@ -14,24 +14,28 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification;
+package com.devops00.spectra.notification.javabean.from;
 
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import lombok.Data;
 
 /**
- * 统一通知模块入口
+ * 消息中心分页查询参数。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-@Configuration
-@ComponentScan("com.devops00.spectra.notification")
-@MapperScan("com.devops00.spectra.notification.mapper")
-@EnableConfigurationProperties(NotificationModuleProperties.class)
-public class NotificationModule {
+@Data
+public class NotificationQueryFrom {
+
+    /** 消息分类。 */
+    private String type;
+    /** 是否只查询已读或未读消息。 */
+    private Boolean isRead;
+    /** 标题或正文关键字。 */
+    private String keyword;
+    /** 创建时间起点。 */
+    private String startTime;
+    /** 创建时间终点。 */
+    private String endTime;
 }

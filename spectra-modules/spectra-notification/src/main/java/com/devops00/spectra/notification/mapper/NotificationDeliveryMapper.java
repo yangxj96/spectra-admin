@@ -14,24 +14,19 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification;
+package com.devops00.spectra.notification.mapper;
 
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
- * 统一通知模块入口
+ * 通知投递 Mapper。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-@Configuration
-@ComponentScan("com.devops00.spectra.notification")
-@MapperScan("com.devops00.spectra.notification.mapper")
-@EnableConfigurationProperties(NotificationModuleProperties.class)
-public class NotificationModule {
+@Mapper
+public interface NotificationDeliveryMapper extends BaseMapper<NotificationDeliveryEntity> {
 }
