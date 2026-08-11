@@ -32,6 +32,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import com.devops00.spectra.workflow.service.ApprovalCallback;
@@ -63,6 +67,10 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     private final WorkflowService workflowService;
 
     private final TaskConverter taskConverter;
+
+    private final NotificationGateway notificationGateway;
+
+    private final NotificationRecipientDirectory recipientDirectory;
 
     @Override
     public IPage<TaskVO> todo(PageFrom page, String assignee, String processDefinitionKey) {
@@ -120,6 +128,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
         // 完成任务
         flowableTaskService.complete(taskId, variables);
+        notifyWorkflowResult(task, operator, true);
+        notifyNextTasks(task.getProcessInstanceId());
         dispatchIfFinished(task.getProcessInstanceId(), task.getProcessDefinitionId(), true, null);
         log.info("任务审批通过: taskId={}, processInstanceId={}", taskId, task.getProcessInstanceId());
     }
@@ -140,6 +150,8 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
         // 完成任务（驳回）
         flowableTaskService.complete(taskId, variables);
+        notifyWorkflowResult(task, operator, false);
+        notifyNextTasks(task.getProcessInstanceId());
         dispatchIfFinished(task.getProcessInstanceId(), task.getProcessDefinitionId(), false, comment);
         log.info("任务已驳回: taskId={}, processInstanceId={}", taskId, task.getProcessInstanceId());
     }
@@ -242,5 +254,58 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         } else {
             callback.onRejected(historic.getBusinessKey(), reason);
         }
+    }
+
+    private void notifyWorkflowResult(org.flowable.task.api.Task task, String operator, boolean approved) {
+        var recipients = recipientDirectory.resolveByLoginNames(java.util.List.of(operator))
+                .stream()
+                .filter(item -> item.active() && item.userId() != null)
+                .map(item -> item.userId())
+                .distinct()
+                .toList();
+        if (recipients.isEmpty()) {
+            return;
+        }
+        var title = approved ? "流程任务已通过" : "流程任务已驳回";
+        var content = approved ? "您处理的流程任务已通过。" : "您处理的流程任务已驳回。";
+        notificationGateway.enqueue(NotificationRequest.inApp(
+                "workflow:result:" + task.getId() + ":" + approved,
+                NotificationPurpose.WORKFLOW_RESULT,
+                recipients,
+                "workflow.task.result",
+                title,
+                content,
+                "WORKFLOW",
+                task.getProcessInstanceId(),
+                "WORKFLOW",
+                "/workflow/tasks/done"));
+    }
+
+    private void notifyNextTasks(String processInstanceId) {
+        flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).list().forEach(task -> {
+            if (!StringUtils.hasText(task.getAssignee())) {
+                return;
+            }
+            var recipients = recipientDirectory.resolveByLoginNames(java.util.List.of(task.getAssignee()))
+                    .stream()
+                    .filter(item -> item.active() && item.userId() != null)
+                    .map(item -> item.userId())
+                    .distinct()
+                    .toList();
+            if (recipients.isEmpty()) {
+                return;
+            }
+            notificationGateway.enqueue(NotificationRequest.inApp(
+                    "workflow:todo:" + task.getId(),
+                    NotificationPurpose.WORKFLOW_TODO,
+                    recipients,
+                    "workflow.task.todo",
+                    "新的待办任务",
+                    "您有新的流程待办任务：" + task.getName(),
+                    "WORKFLOW",
+                    processInstanceId,
+                    "WORKFLOW",
+                    "/workflow/tasks/todo"));
+        });
     }
 }

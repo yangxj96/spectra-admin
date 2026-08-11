@@ -90,4 +90,10 @@ public class SecurityProperties {
      * Token自动续期间隔（秒），请求距上次续期超过此值才刷新
      */
     private long tokenRefreshInterval = 300L;
+
+    /** 验证码有效期（秒）。 */
+    private long verificationCodeExpire = 300L;
+
+    /** 验证码长度。当前只允许 6 位数字。 */
+    private int verificationCodeLength = 6;
 }

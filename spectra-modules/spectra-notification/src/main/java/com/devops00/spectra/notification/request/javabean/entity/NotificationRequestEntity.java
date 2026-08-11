@@ -26,6 +26,7 @@ public class NotificationRequestEntity {
     private String dataScopeKey;
     @TableField(typeHandler = PgJsonbTypeHandler.class)
     private Map<String, Object> payload;
+    private String sensitivePayload;
     private String status;
     private Instant scheduledAt;
     private Instant expiresAt;

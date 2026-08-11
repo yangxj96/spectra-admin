@@ -29,6 +29,7 @@ import com.devops00.spectra.notification.inbox.service.NotificationInboxService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 /** 当前用户消息中心接口；所有查询和写操作均由服务层强制绑定当前收件人。 */
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping({"/notification", "/notification-center/inbox"})
 public class NotificationController {
 

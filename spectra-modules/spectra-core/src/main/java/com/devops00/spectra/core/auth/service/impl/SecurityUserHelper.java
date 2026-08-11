@@ -90,10 +90,15 @@ public class SecurityUserHelper {
         boolean userActive = UserStatus.ACTIVE.getCode().equals(u.getStatus());
         boolean accountTypeMatches = loginType.equals(account.getType());
         boolean verified = loginType == LoginType.PASSWORD
-                || Short.valueOf((short) 1).equals(account.getVerified());
+            || Short.valueOf((short) 1).equals(account.getVerified());
 
-        if (account.getDeleted() != null || u.getDeleted() != null || !accountTypeMatches || !accountActive || !accountNotExpired
-                || !verified || !userActive) {
+        if (account.getDeleted() != null
+            || u.getDeleted() != null
+            || !accountTypeMatches
+            || !accountActive
+            || !accountNotExpired
+            || !verified
+            || !userActive) {
             throw new LoginException("账号当前不可用");
         }
 

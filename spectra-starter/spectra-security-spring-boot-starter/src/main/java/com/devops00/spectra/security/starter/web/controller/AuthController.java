@@ -117,7 +117,7 @@ public class AuthController {
     /**
      * 发送短信验证码
      */
-    @ULog(value = "'发送短信验证码至[' + #params.phone + ']'", type = SysLogType.SAFETY)
+    @ULog(value = "'发送短信验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/sms", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
@@ -128,7 +128,7 @@ public class AuthController {
     /**
      * 发送邮箱验证码
      */
-    @ULog(value = "'发送邮箱验证码至[' + #params.email + ']'", type = SysLogType.SAFETY)
+    @ULog(value = "'发送邮箱验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/email", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)

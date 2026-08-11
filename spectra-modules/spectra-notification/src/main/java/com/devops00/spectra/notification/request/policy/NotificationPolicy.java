@@ -46,11 +46,20 @@ public class NotificationPolicy {
         }
         if ((purpose == NotificationPurpose.BIND_PHONE_CODE
             || purpose == NotificationPurpose.LOGIN_CODE
+            || purpose == NotificationPurpose.BIND_EMAIL_CODE
             || purpose == NotificationPurpose.RESET_PASSWORD_CODE)
             && channels.stream().noneMatch(channel -> channel == NotificationChannel.SMS || channel == NotificationChannel.EMAIL)) {
             throw new DataSaveException("验证码通知必须使用短信或邮件渠道");
         }
         return channels;
+    }
+
+    /** 直接地址只允许用于认证和安全通知，避免普通业务绕过用户目录。 */
+    public boolean allowsDirectAddress(NotificationPurpose purpose) {
+        return purpose == NotificationPurpose.LOGIN_CODE
+            || purpose == NotificationPurpose.BIND_PHONE_CODE
+            || purpose == NotificationPurpose.BIND_EMAIL_CODE
+            || purpose == NotificationPurpose.RESET_PASSWORD_CODE;
     }
 
     /** 强制安全用途始终投递，不受 enabled 或免打扰影响。 */

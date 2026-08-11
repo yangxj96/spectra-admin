@@ -25,7 +25,9 @@ public class NotificationTaskEntity {
     private String link;
     @TableField(typeHandler = PgJsonbTypeHandler.class)
     private Map<String, Object> extra;
+    private String sensitivePayload;
     private Instant scheduledAt;
+    private Instant expiresAt;
     private String status;
     private Integer retryCount;
     private String lastError;

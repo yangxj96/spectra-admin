@@ -18,6 +18,7 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
@@ -75,7 +76,16 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
     public void kaptchaValidate(String phone, String kaptcha) {
         var key = RedisCacheKey.SMS_CODE + phone;
         var val = redisTemplate.opsForValue().get(key);
-        if (val == null || !kaptcha.equals(val.toString())) {
+        if (val == null || !matchesDigest(kaptcha, val.toString())) {
+            throw new KaptchaNotMatchException("验证码错误");
+        }
+    }
+
+    private boolean matchesDigest(String code, String expected) {
+        try {
+            return java.security.MessageDigest.isEqual(SHA256Utils.hash(code).getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                    expected.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        } catch (Exception exception) {
             throw new KaptchaNotMatchException("验证码错误");
         }
     }

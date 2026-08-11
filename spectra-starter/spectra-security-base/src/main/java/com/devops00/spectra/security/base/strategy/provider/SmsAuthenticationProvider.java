@@ -41,8 +41,10 @@ public abstract class SmsAuthenticationProvider implements BasicAuthenticationPr
         if (!(authentication instanceof SmsAuthenticationToken params)) {
             throw new BadCredentialsException("登录失败");
         }
-        if (!(params.getPrincipal() instanceof String phone) || !StringUtils.hasText(phone)
-                || !(params.getCredentials() instanceof String code) || !StringUtils.hasText(code)) {
+        if (!(params.getPrincipal() instanceof String phone)
+            || !StringUtils.hasText(phone)
+            || !(params.getCredentials() instanceof String code)
+            || !StringUtils.hasText(code)) {
             throw new BadCredentialsException("手机号或验证码不能为空");
         }
         try {

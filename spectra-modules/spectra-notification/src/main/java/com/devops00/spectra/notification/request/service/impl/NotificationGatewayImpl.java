@@ -17,6 +17,7 @@
 package com.devops00.spectra.notification.request.service.impl;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -26,17 +27,18 @@ import java.util.UUID;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRequest;
-import com.devops00.spectra.notification.dispatch.javabean.entity.NotificationDeliveryEntity;
-import com.devops00.spectra.notification.dispatch.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.dispatch.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.dispatch.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.inbox.javabean.entity.NotificationInboxEntity;
-import com.devops00.spectra.notification.inbox.mapper.NotificationInboxMapper;
+import com.devops00.spectra.notification.dispatch.service.NotificationSender;
 import com.devops00.spectra.notification.preference.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.preference.mapper.NotificationUserPreferenceMapper;
+import com.devops00.spectra.notification.configuration.NotificationModuleProperties;
+import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.request.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.request.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.request.policy.NotificationPolicy;
@@ -60,18 +62,40 @@ public class NotificationGatewayImpl implements NotificationGateway {
 
     private final NotificationRequestMapper requestMapper;
     private final NotificationTaskMapper taskMapper;
-    private final NotificationDeliveryMapper deliveryMapper;
-    private final NotificationInboxMapper inboxMapper;
     private final NotificationTemplateMapper templateMapper;
     private final NotificationUserPreferenceMapper preferenceMapper;
     private final NotificationTemplateRenderer templateRenderer;
     private final NotificationPolicy policy;
+    private final NotificationModuleProperties properties;
+    private final NotificationRecipientDirectory recipientDirectory;
+    private final NotificationPayloadProtector payloadProtector;
+    private final List<NotificationSender> senders;
+
+    @Override
+    public NotificationChannelAvailability availability(NotificationChannel channel) {
+        if (!properties.enabled()) {
+            return new NotificationChannelAvailability(channel, false, "MODULE_DISABLED");
+        }
+        if (channel == null) {
+            return new NotificationChannelAvailability(null, false, "CHANNEL_REQUIRED");
+        }
+        return senders.stream()
+                .filter(sender -> sender.channel() == channel)
+                .findFirst()
+                .map(sender -> new NotificationChannelAvailability(channel, sender.available(),
+                        sender.available() ? "AVAILABLE" : sender.unavailableReason()))
+                .orElseGet(() -> new NotificationChannelAvailability(channel, false, "CHANNEL_NOT_REGISTERED"));
+    }
 
     @Override
     @Transactional
     public NotificationReceipt enqueue(NotificationRequest request) {
+        if (!properties.enabled()) {
+            throw new DataSaveException("通知模块未启用");
+        }
         validate(request);
         var channels = policy.resolve(request.purpose(), request.channels());
+        var recipients = recipientDirectory.resolve(request.recipientUserIds());
         var existing = requestMapper.selectOne(new LambdaQueryWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationRequestEntity::getIdempotencyKey, request.idempotencyKey()));
@@ -95,6 +119,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setSourceDepartmentId(request.sourceDepartmentId());
         entity.setDataScopeKey(request.sourceDepartmentId() == null ? null : request.sourceDepartmentId().toString());
         entity.setPayload(request.parameters());
+        entity.setSensitivePayload(payloadProtector.protectParameters(request.sensitiveParameters()));
         entity.setStatus("ACCEPTED");
         entity.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
         entity.setExpiresAt(request.expiresAt());
@@ -106,79 +131,73 @@ public class NotificationGatewayImpl implements NotificationGateway {
         }
 
         var taskCount = 0;
-        for (var recipient : request.recipientUserIds().stream().distinct().toList()) {
-            for (var channel : channels) {
-                if (!shouldDeliver(request.purpose(), recipient, channel)) {
-                    continue;
-                }
-                if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
-                        .eq(NotificationTaskEntity::getRequestId, requestId)
-                        .eq(NotificationTaskEntity::getRecipientUserId, recipient)
-                        .eq(NotificationTaskEntity::getChannel, channel.name())) > 0) {
-                    continue;
-                }
-                var rendered = render(request, channel);
-                var task = new NotificationTaskEntity();
-                task.setId(UUID.randomUUID());
-                task.setRequestId(requestId);
-                task.setTenantId(SYSTEM_TENANT_ID);
-                task.setRecipientUserId(recipient);
-                task.setChannel(channel.name());
-                task.setPurpose(request.purpose().name());
-                task.setTitle(rendered.title());
-                task.setContent(rendered.content());
-                task.setLink(request.link());
-                task.setExtra(request.parameters());
-                task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
-                task.setStatus("PENDING");
-                task.setRetryCount(0);
-                task.setCreatedAt(now);
-                task.setUpdatedAt(now);
-                if (taskMapper.insert(task) != 1) {
-                    throw new DataSaveException("创建通知任务失败");
-                }
-                if (channel == NotificationChannel.IN_APP) {
-                    deliverInApp(task, request);
-                }
-                taskCount++;
+        for (var recipient : recipients) {
+            if (!recipient.active()) {
+                log.warn("通知收件人不存在或已禁用: userId={}", recipient.userId());
+                continue;
             }
+            for (var channel : channels) {
+                if (!shouldDeliver(request.purpose(), recipient.userId(), channel)) {
+                    continue;
+                }
+                var address = recipient.addressFor(channel);
+                if (channel != NotificationChannel.IN_APP && address == null) {
+                    log.warn("通知收件人缺少已验证渠道地址: userId={}, channel={}", recipient.userId(), channel);
+                    continue;
+                }
+                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now);
+            }
+        }
+        for (var directAddress : request.directAddresses()) {
+            if (!channels.contains(directAddress.channel())) {
+                continue;
+            }
+            taskCount += createTask(request, requestId, null, directAddress.channel(), directAddress.address(), now);
         }
         return new NotificationReceipt(requestId, "ACCEPTED", taskCount, false);
     }
 
-    private void deliverInApp(NotificationTaskEntity task, NotificationRequest request) {
-        var inbox = new NotificationInboxEntity();
-        inbox.setId(UUID.randomUUID());
-        inbox.setTenantId(task.getTenantId());
-        inbox.setRecipientUserId(task.getRecipientUserId());
-        inbox.setRequestId(task.getRequestId());
-        inbox.setTaskId(task.getId());
-        inbox.setPurpose(task.getPurpose());
-        inbox.setTitle(task.getTitle());
-        inbox.setContent(task.getContent());
-        inbox.setLink(task.getLink());
-        inbox.setExtra(request.parameters());
-        inbox.setCreatedAt(Instant.now());
-        if (inboxMapper.insert(inbox) != 1) {
-            throw new DataSaveException("写入站内信失败");
+    private int createTask(NotificationRequest request, UUID requestId, UUID recipientUserId,
+            NotificationChannel channel, String address, Instant now) {
+        if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
+                .eq(NotificationTaskEntity::getRequestId, requestId)
+                .eq(NotificationTaskEntity::getRecipientUserId, recipientUserId)
+                .eq(NotificationTaskEntity::getChannel, channel.name())) > 0) {
+            return 0;
         }
-        var delivery = new NotificationDeliveryEntity();
-        delivery.setId(UUID.randomUUID());
-        delivery.setTaskId(task.getId());
-        delivery.setProviderCode("IN_APP");
-        delivery.setStatus("SENT");
-        delivery.setResponseSummary("站内信已写入收件箱");
-        delivery.setSentAt(Instant.now());
-        delivery.setCreatedAt(Instant.now());
-        if (deliveryMapper.insert(delivery) != 1) {
-            throw new DataSaveException("记录站内信投递结果失败");
+        var renderParameters = new HashMap<String, Object>(request.parameters());
+        renderParameters.putAll(request.sensitiveParameters());
+        var rendered = render(request, channel, renderParameters);
+        var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
+        var task = new NotificationTaskEntity();
+        task.setId(UUID.randomUUID());
+        task.setRequestId(requestId);
+        task.setTenantId(SYSTEM_TENANT_ID);
+        task.setRecipientUserId(recipientUserId);
+        task.setRecipientAddress(address == null ? null : payloadProtector.protectAddress(address));
+        task.setChannel(channel.name());
+        task.setPurpose(request.purpose().name());
+        task.setTitle(hasSensitivePayload ? "安全通知" : rendered.title());
+        task.setContent(hasSensitivePayload ? "敏感通知内容已加密" : rendered.content());
+        task.setLink(request.link());
+        task.setExtra(request.parameters());
+        task.setSensitivePayload(hasSensitivePayload
+                ? payloadProtector.protectParameters(Map.of("title", rendered.title(), "content", rendered.content()))
+                : null);
+        task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
+        task.setExpiresAt(request.expiresAt());
+        task.setStatus("PENDING");
+        task.setRetryCount(0);
+        task.setCreatedAt(now);
+        task.setUpdatedAt(now);
+        if (taskMapper.insert(task) != 1) {
+            throw new DataSaveException("创建通知任务失败");
         }
-        task.setStatus("SENT");
-        task.setUpdatedAt(Instant.now());
-        taskMapper.updateById(task);
+        return 1;
     }
 
-    private RenderedContent render(NotificationRequest request, NotificationChannel channel) {
+    private RenderedContent render(NotificationRequest request, NotificationChannel channel,
+            Map<String, Object> parameters) {
         var template = templateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
@@ -188,14 +207,18 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 .orderByDesc(NotificationTemplateEntity::getVersionNo)
                 .last("LIMIT 1"));
         if (template != null) {
-            templateRenderer.validate(template.getTitleTemplate(), request.parameters());
-            templateRenderer.validate(template.getContentTemplate(), request.parameters());
+            templateRenderer.validate(template.getTitleTemplate(), parameters);
+            templateRenderer.validate(template.getContentTemplate(), parameters);
             templateRenderer.validateHtml(template.getHtmlTemplate());
-            return new RenderedContent(templateRenderer.render(template.getTitleTemplate(), request.parameters()),
-                    templateRenderer.render(template.getContentTemplate(), request.parameters()));
+            return new RenderedContent(templateRenderer.render(template.getTitleTemplate(), parameters),
+                    templateRenderer.render(template.getContentTemplate(), parameters));
         }
-        var title = String.valueOf(request.parameters().getOrDefault("title", "通知"));
-        var content = String.valueOf(request.parameters().getOrDefault("content", ""));
+        var title = String.valueOf(parameters.getOrDefault("title", "通知"));
+        var content = String.valueOf(parameters.getOrDefault("content", ""));
+        templateRenderer.validate(title, parameters);
+        templateRenderer.validate(content, parameters);
+        title = templateRenderer.render(title, parameters);
+        content = templateRenderer.render(content, parameters);
         if (!StringUtils.hasText(title)) {
             throw new DataSaveException("通知标题不能为空");
         }
@@ -205,6 +228,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
     private boolean shouldDeliver(com.devops00.spectra.common.notification.NotificationPurpose purpose, UUID recipient,
             NotificationChannel channel) {
         if (policy.mandatory(purpose)) {
+            return true;
+        }
+        if (recipient == null) {
             return true;
         }
         var preference = preferenceMapper.selectOne(new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
@@ -222,15 +248,21 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (request == null
             || !StringUtils.hasText(request.idempotencyKey())
             || request.purpose() == null
-            || request.recipientUserIds().isEmpty()
+            || (request.recipientUserIds().isEmpty() && request.directAddresses().isEmpty())
             || !StringUtils.hasText(request.templateGroupCode())) {
             throw new DataSaveException("通知请求参数不完整");
         }
         if (request.recipientUserIds().stream().anyMatch(java.util.Objects::isNull)) {
             throw new DataSaveException("通知收件人无效");
         }
-        if (!request.sensitiveParameters().isEmpty()) {
-            throw new DataSaveException("通知敏感参数尚未完成加密配置");
+        for (var directAddress : request.directAddresses()) {
+            if (directAddress == null
+                || directAddress.channel() == null
+                || !StringUtils.hasText(directAddress.address())
+                || directAddress.channel() == NotificationChannel.IN_APP
+                || !policy.allowsDirectAddress(request.purpose())) {
+                throw new DataSaveException("通知直接收件地址不合法");
+            }
         }
         if (request.parameters()
                 .keySet()

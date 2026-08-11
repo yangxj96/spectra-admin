@@ -16,29 +16,98 @@
 
 package com.devops00.spectra.security.starter.web.service.impl;
 
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.notification.NotificationDirectAddress;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationReceipt;
+import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.web.service.AuthService;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-/**
- * 认证服务实现
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/6/28
- */
+/** 认证验证码服务；负责生成、摘要存储和通过通知 Gateway 入队。 */
 @Service
 @NullMarked
 public class AuthServiceImpl implements AuthService {
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private final NotificationGateway notificationGateway;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityProperties securityProperties;
+
+    public AuthServiceImpl(NotificationGateway notificationGateway,
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+            SecurityProperties securityProperties) {
+        this.notificationGateway = notificationGateway;
+        this.redisTemplate = redisTemplate;
+        this.securityProperties = securityProperties;
+    }
+
     @Override
     public void sendSmsCode(String phone) {
-        throw new SpectraException("短信验证码服务暂未启用");
+        sendCode(phone, NotificationChannel.SMS, RedisCacheKey.SMS_CODE, "security.login-code.sms");
     }
 
     @Override
     public void sendEmailCode(String email) {
-        throw new SpectraException("邮箱验证码服务暂未启用");
+        sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.EMAIL_CODE, "security.login-code.email");
+    }
+
+    private void sendCode(String address, NotificationChannel channel, String redisPrefix, String templateCode) {
+        var availability = notificationGateway.availability(channel);
+        if (!availability.available()) {
+            throw new SpectraException("验证码通知渠道暂不可用: " + availability.reason());
+        }
+        var code = generateCode();
+        var redisKey = redisPrefix + address;
+        try {
+            redisTemplate.opsForValue().set(redisKey, digest(code), securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
+            var request = new NotificationRequest(null, "security:login-code:" + UUID.randomUUID(),
+                    NotificationPurpose.LOGIN_CODE, List.of(channel), List.of(),
+                    List.of(new NotificationDirectAddress(channel, address)), templateCode,
+                    Map.of("title", "登录验证码", "content", "您的验证码为 {{code}}，请在有效期内完成操作。"),
+                    Map.of("code", code), "SECURITY", UUID.randomUUID().toString(), "SECURITY", null,
+                    Instant.now(), Instant.now().plusSeconds(securityProperties.getVerificationCodeExpire()), 100, null);
+            NotificationReceipt receipt = notificationGateway.enqueue(request);
+            if (receipt.taskCount() == 0) {
+                throw new SpectraException("验证码通知未生成投递任务");
+            }
+        } catch (RuntimeException exception) {
+            redisTemplate.delete(redisKey);
+            if (exception instanceof SpectraException) {
+                throw exception;
+            }
+            throw new SpectraException("验证码通知入队失败", exception);
+        }
+    }
+
+    private String generateCode() {
+        if (securityProperties.getVerificationCodeLength() != 6) {
+            throw new SpectraException("验证码长度配置必须为 6 位");
+        }
+        return "%06d".formatted(RANDOM.nextInt(1_000_000));
+    }
+
+    private String digest(String code) {
+        try {
+            return SHA256Utils.hash(code);
+        } catch (Exception exception) {
+            throw new SpectraException("验证码摘要生成失败", exception);
+        }
     }
 }

@@ -41,8 +41,10 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
         if (!(authentication instanceof UsernamePasswordCaptchaAuthenticationToken params)) {
             throw new BadCredentialsException("登录失败");
         }
-        if (!(params.getPrincipal() instanceof String username) || !StringUtils.hasText(username)
-                || !(params.getCredentials() instanceof String password) || !StringUtils.hasText(password)) {
+        if (!(params.getPrincipal() instanceof String username)
+            || !StringUtils.hasText(username)
+            || !(params.getCredentials() instanceof String password)
+            || !StringUtils.hasText(password)) {
             throw new BadCredentialsException("用户名或密码不能为空");
         }
         try {

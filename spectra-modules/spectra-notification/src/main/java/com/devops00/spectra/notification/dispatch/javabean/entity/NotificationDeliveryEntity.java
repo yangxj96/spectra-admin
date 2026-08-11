@@ -11,6 +11,7 @@ import lombok.Data;
 @TableName(value = "ntf_delivery", schema = "spectra_notification")
 public class NotificationDeliveryEntity {
     private UUID id;
+    private UUID tenantId;
     private UUID taskId;
     private String providerCode;
     private String providerMessageId;

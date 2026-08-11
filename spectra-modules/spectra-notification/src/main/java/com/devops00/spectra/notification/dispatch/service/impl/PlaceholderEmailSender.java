@@ -32,6 +32,16 @@ public class PlaceholderEmailSender implements NotificationSender {
     }
 
     @Override
+    public boolean available() {
+        return false;
+    }
+
+    @Override
+    public String unavailableReason() {
+        return "EMAIL_CHANNEL_NOT_CONFIGURED";
+    }
+
+    @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
         return new ChannelSendResult("BLOCKED", "EMAIL_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
     }

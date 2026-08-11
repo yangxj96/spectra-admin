@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.dispatch.javabean.bo.ChannelSendResult;
 import com.devops00.spectra.notification.dispatch.javabean.entity.NotificationTaskEntity;
@@ -58,7 +59,9 @@ public class InAppNotificationSender implements NotificationSender {
             inbox.setLink(task.getLink());
             inbox.setExtra(task.getExtra());
             inbox.setCreatedAt(Instant.now());
-            inboxMapper.insert(inbox);
+            if (inboxMapper.insert(inbox) != 1) {
+                throw new DataSaveException("写入站内信失败");
+            }
         }
         return new ChannelSendResult("SENT", "IN_APP", null, "站内信已写入收件箱");
     }

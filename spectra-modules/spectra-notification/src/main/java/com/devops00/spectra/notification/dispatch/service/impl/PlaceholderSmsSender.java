@@ -32,6 +32,16 @@ public class PlaceholderSmsSender implements NotificationSender {
     }
 
     @Override
+    public boolean available() {
+        return false;
+    }
+
+    @Override
+    public String unavailableReason() {
+        return "SMS_CHANNEL_NOT_CONFIGURED";
+    }
+
+    @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
         return new ChannelSendResult("BLOCKED", "SMS_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
     }

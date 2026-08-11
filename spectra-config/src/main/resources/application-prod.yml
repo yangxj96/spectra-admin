@@ -27,6 +27,14 @@ spectra:
       embedding-batch-size: 20
       max-segment-size: 300
       max-overlap-size: 30
+  notification:
+    enabled: ${NOTIFICATION_ENABLED:true}
+    address-encryption-key: ${NOTIFICATION_ADDRESS_ENCRYPTION_KEY:}
+    sensitive-payload-key: ${NOTIFICATION_SENSITIVE_PAYLOAD_KEY:}
+    worker:
+      fixed-delay-ms: ${NOTIFICATION_WORKER_FIXED_DELAY_MS:5000}
+      processing-timeout-seconds: ${NOTIFICATION_WORKER_PROCESSING_TIMEOUT_SECONDS:300}
+      retry-base-delay-seconds: ${NOTIFICATION_WORKER_RETRY_BASE_DELAY_SECONDS:5}
 
 # ==================== 服务器配置 ====================
 server:

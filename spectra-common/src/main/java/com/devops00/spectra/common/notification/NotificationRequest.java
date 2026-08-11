@@ -15,6 +15,7 @@ public record NotificationRequest(
         NotificationPurpose purpose,
         List<NotificationChannel> channels,
         List<UUID> recipientUserIds,
+        List<NotificationDirectAddress> directAddresses,
         String templateGroupCode,
         Map<String, Object> parameters,
         Map<String, Object> sensitiveParameters,
@@ -30,6 +31,7 @@ public record NotificationRequest(
     public NotificationRequest {
         channels = channels == null ? List.of() : List.copyOf(channels);
         recipientUserIds = recipientUserIds == null ? List.of() : List.copyOf(recipientUserIds);
+        directAddresses = directAddresses == null ? List.of() : List.copyOf(directAddresses);
         parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
         sensitiveParameters = sensitiveParameters == null ? Map.of() : Map.copyOf(sensitiveParameters);
     }
@@ -41,7 +43,7 @@ public record NotificationRequest(
             List<NotificationChannel> channels, List<UUID> recipientUserIds, String templateGroupCode,
             Map<String, Object> parameters, String businessType, String businessId, String sourceModule,
             UUID sourceDepartmentId, Instant scheduledAt, Instant expiresAt, Integer priority, String link) {
-        this(requestId, idempotencyKey, purpose, channels, recipientUserIds, templateGroupCode, parameters, Map.of(),
+        this(requestId, idempotencyKey, purpose, channels, recipientUserIds, List.of(), templateGroupCode, parameters, Map.of(),
                 businessType, businessId, sourceModule, sourceDepartmentId, scheduledAt, expiresAt, priority, link);
     }
 
@@ -53,7 +55,7 @@ public record NotificationRequest(
         parameters.put("title", title == null ? "通知" : title);
         parameters.put("content", content == null ? "" : content);
         return new NotificationRequest(null, idempotencyKey, purpose, List.of(NotificationChannel.IN_APP),
-                recipientUserIds, templateGroupCode, parameters, businessType, businessId, sourceModule, null, null, null,
-                0, link);
+                recipientUserIds, List.of(), templateGroupCode, parameters, Map.of(), businessType, businessId,
+                sourceModule, null, null, null, 0, link);
     }
 }

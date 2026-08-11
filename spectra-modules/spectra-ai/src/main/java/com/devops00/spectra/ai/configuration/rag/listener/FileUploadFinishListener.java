@@ -20,6 +20,9 @@ import com.devops00.spectra.ai.configuration.rag.utils.SpectraDocumentParser;
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
@@ -60,6 +63,8 @@ public class FileUploadFinishListener {
     private final FileUploadFacade fileUploadFacade;
 
     private final AiRAGProperties properties;
+
+    private final NotificationGateway notificationGateway;
 
     @Async
     @EventListener
@@ -104,8 +109,31 @@ public class FileUploadFinishListener {
                 // Thread.sleep(200);
             }
             log.info("{}恭喜！文件 [{}] 索引已成功灌入 PgVector", LogPrefix.AI.p(), fileInfo.getOriginalName());
+            notifyIndexResult(fileInfo, true);
         } catch (Exception e) {
             log.error("{}文件 [{}] RAG 索引构建失败", LogPrefix.AI.p(), fileInfo.getId(), e);
+            notifyIndexResult(fileInfo, false);
         }
+    }
+
+    private void notifyIndexResult(FileInfo fileInfo, boolean success) {
+        if (fileInfo.getCreatedBy() == null) {
+            return;
+        }
+        var title = success ? "知识库索引完成" : "知识库索引失败";
+        var content = success
+                ? "文件「" + fileInfo.getOriginalName() + "」已完成知识库索引。"
+                : "文件「" + fileInfo.getOriginalName() + "」知识库索引失败，请稍后重试。";
+        notificationGateway.enqueue(NotificationRequest.inApp(
+                "ai:rag:index:" + fileInfo.getId() + ":" + (success ? "success" : "failure"),
+                NotificationPurpose.SYSTEM_NOTICE,
+                List.of(fileInfo.getCreatedBy()),
+                "ai.rag.index",
+                title,
+                content,
+                "AI",
+                fileInfo.getId().toString(),
+                "AI",
+                null));
     }
 }
