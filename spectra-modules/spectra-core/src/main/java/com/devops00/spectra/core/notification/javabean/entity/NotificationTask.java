@@ -16,6 +16,8 @@ public class NotificationTask {
     private UUID recipientUserId;
     private String recipientAddress;
     private String channel;
+    private String title;
+    private String content;
     private Instant scheduledAt;
     private String status;
     private Integer retryCount;

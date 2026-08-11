@@ -57,11 +57,7 @@ public class NotificationTaskWorkerImpl implements NotificationTaskWorker {
             return;
         }
         try {
-            // 当前任务表只保存收件人和状态，短信/邮件正文由后续 Provider 从请求模板上下文读取。
-            // 在上下文未关联前拒绝发送，避免向外部供应商发送空内容。
-            fail(task, "任务缺少已渲染的通知内容");
-            return;
-            /* var messageId = gateway.send(channel, task.getRecipientAddress(), title, content);
+            var messageId = gateway.send(channel, task.getRecipientAddress(), task.getTitle(), task.getContent());
             var delivery = new NotificationDelivery();
             delivery.setId(UUID.randomUUID());
             delivery.setTaskId(task.getId());
@@ -74,7 +70,6 @@ public class NotificationTaskWorkerImpl implements NotificationTaskWorker {
             task.setStatus("SENT");
             task.setUpdatedAt(Instant.now());
             notificationTaskMapper.updateById(task);
-            */
         } catch (RuntimeException exception) {
             fail(task, safeMessage(exception));
         }

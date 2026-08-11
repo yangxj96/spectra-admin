@@ -18,5 +18,6 @@ public interface NotificationTaskService {
      * @param address 外部渠道地址，可为空
      * @return 创建的任务
      */
-    List<NotificationTask> split(UUID requestId, UUID tenantId, List<UUID> recipientUserIds, String channel, String address);
+    List<NotificationTask> split(UUID requestId, UUID tenantId, List<UUID> recipientUserIds, String channel, String address,
+            String title, String content);
 }

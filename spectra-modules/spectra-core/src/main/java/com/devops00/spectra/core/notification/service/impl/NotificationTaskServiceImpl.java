@@ -24,9 +24,10 @@ public class NotificationTaskServiceImpl implements NotificationTaskService {
 
     @Override
     @Transactional
-    public List<NotificationTask> split(UUID requestId, UUID tenantId, List<UUID> recipientUserIds, String channel, String address) {
+    public List<NotificationTask> split(UUID requestId, UUID tenantId, List<UUID> recipientUserIds, String channel, String address,
+            String title, String content) {
         if (requestId == null || tenantId == null || recipientUserIds == null || recipientUserIds.isEmpty()
-                || !StringUtils.hasText(channel)) {
+                || !StringUtils.hasText(channel) || !StringUtils.hasText(title) || !StringUtils.hasText(content)) {
             throw new DataSaveException("通知任务参数不完整");
         }
         try {
@@ -47,6 +48,8 @@ public class NotificationTaskServiceImpl implements NotificationTaskService {
             task.setRecipientUserId(recipientUserId);
             task.setRecipientAddress(address);
             task.setChannel(channel.toUpperCase());
+            task.setTitle(title);
+            task.setContent(content);
             task.setScheduledAt(now);
             task.setStatus("PENDING");
             task.setRetryCount(0);

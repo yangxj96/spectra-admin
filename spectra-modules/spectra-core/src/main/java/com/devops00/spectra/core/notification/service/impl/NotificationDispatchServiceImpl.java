@@ -42,7 +42,7 @@ public class NotificationDispatchServiceImpl implements NotificationDispatchServ
         var title = notificationTemplateRenderer.render(titleTemplate, variables);
         var content = notificationTemplateRenderer.render(contentTemplate, variables);
         notificationTaskService.split(request.getId(), request.getTenantId(), recipientUserIds,
-                notificationChannel.name(), address);
+                notificationChannel.name(), address, title, content);
         if (notificationChannel == NotificationChannel.INBOX) {
             notificationInboxService.publish(request.getId(), request.getTenantId(), recipientUserIds, title, content);
         }
