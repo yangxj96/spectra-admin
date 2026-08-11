@@ -31,8 +31,9 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.document.javabean.converter.DocumentConverter;
@@ -80,7 +81,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final DocumentFolderMapper folderMapper;
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
-    private final NotificationService notificationService;
+    private final NotificationGateway notificationGateway;
     private final UserService userService;
     private final DocumentConverter documentConverter;
 
@@ -350,14 +351,10 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             if (receiverIds.isEmpty()) {
                 return;
             }
-            var notification = new NotificationBatchSendDTO();
-            notification.setTitle("文档已发布: " + document.getTitle());
-            notification.setContent(document.getSummary());
-            notification.setType("oa_document");
-            notification.setSenderId(document.getOwnerId());
-            notification.setLink("/oa/document?id=" + document.getId());
-            notification.setReceiverIds(receiverIds);
-            notificationService.batchSend(notification);
+            notificationGateway.enqueue(NotificationRequest.inApp("oa:document:" + document.getId() + ":publish",
+                    NotificationPurpose.OA_NOTICE, receiverIds, "oa.document.published", "文档已发布: " + document.getTitle(),
+                    document.getSummary(), "OA_DOCUMENT", document.getId().toString(), "OA",
+                    "/oa/document?id=" + document.getId()));
         } catch (Exception exception) {
             log.warn("文档发布通知发送失败: documentId={}", document.getId(), exception);
         }

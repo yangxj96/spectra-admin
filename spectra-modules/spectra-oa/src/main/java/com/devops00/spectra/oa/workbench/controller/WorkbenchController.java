@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationCounter;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.service.ApplicationService;
@@ -57,7 +57,7 @@ public class WorkbenchController {
 
     private final ApplicationService applicationService;
     private final TaskService taskService;
-    private final NotificationService notificationService;
+    private final NotificationCounter notificationCounter;
     private final NoticeService noticeService;
     private final CalendarService calendarService;
     private final MeetingService meetingService;
@@ -81,7 +81,7 @@ public class WorkbenchController {
 
         try {
             var userId = SecUtil.getCurrentUserId();
-            result.setUnreadNotificationCount(userId == null ? 0 : notificationService.getUnreadCount(userId));
+            result.setUnreadNotificationCount(notificationCounter.unreadCount(userId));
         } catch (Exception exception) {
             log.warn("OA 工作台消息卡片加载失败", exception);
         }

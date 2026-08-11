@@ -23,8 +23,9 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
@@ -64,7 +65,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final MeetingConverter meetingConverter;
     private final MeetingParticipantMapper participantMapper;
     private final MeetingRecordMapper recordMapper;
-    private final NotificationService notificationService;
+    private final NotificationGateway notificationGateway;
     private final UserService userService;
     private final TimeMapper timeMapper;
 
@@ -114,14 +115,10 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             }
         }
         if (!receivers.isEmpty()) {
-            var dto = new NotificationBatchSendDTO();
-            dto.setTitle("会议邀请：" + entity.getTitle());
-            dto.setContent(entity.getContent());
-            dto.setType("oa_meeting");
-            dto.setSenderId(userId);
-            dto.setLink("/oa/meeting?id=" + entity.getId());
-            dto.setReceiverIds(receivers.stream().distinct().toList());
-            notificationService.batchSend(dto);
+            notificationGateway.enqueue(NotificationRequest.inApp("oa:meeting:" + entity.getId(),
+                    NotificationPurpose.OA_REMINDER, receivers.stream().distinct().toList(), "oa.meeting.invitation",
+                    "会议邀请：" + entity.getTitle(), entity.getContent(), "OA_MEETING", entity.getId().toString(), "OA",
+                    "/oa/meeting?id=" + entity.getId()));
         }
     }
 

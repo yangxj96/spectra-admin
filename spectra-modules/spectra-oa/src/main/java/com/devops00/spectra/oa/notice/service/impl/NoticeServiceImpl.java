@@ -33,8 +33,9 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationBatchSendDTO;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.notice.javabean.converter.NoticeConverter;
@@ -62,7 +63,7 @@ import lombok.RequiredArgsConstructor;
 public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     private final NoticeReaderMapper noticeReaderMapper;
-    private final NotificationService notificationService;
+    private final NotificationGateway notificationGateway;
     private final UserService userService;
     private final NoticeConverter noticeConverter;
     private final TimeMapper timeMapper;
@@ -228,14 +229,10 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (receiverIds.isEmpty()) {
             return;
         }
-        var dto = new NotificationBatchSendDTO();
-        dto.setTitle(notice.getTitle());
-        dto.setContent(notice.getSummary() == null ? notice.getContent() : notice.getSummary());
-        dto.setType("oa_notice");
-        dto.setSenderId(notice.getPublisherId());
-        dto.setLink("/oa/notice?id=" + notice.getId());
-        dto.setReceiverIds(receiverIds);
-        notificationService.batchSend(dto);
+        notificationGateway.enqueue(NotificationRequest.inApp("oa:notice:" + notice.getId() + ":publish",
+                NotificationPurpose.OA_NOTICE, receiverIds, "oa.notice.published", notice.getTitle(),
+                notice.getSummary() == null ? notice.getContent() : notice.getSummary(), "OA_NOTICE",
+                notice.getId().toString(), "OA", "/oa/notice?id=" + notice.getId()));
     }
 
     private void activateDueNotices(List<Notice> notices) {

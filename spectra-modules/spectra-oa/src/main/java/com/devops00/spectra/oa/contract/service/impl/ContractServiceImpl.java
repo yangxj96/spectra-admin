@@ -37,8 +37,9 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
@@ -89,7 +90,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final ContractMilestoneMapper milestoneMapper;
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
-    private final NotificationService notificationService;
+    private final NotificationGateway notificationGateway;
     private final ContractConverter contractConverter;
     private final TimeMapper timeMapper;
 
@@ -383,14 +384,13 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             if (claimed != 1) {
                 continue;
             }
-            var notification = new NotificationSendDTO();
-            notification.setTitle("合同履约节点即将到期");
-            notification.setContent("合同「" + contract.getTitle() + "」的履约节点「" + milestone.getName() + "」将于 " + milestone.getDueDate() + " 到期，请及时处理。");
-            notification.setType("oa_contract_milestone");
-            notification.setReceiverId(receiverId);
-            notification.setLink("/oa/contract/" + contract.getId());
+            var title = "合同履约节点即将到期";
+            var content = "合同「" + contract.getTitle() + "」的履约节点「" + milestone.getName() + "」将于 "
+                    + milestone.getDueDate() + " 到期，请及时处理。";
             try {
-                notificationService.send(notification);
+                notificationGateway.enqueue(NotificationRequest.inApp("oa:contract-milestone:" + milestone.getId(),
+                        NotificationPurpose.OA_REMINDER, List.of(receiverId), "oa.contract.milestone.reminder", title, content,
+                        "OA_CONTRACT_MILESTONE", milestone.getId().toString(), "OA", "/oa/contract/" + contract.getId()));
                 sent++;
             } catch (RuntimeException exception) {
                 milestoneMapper.update(null, new LambdaUpdateWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestone.getId())

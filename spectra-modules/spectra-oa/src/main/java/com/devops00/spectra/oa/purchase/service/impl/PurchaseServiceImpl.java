@@ -37,8 +37,9 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.core.notification.javabean.dto.NotificationSendDTO;
-import com.devops00.spectra.core.notification.service.NotificationService;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
@@ -99,7 +100,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationService applicationService;
     private final ProcessInstanceService processInstanceService;
-    private final NotificationService notificationService;
+    private final NotificationGateway notificationGateway;
     private final PurchaseConverter purchaseConverter;
 
     @Override
@@ -479,12 +480,8 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     }
 
     private void sendNotification(Application application, String title, String content) {
-        var dto = new NotificationSendDTO();
-        dto.setTitle(title);
-        dto.setContent(content);
-        dto.setType("oa");
-        dto.setReceiverId(application.getApplicantId());
-        dto.setLink("/oa/purchase/" + application.getBizId());
-        notificationService.send(dto);
+        notificationGateway.enqueue(NotificationRequest.inApp("oa:purchase:" + application.getBizId() + ":" + title,
+                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), "oa.application.status", title, content,
+                "OA_PURCHASE", application.getBizId().toString(), "OA", "/oa/purchase/" + application.getBizId()));
     }
 }
