@@ -1,0 +1,72 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.ai.configuration.rag.listener;
+
+import java.util.UUID;
+
+import com.devops00.spectra.ai.properties.AiRAGProperties;
+import com.devops00.spectra.common.event.FileUploadFinishEvent;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.upload.javabean.entity.FileInfo;
+import com.devops00.spectra.upload.service.FileInfoService;
+import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+import dev.langchain4j.data.document.Document;
+import dev.langchain4j.data.segment.TextSegment;
+import dev.langchain4j.model.embedding.EmbeddingModel;
+import dev.langchain4j.store.embedding.EmbeddingStore;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/** AI RAG 失败结果通知和幂等键回归测试。 */
+class FileUploadFinishListenerNotificationTest {
+
+    @Test
+    void shouldNotifyCreatorWhenRagIndexFails() {
+        var embeddingStore = mock(EmbeddingStore.class);
+        var embeddingModel = mock(EmbeddingModel.class);
+        var fileInfoService = mock(FileInfoService.class);
+        var fileUploadFacade = mock(FileUploadFacade.class);
+        var properties = new AiRAGProperties();
+        var notificationGateway = mock(NotificationGateway.class);
+        var fileId = UUID.randomUUID();
+        var creatorId = UUID.randomUUID();
+        var fileInfo = new FileInfo();
+        fileInfo.setId(fileId);
+        fileInfo.setCreatedBy(creatorId);
+        fileInfo.setOriginalName("知识库文档.pdf");
+        when(fileInfoService.getById(fileId)).thenReturn(fileInfo);
+        when(fileUploadFacade.openStream(fileInfo)).thenThrow(new IllegalStateException("mock storage failure"));
+
+        var listener = new FileUploadFinishListener(embeddingStore, embeddingModel, fileInfoService, fileUploadFacade,
+                properties, notificationGateway);
+
+        listener.handleFileUploaded(new FileUploadFinishEvent(this, fileId));
+
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
+        verify(notificationGateway).enqueue(requestCaptor.capture());
+        assertEquals(NotificationPurpose.SYSTEM_NOTICE, requestCaptor.getValue().purpose());
+        assertEquals("ai:rag:index:" + fileId + ":failure", requestCaptor.getValue().idempotencyKey());
+        assertEquals(creatorId, requestCaptor.getValue().recipientUserIds().getFirst());
+    }
+}
