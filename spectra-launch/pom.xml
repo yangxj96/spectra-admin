@@ -40,6 +40,12 @@
     </properties>
 
     <dependencies>
+        <!-- 统一通知模块 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-notification</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- === 项目模块-基础功能 === -->
         <!-- 文件上传 -->
         <dependency>
