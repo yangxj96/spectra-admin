@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.mapper;
 import java.time.Instant;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -35,5 +36,6 @@ import org.apache.ibatis.annotations.Param;
 public interface NotificationTaskMapper extends BaseMapper<NotificationTaskEntity> {
 
     /** 按计划时间领取待处理任务，并使用 PostgreSQL 行锁跳过已被其他 Worker 锁定的任务。 */
+    @InterceptorIgnore(dataPermission = "true")
     List<NotificationTaskEntity> selectPendingTasks(@Param("now") Instant now, @Param("limit") int limit);
 }

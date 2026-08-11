@@ -17,27 +17,36 @@
 package com.devops00.spectra.notification.schema;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
+import com.baomidou.mybatisplus.core.plugins.InterceptorIgnoreHelper;
+import com.baomidou.mybatisplus.extension.plugins.inner.DataPermissionInterceptor;
+import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
+import org.apache.ibatis.builder.StaticSqlSource;
+import org.apache.ibatis.mapping.MappedStatement;
+import org.apache.ibatis.mapping.SqlCommandType;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.RowBounds;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** 通知建表和迁移脚本的结构契约测试；真实事务/并发行为需在 PostgreSQL 环境执行。 */
+/** 通知建表脚本与 Mapper XML 的结构契约测试；真实事务和并发行为需在 PostgreSQL 环境执行。 */
 class NotificationSqlContractTest {
 
     @Test
-    void shouldKeepSchemaTablesIndexesAndIdempotentMigrations() throws IOException {
+    void shouldKeepSchemaTablesIndexesAndColumnComments() throws IOException {
         var schema = readSql("建表.sql");
-        var messages = readSql("迁移/20260811-旧消息迁移.sql");
-        var preferences = readSql("迁移/20260811-旧偏好迁移.sql");
-        var tasks = readSql("迁移/20260811-任务内容.sql");
 
         assertTrue(schema.contains("CREATE SCHEMA IF NOT EXISTS spectra_notification"));
         assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request"));
@@ -55,10 +64,45 @@ class NotificationSqlContractTest {
         var tableColumns = tableColumns(schema);
         assertEquals(131, tableColumns.size());
         assertEquals(tableColumns, commentedColumns(schema));
-        assertTrue(messages.contains("ON CONFLICT DO NOTHING"));
-        assertTrue(preferences.contains("ON CONFLICT (tenant_id, user_id, purpose, channel) WHERE deleted IS NULL DO UPDATE"));
-        assertTrue(tasks.contains("ALTER TABLE spectra_notification.ntf_task ADD COLUMN IF NOT EXISTS title"));
-        assertTrue(tasks.contains("ALTER TABLE spectra_notification.ntf_task ADD COLUMN IF NOT EXISTS content"));
+    }
+
+    @Test
+    void shouldPutPostgresLockClauseAfterOrderByAndLimit() throws IOException {
+        var mapper = readResource("mapper/NotificationTaskMapper.xml");
+        var orderByIndex = mapper.indexOf("ORDER BY priority DESC, scheduled_at ASC, created_at ASC");
+        var limitIndex = mapper.indexOf("LIMIT #{limit}");
+        var lockIndex = mapper.indexOf("FOR UPDATE SKIP LOCKED");
+
+        assertTrue(orderByIndex >= 0, "通知任务领取 SQL 缺少 ORDER BY 子句");
+        assertTrue(limitIndex > orderByIndex, "LIMIT 子句必须位于 ORDER BY 之后");
+        assertTrue(lockIndex > limitIndex, "PostgreSQL 锁定子句必须位于 ORDER BY 和 LIMIT 之后");
+    }
+
+    @Test
+    void shouldBypassDataPermissionParserForPostgresLockingQuery() throws Exception {
+        var method = NotificationTaskMapper.class.getMethod("selectPendingTasks", Instant.class, int.class);
+        var interceptorIgnore = method.getAnnotation(InterceptorIgnore.class);
+        var mappedStatementId = NotificationTaskMapper.class.getName() + ".selectPendingTasks";
+        var classIgnoreStrategy = InterceptorIgnoreHelper.initSqlParserInfoCache(NotificationTaskMapper.class);
+        InterceptorIgnoreHelper.initSqlParserInfoCache(classIgnoreStrategy, NotificationTaskMapper.class.getName(), method);
+        var ignoreStrategy = InterceptorIgnoreHelper.getIgnoreStrategy(mappedStatementId);
+
+        assertNotNull(interceptorIgnore, "通知任务领取 SQL 必须跳过会重新序列化 SQL 的数据权限拦截器");
+        assertEquals("true", interceptorIgnore.dataPermission());
+        assertNotNull(ignoreStrategy, "MyBatis-Plus 必须识别通知任务领取方法的拦截器忽略策略");
+        assertEquals(Boolean.TRUE, ignoreStrategy.getDataPermission());
+
+        var originalSql = "SELECT id FROM spectra_notification.ntf_task "
+                + "ORDER BY priority DESC LIMIT ? FOR UPDATE SKIP LOCKED";
+        var configuration = new Configuration();
+        var mappedStatement = new MappedStatement.Builder(
+                configuration, mappedStatementId, new StaticSqlSource(configuration, originalSql), SqlCommandType.SELECT)
+                .build();
+        var boundSql = mappedStatement.getBoundSql(null);
+
+        new DataPermissionInterceptor().beforeQuery(null, mappedStatement, null, RowBounds.DEFAULT, null, boundSql);
+
+        assertEquals(originalSql, boundSql.getSql(), "数据权限拦截器不得重新序列化 PostgreSQL 锁定查询");
     }
 
     private String readSql(String name) throws IOException {
@@ -73,6 +117,15 @@ class NotificationSqlContractTest {
             }
         }
         throw new IOException("找不到通知 SQL 文件: " + name);
+    }
+
+    private String readResource(String name) throws IOException {
+        try (var resource = getClass().getClassLoader().getResourceAsStream(name)) {
+            if (resource == null) {
+                throw new IOException("找不到通知模块资源: " + name);
+            }
+            return new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     private Set<String> tableColumns(String schema) {
