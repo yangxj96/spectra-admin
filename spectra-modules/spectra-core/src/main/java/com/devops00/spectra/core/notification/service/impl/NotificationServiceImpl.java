@@ -47,7 +47,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
         Page<Notification> pageParam = new Page<>(page.getPageNum(), page.getPageSize());
         var wrapper = new LambdaQueryWrapper<Notification>();
 
-        wrapper.eq(Notification::getReceiverId, userId);
+        wrapper.eq(Notification::getReceiverId, userId).isNull(Notification::getDeleted);
 
         if (StringUtils.hasText(params.getType())) {
             wrapper.eq(Notification::getType, params.getType());
@@ -86,7 +86,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
     @Override
     public long getUnreadCount(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false);
+        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false).isNull(Notification::getDeleted);
         return this.count(wrapper);
     }
 
@@ -94,11 +94,11 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
     @Transactional
     public void markAsRead(UUID id, UUID userId) {
         var entity = this.getById(id);
-        if (entity == null || !entity.getReceiverId().equals(userId)) {
+        if (entity == null || entity.getDeleted() != null || !userId.equals(entity.getReceiverId())) {
             throw new DataNotExistException("消息不存在");
         }
 
-        if (!entity.getIsRead()) {
+        if (!Boolean.TRUE.equals(entity.getIsRead())) {
             entity.setIsRead(true);
             entity.setReadAt(Instant.now());
             if (!this.updateById(entity)) {
@@ -112,7 +112,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
     @Transactional
     public void markAllAsRead(UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false);
+        wrapper.eq(Notification::getReceiverId, userId).eq(Notification::getIsRead, false).isNull(Notification::getDeleted);
 
         var entity = new Notification();
         entity.setIsRead(true);
@@ -126,7 +126,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
     @Transactional
     public void deleteById(UUID id, UUID userId) {
         var entity = this.getById(id);
-        if (entity == null || !entity.getReceiverId().equals(userId)) {
+        if (entity == null || entity.getDeleted() != null || !userId.equals(entity.getReceiverId())) {
             throw new DataNotExistException("消息不存在");
         }
 
@@ -140,7 +140,7 @@ public class NotificationServiceImpl extends BaseServiceImpl<NotificationMapper,
     @Transactional
     public void batchDelete(List<UUID> ids, UUID userId) {
         var wrapper = new LambdaQueryWrapper<Notification>();
-        wrapper.in(Notification::getId, ids).eq(Notification::getReceiverId, userId);
+        wrapper.in(Notification::getId, ids).eq(Notification::getReceiverId, userId).isNull(Notification::getDeleted);
 
         this.remove(wrapper);
         log.info("批量删除消息: count={}", ids.size());

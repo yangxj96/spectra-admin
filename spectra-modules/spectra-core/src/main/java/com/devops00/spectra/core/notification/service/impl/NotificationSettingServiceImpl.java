@@ -35,7 +35,7 @@ public class NotificationSettingServiceImpl extends BaseServiceImpl<Notification
     @Override
     public NotificationSettingVO getSetting(UUID userId) {
         var wrapper = new LambdaQueryWrapper<NotificationSetting>();
-        wrapper.eq(NotificationSetting::getUserId, userId);
+        wrapper.eq(NotificationSetting::getUserId, userId).isNull(NotificationSetting::getDeleted);
         var entity = this.getOne(wrapper);
 
         if (entity == null) {
@@ -50,7 +50,7 @@ public class NotificationSettingServiceImpl extends BaseServiceImpl<Notification
     @Transactional
     public void updateSetting(UUID userId, NotificationSettingFrom from) {
         var wrapper = new LambdaQueryWrapper<NotificationSetting>();
-        wrapper.eq(NotificationSetting::getUserId, userId);
+        wrapper.eq(NotificationSetting::getUserId, userId).isNull(NotificationSetting::getDeleted);
         var entity = this.getOne(wrapper);
 
         if (entity == null) {
