@@ -25,5 +25,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>
