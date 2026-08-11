@@ -16,15 +16,10 @@
 
 package com.devops00.spectra.security.starter.web.service.impl;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.security.starter.web.service.AuthService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-
-import java.time.Duration;
 
 /**
  * 认证服务实现
@@ -33,23 +28,17 @@ import java.time.Duration;
  * @version 1.0
  * @since 2026/6/28
  */
-@Slf4j
 @Service
 @NullMarked
-@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
     public void sendSmsCode(String phone) {
-        // TODO: 调用短信服务发送验证码
-        redisTemplate.opsForValue().set(RedisCacheKey.SMS_CODE + phone, "1234", Duration.ofMinutes(5));
+        throw new SpectraException("短信验证码服务暂未启用");
     }
 
     @Override
     public void sendEmailCode(String email) {
-        // TODO: 调用邮件服务发送验证码
-        redisTemplate.opsForValue().set(RedisCacheKey.EMAIL_CODE + email, "1234", Duration.ofMinutes(5));
+        throw new SpectraException("邮箱验证码服务暂未启用");
     }
 }

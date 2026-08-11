@@ -20,11 +20,10 @@ import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.strategy.provider.SmsAuthenticationProvider;
-import com.devops00.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,8 +49,6 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     private final SecurityUserHelper securityUserHelper;
 
-    private String currentPhone;
-
     public LoginSmsProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
             SecurityUserHelper securityUserHelper) {
         this.redisTemplate = redisTemplate;
@@ -61,30 +58,22 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
     }
 
     @Override
-    public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        if (authentication instanceof SmsAuthenticationToken token) {
-            this.currentPhone = token.getPrincipal().toString();
-        }
-        return super.authenticate(authentication);
-    }
-
-    @Override
     public Authentication login(String phone, String code) throws AuthenticationException {
         var account = accountService.getByPhone(phone);
         if (account == null) {
-            throw new LoginException("该手机号未注册");
+            throw new LoginException("账号或验证码错误");
         }
         var user = userService.getById(account.getUserId());
         if (user == null) {
-            throw new LoginException("用户不存在");
+            throw new LoginException("账号或验证码错误");
         }
-        var su = securityUserHelper.toSecurityUser(user);
+        var su = securityUserHelper.toSecurityUser(LoginType.SMS, account, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 
     @Override
-    public void kaptchaValidate(String kaptcha) {
-        var key = RedisCacheKey.SMS_CODE + currentPhone;
+    public void kaptchaValidate(String phone, String kaptcha) {
+        var key = RedisCacheKey.SMS_CODE + phone;
         var val = redisTemplate.opsForValue().get(key);
         if (val == null || !kaptcha.equals(val.toString())) {
             throw new KaptchaNotMatchException("验证码错误");
@@ -92,8 +81,8 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
     }
 
     @Override
-    public void kaptchaDelete() {
-        var key = RedisCacheKey.SMS_CODE + currentPhone;
+    public void kaptchaDelete(String phone) {
+        var key = RedisCacheKey.SMS_CODE + phone;
         redisTemplate.delete(key);
     }
 }

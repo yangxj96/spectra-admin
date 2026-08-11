@@ -23,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 
 /**
  * 用户名密码登录
@@ -38,17 +39,16 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
     @Override
     public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!(authentication instanceof UsernamePasswordCaptchaAuthenticationToken params)) {
-            throw new RuntimeException("登录失败,未知原因");
+            throw new BadCredentialsException("登录失败");
+        }
+        if (!(params.getPrincipal() instanceof String username) || !StringUtils.hasText(username)
+                || !(params.getCredentials() instanceof String password) || !StringUtils.hasText(password)) {
+            throw new BadCredentialsException("用户名或密码不能为空");
         }
         try {
             // 验证码验证
             kaptchaValidate(params.getCaptcha());
-
-            if (params.getPrincipal() == null || params.getCredentials() == null) {
-                throw new BadCredentialsException("用户名或密码不能为空");
-            }
-
-            return login(params.getPrincipal().toString(), params.getCredentials().toString());
+            return login(username, password);
         } finally {
             // 不管登录是否失败,都需要删除掉验证码
             kaptchaDelete();

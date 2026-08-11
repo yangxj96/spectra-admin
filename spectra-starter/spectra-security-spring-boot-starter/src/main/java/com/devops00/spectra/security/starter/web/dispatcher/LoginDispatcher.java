@@ -22,6 +22,7 @@ import com.devops00.spectra.security.base.strategy.tokens.EmailAuthenticationTok
 import com.devops00.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
 import com.devops00.spectra.security.base.strategy.tokens.UsernamePasswordCaptchaAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -49,16 +50,19 @@ public class LoginDispatcher {
      * @return 登录结果
      */
     public Authentication authenticate(LoginFrom request) {
+        if (request == null || request.getType() == null) {
+            throw new BadCredentialsException("登录类型不能为空");
+        }
 
         return switch (request.getType()) {
-            case LoginType.PASSWORD -> authenticationManager
+            case PASSWORD -> authenticationManager
                     .authenticate(new UsernamePasswordCaptchaAuthenticationToken(request.getUsername(), request.getPassword(), request.getCaptcha()));
 
-            case LoginType.SMS -> authenticationManager.authenticate(new SmsAuthenticationToken(request.getUsername(), request.getSmsCode()));
+            case SMS -> authenticationManager.authenticate(new SmsAuthenticationToken(request.getUsername(), request.getSmsCode()));
 
-            case LoginType.EMAIL -> authenticationManager.authenticate(new EmailAuthenticationToken(request.getUsername(), request.getEmailCode()));
+            case EMAIL -> authenticationManager.authenticate(new EmailAuthenticationToken(request.getUsername(), request.getEmailCode()));
 
-            default -> throw new IllegalArgumentException("不支持的登录类型");
+            case OTP -> throw new BadCredentialsException("不支持的登录类型");
         };
     }
 }

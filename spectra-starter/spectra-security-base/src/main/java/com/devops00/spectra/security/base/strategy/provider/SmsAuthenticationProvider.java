@@ -23,6 +23,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 
 /**
  * 短信登录
@@ -38,26 +39,25 @@ public abstract class SmsAuthenticationProvider implements BasicAuthenticationPr
     @Override
     public @Nullable Authentication authenticate(Authentication authentication) throws AuthenticationException {
         if (!(authentication instanceof SmsAuthenticationToken params)) {
-            throw new RuntimeException("登录失败,未知原因");
+            throw new BadCredentialsException("登录失败");
+        }
+        if (!(params.getPrincipal() instanceof String phone) || !StringUtils.hasText(phone)
+                || !(params.getCredentials() instanceof String code) || !StringUtils.hasText(code)) {
+            throw new BadCredentialsException("手机号或验证码不能为空");
         }
         try {
-            kaptchaValidate(params.getCredentials().toString());
-
-            if (params.getPrincipal() == null || params.getCredentials() == null) {
-                throw new BadCredentialsException("手机号或验证码不能为空");
-            }
-
-            return login(params.getPrincipal().toString(), params.getCredentials().toString());
+            kaptchaValidate(phone, code);
+            return login(phone, code);
         } finally {
-            kaptchaDelete();
+            kaptchaDelete(phone);
         }
     }
 
     public abstract Authentication login(String phone, String code) throws AuthenticationException;
 
-    public abstract void kaptchaValidate(String kaptcha);
+    public abstract void kaptchaValidate(String phone, String kaptcha);
 
-    public abstract void kaptchaDelete();
+    public abstract void kaptchaDelete(String phone);
 
     @Override
     public boolean supports(Class<?> authentication) {

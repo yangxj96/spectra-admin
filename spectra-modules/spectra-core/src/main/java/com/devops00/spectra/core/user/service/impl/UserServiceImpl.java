@@ -31,6 +31,7 @@ import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
+import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
@@ -52,7 +53,6 @@ import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
-import com.devops00.spectra.framework.configure.mvc.properties.UserProperties;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
@@ -66,6 +66,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 /**
  * 用户service层-实现
@@ -91,8 +93,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final PasswordEncoder passwordEncoder;
 
-    private final UserProperties userProperties;
-
     private final AccountService accountService;
 
     private final UserDataScopeMapper dataScopeMapper;
@@ -116,9 +116,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         defaultAccount.setUserId(entity.getId());
         defaultAccount.setType(LoginType.PASSWORD);
         defaultAccount.setLoginName(entity.getEmail());
-        defaultAccount.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
+        defaultAccount.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
         defaultAccount.setProvider("DEFAULT");
-        defaultAccount.setStatus((short) 0);
+        defaultAccount.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
         if (!accountService.save(defaultAccount)) {
             throw new DataSaveException("保存用户信息异常");
         }
@@ -228,7 +228,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         try {
             var user = this.getById(uid);
             Account account = accountService.getDefaultByUserId(user.getId());
-            account.setPassword(passwordEncoder.encode(userProperties.getDefaultPassword()));
+            account.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
+            account.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
             accountService.updateById(account);
         } catch (Exception e) {
             log.error("用户不存在", e);
@@ -342,6 +343,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 6. 加密新密码并更新
         account.setPassword(passwordEncoder.encode(params.getNewPassword()));
+        account.setStatus(AccountStatus.ACTIVE.getCode());
         if (!accountService.updateById(account)) {
             throw new EntityUpdateException("修改密码失败");
         }
@@ -403,5 +405,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             && currentUser.getAuthorities()
                     .stream()
                     .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
+    }
+
+    /**
+     * 生成仅用于占位的随机凭证，避免所有新账号共享一个可猜测的默认密码。
+     *
+     * @return 随机临时凭证
+     */
+    private String generateTemporaryPassword() {
+        var bytes = new byte[32];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 }

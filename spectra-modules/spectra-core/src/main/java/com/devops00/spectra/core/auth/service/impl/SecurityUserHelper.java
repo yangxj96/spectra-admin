@@ -20,13 +20,17 @@ import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.ObjUtils;
 import com.devops00.spectra.core.auth.javabean.converter.AuthConverter;
+import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
+import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
 import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.security.base.constant.LoginType;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
@@ -35,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.time.Instant;
 
 /**
  * SecurityUser构建工具
@@ -66,16 +71,37 @@ public class SecurityUserHelper {
     /**
      * 数据库用户实体转SpringSecurity使用的用户对象
      *
+     * @param loginType
+     *            本次登录方式
+     * @param account
+     *            数据库账号实体
      * @param user
      *            数据库用户实体
      * @return SpringSecurity的用户对象
      */
-    public SecurityUser toSecurityUser(Object user) {
-        if (!(user instanceof User u)) {
-            throw new LoginException("用户信息不正常");
+    public SecurityUser toSecurityUser(LoginType loginType, Account account, Object user) {
+        if (loginType == null || account == null || !(user instanceof User u)) {
+            throw new LoginException("账号当前不可用");
+        }
+
+        var now = Instant.now();
+        boolean accountActive = AccountStatus.ACTIVE.getCode().equals(account.getStatus());
+        boolean accountNotExpired = account.getExpiresAt() == null || account.getExpiresAt().isAfter(now);
+        boolean userActive = UserStatus.ACTIVE.getCode().equals(u.getStatus());
+        boolean accountTypeMatches = loginType.equals(account.getType());
+        boolean verified = loginType == LoginType.PASSWORD
+                || Short.valueOf((short) 1).equals(account.getVerified());
+
+        if (account.getDeleted() != null || u.getDeleted() != null || !accountTypeMatches || !accountActive || !accountNotExpired
+                || !verified || !userActive) {
+            throw new LoginException("账号当前不可用");
         }
 
         var securityUser = authConverter.toSecurityUser(u);
+        securityUser.setEnabled(accountActive && userActive);
+        securityUser.setAccountNonExpired(accountNotExpired);
+        securityUser.setAccountNonLocked(accountActive);
+        securityUser.setCredentialsNonExpired(accountNotExpired && verified);
         securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
 
         // 加载数据范围信息

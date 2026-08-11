@@ -20,6 +20,7 @@ import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.strategy.provider.UsernamePasswordAuthenticationProvider;
 import org.jspecify.annotations.NullMarked;
@@ -67,9 +68,9 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
         }
         var user = userService.getById(account.getUserId());
         if (user == null) {
-            throw new LoginException("用户不存在");
+            throw new LoginException("账号或密码错误");
         }
-        var su = securityUserHelper.toSecurityUser(user);
+        var su = securityUserHelper.toSecurityUser(LoginType.PASSWORD, account, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 
@@ -77,7 +78,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     public void kaptchaValidate(String kaptcha) {
         if (kaptchaService.isCheck() == Boolean.TRUE) {
             var code = kaptchaService.getKaptchaCode();
-            if (!kaptcha.equals(code)) {
+            if (kaptcha == null || !kaptcha.equals(code)) {
                 throw new KaptchaNotMatchException("验证码错误");
             }
         }

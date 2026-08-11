@@ -23,6 +23,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
+import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.mapper.AccountMapper;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.security.base.constant.LoginType;
@@ -103,7 +104,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
         account.setType(LoginType.SMS);
         account.setPhone(phone);
         account.setProvider("DEFAULT");
-        account.setStatus((short) 1);
+        account.setStatus(AccountStatus.ACTIVE.getCode());
         account.setVerified((short) 1);
         if (!this.save(account)) {
             throw new DataSaveException("绑定手机号失败");
@@ -131,7 +132,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
         account.setType(LoginType.EMAIL);
         account.setEmail(email);
         account.setProvider("DEFAULT");
-        account.setStatus((short) 1);
+        account.setStatus(AccountStatus.ACTIVE.getCode());
         account.setVerified((short) 1);
         if (!this.save(account)) {
             throw new DataSaveException("绑定邮箱失败");
