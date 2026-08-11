@@ -19,10 +19,14 @@ package com.devops00.spectra.notification.schema;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** 通知建表和迁移脚本的结构契约测试；真实事务/并发行为需在 PostgreSQL 环境执行。 */
@@ -48,6 +52,9 @@ class NotificationSqlContractTest {
         assertTrue(schema.contains("attempt_no"));
         assertTrue(schema.contains("is_read"));
         assertTrue(schema.contains("tenant_id"));
+        var tableColumns = tableColumns(schema);
+        assertEquals(131, tableColumns.size());
+        assertEquals(tableColumns, commentedColumns(schema));
         assertTrue(messages.contains("ON CONFLICT DO NOTHING"));
         assertTrue(preferences.contains("ON CONFLICT (tenant_id, user_id, purpose, channel) WHERE deleted IS NULL DO UPDATE"));
         assertTrue(tasks.contains("ALTER TABLE spectra_notification.ntf_task ADD COLUMN IF NOT EXISTS title"));
@@ -66,5 +73,32 @@ class NotificationSqlContractTest {
             }
         }
         throw new IOException("找不到通知 SQL 文件: " + name);
+    }
+
+    private Set<String> tableColumns(String schema) {
+        var tablePattern = Pattern.compile(
+                "CREATE TABLE IF NOT EXISTS spectra_notification\\.(\\w+) \\((.*?)\\R\\);", Pattern.DOTALL);
+        var columnPattern = Pattern.compile("^ {4}([a-z][a-z0-9_]*)\\s+[A-Z]", Pattern.MULTILINE);
+        var columns = new HashSet<String>();
+        var tables = tablePattern.matcher(schema);
+        while (tables.find()) {
+            var tableName = tables.group(1);
+            var tableColumns = columnPattern.matcher(tables.group(2));
+            while (tableColumns.find()) {
+                columns.add(tableName + "." + tableColumns.group(1));
+            }
+        }
+        return columns;
+    }
+
+    private Set<String> commentedColumns(String schema) {
+        var commentPattern = Pattern.compile(
+                "^COMMENT ON COLUMN spectra_notification\\.(\\w+)\\.(\\w+) IS '[^']+';$", Pattern.MULTILINE);
+        var columns = new HashSet<String>();
+        var comments = commentPattern.matcher(schema);
+        while (comments.find()) {
+            columns.add(comments.group(1) + "." + comments.group(2));
+        }
+        return columns;
     }
 }
