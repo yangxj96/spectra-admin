@@ -18,10 +18,27 @@ package com.devops00.spectra.common.notification;
 
 import java.util.UUID;
 
-/** 通知模块使用的收件人快照，不暴露 Core Entity。 */
+/**
+ * 通知模块使用的最小收件人快照，隔离 Core 账号实体和其他业务字段。
+ *
+ * @param userId   系统用户 ID
+ * @param phone    用于短信投递的手机号；未绑定时为空
+ * @param email    用于邮件投递的邮箱地址；未绑定时为空
+ * @param active   用户是否存在可用的活跃账号
+ * @param verified 收件地址是否已通过账号验证
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/11
+ */
 public record NotificationRecipient(UUID userId, String phone, String email, boolean active, boolean verified) {
 
-    /** 返回指定外部渠道的已验证地址。 */
+    /**
+     * 返回指定外部渠道的已验证地址。用户不可用、地址未验证或渠道为站内信时返回空。
+     *
+     * @param channel
+     *            待解析地址的通知渠道
+     * @return 手机号或邮箱地址；没有可用地址时返回 {@code null}
+     */
     public String addressFor(NotificationChannel channel) {
         if (!active || !verified || channel == null) {
             return null;

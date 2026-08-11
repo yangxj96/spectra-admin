@@ -19,17 +19,13 @@ package com.devops00.spectra.notification.javabean.domain;
 /**
  * 渠道发送结果；占位渠道不会伪造成功。
  *
+ * @param status            标准化投递结果状态
+ * @param providerCode      执行投递的渠道供应商编码
+ * @param providerMessageId 供应商返回的消息 ID；未提供时为空
+ * @param summary           可安全持久化的脱敏响应摘要
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-public record ChannelSendResult(
-        /** 投递结果状态。 */
-        String status,
-        /** 渠道供应商编码。 */
-        String providerCode,
-        /** 供应商返回的消息 ID。 */
-        String providerMessageId,
-        /** 供应商响应摘要。 */
-        String summary) {
+public record ChannelSendResult(String status, String providerCode, String providerMessageId, String summary) {
 }

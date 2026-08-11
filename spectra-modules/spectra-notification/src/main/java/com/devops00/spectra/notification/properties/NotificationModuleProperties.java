@@ -21,18 +21,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * 通知模块基础配置。
  *
+ * @param enabled              是否启用统一通知模块
+ * @param addressEncryptionKey Base64 编码的收件地址加密密钥
+ * @param sensitivePayloadKey  Base64 编码的敏感载荷加密密钥
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
 @ConfigurationProperties(prefix = "spectra.notification")
-public record NotificationModuleProperties(
-        /** 是否启用通知模块。 */
-        boolean enabled,
-        /** 收件地址加密密钥，使用 Base64 编码。 */
-        String addressEncryptionKey,
-        /** 敏感载荷加密密钥，使用 Base64 编码。 */
-        String sensitivePayloadKey) {
+public record NotificationModuleProperties(boolean enabled, String addressEncryptionKey, String sensitivePayloadKey) {
 
     /** 将未配置的可选密钥归一化为空字符串，实际使用时再明确拒绝。 */
     public NotificationModuleProperties {

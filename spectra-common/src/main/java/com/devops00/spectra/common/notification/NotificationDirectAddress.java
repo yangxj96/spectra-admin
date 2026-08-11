@@ -17,12 +17,13 @@
 package com.devops00.spectra.common.notification;
 
 /**
- * 未登录场景使用的直接投递地址。
+ * 未登录场景使用的直接投递地址，仅允许策略明确授权的认证和安全用途使用。
  *
- * @param channel
- *            目标渠道
- * @param address
- *            未加密的原始地址，仅允许在入队边界短暂使用
+ * @param channel 目标外部渠道，通常为短信或邮件
+ * @param address 未加密的原始地址，仅允许在入队边界短暂存活
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/11
  */
 public record NotificationDirectAddress(NotificationChannel channel, String address) {
 }

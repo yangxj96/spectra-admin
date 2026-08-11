@@ -16,6 +16,15 @@
 
 package com.devops00.spectra.common.notification;
 
-/** 通知渠道运行时可用性。 */
+/**
+ * 通知渠道的运行时可用性快照，供业务模块在入队前判断渠道是否可用。
+ *
+ * @param channel   被检查的通知渠道
+ * @param available 当前配置和运行状态是否允许接收投递
+ * @param reason    不可用时的脱敏原因；可用时可为空
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/11
+ */
 public record NotificationChannelAvailability(NotificationChannel channel, boolean available, String reason) {
 }

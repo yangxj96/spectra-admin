@@ -2,6 +2,7 @@
 <profiles version="12">
     <profile kind="CodeFormatterProfile" name="Spectra" version="12">
         <setting id="org.eclipse.jdt.core.formatter.comment.format_block_comments" value="false"/>
+        <setting id="org.eclipse.jdt.core.formatter.comment.format_javadoc_comments" value="false"/>
         <setting id="org.eclipse.jdt.core.formatter.comment.format_markdown_comments" value="false"/>
         <setting id="org.eclipse.jdt.core.formatter.comment.format_line_comments" value="false"/>
         <setting id="org.eclipse.jdt.core.formatter.alignment_for_enum_constants" value="49"/>

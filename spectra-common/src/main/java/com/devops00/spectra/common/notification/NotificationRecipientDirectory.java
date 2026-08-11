@@ -19,7 +19,13 @@ package com.devops00.spectra.common.notification;
 import java.util.List;
 import java.util.UUID;
 
-/** Core 向通知模块提供的收件人解析端口。 */
+/**
+ * Core 向通知模块提供的收件人解析端口，只返回投递所需的最小快照。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/11
+ */
 public interface NotificationRecipientDirectory {
 
     /**
@@ -31,6 +37,12 @@ public interface NotificationRecipientDirectory {
      */
     List<NotificationRecipient> resolve(List<UUID> userIds);
 
-    /** 按登录名解析流程任务等内部调用方使用的收件人。 */
+    /**
+     * 按登录名解析流程任务等内部调用方使用的收件人快照。
+     *
+     * @param loginNames
+     *            用户登录名；空值和重复值由实现过滤
+     * @return 可解析登录名对应的收件人快照
+     */
     List<NotificationRecipient> resolveByLoginNames(List<String> loginNames);
 }

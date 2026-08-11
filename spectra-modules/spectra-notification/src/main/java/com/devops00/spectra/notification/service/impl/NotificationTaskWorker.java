@@ -67,9 +67,15 @@ public class NotificationTaskWorker {
     /** 已注册的渠道发送端。 */
     private final List<NotificationSender> senders;
 
+    /**
+     * 任务处于 {@code PROCESSING} 状态的最长允许时间，单位为秒。超时后任务可由 Worker 重新领取，避免异常中断导致永久卡住。
+     */
     @Value("${spectra.notification.worker.processing-timeout-seconds:300}")
     private long processingTimeoutSeconds;
 
+    /**
+     * 通知投递失败后首次重试的基础延迟，单位为秒；后续重试在此基础上按尝试次数执行指数退避。
+     */
     @Value("${spectra.notification.worker.retry-base-delay-seconds:5}")
     private long retryBaseDelaySeconds;
 

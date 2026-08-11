@@ -16,9 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
@@ -29,6 +26,8 @@ import com.devops00.spectra.notification.mapper.NotificationInboxMapper;
 import com.devops00.spectra.notification.service.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 /**
  * 站内信 Sender；taskId 是天然幂等键。
@@ -41,16 +40,22 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class InAppNotificationSender implements NotificationSender {
 
-    /** 站内信收件箱 Mapper。 */
+    /**
+     * 站内信收件箱 Mapper。
+     */
     private final NotificationInboxMapper inboxMapper;
 
-    /** 返回站内信渠道标识。 */
+    /**
+     * 返回站内信渠道标识。
+     */
     @Override
     public NotificationChannel channel() {
         return NotificationChannel.IN_APP;
     }
 
-    /** 幂等写入收件箱，并返回成功结果。 */
+    /**
+     * 幂等写入收件箱，并返回成功结果。
+     */
     @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
         var exists = inboxMapper.selectOne(new LambdaQueryWrapper<NotificationInboxEntity>()
