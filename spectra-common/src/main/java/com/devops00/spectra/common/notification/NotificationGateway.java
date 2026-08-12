@@ -28,8 +28,7 @@ public interface NotificationGateway {
     /**
      * 查询指定渠道是否已配置并可接受投递。
      *
-     * @param channel
-     *            待检查的通知渠道
+     * @param channel 待检查的通知渠道
      * @return 渠道标识、可用状态与脱敏原因
      */
     NotificationChannelAvailability availability(NotificationChannel channel);
@@ -37,8 +36,7 @@ public interface NotificationGateway {
     /**
      * 提交不可变通知请求，完成幂等校验和收件人任务展开后返回入队回执。
      *
-     * @param request
-     *            业务模块构造的通知请求
+     * @param request 业务模块构造的通知请求
      * @return 逻辑请求 ID、状态、任务数与幂等重放标记
      */
     NotificationReceipt enqueue(NotificationRequest request);

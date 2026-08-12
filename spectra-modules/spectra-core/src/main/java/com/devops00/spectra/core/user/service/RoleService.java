@@ -39,34 +39,29 @@ public interface RoleService extends BaseService<Role> {
     /**
      * 创建角色
      *
-     * @param params
-     *            实体入参
+     * @param params 实体入参
      */
     void created(RoleFrom params);
 
     /**
      * 删除角色
      *
-     * @param id
-     *            角色ID
+     * @param id 角色ID
      */
     void deleteById(UUID id);
 
     /**
      * 修改角色
      *
-     * @param params
-     *            实体入参
+     * @param params 实体入参
      */
     void modify(RoleFrom params);
 
     /**
      * 分页查询角色信息
      *
-     * @param page
-     *            分页信息
-     * @param params
-     *            查询参数
+     * @param page   分页信息
+     * @param params 查询参数
      */
     IPage<RoleVO> page(PageFrom page, RolePageFrom params);
 

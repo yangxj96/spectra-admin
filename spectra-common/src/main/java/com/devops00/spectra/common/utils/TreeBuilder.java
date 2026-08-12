@@ -25,8 +25,7 @@ import java.util.*;
 /**
  * 通用树结构构建器
  *
- * @param <T>
- *            实现了{@link Tree}的子类
+ * @param <T> 实现了{@link Tree}的子类
  * @author yangxj96
  * @version 1.0
  * @since 2025/6/14 00:00
@@ -37,8 +36,7 @@ public record TreeBuilder<T extends Tree<T>>(@Nullable List<T> dataList) {
     /**
      * 构建树形结构
      *
-     * @param rootPid
-     *            根节点的 pid 值（例如 -1L、0L）
+     * @param rootPid 根节点的 pid 值（例如 -1L、0L）
      * @return 树形结构列表
      */
     public @Nullable List<T> buildTree(@Nullable UUID rootPid) {

@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.workflow.javabean.converter;
 
-import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

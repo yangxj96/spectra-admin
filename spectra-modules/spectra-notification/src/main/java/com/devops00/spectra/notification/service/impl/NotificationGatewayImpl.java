@@ -16,26 +16,11 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.HexFormat;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationChannelAvailability;
-import com.devops00.spectra.common.notification.NotificationGateway;
-import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.notification.NotificationReceipt;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.*;
+import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
@@ -45,7 +30,6 @@ import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.service.NotificationSender;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +37,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * 独立通知模块的统一入队实现。
@@ -66,33 +55,59 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class NotificationGatewayImpl implements NotificationGateway {
 
-    /** 独立通知模块使用的系统租户。 */
+    /**
+     * 独立通知模块使用的系统租户。
+     */
     private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-    /** 普通参数中禁止出现的敏感字段关键词。 */
+    /**
+     * 普通参数中禁止出现的敏感字段关键词。
+     */
     private static final Set<String> SENSITIVE_KEYS = Set.of("code", "captcha", "password", "token", "secret");
 
-    /** 通知请求 Mapper。 */
+    /**
+     * 通知请求 Mapper。
+     */
     private final NotificationRequestMapper requestMapper;
-    /** 通知任务 Mapper。 */
+    /**
+     * 通知任务 Mapper。
+     */
     private final NotificationTaskMapper taskMapper;
-    /** 通知模板 Mapper。 */
+    /**
+     * 通知模板 Mapper。
+     */
     private final NotificationTemplateMapper templateMapper;
-    /** 用户通知偏好 Mapper。 */
+    /**
+     * 用户通知偏好 Mapper。
+     */
     private final NotificationUserPreferenceMapper preferenceMapper;
-    /** 通知模板渲染器。 */
+    /**
+     * 通知模板渲染器。
+     */
     private final NotificationTemplateRenderer templateRenderer;
-    /** 通知用途策略。 */
+    /**
+     * 通知用途策略。
+     */
     private final NotificationPolicy policy;
-    /** 通知模块配置。 */
+    /**
+     * 通知模块配置。
+     */
     private final NotificationModuleProperties properties;
-    /** 收件人目录。 */
+    /**
+     * 收件人目录。
+     */
     private final NotificationRecipientDirectory recipientDirectory;
-    /** 地址与敏感载荷保护器。 */
+    /**
+     * 地址与敏感载荷保护器。
+     */
     private final NotificationPayloadProtector payloadProtector;
-    /** 已注册的渠道发送端。 */
+    /**
+     * 已注册的渠道发送端。
+     */
     private final List<NotificationSender> senders;
 
-    /** 查询指定渠道的配置与可用状态。 */
+    /**
+     * 查询指定渠道的配置与可用状态。
+     */
     @Override
     public NotificationChannelAvailability availability(NotificationChannel channel) {
         if (!properties.enabled()) {
@@ -109,7 +124,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 .orElseGet(() -> new NotificationChannelAvailability(channel, false, "CHANNEL_NOT_REGISTERED"));
     }
 
-    /** 校验请求并创建通知请求及投递任务。 */
+    /**
+     * 校验请求并创建通知请求及投递任务。
+     */
     @Override
     @Transactional
     public NotificationReceipt enqueue(NotificationRequest request) {
@@ -184,9 +201,11 @@ public class NotificationGatewayImpl implements NotificationGateway {
         return new NotificationReceipt(requestId, "ACCEPTED", taskCount, false);
     }
 
-    /** 为单个收件人和渠道创建幂等投递任务。 */
+    /**
+     * 为单个收件人和渠道创建幂等投递任务。
+     */
     private int createTask(NotificationRequest request, UUID requestId, UUID recipientUserId,
-            NotificationChannel channel, String address, Instant now) {
+                           NotificationChannel channel, String address, Instant now) {
         var recipientKeyHash = recipientKeyHash(recipientUserId, channel, address);
         if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getNotificationRequestId, requestId)
@@ -229,9 +248,11 @@ public class NotificationGatewayImpl implements NotificationGateway {
         return 1;
     }
 
-    /** 优先使用渠道模板渲染内容，没有模板时回退到请求参数。 */
+    /**
+     * 优先使用渠道模板渲染内容，没有模板时回退到请求参数。
+     */
     private RenderedContent render(NotificationRequest request, NotificationChannel channel,
-            Map<String, Object> parameters) {
+                                   Map<String, Object> parameters) {
         var template = templateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
@@ -259,9 +280,11 @@ public class NotificationGatewayImpl implements NotificationGateway {
         return new RenderedContent(null, title, content);
     }
 
-    /** 判断用户偏好是否允许向指定渠道投递。 */
+    /**
+     * 判断用户偏好是否允许向指定渠道投递。
+     */
     private boolean shouldDeliver(com.devops00.spectra.common.notification.NotificationPurpose purpose, UUID recipient,
-            NotificationChannel channel) {
+                                  NotificationChannel channel) {
         if (policy.mandatory(purpose)) {
             return true;
         }
@@ -279,13 +302,15 @@ public class NotificationGatewayImpl implements NotificationGateway {
         return Boolean.TRUE.equals(preference.getEnabled()) && !Boolean.TRUE.equals(preference.getDoNotDisturb());
     }
 
-    /** 校验幂等、收件人、直接地址、敏感参数和跳转链接。 */
+    /**
+     * 校验幂等、收件人、直接地址、敏感参数和跳转链接。
+     */
     private void validate(NotificationRequest request) {
         if (request == null
-            || !StringUtils.hasText(request.idempotencyKey())
-            || request.purpose() == null
-            || (request.recipientUserIds().isEmpty() && request.directAddresses().isEmpty())
-            || !StringUtils.hasText(request.templateGroupCode())) {
+                || !StringUtils.hasText(request.idempotencyKey())
+                || request.purpose() == null
+                || (request.recipientUserIds().isEmpty() && request.directAddresses().isEmpty())
+                || !StringUtils.hasText(request.templateGroupCode())) {
             throw new DataSaveException("通知请求参数不完整");
         }
         if (request.recipientUserIds().stream().anyMatch(java.util.Objects::isNull)) {
@@ -293,10 +318,10 @@ public class NotificationGatewayImpl implements NotificationGateway {
         }
         for (var directAddress : request.directAddresses()) {
             if (directAddress == null
-                || directAddress.channel() == null
-                || !StringUtils.hasText(directAddress.address())
-                || directAddress.channel() == NotificationChannel.IN_APP
-                || !policy.allowsDirectAddress(request.purpose())) {
+                    || directAddress.channel() == null
+                    || !StringUtils.hasText(directAddress.address())
+                    || directAddress.channel() == NotificationChannel.IN_APP
+                    || !policy.allowsDirectAddress(request.purpose())) {
                 throw new DataSaveException("通知直接收件地址不合法");
             }
         }
@@ -308,19 +333,23 @@ public class NotificationGatewayImpl implements NotificationGateway {
             throw new DataSaveException("通知普通参数不能包含敏感字段");
         }
         if (StringUtils.hasText(request.link())
-            && (!request.link().startsWith("/")
-                || request.link().startsWith("//")
-                || request.link().contains(".."))) {
+                && (!request.link().startsWith("/")
+                        || request.link().startsWith("//")
+                        || request.link().contains(".."))) {
             throw new DataSaveException("通知跳转链接不合法");
         }
     }
 
-    /** 返回有内容的原值，否则返回默认值。 */
+    /**
+     * 返回有内容的原值，否则返回默认值。
+     */
     private String defaultValue(String value, String fallback) {
         return StringUtils.hasText(value) ? value : fallback;
     }
 
-    /** 生成不包含明文地址的稳定接收人键。 */
+    /**
+     * 生成不包含明文地址的稳定接收人键。
+     */
     private String recipientKeyHash(UUID recipientUserId, NotificationChannel channel, String address) {
         var key = recipientUserId == null ? channel.name() + ":" + address : recipientUserId.toString();
         try {
@@ -332,7 +361,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
         }
     }
 
-    /** 仅保存可用于运维定位的脱敏地址。 */
+    /**
+     * 仅保存可用于运维定位的脱敏地址。
+     */
     private String maskAddress(String address) {
         if (!StringUtils.hasText(address)) {
             return null;
@@ -345,7 +376,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
         return value.length() > 4 ? value.substring(0, 3) + "****" + value.substring(value.length() - 2) : "***";
     }
 
-    /** 渲染后的标题和正文。 */
+    /**
+     * 渲染后的标题和正文。
+     */
     private record RenderedContent(UUID templateId, String title, String content) {
     }
 }

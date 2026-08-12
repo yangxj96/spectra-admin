@@ -20,7 +20,7 @@ import lombok.Data;
 
 /**
  * 报销提交参数。
- *
+ * <p>
  * approverUsername 为空时使用当前用户，便于本地演示；正式环境应由流程路由配置审批人。
  *
  * @author yangxj96

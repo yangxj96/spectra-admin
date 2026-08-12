@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.purchase.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 采购明细响应视图。

@@ -16,12 +16,12 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.util.UUID;
-
 import com.devops00.spectra.common.notification.NotificationCounter;
 import com.devops00.spectra.notification.service.NotificationInboxService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 /**
  * 消息中心未读数公共端口实现。
@@ -34,13 +34,19 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationCounterImpl implements NotificationCounter {
 
-    /** 独立通知模块使用的系统租户。 */
+    /**
+     * 独立通知模块使用的系统租户。
+     */
     private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
 
-    /** 消息中心服务。 */
+    /**
+     * 消息中心服务。
+     */
     private final NotificationInboxService inboxService;
 
-    /** 查询指定用户未读消息数；匿名用户返回零。 */
+    /**
+     * 查询指定用户未读消息数；匿名用户返回零。
+     */
     @Override
     public long unreadCount(UUID userId) {
         return userId == null ? 0 : inboxService.unreadCount(SYSTEM_TENANT_ID, userId);

@@ -47,11 +47,11 @@ import java.util.UUID;
  * @since 2026/8/11
  */
 public record NotificationRequest(UUID requestId, String idempotencyKey, NotificationPurpose purpose,
-        List<NotificationChannel> channels, List<UUID> recipientUserIds,
-        List<NotificationDirectAddress> directAddresses, String templateGroupCode,
-        Map<String, Object> parameters, Map<String, Object> sensitiveParameters, String businessType,
-        String businessId, String sourceModule, UUID sourceDepartmentId, Instant scheduledAt,
-        Instant expiresAt, Integer priority, String link) {
+                                  List<NotificationChannel> channels, List<UUID> recipientUserIds,
+                                  List<NotificationDirectAddress> directAddresses, String templateGroupCode,
+                                  Map<String, Object> parameters, Map<String, Object> sensitiveParameters, String businessType,
+                                  String businessId, String sourceModule, UUID sourceDepartmentId, Instant scheduledAt,
+                                  Instant expiresAt, Integer priority, String link) {
 
     /**
      * 将可空的集合与参数快照归一化为不可变空集合，避免请求入队后被调用方继续修改。
@@ -84,9 +84,9 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
      * @param link               客户端站内跳转路径
      */
     public NotificationRequest(UUID requestId, String idempotencyKey, NotificationPurpose purpose,
-            List<NotificationChannel> channels, List<UUID> recipientUserIds, String templateGroupCode,
-            Map<String, Object> parameters, String businessType, String businessId, String sourceModule,
-            UUID sourceDepartmentId, Instant scheduledAt, Instant expiresAt, Integer priority, String link) {
+                               List<NotificationChannel> channels, List<UUID> recipientUserIds, String templateGroupCode,
+                               Map<String, Object> parameters, String businessType, String businessId, String sourceModule,
+                               UUID sourceDepartmentId, Instant scheduledAt, Instant expiresAt, Integer priority, String link) {
         this(requestId, idempotencyKey, purpose, channels, recipientUserIds, List.of(), templateGroupCode, parameters, Map.of(),
                 businessType, businessId, sourceModule, sourceDepartmentId, scheduledAt, expiresAt, priority, link);
     }
@@ -107,8 +107,8 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
      * @return 仅包含 {@link NotificationChannel#IN_APP} 渠道的不可变通知请求
      */
     public static NotificationRequest inApp(String idempotencyKey, NotificationPurpose purpose,
-            List<UUID> recipientUserIds, String templateGroupCode, String title, String content,
-            String businessType, String businessId, String sourceModule, String link) {
+                                            List<UUID> recipientUserIds, String templateGroupCode, String title, String content,
+                                            String businessType, String businessId, String sourceModule, String link) {
         var parameters = new java.util.HashMap<String, Object>();
         parameters.put("title", title == null ? "通知" : title);
         parameters.put("content", content == null ? "" : content);

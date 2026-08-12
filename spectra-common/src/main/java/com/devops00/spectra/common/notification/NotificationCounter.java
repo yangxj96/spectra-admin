@@ -30,8 +30,7 @@ public interface NotificationCounter {
     /**
      * 查询指定用户当前可见的未读站内信数量。
      *
-     * @param userId
-     *            待查询的用户 ID
+     * @param userId 待查询的用户 ID
      * @return 未读且未删除的站内信数量
      */
     long unreadCount(UUID userId);

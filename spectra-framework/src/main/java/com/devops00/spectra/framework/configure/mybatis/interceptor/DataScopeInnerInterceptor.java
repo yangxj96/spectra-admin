@@ -16,11 +16,6 @@
 
 package com.devops00.spectra.framework.configure.mybatis.interceptor;
 
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.ObjectProvider;
-
 import com.baomidou.mybatisplus.extension.plugins.handler.MultiDataPermissionHandler;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.constant.DataScopeType;
@@ -29,7 +24,6 @@ import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.framework.configure.mybatis.DataScopeEntityRegistry;
 import com.devops00.spectra.security.base.holder.SecUtil;
-
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -42,6 +36,10 @@ import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
+import org.springframework.beans.factory.ObjectProvider;
+
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * MP执行的单表SQL拦截处理 — 自动注入数据范围 WHERE 条件
@@ -162,7 +160,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
      * 构建结构维度条件（department_id / created_by）
      */
     private Expression buildStructuralExpression(Table table, DataScope annotation, String columnName, DataScopeProvider.EffectiveScope scope,
-            UUID currentUserId) {
+                                                 UUID currentUserId) {
         return switch (scope.getScopeType()) {
             case SELF -> {
                 // created_by = currentUserId

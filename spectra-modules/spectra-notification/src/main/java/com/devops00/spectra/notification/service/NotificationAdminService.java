@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.notification.service;
 
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
@@ -26,6 +24,8 @@ import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFro
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO;
+
+import java.util.UUID;
 
 /**
  * 通知管理端查询和运维服务。
@@ -36,21 +36,33 @@ import com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO;
  */
 public interface NotificationAdminService {
 
-    /** 查询通知渠道是否已配置并可投递。 */
+    /**
+     * 查询通知渠道是否已配置并可投递。
+     */
     NotificationChannelAvailability availability(NotificationChannel channel);
 
-    /** 查询逻辑通知请求。 */
+    /**
+     * 查询逻辑通知请求。
+     */
     IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params);
 
-    /** 查询投递任务。 */
+    /**
+     * 查询投递任务。
+     */
     IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params);
 
-    /** 查询渠道投递记录。 */
+    /**
+     * 查询渠道投递记录。
+     */
     IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params);
 
-    /** 显式重试失败或未知任务。 */
+    /**
+     * 显式重试失败或未知任务。
+     */
     void retry(UUID taskId);
 
-    /** 取消尚未完成的任务。 */
+    /**
+     * 取消尚未完成的任务。
+     */
     void cancel(UUID taskId);
 }

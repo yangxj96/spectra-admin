@@ -16,15 +16,17 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.util.Map;
-
 import com.devops00.spectra.common.exception.DataSaveException;
 import org.junit.jupiter.api.Test;
+
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** 通知模板渲染规则测试。 */
+/**
+ * 通知模板渲染规则测试。
+ */
 class NotificationTemplateRendererTest {
 
     private final NotificationTemplateRenderer renderer = new NotificationTemplateRenderer();

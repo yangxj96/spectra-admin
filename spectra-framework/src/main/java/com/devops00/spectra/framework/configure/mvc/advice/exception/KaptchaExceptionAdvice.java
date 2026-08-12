@@ -44,10 +44,8 @@ public class KaptchaExceptionAdvice {
     /**
      * 验证码不匹配
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(KaptchaNotMatchException.class)
@@ -60,10 +58,8 @@ public class KaptchaExceptionAdvice {
     /**
      * 验证码过期
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(KaptchaExpiresException.class)

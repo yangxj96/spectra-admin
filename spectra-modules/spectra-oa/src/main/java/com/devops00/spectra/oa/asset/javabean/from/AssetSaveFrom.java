@@ -16,13 +16,13 @@
 
 package com.devops00.spectra.oa.asset.javabean.from;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * 资产入库或台账保存参数。

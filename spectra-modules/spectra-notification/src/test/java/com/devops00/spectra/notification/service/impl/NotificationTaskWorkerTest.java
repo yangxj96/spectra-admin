@@ -16,16 +16,10 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
-import org.apache.ibatis.type.JdbcType;
-import org.apache.ibatis.type.ObjectTypeHandler;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
@@ -35,21 +29,24 @@ import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.service.NotificationSender;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
+import org.apache.ibatis.type.JdbcType;
+import org.apache.ibatis.type.ObjectTypeHandler;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.isNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-/** Worker 的租约、过期、失败和 Delivery 隔离测试。 */
+/**
+ * Worker 的租约、过期、失败和 Delivery 隔离测试。
+ */
 class NotificationTaskWorkerTest {
 
     @BeforeAll
@@ -142,8 +139,8 @@ class NotificationTaskWorkerTest {
     }
 
     private NotificationTaskWorker worker(NotificationTaskMapper taskMapper,
-            NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
-            List<NotificationSender> senders) {
+                                          NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
+                                          List<NotificationSender> senders) {
         var worker = new NotificationTaskWorker(taskMapper, deliveryMapper, requestMapper, senders);
         setField(worker, "processingTimeoutSeconds", 300L);
         setField(worker, "retryBaseDelaySeconds", 1L);

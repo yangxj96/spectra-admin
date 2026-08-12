@@ -61,7 +61,7 @@ public class DictServiceImpl implements DictService {
     private final DictItemService dataService;
 
     public DictServiceImpl(DictGroupConverter dictGroupConverter, DictItemConverter dictItemConverter, DictGroupService groupService,
-            DictItemService dataService) {
+                           DictItemService dataService) {
         this.dictGroupConverter = dictGroupConverter;
         this.dictItemConverter = dictItemConverter;
         this.groupService = groupService;

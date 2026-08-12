@@ -16,27 +16,6 @@
 
 package com.devops00.spectra.oa.report.service.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.stereotype.Service;
-
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -53,9 +32,18 @@ import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import com.devops00.spectra.oa.report.service.DepartmentStatsService;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
 import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * 部门维度统计服务实现。

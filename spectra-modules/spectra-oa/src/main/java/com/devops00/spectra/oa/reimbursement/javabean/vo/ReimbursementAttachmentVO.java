@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.reimbursement.javabean.vo;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 报销凭证附件响应视图。

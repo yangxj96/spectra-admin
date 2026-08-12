@@ -91,9 +91,13 @@ public class SecurityProperties {
      */
     private long tokenRefreshInterval = 300L;
 
-    /** 验证码有效期（秒）。 */
+    /**
+     * 验证码有效期（秒）。
+     */
     private long verificationCodeExpire = 300L;
 
-    /** 验证码长度。当前只允许 6 位数字。 */
+    /**
+     * 验证码长度。当前只允许 6 位数字。
+     */
     private int verificationCodeLength = 6;
 }

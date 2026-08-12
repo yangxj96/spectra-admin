@@ -49,8 +49,7 @@ public class FileTypeValidator {
     /**
      * 执行所有注册的验证策略（含扩展名 + 内容校验）
      *
-     * @param file
-     *            待验证的文件
+     * @param file 待验证的文件
      * @return 如果所有策略均通过，则返回 true；否则返回 false
      */
     public boolean validate(MultipartFile file) {
@@ -73,8 +72,7 @@ public class FileTypeValidator {
     /**
      * 仅根据文件名做轻量校验（适用于 pre 阶段，无文件内容）
      *
-     * @param filename
-     *            原始文件名
+     * @param filename 原始文件名
      * @return 文件名校验是否通过
      */
     public boolean validateFilename(@Nullable String filename) {

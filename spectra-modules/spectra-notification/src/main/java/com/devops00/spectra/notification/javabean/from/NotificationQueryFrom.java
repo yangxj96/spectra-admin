@@ -28,14 +28,24 @@ import lombok.Data;
 @Data
 public class NotificationQueryFrom {
 
-    /** 消息分类。 */
+    /**
+     * 消息分类。
+     */
     private String type;
-    /** 是否只查询已读或未读消息。 */
+    /**
+     * 是否只查询已读或未读消息。
+     */
     private Boolean isRead;
-    /** 标题或正文关键字。 */
+    /**
+     * 标题或正文关键字。
+     */
     private String keyword;
-    /** 创建时间起点。 */
+    /**
+     * 创建时间起点。
+     */
     private String startTime;
-    /** 创建时间终点。 */
+    /**
+     * 创建时间终点。
+     */
     private String endTime;
 }

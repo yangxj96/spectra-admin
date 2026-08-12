@@ -1,12 +1,12 @@
 package com.devops00.spectra.oa.supply.javabean.from;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * 办公用品 SKU 保存参数。

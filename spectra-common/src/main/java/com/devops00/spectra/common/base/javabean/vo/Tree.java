@@ -24,8 +24,7 @@ import java.util.UUID;
 /**
  * 所有树形结构 VO 的通用接口
  *
- * @param <T>
- *            具体类型
+ * @param <T> 具体类型
  * @author yangxj96
  * @version 1.0
  * @since 2025-6-14 00:00

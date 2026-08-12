@@ -32,25 +32,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaceholderSmsSender implements NotificationSender {
 
-    /** 返回短信渠道标识。 */
+    /**
+     * 返回短信渠道标识。
+     */
     @Override
     public NotificationChannel channel() {
         return NotificationChannel.SMS;
     }
 
-    /** 短信供应商尚未配置。 */
+    /**
+     * 短信供应商尚未配置。
+     */
     @Override
     public boolean available() {
         return false;
     }
 
-    /** 返回短信渠道未配置原因。 */
+    /**
+     * 返回短信渠道未配置原因。
+     */
     @Override
     public String unavailableReason() {
         return "SMS_CHANNEL_NOT_CONFIGURED";
     }
 
-    /** 明确阻断投递，不伪造短信发送成功。 */
+    /**
+     * 明确阻断投递，不伪造短信发送成功。
+     */
     @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
         return new ChannelSendResult("BLOCKED", "SMS_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");

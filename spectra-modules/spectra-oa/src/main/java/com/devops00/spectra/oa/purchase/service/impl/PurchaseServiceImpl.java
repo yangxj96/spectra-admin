@@ -16,19 +16,6 @@
 
 package com.devops00.spectra.oa.purchase.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Instant;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,10 +23,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
 import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
@@ -51,13 +38,7 @@ import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseItem;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceiptItem;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseExecuteFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseItemFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchasePageFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptItemFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSaveFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSubmitFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.*;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseReceiptVO;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseVO;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseItemMapper;
@@ -67,9 +48,16 @@ import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper;
 import com.devops00.spectra.oa.purchase.service.PurchaseService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.*;
 
 /**
  * 采购申请业务闭环服务实现。
@@ -305,7 +293,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
         for (var purchaseItem : purchaseItems) {
             if (!receiptItems.containsKey(purchaseItem.getId())
-                && (purchaseItem.getReceivedQuantity() == null || purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) < 0)) {
+                    && (purchaseItem.getReceivedQuantity() == null || purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) < 0)) {
                 allReceived = false;
             }
         }

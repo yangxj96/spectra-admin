@@ -18,15 +18,14 @@ package com.devops00.spectra.oa.document.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import java.util.UUID;
-import java.time.Instant;
-
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * OA-文档表主表实体

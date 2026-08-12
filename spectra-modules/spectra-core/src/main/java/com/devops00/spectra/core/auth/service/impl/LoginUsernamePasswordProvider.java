@@ -52,7 +52,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     private final SecurityUserHelper securityUserHelper;
 
     public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService, AccountService accountService,
-            PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
+                                         PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
         this.kaptchaService = kaptchaService;
         this.userService = userService;
         this.accountService = accountService;

@@ -48,7 +48,7 @@ import java.time.Duration;
 
 /**
  * 请求体解密 Advice
- *
+ * <p>
  * 在 MessageConverter 反序列化之前拦截请求，
  * 自动检测加密请求并解密后放行。
  * 支持验签、防重放攻击（时间窗口 + Nonce 去重）。
@@ -131,7 +131,8 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     @Override
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
-            Class<? extends HttpMessageConverter<?>> converterType) throws IOException {
+                                           Class<? extends HttpMessageConverter<?>> converterType)
+            throws IOException {
         byte[] bodyBytes = inputMessage.getBody().readAllBytes();
 
         // 优先检查 X-Encrypted 请求头
@@ -170,13 +171,13 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
 
     @Override
     public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
-            Class<? extends HttpMessageConverter<?>> converterType) {
+                                Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 
     @Override
     public Object handleEmptyBody(Object body, HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
-            Class<? extends HttpMessageConverter<?>> converterType) {
+                                  Class<? extends HttpMessageConverter<?>> converterType) {
         return body;
     }
 

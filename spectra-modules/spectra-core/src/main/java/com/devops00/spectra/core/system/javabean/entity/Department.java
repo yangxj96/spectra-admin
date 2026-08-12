@@ -16,20 +16,18 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
-import java.io.Serial;
-import java.util.UUID;
-
-import org.jspecify.annotations.Nullable;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.jspecify.annotations.Nullable;
+
+import java.io.Serial;
+import java.util.UUID;
 
 /**
  * 组织机构
@@ -69,7 +67,7 @@ public class Department extends BaseEntity {
 
     /**
      * 组织机构类型
-     *
+     * <p>
      * 对应字典组:sys_organization_type
      */
     @TableField(value = "type")

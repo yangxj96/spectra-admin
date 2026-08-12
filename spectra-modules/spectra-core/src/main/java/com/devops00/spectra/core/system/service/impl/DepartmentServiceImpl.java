@@ -164,12 +164,9 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
     /**
      * 深度优先遍历（防止死循环）
      *
-     * @param currentId
-     *            当前节点ID
-     * @param childrenMap
-     *            子节点map
-     * @param result
-     *            响应结果
+     * @param currentId   当前节点ID
+     * @param childrenMap 子节点map
+     * @param result      响应结果
      */
     private void dfs(UUID currentId, Map<UUID, List<UUID>> childrenMap, @NonNull Set<UUID> result) {
 

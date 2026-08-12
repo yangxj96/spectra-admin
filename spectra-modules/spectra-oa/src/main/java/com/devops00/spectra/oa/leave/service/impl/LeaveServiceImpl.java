@@ -16,23 +16,6 @@
 
 package com.devops00.spectra.oa.leave.service.impl;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.DayOfWeek;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZonedDateTime;
-import java.util.Map;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -66,9 +49,19 @@ import com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper;
 import com.devops00.spectra.oa.leave.service.LeaveService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 请假业务闭环服务实现。
@@ -395,10 +388,10 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         while (!date.isAfter(last)) {
             var attendanceDate = date.atStartOfDay(zoneId).toInstant();
             if (date.getDayOfWeek() != DayOfWeek.SATURDAY
-                && date.getDayOfWeek() != DayOfWeek.SUNDAY
-                && attendanceRecordMapper
-                        .selectCount(new LambdaQueryWrapper<AttendanceRecord>().eq(AttendanceRecord::getApplicationId, application.getId())
-                                .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
+                    && date.getDayOfWeek() != DayOfWeek.SUNDAY
+                    && attendanceRecordMapper
+                            .selectCount(new LambdaQueryWrapper<AttendanceRecord>().eq(AttendanceRecord::getApplicationId, application.getId())
+                                    .eq(AttendanceRecord::getAttendanceDate, attendanceDate)) == 0) {
                 var record = new AttendanceRecord();
                 record.setApplicationId(application.getId());
                 record.setUserId(application.getApplicantId());

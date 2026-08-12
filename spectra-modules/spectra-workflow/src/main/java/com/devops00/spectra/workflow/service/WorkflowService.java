@@ -28,18 +28,15 @@ public interface WorkflowService {
     /**
      * 注册审批回调
      *
-     * @param processDefinitionKey
-     *            流程定义KEY
-     * @param callback
-     *            审批回调实现
+     * @param processDefinitionKey 流程定义KEY
+     * @param callback             审批回调实现
      */
     void registerCallback(String processDefinitionKey, ApprovalCallback callback);
 
     /**
      * 获取审批回调
      *
-     * @param processDefinitionKey
-     *            流程定义KEY
+     * @param processDefinitionKey 流程定义KEY
      * @return 审批回调实现，未注册时返回null
      */
     ApprovalCallback getCallback(String processDefinitionKey);

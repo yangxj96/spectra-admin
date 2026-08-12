@@ -32,7 +32,7 @@ public class FileUploadStatusVO {
 
     /**
      * 文件上传状态
-     *
+     * <p>
      * INIT → UPLOADING → DONE → EXPIRED
      */
     private String status;

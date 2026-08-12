@@ -37,16 +37,14 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 创建菜单
      *
-     * @param params
-     *            菜单信息
+     * @param params 菜单信息
      */
     void created(MenuSaveFrom params);
 
     /**
      * 修改菜单信息
      *
-     * @param params
-     *            修改参数
+     * @param params 修改参数
      */
     void modify(MenuSaveFrom params);
 
@@ -61,8 +59,7 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 获取当前用户的授权菜单树
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 当前用户授权菜单树
      */
     List<MenuTreeVO> current(UUID userId);
@@ -70,8 +67,7 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 根据角色ID获取角色关联的菜单
      *
-     * @param id
-     *            角色ID
+     * @param id 角色ID
      * @return 关联的菜单
      */
     List<Menu> getByRelRoleId(UUID id);
@@ -79,8 +75,7 @@ public interface MenuService extends BaseService<Menu> {
     /**
      * 根据ID删除菜单
      *
-     * @param id
-     *            菜单ID
+     * @param id 菜单ID
      */
     void deleteById(UUID id);
 }

@@ -16,17 +16,16 @@
 
 package com.devops00.spectra.core.user.javabean.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * 用户信息

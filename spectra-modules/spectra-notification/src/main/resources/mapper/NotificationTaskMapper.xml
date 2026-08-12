@@ -85,10 +85,10 @@
         <include refid="Base_Column_List"/>
         FROM spectra_notification.ntf_task
         WHERE deleted IS NULL
-          AND status IN ('PENDING', 'RETRYING')
-          AND scheduled_at &lt;= #{now}
-          AND (next_retry_at IS NULL OR next_retry_at &lt;= #{now})
-          AND (expires_at IS NULL OR expires_at &gt; #{now})
+        AND status IN ('PENDING', 'RETRYING')
+        AND scheduled_at &lt;= #{now}
+        AND (next_retry_at IS NULL OR next_retry_at &lt;= #{now})
+        AND (expires_at IS NULL OR expires_at &gt; #{now})
         ORDER BY priority DESC, scheduled_at ASC, created_at ASC
         LIMIT #{limit}
         FOR UPDATE SKIP LOCKED

@@ -16,9 +16,6 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
@@ -27,7 +24,12 @@ import com.devops00.spectra.core.auth.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-/** Core 用户账号到通知收件人快照的适配器。 */
+import java.util.List;
+import java.util.UUID;
+
+/**
+ * Core 用户账号到通知收件人快照的适配器。
+ */
 @Service
 @RequiredArgsConstructor
 public class CoreNotificationRecipientDirectory implements NotificationRecipientDirectory {
@@ -67,7 +69,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         var active = accounts.stream().anyMatch(this::isActive);
         var verified = accounts.stream()
                 .anyMatch(account -> isActive(account)
-                    && Short.valueOf((short) 1).equals(account.getVerified()));
+                        && Short.valueOf((short) 1).equals(account.getVerified()));
         var phone = accounts.stream()
                 .filter(this::isUsable)
                 .map(Account::getPhone)

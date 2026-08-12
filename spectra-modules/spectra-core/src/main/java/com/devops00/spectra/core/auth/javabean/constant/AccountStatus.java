@@ -28,16 +28,24 @@ import lombok.Getter;
 @Getter
 public enum AccountStatus {
 
-    /** 可登录。 */
+    /**
+     * 可登录。
+     */
     ACTIVE((short) 1),
 
-    /** 已禁用。 */
+    /**
+     * 已禁用。
+     */
     DISABLED((short) 2),
 
-    /** 尚未完成手机号或邮箱验证。 */
+    /**
+     * 尚未完成手机号或邮箱验证。
+     */
     UNVERIFIED((short) 3),
 
-    /** 已生成凭证但必须先完成密码设置。 */
+    /**
+     * 已生成凭证但必须先完成密码设置。
+     */
     PASSWORD_RESET_REQUIRED((short) 4);
 
     private final Short code;

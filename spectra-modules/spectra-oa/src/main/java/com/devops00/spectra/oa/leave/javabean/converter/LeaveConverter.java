@@ -16,12 +16,11 @@
 
 package com.devops00.spectra.oa.leave.javabean.converter;
 
-import org.mapstruct.Mapper;
-
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;
 import com.devops00.spectra.oa.leave.javabean.vo.LeaveVO;
+import org.mapstruct.Mapper;
 
 /**
  * 请假申请 MapStruct 转换器。

@@ -48,11 +48,10 @@ public class ConfiguredController {
 
     /**
      * 修改系统配置
-     *
+     * <p>
      * 只能修改值和说明
      *
-     * @param params
-     *            修改参数入参实体
+     * @param params 修改参数入参实体
      */
     @ULog("'修改系统配置'")
     @PutMapping(version = "1.0.0+")

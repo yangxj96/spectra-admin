@@ -16,33 +16,19 @@
 
 package com.devops00.spectra.core.user.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
-import org.jspecify.annotations.NullMarked;
-import org.springframework.stereotype.Component;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.core.system.service.DepartmentService;
-import com.devops00.spectra.core.user.javabean.entity.RoleDataScope;
-import com.devops00.spectra.core.user.javabean.entity.RoleDataScopeTarget;
-import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
-import com.devops00.spectra.core.user.javabean.entity.UserDataScopeTarget;
-import com.devops00.spectra.core.user.mapper.RoleDataScopeMapper;
-import com.devops00.spectra.core.user.mapper.RoleDataScopeTargetMapper;
-import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
-import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
-import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.javabean.entity.*;
+import com.devops00.spectra.core.user.mapper.*;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NullMarked;
+import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 /**
  * 数据范围解析器 — 计算用户的有效数据范围
@@ -159,7 +145,7 @@ public class DataScopeResolver implements DataScopeProvider {
 
     /**
      * 比较两个范围类型的优先级（数字越小范围越大）
-     *
+     * <p>
      * GLOBAL(0) > DEPT_AND_CHILDREN(3) > DEPT(2) > CUSTOM(4) > SELF(1)
      */
     private int comparePriority(DataScopeType a, DataScopeType b) {

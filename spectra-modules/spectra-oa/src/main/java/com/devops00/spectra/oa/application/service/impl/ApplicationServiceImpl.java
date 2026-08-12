@@ -16,17 +16,6 @@
 
 package com.devops00.spectra.oa.application.service.impl;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,9 +36,18 @@ import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.workflow.service.TaskService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * OA 通用申请生命周期服务实现。
@@ -105,9 +103,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
         if (user != null
-            && user.getId() != null
-            && user.getDepartmentId() != null
-            && (user.getId().equals(entity.getApplicantId()) || user.getDepartmentId().equals(entity.getDepartmentId()))) {
+                && user.getId() != null
+                && user.getDepartmentId() != null
+                && (user.getId().equals(entity.getApplicantId()) || user.getDepartmentId().equals(entity.getDepartmentId()))) {
             return entity;
         }
         String username = SecUtil.getCurrentUsername();
@@ -271,9 +269,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var entity = require(id);
         var current = entity.getStatus();
         if (ApplicationStatus.IN_REVIEW.name().equals(status)
-            && !(ApplicationStatus.DRAFT.name().equals(current)
-                || ApplicationStatus.REJECTED.name().equals(current)
-                || ApplicationStatus.WITHDRAWN.name().equals(current))) {
+                && !(ApplicationStatus.DRAFT.name().equals(current)
+                        || ApplicationStatus.REJECTED.name().equals(current)
+                        || ApplicationStatus.WITHDRAWN.name().equals(current))) {
             throw new DataSaveException("当前状态不允许提交");
         }
         entity.setStatus(status);

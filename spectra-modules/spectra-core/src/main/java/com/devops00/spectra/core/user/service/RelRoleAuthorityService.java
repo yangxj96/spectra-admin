@@ -34,26 +34,22 @@ public interface RelRoleAuthorityService {
     /**
      * 授予角色权限
      *
-     * @param roleId
-     *            角色ID
-     * @param from
-     *            权限关联信息
+     * @param roleId 角色ID
+     * @param from   权限关联信息
      */
     void grant(UUID roleId, RoleAuthorityFrom from);
 
     /**
      * 撤销角色权限
      *
-     * @param roleId
-     *            角色ID
+     * @param roleId 角色ID
      */
     void revoke(UUID roleId);
 
     /**
      * 获取角色权限
      *
-     * @param roleId
-     *            角色ID
+     * @param roleId 角色ID
      * @return 权限列表
      */
     List<AuthorityVO> get(UUID roleId);
@@ -61,8 +57,7 @@ public interface RelRoleAuthorityService {
     /**
      * 获取角色权限
      *
-     * @param ids
-     *            角色ID列表
+     * @param ids 角色ID列表
      * @return 权限列表,已去重
      */
     List<AuthorityVO> get(List<UUID> ids);

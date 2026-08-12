@@ -45,7 +45,8 @@ public enum LoginType implements IEnum<Integer> {
     /**
      * 邮件验证码登录
      */
-    EMAIL(4, "email"),;
+    EMAIL(4, "email"),
+    ;
 
     private final Integer value;
 

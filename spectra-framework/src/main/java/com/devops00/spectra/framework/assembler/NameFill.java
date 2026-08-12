@@ -23,25 +23,25 @@ import java.lang.annotation.Target;
 
 /**
  * 字段名称填充注解
- *
+ * <p>
  * 用于 VO（View Object）层，在仅持有 ID 字段的情况下，
  * 通过指定的 {@link NameLookup} 实现类，
  * 在响应阶段自动填充对应的「名称 / 展示值」字段。
- *
+ * <p>
  * 设计目标：
  * <ul>
  * <li>避免在实体或 VO 中引入多余的冗余字段</li>
  * <li>避免在 SQL 层进行强耦合 JOIN</li>
  * <li>将「ID → Name」的装配逻辑统一收敛到 Assembler 层</li>
  * </ul>
- *
+ * <p>
  * 使用约束：
  * <ul>
  * <li>只能用于 VO 层字段</li>
  * <li>仅用于<strong>展示型字段</strong>，不得参与业务判断</li>
  * <li>lookup 必须是 {@link NameLookup} 的具体实现类（而非 Service 接口）</li>
  * </ul>
- *
+ * <p>
  * 示例：
  *
  * <pre>
@@ -61,7 +61,7 @@ public @interface NameFill {
 
     /**
      * 指定用于执行「ID → Name」映射的 Lookup 实现类
-     *
+     * <p>
      * 必须是 {@link NameLookup} 的具体实现类，
      * 而不是 Service 接口或抽象类，
      * 以确保语义清晰、职责单一。
@@ -70,7 +70,7 @@ public @interface NameFill {
 
     /**
      * VO 中用于取值的 ID 字段名
-     *
+     * <p>
      * 该字段必须存在于当前 VO 类中，
      * 且其类型需与 lookup.idType() 返回的类型一致。
      */

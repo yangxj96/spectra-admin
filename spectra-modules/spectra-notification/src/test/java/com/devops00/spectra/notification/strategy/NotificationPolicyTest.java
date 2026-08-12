@@ -16,19 +16,18 @@
 
 package com.devops00.spectra.notification.strategy;
 
-import java.util.List;
-
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
 
-/** 通知用途与渠道策略测试。 */
+import static org.junit.jupiter.api.Assertions.*;
+
+/**
+ * 通知用途与渠道策略测试。
+ */
 class NotificationPolicyTest {
 
     private final NotificationPolicy policy = new NotificationPolicy();

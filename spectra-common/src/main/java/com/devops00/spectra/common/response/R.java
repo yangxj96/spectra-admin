@@ -25,8 +25,7 @@ import java.io.Serializable;
 /**
  * 响应
  *
- * @param <T>
- *            具体类型
+ * @param <T> 具体类型
  * @author yangxj96
  * @version 1.0
  * @since 2025/6/14 00:00
@@ -50,8 +49,7 @@ public class R<T> implements Serializable {
     /**
      * 自定义的构建方式
      *
-     * @param status
-     *            http状态码
+     * @param status http状态码
      */
     public R(HttpStatus status) {
         this.code = status.value();

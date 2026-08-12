@@ -22,8 +22,8 @@ import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.mapper.RelUserRoleMapper;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
-import lombok.extern.slf4j.Slf4j;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

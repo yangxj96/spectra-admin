@@ -38,8 +38,7 @@ public interface OrganizationConverter {
     /**
      * 实体转树形
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 树形
      */
     DepartmentTreeVo toTreeVO(Department source);
@@ -47,8 +46,7 @@ public interface OrganizationConverter {
     /**
      * 实体转树形(列表)
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 树形
      */
     List<DepartmentTreeVo> toTreeVOList(List<Department> source);
@@ -56,8 +54,7 @@ public interface OrganizationConverter {
     /**
      * 入参转实体
      *
-     * @param source
-     *            入参
+     * @param source 入参
      * @return 实体
      */
     Department toEntity(DepartmentFrom source);

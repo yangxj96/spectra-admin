@@ -51,10 +51,8 @@ public class CommonExceptionAdvice {
     /**
      * 方法级权限不足异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为权限不足响应
      */
     @ExceptionHandler(AccessDeniedException.class)
@@ -77,10 +75,8 @@ public class CommonExceptionAdvice {
     /**
      * 未找到资源
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(NoResourceFoundException.class)
@@ -93,10 +89,8 @@ public class CommonExceptionAdvice {
     /**
      * 未进行功能实现异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(NotImplementedException.class)
@@ -109,10 +103,8 @@ public class CommonExceptionAdvice {
     /**
      * 数据已存在异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(DataExistException.class)
@@ -125,10 +117,8 @@ public class CommonExceptionAdvice {
     /**
      * 数据不存在异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(DataNotExistException.class)
@@ -141,10 +131,8 @@ public class CommonExceptionAdvice {
     /**
      * 参数验证异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -167,10 +155,8 @@ public class CommonExceptionAdvice {
     /**
      * 运行时异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -183,10 +169,8 @@ public class CommonExceptionAdvice {
     /**
      * 运行时异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(RuntimeException.class)
@@ -199,10 +183,8 @@ public class CommonExceptionAdvice {
     /**
      * 兜底异常处理
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(Exception.class)

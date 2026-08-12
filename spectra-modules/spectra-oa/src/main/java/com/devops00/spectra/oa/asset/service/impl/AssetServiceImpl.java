@@ -181,8 +181,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         var entity = require(id);
         ensureOperable(entity);
         if (STATUS_IN_USE.equals(entity.getStatus())
-            && entity.getCustodianId() != null
-            && (from == null || from.getToUserId() == null || !Objects.equals(entity.getCustodianId(), from.getToUserId()))) {
+                && entity.getCustodianId() != null
+                && (from == null || from.getToUserId() == null || !Objects.equals(entity.getCustodianId(), from.getToUserId()))) {
             throw new DataSaveException("资产已被其他人员领用");
         }
         var operation = operation(entity, OP_ASSIGN, from);

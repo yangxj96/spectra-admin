@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.util.UUID;
-
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import org.junit.jupiter.api.Test;
@@ -26,12 +24,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.UUID;
 
-/** 通知偏好首次保存和更新分支测试。 */
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+/**
+ * 通知偏好首次保存和更新分支测试。
+ */
 @ExtendWith(MockitoExtension.class)
 class NotificationPreferenceServiceImplTest {
 

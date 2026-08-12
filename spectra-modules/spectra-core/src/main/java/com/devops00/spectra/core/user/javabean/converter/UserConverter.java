@@ -41,8 +41,7 @@ public interface UserConverter {
     /**
      * 实体转分页VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 分页实体
      */
     UserPageVO toVO(User source);
@@ -50,8 +49,7 @@ public interface UserConverter {
     /**
      * 入参vo转实体
      *
-     * @param source
-     *            入参vo
+     * @param source 入参vo
      * @return 实体
      */
     User toEntity(UserSaveFrom source);
@@ -59,8 +57,7 @@ public interface UserConverter {
     /**
      * 转换为分页VO
      *
-     * @param source
-     *            入参
+     * @param source 入参
      * @return 分页的VO
      */
     @Mapping(target = "pages", ignore = true)
@@ -69,18 +66,15 @@ public interface UserConverter {
     /**
      * 使用params更新现有的user实体
      *
-     * @param source
-     *            更新的参数
-     * @param target
-     *            现有的实体
+     * @param source 更新的参数
+     * @param target 现有的实体
      */
     void updateUser(UserSaveFrom source, @MappingTarget User target);
 
     /**
      * 实体转用户详情VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 用户详情VO
      */
     UserProfileVO toProfileVO(User source);
@@ -88,10 +82,8 @@ public interface UserConverter {
     /**
      * 使用params更新现有的user实体（个人中心）
      *
-     * @param source
-     *            更新的参数
-     * @param target
-     *            现有的实体
+     * @param source 更新的参数
+     * @param target 现有的实体
      */
     void updateProfile(UserProfileFrom source, @MappingTarget User target);
 }

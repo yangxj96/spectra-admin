@@ -16,15 +16,11 @@
 
 package com.devops00.spectra.common.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * 接口加解密标记
- *
+ * <p>
  * 标记在 Controller 类或方法上，控制是否需要加密响应/解密请求。 方法级注解优先级高于类级注解。
  *
  * @author yangxj96

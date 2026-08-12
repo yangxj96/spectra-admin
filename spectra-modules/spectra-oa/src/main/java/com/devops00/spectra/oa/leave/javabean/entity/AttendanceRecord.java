@@ -16,17 +16,16 @@
 
 package com.devops00.spectra.oa.leave.javabean.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * 审批通过后生成的考勤记录。

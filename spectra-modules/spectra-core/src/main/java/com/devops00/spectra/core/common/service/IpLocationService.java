@@ -31,17 +31,15 @@ public interface IpLocationService {
     /**
      * 查询 IP 所在地理位置，支持精度控制
      *
-     * @param ip
-     *            客户端 IP 地址（IPv4），如 "8.8.8.8"
-     * @param level
-     *            精度级别:
+     * @param ip    客户端 IP 地址（IPv4），如 "8.8.8.8"
+     * @param level 精度级别:
      *
-     *            <pre>
-     *                                                                                                                      0 国家（如：中国）
-     *                                                                                                                      1 省份（如：中国 广东省）
-     *                                                                                                                      2 城市（如：中国 广东省 深圳市）
-     *                                                                                                                      3 运营商（如：中国 广东省 深圳市 电信）
-     *            </pre>
+     *              <pre>
+     *                                                                                                                                   0 国家（如：中国）
+     *                                                                                                                                   1 省份（如：中国 广东省）
+     *                                                                                                                                   2 城市（如：中国 广东省 深圳市）
+     *                                                                                                                                   3 运营商（如：中国 广东省 深圳市 电信）
+     *              </pre>
      *
      * @return 格式化后的位置字符串，内网 IP 返回 "内网"，查询失败返回 "未知"
      */
@@ -53,8 +51,7 @@ public interface IpLocationService {
      * 相当于调用 {@code #getCityEn(String, int)} 并设置 level = 2。
      * </p>
      *
-     * @param ip
-     *            客户端 IP 地址
+     * @param ip 客户端 IP 地址
      * @return 位置信息，格式：国家 省份 城市
      */
     String getCityEn(String ip);
@@ -62,8 +59,7 @@ public interface IpLocationService {
     /**
      * 判断是否为私有（内网）IP 地址（IPv4）
      *
-     * @param ip
-     *            ip
+     * @param ip ip
      * @return 是否
      */
     boolean isPrivateIp(String ip);

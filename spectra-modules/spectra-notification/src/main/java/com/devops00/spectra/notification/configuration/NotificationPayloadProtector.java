@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.notification.configuration;
 
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
+import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;

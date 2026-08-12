@@ -6,9 +6,9 @@
 
 package com.devops00.spectra.oa.contact.javabean.vo;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * OA 通讯录公开信息。

@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.report.javabean.from;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 部门维度统计查询参数。

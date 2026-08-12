@@ -31,7 +31,7 @@ import java.util.List;
 
 /**
  * 加解密密钥管理器
- *
+ * <p>
  * 从 sys_config 表读取 RSA 密钥配置，缓存到内存中供请求处理使用。
  * 密钥变更后调用 refresh() 重新加载，无需重启服务。
  *
@@ -56,7 +56,7 @@ public class CryptoKeyManager {
      * 不可变密钥容器，volatile 原子替换保证线程安全
      */
     private record CryptoKeys(boolean enabled, @Nullable PublicKey serverPublicKey, @Nullable PrivateKey serverPrivateKey,
-            @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey) {
+                              @Nullable PublicKey clientPublicKey, @Nullable PrivateKey clientPrivateKey) {
 
         /**
          * 检查密钥完整性（启用时四个密钥必须全部存在）

@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.notice.javabean.from;
 
-import java.util.UUID;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 公告创建参数。

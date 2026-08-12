@@ -1,18 +1,5 @@
 package com.devops00.spectra.oa.supply.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
@@ -22,8 +9,13 @@ import com.devops00.spectra.oa.supply.javabean.from.SupplyPageFrom;
 import com.devops00.spectra.oa.supply.javabean.from.SupplySaveFrom;
 import com.devops00.spectra.oa.supply.javabean.vo.SupplyItemVO;
 import com.devops00.spectra.oa.supply.service.SupplyService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 办公用品库存接口。

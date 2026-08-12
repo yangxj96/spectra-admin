@@ -22,16 +22,11 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.DataScopeType;
-import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.common.exception.DataScopeViolationException;
-import com.devops00.spectra.common.exception.EntityUpdateException;
-import com.devops00.spectra.common.exception.SpectraException;
+import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
+import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
@@ -46,10 +41,10 @@ import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
+import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
@@ -62,12 +57,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.UUID;
 import java.security.SecureRandom;
-import java.util.Base64;
+import java.util.*;
 
 /**
  * 用户service层-实现
@@ -353,12 +344,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     /**
      * 更新用户数据范围
      *
-     * @param userId
-     *            用户ID
-     * @param type
-     *            权限范围类型
-     * @param targetIds
-     *            自定义权限范围
+     * @param userId    用户ID
+     * @param type      权限范围类型
+     * @param targetIds 自定义权限范围
      */
     private void updateUserScope(UUID userId, DataScopeType type, List<UUID> targetIds) {
         // null 表示继承角色范围，不能偷偷转换成 DEPT 覆盖角色。
@@ -402,9 +390,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private boolean canManageGlobalScope() {
         var currentUser = SecUtil.getCurrentUser();
         return currentUser != null
-            && currentUser.getAuthorities()
-                    .stream()
-                    .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
+                && currentUser.getAuthorities()
+                        .stream()
+                        .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 
     /**

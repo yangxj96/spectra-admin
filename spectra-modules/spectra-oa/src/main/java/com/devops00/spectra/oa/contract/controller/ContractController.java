@@ -16,35 +16,22 @@
 
 package com.devops00.spectra.oa.contract.controller;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
-import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
-import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
-import com.devops00.spectra.oa.contract.javabean.from.ContractSaveFrom;
-import com.devops00.spectra.oa.contract.javabean.from.ContractVersionFrom;
+import com.devops00.spectra.oa.contract.javabean.from.*;
 import com.devops00.spectra.oa.contract.javabean.vo.ContractMilestoneVO;
-import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
 import com.devops00.spectra.oa.contract.javabean.vo.ContractVO;
+import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
 import com.devops00.spectra.oa.contract.service.ContractService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 合同台账接口。

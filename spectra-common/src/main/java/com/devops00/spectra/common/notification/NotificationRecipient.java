@@ -35,8 +35,7 @@ public record NotificationRecipient(UUID userId, String phone, String email, boo
     /**
      * 返回指定外部渠道的已验证地址。用户不可用、地址未验证或渠道为站内信时返回空。
      *
-     * @param channel
-     *            待解析地址的通知渠道
+     * @param channel 待解析地址的通知渠道
      * @return 手机号或邮箱地址；没有可用地址时返回 {@code null}
      */
     public String addressFor(NotificationChannel channel) {

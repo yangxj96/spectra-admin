@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 数据资源元数据注册表。
- *
+ * <p>
  * 除了从 mappedStatementId 推导实体，还按实际表名注册所有 {@code @DataScope} 实体。
  * 这样 XML 自定义 SQL、别名或非标准 Mapper 命名无法绕过已声明的数据隔离。
  *

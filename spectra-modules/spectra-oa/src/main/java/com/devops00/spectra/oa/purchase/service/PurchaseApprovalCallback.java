@@ -16,15 +16,13 @@
 
 package com.devops00.spectra.oa.purchase.service;
 
-import java.util.Map;
-
-import org.springframework.stereotype.Component;
-
 import com.devops00.spectra.workflow.service.ApprovalCallback;
 import com.devops00.spectra.workflow.service.WorkflowService;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
 
 /**
  * 采购流程审批回调注册器。

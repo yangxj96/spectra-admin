@@ -34,18 +34,24 @@ import org.mapstruct.Mapping;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface NotificationInboxConverter {
 
-    /** 将收件箱实体转换为兼容消息中心字段的响应对象。 */
+    /**
+     * 将收件箱实体转换为兼容消息中心字段的响应对象。
+     */
     @Mapping(target = "type", expression = "java(toLegacyType(source.getPurpose()))")
     @Mapping(source = "senderUserId", target = "senderId")
     @Mapping(source = "receiverUserId", target = "receiverId")
     @Mapping(source = "isRead", target = "isRead")
     NotificationInboxVO toVO(NotificationInboxEntity source);
 
-    /** 将收件箱分页实体转换为响应分页结果。 */
+    /**
+     * 将收件箱分页实体转换为响应分页结果。
+     */
     @Mapping(target = "pages", ignore = true)
     Page<NotificationInboxVO> toVOPage(Page<NotificationInboxEntity> source);
 
-    /** 将通知用途映射为旧消息中心分类。 */
+    /**
+     * 将通知用途映射为旧消息中心分类。
+     */
     default String toLegacyType(String purpose) {
         if (purpose == null) {
             return "system";

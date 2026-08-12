@@ -16,13 +16,13 @@
 
 package com.devops00.spectra.oa.asset.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 资产台账响应视图。

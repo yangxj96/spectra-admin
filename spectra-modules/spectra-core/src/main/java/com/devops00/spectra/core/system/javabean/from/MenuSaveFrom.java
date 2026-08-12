@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.system.javabean.from;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;

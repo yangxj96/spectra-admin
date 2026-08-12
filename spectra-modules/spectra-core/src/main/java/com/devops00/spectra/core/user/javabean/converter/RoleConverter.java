@@ -38,8 +38,7 @@ public interface RoleConverter {
     /**
      * 实体转分页VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 分页实体
      */
     RoleVO toVO(Role source);

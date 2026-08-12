@@ -1,11 +1,11 @@
 package com.devops00.spectra.oa.supply.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 办公用品库存响应视图。

@@ -16,11 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -48,6 +43,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
 /**
  * 通知管理端 Service 实现；不返回请求参数、敏感载荷或原始地址。
  *
@@ -60,31 +60,51 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class NotificationAdminServiceImpl implements NotificationAdminService {
 
-    /** 独立通知模块使用的系统租户。 */
+    /**
+     * 独立通知模块使用的系统租户。
+     */
     private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-    /** 允许人工重新排队的终态。 */
+    /**
+     * 允许人工重新排队的终态。
+     */
     private static final Set<String> RETRYABLE_STATUSES = Set.of("FAILED", "BLOCKED", "UNKNOWN");
-    /** 允许取消的处理中状态。 */
+    /**
+     * 允许取消的处理中状态。
+     */
     private static final Set<String> CANCELLABLE_STATUSES = Set.of("PENDING", "RETRYING", "PROCESSING");
 
-    /** 通知请求 Mapper。 */
+    /**
+     * 通知请求 Mapper。
+     */
     private final NotificationRequestMapper requestMapper;
-    /** 通知任务 Mapper。 */
+    /**
+     * 通知任务 Mapper。
+     */
     private final NotificationTaskMapper taskMapper;
-    /** 投递记录 Mapper。 */
+    /**
+     * 投递记录 Mapper。
+     */
     private final NotificationDeliveryMapper deliveryMapper;
-    /** 管理视图转换器。 */
+    /**
+     * 管理视图转换器。
+     */
     private final NotificationAdminConverter converter;
-    /** 统一通知 Gateway。 */
+    /**
+     * 统一通知 Gateway。
+     */
     private final NotificationGateway notificationGateway;
 
-    /** 查询渠道健康状态。 */
+    /**
+     * 查询渠道健康状态。
+     */
     @Override
     public NotificationChannelAvailability availability(NotificationChannel channel) {
         return notificationGateway.availability(channel);
     }
 
-    /** 分页查询通知请求，并限制在系统租户范围内。 */
+    /**
+     * 分页查询通知请求，并限制在系统租户范围内。
+     */
     @Override
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
         var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>()
@@ -113,7 +133,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         return converter.toRequestPage(requestMapper.selectPage(page.toPage(), wrapper));
     }
 
-    /** 分页查询通知任务，并限制在系统租户范围内。 */
+    /**
+     * 分页查询通知任务，并限制在系统租户范围内。
+     */
     @Override
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
         var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>()
@@ -142,7 +164,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         return converter.toTaskPage(taskMapper.selectPage(page.toPage(), wrapper));
     }
 
-    /** 分页查询渠道投递记录，并限制在系统租户范围内。 */
+    /**
+     * 分页查询渠道投递记录，并限制在系统租户范围内。
+     */
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
         var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>()
@@ -159,7 +183,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         return converter.toDeliveryPage(deliveryMapper.selectPage(page.toPage(), wrapper));
     }
 
-    /** 将失败或阻断任务重新置为可处理状态。 */
+    /**
+     * 将失败或阻断任务重新置为可处理状态。
+     */
     @Override
     @Transactional
     public void retry(UUID taskId) {
@@ -188,7 +214,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         log.info("已重新排队通知任务: taskId={}", taskId);
     }
 
-    /** 取消尚未完成的任务，并同步请求状态。 */
+    /**
+     * 取消尚未完成的任务，并同步请求状态。
+     */
     @Override
     @Transactional
     public void cancel(UUID taskId) {
@@ -208,7 +236,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         log.info("已取消通知任务: taskId={}", taskId);
     }
 
-    /** 查询指定系统租户下的通知任务。 */
+    /**
+     * 查询指定系统租户下的通知任务。
+     */
     private NotificationTaskEntity getTask(UUID taskId) {
         var task = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, taskId)
@@ -219,7 +249,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         return task;
     }
 
-    /** 根据剩余任务状态刷新取消后的请求状态。 */
+    /**
+     * 根据剩余任务状态刷新取消后的请求状态。
+     */
     private void updateRequestAfterCancel(UUID requestId) {
         var tasks = taskMapper.selectList(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getNotificationRequestId, requestId));

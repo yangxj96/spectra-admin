@@ -24,10 +24,16 @@ package com.devops00.spectra.common.notification;
  * @since 2026/8/11
  */
 public enum NotificationChannel {
-    /** 站内信。 */
+    /**
+     * 站内信。
+     */
     IN_APP,
-    /** 短信。 */
+    /**
+     * 短信。
+     */
     SMS,
-    /** 邮件。 */
+    /**
+     * 邮件。
+     */
     EMAIL
 }

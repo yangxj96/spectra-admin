@@ -44,7 +44,7 @@ import java.util.Arrays;
 
 /**
  * ULog注解AOP环绕切面
- *
+ * <p>
  * 彻底移除 ThreadLocal，完美防范内存泄漏、参数暴雷及长文本溢出
  *
  * @author yangxj96
@@ -62,13 +62,11 @@ public class ULogAspect {
 
     /**
      * 改用 @Around 环绕通知
-     *
+     * <p>
      * 掌控整个执行链路，天然线程隔离，彻底绝育内存泄漏风险
      *
-     * @param point
-     *            入点
-     * @param annotation
-     *            注解
+     * @param point      入点
+     * @param annotation 注解
      */
     @Around("@annotation(annotation)")
     public Object handleAround(ProceedingJoinPoint point, ULog annotation) throws Throwable {
@@ -101,7 +99,7 @@ public class ULogAspect {
     }
 
     private void executeLogSafely(ProceedingJoinPoint point, ULog annotation, @Nullable Exception e, @Nullable Object result, long timeCost,
-            String preParsedExplain) {
+                                  String preParsedExplain) {
         try {
             var attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
             if (attributes == null) {
@@ -159,10 +157,10 @@ public class ULogAspect {
         // 依旧干净地过滤掉无法打包的 Web 核心基础对象
         return Arrays.stream(args)
                 .filter(arg -> arg != null
-                    && !(arg instanceof MultipartFile
-                        || arg instanceof HttpServletRequest
-                        || arg instanceof HttpServletResponse
-                        || arg instanceof org.springframework.validation.BindingResult))
+                        && !(arg instanceof MultipartFile
+                                || arg instanceof HttpServletRequest
+                                || arg instanceof HttpServletResponse
+                                || arg instanceof org.springframework.validation.BindingResult))
                 .toArray();
     }
 

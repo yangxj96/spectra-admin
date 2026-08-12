@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.workflow.javabean.converter;
 
-import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionVO;
-import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionVO;
+import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.mapstruct.Mapper;

@@ -37,8 +37,7 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 根据 LoginName 字段查询账号信息
      *
-     * @param loginName
-     *            登录用户名
+     * @param loginName 登录用户名
      * @return 账号信息，可能为null
      */
     @Nullable
@@ -47,8 +46,7 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 根据用户ID获取用户的默认账号
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 账号信息
      */
     Account getDefaultByUserId(UUID userId);
@@ -56,8 +54,7 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 根据手机号查询账号
      *
-     * @param phone
-     *            手机号
+     * @param phone 手机号
      * @return 账号信息，可能为null
      */
     @Nullable
@@ -66,8 +63,7 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 根据邮箱查询账号
      *
-     * @param email
-     *            邮箱
+     * @param email 邮箱
      * @return 账号信息，可能为null
      */
     @Nullable
@@ -76,16 +72,14 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 根据用户ID删除用户的所有登录方式
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      */
     void deleteByUserId(UUID userId);
 
     /**
      * 获取用户的所有绑定账号
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 账号列表
      */
     List<Account> listByUserId(UUID userId);
@@ -93,34 +87,26 @@ public interface AccountService extends BaseService<Account> {
     /**
      * 绑定手机号
      *
-     * @param userId
-     *            用户ID
-     * @param phone
-     *            手机号
-     * @param code
-     *            验证码
+     * @param userId 用户ID
+     * @param phone  手机号
+     * @param code   验证码
      */
     void bindPhone(UUID userId, String phone, String code);
 
     /**
      * 绑定邮箱
      *
-     * @param userId
-     *            用户ID
-     * @param email
-     *            邮箱
-     * @param code
-     *            验证码
+     * @param userId 用户ID
+     * @param email  邮箱
+     * @param code   验证码
      */
     void bindEmail(UUID userId, String email, String code);
 
     /**
      * 解绑账号
      *
-     * @param userId
-     *            用户ID
-     * @param accountId
-     *            账号ID
+     * @param userId    用户ID
+     * @param accountId 账号ID
      */
     void unbind(UUID userId, UUID accountId);
 }

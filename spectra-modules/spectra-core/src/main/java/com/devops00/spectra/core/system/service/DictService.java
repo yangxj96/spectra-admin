@@ -37,48 +37,42 @@ public interface DictService {
     /**
      * 创建字典组
      *
-     * @param params
-     *            入参from
+     * @param params 入参from
      */
     void createGroup(DictGroupFrom params);
 
     /**
      * 根据ID删除字典组
      *
-     * @param id
-     *            字典组主键ID
+     * @param id 字典组主键ID
      */
     void deleteGroup(UUID id);
 
     /**
      * 修改字典组
      *
-     * @param params
-     *            入参from
+     * @param params 入参from
      */
     void modifyGroup(DictGroupFrom params);
 
     /**
      * 创建字典数据
      *
-     * @param params
-     *            入参from
+     * @param params 入参from
      */
     void createData(DictItemFrom params);
 
     /**
      * 根据ID删除字典数据
      *
-     * @param id
-     *            字典数据ID
+     * @param id 字典数据ID
      */
     void deleteData(UUID id);
 
     /**
      * 修改字典数据
      *
-     * @param params
-     *            入参from
+     * @param params 入参from
      */
     void modifyData(DictItemFrom params);
 
@@ -93,8 +87,7 @@ public interface DictService {
     /**
      * 根据字典类型编码获取字典数据列表
      *
-     * @param code
-     *            字典类型编码
+     * @param code 字典类型编码
      * @return 字典数据列表
      */
     List<DictItemVO> listDictDataByGroupCode(String code);

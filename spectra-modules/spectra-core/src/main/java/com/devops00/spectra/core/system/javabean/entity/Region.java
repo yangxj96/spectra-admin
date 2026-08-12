@@ -16,18 +16,13 @@
 
 package com.devops00.spectra.core.system.javabean.entity;
 
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.constant.RegionLevel;
+import lombok.*;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import java.util.UUID;
 
 /**
  * GB/T 2260的行政区域数据表

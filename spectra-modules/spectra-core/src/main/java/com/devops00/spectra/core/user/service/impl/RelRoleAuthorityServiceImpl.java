@@ -57,7 +57,7 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
     private final AuthorityService authorityService;
 
     public RelRoleAuthorityServiceImpl(AuthorityConverter authorityConverter, RelRoleAuthorityMapper relRoleAuthorityMapper,
-            AuthorityService authorityService) {
+                                       AuthorityService authorityService) {
         this.authorityConverter = authorityConverter;
         this.relRoleAuthorityMapper = relRoleAuthorityMapper;
         this.authorityService = authorityService;

@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.oa.contract.javabean.from;
 
-import java.util.UUID;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 合同履约节点创建参数。

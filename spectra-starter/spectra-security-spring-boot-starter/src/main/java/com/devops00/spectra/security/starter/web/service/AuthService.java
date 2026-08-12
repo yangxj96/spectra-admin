@@ -28,16 +28,14 @@ public interface AuthService {
     /**
      * 发送短信验证码
      *
-     * @param phone
-     *            手机号
+     * @param phone 手机号
      */
     void sendSmsCode(String phone);
 
     /**
      * 发送邮箱验证码
      *
-     * @param email
-     *            邮箱
+     * @param email 邮箱
      */
     void sendEmailCode(String email);
 }

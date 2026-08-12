@@ -16,10 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -39,6 +35,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * 当前用户消息中心服务实现。
  *
@@ -51,14 +51,22 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class NotificationInboxServiceImpl implements NotificationInboxService {
 
-    /** 消息收件箱 Mapper。 */
+    /**
+     * 消息收件箱 Mapper。
+     */
     private final NotificationInboxMapper mapper;
-    /** 实体与响应对象转换器。 */
+    /**
+     * 实体与响应对象转换器。
+     */
     private final NotificationInboxConverter converter;
-    /** 时间格式转换器。 */
+    /**
+     * 时间格式转换器。
+     */
     private final TimeMapper timeMapper;
 
-    /** 分页查询指定用户仍可见的消息。 */
+    /**
+     * 分页查询指定用户仍可见的消息。
+     */
     @Override
     public IPage<NotificationInboxVO> page(PageFrom page, UUID tenantId, UUID userId, NotificationQueryFrom params) {
         var query = new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getTenantId, tenantId)
@@ -89,7 +97,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         return converter.toVOPage(mapper.selectPage(page.toPage(), query));
     }
 
-    /** 统计指定用户的未读消息数量。 */
+    /**
+     * 统计指定用户的未读消息数量。
+     */
     @Override
     public long unreadCount(UUID tenantId, UUID userId) {
         return mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getTenantId, tenantId)
@@ -98,13 +108,17 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 .isNull(NotificationInboxEntity::getDeleted));
     }
 
-    /** 查询指定用户拥有的消息详情。 */
+    /**
+     * 查询指定用户拥有的消息详情。
+     */
     @Override
     public NotificationInboxVO detail(UUID id, UUID tenantId, UUID userId) {
         return converter.toVO(owned(id, tenantId, userId));
     }
 
-    /** 将指定用户的一条消息标记为已读。 */
+    /**
+     * 将指定用户的一条消息标记为已读。
+     */
     @Override
     @Transactional
     public void markAsRead(UUID id, UUID tenantId, UUID userId) {
@@ -117,16 +131,18 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 .set(NotificationInboxEntity::getIsRead, true)
                 .set(NotificationInboxEntity::getReadAt, Instant.now()));
         if (updated == 0
-            && mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
-                    .eq(NotificationInboxEntity::getId, id)
-                    .eq(NotificationInboxEntity::getTenantId, tenantId)
-                    .eq(NotificationInboxEntity::getReceiverUserId, userId)
-                    .isNull(NotificationInboxEntity::getDeleted)) == 0) {
+                && mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
+                        .eq(NotificationInboxEntity::getId, id)
+                        .eq(NotificationInboxEntity::getTenantId, tenantId)
+                        .eq(NotificationInboxEntity::getReceiverUserId, userId)
+                        .isNull(NotificationInboxEntity::getDeleted)) == 0) {
             throw new DataNotExistException("消息不存在");
         }
     }
 
-    /** 将指定用户的全部可见消息标记为已读。 */
+    /**
+     * 将指定用户的全部可见消息标记为已读。
+     */
     @Override
     @Transactional
     public void markAllAsRead(UUID tenantId, UUID userId) {
@@ -138,7 +154,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 .set(NotificationInboxEntity::getReadAt, Instant.now()));
     }
 
-    /** 软删除指定用户拥有的一条消息。 */
+    /**
+     * 软删除指定用户拥有的一条消息。
+     */
     @Override
     @Transactional
     public void deleteById(UUID id, UUID tenantId, UUID userId) {
@@ -152,7 +170,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         }
     }
 
-    /** 批量软删除指定用户拥有的消息。 */
+    /**
+     * 批量软删除指定用户拥有的消息。
+     */
     @Override
     @Transactional
     public void batchDelete(List<UUID> ids, UUID tenantId, UUID userId) {
@@ -166,7 +186,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 .set(NotificationInboxEntity::getDeleted, Instant.now()));
     }
 
-    /** 按租户和收件人约束查询消息，避免越权读取。 */
+    /**
+     * 按租户和收件人约束查询消息，避免越权读取。
+     */
     private NotificationInboxEntity owned(UUID id, UUID tenantId, UUID userId) {
         var entity = mapper.selectOne(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getId, id)
                 .eq(NotificationInboxEntity::getTenantId, tenantId)
@@ -178,7 +200,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         return entity;
     }
 
-    /** 将兼容接口的消息分类转换为通知用途查询条件。 */
+    /**
+     * 将兼容接口的消息分类转换为通知用途查询条件。
+     */
     private void applyType(LambdaQueryWrapper<NotificationInboxEntity> query, String type) {
         if (!StringUtils.hasText(type) || "all".equalsIgnoreCase(type)) {
             return;
@@ -194,7 +218,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         }
     }
 
-    /** 解析查询时间，统一转换为无时区时间点。 */
+    /**
+     * 解析查询时间，统一转换为无时区时间点。
+     */
     private Instant parseTime(String value) {
         try {
             return timeMapper.toInstant(value);

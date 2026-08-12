@@ -35,8 +35,7 @@ public interface AuthConverter {
     /**
      * 用户信息转换为UserDTO,用于认证
      *
-     * @param source
-     *            用户信息
+     * @param source 用户信息
      * @return 转换结果
      */
     SecurityUser toSecurityUser(User source);

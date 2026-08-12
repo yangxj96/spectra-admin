@@ -16,19 +16,10 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.util.Base64;
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
-import com.devops00.spectra.common.notification.NotificationRecipient;
-import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
@@ -38,6 +29,7 @@ import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
+import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,16 +37,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import tools.jackson.databind.ObjectMapper;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.Base64;
+import java.util.List;
+import java.util.UUID;
 
-/** Gateway 幂等和多收件人展开测试。 */
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+/**
+ * Gateway 幂等和多收件人展开测试。
+ */
 class NotificationGatewayImplTest {
 
     @BeforeAll

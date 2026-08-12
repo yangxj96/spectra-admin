@@ -28,20 +28,36 @@ import lombok.Data;
 @Data
 public class NotificationSettingFrom {
 
-    /** 是否接收系统通知。 */
+    /**
+     * 是否接收系统通知。
+     */
     private Boolean systemEnabled;
-    /** 是否接收流程通知。 */
+    /**
+     * 是否接收流程通知。
+     */
     private Boolean workflowEnabled;
-    /** 是否接收 OA 通知。 */
+    /**
+     * 是否接收 OA 通知。
+     */
     private Boolean oaEnabled;
-    /** 是否接收站内私信。 */
+    /**
+     * 是否接收站内私信。
+     */
     private Boolean innerMailEnabled;
-    /** 是否接收审批通知。 */
+    /**
+     * 是否接收审批通知。
+     */
     private Boolean approvalEnabled;
-    /** 是否开启免打扰。 */
+    /**
+     * 是否开启免打扰。
+     */
     private Boolean doNotDisturb;
-    /** 免打扰开始时间。 */
+    /**
+     * 免打扰开始时间。
+     */
     private String doNotDisturbStart;
-    /** 免打扰结束时间。 */
+    /**
+     * 免打扰结束时间。
+     */
     private String doNotDisturbEnd;
 }

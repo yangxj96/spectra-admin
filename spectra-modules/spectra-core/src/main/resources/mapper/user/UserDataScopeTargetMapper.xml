@@ -41,7 +41,7 @@
         <include refid="Base_Column_List"/>
         FROM spectra_core.sys_user_data_scope_target
         WHERE user_id = #{userId}
-          AND deleted IS NULL
+        AND deleted IS NULL
     </select>
 
     <delete id="removeByUserId">

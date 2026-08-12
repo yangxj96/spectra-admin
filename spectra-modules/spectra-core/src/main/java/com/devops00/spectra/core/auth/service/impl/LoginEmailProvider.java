@@ -51,7 +51,7 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
     private final SecurityUserHelper securityUserHelper;
 
     public LoginEmailProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
-            SecurityUserHelper securityUserHelper) {
+                              SecurityUserHelper securityUserHelper) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
         this.accountService = accountService;

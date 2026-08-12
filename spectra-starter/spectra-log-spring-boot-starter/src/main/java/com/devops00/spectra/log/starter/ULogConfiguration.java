@@ -40,8 +40,7 @@ public class ULogConfiguration {
     /**
      * 日志消息订阅发布者
      *
-     * @param publisher
-     *            发布者
+     * @param publisher 发布者
      * @return {@link ULogEventPublisher}
      */
     @Bean

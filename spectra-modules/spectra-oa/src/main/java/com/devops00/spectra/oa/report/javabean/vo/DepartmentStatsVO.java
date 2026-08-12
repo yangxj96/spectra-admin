@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.report.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 部门维度 OA 业务统计结果。

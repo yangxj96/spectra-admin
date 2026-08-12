@@ -44,7 +44,7 @@ public class MeetingParticipantFrom {
 
     /**
      * 角色
-     *
+     * <p>
      * |值|说明|
      * |----|----|
      * |host|主持人|

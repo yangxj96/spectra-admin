@@ -52,8 +52,7 @@ public interface AuthorityService extends BaseService<Authority> {
     /**
      * 根据角色ID获取角色关联的权限
      *
-     * @param id
-     *            角色ID
+     * @param id 角色ID
      * @return 关联的权限
      */
     List<Authority> getByRelRoleId(UUID id);

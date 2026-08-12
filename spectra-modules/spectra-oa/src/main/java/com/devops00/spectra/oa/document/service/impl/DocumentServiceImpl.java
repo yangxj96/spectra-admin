@@ -16,13 +16,6 @@
 
 package com.devops00.spectra.oa.document.service.impl;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -45,8 +38,8 @@ import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentVersionFrom;
 import com.devops00.spectra.oa.document.javabean.vo.DocumentFolderVO;
-import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
 import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
 import com.devops00.spectra.oa.document.mapper.DocumentFolderMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
@@ -55,8 +48,14 @@ import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 文档表主表-服务默认实现
@@ -312,11 +311,11 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         var entity = require(id);
         var user = SecUtil.getCurrentUser();
         if (user == null
-            || user.getDepartmentId() == null
-            || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
-                && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
-                    && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
-                && !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
+                || user.getDepartmentId() == null
+                || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
+                        && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
+                                && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
+                        && !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
             throw new DataNotExistException("文档不存在或无权访问");
         }
         return entity;

@@ -23,10 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * RESTFul 接口公用service层
  *
- * @param <M>
- *            子类对应的mapper
- * @param <O>
- *            子类对应的实体
+ * @param <M> 子类对应的mapper
+ * @param <O> 子类对应的实体
  * @author yangxj96
  * @version 1.0
  * @since 2025-6-14 00:00

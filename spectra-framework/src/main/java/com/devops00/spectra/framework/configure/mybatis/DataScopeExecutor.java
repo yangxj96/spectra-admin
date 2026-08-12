@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 /**
  * 受控的数据隔离手动扩展点。
- *
+ * <p>
  * 只有系统运维角色或显式通配权限可以临时绕过隔离，调用范围限定在一个
  * lambda 内，避免出现全局开关未恢复的问题。
  *
@@ -45,9 +45,9 @@ public class DataScopeExecutor {
     private void requireSystemOperator() {
         var user = SecUtil.getCurrentUser();
         if (user == null
-            || user.getAuthorities()
-                    .stream()
-                    .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()))) {
+                || user.getAuthorities()
+                        .stream()
+                        .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()))) {
             throw new DataScopeViolationException("当前用户无权临时绕过数据隔离");
         }
     }

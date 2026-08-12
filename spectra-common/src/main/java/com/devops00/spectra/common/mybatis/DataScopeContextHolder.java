@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 /**
  * 数据权限请求上下文。
- *
+ * <p>
  * Web 请求由 framework 统一开启和清理；非 Web 线程不会缓存范围，避免线程池 复用时将上一个用户的范围带入下一个任务。绕过隔离只能通过
  * framework 提供 的受控执行器进入，拦截器只消费这里的状态。
  *

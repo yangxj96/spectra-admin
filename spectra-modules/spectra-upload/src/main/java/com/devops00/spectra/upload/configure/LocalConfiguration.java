@@ -16,12 +16,10 @@
 
 package com.devops00.spectra.upload.configure;
 
+import com.devops00.spectra.upload.properties.LocalProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
-
-import com.devops00.spectra.upload.properties.LocalProperties;
-
-import lombok.RequiredArgsConstructor;
 
 /**
  * 本地上传配置

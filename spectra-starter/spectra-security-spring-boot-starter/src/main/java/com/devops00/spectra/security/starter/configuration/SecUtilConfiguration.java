@@ -18,9 +18,9 @@ package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import com.devops00.spectra.security.starter.holder.SecStrategyBridge;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
+import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,11 +61,10 @@ public class SecUtilConfiguration {
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
     public RedisSecHolderStrategy redisSecHolderStrategy(
-            @Qualifier("securityObjectMapper") ObjectMapper om,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-            SecurityProperties properties,
-            UserOnlineConverter userOnlineConverter
-    ) {
+                                                         @Qualifier("securityObjectMapper") ObjectMapper om,
+                                                         @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+                                                         SecurityProperties properties,
+                                                         UserOnlineConverter userOnlineConverter) {
         return new RedisSecHolderStrategy(om, redis, properties, userOnlineConverter);
     }
 }

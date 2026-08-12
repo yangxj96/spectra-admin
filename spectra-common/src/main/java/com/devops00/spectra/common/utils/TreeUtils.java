@@ -37,14 +37,10 @@ public class TreeUtils {
     /**
      * 压缩选中的树节点：如果父节点的所有子节点都被选中，则只保留父节点
      *
-     * @param tree
-     *            树的根节点列表
-     * @param selectedIds
-     *            用户选中的节点ID集合
-     * @param idExtractor
-     *            提取节点ID的函数（如 AuthorityTreeVO::getId）
-     * @param <T>
-     *            实现 Tree<T> 的具体类型
+     * @param tree        树的根节点列表
+     * @param selectedIds 用户选中的节点ID集合
+     * @param idExtractor 提取节点ID的函数（如 AuthorityTreeVO::getId）
+     * @param <T>         实现 Tree<T> 的具体类型
      * @return 压缩处理后的选中ID集合
      */
     public static <T extends Tree<T>> Set<UUID> compressSelectedNodes(List<T> tree, Set<UUID> selectedIds, Function<T, UUID> idExtractor) {

@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.contract.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 合同文件版本视图。

@@ -32,25 +32,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class PlaceholderEmailSender implements NotificationSender {
 
-    /** 返回邮件渠道标识。 */
+    /**
+     * 返回邮件渠道标识。
+     */
     @Override
     public NotificationChannel channel() {
         return NotificationChannel.EMAIL;
     }
 
-    /** 邮件供应商尚未配置。 */
+    /**
+     * 邮件供应商尚未配置。
+     */
     @Override
     public boolean available() {
         return false;
     }
 
-    /** 返回邮件渠道未配置原因。 */
+    /**
+     * 返回邮件渠道未配置原因。
+     */
     @Override
     public String unavailableReason() {
         return "EMAIL_CHANNEL_NOT_CONFIGURED";
     }
 
-    /** 明确阻断投递，不伪造邮件发送成功。 */
+    /**
+     * 明确阻断投递，不伪造邮件发送成功。
+     */
     @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
         return new ChannelSendResult("BLOCKED", "EMAIL_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");

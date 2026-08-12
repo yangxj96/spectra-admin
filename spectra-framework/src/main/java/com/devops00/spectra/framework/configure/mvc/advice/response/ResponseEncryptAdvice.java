@@ -125,7 +125,8 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public @Nullable Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
-            Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
+                                            Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request,
+                                            ServerHttpResponse response) {
         // 第一：流式直接放行
         if (MediaType.TEXT_EVENT_STREAM.includes(contentType) || body instanceof Flux || Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过流式响应包装"));

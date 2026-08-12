@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.core.common.service.impl;
 
+import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
-import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,7 +54,7 @@ public class KaptchaServiceImpl implements KaptchaService {
     private final HttpServletResponse response;
 
     public KaptchaServiceImpl(Producer kaptchaProducer, KaptchaProperties properties, RedisTemplate<String, Object> redisTemplate,
-            HttpServletRequest request, HttpServletResponse response) {
+                              HttpServletRequest request, HttpServletResponse response) {
         this.kaptchaProducer = kaptchaProducer;
         this.properties = properties;
         this.redisTemplate = redisTemplate;

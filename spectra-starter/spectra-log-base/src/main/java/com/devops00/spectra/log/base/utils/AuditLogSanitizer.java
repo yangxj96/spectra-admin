@@ -17,12 +17,7 @@
 package com.devops00.spectra.log.base.utils;
 
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -56,8 +51,7 @@ public final class AuditLogSanitizer {
             "smscode",
             "emailcode",
             "otp",
-            "totp"
-    );
+            "totp");
 
     private static final Pattern URL_SECRET = Pattern.compile(
             "(?i)([?&](?:x-amz-signature|x-amz-credential|signature|token|access_token|refresh_token|api_key|apikey|secret)=)[^&#\\s]*");
@@ -118,11 +112,11 @@ public final class AuditLogSanitizer {
     private static boolean isSensitiveKey(String key) {
         String normalized = key.replaceAll("[-_.]", "").toLowerCase(Locale.ROOT);
         return SENSITIVE_KEYS.contains(normalized)
-            || normalized.endsWith("password")
-            || normalized.endsWith("token")
-            || normalized.endsWith("secret")
-            || normalized.endsWith("apikey")
-            || normalized.endsWith("privatekey");
+                || normalized.endsWith("password")
+                || normalized.endsWith("token")
+                || normalized.endsWith("secret")
+                || normalized.endsWith("apikey")
+                || normalized.endsWith("privatekey");
     }
 
     private static String sanitizeText(String text) {

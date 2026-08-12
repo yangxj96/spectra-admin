@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.notification.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 脱敏通知请求管理视图。
@@ -31,28 +31,52 @@ import lombok.Data;
 @Data
 public class NotificationRequestAdminVO {
 
-    /** 通知请求 ID。 */
+    /**
+     * 通知请求 ID。
+     */
     private UUID id;
-    /** 业务类型。 */
+    /**
+     * 业务类型。
+     */
     private String businessType;
-    /** 业务 ID。 */
+    /**
+     * 业务 ID。
+     */
     private String businessId;
-    /** 模板编码。 */
+    /**
+     * 模板编码。
+     */
     private String templateCode;
-    /** 通知用途。 */
+    /**
+     * 通知用途。
+     */
     private String purpose;
-    /** 来源模块。 */
+    /**
+     * 来源模块。
+     */
     private String sourceModule;
-    /** 请求状态。 */
+    /**
+     * 请求状态。
+     */
     private String status;
-    /** 计划投递时间。 */
+    /**
+     * 计划投递时间。
+     */
     private LocalDateTime scheduledAt;
-    /** 过期时间。 */
+    /**
+     * 过期时间。
+     */
     private LocalDateTime expiresAt;
-    /** 创建时间。 */
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
-    /** 更新时间。 */
+    /**
+     * 更新时间。
+     */
     private LocalDateTime updatedAt;
-    /** 优先级。 */
+    /**
+     * 优先级。
+     */
     private Integer priority;
 }

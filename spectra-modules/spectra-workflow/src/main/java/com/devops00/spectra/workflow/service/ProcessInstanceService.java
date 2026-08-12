@@ -32,10 +32,8 @@ public interface ProcessInstanceService {
     /**
      * 启动一个流程
      *
-     * @param processDefinitionKey
-     *            流程定义的KEY
-     * @param businessKey
-     *            业务KEY
+     * @param processDefinitionKey 流程定义的KEY
+     * @param businessKey          业务KEY
      * @return 流程ID
      */
     String start(String processDefinitionKey, String businessKey);
@@ -43,12 +41,9 @@ public interface ProcessInstanceService {
     /**
      * 启动一个流程（带变量）
      *
-     * @param processDefinitionKey
-     *            流程定义的KEY
-     * @param businessKey
-     *            业务KEY
-     * @param variables
-     *            流程变量
+     * @param processDefinitionKey 流程定义的KEY
+     * @param businessKey          业务KEY
+     * @param variables            流程变量
      * @return 流程ID
      */
     String start(String processDefinitionKey, String businessKey, Map<String, Object> variables);
@@ -56,8 +51,7 @@ public interface ProcessInstanceService {
     /**
      * 查询流程状态
      *
-     * @param processInstanceId
-     *            流程实例ID
+     * @param processInstanceId 流程实例ID
      * @return 流程实例信息
      */
     ProcessInstanceVO getStatus(String processInstanceId);
@@ -65,8 +59,7 @@ public interface ProcessInstanceService {
     /**
      * 获取流程变量
      *
-     * @param processInstanceId
-     *            流程实例ID
+     * @param processInstanceId 流程实例ID
      * @return 流程变量
      */
     Map<String, Object> getVariables(String processInstanceId);
@@ -74,18 +67,15 @@ public interface ProcessInstanceService {
     /**
      * 终止流程
      *
-     * @param processInstanceId
-     *            流程实例ID
-     * @param reason
-     *            终止原因
+     * @param processInstanceId 流程实例ID
+     * @param reason            终止原因
      */
     void terminate(String processInstanceId, String reason);
 
     /**
      * 获取流程图（高亮当前节点）
      *
-     * @param processInstanceId
-     *            流程实例ID
+     * @param processInstanceId 流程实例ID
      * @return 流程图图片（PNG格式）
      */
     byte[] getDiagram(String processInstanceId);

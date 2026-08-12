@@ -35,7 +35,7 @@ public interface DataScopeProvider {
 
     /**
      * 计算指定用户的最终有效数据范围
-     *
+     * <p>
      * 规则：
      * <ol>
      * <li>用户自定义范围优先于角色范围</li>
@@ -43,8 +43,7 @@ public interface DataScopeProvider {
      * <li>所有 CUSTOM 的 targetIds 合并</li>
      * </ol>
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 有效数据范围
      */
     EffectiveScope resolve(UUID userId);

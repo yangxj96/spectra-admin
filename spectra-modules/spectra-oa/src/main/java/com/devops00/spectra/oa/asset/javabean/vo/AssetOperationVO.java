@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.oa.asset.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 资产生命周期操作响应视图。

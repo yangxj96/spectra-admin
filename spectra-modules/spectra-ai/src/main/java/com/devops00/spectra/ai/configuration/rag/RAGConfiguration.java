@@ -48,10 +48,8 @@ public class RAGConfiguration {
     /**
      * 配置向量存储器
      *
-     * @param template
-     *            JDBC连接
-     * @param om
-     *            Jackson序列化
+     * @param template JDBC连接
+     * @param om       Jackson序列化
      */
     @Bean
     public EmbeddingStore<TextSegment> embeddingStore(JdbcTemplate template, ObjectMapper om) {
@@ -60,7 +58,7 @@ public class RAGConfiguration {
 
     /**
      * 配置向量化（Embedding）模型：用于将文本片段及用户提问翻译成数学向量。
-     *
+     * <p>
      * 这里以阿里 DashScope 为例（组合拳模式：阿里生成向量，DeepSeek 负责聊天）。
      */
     @Bean

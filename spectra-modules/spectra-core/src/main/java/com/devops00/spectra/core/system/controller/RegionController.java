@@ -55,8 +55,7 @@ public class RegionController {
     /**
      * 懒加载树
      *
-     * @param from
-     *            查询参数
+     * @param from 查询参数
      * @return 根据条件获取的下级的列表
      */
     @ULog("'获取行政区划懒加载树'")
@@ -83,8 +82,7 @@ public class RegionController {
     /**
      * 新增行政区划
      *
-     * @param params
-     *            行政区划信息
+     * @param params 行政区划信息
      * @return 新增后的行政区划信息
      */
     @ULog("'新增行政区划'")
@@ -97,8 +95,7 @@ public class RegionController {
     /**
      * 修改行政区划
      *
-     * @param params
-     *            行政区划信息
+     * @param params 行政区划信息
      * @return 修改后的行政区划信息
      */
     @ULog("'修改行政区划'")
@@ -111,8 +108,7 @@ public class RegionController {
     /**
      * 根据ID删除行政区划
      *
-     * @param id
-     *            行政区划ID
+     * @param id 行政区划ID
      */
     @ULog("'删除行政区划'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")

@@ -63,8 +63,8 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     private final UserOnlineConverter userOnlineConverter;
 
     public RedisSecHolderStrategy(@Qualifier("securityObjectMapper") ObjectMapper om,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
-            UserOnlineConverter userOnlineConverter) {
+                                  @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
+                                  UserOnlineConverter userOnlineConverter) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
@@ -518,25 +518,25 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
         // 小程序识别：微信/支付宝/抖音等小程序环境
         if (lower.contains("miniprogram")
-            || lower.contains("miniprogramenv")
-            || lower.contains("wechat")
-            || lower.contains("alipay")
-            || lower.contains("bytedance")
-            || lower.contains("toutiao")) {
+                || lower.contains("miniprogramenv")
+                || lower.contains("wechat")
+                || lower.contains("alipay")
+                || lower.contains("bytedance")
+                || lower.contains("toutiao")) {
             return ClientType.MINI;
         }
 
         // APP识别：UniApp（含 uni-app / html5plus 标识）及原生App（含移动端SDK标识）
         if (lower.contains("uni-app")
-            || lower.contains("uniapp")
-            || lower.contains("html5plus")
-            || lower.contains("uts")
-            || lower.contains("okhttp")
-            || lower.contains("retrofit")
-            || lower.contains("af-android-sdk")
-            || lower.contains("alibc")
-            || lower.contains("flutter")
-            || lower.contains("reactnative")) {
+                || lower.contains("uniapp")
+                || lower.contains("html5plus")
+                || lower.contains("uts")
+                || lower.contains("okhttp")
+                || lower.contains("retrofit")
+                || lower.contains("af-android-sdk")
+                || lower.contains("alibc")
+                || lower.contains("flutter")
+                || lower.contains("reactnative")) {
             return ClientType.APP;
         }
 

@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.system.ai.tools;
 
+import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
-import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import dev.langchain4j.agent.tool.Tool;
@@ -44,8 +44,7 @@ public class AiDeptTool implements AiToolMarker {
     /**
      * 获取所有部门信息
      *
-     * @param memoryId
-     *            复合记忆标识
+     * @param memoryId 复合记忆标识
      */
     @Tool("获取所有部门信息")
     public String getAllDepartments(@ToolMemoryId AiMemoryId memoryId) {

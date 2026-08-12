@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.purchase.javabean.from;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 采购执行登记参数。

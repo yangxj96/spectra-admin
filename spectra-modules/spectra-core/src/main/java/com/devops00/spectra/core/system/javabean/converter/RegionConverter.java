@@ -48,8 +48,7 @@ public interface RegionConverter {
     /**
      * 转换到分页的VO信息
      *
-     * @param source
-     *            分页信息
+     * @param source 分页信息
      * @return IPAGE
      */
     @Mapping(target = "pages", ignore = true)

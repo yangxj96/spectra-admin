@@ -16,15 +16,14 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import com.devops00.spectra.upload.javabean.constant.UploadType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * 文件信息VO

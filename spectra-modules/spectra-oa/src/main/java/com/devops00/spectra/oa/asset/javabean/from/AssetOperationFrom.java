@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.asset.javabean.from;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 资产领用、归还、调拨、维修和报废操作参数。

@@ -16,10 +16,6 @@
 
 package com.devops00.spectra.notification.javabean.entity;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -28,6 +24,10 @@ import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 逻辑通知请求实体。
@@ -42,67 +42,109 @@ import lombok.ToString;
 @TableName(value = "ntf_request", schema = "spectra_notification", autoResultMap = true)
 public class NotificationRequestEntity extends BaseEntity {
 
-    /** 租户 ID。 */
+    /**
+     * 租户 ID。
+     */
     @TableField("tenant_id")
     private UUID tenantId;
-    /** 调用方生成的外部请求 ID。 */
+    /**
+     * 调用方生成的外部请求 ID。
+     */
     @TableField("external_request_id")
     private String externalRequestId;
-    /** 业务幂等键。 */
+    /**
+     * 业务幂等键。
+     */
     @TableField("idempotency_key")
     private String idempotencyKey;
-    /** 通知用途。 */
+    /**
+     * 通知用途。
+     */
     @TableField("purpose")
     private String purpose;
-    /** 逻辑模板组编码。 */
+    /**
+     * 逻辑模板组编码。
+     */
     @TableField("template_group_code")
     private String templateGroupCode;
-    /** 来源模块。 */
+    /**
+     * 来源模块。
+     */
     @TableField("source_module")
     private String sourceModule;
-    /** 业务类型弱引用。 */
+    /**
+     * 业务类型弱引用。
+     */
     @TableField("business_type")
     private String businessType;
-    /** 业务 ID 弱引用。 */
+    /**
+     * 业务 ID 弱引用。
+     */
     @TableField("business_id")
     private String businessId;
-    /** 发起方类型。 */
+    /**
+     * 发起方类型。
+     */
     @TableField("initiator_type")
     private String initiatorType;
-    /** 发起用户 ID。 */
+    /**
+     * 发起用户 ID。
+     */
     @TableField("initiator_user_id")
     private UUID initiatorUserId;
-    /** 来源部门快照。 */
+    /**
+     * 来源部门快照。
+     */
     @TableField("source_department_id")
     private UUID sourceDepartmentId;
-    /** 非敏感参数。 */
+    /**
+     * 非敏感参数。
+     */
     @TableField(value = "parameters", typeHandler = PgJsonbTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
     private Map<String, Object> parameters;
-    /** 敏感参数密文。 */
+    /**
+     * 敏感参数密文。
+     */
     @TableField("sensitive_parameters_ciphertext")
     private String sensitiveParametersCiphertext;
-    /** 敏感参数密钥版本。 */
+    /**
+     * 敏感参数密钥版本。
+     */
     @TableField("encryption_key_id")
     private String encryptionKeyId;
-    /** 请求状态。 */
+    /**
+     * 请求状态。
+     */
     @TableField("status")
     private String status;
-    /** 展开后的接收人数。 */
+    /**
+     * 展开后的接收人数。
+     */
     @TableField("recipient_count")
     private Integer recipientCount;
-    /** 展开后的任务数。 */
+    /**
+     * 展开后的任务数。
+     */
     @TableField("task_count")
     private Integer taskCount;
-    /** 计划投递时间。 */
+    /**
+     * 计划投递时间。
+     */
     @TableField("scheduled_at")
     private Instant scheduledAt;
-    /** 请求过期时间。 */
+    /**
+     * 请求过期时间。
+     */
     @TableField("expires_at")
     private Instant expiresAt;
-    /** 请求优先级。 */
+    /**
+     * 请求优先级。
+     */
     @TableField("priority")
     private Integer priority;
-    /** 链路追踪 ID。 */
+    /**
+     * 链路追踪 ID。
+     */
     @TableField("trace_id")
     private String traceId;
 }

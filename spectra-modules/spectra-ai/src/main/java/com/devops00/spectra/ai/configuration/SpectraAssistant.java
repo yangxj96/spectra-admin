@@ -33,10 +33,8 @@ public interface SpectraAssistant {
     /**
      * 流式输出对话（打字机效果）
      *
-     * @param memoryId
-     *            复合记忆标识（conversationId + token）
-     * @param message
-     *            问题内容
+     * @param memoryId 复合记忆标识（conversationId + token）
+     * @param message  问题内容
      */
     TokenStream stream(@MemoryId AiMemoryId memoryId, @UserMessage String message);
 }

@@ -37,18 +37,15 @@ public interface ConfiguredService extends BaseService<Configured> {
     /**
      * 修改系统配置的值和说明
      *
-     * @param params
-     *            修改入参
+     * @param params 修改入参
      */
     void modify(ConfiguredFrom params);
 
     /**
      * 分页查询系统配置项
      *
-     * @param page
-     *            分页信息
-     * @param params
-     *            过滤参数
+     * @param page   分页信息
+     * @param params 过滤参数
      * @return 分页响应信息
      */
     IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params);
@@ -56,14 +53,10 @@ public interface ConfiguredService extends BaseService<Configured> {
     /**
      * 保存或更新配置（按 key 去重）
      *
-     * @param key
-     *            配置键
-     * @param value
-     *            配置值
-     * @param type
-     *            值类型
-     * @param remarks
-     *            备注说明
+     * @param key     配置键
+     * @param value   配置值
+     * @param type    值类型
+     * @param remarks 备注说明
      */
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
 }

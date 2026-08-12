@@ -44,8 +44,7 @@ public class SecRedisConfiguration {
     /**
      * 自定义redisTemplate
      *
-     * @param factory
-     *            redis连接工程
+     * @param factory redis连接工程
      * @return 自定义配置的[RedisTemplate]
      */
     @Bean("securityRedisTemplate")

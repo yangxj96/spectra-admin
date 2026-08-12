@@ -41,7 +41,7 @@
         INSERT INTO spectra_ai.ai_chat_memory (memory_id, messages, created_at, updated_at)
         VALUES (#{memoryId}, #{messages}, now(), now())
         ON CONFLICT (memory_id)
-        DO UPDATE SET messages = EXCLUDED.messages, updated_at = now()
+            DO UPDATE SET messages   = EXCLUDED.messages,
+                          updated_at = now()
     </insert>
-
 </mapper>

@@ -54,8 +54,7 @@ public interface FileUploadService {
     /**
      * 文件预处理
      *
-     * @param from
-     *            文件信息
+     * @param from 文件信息
      * @return 预处理结果
      */
     FileUploadPreVO pre(FileUploadPreFrom from);
@@ -63,40 +62,35 @@ public interface FileUploadService {
     /**
      * 文件保存
      *
-     * @param from
-     *            文件直接保存的参数
+     * @param from 文件直接保存的参数
      */
     FileUploadVO upload(FileUploadFrom from);
 
     /**
      * 保存分片
      *
-     * @param from
-     *            文件分片参数
+     * @param from 文件分片参数
      */
     FileUploadChunkVO chunk(FileUploadChunkFrom from);
 
     /**
      * 文件合并
      *
-     * @param uploadId
-     *            上传ID
+     * @param uploadId 上传ID
      */
     FileUploadVO merge(String uploadId);
 
     /**
      * 根据文件ID预览图片
      *
-     * @param file
-     *            文件信息数据
+     * @param file 文件信息数据
      */
     void preview(FileInfo file);
 
     /**
      * 根据文件信息打开文件流
      *
-     * @param fileInfo
-     *            文件信息
+     * @param fileInfo 文件信息
      * @return 文件流
      */
     InputStream openStream(FileInfo fileInfo);
@@ -104,16 +98,14 @@ public interface FileUploadService {
     /**
      * 下载文件
      *
-     * @param file
-     *            文件信息
+     * @param file 文件信息
      */
     void download(FileInfo file);
 
     /**
      * 生成带年月前缀的系统唯一文件名 (例如: "202606/019eca58-xxxx...")
      *
-     * @param filename
-     *            源文件名称
+     * @param filename 源文件名称
      */
     default String generatePathFilename(@Nullable String filename) {
         // 1. 动态获取当前年月前缀，如 "202606"
@@ -129,8 +121,7 @@ public interface FileUploadService {
     /**
      * 根据 MultipartFile 获取后缀
      *
-     * @param file
-     *            文件对象
+     * @param file 文件对象
      */
     default String getSuffix(@Nullable MultipartFile file) {
         if (file == null)
@@ -141,8 +132,7 @@ public interface FileUploadService {
     /**
      * 根据文件名字符串获取后缀
      *
-     * @param filename
-     *            文件名称
+     * @param filename 文件名称
      */
     default String getSuffix(@Nullable String filename) {
         if (filename == null)

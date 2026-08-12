@@ -34,26 +34,22 @@ public interface RelRoleMenuService {
     /**
      * 授予角色菜单
      *
-     * @param roleId
-     *            角色ID
-     * @param from
-     *            角色关联菜单信息
+     * @param roleId 角色ID
+     * @param from   角色关联菜单信息
      */
     void grant(UUID roleId, RoleMenuFrom from);
 
     /**
      * 撤销角色菜单
      *
-     * @param roleId
-     *            角色ID
+     * @param roleId 角色ID
      */
     void revoke(UUID roleId);
 
     /**
      * 获取角色菜单
      *
-     * @param roleId
-     *            角色ID
+     * @param roleId 角色ID
      * @return 菜单列表
      */
     List<MenuVO> get(UUID roleId);

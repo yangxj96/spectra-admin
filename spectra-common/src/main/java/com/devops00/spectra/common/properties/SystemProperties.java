@@ -111,7 +111,7 @@ public class SystemProperties {
 
         /**
          * 预检后缓存策略时长,单位为妙
-         *
+         * <p>
          * 默认一小时
          */
         private Long maxAge = 3600L;

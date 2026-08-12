@@ -51,10 +51,8 @@ public class SqlExceptionAdvice {
     /**
      * 处理唯一键冲突异常
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(DuplicateKeyException.class)
@@ -77,10 +75,8 @@ public class SqlExceptionAdvice {
     /**
      * 处理 SQL 语法错误
      *
-     * @param e
-     *            错误信息
-     * @param response
-     *            响应
+     * @param e        错误信息
+     * @param response 响应
      * @return 格式化为正常响应返回
      */
     @ExceptionHandler(BadSqlGrammarException.class)
@@ -123,7 +119,7 @@ public class SqlExceptionAdvice {
 
     /**
      * 【兜底】捕获原始SQLException（如未通过Spring异常翻译的场景）
-     *
+     * <p>
      * 注意：大多数情况下,Spring会将SQLException翻译为DataAccessException
      */
     @ExceptionHandler(SQLException.class)

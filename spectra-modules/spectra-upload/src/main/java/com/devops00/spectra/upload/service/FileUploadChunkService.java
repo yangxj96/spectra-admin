@@ -33,8 +33,7 @@ public interface FileUploadChunkService extends BaseService<FileUploadChunk> {
     /**
      * 根据上传ID查询已经上传的分片
      *
-     * @param uploadId
-     *            上传ID
+     * @param uploadId 上传ID
      * @return 已经上传的分片
      */
     List<FileUploadChunk> findByUploadId(String uploadId);
@@ -42,8 +41,7 @@ public interface FileUploadChunkService extends BaseService<FileUploadChunk> {
     /**
      * 根据上传id查询分片已经上传的数量
      *
-     * @param uploadId
-     *            上传ID
+     * @param uploadId 上传ID
      * @return 已经上传的分片
      */
     int countByUploadId(String uploadId);

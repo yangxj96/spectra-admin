@@ -16,32 +16,20 @@
 
 package com.devops00.spectra.oa.purchase.controller;
 
-import java.util.UUID;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseExecuteFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchasePageFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSaveFrom;
-import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSubmitFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.*;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseVO;
 import com.devops00.spectra.oa.purchase.service.PurchaseService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
  * 采购申请接口。

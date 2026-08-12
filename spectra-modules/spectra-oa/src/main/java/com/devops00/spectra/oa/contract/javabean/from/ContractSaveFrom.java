@@ -16,12 +16,12 @@
 
 package com.devops00.spectra.oa.contract.javabean.from;
 
-import java.math.BigDecimal;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * 合同台账保存参数。

@@ -16,21 +16,9 @@
 
 package com.devops00.spectra.security.starter.web.service.impl;
 
-import java.security.SecureRandom;
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationDirectAddress;
-import com.devops00.spectra.common.notification.NotificationGateway;
-import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationReceipt;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.web.service.AuthService;
@@ -39,7 +27,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-/** 认证验证码服务；负责生成、摘要存储和通过通知 Gateway 入队。 */
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 认证验证码服务；负责生成、摘要存储和通过通知 Gateway 入队。
+ */
 @Service
 @NullMarked
 public class AuthServiceImpl implements AuthService {
@@ -51,8 +48,8 @@ public class AuthServiceImpl implements AuthService {
     private final SecurityProperties securityProperties;
 
     public AuthServiceImpl(NotificationGateway notificationGateway,
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
-            SecurityProperties securityProperties) {
+                           @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+                           SecurityProperties securityProperties) {
         this.notificationGateway = notificationGateway;
         this.redisTemplate = redisTemplate;
         this.securityProperties = securityProperties;

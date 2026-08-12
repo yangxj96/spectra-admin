@@ -20,7 +20,7 @@ import java.lang.annotation.*;
 
 /**
  * 数据范围注解 — 声明实体如何参与数据权限过滤
- *
+ * <p>
  * 标注在 Entity 类上，DataScopeInnerInterceptor 根据此注解自动生成 WHERE 条件。
  *
  * <h3>结构维度</h3> 通过 {@link #column()} 指定归属字段（默认 department_id）。 查询时自动加上
@@ -45,7 +45,7 @@ public @interface DataScope {
 
     /**
      * SELF 范围使用的归属字段，默认使用审计字段 created_by。
-     *
+     * <p>
      * 结构字段与本人字段不是同一个概念：例如会议按 department_id 隔离， 但本人范围应按
      * created_by；关联明细则可以显式指定 user_id。
      */

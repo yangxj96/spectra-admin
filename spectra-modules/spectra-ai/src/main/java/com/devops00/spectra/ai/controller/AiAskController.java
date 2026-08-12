@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.ai.controller;
 
-import com.devops00.spectra.ai.configuration.SpectraAssistant;
 import com.devops00.spectra.ai.base.AiMemoryId;
+import com.devops00.spectra.ai.configuration.SpectraAssistant;
 import com.devops00.spectra.ai.javabean.from.AiAskFrom;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
 import com.devops00.spectra.ai.service.AiConversationService;

@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.framework;
 
-import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.framework.configure.mvc.advice.exception.CommonExceptionAdvice;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;

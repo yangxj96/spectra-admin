@@ -51,7 +51,7 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
     private final SecurityUserHelper securityUserHelper;
 
     public LoginSmsProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
-            SecurityUserHelper securityUserHelper) {
+                            SecurityUserHelper securityUserHelper) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
         this.accountService = accountService;

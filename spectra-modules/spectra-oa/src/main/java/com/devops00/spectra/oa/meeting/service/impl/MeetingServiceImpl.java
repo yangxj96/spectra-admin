@@ -213,9 +213,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                         com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
         return candidates.stream()
                 .anyMatch(item -> item.getStartTime() != null
-                    && item.getEndTime() != null
-                    && start.isBefore(item.getEndTime())
-                    && end.isAfter(item.getStartTime()));
+                        && item.getEndTime() != null
+                        && start.isBefore(item.getEndTime())
+                        && end.isAfter(item.getStartTime()));
     }
 
     private Instant parse(String value) {

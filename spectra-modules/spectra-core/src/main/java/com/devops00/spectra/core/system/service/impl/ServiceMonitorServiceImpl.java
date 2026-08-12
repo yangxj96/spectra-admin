@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
+import com.devops00.spectra.core.system.javabean.converter.JVMInfoConverter;
 import com.devops00.spectra.core.system.javabean.vo.CPUInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
-import com.devops00.spectra.core.system.javabean.converter.JVMInfoConverter;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

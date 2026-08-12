@@ -16,18 +16,20 @@
 
 package com.devops00.spectra.notification.configuration;
 
-import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import java.util.Base64;
-import java.util.Map;
-
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.Base64;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/** 通知地址和敏感参数不能以明文落库的测试。 */
+/**
+ * 通知地址和敏感参数不能以明文落库的测试。
+ */
 class NotificationPayloadProtectorTest {
 
     @Test

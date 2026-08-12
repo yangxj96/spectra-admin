@@ -53,8 +53,7 @@ public class MenuController {
     /**
      * 新增菜单信息
      *
-     * @param params
-     *            菜单信息
+     * @param params 菜单信息
      */
     @ULog("'新增菜单'")
     @PostMapping(value = "/created", version = "1.0.0+")
@@ -73,8 +72,7 @@ public class MenuController {
     /**
      * 修改菜单信息
      *
-     * @param params
-     *            菜单信息
+     * @param params 菜单信息
      */
     @ULog("'修改菜单'")
     @PutMapping(value = "/modify", version = "1.0.0+")
@@ -98,8 +96,7 @@ public class MenuController {
     /**
      * 获取当前用户授权菜单树
      *
-     * @param user
-     *            当前登录用户
+     * @param user 当前登录用户
      * @return 当前用户授权菜单树
      */
     @ULog(value = "'获取当前用户菜单'")

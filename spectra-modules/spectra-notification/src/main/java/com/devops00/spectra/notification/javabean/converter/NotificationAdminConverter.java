@@ -39,15 +39,21 @@ import org.mapstruct.Named;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface NotificationAdminConverter {
 
-    /** 将通知请求实体转换为脱敏管理视图。 */
+    /**
+     * 将通知请求实体转换为脱敏管理视图。
+     */
     @Mapping(target = "templateCode", source = "templateGroupCode")
     NotificationRequestAdminVO toRequestVO(NotificationRequestEntity source);
 
-    /** 将通知请求分页实体转换为管理视图分页结果。 */
+    /**
+     * 将通知请求分页实体转换为管理视图分页结果。
+     */
     @Mapping(target = "records", expression = "java(source.getRecords().stream().map(this::toRequestVO).toList())")
     Page<NotificationRequestAdminVO> toRequestPage(Page<NotificationRequestEntity> source);
 
-    /** 将通知任务实体转换为脱敏管理视图。 */
+    /**
+     * 将通知任务实体转换为脱敏管理视图。
+     */
     @Mapping(target = "requestId", source = "notificationRequestId")
     @Mapping(target = "recipientUserId", source = "receiverUserId")
     @Mapping(target = "recipientAddress", source = "recipientMasked")
@@ -55,11 +61,15 @@ public interface NotificationAdminConverter {
     @Mapping(target = "lastError", source = "lastErrorCode", qualifiedByName = "maskText")
     NotificationTaskAdminVO toTaskVO(NotificationTaskEntity source);
 
-    /** 将通知任务分页实体转换为管理视图分页结果。 */
+    /**
+     * 将通知任务分页实体转换为管理视图分页结果。
+     */
     @Mapping(target = "records", expression = "java(source.getRecords().stream().map(this::toTaskVO).toList())")
     Page<NotificationTaskAdminVO> toTaskPage(Page<NotificationTaskEntity> source);
 
-    /** 将投递记录实体转换为脱敏管理视图。 */
+    /**
+     * 将投递记录实体转换为脱敏管理视图。
+     */
     @Mapping(target = "taskId", source = "notificationTaskId")
     @Mapping(target = "providerCode", source = "provider")
     @Mapping(target = "status", source = "resultStatus")
@@ -67,17 +77,23 @@ public interface NotificationAdminConverter {
     @Mapping(target = "sentAt", source = "completedAt")
     NotificationDeliveryAdminVO toDeliveryVO(NotificationDeliveryEntity source);
 
-    /** 将投递记录分页实体转换为管理视图分页结果。 */
+    /**
+     * 将投递记录分页实体转换为管理视图分页结果。
+     */
     @Mapping(target = "records", expression = "java(source.getRecords().stream().map(this::toDeliveryVO).toList())")
     Page<NotificationDeliveryAdminVO> toDeliveryPage(Page<NotificationDeliveryEntity> source);
 
-    /** 将收件地址替换为固定脱敏标记。 */
+    /**
+     * 将收件地址替换为固定脱敏标记。
+     */
     @Named("maskAddress")
     default String maskAddress(String value) {
         return value == null || value.isBlank() ? null : "[已加密]";
     }
 
-    /** 对错误文本和供应商响应中的常见敏感值进行脱敏。 */
+    /**
+     * 对错误文本和供应商响应中的常见敏感值进行脱敏。
+     */
     @Named("maskText")
     default String maskText(String value) {
         if (value == null || value.isBlank()) {
@@ -88,7 +104,9 @@ public interface NotificationAdminConverter {
                 .replaceAll("(?i)(code|captcha|token|secret|password)\\s*[:=]\\s*[^,; ]+", "$1=[敏感值已脱敏]");
     }
 
-    /** 将结构化供应商响应摘要转换为脱敏文本。 */
+    /**
+     * 将结构化供应商响应摘要转换为脱敏文本。
+     */
     @Named("maskSummary")
     default String maskSummary(java.util.Map<String, Object> value) {
         return value == null ? null : maskText(value.toString());

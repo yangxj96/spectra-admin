@@ -39,8 +39,7 @@ public interface MenuConverter {
     /**
      * 实体转 树形实体VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 树形实体VO
      */
     MenuTreeVO toTreeVO(Menu source);
@@ -48,8 +47,7 @@ public interface MenuConverter {
     /**
      * 实体转 树形实体VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return 树形实体VO
      */
     List<MenuTreeVO> toTreeVOList(List<Menu> source);
@@ -57,8 +55,7 @@ public interface MenuConverter {
     /**
      * 实体转VO
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return VO
      */
     MenuVO toVO(Menu source);
@@ -66,8 +63,7 @@ public interface MenuConverter {
     /**
      * 实体转VO(列表)
      *
-     * @param source
-     *            实体
+     * @param source 实体
      * @return VO
      */
     List<MenuVO> toVOList(List<Menu> source);
@@ -75,8 +71,7 @@ public interface MenuConverter {
     /**
      * 保存入参转实体
      *
-     * @param source
-     *            保存入参
+     * @param source 保存入参
      * @return 实体
      */
     Menu toEntity(MenuSaveFrom source);

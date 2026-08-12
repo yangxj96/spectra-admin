@@ -54,8 +54,7 @@ public class RoleDeletionOnUserRoleCleanupListener {
      * 撤销关联的用户
      * </p>
      *
-     * @param event
-     *            角色删除事件实体
+     * @param event 角色删除事件实体
      */
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {

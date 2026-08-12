@@ -16,15 +16,14 @@
 
 package com.devops00.spectra.oa.notice.javabean.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * 公告阅读回执实体。

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:flowable="http://flowable.org/bpmn"
-        targetNamespace="http://spectra.devops00.com/oa/purchase">
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:flowable="http://flowable.org/bpmn"
+                  targetNamespace="http://spectra.devops00.com/oa/purchase">
     <!-- 采购申请流程：提交后进入审批人待办，结果由 PurchaseService 回调业务状态。 -->
     <bpmn:process id="oa_purchase_approval" name="采购申请审批" isExecutable="true">
         <bpmn:startEvent id="start" name="开始"/>

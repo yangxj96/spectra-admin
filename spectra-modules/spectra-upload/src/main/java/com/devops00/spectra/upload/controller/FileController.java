@@ -61,8 +61,7 @@ public class FileController {
     /**
      * 小文件直接保存
      *
-     * @param from
-     *            文件直接保存的参数
+     * @param from 文件直接保存的参数
      */
     @ULog("'普通上传'")
     @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
@@ -74,8 +73,7 @@ public class FileController {
     /**
      * 上传切片
      *
-     * @param from
-     *            文件分片上传参数
+     * @param from 文件分片上传参数
      */
     @ULog("'分片上传'")
     @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
@@ -87,8 +85,7 @@ public class FileController {
     /**
      * 请求合并
      *
-     * @param uploadId
-     *            上传id
+     * @param uploadId 上传id
      */
     @ULog("'分片上传'")
     @PostMapping(value = "/merge/{uploadId}", version = "1.0.0+")
@@ -100,8 +97,7 @@ public class FileController {
     /**
      * 附件预览
      *
-     * @param id
-     *            文件ID
+     * @param id 文件ID
      */
     @ULog("'附件预览'")
     @PreAuthorize("permitAll()")
@@ -113,8 +109,7 @@ public class FileController {
     /**
      * 下载文件
      *
-     * @param id
-     *            文件ID
+     * @param id 文件ID
      */
     @ULog("'下载文件'")
     @GetMapping(value = "/download/{id}", version = "1.0.0+")

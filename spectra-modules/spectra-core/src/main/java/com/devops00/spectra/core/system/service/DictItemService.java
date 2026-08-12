@@ -34,8 +34,7 @@ public interface DictItemService extends BaseService<DictItem> {
     /**
      * 根据字典组ID查询字典数据列表
      *
-     * @param gid
-     *            字典组ID
+     * @param gid 字典组ID
      * @return 字典数据列表
      */
     List<DictItem> listByGid(UUID gid);

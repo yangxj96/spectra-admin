@@ -16,10 +16,6 @@
 
 package com.devops00.spectra.oa.application.javabean.converter;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -27,6 +23,9 @@ import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.javabean.from.ApplicationTypeSaveFrom;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationTypeVO;
 import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
+import org.mapstruct.Mapper;
+
+import java.util.List;
 
 /**
  * OA 申请 MapStruct 转换器。

@@ -40,10 +40,8 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 懒加载树
      *
-     * @param level
-     *            层级
-     * @param id
-     *            父级ID
+     * @param level 层级
+     * @param id    父级ID
      * @return 根据条件获取的下级的列表
      */
     List<RegionVO> lazyTree(Integer level, String id);
@@ -51,10 +49,8 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 分页查询行政区划
      *
-     * @param page
-     *            分页信息
-     * @param params
-     *            过滤参数
+     * @param page   分页信息
+     * @param params 过滤参数
      * @return 分页响应信息
      */
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
@@ -64,8 +60,7 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 新增行政区划
      *
-     * @param params
-     *            行政区划信息
+     * @param params 行政区划信息
      * @return 新增后的行政区划信息
      */
     RegionVO created(RegionFrom params);
@@ -73,8 +68,7 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 修改行政区划
      *
-     * @param params
-     *            行政区划信息
+     * @param params 行政区划信息
      * @return 修改后的行政区划信息
      */
     RegionVO modify(RegionFrom params);
@@ -82,8 +76,7 @@ public interface RegionService extends BaseService<Region> {
     /**
      * 根据ID删除行政区划
      *
-     * @param id
-     *            行政区划ID
+     * @param id 行政区划ID
      */
     void deleteById(UUID id);
 }

@@ -16,11 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
@@ -39,6 +34,11 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * PostgreSQL Outbox 任务 Worker；支持并发领取、租约恢复和指数退避。
  *
@@ -51,20 +51,34 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class NotificationTaskWorker {
 
-    /** 单个任务允许的最大重试次数。 */
+    /**
+     * 单个任务允许的最大重试次数。
+     */
     private static final int MAX_RETRY_COUNT = 3;
-    /** 指数退避的最大等待时间。 */
+    /**
+     * 指数退避的最大等待时间。
+     */
     private static final long MAX_RETRY_DELAY_SECONDS = 3_600L;
-    /** Worker 锁定标识。 */
+    /**
+     * Worker 锁定标识。
+     */
     private static final String WORKER_ID = "notification-worker";
 
-    /** 通知任务 Mapper。 */
+    /**
+     * 通知任务 Mapper。
+     */
     private final NotificationTaskMapper taskMapper;
-    /** 投递记录 Mapper。 */
+    /**
+     * 投递记录 Mapper。
+     */
     private final NotificationDeliveryMapper deliveryMapper;
-    /** 通知请求 Mapper。 */
+    /**
+     * 通知请求 Mapper。
+     */
     private final NotificationRequestMapper requestMapper;
-    /** 已注册的渠道发送端。 */
+    /**
+     * 已注册的渠道发送端。
+     */
     private final List<NotificationSender> senders;
 
     /**
@@ -79,13 +93,17 @@ public class NotificationTaskWorker {
     @Value("${spectra.notification.worker.retry-base-delay-seconds:5}")
     private long retryBaseDelaySeconds;
 
-    /** 周期领取到期任务；停用 Worker 不影响消息中心读取。 */
+    /**
+     * 周期领取到期任务；停用 Worker 不影响消息中心读取。
+     */
     @Scheduled(fixedDelayString = "${spectra.notification.worker.fixed-delay-ms:5000}")
     public void scheduledProcess() {
         processPending(50);
     }
 
-    /** 供测试和运维手工触发的任务处理入口。 */
+    /**
+     * 供测试和运维手工触发的任务处理入口。
+     */
     @Transactional
     public int processPending(int limit) {
         var safeLimit = Math.max(1, Math.min(limit, 100));
@@ -96,7 +114,9 @@ public class NotificationTaskWorker {
         return tasks.size();
     }
 
-    /** 将超时的处理中任务恢复为可重试状态。 */
+    /**
+     * 将超时的处理中任务恢复为可重试状态。
+     */
     private void recoverExpiredLeases(Instant now) {
         var leaseDeadline = now.minusSeconds(Math.max(1L, processingTimeoutSeconds));
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
@@ -110,7 +130,9 @@ public class NotificationTaskWorker {
                 .set(NotificationTaskEntity::getLockedAt, null));
     }
 
-    /** 领取并处理单个通知任务。 */
+    /**
+     * 领取并处理单个通知任务。
+     */
     private void processOne(NotificationTaskEntity task) {
         var now = Instant.now();
         if (isExpired(task, now)) {
@@ -146,7 +168,9 @@ public class NotificationTaskWorker {
         refreshRequestStatus(task.getNotificationRequestId());
     }
 
-    /** 记录渠道结果并将任务更新为对应终态。 */
+    /**
+     * 记录渠道结果并将任务更新为对应终态。
+     */
     private void finish(NotificationTaskEntity task, ChannelSendResult result) {
         var delivery = new NotificationDeliveryEntity();
         var completedAt = Instant.now();
@@ -172,7 +196,9 @@ public class NotificationTaskWorker {
                 .set(NotificationTaskEntity::getLockedAt, null));
     }
 
-    /** 记录渠道异常，并按重试次数决定下次处理时间或失败终态。 */
+    /**
+     * 记录渠道异常，并按重试次数决定下次处理时间或失败终态。
+     */
     private void finishFailure(NotificationTaskEntity task, String message) {
         var attemptCount = task.getAttemptCount() == null ? 1 : task.getAttemptCount() + 1;
         var terminal = attemptCount >= MAX_RETRY_COUNT;
@@ -191,19 +217,25 @@ public class NotificationTaskWorker {
         log.warn("通知任务处理失败: taskId={}, attemptCount={}, status={}", task.getId(), attemptCount, status);
     }
 
-    /** 根据重试次数计算指数退避时间。 */
+    /**
+     * 根据重试次数计算指数退避时间。
+     */
     private long retryDelaySeconds(int retryCount) {
         var base = Math.max(1L, retryBaseDelaySeconds);
         var multiplier = 1L << Math.min(Math.max(0, retryCount - 1), 10);
         return Math.min(MAX_RETRY_DELAY_SECONDS, base * multiplier);
     }
 
-    /** 判断任务是否已超过过期时间。 */
+    /**
+     * 判断任务是否已超过过期时间。
+     */
     private boolean isExpired(NotificationTaskEntity task, Instant now) {
         return task.getExpiresAt() != null && !task.getExpiresAt().isAfter(now);
     }
 
-    /** 将尚未领取的过期任务标记为过期。 */
+    /**
+     * 将尚未领取的过期任务标记为过期。
+     */
     private void markExpired(NotificationTaskEntity task, Instant now) {
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
@@ -213,7 +245,9 @@ public class NotificationTaskWorker {
                 .set(NotificationTaskEntity::getLockedAt, null));
     }
 
-    /** 根据任务汇总状态刷新逻辑请求状态。 */
+    /**
+     * 根据任务汇总状态刷新逻辑请求状态。
+     */
     private void refreshRequestStatus(UUID requestId) {
         if (requestId == null) {
             return;

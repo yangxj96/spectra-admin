@@ -16,10 +16,6 @@
 
 package com.devops00.spectra.notification.javabean.entity;
 
-import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -28,6 +24,10 @@ import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.time.Instant;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 单次渠道投递尝试实体。
@@ -42,40 +42,64 @@ import lombok.ToString;
 @TableName(value = "ntf_delivery", schema = "spectra_notification", autoResultMap = true)
 public class NotificationDeliveryEntity extends BaseEntity {
 
-    /** 租户 ID。 */
+    /**
+     * 租户 ID。
+     */
     @TableField("tenant_id")
     private UUID tenantId;
-    /** 所属通知任务 ID。 */
+    /**
+     * 所属通知任务 ID。
+     */
     @TableField("notification_task_id")
     private UUID notificationTaskId;
-    /** 当前任务尝试序号。 */
+    /**
+     * 当前任务尝试序号。
+     */
     @TableField("attempt_no")
     private Integer attemptNo;
-    /** 供应商标识。 */
+    /**
+     * 供应商标识。
+     */
     @TableField("provider")
     private String provider;
-    /** 供应商返回的消息 ID。 */
+    /**
+     * 供应商返回的消息 ID。
+     */
     @TableField("provider_message_id")
     private String providerMessageId;
-    /** 开始发送时间。 */
+    /**
+     * 开始发送时间。
+     */
     @TableField("started_at")
     private Instant startedAt;
-    /** 完成发送时间。 */
+    /**
+     * 完成发送时间。
+     */
     @TableField("completed_at")
     private Instant completedAt;
-    /** 标准化投递结果。 */
+    /**
+     * 标准化投递结果。
+     */
     @TableField("result_status")
     private String resultStatus;
-    /** 标准化错误码。 */
+    /**
+     * 标准化错误码。
+     */
     @TableField("error_code")
     private String errorCode;
-    /** 脱敏错误信息。 */
+    /**
+     * 脱敏错误信息。
+     */
     @TableField("error_message_sanitized")
     private String errorMessageSanitized;
-    /** 发送耗时毫秒数。 */
+    /**
+     * 发送耗时毫秒数。
+     */
     @TableField("duration_ms")
     private Long durationMs;
-    /** 白名单响应摘要。 */
+    /**
+     * 白名单响应摘要。
+     */
     @TableField(value = "response_summary", typeHandler = PgJsonbTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
     private Map<String, Object> responseSummary;
 }

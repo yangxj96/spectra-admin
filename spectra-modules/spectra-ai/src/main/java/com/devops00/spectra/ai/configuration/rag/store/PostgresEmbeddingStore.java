@@ -33,7 +33,7 @@ import java.util.UUID;
 
 /**
  * PGSQL向量数据库存储操作
- *
+ * <p>
  * 配置向量存储器：绑定到 PgSQL 独立的 ai_rag schema 中
  *
  * @author yangxj96

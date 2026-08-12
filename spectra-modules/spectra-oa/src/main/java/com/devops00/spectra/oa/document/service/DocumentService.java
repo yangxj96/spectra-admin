@@ -16,9 +16,6 @@
 
 package com.devops00.spectra.oa.document.service;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
@@ -28,8 +25,11 @@ import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentVersionFrom;
 import com.devops00.spectra.oa.document.javabean.vo.DocumentFolderVO;
-import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
 import com.devops00.spectra.oa.document.javabean.vo.DocumentVO;
+import com.devops00.spectra.oa.document.javabean.vo.DocumentVersionVO;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 文档表主表-服务

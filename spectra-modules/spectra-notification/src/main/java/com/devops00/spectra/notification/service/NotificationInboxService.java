@@ -16,13 +16,13 @@
 
 package com.devops00.spectra.notification.service;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 当前用户消息中心服务。
@@ -33,24 +33,38 @@ import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
  */
 public interface NotificationInboxService {
 
-    /** 查询当前用户消息，查询条件始终附带收件人所有权。 */
+    /**
+     * 查询当前用户消息，查询条件始终附带收件人所有权。
+     */
     IPage<NotificationInboxVO> page(PageFrom page, UUID tenantId, UUID userId, NotificationQueryFrom params);
 
-    /** 查询当前用户未读数。 */
+    /**
+     * 查询当前用户未读数。
+     */
     long unreadCount(UUID tenantId, UUID userId);
 
-    /** 查询当前用户消息详情。 */
+    /**
+     * 查询当前用户消息详情。
+     */
     NotificationInboxVO detail(UUID id, UUID tenantId, UUID userId);
 
-    /** 标记单条已读。 */
+    /**
+     * 标记单条已读。
+     */
     void markAsRead(UUID id, UUID tenantId, UUID userId);
 
-    /** 标记当前用户全部已读。 */
+    /**
+     * 标记当前用户全部已读。
+     */
     void markAllAsRead(UUID tenantId, UUID userId);
 
-    /** 删除当前用户消息。 */
+    /**
+     * 删除当前用户消息。
+     */
     void deleteById(UUID id, UUID tenantId, UUID userId);
 
-    /** 批量删除当前用户消息，混合 ID 不影响其他用户记录。 */
+    /**
+     * 批量删除当前用户消息，混合 ID 不影响其他用户记录。
+     */
     void batchDelete(List<UUID> ids, UUID tenantId, UUID userId);
 }

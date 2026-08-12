@@ -42,9 +42,9 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
             throw new BadCredentialsException("登录失败");
         }
         if (!(params.getPrincipal() instanceof String username)
-            || !StringUtils.hasText(username)
-            || !(params.getCredentials() instanceof String password)
-            || !StringUtils.hasText(password)) {
+                || !StringUtils.hasText(username)
+                || !(params.getCredentials() instanceof String password)
+                || !StringUtils.hasText(password)) {
             throw new BadCredentialsException("用户名或密码不能为空");
         }
         try {

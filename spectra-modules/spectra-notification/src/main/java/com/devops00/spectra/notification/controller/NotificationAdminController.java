@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.notification.controller;
 
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
@@ -31,12 +29,9 @@ import com.devops00.spectra.notification.service.NotificationAdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
  * 通知管理端接口；仅开放脱敏查询和受控运维操作。
@@ -51,10 +46,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/notification/admin")
 public class NotificationAdminController {
 
-    /** 通知管理端服务。 */
+    /**
+     * 通知管理端服务。
+     */
     private final NotificationAdminService service;
 
-    /** 查询渠道健康状态；仅返回是否可用及脱敏原因。 */
+    /**
+     * 查询渠道健康状态；仅返回是否可用及脱敏原因。
+     */
     @ULog("'查询通知渠道状态'")
     @GetMapping(value = "/channels/{channel}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
@@ -62,7 +61,9 @@ public class NotificationAdminController {
         return service.availability(channel);
     }
 
-    /** 查询逻辑通知请求。 */
+    /**
+     * 查询逻辑通知请求。
+     */
     @ULog("'查询通知请求'")
     @GetMapping(value = "/requests", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
@@ -70,7 +71,9 @@ public class NotificationAdminController {
         return service.pageRequests(page, params);
     }
 
-    /** 查询通知投递任务。 */
+    /**
+     * 查询通知投递任务。
+     */
     @ULog("'查询通知任务'")
     @GetMapping(value = "/tasks", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
@@ -78,7 +81,9 @@ public class NotificationAdminController {
         return service.pageTasks(page, params);
     }
 
-    /** 查询通知投递记录。 */
+    /**
+     * 查询通知投递记录。
+     */
     @ULog("'查询通知投递记录'")
     @GetMapping(value = "/deliveries", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
@@ -86,7 +91,9 @@ public class NotificationAdminController {
         return service.pageDeliveries(page, params);
     }
 
-    /** 重新排队失败通知任务。 */
+    /**
+     * 重新排队失败通知任务。
+     */
     @ULog("'重试通知任务'")
     @PostMapping(value = "/tasks/{id}/retry", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
@@ -94,7 +101,9 @@ public class NotificationAdminController {
         service.retry(id);
     }
 
-    /** 取消尚未完成的通知任务。 */
+    /**
+     * 取消尚未完成的通知任务。
+     */
     @ULog("'取消通知任务'")
     @DeleteMapping(value = "/tasks/{id}", version = "1.0.0+")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")

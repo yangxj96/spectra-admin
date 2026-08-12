@@ -32,8 +32,7 @@ public interface DictGroupService extends BaseService<DictGroup> {
     /**
      * 根据字典类型编码获取字典类型
      *
-     * @param code
-     *            字典类型编码
+     * @param code 字典类型编码
      * @return 字典类型
      */
     @Nullable

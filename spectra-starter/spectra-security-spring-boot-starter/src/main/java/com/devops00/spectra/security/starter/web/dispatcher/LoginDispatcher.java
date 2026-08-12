@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.security.starter.web.dispatcher;
 
-import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
 import com.devops00.spectra.security.base.strategy.tokens.EmailAuthenticationToken;
 import com.devops00.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
@@ -45,8 +44,7 @@ public class LoginDispatcher {
     /**
      * 进行登录
      *
-     * @param request
-     *            登录请求参数
+     * @param request 登录请求参数
      * @return 登录结果
      */
     public Authentication authenticate(LoginFrom request) {

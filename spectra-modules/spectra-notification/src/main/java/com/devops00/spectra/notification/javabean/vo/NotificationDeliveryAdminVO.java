@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.notification.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 脱敏通知投递记录管理视图。
@@ -31,20 +31,36 @@ import lombok.Data;
 @Data
 public class NotificationDeliveryAdminVO {
 
-    /** 投递记录 ID。 */
+    /**
+     * 投递记录 ID。
+     */
     private UUID id;
-    /** 所属投递任务 ID。 */
+    /**
+     * 所属投递任务 ID。
+     */
     private UUID taskId;
-    /** 渠道供应商编码。 */
+    /**
+     * 渠道供应商编码。
+     */
     private String providerCode;
-    /** 供应商返回的消息 ID。 */
+    /**
+     * 供应商返回的消息 ID。
+     */
     private String providerMessageId;
-    /** 投递结果状态。 */
+    /**
+     * 投递结果状态。
+     */
     private String status;
-    /** 已脱敏的供应商响应摘要。 */
+    /**
+     * 已脱敏的供应商响应摘要。
+     */
     private String responseSummary;
-    /** 成功发送时间。 */
+    /**
+     * 成功发送时间。
+     */
     private LocalDateTime sentAt;
-    /** 创建时间。 */
+    /**
+     * 创建时间。
+     */
     private LocalDateTime createdAt;
 }

@@ -31,8 +31,7 @@ public interface FileUploadTaskService extends BaseService<FileUploadTask> {
     /**
      * 根据上传ID查询上传任务信息
      *
-     * @param uploadId
-     *            上传ID
+     * @param uploadId 上传ID
      * @return 任务信息
      */
     FileUploadTask findByUploadId(String uploadId);

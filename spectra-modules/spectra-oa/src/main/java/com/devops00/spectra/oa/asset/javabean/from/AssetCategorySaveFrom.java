@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.asset.javabean.from;
 
-import java.util.UUID;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 资产分类保存参数。

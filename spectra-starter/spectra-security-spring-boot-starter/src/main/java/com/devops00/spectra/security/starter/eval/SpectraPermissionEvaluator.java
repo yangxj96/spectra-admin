@@ -53,9 +53,9 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /**
      * 权限表达式缓存（线程安全 LRU）
-     *
+     * <p>
      * key: 原始权限表达式，如 "order:*:read"
-     *
+     * <p>
      * value: 预编译表示，例如分段结构或 regex Pattern
      */
     private static final Map<String, CompiledPermissionPattern> CACHE = Collections.synchronizedMap(new LinkedHashMap<>(128, 0.75f, true) {
@@ -76,9 +76,9 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /**
      * 编译权限表达式。
-     *
+     * <p>
      * 如果表达式包含 ":" → 使用分段匹配（性能最佳）
-     *
+     * <p>
      * 否则 → fallback 为 regex
      */
     private static CompiledPermissionPattern compilePattern(String expr) {
@@ -117,7 +117,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /**
      * 多级权限分段匹配：
-     *
+     * <p>
      * 示例：
      *
      * <pre>
@@ -160,12 +160,9 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     /**
      * 基于对象实例进行权限判断。
      *
-     * @param authentication
-     *            当前认证对象（@NullMarked → 必定非 null）
-     * @param targetDomainObject
-     *            目标领域对象，可为 null（如业务不需要资源对象）
-     * @param permission
-     *            表达式权限字符串（非 null）
+     * @param authentication     当前认证对象（@NullMarked → 必定非 null）
+     * @param targetDomainObject 目标领域对象，可为 null（如业务不需要资源对象）
+     * @param permission         表达式权限字符串（非 null）
      * @return true: 拥有权限 false: 权限不足
      */
     @Override
@@ -205,7 +202,7 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /**
      * 基于资源 ID + 类型的权限判断。
-     *
+     * <p>
      * 当前业务无需使用targetId/targetType,因此委托给第一个方法。
      */
     @Override
@@ -235,19 +232,16 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
 
     /**
      * 预编译后的权限表达式结构
-     *
+     * <p>
      * 若为 segmentBased=true，则使用分段匹配（最快）
-     *
+     * <p>
      * 若为 segmentBased=false，则 fallback 使用 regex
      *
      * @param segmentBased
-     * @param segments
-     *            仅在 segmentBased=true 时不为空
-     * @param hasDoubleStar
-     *            是否包含 "**" 通配
-     * @param regex
-     *            仅在 segmentBased=false 时不为空
-     *            编译后的权限匹配模式。
+     * @param segments      仅在 segmentBased=true 时不为空
+     * @param hasDoubleStar 是否包含 "**" 通配
+     * @param regex         仅在 segmentBased=false 时不为空
+     *                      编译后的权限匹配模式。
      */
     private record CompiledPermissionPattern(boolean segmentBased, String[] segments, boolean hasDoubleStar, Pattern regex) {
     }

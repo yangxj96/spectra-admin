@@ -28,10 +28,14 @@ import lombok.Getter;
 @Getter
 public enum UserStatus {
 
-    /** 禁用。 */
+    /**
+     * 禁用。
+     */
     DISABLED((short) 0),
 
-    /** 正常。 */
+    /**
+     * 正常。
+     */
     ACTIVE((short) 1);
 
     private final Short code;

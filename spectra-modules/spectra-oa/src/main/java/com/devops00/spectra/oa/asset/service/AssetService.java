@@ -1,19 +1,15 @@
 package com.devops00.spectra.oa.asset.service;
 
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
-import com.devops00.spectra.oa.asset.javabean.from.AssetCategorySaveFrom;
-import com.devops00.spectra.oa.asset.javabean.from.AssetOperationFrom;
-import com.devops00.spectra.oa.asset.javabean.from.AssetPageFrom;
-import com.devops00.spectra.oa.asset.javabean.from.AssetPurchaseDraftFrom;
-import com.devops00.spectra.oa.asset.javabean.from.AssetSaveFrom;
+import com.devops00.spectra.oa.asset.javabean.from.*;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
+
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 资产管理业务服务。

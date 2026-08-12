@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.oa.purchase.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 采购收货批次响应视图。

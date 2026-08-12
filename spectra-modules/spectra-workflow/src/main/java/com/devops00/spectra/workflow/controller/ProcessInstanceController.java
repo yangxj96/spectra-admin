@@ -16,26 +16,19 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import java.util.Map;
-
+import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
+import com.devops00.spectra.workflow.javabean.from.ProcessInstanceTerminateFrom;
+import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
+import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.workflow.javabean.from.ProcessInstanceTerminateFrom;
-import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
-import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
-import com.devops00.spectra.workflow.service.ProcessInstanceService;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
 
 /**
  * 工作流-流程实例
@@ -55,8 +48,7 @@ public class ProcessInstanceController {
     /**
      * 启动流程（带变量）
      *
-     * @param from
-     *            启动参数
+     * @param from 启动参数
      * @return 流程实例ID
      */
     @ULog("'启动流程'")
@@ -69,8 +61,7 @@ public class ProcessInstanceController {
     /**
      * 查询流程状态
      *
-     * @param id
-     *            流程实例ID
+     * @param id 流程实例ID
      * @return 流程实例信息
      */
     @ULog("'查询流程实例状态'")
@@ -83,8 +74,7 @@ public class ProcessInstanceController {
     /**
      * 获取流程变量
      *
-     * @param id
-     *            流程实例ID
+     * @param id 流程实例ID
      * @return 流程变量
      */
     @ULog("'查询流程变量'")
@@ -97,10 +87,8 @@ public class ProcessInstanceController {
     /**
      * 终止流程
      *
-     * @param id
-     *            流程实例ID
-     * @param from
-     *            终止参数
+     * @param id   流程实例ID
+     * @param from 终止参数
      */
     @ULog("'终止流程'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
@@ -112,8 +100,7 @@ public class ProcessInstanceController {
     /**
      * 获取流程图（高亮当前节点）
      *
-     * @param id
-     *            流程实例ID
+     * @param id 流程实例ID
      * @return 流程图图片（PNG格式）
      */
     @ULog("'获取流程实例图'")

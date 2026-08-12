@@ -98,8 +98,7 @@ public class RedisConfiguration {
     /**
      * 自定义redisTemplate
      *
-     * @param factory
-     *            redis连接工程
+     * @param factory redis连接工程
      * @return RedisTemplate<String, Object>
      */
     @Bean

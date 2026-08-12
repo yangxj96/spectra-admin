@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.ai.configuration.tool;
 
+import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
-import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import dev.langchain4j.agent.tool.Tool;
@@ -44,8 +44,7 @@ public class TimeTools implements AiToolMarker {
     /**
      * 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
      *
-     * @param memoryId
-     *            复合记忆标识
+     * @param memoryId 复合记忆标识
      */
     @Tool("获取当前日期和时间，返回标准的ISO 8601格式字符串")
     public String getCurrentDateTimeISO(@ToolMemoryId AiMemoryId memoryId) {

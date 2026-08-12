@@ -73,7 +73,7 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     public Object beforeBodyWrite(@Nullable Object body, MethodParameter returnType, MediaType contentType,
-            Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
+                                  Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
 
         // 第一优先级：流式直接放行
         if (MediaType.TEXT_EVENT_STREAM.includes(contentType) || body instanceof Flux || Flux.class.isAssignableFrom(returnType.getParameterType())) {
@@ -101,10 +101,8 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
     /**
      * 空body处理
      *
-     * @param request
-     *            请求
-     * @param response
-     *            响应
+     * @param request  请求
+     * @param response 响应
      * @return 结果
      */
     private R<Object> handleNullBody(ServerHttpRequest request, ServerHttpResponse response) {

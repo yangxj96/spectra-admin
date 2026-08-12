@@ -16,14 +16,14 @@
 
 package com.devops00.spectra.oa.contract.javabean.entity;
 
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.UUID;
 
 /**
  * 合同文件版本实体。

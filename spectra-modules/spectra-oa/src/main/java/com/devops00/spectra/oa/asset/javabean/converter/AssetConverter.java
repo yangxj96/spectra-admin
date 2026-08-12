@@ -16,11 +16,6 @@
 
 package com.devops00.spectra.oa.asset.javabean.converter;
 
-import org.mapstruct.BeanMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
-
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
@@ -31,6 +26,10 @@ import com.devops00.spectra.oa.asset.javabean.from.AssetSaveFrom;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetOperationVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
+import org.mapstruct.BeanMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
 /**
  * 资产 MapStruct 转换器。

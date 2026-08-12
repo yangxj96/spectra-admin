@@ -16,8 +16,6 @@
 
 package com.devops00.spectra.ai.configuration.rag.listener;
 
-import java.util.UUID;
-
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
 import com.devops00.spectra.common.notification.NotificationGateway;
@@ -26,19 +24,18 @@ import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
-import dev.langchain4j.data.document.Document;
-import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import java.util.UUID;
 
-/** AI RAG 失败结果通知和幂等键回归测试。 */
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+
+/**
+ * AI RAG 失败结果通知和幂等键回归测试。
+ */
 class FileUploadFinishListenerNotificationTest {
 
     @Test

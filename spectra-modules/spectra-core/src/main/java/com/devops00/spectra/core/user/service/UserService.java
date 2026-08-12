@@ -43,10 +43,8 @@ public interface UserService extends BaseService<User> {
     /**
      * 分页查询用户列表
      *
-     * @param page
-     *            分页参数
-     * @param params
-     *            查询条件参数
+     * @param page   分页参数
+     * @param params 查询条件参数
      * @return 分页结果
      */
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException;
@@ -54,42 +52,36 @@ public interface UserService extends BaseService<User> {
     /**
      * 创建用户
      *
-     * @param params
-     *            请求参数
+     * @param params 请求参数
      */
     void create(UserSaveFrom params);
 
     /**
      * 根据用户ID更新用户
      *
-     * @param params
-     *            请求参数
+     * @param params 请求参数
      */
     void modify(UserSaveFrom params);
 
     /**
      * 覆盖用户角色
      *
-     * @param userId
-     *            用户ID
-     * @param roleIds
-     *            角色ID列表
+     * @param userId  用户ID
+     * @param roleIds 角色ID列表
      */
     void replaceRoles(UUID userId, List<UUID> roleIds);
 
     /**
      * 根据用户ID删除用户信息
      *
-     * @param uid
-     *            用户ID
+     * @param uid 用户ID
      */
     void deleteById(UUID uid);
 
     /**
      * 重置用户密码
      *
-     * @param uid
-     *            用户ID
+     * @param uid 用户ID
      */
     void passwordResetById(UUID uid);
 
@@ -103,8 +95,7 @@ public interface UserService extends BaseService<User> {
     /**
      * 获取当前用户详情
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 用户详情
      */
     UserProfileVO getProfile(UUID userId);
@@ -112,20 +103,16 @@ public interface UserService extends BaseService<User> {
     /**
      * 更新当前用户信息
      *
-     * @param userId
-     *            用户ID
-     * @param params
-     *            更新参数
+     * @param userId 用户ID
+     * @param params 更新参数
      */
     void updateProfile(UUID userId, UserProfileFrom params);
 
     /**
      * 修改当前用户密码
      *
-     * @param userId
-     *            用户ID
-     * @param params
-     *            修改密码参数
+     * @param userId 用户ID
+     * @param params 修改密码参数
      */
     void changePassword(UUID userId, ChangePasswordFrom params);
 }

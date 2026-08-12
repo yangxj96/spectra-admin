@@ -41,12 +41,9 @@ public final class ObjUtils {
     /**
      * obj转list
      *
-     * @param obj
-     *            obj对象
-     * @param clazz
-     *            具体类型
-     * @param <T>
-     *            具体类型
+     * @param obj   obj对象
+     * @param clazz 具体类型
+     * @param <T>   具体类型
      * @return 转换后的结果
      */
     public static <T> List<T> castList(Object obj, Class<T> clazz) {
@@ -64,16 +61,11 @@ public final class ObjUtils {
     /**
      * Object → Map<K, V>
      *
-     * @param obj
-     *            对象
-     * @param keyClass
-     *            key类型
-     * @param valueClass
-     *            value类型
-     * @param <K>
-     *            key类型
-     * @param <V>
-     *            value类型
+     * @param obj        对象
+     * @param keyClass   key类型
+     * @param valueClass value类型
+     * @param <K>        key类型
+     * @param <V>        value类型
      * @return 转换后的map
      */
     public static <K, V> Map<K, V> castMap(Object obj, Class<K> keyClass, Class<V> valueClass) {
@@ -97,16 +89,11 @@ public final class ObjUtils {
     /**
      * object转list map
      *
-     * @param obj
-     *            对象
-     * @param kClazz
-     *            k类型
-     * @param vClazz
-     *            v类型
-     * @param <K>
-     *            class
-     * @param <V>
-     *            class
+     * @param obj    对象
+     * @param kClazz k类型
+     * @param vClazz v类型
+     * @param <K>    class
+     * @param <V>    class
      * @return 转换后的List Map
      */
     public static <K, V> List<Map<K, V>> castListMap(Object obj, Class<K> kClazz, Class<V> vClazz) {
@@ -126,8 +113,7 @@ public final class ObjUtils {
     /**
      * Object 转换为 Map String Object
      *
-     * @param obj
-     *            对象
+     * @param obj 对象
      * @return {@code Map<String,Object} key为string,value为object
      */
     public static Map<String, Object> castStrObjMap(Object obj) {

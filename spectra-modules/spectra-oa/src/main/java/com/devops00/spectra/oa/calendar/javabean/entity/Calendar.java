@@ -16,16 +16,15 @@
 
 package com.devops00.spectra.oa.calendar.javabean.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.time.Instant;
+import java.util.UUID;
 
 /**
  * OA 日程实体。

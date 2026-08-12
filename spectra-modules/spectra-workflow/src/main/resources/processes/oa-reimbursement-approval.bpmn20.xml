@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:flowable="http://flowable.org/bpmn"
-        targetNamespace="http://spectra.devops00.com/oa/reimbursement">
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns:flowable="http://flowable.org/bpmn"
+                  targetNamespace="http://spectra.devops00.com/oa/reimbursement">
     <!-- 报销首版流程：提交后直接进入审批人待办，审批结果由 WorkflowService 回调业务服务。 -->
     <bpmn:process id="oa_reimbursement_approval" name="费用报销审批" isExecutable="true">
         <bpmn:startEvent id="start" name="开始"/>

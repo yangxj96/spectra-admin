@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.workflow.javabean.vo;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /**
  * 流程定义响应VO

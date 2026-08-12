@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.oa.reimbursement.javabean.vo;
 
+import lombok.Data;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 报销明细响应视图。

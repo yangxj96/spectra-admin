@@ -25,8 +25,8 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.DefaultDataException;
 import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.exception.DefaultDataException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.entity.Role;
@@ -36,9 +36,9 @@ import com.devops00.spectra.core.user.javabean.event.RoleDeletedEvent;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
-import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.mapper.RoleDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.RoleDataScopeTargetMapper;
+import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RoleService;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
@@ -178,8 +178,8 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     private boolean canManageGlobalScope() {
         var currentUser = SecUtil.getCurrentUser();
         return currentUser != null
-            && currentUser.getAuthorities()
-                    .stream()
-                    .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
+                && currentUser.getAuthorities()
+                        .stream()
+                        .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 }

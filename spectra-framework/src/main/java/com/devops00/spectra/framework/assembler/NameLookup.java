@@ -25,17 +25,17 @@ import java.util.UUID;
 
 /**
  * 名称查询抽象接口
- *
+ * <p>
  * 该接口用于定义「ID → Name」的批量查询能力，
  * 是 {@link NameFill} 注解的核心扩展点。
- *
+ * <p>
  * 实现类职责：
  * <ul>
  * <li>只关心如何根据 ID 获取名称</li>
  * <li>可以使用数据库、缓存、RPC 等任意方式</li>
  * <li>必须支持<strong>批量查询</strong></li>
  * </ul>
- *
+ * <p>
  * 设计约束：
  * <ul>
  * <li>不得包含业务逻辑</li>
@@ -43,8 +43,7 @@ import java.util.UUID;
  * <li>建议实现类是无状态的</li>
  * </ul>
  *
- * @param <ID>
- *            ID 类型（如 Long / String）
+ * @param <ID> ID 类型（如 Long / String）
  * @author yangxj96
  * @version 1.0
  * @since 2026/2/2 16:26
@@ -53,7 +52,7 @@ public interface NameLookup<ID> {
 
     /**
      * 声明 Lookup 支持的 ID 类型
-     *
+     * <p>
      * 默认返回 String.class，
      * 若使用其他类型（如 Long），
      * 实现类应显式覆写该方法。
@@ -77,15 +76,14 @@ public interface NameLookup<ID> {
 
     /**
      * 批量查询 ID 对应的名称映射
-     *
+     * <p>
      * 返回 Map 中:
      * <ul>
      * <li>Key:ID</li>
      * <li>Value:对应的展示名称</li>
      * </ul>
      *
-     * @param ids
-     *            ID 集合（不为空）
+     * @param ids ID 集合（不为空）
      * @return ID → Name 的映射关系
      */
     Map<ID, String> getNameMap(Set<ID> ids);

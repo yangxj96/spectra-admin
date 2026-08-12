@@ -16,12 +16,12 @@
 
 package com.devops00.spectra.oa.purchase.javabean.from;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * 采购收货明细参数。

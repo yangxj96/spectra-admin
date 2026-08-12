@@ -102,8 +102,7 @@ public class SecurityConfiguration {
     /**
      * Spring Security核心过滤器
      *
-     * @param http
-     *            {@code HttpSecurity}
+     * @param http {@code HttpSecurity}
      * @return Security过滤器链
      */
     @Bean

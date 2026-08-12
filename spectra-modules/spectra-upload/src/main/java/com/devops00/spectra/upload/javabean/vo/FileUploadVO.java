@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 普通上传的上传结果

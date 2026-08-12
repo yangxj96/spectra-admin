@@ -1,10 +1,10 @@
 package com.devops00.spectra.oa.supply.javabean.from;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import jakarta.validation.constraints.DecimalMin;
 import lombok.Data;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * 办公用品入库、领用、退库和盘点调整参数。

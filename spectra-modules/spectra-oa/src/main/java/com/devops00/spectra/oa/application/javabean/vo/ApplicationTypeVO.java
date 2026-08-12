@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.application.javabean.vo;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * OA 申请类型响应。

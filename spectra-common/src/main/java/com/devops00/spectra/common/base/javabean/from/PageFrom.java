@@ -57,8 +57,7 @@ public class PageFrom {
     /**
      * 转换成mybatis plus分页查询用的分页参数
      *
-     * @param <T>
-     *            具体类型
+     * @param <T> 具体类型
      * @return 分页参数对象
      */
     public <T> Page<T> toPage() {

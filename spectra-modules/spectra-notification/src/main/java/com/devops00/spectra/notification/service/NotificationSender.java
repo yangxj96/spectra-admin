@@ -29,19 +29,27 @@ import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
  */
 public interface NotificationSender {
 
-    /** 当前 Sender 支持的渠道。 */
+    /**
+     * 当前 Sender 支持的渠道。
+     */
     NotificationChannel channel();
 
-    /** 当前 Sender 是否已配置为可用。 */
+    /**
+     * 当前 Sender 是否已配置为可用。
+     */
     default boolean available() {
         return true;
     }
 
-    /** 不可用时返回脱敏原因。 */
+    /**
+     * 不可用时返回脱敏原因。
+     */
     default String unavailableReason() {
         return "CHANNEL_NOT_CONFIGURED";
     }
 
-    /** 执行一次投递；不得记录明文敏感载荷。 */
+    /**
+     * 执行一次投递；不得记录明文敏感载荷。
+     */
     ChannelSendResult send(NotificationTaskEntity task);
 }

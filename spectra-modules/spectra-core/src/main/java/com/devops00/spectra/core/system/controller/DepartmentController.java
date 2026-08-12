@@ -51,8 +51,7 @@ public class DepartmentController {
     /**
      * 新增组织机构
      *
-     * @param from
-     *            请求入参
+     * @param from 请求入参
      */
     @ULog("'新增组织机构'")
     @PostMapping(version = "1.0.0+")
@@ -64,8 +63,7 @@ public class DepartmentController {
     /**
      * 删除组织机构
      *
-     * @param id
-     *            组织机构ID
+     * @param id 组织机构ID
      */
     @ULog("'删除组织机构'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
@@ -77,8 +75,7 @@ public class DepartmentController {
     /**
      * 编辑组织机构
      *
-     * @param from
-     *            请求入参
+     * @param from 请求入参
      */
     @ULog("'编辑组织机构'")
     @PutMapping(version = "1.0.0+")

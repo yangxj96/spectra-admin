@@ -16,10 +16,6 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
@@ -34,6 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 /**
  * 用户用途×渠道偏好服务实现。
  *
@@ -45,14 +45,20 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class NotificationPreferenceServiceImpl implements NotificationPreferenceService {
 
-    /** 不允许用户关闭或免打扰的安全用途。 */
+    /**
+     * 不允许用户关闭或免打扰的安全用途。
+     */
     private static final List<String> MANDATORY_PURPOSES = List.of("LOGIN_CODE", "BIND_PHONE_CODE", "BIND_EMAIL_CODE",
             "RESET_PASSWORD_CODE", "SECURITY_ALERT");
 
-    /** 用户通知偏好 Mapper。 */
+    /**
+     * 用户通知偏好 Mapper。
+     */
     private final NotificationUserPreferenceMapper mapper;
 
-    /** 查询指定用户的用途与渠道偏好。 */
+    /**
+     * 查询指定用户的用途与渠道偏好。
+     */
     @Override
     public List<NotificationUserPreferenceEntity> list(UUID tenantId, UUID userId) {
         return mapper
@@ -62,7 +68,9 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
                         .orderByAsc(NotificationUserPreferenceEntity::getChannel));
     }
 
-    /** 保存单个用途与渠道的偏好，并强制保护安全用途。 */
+    /**
+     * 保存单个用途与渠道的偏好，并强制保护安全用途。
+     */
     @Override
     @Transactional
     public void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb) {
@@ -110,7 +118,9 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         }
     }
 
-    /** 将用途与渠道偏好聚合为旧消息中心设置结构。 */
+    /**
+     * 将用途与渠道偏好聚合为旧消息中心设置结构。
+     */
     @Override
     public NotificationSettingVO legacy(UUID tenantId, UUID userId) {
         var result = new NotificationSettingVO();
@@ -128,7 +138,9 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         return result;
     }
 
-    /** 将旧消息中心设置展开保存为站内信用途偏好。 */
+    /**
+     * 将旧消息中心设置展开保存为站内信用途偏好。
+     */
     @Override
     @Transactional
     public void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from) {

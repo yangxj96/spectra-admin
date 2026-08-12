@@ -37,8 +37,7 @@ public interface ConfiguredConverter {
     /**
      * 数据库实体转VO
      *
-     * @param source
-     *            数据库实体
+     * @param source 数据库实体
      * @return VO
      */
     ConfiguredVO toVO(Configured source);
@@ -46,8 +45,7 @@ public interface ConfiguredConverter {
     /**
      * 转换到分页的VO信息
      *
-     * @param source
-     *            分页信息
+     * @param source 分页信息
      * @return IPAGE
      */
     @Mapping(target = "pages", ignore = true)

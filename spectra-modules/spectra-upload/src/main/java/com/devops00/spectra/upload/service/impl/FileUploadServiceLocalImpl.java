@@ -18,8 +18,8 @@ package com.devops00.spectra.upload.service.impl;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
-import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
@@ -92,7 +92,8 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     private final ApplicationEventPublisher publisher;
 
     public FileUploadServiceLocalImpl(LocalProperties properties, FileUploadProperties uploadProperties, FileInfoService infoService,
-            FileUploadTaskService taskService, FileUploadChunkService chunkService, ApplicationEventPublisher publisher) throws IOException {
+                                      FileUploadTaskService taskService, FileUploadChunkService chunkService, ApplicationEventPublisher publisher)
+            throws IOException {
         this.uploadProperties = uploadProperties;
         this.infoService = infoService;
         this.taskService = taskService;
@@ -412,12 +413,11 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
     /**
      * 构建文件保存路径
-     *
+     * <p>
      * 文件名本身包含年月目录前缀（例如 202608/uuid.png），因此这里直接相对根目录解析，
      * 避免再次拼接年月目录导致实际保存路径变成 202608/202608/uuid.png。
      *
-     * @param filename
-     *            文件名称（可包含相对目录）
+     * @param filename 文件名称（可包含相对目录）
      */
     private Path buildFilePath(String filename) {
         Path filePath = root.resolve(filename).normalize();
@@ -439,8 +439,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     /**
      * 构建临时文件路径
      *
-     * @param uploadId
-     *            文件ID
+     * @param uploadId 文件ID
      */
     private Path buildTempDir(String uploadId) {
         return temp.resolve(uploadId);
@@ -449,8 +448,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     /**
      * 构建上传响应VO
      *
-     * @param url
-     *            地址
+     * @param url 地址
      */
     private FileUploadVO buildUploadVO(String url, java.util.UUID fileId) {
         FileUploadVO vo = new FileUploadVO();
@@ -462,8 +460,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     /**
      * 构建分片上传响应VO
      *
-     * @param chunkNumber
-     *            分片序号
+     * @param chunkNumber 分片序号
      */
     private FileUploadChunkVO buildChunkVO(int chunkNumber) {
         FileUploadChunkVO vo = new FileUploadChunkVO();

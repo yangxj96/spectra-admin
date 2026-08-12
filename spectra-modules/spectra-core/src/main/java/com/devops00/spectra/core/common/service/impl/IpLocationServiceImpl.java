@@ -77,10 +77,8 @@ public class IpLocationServiceImpl implements IpLocationService {
     /**
      * 格式化 IP 查询结果，按精度截断
      *
-     * @param fields
-     *            IP 数据字段数组，顺序：国家|省份|城市|运营商|...
-     * @param level
-     *            精度级别
+     * @param fields IP 数据字段数组，顺序：国家|省份|城市|运营商|...
+     * @param level  精度级别
      * @return 格式化后的位置字符串
      */
     @NullMarked
@@ -173,12 +171,12 @@ public class IpLocationServiceImpl implements IpLocationService {
             int b = Integer.parseInt(parts[1]);
 
             return (a == 10)
-                || // 10.x.x.x
-                (a == 127)
-                || // 127.x.x.x
-                (a == 192 && b == 168)
-                || // 192.168.x.x
-                (a == 172 && b >= 16 && b <= 31); // 172.16.0.0 ~ 172.31.255.255
+                    || // 10.x.x.x
+                    (a == 127)
+                    || // 127.x.x.x
+                    (a == 192 && b == 168)
+                    || // 192.168.x.x
+                    (a == 172 && b >= 16 && b <= 31); // 172.16.0.0 ~ 172.31.255.255
         } catch (NumberFormatException _) {
             return false;
         }

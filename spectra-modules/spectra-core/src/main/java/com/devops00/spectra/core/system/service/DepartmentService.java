@@ -38,32 +38,28 @@ public interface DepartmentService extends BaseService<Department> {
     /**
      * 新增组织机构
      *
-     * @param from
-     *            请求入参
+     * @param from 请求入参
      */
     void created(DepartmentFrom from);
 
     /**
      * 根据ID删除组织机构
      *
-     * @param id
-     *            ID
+     * @param id ID
      */
     void deleteById(UUID id);
 
     /**
      * 编辑组织机构
      *
-     * @param from
-     *            请求入参
+     * @param from 请求入参
      */
     void modify(DepartmentFrom from);
 
     /**
      * 计算组织机构路径
      *
-     * @param id
-     *            组织机构ID
+     * @param id 组织机构ID
      * @return 组织机构路径
      */
     String generatePath(UUID id);

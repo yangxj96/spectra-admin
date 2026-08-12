@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.notification.javabean.from;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 通知管理端分页查询参数。
@@ -30,22 +30,40 @@ import lombok.Data;
 @Data
 public class NotificationAdminQueryFrom {
 
-    /** 逻辑通知请求 ID。 */
+    /**
+     * 逻辑通知请求 ID。
+     */
     private UUID requestId;
-    /** 投递任务 ID。 */
+    /**
+     * 投递任务 ID。
+     */
     private UUID taskId;
-    /** 收件用户 ID。 */
+    /**
+     * 收件用户 ID。
+     */
     private UUID recipientUserId;
-    /** 任务或请求状态。 */
+    /**
+     * 任务或请求状态。
+     */
     private String status;
-    /** 通知渠道。 */
+    /**
+     * 通知渠道。
+     */
     private String channel;
-    /** 通知用途。 */
+    /**
+     * 通知用途。
+     */
     private String purpose;
-    /** 来源模块。 */
+    /**
+     * 来源模块。
+     */
     private String sourceModule;
-    /** 业务类型。 */
+    /**
+     * 业务类型。
+     */
     private String businessType;
-    /** 业务 ID。 */
+    /**
+     * 业务 ID。
+     */
     private String businessId;
 }

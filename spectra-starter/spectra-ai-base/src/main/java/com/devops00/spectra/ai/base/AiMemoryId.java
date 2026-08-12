@@ -18,7 +18,7 @@ package com.devops00.spectra.ai.base;
 
 /**
  * AI 对话复合记忆标识
- *
+ * <p>
  * conversationId 用于 ChatMemory 缓存 key 和数据库存储 key；
  * token 用于工具执行时设置 SecurityContext。
  * equals/hashCode 仅比较 conversationId，确保同一会话在 token 变化后仍复用同一 Memory 实例。

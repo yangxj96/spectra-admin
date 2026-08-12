@@ -42,9 +42,9 @@ public abstract class EmailAuthenticationProvider implements BasicAuthentication
             throw new BadCredentialsException("登录失败");
         }
         if (!(params.getPrincipal() instanceof String email)
-            || !StringUtils.hasText(email)
-            || !(params.getCredentials() instanceof String code)
-            || !StringUtils.hasText(code)) {
+                || !StringUtils.hasText(email)
+                || !(params.getCredentials() instanceof String code)
+                || !StringUtils.hasText(code)) {
             throw new BadCredentialsException("邮箱或验证码不能为空");
         }
         try {

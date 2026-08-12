@@ -39,8 +39,7 @@ public interface DictItemConverter {
      *
      * 字典数据入参转实体
      *
-     * @param source
-     *            字典数据入参
+     * @param source 字典数据入参
      * @return 转换后的实体
      *
      */
@@ -49,8 +48,7 @@ public interface DictItemConverter {
     /**
      * 字典数据转字典数据VO
      *
-     * @param source
-     *            字典数据
+     * @param source 字典数据
      * @return 字典数据VO
      */
     DictItemVO toVO(DictItem source);
@@ -58,8 +56,7 @@ public interface DictItemConverter {
     /**
      * 字典数据转字典数据VO(列表)
      *
-     * @param source
-     *            字典数据
+     * @param source 字典数据
      * @return 字典数据VO(列表)
      */
     List<DictItemVO> toVOList(List<DictItem> source);

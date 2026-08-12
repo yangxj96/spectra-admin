@@ -40,7 +40,10 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -64,7 +67,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     private final RelUserRoleService relUserRoleService;
 
     public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
-            RelUserRoleService relUserRoleService) {
+                           RelUserRoleService relUserRoleService) {
         this.menuMapper = menuMapper;
         this.menuConverter = menuConverter;
         this.roleMenuMapper = roleMenuMapper;

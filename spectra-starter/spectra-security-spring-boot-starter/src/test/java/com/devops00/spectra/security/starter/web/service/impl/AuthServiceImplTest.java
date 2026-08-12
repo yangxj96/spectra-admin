@@ -16,32 +16,25 @@
 
 package com.devops00.spectra.security.starter.web.service.impl;
 
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
-
 import com.devops00.spectra.common.constant.RedisCacheKey;
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationChannelAvailability;
-import com.devops00.spectra.common.notification.NotificationGateway;
-import com.devops00.spectra.common.notification.NotificationReceipt;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-/** 验证码摘要、过期和发送失败补偿测试。 */
+/**
+ * 验证码摘要、过期和发送失败补偿测试。
+ */
 class AuthServiceImplTest {
 
     @Test

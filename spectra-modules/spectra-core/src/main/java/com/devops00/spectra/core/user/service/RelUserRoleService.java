@@ -34,36 +34,30 @@ public interface RelUserRoleService {
     /**
      * 授予用户角色
      *
-     * @param userId
-     *            用户ID
-     * @param roleIds
-     *            角色ID列表
+     * @param userId  用户ID
+     * @param roleIds 角色ID列表
      */
     void grant(UUID userId, List<UUID> roleIds);
 
     /**
      * 撤销用户角色(全部)
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      */
     void revoke(UUID userId);
 
     /**
      * 撤销用户角色(指定的角色)
      *
-     * @param userId
-     *            用户ID
-     * @param roleIds
-     *            需要撤销的角色列表
+     * @param userId  用户ID
+     * @param roleIds 需要撤销的角色列表
      */
     void revoke(UUID userId, List<UUID> roleIds);
 
     /**
      * 根据角色ID获取关联关系
      *
-     * @param roleId
-     *            角色ID
+     * @param roleId 角色ID
      * @return 这个角色有的关联关系
      */
     List<RelUserRole> getRelByRoleId(UUID roleId);
@@ -71,8 +65,7 @@ public interface RelUserRoleService {
     /**
      * 获取用户角色
      *
-     * @param userId
-     *            角色ID
+     * @param userId 角色ID
      * @return 用户角色列表
      */
     List<Role> getRoles(UUID userId);

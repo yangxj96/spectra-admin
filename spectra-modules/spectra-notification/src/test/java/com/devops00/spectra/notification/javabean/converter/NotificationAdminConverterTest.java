@@ -16,18 +16,20 @@
 
 package com.devops00.spectra.notification.javabean.converter;
 
-import java.util.UUID;
-import java.util.Map;
-
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.Map;
+import java.util.UUID;
 
-/** 管理端地址、错误和投递摘要脱敏测试。 */
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
+/**
+ * 管理端地址、错误和投递摘要脱敏测试。
+ */
 class NotificationAdminConverterTest {
 
     private final NotificationAdminConverter converter = new NotificationAdminConverterImpl(new TimeMapper());

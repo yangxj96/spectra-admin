@@ -41,10 +41,8 @@ public class LoginExceptionAdvice {
     /**
      * 登陆失败拦截
      *
-     * @param e
-     *            [LoginException]错误信息
-     * @param response
-     *            [HttpServletResponse]响应对象
+     * @param e        [LoginException]错误信息
+     * @param response [HttpServletResponse]响应对象
      * @return 通用响应对象
      */
     @ExceptionHandler(LoginException.class)

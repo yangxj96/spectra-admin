@@ -55,7 +55,7 @@ public class MeetingParticipant extends BaseEntity {
 
     /**
      * 角色
-     *
+     * <p>
      * |值|说明|
      * |----|----|
      * |host|主持人|
@@ -67,7 +67,7 @@ public class MeetingParticipant extends BaseEntity {
 
     /**
      * 状态
-     *
+     * <p>
      * |值|说明|
      * |----|----|
      * |pending|未响应|

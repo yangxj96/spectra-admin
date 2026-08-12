@@ -16,15 +16,17 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import java.util.UUID;
-
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import org.junit.jupiter.api.Test;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** SMS/EMAIL Provider 测试替身示例。 */
+/**
+ * SMS/EMAIL Provider 测试替身示例。
+ */
 class MockProviderTest {
 
     @Test

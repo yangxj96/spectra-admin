@@ -41,8 +41,7 @@ public final class IpUtils {
     /**
      * 获取客户端真实 IP 地址（支持多级代理）
      *
-     * @param request
-     *            HTTP 请求（允许 null）
+     * @param request HTTP 请求（允许 null）
      * @return 非 null 的 IP 字符串，若无法获取则返回 "unknown"
      */
     public static String getClientIP(@Nullable HttpServletRequest request) {
@@ -80,10 +79,8 @@ public final class IpUtils {
     /**
      * 从指定 header 中提取 IP，自动 trim 并转为小写比较
      *
-     * @param request
-     *            请求体
-     * @param headerName
-     *            请求头名称
+     * @param request    请求体
+     * @param headerName 请求头名称
      * @return 提取出来的IP
      */
     private static String extractIpFromHeader(HttpServletRequest request, String headerName) {
@@ -94,8 +91,7 @@ public final class IpUtils {
     /**
      * 判断 IP 是否无效（null、empty、blank 或 "unknown"）
      *
-     * @param ip
-     *            需要判断的IP
+     * @param ip 需要判断的IP
      * @return IP是否有效
      */
     private static boolean isInvalidIp(@Nullable String ip) {
@@ -105,8 +101,7 @@ public final class IpUtils {
     /**
      * 从逗号分隔的 IP 列表中提取第一个有效 IP
      *
-     * @param ipList
-     *            可能为 null 或单个 IP 或 "ip1, ip2, ..."
+     * @param ipList 可能为 null 或单个 IP 或 "ip1, ip2, ..."
      * @return 第一个有效 IP，若无则返回原值（可能为 invalid）
      */
     private static String getFirstValidIpFromList(@Nullable String ipList) {

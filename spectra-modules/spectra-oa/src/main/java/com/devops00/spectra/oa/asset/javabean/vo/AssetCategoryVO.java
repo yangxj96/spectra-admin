@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.asset.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 资产分类响应视图。

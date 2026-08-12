@@ -16,16 +16,18 @@
 
 package com.devops00.spectra.notification.controller;
 
-import java.util.UUID;
-
 import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
-/** 管理端查询、重试和取消权限边界测试。 */
+/**
+ * 管理端查询、重试和取消权限边界测试。
+ */
 class NotificationAdminControllerTest {
 
     @Test

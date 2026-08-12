@@ -31,8 +31,7 @@ public interface NotificationRecipientDirectory {
     /**
      * 按用户 ID 解析通知所需的最小收件人快照。
      *
-     * @param userIds
-     *            用户 ID
+     * @param userIds 用户 ID
      * @return 与输入 ID 一一对应的快照；未知用户返回 inactive 快照
      */
     List<NotificationRecipient> resolve(List<UUID> userIds);
@@ -40,8 +39,7 @@ public interface NotificationRecipientDirectory {
     /**
      * 按登录名解析流程任务等内部调用方使用的收件人快照。
      *
-     * @param loginNames
-     *            用户登录名；空值和重复值由实现过滤
+     * @param loginNames 用户登录名；空值和重复值由实现过滤
      * @return 可解析登录名对应的收件人快照
      */
     List<NotificationRecipient> resolveByLoginNames(List<String> loginNames);

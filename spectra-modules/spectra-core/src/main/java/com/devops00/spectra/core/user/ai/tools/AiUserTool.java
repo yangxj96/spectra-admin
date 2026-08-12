@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.core.user.ai.tools;
 
+import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
-import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.core.user.service.UserService;
 import dev.langchain4j.agent.tool.Tool;
@@ -44,8 +44,7 @@ public class AiUserTool implements AiToolMarker {
     /**
      * 获取所有用户信息
      *
-     * @param memoryId
-     *            复合记忆标识
+     * @param memoryId 复合记忆标识
      */
     @Tool("获取所有用户信息")
     public String getAllUsers(@ToolMemoryId AiMemoryId memoryId) {

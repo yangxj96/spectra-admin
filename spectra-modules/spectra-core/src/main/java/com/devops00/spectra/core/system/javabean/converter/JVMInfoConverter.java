@@ -16,15 +16,14 @@
 
 package com.devops00.spectra.core.system.javabean.converter;
 
-import java.lang.management.RuntimeMXBean;
-import java.util.Map;
-
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
 import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+import java.lang.management.RuntimeMXBean;
+import java.util.Map;
 
 /**
  * JVM 信息 MapStruct 转换器。
@@ -52,5 +51,5 @@ public interface JVMInfoConverter {
     @Mapping(target = "classPath", source = "runtimeMXBean.classPath")
     @Mapping(target = "libraryPath", source = "runtimeMXBean.libraryPath")
     JVMInfoVO toVO(RuntimeMXBean runtimeMXBean, String javaVersion, String javaHome, String javaVendor, String javaVendorUrl,
-            Map<String, String> systemProps);
+                   Map<String, String> systemProps);
 }

@@ -16,10 +16,10 @@
 
 package com.devops00.spectra.oa.calendar.javabean.vo;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 import java.util.UUID;
-
-import lombok.Data;
 
 /**
  * 日程响应视图。

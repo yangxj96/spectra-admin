@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.upload.service.impl;
 
-import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.configure.FileUploadServiceRegistry;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
@@ -110,8 +110,7 @@ public class FileUploadFacade {
     /**
      * 文件预览
      *
-     * @param id
-     *            文件ID
+     * @param id 文件ID
      */
     public void preview(UUID id) {
         FileInfo info = fileInfoService.getById(id);
@@ -128,8 +127,7 @@ public class FileUploadFacade {
     /**
      * 根据文件信息读取文件返回输入流
      *
-     * @param fileInfo
-     *            文件信息
+     * @param fileInfo 文件信息
      */
     public InputStream openStream(FileInfo fileInfo) {
         return switch (fileInfo.getStorageType()) {
@@ -141,8 +139,7 @@ public class FileUploadFacade {
     /**
      * 下载文件
      *
-     * @param id
-     *            文件ID
+     * @param id 文件ID
      */
     public void download(UUID id) {
         FileInfo info = fileInfoService.getById(id);

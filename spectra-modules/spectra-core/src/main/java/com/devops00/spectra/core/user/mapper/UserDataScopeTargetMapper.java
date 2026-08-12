@@ -37,8 +37,7 @@ public interface UserDataScopeTargetMapper extends BaseMapper<UserDataScopeTarge
     /**
      * 根据用户ID获取数据范围目标信息
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      * @return 数据范围目标列表
      */
     List<UserDataScopeTarget> findByUserId(@Param("userId") UUID userId);
@@ -46,8 +45,7 @@ public interface UserDataScopeTargetMapper extends BaseMapper<UserDataScopeTarge
     /**
      * 根据用户ID删除用户的数据范围内容
      *
-     * @param userId
-     *            用户ID
+     * @param userId 用户ID
      */
     void removeByUserId(@Param("userId") UUID userId);
 }

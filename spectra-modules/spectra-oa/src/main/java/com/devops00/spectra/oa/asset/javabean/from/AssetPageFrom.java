@@ -16,9 +16,9 @@
 
 package com.devops00.spectra.oa.asset.javabean.from;
 
-import java.util.UUID;
-
 import lombok.Data;
+
+import java.util.UUID;
 
 /**
  * 资产台账分页查询参数。

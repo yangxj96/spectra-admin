@@ -32,10 +32,8 @@ public interface S3Service {
     /**
      * 生成上传预签名 URL
      *
-     * @param bucket
-     *            桶
-     * @param key
-     *            key
+     * @param bucket 桶
+     * @param key    key
      */
     String createUploadUrl(String bucket, String key);
 }

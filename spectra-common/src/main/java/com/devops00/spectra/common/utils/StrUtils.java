@@ -111,14 +111,14 @@ public final class StrUtils {
 
     /**
      * 按「最大字节数」安全截取（方案一:逐字符计算）
-     *
+     * <p>
      * 适用场景：
      * <ul>
      * <li>数据库 VARCHAR(n) 按字节限制</li>
      * <li>中文 / 英文 / 数字混合</li>
      * <li>业务系统首选（稳定、可读性好）</li>
      * </ul>
-     *
+     * <p>
      * 特性：
      * <ul>
      * <li>不会截断半个中文字符</li>
@@ -161,14 +161,14 @@ public final class StrUtils {
 
     /**
      * 按「最大字节数」安全截取（方案二:CharsetEncoder）
-     *
+     * <p>
      * 适用场景：
      * <ul>
      * <li>高并发 / 大文本</li>
      * <li>对编码行为要求极严格</li>
      * <li>通用基础组件</li>
      * </ul>
-     *
+     * <p>
      * 特性：
      * <ul>
      * <li>由 CharsetEncoder 保证字符完整性</li>
@@ -205,12 +205,9 @@ public final class StrUtils {
      * 将字符串转换为 camelCase 或 PascalCase 格式 > 前提：str 不得为 null（Servlet 参数名、配置 key
      * 等场景天然满足）
      *
-     * @param str
-     *            非 null 输入字符串（如 "user_first_name"）
-     * @param capitalizeFirstLetter
-     *            true → PascalCase ("UserName")，false → camelCase ("userName")
-     * @param delimiter
-     *            分隔符（如 '_'）
+     * @param str                   非 null 输入字符串（如 "user_first_name"）
+     * @param capitalizeFirstLetter true → PascalCase ("UserName")，false → camelCase ("userName")
+     * @param delimiter             分隔符（如 '_'）
      * @return 转换后的非 null 字符串
      */
     public static String toCamelCase(String str, boolean capitalizeFirstLetter, char delimiter) {

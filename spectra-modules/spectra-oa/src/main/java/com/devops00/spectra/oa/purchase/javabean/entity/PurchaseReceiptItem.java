@@ -16,17 +16,16 @@
 
 package com.devops00.spectra.oa.purchase.javabean.entity;
 
-import java.math.BigDecimal;
-import java.util.UUID;
-
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
-
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * 采购收货明细。
