@@ -31,6 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +78,16 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
     @Override
     @Transactional
     public void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb) {
+        save(tenantId, userId, purpose, channel, enabled, doNotDisturb, null, null);
+    }
+
+    /**
+     * 保存带每日免打扰窗口的用途与渠道偏好，并强制保护安全用途。
+     */
+    @Override
+    @Transactional
+    public void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
+                     Instant doNotDisturbStart, Instant doNotDisturbEnd) {
         if (tenantId == null || userId == null || !StringUtils.hasText(purpose) || !StringUtils.hasText(channel)) {
             throw new DataSaveException("通知偏好参数不完整");
         }
@@ -88,6 +102,12 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         if (MANDATORY_PURPOSES.contains(normalizedPurpose)) {
             enabled = true;
             doNotDisturb = false;
+            doNotDisturbStart = null;
+            doNotDisturbEnd = null;
+        }
+        if (!doNotDisturb) {
+            doNotDisturbStart = null;
+            doNotDisturbEnd = null;
         }
         var query = new LambdaQueryWrapper<NotificationUserPreferenceEntity>().eq(NotificationUserPreferenceEntity::getTenantId, tenantId)
                 .eq(NotificationUserPreferenceEntity::getUserId, userId)
@@ -106,6 +126,8 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         }
         entity.setEnabled(enabled);
         entity.setDoNotDisturb(doNotDisturb);
+        entity.setDoNotDisturbStart(doNotDisturbStart);
+        entity.setDoNotDisturbEnd(doNotDisturbEnd);
         entity.setUpdatedAt(Instant.now());
         if (existing) {
             if (mapper.updateById(entity) != 1) {
@@ -123,9 +145,18 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     public NotificationSettingVO legacy(UUID tenantId, UUID userId) {
+        return legacy(tenantId, userId, ZoneOffset.UTC);
+    }
+
+    /**
+     * 按用户时区将用途与渠道偏好聚合为旧消息中心设置结构。
+     */
+    @Override
+    public NotificationSettingVO legacy(UUID tenantId, UUID userId, ZoneId userZone) {
         var result = new NotificationSettingVO();
         result.setUserId(userId);
-        var values = list(tenantId, userId).stream()
+        var preferences = list(tenantId, userId);
+        var values = preferences.stream()
                 .filter(item -> "IN_APP".equals(item.getChannel()))
                 .collect(java.util.stream.Collectors.toMap(NotificationUserPreferenceEntity::getPurpose,
                         item -> Boolean.TRUE.equals(item.getEnabled()), (left, right) -> right));
@@ -134,7 +165,16 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         result.setOaEnabled(values.getOrDefault("OA_NOTICE", true));
         result.setInnerMailEnabled(values.getOrDefault("INNER_MESSAGE", true));
         result.setApprovalEnabled(values.getOrDefault("WORKFLOW_RESULT", true));
-        result.setDoNotDisturb(list(tenantId, userId).stream().anyMatch(item -> Boolean.TRUE.equals(item.getDoNotDisturb())));
+        var dndPreference = preferences.stream()
+                .filter(item -> Boolean.TRUE.equals(item.getDoNotDisturb()))
+                .findFirst()
+                .orElse(null);
+        result.setDoNotDisturb(dndPreference != null);
+        if (dndPreference != null) {
+            var zone = userZone == null ? ZoneOffset.UTC : userZone;
+            result.setDoNotDisturbStart(toLocalTime(dndPreference.getDoNotDisturbStart(), zone));
+            result.setDoNotDisturbEnd(toLocalTime(dndPreference.getDoNotDisturbEnd(), zone));
+        }
         return result;
     }
 
@@ -144,14 +184,55 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
     @Override
     @Transactional
     public void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from) {
+        saveLegacy(tenantId, userId, from, ZoneOffset.UTC);
+    }
+
+    /**
+     * 按用户时区将旧消息中心设置展开保存为站内信用途偏好。
+     */
+    @Override
+    @Transactional
+    public void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from, ZoneId userZone) {
         if (from == null) {
             throw new DataSaveException("通知设置不能为空");
         }
         var doNotDisturb = Boolean.TRUE.equals(from.getDoNotDisturb());
-        save(tenantId, userId, "SYSTEM_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getSystemEnabled()), doNotDisturb);
-        save(tenantId, userId, "WORKFLOW_TODO", "IN_APP", Boolean.TRUE.equals(from.getWorkflowEnabled()), doNotDisturb);
-        save(tenantId, userId, "OA_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getOaEnabled()), doNotDisturb);
-        save(tenantId, userId, "INNER_MESSAGE", "IN_APP", Boolean.TRUE.equals(from.getInnerMailEnabled()), doNotDisturb);
-        save(tenantId, userId, "WORKFLOW_RESULT", "IN_APP", Boolean.TRUE.equals(from.getApprovalEnabled()), doNotDisturb);
+        var zone = userZone == null ? ZoneOffset.UTC : userZone;
+        var start = doNotDisturb ? parseTime(from.getDoNotDisturbStart(), "免打扰开始时间") : null;
+        var end = doNotDisturb ? parseTime(from.getDoNotDisturbEnd(), "免打扰结束时间") : null;
+        if (doNotDisturb && (start == null) != (end == null)) {
+            throw new DataSaveException("免打扰开始和结束时间必须同时填写");
+        }
+        var startInstant = doNotDisturb && start != null ? toInstant(start, zone) : null;
+        var endInstant = doNotDisturb && end != null ? toInstant(end, zone) : null;
+        save(tenantId, userId, "SYSTEM_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getSystemEnabled()), doNotDisturb,
+                startInstant, endInstant);
+        save(tenantId, userId, "WORKFLOW_TODO", "IN_APP", Boolean.TRUE.equals(from.getWorkflowEnabled()), doNotDisturb,
+                startInstant, endInstant);
+        save(tenantId, userId, "OA_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getOaEnabled()), doNotDisturb,
+                startInstant, endInstant);
+        save(tenantId, userId, "INNER_MESSAGE", "IN_APP", Boolean.TRUE.equals(from.getInnerMailEnabled()), doNotDisturb,
+                startInstant, endInstant);
+        save(tenantId, userId, "WORKFLOW_RESULT", "IN_APP", Boolean.TRUE.equals(from.getApprovalEnabled()), doNotDisturb,
+                startInstant, endInstant);
+    }
+
+    private LocalTime parseTime(String value, String fieldName) {
+        if (!StringUtils.hasText(value)) {
+            return null;
+        }
+        try {
+            return LocalTime.parse(value.trim());
+        } catch (java.time.format.DateTimeParseException exception) {
+            throw new DataSaveException(fieldName + "格式不合法");
+        }
+    }
+
+    private Instant toInstant(LocalTime value, ZoneId zone) {
+        return LocalDate.now(zone).atTime(value).atZone(zone).toInstant();
+    }
+
+    private LocalTime toLocalTime(Instant value, ZoneId zone) {
+        return value == null ? null : value.atZone(zone).toLocalTime();
     }
 }

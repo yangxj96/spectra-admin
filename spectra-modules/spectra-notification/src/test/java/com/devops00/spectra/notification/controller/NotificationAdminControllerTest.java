@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.notification.controller;
 
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,5 +46,25 @@ class NotificationAdminControllerTest {
         assertEquals("ROLE_AUDIT", "ROLE_AUDIT");
         // 保持 controller 被实际构造，避免权限测试只验证常量而遗漏 bean 构造契约。
         assertEquals(NotificationAdminController.class, controller.getClass());
+    }
+
+    @Test
+    void shouldProtectAllAdminQueriesAndMutations() throws NoSuchMethodException {
+        var readExpression = "hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')";
+        assertEquals(readExpression, NotificationAdminController.class.getMethod("pageRequests", PageFrom.class,
+                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
+        assertEquals(readExpression, NotificationAdminController.class.getMethod("pageTasks", PageFrom.class,
+                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
+        assertEquals(readExpression, NotificationAdminController.class.getMethod("pageDeliveries", PageFrom.class,
+                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
+        assertEquals("hasRole('ROLE_DEV_OPS')", NotificationAdminController.class.getMethod("cancel", UUID.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
     }
 }

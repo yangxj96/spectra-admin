@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.notification;
 
+import com.devops00.spectra.notification.properties.NotificationCleanupProperties;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,6 +33,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan("com.devops00.spectra.notification")
 @MapperScan("com.devops00.spectra.notification.mapper")
-@EnableConfigurationProperties(NotificationModuleProperties.class)
+@EnableConfigurationProperties({NotificationModuleProperties.class, NotificationCleanupProperties.class})
 public class NotificationModule {
 }

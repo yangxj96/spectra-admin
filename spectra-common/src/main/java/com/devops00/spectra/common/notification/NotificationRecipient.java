@@ -26,11 +26,20 @@ import java.util.UUID;
  * @param email    用于邮件投递的邮箱地址；未绑定时为空
  * @param active   用户是否存在可用的活跃账号
  * @param verified 收件地址是否已通过账号验证
+ * @param timezone 用户时区 ID；为空时由通知模块按 UTC 处理
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-public record NotificationRecipient(UUID userId, String phone, String email, boolean active, boolean verified) {
+public record NotificationRecipient(UUID userId, String phone, String email, boolean active, boolean verified,
+                                    String timezone) {
+
+    /**
+     * 兼容未提供用户时区的调用方。
+     */
+    public NotificationRecipient(UUID userId, String phone, String email, boolean active, boolean verified) {
+        this(userId, phone, email, active, verified, null);
+    }
 
     /**
      * 返回指定外部渠道的已验证地址。用户不可用、地址未验证或渠道为站内信时返回空。

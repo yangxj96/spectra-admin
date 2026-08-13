@@ -72,4 +72,26 @@
         trace_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <!-- 清理终态或过期请求中的敏感载荷；批量处理避免长事务。 -->
+    <update id="clearSensitivePayloads">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_request
+            WHERE deleted IS NULL
+              AND sensitive_parameters_ciphertext IS NOT NULL
+              AND (
+                    expires_at IS NOT NULL AND expires_at &lt;= #{now}
+                    OR (status IN ('SUCCEEDED', 'PARTIAL', 'FAILED', 'CANCELLED', 'EXPIRED')
+                        AND updated_at &lt;= #{cutoff})
+                  )
+            ORDER BY updated_at NULLS FIRST
+            LIMIT #{limit}
+        )
+        UPDATE spectra_notification.ntf_request target
+           SET sensitive_parameters_ciphertext = NULL,
+               encryption_key_id = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+    </update>
 </mapper>

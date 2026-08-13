@@ -21,6 +21,8 @@ import com.devops00.spectra.notification.javabean.from.NotificationSettingFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationSettingVO;
 
 import java.util.List;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.UUID;
 
 /**
@@ -43,12 +45,28 @@ public interface NotificationPreferenceService {
     void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb);
 
     /**
+     * 保存带每日免打扰窗口的用途与渠道偏好。
+     */
+    void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
+              Instant doNotDisturbStart, Instant doNotDisturbEnd);
+
+    /**
      * 读取旧消息中心设置结构，供兼容 API 使用。
      */
     NotificationSettingVO legacy(UUID tenantId, UUID userId);
 
     /**
+     * 按用户时区读取旧消息中心设置结构。
+     */
+    NotificationSettingVO legacy(UUID tenantId, UUID userId, ZoneId userZone);
+
+    /**
      * 保存旧消息中心设置结构，内部展开为用途×渠道记录。
      */
     void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from);
+
+    /**
+     * 按用户时区保存旧消息中心设置结构。
+     */
+    void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from, ZoneId userZone);
 }

@@ -18,7 +18,11 @@ package com.devops00.spectra.notification.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.time.Instant;
 
 /**
  * 通知请求 Mapper。
@@ -29,4 +33,11 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface NotificationRequestMapper extends BaseMapper<NotificationRequestEntity> {
+
+    /**
+     * 批量清理已过期或已超过保留窗口的敏感请求载荷。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    int clearSensitivePayloads(@Param("now") Instant now, @Param("cutoff") Instant cutoff,
+                               @Param("limit") int limit);
 }

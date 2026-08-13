@@ -40,6 +40,7 @@ import tools.jackson.databind.ObjectMapper;
 import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -152,6 +153,144 @@ class NotificationGatewayImplTest {
         verify(taskMapper).insert(taskCaptor.capture());
         assertEquals("安全通知", taskCaptor.getValue().getTitle());
         assertFalse(taskCaptor.getValue().getSensitiveParametersCiphertext().contains("123456"));
+    }
+
+    @Test
+    void shouldSkipOptionalChannelWhenUserDisabledIt() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(false);
+        preference.setDoNotDisturb(false);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(taskMapper.selectCount(any())).thenReturn(0L);
+        when(templateMapper.selectOne(any())).thenReturn(null);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, "13800138000", null, true, true)));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.SMS, recipientId,
+                "test:optional-disabled");
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(0, receipt.taskCount());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    @Test
+    void shouldKeepMandatorySecurityChannelDespiteDisabledPreference() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(false);
+        preference.setDoNotDisturb(true);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(taskMapper.selectCount(any())).thenReturn(0L);
+        when(taskMapper.insert(any(NotificationTaskEntity.class))).thenReturn(1);
+        when(templateMapper.selectOne(any())).thenReturn(null);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, null, null, true, true)));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = request(NotificationPurpose.SECURITY_ALERT, NotificationChannel.IN_APP, recipientId,
+                "test:security-alert");
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(1, receipt.taskCount());
+        verify(taskMapper).insert(any(NotificationTaskEntity.class));
+        verify(preferenceMapper, never()).selectOne(any());
+    }
+
+    @Test
+    void shouldSkipOptionalChannelDuringDoNotDisturb() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        preference.setDoNotDisturb(true);
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(taskMapper.selectCount(any())).thenReturn(0L);
+        when(templateMapper.selectOne(any())).thenReturn(null);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, null, "user@example.com", true, true)));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.EMAIL, recipientId,
+                "test:do-not-disturb");
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(0, receipt.taskCount());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    @Test
+    void shouldSkipOptionalChannelInsideConfiguredDoNotDisturbWindow() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var preference = new NotificationUserPreferenceEntity();
+        preference.setEnabled(true);
+        preference.setDoNotDisturb(true);
+        var now = Instant.now();
+        preference.setDoNotDisturbStart(now.minusSeconds(60));
+        preference.setDoNotDisturbEnd(now.plusSeconds(60));
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(taskMapper.selectCount(any())).thenReturn(0L);
+        when(templateMapper.selectOne(any())).thenReturn(null);
+        when(preferenceMapper.selectOne(any())).thenReturn(preference);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, null, "user@example.com", true, true, "UTC")));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.EMAIL, recipientId,
+                "test:do-not-disturb-window");
+
+        var receipt = gateway.enqueue(request);
+
+        assertEquals(0, receipt.taskCount());
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    private NotificationGatewayImpl gateway(NotificationRequestMapper requestMapper,
+                                            NotificationTaskMapper taskMapper,
+                                            NotificationTemplateMapper templateMapper,
+                                            NotificationUserPreferenceMapper preferenceMapper,
+                                            NotificationRecipientDirectory directory) {
+        return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
+                new NotificationTemplateRenderer(), new NotificationPolicy(),
+                new NotificationModuleProperties(true, "", ""), directory, protector(), List.of());
+    }
+
+    private NotificationRequest request(NotificationPurpose purpose, NotificationChannel channel, UUID recipientId,
+                                        String idempotencyKey) {
+        return new NotificationRequest(null, idempotencyKey, purpose, List.of(channel), List.of(recipientId),
+                List.of(), "test", java.util.Map.of("title", "通知", "content", "正文"), java.util.Map.of(),
+                "SYSTEM", idempotencyKey, "SYSTEM", null, null, null, 0, null);
     }
 
     private NotificationPayloadProtector protector() {

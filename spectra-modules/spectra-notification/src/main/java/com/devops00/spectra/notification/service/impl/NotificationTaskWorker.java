@@ -26,10 +26,12 @@ import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
+import com.devops00.spectra.notification.observability.NotificationMetrics;
 import com.devops00.spectra.notification.service.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +82,16 @@ public class NotificationTaskWorker {
      * 已注册的渠道发送端。
      */
     private final List<NotificationSender> senders;
+
+    /**
+     * 可选指标门面；测试或精简运行时未注册 MeterRegistry 时保持 Worker 可用。
+     */
+    private NotificationMetrics metrics;
+
+    @Autowired(required = false)
+    public void setMetrics(NotificationMetrics metrics) {
+        this.metrics = metrics;
+    }
 
     /**
      * 任务处于 {@code PROCESSING} 状态的最长允许时间，单位为秒。超时后任务可由 Worker 重新领取，避免异常中断导致永久卡住。
@@ -160,10 +172,17 @@ public class NotificationTaskWorker {
             return;
         }
         try {
-            finish(task, sender.send(task));
+            var result = sender.send(task);
+            finish(task, result);
+            if (metrics != null) {
+                metrics.recordTask(task.getChannel(), result.status(), task.getPurpose());
+            }
         } catch (RuntimeException exception) {
             var message = exception.getMessage() == null ? "通知渠道调用失败" : exception.getMessage();
             finishFailure(task, message.length() > 1000 ? message.substring(0, 1000) : message);
+            if (metrics != null) {
+                metrics.recordRetry(task.getChannel(), "PROVIDER_FAILURE");
+            }
         }
         refreshRequestStatus(task.getNotificationRequestId());
     }

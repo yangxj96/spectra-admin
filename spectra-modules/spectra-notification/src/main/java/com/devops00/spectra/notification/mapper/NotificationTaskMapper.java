@@ -40,4 +40,11 @@ public interface NotificationTaskMapper extends BaseMapper<NotificationTaskEntit
      */
     @InterceptorIgnore(dataPermission = "true")
     List<NotificationTaskEntity> selectPendingTasks(@Param("now") Instant now, @Param("limit") int limit);
+
+    /**
+     * 批量清理已过期或已超过保留窗口的敏感任务载荷。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    int clearSensitivePayloads(@Param("now") Instant now, @Param("cutoff") Instant cutoff,
+                               @Param("limit") int limit);
 }

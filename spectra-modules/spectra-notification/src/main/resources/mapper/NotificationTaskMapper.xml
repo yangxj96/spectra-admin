@@ -93,4 +93,25 @@
         LIMIT #{limit}
         FOR UPDATE SKIP LOCKED
     </select>
+
+    <!-- 清理终态或过期任务中的敏感渲染载荷；批量处理避免长事务。 -->
+    <update id="clearSensitivePayloads">
+        WITH candidates AS (
+            SELECT id
+            FROM spectra_notification.ntf_task
+            WHERE deleted IS NULL
+              AND sensitive_parameters_ciphertext IS NOT NULL
+              AND (
+                    expires_at IS NOT NULL AND expires_at &lt;= #{now}
+                    OR (status IN ('SENT', 'FAILED', 'BLOCKED', 'UNKNOWN', 'EXPIRED', 'CANCELLED')
+                        AND updated_at &lt;= #{cutoff})
+                  )
+            ORDER BY updated_at NULLS FIRST
+            LIMIT #{limit}
+        )
+        UPDATE spectra_notification.ntf_task target
+           SET sensitive_parameters_ciphertext = NULL,
+               updated_at = CURRENT_TIMESTAMP
+         WHERE target.id IN (SELECT id FROM candidates)
+    </update>
 </mapper>

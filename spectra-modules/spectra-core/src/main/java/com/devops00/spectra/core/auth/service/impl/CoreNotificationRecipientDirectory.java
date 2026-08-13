@@ -21,6 +21,7 @@ import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +36,8 @@ import java.util.UUID;
 public class CoreNotificationRecipientDirectory implements NotificationRecipientDirectory {
 
     private final AccountService accountService;
+
+    private final UserService userService;
 
     @Override
     public List<NotificationRecipient> resolve(List<UUID> userIds) {
@@ -82,7 +85,8 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .filter(this::hasText)
                 .findFirst()
                 .orElse(null);
-        return new NotificationRecipient(userId, phone, email, active, verified);
+        var user = userService.getById(userId);
+        return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }
 
     private boolean isUsable(Account account) {

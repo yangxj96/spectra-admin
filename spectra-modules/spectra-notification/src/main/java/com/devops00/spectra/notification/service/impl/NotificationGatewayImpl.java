@@ -29,12 +29,15 @@ import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
+import com.devops00.spectra.notification.observability.NotificationMetrics;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -106,6 +109,16 @@ public class NotificationGatewayImpl implements NotificationGateway {
     private final List<NotificationSender> senders;
 
     /**
+     * 可选指标门面；测试或精简运行时未注册 MeterRegistry 时保持业务路径可用。
+     */
+    private NotificationMetrics metrics;
+
+    @Autowired(required = false)
+    public void setMetrics(NotificationMetrics metrics) {
+        this.metrics = metrics;
+    }
+
+    /**
      * 查询指定渠道的配置与可用状态。
      */
     @Override
@@ -170,6 +183,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (requestMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知请求失败");
         }
+        if (metrics != null) {
+            metrics.recordRequest(request.purpose().name(), "ACCEPTED");
+        }
 
         var taskCount = 0;
         for (var recipient : recipients) {
@@ -178,7 +194,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 continue;
             }
             for (var channel : channels) {
-                if (!shouldDeliver(request.purpose(), recipient.userId(), channel)) {
+                if (!shouldDeliver(request.purpose(), recipient, channel)) {
                     continue;
                 }
                 var address = recipient.addressFor(channel);
@@ -245,6 +261,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (taskMapper.insert(task) != 1) {
             throw new DataSaveException("创建通知任务失败");
         }
+        if (metrics != null) {
+            metrics.recordTask(channel.name(), "PENDING", request.purpose().name());
+        }
         return 1;
     }
 
@@ -283,23 +302,27 @@ public class NotificationGatewayImpl implements NotificationGateway {
     /**
      * 判断用户偏好是否允许向指定渠道投递。
      */
-    private boolean shouldDeliver(com.devops00.spectra.common.notification.NotificationPurpose purpose, UUID recipient,
+    private boolean shouldDeliver(com.devops00.spectra.common.notification.NotificationPurpose purpose,
+                                  NotificationRecipient recipient,
                                   NotificationChannel channel) {
         if (policy.mandatory(purpose)) {
             return true;
         }
-        if (recipient == null) {
+        if (recipient == null || recipient.userId() == null) {
             return true;
         }
         var preference = preferenceMapper.selectOne(new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
                 .eq(NotificationUserPreferenceEntity::getTenantId, SYSTEM_TENANT_ID)
-                .eq(NotificationUserPreferenceEntity::getUserId, recipient)
+                .eq(NotificationUserPreferenceEntity::getUserId, recipient.userId())
                 .eq(NotificationUserPreferenceEntity::getPurpose, purpose.name())
                 .eq(NotificationUserPreferenceEntity::getChannel, channel.name()));
         if (preference == null) {
             return channel == NotificationChannel.IN_APP;
         }
-        return Boolean.TRUE.equals(preference.getEnabled()) && !Boolean.TRUE.equals(preference.getDoNotDisturb());
+        return Boolean.TRUE.equals(preference.getEnabled())
+                && !NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
+                        Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
+                        NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()));
     }
 
     /**

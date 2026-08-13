@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.time.ZoneId;
 
 /**
  * 旧消息中心设置 API 的兼容门面。
@@ -56,7 +57,7 @@ public class NotificationSettingController {
     @GetMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')")
     public NotificationSettingVO getSetting() {
-        return service.legacy(SYSTEM_TENANT_ID, currentUserId());
+        return service.legacy(SYSTEM_TENANT_ID, currentUserId(), currentUserZone());
     }
 
     /**
@@ -66,7 +67,7 @@ public class NotificationSettingController {
     @PutMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')")
     public void updateSetting(@RequestBody NotificationSettingFrom from) {
-        service.saveLegacy(SYSTEM_TENANT_ID, currentUserId(), from);
+        service.saveLegacy(SYSTEM_TENANT_ID, currentUserId(), from, currentUserZone());
     }
 
     /**
@@ -74,5 +75,16 @@ public class NotificationSettingController {
      */
     private UUID currentUserId() {
         return SecUtil.getCurrentUserId();
+    }
+
+    /**
+     * 获取当前用户时区，非法值回退到 UTC。
+     */
+    private ZoneId currentUserZone() {
+        try {
+            return ZoneId.of(SecUtil.getCurrentUserZoneId());
+        } catch (java.time.DateTimeException exception) {
+            return ZoneId.of("UTC");
+        }
     }
 }
