@@ -6,6 +6,7 @@ on:
       - 'spectra-config/src/main/resources/db/migration/**'
       - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/schema/SecurityFlywayPostgresIntegrationTest.java'
       - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/schema/SecuritySchemaContractTest.java'
+      - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/root/SecurityRootConcurrencyPostgresIntegrationTest.java'
       - 'pom.xml'
       - 'mvnw'
       - '.github/workflows/security-flyway-postgres.yml'
@@ -16,6 +17,7 @@ on:
       - 'spectra-config/src/main/resources/db/migration/**'
       - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/schema/SecurityFlywayPostgresIntegrationTest.java'
       - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/schema/SecuritySchemaContractTest.java'
+      - 'spectra-modules/spectra-core/src/test/java/com/devops00/spectra/core/security/root/SecurityRootConcurrencyPostgresIntegrationTest.java'
       - 'pom.xml'
       - 'mvnw'
       - '.github/workflows/security-flyway-postgres.yml'
@@ -65,4 +67,4 @@ jobs:
           SPECTRA_SECURITY_FLYWAY_NONEMPTY_DB_URL: jdbc:postgresql://127.0.0.1:5432/spectra_security_flyway_nonempty
           SPECTRA_SECURITY_FLYWAY_NONEMPTY_DB_USERNAME: postgres
           SPECTRA_SECURITY_FLYWAY_NONEMPTY_DB_PASSWORD: spectra-ci
-        run: ./mvnw -B -pl spectra-modules/spectra-core -am test -Dtest=SecurityFlywayPostgresIntegrationTest,SecuritySchemaContractTest -Dsurefire.failIfNoSpecifiedTests=false
+        run: ./mvnw -B -pl spectra-modules/spectra-core -am test -Dtest=SecurityFlywayPostgresIntegrationTest,SecuritySchemaContractTest,SecurityRootConcurrencyPostgresIntegrationTest -Dsurefire.failIfNoSpecifiedTests=false
