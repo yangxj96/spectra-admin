@@ -96,6 +96,37 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase6MustKeepResourceScopeIndexesInFlywayAndSchemaDocumentation() throws IOException {
+        String migration = readMigration("V7__permission_aware_datascope_indexes.sql");
+        String documented = readOaSql();
+        List<String> indexes = List.of(
+                "idx_oa_asset_scope_department",
+                "idx_oa_calendar_scope_owner_department",
+                "idx_oa_contract_scope_department_owner",
+                "idx_oa_document_scope_department_owner",
+                "idx_oa_document_folder_scope_department",
+                "idx_oa_meeting_scope_department",
+                "idx_oa_meeting_participant_scope",
+                "idx_oa_meeting_record_scope_department",
+                "idx_oa_notice_scope_department",
+                "idx_oa_application_scope_department",
+                "idx_oa_leave_application_scope_department",
+                "idx_oa_leave_balance_scope",
+                "idx_oa_attendance_record_scope",
+                "idx_oa_supply_item_scope_department",
+                "idx_oa_purchase_scope_department",
+                "idx_oa_purchase_item_scope_department",
+                "idx_oa_purchase_receipt_scope_purchase",
+                "idx_oa_purchase_receipt_item_scope_purchase_item",
+                "idx_oa_reimbursement_scope_department",
+                "idx_oa_reimbursement_item_scope_department");
+        for (String index : indexes) {
+            assertTrue(migration.contains(index), index);
+            assertTrue(documented.contains(index), index);
+        }
+    }
+
+    @Test
     void targetFlywayV1MustBeCompleteAndMustNotReintroduceLegacySecurityOrTenantTables() throws IOException {
         String migration = readV1();
 
@@ -180,6 +211,20 @@ class SecuritySchemaContractTest {
             }
         }
         throw new IOException("找不到 Permission Catalog");
+    }
+
+    private String readOaSql() throws IOException {
+        var candidates = List.of(
+                Path.of("docs", "sql", "spectra_oa", "建表.sql"),
+                Path.of("..", "docs", "sql", "spectra_oa", "建表.sql"),
+                Path.of("..", "..", "docs", "sql", "spectra_oa", "建表.sql"),
+                Path.of("..", "..", "..", "docs", "sql", "spectra_oa", "建表.sql"));
+        for (var candidate : candidates) {
+            if (Files.isRegularFile(candidate)) {
+                return Files.readString(candidate);
+            }
+        }
+        throw new IOException("找不到 OA schema SQL 文件");
     }
 
     private String readMigration(String fileName) throws IOException {

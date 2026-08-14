@@ -39,7 +39,7 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_asset", schema = "spectra_oa")
-@DataScope
+@DataScope(readPermission = "oa:asset:read", writePermission = "oa:asset:update")
 public class Asset extends BaseEntity {
 
     /**

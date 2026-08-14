@@ -38,7 +38,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @TableName(value = "oa_meeting_participant", schema = "spectra_oa")
-@DataScope(column = "department_id", ownerColumn = "user_id")
+@DataScope(readPermission = "oa:meeting:read", writePermission = "oa:meeting:update", column = "department_id", ownerColumn = "user_id")
 public class MeetingParticipant extends BaseEntity {
 
     /**

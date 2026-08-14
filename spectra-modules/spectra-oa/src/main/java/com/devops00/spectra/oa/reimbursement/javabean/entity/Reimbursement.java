@@ -39,7 +39,7 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_reimbursement", schema = "spectra_oa")
-@DataScope
+@DataScope(readPermission = "oa:reimbursement:read", writePermission = "oa:reimbursement:update")
 public class Reimbursement extends BaseEntity {
 
     /**

@@ -36,7 +36,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_notice", schema = "spectra_oa")
-@DataScope(ignore = true)
+@DataScope(readPermission = "oa:notice:read", writePermission = "oa:notice:update")
 public class Notice extends BaseEntity {
 
     /**

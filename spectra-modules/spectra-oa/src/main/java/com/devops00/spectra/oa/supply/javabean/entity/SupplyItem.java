@@ -22,7 +22,7 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_supply_item", schema = "spectra_oa")
-@DataScope
+@DataScope(readPermission = "oa:purchase:read", writePermission = "oa:purchase:update")
 public class SupplyItem extends BaseEntity {
 
     /**

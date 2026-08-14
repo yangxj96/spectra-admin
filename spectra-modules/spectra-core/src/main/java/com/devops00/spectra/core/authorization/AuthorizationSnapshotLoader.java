@@ -17,10 +17,12 @@
 package com.devops00.spectra.core.authorization;
 
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 
 import java.util.UUID;
 
-public interface AuthorizationSnapshotLoader {
+public interface AuthorizationSnapshotLoader extends AuthorizationSnapshotProvider {
 
+    @Override
     AuthorizationSnapshot load(UUID userId);
 }

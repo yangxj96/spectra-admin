@@ -36,7 +36,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_calendar", schema = "spectra_oa")
-@DataScope(ignore = true)
+@DataScope(readPermission = "oa:calendar:read", writePermission = "oa:calendar:update", ownerColumn = "owner_id")
 public class Calendar extends BaseEntity {
 
     /**

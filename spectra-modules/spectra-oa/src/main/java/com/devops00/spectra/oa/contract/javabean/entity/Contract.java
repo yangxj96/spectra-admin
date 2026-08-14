@@ -39,7 +39,7 @@ import java.util.UUID;
 @Setter
 @ToString
 @TableName(value = "oa_contract", schema = "spectra_oa")
-@DataScope
+@DataScope(readPermission = "oa:contract:read", writePermission = "oa:contract:update", ownerColumn = "owner_id")
 public class Contract extends BaseEntity {
 
     /**

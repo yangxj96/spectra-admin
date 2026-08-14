@@ -39,6 +39,21 @@ import java.lang.annotation.*;
 public @interface DataScope {
 
     /**
+     * SELECT/list/detail 使用的 Permission。为空时资源不会进入 SQL 隔离注册表。
+     */
+    String readPermission() default "";
+
+    /**
+     * UPDATE/DELETE/BATCH 使用的 Permission。写操作不得隐式借用 read Permission。
+     */
+    String writePermission() default "";
+
+    /**
+     * EXPORT 使用的 Permission。导出必须显式登记，不能复用普通查询权限。
+     */
+    String exportPermission() default "";
+
+    /**
      * 结构维度过滤字段名，默认 department_id
      */
     String column() default "department_id";
@@ -52,7 +67,7 @@ public @interface DataScope {
     String ownerColumn() default "created_by";
 
     /**
-     * 是否忽略数据范围过滤（SYS_ 表使用）
+     * 兼容旧源码的标记；受保护业务实体不得设置为 true，拦截器会 fail-closed。
      */
     boolean ignore() default false;
 
@@ -86,5 +101,10 @@ public @interface DataScope {
          * 主表用于 IN 匹配的列名（默认 id，MeetingRecord 等关联需用 meeting_id）
          */
         String mainColumn() default "id";
+
+        /**
+         * 关联表的部门归属列；用于没有自身 department_id 的明细资源。
+         */
+        String departmentColumn() default "";
     }
 }

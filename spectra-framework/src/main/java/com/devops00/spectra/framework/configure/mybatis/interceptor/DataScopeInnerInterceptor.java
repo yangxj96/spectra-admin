@@ -23,6 +23,9 @@ import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.framework.configure.mybatis.DataScopeEntityRegistry;
+import com.devops00.spectra.framework.configure.mybatis.security.ScopeSqlPolicy;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
@@ -37,6 +40,7 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -52,7 +56,7 @@ import java.util.stream.Collectors;
  *
  * <h3>跳过规则</h3>
  * <ul>
- * <li>{@link DataScope#ignore()} = true 的表不过滤</li>
+ * <li>业务实体设置 {@link DataScope#ignore()} = true 会 fail-closed，不能绕过登记</li>
  * <li>GLOBAL 范围的用户不过滤</li>
  * <li>缺少登录上下文时拒绝执行（fail-closed）</li>
  * </ul>
@@ -66,10 +70,23 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     private final ObjectProvider<DataScopeProvider> dataScopeProvider;
 
+    private final ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider;
+
     private final DataScopeEntityRegistry dataScopeEntityRegistry;
 
+    /**
+     * 保留给框架单测和没有新授权模块的独立使用场景；正式应用使用三参数构造器。
+     */
     public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider, DataScopeEntityRegistry dataScopeEntityRegistry) {
+        this(dataScopeProvider, null, dataScopeEntityRegistry);
+    }
+
+    @Autowired
+    public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider,
+                                     ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider,
+                                     DataScopeEntityRegistry dataScopeEntityRegistry) {
         this.dataScopeProvider = dataScopeProvider;
+        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
         this.dataScopeEntityRegistry = dataScopeEntityRegistry;
     }
 
@@ -92,8 +109,11 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         if (annotation == null) {
             annotation = dataScopeEntityRegistry.find(tableName);
         }
-        if (annotation == null || annotation.ignore()) {
+        if (annotation == null) {
             return null;
+        }
+        if (annotation.ignore()) {
+            throw new DataScopeViolationException("受保护资源不得使用未登记的 ignore=true 数据范围策略");
         }
 
         // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
@@ -102,6 +122,22 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         UUID userId = SecUtil.getCurrentUserId();
         if (userId == null) {
             throw new DataScopeViolationException("数据权限 SQL 缺少当前用户上下文");
+        }
+
+        AuthorizationSnapshotProvider snapshotProvider = authorizationSnapshotProvider == null
+                ? null : authorizationSnapshotProvider.getIfAvailable();
+        if (snapshotProvider != null) {
+            String permission = ScopeSqlPolicy.permissionFor(annotation, mappedStatementId);
+            if (permission == null) {
+                return where;
+            }
+            AuthorizationSnapshot snapshot = snapshotProvider.load(userId);
+            Expression scopeExpression = ScopeSqlPolicy.build(table, annotation,
+                    snapshot.accessBoundaries(permission), userId);
+            if (where == null) {
+                return scopeExpression;
+            }
+            return new AndExpression(where, scopeExpression);
         }
 
         // 解析用户有效数据范围
