@@ -37,6 +37,21 @@ public class Permission {
     @TableField(value = "name")
     private String name;
 
+    @TableField(value = "resource_code")
+    private String resourceCode;
+
+    @TableField(value = "action_code")
+    private String actionCode;
+
+    @TableField(value = "allowed_scope_modes")
+    private String allowedScopeModes;
+
     @TableField(value = "state")
     private String state;
+
+    @TableField(value = "system_managed")
+    private Boolean systemManaged;
+
+    @TableField(value = "version")
+    private Long version;
 }

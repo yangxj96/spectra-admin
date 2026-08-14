@@ -167,6 +167,12 @@ class SecuritySchemaContractTest {
         assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_workflow"));
         assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_notification"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.role_menu"));
+        assertTrue(migration.contains("resource_code"));
+        assertTrue(migration.contains("action_code"));
+        assertTrue(migration.contains("allowed_scope_modes"));
+        assertTrue(migration.contains("system_managed"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.role_permission"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.role_grantable_permission"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_user_department_membership"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_organization_version"));

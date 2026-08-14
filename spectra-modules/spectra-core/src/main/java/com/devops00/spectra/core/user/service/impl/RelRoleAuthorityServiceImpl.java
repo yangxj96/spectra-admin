@@ -17,28 +17,23 @@
 package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.utils.CollUtils;
-import com.devops00.spectra.common.utils.TreeUtils;
+import com.devops00.spectra.core.authorization.entity.Permission;
+import com.devops00.spectra.core.authorization.entity.RoleGrantablePermission;
+import com.devops00.spectra.core.authorization.entity.RolePermission;
 import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
-import com.devops00.spectra.core.user.javabean.converter.AuthorityConverter;
-import com.devops00.spectra.core.user.javabean.entity.Authority;
-import com.devops00.spectra.core.user.javabean.entity.RelRoleAuthority;
+import com.devops00.spectra.core.authorization.mapper.PermissionMapper;
+import com.devops00.spectra.core.authorization.mapper.RoleGrantablePermissionMapper;
+import com.devops00.spectra.core.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
-import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
-import com.devops00.spectra.core.user.mapper.RelRoleAuthorityMapper;
-import com.devops00.spectra.core.user.service.AuthorityService;
 import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * 关联服务-用户和权限
@@ -47,21 +42,20 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2025/11/11 00:00
  */
-@Slf4j
 @Service
 public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
 
-    private final AuthorityConverter authorityConverter;
+    private final PermissionMapper permissionMapper;
 
-    private final RelRoleAuthorityMapper relRoleAuthorityMapper;
+    private final RolePermissionMapper rolePermissionMapper;
 
-    private final AuthorityService authorityService;
+    private final RoleGrantablePermissionMapper roleGrantablePermissionMapper;
 
-    public RelRoleAuthorityServiceImpl(AuthorityConverter authorityConverter, RelRoleAuthorityMapper relRoleAuthorityMapper,
-                                       AuthorityService authorityService) {
-        this.authorityConverter = authorityConverter;
-        this.relRoleAuthorityMapper = relRoleAuthorityMapper;
-        this.authorityService = authorityService;
+    public RelRoleAuthorityServiceImpl(PermissionMapper permissionMapper, RolePermissionMapper rolePermissionMapper,
+                                       RoleGrantablePermissionMapper roleGrantablePermissionMapper) {
+        this.permissionMapper = permissionMapper;
+        this.rolePermissionMapper = rolePermissionMapper;
+        this.roleGrantablePermissionMapper = roleGrantablePermissionMapper;
     }
 
     @Override
@@ -73,26 +67,39 @@ public class RelRoleAuthorityServiceImpl implements RelRoleAuthorityService {
     @Override
     @Transactional
     public void revoke(UUID roleId) {
-        // 删除角色关联的权限
-        var wrapper = new LambdaQueryWrapper<RelRoleAuthority>().eq(RelRoleAuthority::getRoleId, roleId);
-        relRoleAuthorityMapper.delete(wrapper);
+        rolePermissionMapper.delete(new LambdaQueryWrapper<RolePermission>().eq(RolePermission::getRoleId, roleId));
+        roleGrantablePermissionMapper.delete(new LambdaQueryWrapper<RoleGrantablePermission>()
+                .eq(RoleGrantablePermission::getRoleId, roleId));
     }
 
     @Override
     public List<AuthorityVO> get(UUID roleId) {
-        var authority = authorityService.getByRelRoleId(roleId);
-        return authorityConverter.toVOList(authority);
+        var permissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
+                        .eq(RolePermission::getRoleId, roleId)).stream()
+                .map(RolePermission::getPermissionId).toList();
+        return toVO(permissionIds);
     }
 
     @Override
     public List<AuthorityVO> get(List<UUID> ids) {
-        List<RelRoleAuthority> relRoleAuthorities = relRoleAuthorityMapper
-                .selectList(new LambdaQueryWrapper<RelRoleAuthority>().in(RelRoleAuthority::getRoleId, ids));
-        if (CollUtils.isEmpty(relRoleAuthorities)) {
+        if (CollUtils.isEmpty(ids)) {
             return new ArrayList<>();
         }
-        var authorityIds = relRoleAuthorities.stream().map(RelRoleAuthority::getAuthorityId).toList();
-        var coll = authorityService.list(new LambdaQueryWrapper<Authority>().in(BaseEntity::getId, authorityIds));
-        return authorityConverter.toVOList(coll);
+        var permissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
+                        .in(RolePermission::getRoleId, ids)).stream()
+                .map(RolePermission::getPermissionId).distinct().toList();
+        return toVO(permissionIds);
+    }
+
+    private List<AuthorityVO> toVO(List<UUID> permissionIds) {
+        if (CollUtils.isEmpty(permissionIds)) {
+            return new ArrayList<>();
+        }
+        return permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
+                        .in(Permission::getId, permissionIds)
+                        .eq(Permission::getState, "ACTIVE")
+                        .orderByAsc(Permission::getCode)).stream()
+                .map(permission -> new AuthorityVO(permission.getId(), null, permission.getName(), permission.getCode()))
+                .toList();
     }
 }

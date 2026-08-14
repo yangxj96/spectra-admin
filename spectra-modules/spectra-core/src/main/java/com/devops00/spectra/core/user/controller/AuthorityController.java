@@ -16,19 +16,15 @@
 
 package com.devops00.spectra.core.user.controller;
 
-import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.core.user.javabean.from.AuthoritySaveFrom;
+import com.devops00.spectra.core.authorization.service.PermissionCatalogService;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
-import com.devops00.spectra.core.user.service.AuthorityService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import lombok.extern.slf4j.Slf4j;
-import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 权限相关操作
@@ -37,42 +33,20 @@ import java.util.UUID;
  * @version 1.0
  * @since 2025/11/11 00:00
  */
-@Slf4j
 @RestController
 @RequestMapping("/authority")
 public class AuthorityController {
 
-    private final AuthorityService bindService;
+    private final PermissionCatalogService permissionCatalogService;
 
-    public AuthorityController(AuthorityService bindService) {
-        this.bindService = bindService;
+    public AuthorityController(PermissionCatalogService permissionCatalogService) {
+        this.permissionCatalogService = permissionCatalogService;
     }
 
-    @ULog("'创建权限'")
-    @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'permission:manage')")
-    public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody AuthoritySaveFrom params) {
-        bindService.created(params);
-    }
-
-    @ULog("'删除权限'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'permission:manage')")
-    public void deleteAuthority(@PathVariable UUID id) {
-        bindService.deleteById(id);
-    }
-
-    @ULog("'修改权限信息'")
-    @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'permission:manage')")
-    public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody AuthoritySaveFrom params) {
-        bindService.modify(params);
-    }
-
-    @ULog("'获取权限树列表'")
+    @ULog("'获取 Permission Catalog 树列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'permission:read')")
-    public @Nullable List<AuthorityTreeVO> tree() {
-        return bindService.tree();
+    public List<AuthorityTreeVO> tree() {
+        return permissionCatalogService.tree();
     }
 }
