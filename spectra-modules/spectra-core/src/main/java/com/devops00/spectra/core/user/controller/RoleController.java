@@ -21,6 +21,7 @@ import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
@@ -131,12 +132,7 @@ public class RoleController {
     @PutMapping(value = "/{roleId}/authorities", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleAuthorityFrom from) {
-        try {
-            relRoleAuthorityService.grant(roleId, from);
-        } catch (Exception e) {
-            log.error("{}保存角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new DataException("参数转换失败");
-        }
+        LegacyAuthorizationWriteGuard.reject("旧角色权限关联写入口");
     }
 
     @ULog("'保存角色关联的菜单列表'")

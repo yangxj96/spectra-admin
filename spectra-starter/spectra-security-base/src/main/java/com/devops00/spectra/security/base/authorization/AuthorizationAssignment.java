@@ -26,8 +26,19 @@ import java.util.UUID;
  */
 public record AuthorizationAssignment(UUID assignmentId,
                                       String roleCode,
+                                      int authorityLevel,
                                       Map<String, PermissionBoundary> accessBoundaries,
                                       Map<String, PermissionBoundary> grantBoundaries) {
+
+    /**
+     * 兼容 Phase 3 的构造方式；未从旧快照提供等级时使用最低有效等级。
+     */
+    public AuthorizationAssignment(UUID assignmentId,
+                                   String roleCode,
+                                   Map<String, PermissionBoundary> accessBoundaries,
+                                   Map<String, PermissionBoundary> grantBoundaries) {
+        this(assignmentId, roleCode, 1, accessBoundaries, grantBoundaries);
+    }
 
     public AuthorizationAssignment {
         if (assignmentId == null) {
@@ -35,6 +46,9 @@ public record AuthorizationAssignment(UUID assignmentId,
         }
         if (roleCode == null || roleCode.isBlank()) {
             throw new IllegalArgumentException("roleCode 不能为空");
+        }
+        if (authorityLevel <= 0) {
+            throw new IllegalArgumentException("authorityLevel 必须大于 0");
         }
         accessBoundaries = immutableByPermission(accessBoundaries);
         grantBoundaries = immutableByPermission(grantBoundaries);

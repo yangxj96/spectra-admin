@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.common.base.Verify;
+import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.service.DepartmentService;
@@ -57,7 +58,7 @@ public class DepartmentController {
     @PostMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
     public void created(@RequestBody @Validated(Verify.Insert.class) DepartmentFrom from) {
-        bindService.created(from);
+        LegacyAuthorizationWriteGuard.reject("旧部门创建写入口");
     }
 
     /**
@@ -81,7 +82,7 @@ public class DepartmentController {
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'DEPT:UPDATE')")
     public void modify(@RequestBody @Validated(Verify.Update.class) DepartmentFrom from) {
-        bindService.modify(from);
+        LegacyAuthorizationWriteGuard.reject("旧部门修改写入口");
     }
 
     /**

@@ -114,4 +114,9 @@ public class SecurityProperties {
      * Root 最大用户数，默认 3（推荐 2 个日常 Root + 1 个 break-glass）。
      */
     private int maxDevOpsUsers = 3;
+
+    /**
+     * Preview/Apply 授权变更 token 的 HMAC 密钥；未配置时相关写入口 fail-closed。
+     */
+    private String authorizationChangeTokenHmacKey = "";
 }

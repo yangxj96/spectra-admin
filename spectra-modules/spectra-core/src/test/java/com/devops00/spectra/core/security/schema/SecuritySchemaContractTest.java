@@ -61,6 +61,25 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase4ConcurrencyAndDelegationColumnsMustRemainInTheDatabaseContract() throws IOException {
+        String schema = readSql();
+        String migration = readV1();
+
+        for (String source : List.of(schema, migration)) {
+            assertTrue(source.contains("authority_level SMALLINT NOT NULL"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.role_assignment"));
+            assertTrue(source.contains("version       BIGINT NOT NULL DEFAULT 0"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.assignment_permission_boundary"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.assignment_grant_boundary"));
+            assertTrue(source.contains("PRIMARY KEY (assignment_id, permission_id)"));
+        }
+        assertTrue(migration.contains("security_version      BIGINT NOT NULL DEFAULT 0"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_organization_version"));
+        assertTrue(migration.contains("CONSTRAINT ck_sys_user_security_version CHECK (security_version >= 0)"));
+    }
+
+    @Test
     void targetFlywayV1MustBeCompleteAndMustNotReintroduceLegacySecurityOrTenantTables() throws IOException {
         String migration = readV1();
 

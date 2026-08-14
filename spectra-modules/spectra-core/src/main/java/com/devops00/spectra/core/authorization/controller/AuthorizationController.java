@@ -16,13 +16,29 @@
 
 package com.devops00.spectra.core.authorization.controller;
 
+import com.devops00.spectra.core.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
+import com.devops00.spectra.core.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeApplyFrom;
+import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationApplyFrom;
+import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.vo.AuthorizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.javabean.vo.OrganizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.authorization.service.OrganizationChangeService;
+import com.devops00.spectra.core.authorization.service.RoleAuthorizationChangeService;
 import com.devops00.spectra.core.authorization.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,19 +46,86 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 目标授权模型只读查询入口。RoleAssignment 写入仍由 Phase 4 GrantBoundary 流程统一接管。
+ * 目标授权模型查询与 Grant Boundary Preview/Apply 入口。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/14
  */
 @RestController
+@Slf4j
 @RequestMapping("/security/authorization")
 @RequiredArgsConstructor
 public class AuthorizationController {
 
     private final AuthorizationAssignmentQueryService queryService;
 
+    private final AuthorizationAssignmentChangeService changeService;
+
+    private final RoleAuthorizationChangeService roleChangeService;
+
+    private final OrganizationChangeService organizationChangeService;
+
+    @ULog("'预览部门移动影响'")
+    @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'department:update')")
+    public OrganizationChangePreviewVO departmentPreview(@PathVariable UUID departmentId,
+                                                          @Validated @RequestBody OrganizationChangeFrom from) {
+        log.debug("预览部门移动影响: departmentId={}, expectedOrganizationVersion={}", departmentId,
+                from.getExpectedOrganizationVersion());
+        return organizationChangeService.preview(departmentId, from);
+    }
+
+    @ULog("'提交部门移动变更'")
+    @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'department:update')")
+    public void departmentApply(@PathVariable UUID departmentId,
+                                @Validated @RequestBody OrganizationChangeApplyFrom from) {
+        log.debug("提交部门移动变更: departmentId={}, expectedOrganizationVersion={}", departmentId,
+                from.getExpectedOrganizationVersion());
+        organizationChangeService.apply(departmentId, from);
+    }
+
+    @ULog("'预览 Role 授权能力变更'")
+    @PostMapping(value = "/roles/{roleId}/impact-preview", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'role:grant')")
+    public RoleAuthorizationChangePreviewVO rolePreview(@PathVariable UUID roleId,
+                                                         @Validated @RequestBody RoleAuthorizationChangeFrom from) {
+        log.debug("预览 Role 授权能力变更: roleId={}, expectedVersion={}", roleId, from.getExpectedVersion());
+        return roleChangeService.preview(roleId, from);
+    }
+
+    @ULog("'提交 Role 授权能力变更'")
+    @PostMapping(value = "/roles/{roleId}/impact-apply", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'role:grant')")
+    public void roleApply(@PathVariable UUID roleId,
+                          @Validated @RequestBody RoleAuthorizationApplyFrom from) {
+        log.debug("提交 Role 授权能力变更: roleId={}, expectedVersion={}", roleId, from.getExpectedVersion());
+        roleChangeService.apply(roleId, from);
+    }
+
     @ULog("'查询用户授权实例'")
     @GetMapping(value = "/users/{userId}/assignments", version = "2.0.0+")
     @PreAuthorize("hasPermission(null ,'role:read')")
     public List<AuthorizationAssignmentView> assignments(@PathVariable UUID userId) {
         return queryService.findByUserId(userId);
+    }
+
+    @ULog("'预览用户授权实例变更'")
+    @PostMapping(value = "/users/{userId}/assignments/preview", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'role:assign')")
+    public AuthorizationChangePreviewVO preview(@PathVariable UUID userId,
+                                                @Validated @RequestBody AuthorizationAssignmentChangeFrom from) {
+        log.debug("预览用户授权实例变更: userId={}, assignmentId={}", userId, from.getAssignmentId());
+        return changeService.preview(userId, from);
+    }
+
+    @ULog("'提交用户授权实例变更'")
+    @PostMapping(value = "/users/{userId}/assignments/apply", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'role:assign')")
+    public void apply(@PathVariable UUID userId,
+                      @Validated @RequestBody AuthorizationAssignmentApplyFrom from) {
+        log.debug("提交用户授权实例变更: userId={}, assignmentId={}", userId, from.getAssignmentId());
+        changeService.apply(userId, from);
     }
 }

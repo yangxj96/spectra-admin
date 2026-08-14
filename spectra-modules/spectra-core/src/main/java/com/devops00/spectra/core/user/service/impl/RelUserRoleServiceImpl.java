@@ -18,6 +18,7 @@ package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.core.user.javabean.entity.RelUserRole;
+import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.mapper.RelUserRoleMapper;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
@@ -27,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -52,11 +52,7 @@ public class RelUserRoleServiceImpl implements RelUserRoleService {
     @Override
     @Transactional
     public void grant(UUID userId, List<UUID> roleIds) {
-        var coll = new ArrayList<RelUserRole>();
-        for (UUID roleId : roleIds) {
-            coll.add(RelUserRole.builder().userId(userId).roleId(roleId).build());
-        }
-        relUserRoleMapper.insert(coll);
+        LegacyAuthorizationWriteGuard.reject("旧用户角色关联写入口");
     }
 
     @Override

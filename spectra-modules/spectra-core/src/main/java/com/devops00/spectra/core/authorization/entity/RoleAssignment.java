@@ -46,4 +46,7 @@ public class RoleAssignment {
 
     @TableField(value = "valid_until")
     private Instant validUntil;
+
+    @TableField(value = "version")
+    private Long version;
 }

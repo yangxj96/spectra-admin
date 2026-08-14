@@ -25,7 +25,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.common.exception.DefaultDataException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
@@ -40,7 +40,6 @@ import com.devops00.spectra.core.user.mapper.RoleDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.RoleDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RoleService;
-import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -137,11 +136,8 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     }
 
     private void validateScope(DataScopeType type, List<UUID> targetIds) {
-        if (type == DataScopeType.GLOBAL && !canManageGlobalScope()) {
-            throw new DataScopeViolationException("只有系统运维角色可以授予 GLOBAL 数据范围");
-        }
-        if (type == DataScopeType.CUSTOM && (targetIds == null || targetIds.isEmpty())) {
-            throw new DataScopeViolationException("CUSTOM 数据范围必须指定至少一个目标部门");
+        if (type != null) {
+            LegacyAuthorizationWriteGuard.reject("旧角色 DataScope 写入口");
         }
     }
 
@@ -175,11 +171,4 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
         }
     }
 
-    private boolean canManageGlobalScope() {
-        var currentUser = SecUtil.getCurrentUser();
-        return currentUser != null
-                && currentUser.getAuthorities()
-                        .stream()
-                        .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
-    }
 }

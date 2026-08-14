@@ -160,6 +160,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                     return new AuthorizationAssignment(
                             assignment.getId(),
                             role.getCode(),
+                            role.getAuthorityLevel() == null ? 1 : role.getAuthorityLevel(),
                             toAccessBoundaries(
                                     accessByAssignment.getOrDefault(assignment.getId(), List.of()),
                                     permissions,

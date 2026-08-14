@@ -14,34 +14,26 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.authorization.entity;
+package com.devops00.spectra.core.system.javabean.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
-import java.util.UUID;
-
+/**
+ * 组织树安全版本。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/14
+ */
 @Data
-@TableName(value = "role", schema = "spectra_security")
-public class SecurityRole {
+@TableName(value = "sys_organization_version", schema = "spectra_core")
+public class OrganizationVersion {
 
-    @TableId(value = "id", type = IdType.INPUT)
-    private UUID id;
-
-    @TableField(value = "code")
-    private String code;
-
-    @TableField(value = "state")
-    private String state;
-
-    @TableField(value = "role_kind")
-    private String roleKind;
-
-    @TableField(value = "authority_level")
-    private Integer authorityLevel;
+    @TableId(value = "singleton_key")
+    private String singletonKey;
 
     @TableField(value = "version")
     private Long version;

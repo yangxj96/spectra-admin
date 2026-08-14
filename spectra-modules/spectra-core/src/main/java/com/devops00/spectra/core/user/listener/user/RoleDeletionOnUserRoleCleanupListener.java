@@ -20,14 +20,13 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.core.user.javabean.entity.RelUserRole;
 import com.devops00.spectra.core.user.javabean.event.RoleDeletedEvent;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
-import com.devops00.spectra.core.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import java.util.Collections;
 import java.util.UUID;
+import java.util.List;
 
 /**
  * 角色删除事件
@@ -44,8 +43,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoleDeletionOnUserRoleCleanupListener {
 
-    private final RoleService roleService;
-
     private final RelUserRoleService relUserRoleService;
 
     /**
@@ -59,26 +56,18 @@ public class RoleDeletionOnUserRoleCleanupListener {
     @TransactionalEventListener(fallbackExecution = true)
     public void handleRoleDeleted(RoleDeletedEvent event) {
         log.debug("{}角色删除事件监听-用户角色关联关系:{}", LogPrefix.CORE.p(), event.roleId());
-        // 获取保底角色
-        var defaultRole = roleService.getSystemDefaultUserRole();
         // 查询所有有这个角色的用户,
         var relUserRoles = relUserRoleService.getRelByRoleId(event.roleId());
         if (relUserRoles.isEmpty()) {
             return;
         }
-        // 如果只有这一个角色的,则移除这个角色关联关系,新增一个保底角色的关联关系,保证正常登录
-        // 如果有多个角色,则删除这个角色的关联关系即可
+        // 旧角色关联写入口已冻结；这里只做历史关系清理，不再自动补写旧角色。
         // 获取哪些用户有这个角色
         var userIds = relUserRoles.stream().map(RelUserRole::getUserId).distinct().toList();
         // 循环查询这个用户的角色进行处理
         for (UUID userId : userIds) {
-            var roles = relUserRoleService.getRoles(userId);
-            // 他只有一个角色的情况,取消了关联就要给他一个默认保底
-            if (roles.size() <= 1) {
-                relUserRoleService.grant(userId, Collections.singletonList(defaultRole.getId()));
-            }
             // 取消关联
-            relUserRoleService.revoke(userId, Collections.singletonList(event.roleId()));
+            relUserRoleService.revoke(userId, List.of(event.roleId()));
         }
     }
 }

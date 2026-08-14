@@ -27,11 +27,11 @@ import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.auth.service.PasswordCredentialService;
+import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
-import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScopeTarget;
@@ -41,7 +41,6 @@ import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
-import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
 import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
@@ -80,8 +79,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final RelUserRoleService relUserRoleService;
 
-    private final RoleMapper roleMapper;
-
     private final DepartmentService departmentService;
 
     private final PasswordEncoder passwordEncoder;
@@ -109,6 +106,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
+        if (CollUtils.isNotEmpty(params.getRoleIds())) {
+            LegacyAuthorizationWriteGuard.reject("旧用户角色关联写入口");
+        }
         if (params.getStatus() != UserStatus.ACTIVE) {
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
@@ -122,8 +122,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 目标认证模型将身份标识和密码凭证拆分保存；临时密码只保存其哈希。
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
-        // 关联角色
-        relUserRoleService.grant(entity.getId(), params.getRoleIds());
         // 更新用户数据范围
         this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
     }
@@ -152,6 +150,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
+        if (params.getRoleIds() != null) {
+            LegacyAuthorizationWriteGuard.reject("旧用户角色关联写入口");
+        }
         if (params.getStatus() != entity.getStatus()) {
             throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
@@ -170,59 +171,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 数据范围修改
         this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
 
-        // 角色处理
-        // 判断角色是否修改过,有角色就要判断下角色是否修改过了
-        var currentRoles = new HashSet<>(relUserRoleService.getRoles(params.getId()).stream().map(Role::getId).toList());
-        var targetRoles = new HashSet<>(params.getRoleIds() != null ? params.getRoleIds() : List.of());
-
-        // 计算要删除的
-        var roleToDelete = new HashSet<>(currentRoles);
-        roleToDelete.removeAll(targetRoles);
-
-        if (!roleToDelete.isEmpty()) {
-            List<UUID> deleteList = List.copyOf(roleToDelete);
-            try {
-                relUserRoleService.revoke(entity.getId(), deleteList);
-            } catch (Exception e) {
-                log.error("删除角色关联失败，未完全删除,{}", e.getMessage(), e);
-                throw new EntityUpdateException("删除角色关联失败，未完全删除");
-            }
-        }
-
-        // 计算要插入的角色
-        var roleToInsert = new HashSet<>(targetRoles);
-        roleToInsert.removeAll(currentRoles);
-
-        if (!roleToInsert.isEmpty()) {
-            List<UUID> insertList = List.copyOf(roleToInsert);
-            try {
-                relUserRoleService.grant(entity.getId(), insertList);
-            } catch (Exception e) {
-                log.error("新增角色关联失败，未完全插入,{}", e.getMessage(), e);
-                throw new EntityUpdateException("新增角色关联失败，未完全插入");
-            }
-        }
     }
 
     @Override
     @Transactional
     public void replaceRoles(UUID userId, List<UUID> roleIds) {
-        if (this.getById(userId) == null) {
-            throw new DataNotExistException("用户不存在");
-        }
-        var targetIds = new HashSet<>(roleIds == null ? List.<UUID>of() : roleIds);
-        if (targetIds.isEmpty()) {
-            throw new DataException("用户至少需要关联一个角色");
-        }
-        var activeRoleCount = roleMapper
-                .selectCount(new LambdaQueryWrapper<Role>().in(Role::getId, targetIds).eq(Role::getState, Boolean.TRUE).isNull(Role::getDeleted));
-        if (activeRoleCount != targetIds.size()) {
-            throw new DataNotExistException("存在无效或禁用角色");
-        }
-        relUserRoleService.revoke(userId);
-        relUserRoleService.grant(userId, List.copyOf(targetIds));
-        // RoleAssignment 变化立即撤销该用户的全部 Session，避免旧权限继续生效。
-        SecUtil.kick(userId);
+        LegacyAuthorizationWriteGuard.reject("旧用户角色覆盖写入口");
     }
 
     @Override
@@ -422,8 +376,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             dataScopeTargetMapper.removeByUserId(userId);
             return;
         }
-        if (type == DataScopeType.GLOBAL && !canManageGlobalScope()) {
-            throw new DataScopeViolationException("只有系统运维角色可以授予 GLOBAL 数据范围");
+        if (type != null) {
+            LegacyAuthorizationWriteGuard.reject("旧用户 DataScope 写入口");
         }
         if (type == DataScopeType.CUSTOM && CollUtils.isEmpty(targetIds)) {
             throw new DataScopeViolationException("CUSTOM 数据范围必须指定至少一个目标部门");
@@ -452,14 +406,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             }
             dataScopeTargetMapper.insert(targets);
         }
-    }
-
-    private boolean canManageGlobalScope() {
-        var currentUser = SecUtil.getCurrentUser();
-        return currentUser != null
-                && currentUser.getAuthorities()
-                        .stream()
-                        .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()) || "*".equals(authority.getAuthority()));
     }
 
     /**

@@ -19,6 +19,8 @@ package com.devops00.spectra.core.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.UUID;
@@ -32,6 +34,31 @@ import java.util.UUID;
  */
 @Mapper
 public interface DepartmentMapper extends BaseMapper<Department> {
+
+    /**
+     * 清理组织闭包表，调用方必须在同一事务中随后重建。
+     */
+    @Delete("DELETE FROM spectra_core.sys_department_closure")
+    int clearClosure();
+
+    /**
+     * 按当前邻接关系重建组织闭包表。
+     */
+    @Insert("""
+            WITH RECURSIVE department_tree AS (
+                SELECT id AS ancestor_id, id AS descendant_id, 0 AS depth, ARRAY[id] AS path
+                FROM spectra_core.sys_department
+                UNION ALL
+                SELECT tree.ancestor_id, child.id, tree.depth + 1, tree.path || child.id
+                FROM department_tree tree
+                JOIN spectra_core.sys_department child ON child.pid = tree.descendant_id
+                WHERE NOT child.id = ANY(tree.path)
+            )
+            INSERT INTO spectra_core.sys_department_closure (ancestor_id, descendant_id, depth)
+            SELECT ancestor_id, descendant_id, depth
+            FROM department_tree
+            """)
+    int rebuildClosure();
 
     /**
      * 根据ID生成组织机构路径
