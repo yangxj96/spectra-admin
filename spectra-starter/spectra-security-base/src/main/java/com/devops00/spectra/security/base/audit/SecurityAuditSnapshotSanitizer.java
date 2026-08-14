@@ -18,6 +18,7 @@ package com.devops00.spectra.security.base.audit;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -59,7 +60,7 @@ public final class SecurityAuditSnapshotSanitizer {
             }
             sanitized.put(key, sanitizeValue(value));
         });
-        return Map.copyOf(sanitized);
+        return Collections.unmodifiableMap(new LinkedHashMap<>(sanitized));
     }
 
     private static Object sanitizeValue(Object value) {
@@ -70,10 +71,10 @@ public final class SecurityAuditSnapshotSanitizer {
                     nestedMap.put(key.toString(), sanitizeValue(nestedValue));
                 }
             });
-            return Map.copyOf(nestedMap);
+            return Collections.unmodifiableMap(new LinkedHashMap<>(nestedMap));
         }
         if (value instanceof Collection<?> collection) {
-            return collection.stream().map(SecurityAuditSnapshotSanitizer::sanitizeValue).toList();
+            return Collections.unmodifiableList(collection.stream().map(SecurityAuditSnapshotSanitizer::sanitizeValue).toList());
         }
         if (value != null && value.getClass().isArray()) {
             int length = java.lang.reflect.Array.getLength(value);
@@ -81,7 +82,7 @@ public final class SecurityAuditSnapshotSanitizer {
             for (int index = 0; index < length; index++) {
                 values.add(sanitizeValue(java.lang.reflect.Array.get(value, index)));
             }
-            return ListCopy.copy(values);
+            return Collections.unmodifiableList(new ArrayList<>(values));
         }
         return value;
     }
@@ -89,16 +90,5 @@ public final class SecurityAuditSnapshotSanitizer {
     private static boolean isSensitiveKey(String key) {
         String normalized = key.replaceAll("[^A-Za-z0-9]", "").toLowerCase(Locale.ROOT);
         return SENSITIVE_KEYS.contains(normalized) || normalized.endsWith("secret") || normalized.endsWith("token");
-    }
-
-    /** 避免向外暴露可变 ArrayList。 */
-    private static final class ListCopy {
-
-        private ListCopy() {
-        }
-
-        private static <T> java.util.List<T> copy(Collection<T> values) {
-            return java.util.List.copyOf(values);
-        }
     }
 }

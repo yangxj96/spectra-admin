@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.base.audit;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -94,6 +95,6 @@ public record SecurityAuditEvent(UUID eventId,
         if (source == null || source.isEmpty()) {
             return Map.of();
         }
-        return Map.copyOf(new LinkedHashMap<>(source));
+        return Collections.unmodifiableMap(new LinkedHashMap<>(source));
     }
 }

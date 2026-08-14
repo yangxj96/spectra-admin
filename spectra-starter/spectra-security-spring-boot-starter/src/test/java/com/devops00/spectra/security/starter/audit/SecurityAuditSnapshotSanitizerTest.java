@@ -21,6 +21,7 @@ import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -44,5 +45,15 @@ class SecurityAuditSnapshotSanitizerTest {
         assertFalse(((Map<?, ?>) event.before().get("nested")).containsKey("refresh_token"));
         assertEquals("safe", ((Map<?, ?>) ((List<?>) event.before().get("items")).getFirst()).get("name"));
         assertFalse(((Map<?, ?>) ((List<?>) event.before().get("items")).getFirst()).containsKey("clientSecret"));
+    }
+
+    @Test
+    void shouldKeepLegitimateNullValuesInImmutableSnapshots() {
+        var before = new HashMap<String, Object>();
+        before.put("nickname", null);
+        var event = new SecurityAuditEvent(null, "PROFILE_UPDATED", null, null, "WEB", null, null,
+                before, Map.of(), "test", null, AuditResult.STARTED, "corr");
+
+        assertEquals(null, event.before().get("nickname"));
     }
 }
