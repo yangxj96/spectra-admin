@@ -21,7 +21,7 @@ import com.devops00.spectra.ai.javabean.from.AiConversationRenameFrom;
 import com.devops00.spectra.ai.javabean.vo.ChatMessageVO;
 import com.devops00.spectra.ai.service.AiConversationService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +46,8 @@ public class AiConversationController {
 
     private final AiConversationService conversationService;
 
+    private final SecurityContextAccessor securityContextAccessor;
+
     /**
      * 获取当前用户的会话列表
      */
@@ -53,7 +55,7 @@ public class AiConversationController {
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'ai:read')")
     public List<AiConversation> list() {
-        return conversationService.listByUser(SecUtil.getCurrentUserId());
+        return conversationService.listByUser(securityContextAccessor.currentUserId());
     }
 
     /**
@@ -63,7 +65,7 @@ public class AiConversationController {
     @PutMapping(value = "/{id}/title", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'ai:update')")
     public void rename(@PathVariable UUID id, @Validated @ModelAttribute AiConversationRenameFrom from) {
-        conversationService.rename(id, SecUtil.getCurrentUserId(), from.getTitle());
+        conversationService.rename(id, securityContextAccessor.currentUserId(), from.getTitle());
     }
 
     /**
@@ -73,7 +75,7 @@ public class AiConversationController {
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'ai:delete')")
     public void deleteById(@PathVariable UUID id) {
-        conversationService.delete(id, SecUtil.getCurrentUserId());
+        conversationService.delete(id, securityContextAccessor.currentUserId());
     }
 
     /**
@@ -83,6 +85,6 @@ public class AiConversationController {
     @GetMapping(value = "/{id}/messages", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'ai:read')")
     public List<ChatMessageVO> messages(@PathVariable UUID id) {
-        return conversationService.getMessages(id, SecUtil.getCurrentUserId());
+        return conversationService.getMessages(id, securityContextAccessor.currentUserId());
     }
 }

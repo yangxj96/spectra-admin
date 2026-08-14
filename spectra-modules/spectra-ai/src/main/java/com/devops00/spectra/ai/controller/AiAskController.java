@@ -22,7 +22,7 @@ import com.devops00.spectra.ai.javabean.from.AiAskFrom;
 import com.devops00.spectra.ai.javabean.vo.OpenAIStreamVO;
 import com.devops00.spectra.ai.service.AiConversationService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -58,15 +58,17 @@ public class AiAskController {
 
     private final ObjectMapper om;
 
+    private final SecurityContextAccessor securityContextAccessor;
+
     @ULog("'AI对话流式问答'")
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'ai:create')")
     public Flux<String> stream(@Validated @RequestBody AiAskFrom from) {
         UUID conversationId = from.getConversationId();
         if (conversationId == null) {
-            conversationId = conversationService.create(SecUtil.getCurrentUserId(), from.getMessage());
+            conversationId = conversationService.create(securityContextAccessor.currentUserId(), from.getMessage());
         }
-        AiMemoryId memoryId = new AiMemoryId(conversationId.toString(), SecUtil.getCurrentToken());
+        AiMemoryId memoryId = new AiMemoryId(conversationId.toString(), securityContextAccessor.currentToken());
 
         String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
         final String convId = conversationId.toString();

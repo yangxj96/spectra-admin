@@ -20,9 +20,10 @@ import com.devops00.spectra.ai.base.AiMemoryId;
 import com.devops00.spectra.ai.base.AiToolMarker;
 import com.devops00.spectra.ai.base.ToolExecutor;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.ToolMemoryId;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -39,7 +40,10 @@ import java.time.format.DateTimeFormatter;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class TimeTools implements AiToolMarker {
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
@@ -49,7 +53,7 @@ public class TimeTools implements AiToolMarker {
     @Tool("获取当前日期和时间，返回标准的ISO 8601格式字符串")
     public String getCurrentDateTimeISO(@ToolMemoryId AiMemoryId memoryId) {
         return ToolExecutor.execute(memoryId.token(), _ -> {
-            String zoneId = SecUtil.getCurrentUserZoneId();
+            String zoneId = securityContextAccessor.currentUserZoneId();
             log.debug("{}当前用户时区:{}", LogPrefix.AI.p(), zoneId);
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of(zoneId));
             return now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
