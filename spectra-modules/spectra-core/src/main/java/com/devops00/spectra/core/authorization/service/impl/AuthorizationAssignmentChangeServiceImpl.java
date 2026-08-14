@@ -58,7 +58,7 @@ import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
 import com.devops00.spectra.security.base.change.HighRiskApprovalGate;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -109,6 +109,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private final AuthorizationChangeTokenService tokenService;
     private final AuthorizationEpochGuard epochGuard;
     private final SecuritySessionRevocationPort sessionRevocationPort;
+
+    private final SecurityContextAccessor securityContextAccessor;
     private final SecurityChangeExecutor securityChangeExecutor;
     private final ObjectProvider<RootAuthorizationPolicy> rootAuthorizationPolicy;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
@@ -340,7 +342,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     }
 
     private UUID currentOperatorId() {
-        var operatorId = SecUtil.getCurrentUserId();
+        var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
             throw new DataException("无法识别当前安全主体");
         }

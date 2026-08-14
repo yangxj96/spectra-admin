@@ -51,7 +51,9 @@ import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
+import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -98,6 +100,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final SecurityContextAccessor securityContextAccessor;
+
+    private final SecuritySessionQueryPort securitySessionQueryPort;
+
+    private final SecuritySessionRevocationPort securitySessionRevocationPort;
+
     @Override
     public User getByEmail(String email) {
         if (StrUtils.isBlank(email)) {
@@ -138,7 +146,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("用户不存在");
         }
         // 根据用户强制注销账号登录信息
-        SecUtil.kick(user.getId());
+        securitySessionRevocationPort.revokeUserSessions(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
         // 撤销认证身份；目标 schema 保留身份历史，不物理删除安全事实。
@@ -197,7 +205,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         appendAudit("PASSWORD_RESET", uid, Map.of(), Map.of("mustChange", true), "管理员重置密码");
         // 密码凭证变化后，所有设备必须重新认证。
-        SecUtil.kick(uid);
+        securitySessionRevocationPort.revokeUserSessions(uid);
     }
 
     @Override
@@ -236,7 +244,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     public List<UserOnlineVO> online(PageFrom page) {
-        return SecUtil.online();
+        return securitySessionQueryPort.listOnlineUsers();
     }
 
     @Override
@@ -308,7 +316,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false);
         appendAudit("PASSWORD_CHANGED", userId, Map.of(), Map.of("mustChange", false), "用户修改密码");
         // 密码变化包括当前设备在内全部 Session 失效。
-        SecUtil.kick(userId);
+        securitySessionRevocationPort.revokeUserSessions(userId);
         log.info("用户 {} 修改密码成功", userId);
     }
 
@@ -357,8 +365,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             if (target == UserStatus.DEPARTED) {
                 relUserRoleService.revoke(userId);
             }
-            // Redis/Session 核心依赖不可用时 SecUtil.kick 会 fail-closed，事务随之回滚。
-            SecUtil.kick(userId);
+            // Redis/Session 核心依赖不可用时撤销端口会 fail-closed，事务随之回滚。
+            securitySessionRevocationPort.revokeUserSessions(userId);
             return Boolean.TRUE;
         });
     }
@@ -385,7 +393,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     private UUID currentOperatorId() {
-        var currentUser = SecUtil.getCurrentUser();
+        var currentUser = securityContextAccessor.currentUser();
         return currentUser == null ? null : currentUser.getId();
     }
 

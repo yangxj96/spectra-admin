@@ -21,7 +21,7 @@ import com.devops00.spectra.core.auth.javabean.from.BindPhoneFrom;
 import com.devops00.spectra.core.auth.javabean.vo.AccountVO;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +46,8 @@ public class AccountController {
 
     private final AccountService accountService;
 
+    private final SecurityContextAccessor securityContextAccessor;
+
     /**
      * 获取当前用户绑定的账号列表
      */
@@ -53,7 +55,7 @@ public class AccountController {
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'account:read')")
     public List<AccountVO> list() {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         var accounts = accountService.listByUserId(userId);
 
         return accounts.stream().map(account -> {
@@ -75,7 +77,7 @@ public class AccountController {
     @PostMapping(value = "/bindPhone", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindPhone(@Validated @RequestBody BindPhoneFrom params) {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         accountService.bindPhone(userId, params.getPhone(), params.getCode());
     }
 
@@ -86,7 +88,7 @@ public class AccountController {
     @PostMapping(value = "/bindEmail", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindEmail(@Validated @RequestBody BindEmailFrom params) {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         accountService.bindEmail(userId, params.getEmail(), params.getCode());
     }
 
@@ -97,7 +99,7 @@ public class AccountController {
     @DeleteMapping(value = "/unbind/{accountId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void unbind(@PathVariable UUID accountId) {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         accountService.unbind(userId, accountId);
     }
 

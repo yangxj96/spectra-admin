@@ -14,26 +14,26 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.security.change;
+package com.devops00.spectra.security.base.change;
 
-import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
-import com.devops00.spectra.security.base.holder.SecUtil;
-import org.springframework.stereotype.Service;
+import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 
-import java.util.UUID;
+import java.util.List;
 
 /**
- * Phase 5 v2 Session 接入前的撤销适配器；任何 Redis 失败均继续由 SecUtil fail-closed 处理。
+ * 安全 Session 查询端口。
+ *
+ * <p>业务模块只依赖该端口，不直接依赖 Redis 会话策略或静态安全工具。</p>
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/14
  */
-@Service
-public class LegacySecuritySessionRevocationPort implements SecuritySessionRevocationPort {
+@FunctionalInterface
+public interface SecuritySessionQueryPort {
 
-    @Override
-    public void revokeUserSessions(UUID userId) {
-        SecUtil.kick(userId);
-    }
+    /**
+     * 查询当前在线用户及其会话摘要。
+     */
+    List<UserOnlineVO> listOnlineUsers();
 }

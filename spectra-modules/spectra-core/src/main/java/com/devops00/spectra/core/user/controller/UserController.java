@@ -26,7 +26,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,8 +50,11 @@ public class UserController {
 
     private final UserService bindService;
 
-    public UserController(UserService bindService) {
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public UserController(UserService bindService, SecurityContextAccessor securityContextAccessor) {
         this.bindService = bindService;
+        this.securityContextAccessor = securityContextAccessor;
     }
 
     @ULog("'创建用户'")
@@ -149,7 +152,7 @@ public class UserController {
     @GetMapping(value = "/profile", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
     public UserProfileVO getProfile() {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         return bindService.getProfile(userId);
     }
 
@@ -157,7 +160,7 @@ public class UserController {
     @PutMapping(value = "/profile", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
     public void updateProfile(@Validated @RequestBody UserProfileFrom params) {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         bindService.updateProfile(userId, params);
     }
 
@@ -165,7 +168,7 @@ public class UserController {
     @PutMapping(value = "/password", version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
     public void changePassword(@Validated @RequestBody ChangePasswordFrom params) {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         bindService.changePassword(userId, params);
     }
 }

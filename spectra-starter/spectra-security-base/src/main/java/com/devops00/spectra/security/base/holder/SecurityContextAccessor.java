@@ -1,0 +1,32 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ */
+
+package com.devops00.spectra.security.base.holder;
+
+import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import org.jspecify.annotations.Nullable;
+
+import java.util.UUID;
+
+/**
+ * 业务层读取当前安全上下文的窄端口；会话、Token 和 Redis 细节留在适配层。
+ */
+public interface SecurityContextAccessor {
+
+    @Nullable
+    SecurityUser currentUser();
+
+    @Nullable
+    UUID currentUserId();
+
+    @Nullable
+    String currentToken();
+
+    String currentUserZoneId();
+
+    String currentUsername();
+}

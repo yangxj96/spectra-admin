@@ -23,7 +23,7 @@ import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +40,8 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
     private final UserService userService;
 
     private final DataScopeProvider dataScopeProvider;
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public List<NotificationRecipient> resolve(List<UUID> userIds) {
@@ -85,7 +87,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
      * 当前登录用户发起的通知必须遵守其有效数据范围；无登录上下文的定时任务由服务身份负责授权。
      */
     private boolean allowedByCurrentUserScope(UUID recipientUserId) {
-        var currentUserId = SecUtil.getCurrentUserId();
+        var currentUserId = securityContextAccessor.currentUserId();
         if (currentUserId == null) {
             return true;
         }

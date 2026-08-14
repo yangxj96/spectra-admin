@@ -9,7 +9,7 @@ package com.devops00.spectra.core.security.authentication.controller;
 
 import com.devops00.spectra.core.security.authentication.MfaEnrollmentResult;
 import com.devops00.spectra.core.security.authentication.MfaService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,8 +33,11 @@ public class MfaController {
 
     private final MfaService mfaService;
 
-    public MfaController(MfaService mfaService) {
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public MfaController(MfaService mfaService, SecurityContextAccessor securityContextAccessor) {
         this.mfaService = mfaService;
+        this.securityContextAccessor = securityContextAccessor;
     }
 
     @PostMapping("/totp/enroll")
@@ -59,7 +62,7 @@ public class MfaController {
     }
 
     private UUID currentUserId() {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new IllegalStateException("当前请求没有有效用户");
         }

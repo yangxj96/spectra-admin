@@ -8,7 +8,7 @@ package com.devops00.spectra.core.authorization.controller;
 
 import com.devops00.spectra.core.authorization.vo.AuthorizationContextVO;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,14 +26,18 @@ public class SecurityContextController {
 
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
-    public SecurityContextController(AuthorizationSnapshotProvider authorizationSnapshotProvider) {
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public SecurityContextController(AuthorizationSnapshotProvider authorizationSnapshotProvider,
+                                     SecurityContextAccessor securityContextAccessor) {
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
+        this.securityContextAccessor = securityContextAccessor;
     }
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public AuthorizationContextVO current() {
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new AccessDeniedException("当前认证主体缺少用户标识");
         }

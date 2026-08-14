@@ -16,10 +16,14 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
+import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
+import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecStrategyBridge;
+import com.devops00.spectra.security.starter.holder.SecHolderSecurityContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +54,21 @@ public class SecUtilConfiguration {
     @Bean
     public SecStrategyBridge secStrategyBridge(SecHolderStrategy strategy) {
         return new SecStrategyBridge(strategy);
+    }
+
+    @Bean
+    public SecurityContextAccessor securityContextAccessor(SecHolderStrategy strategy) {
+        return new SecHolderSecurityContextAccessor(strategy);
+    }
+
+    @Bean
+    public SecuritySessionRevocationPort securitySessionRevocationPort(SecHolderStrategy strategy) {
+        return strategy::deleteByUserId;
+    }
+
+    @Bean
+    public SecuritySessionQueryPort securitySessionQueryPort(SecHolderStrategy strategy) {
+        return strategy::listOnlineUsers;
     }
 
     /**

@@ -22,9 +22,7 @@ import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
-import com.devops00.spectra.security.base.holder.SecHolderStrategy;
-import com.devops00.spectra.security.base.holder.SecUtil;
-import org.junit.jupiter.api.AfterEach;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -55,14 +53,13 @@ class CoreNotificationRecipientDirectoryTest {
 
     private DataScopeProvider dataScopeProvider;
 
-    private SecHolderStrategy security;
+    private SecurityContextAccessor security;
 
     @BeforeEach
     void setUp() {
         userService = mock(UserService.class);
         dataScopeProvider = mock(DataScopeProvider.class);
-        security = mock(SecHolderStrategy.class);
-        SecUtil.setHolder(security);
+        security = mock(SecurityContextAccessor.class);
         var recipient = new User();
         recipient.setId(RECIPIENT_USER);
         recipient.setStatus(UserStatus.ACTIVE);
@@ -70,12 +67,7 @@ class CoreNotificationRecipientDirectoryTest {
         recipient.setPhone("13800138000");
         recipient.setDepartmentId(CURRENT_DEPARTMENT);
         when(userService.getById(RECIPIENT_USER)).thenReturn(recipient);
-        when(security.getCurrentUserId()).thenReturn(CURRENT_USER);
-    }
-
-    @AfterEach
-    void tearDown() {
-        SecUtil.setHolder(null);
+        when(security.currentUserId()).thenReturn(CURRENT_USER);
     }
 
     @Test
@@ -106,7 +98,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     @Test
     void shouldAllowSystemTaskWithoutUserContext() {
-        when(security.getCurrentUserId()).thenReturn(null);
+        when(security.currentUserId()).thenReturn(null);
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -136,6 +128,6 @@ class CoreNotificationRecipientDirectoryTest {
     }
 
     private CoreNotificationRecipientDirectory directory() {
-        return new CoreNotificationRecipientDirectory(userService, dataScopeProvider);
+        return new CoreNotificationRecipientDirectory(userService, dataScopeProvider, security);
     }
 }
