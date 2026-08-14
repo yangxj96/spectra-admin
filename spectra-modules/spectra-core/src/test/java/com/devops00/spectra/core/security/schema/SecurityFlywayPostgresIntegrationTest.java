@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV9() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV12() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,11 +70,20 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9"), versions);
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"), versions);
             assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "security_audit_archive_manifest"));
             assertTrue(tableExists(connection, "spectra_security", "assignment_permission_boundary"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope_target"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_role_data_scope"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_role_data_scope_target"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_rel_user_role"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_rel_role_authority"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_rel_role_menu"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_authority"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_role"));
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.permission")) {
                 resultSet.next();
