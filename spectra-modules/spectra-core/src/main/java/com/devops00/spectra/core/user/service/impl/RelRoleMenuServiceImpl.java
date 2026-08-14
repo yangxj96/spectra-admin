@@ -20,14 +20,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
+import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
 import com.devops00.spectra.core.system.service.MenuService;
-import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
-import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,13 +53,17 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
     private final MenuConverter menuConverter;
 
-    private final RelRoleMenuMapper relRoleMenuMapper;
+    private final SecurityRoleMenuMapper securityRoleMenuMapper;
+
+    private final SecurityRoleMapper securityRoleMapper;
 
     private final MenuService menuService;
 
-    public RelRoleMenuServiceImpl(MenuConverter menuConverter, RelRoleMenuMapper relRoleMenuMapper, MenuService menuService) {
+    public RelRoleMenuServiceImpl(MenuConverter menuConverter, SecurityRoleMenuMapper securityRoleMenuMapper,
+                                  SecurityRoleMapper securityRoleMapper, MenuService menuService) {
         this.menuConverter = menuConverter;
-        this.relRoleMenuMapper = relRoleMenuMapper;
+        this.securityRoleMenuMapper = securityRoleMenuMapper;
+        this.securityRoleMapper = securityRoleMapper;
         this.menuService = menuService;
     }
 
@@ -67,6 +72,13 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     public void grant(UUID roleId, RoleMenuFrom from) {
         if (!Objects.equals(roleId, from.getRoleId())) {
             throw new DataException("路径角色ID与请求角色ID不一致");
+        }
+        var role = securityRoleMapper.selectById(roleId);
+        if (role == null) {
+            throw new DataNotExistException("角色不存在");
+        }
+        if (!Objects.equals("ACTIVE", role.getState())) {
+            throw new DataException("停用角色不能配置菜单");
         }
 
         var requestedIds = new HashSet<>(from.getMenuIds());
@@ -85,26 +97,28 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         }
 
         // 当前角色关联的菜单信息
-        var currentIds = relRoleMenuMapper.getByRoleId(roleId).stream().map(RelRoleMenu::getMenuId).collect(Collectors.toSet());
+        var currentIds = securityRoleMenuMapper.selectList(new LambdaQueryWrapper<SecurityRoleMenu>()
+                        .eq(SecurityRoleMenu::getRoleId, roleId))
+                .stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet());
 
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);
         removeIds.removeAll(targetIds); // current - target = 删除
         if (CollUtils.isNotEmpty(removeIds)) {
-            var wrapper = new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, roleId).in(RelRoleMenu::getMenuId, removeIds);
-            relRoleMenuMapper.delete(wrapper);
+            var wrapper = new LambdaQueryWrapper<SecurityRoleMenu>().eq(SecurityRoleMenu::getRoleId, roleId)
+                    .in(SecurityRoleMenu::getMenuId, removeIds);
+            securityRoleMenuMapper.delete(wrapper);
         }
         // 计算新增且插入
         var addIds = new HashSet<>(targetIds);
         addIds.removeAll(currentIds); // target - current = 新增
         if (CollUtils.isNotEmpty(addIds)) {
-            List<RelRoleMenu> newMenu = addIds.stream().map(addId -> {
-                var datum = new RelRoleMenu();
+            addIds.stream().map(addId -> {
+                var datum = new SecurityRoleMenu();
                 datum.setRoleId(roleId);
                 datum.setMenuId(addId);
                 return datum;
-            }).collect(Collectors.toList());
-            relRoleMenuMapper.insert(newMenu);
+            }).forEach(securityRoleMenuMapper::insert);
         }
     }
 
@@ -112,8 +126,8 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     @Transactional
     public void revoke(UUID roleId) {
         // 删除角色关联的菜单
-        var wrapper = new LambdaQueryWrapper<RelRoleMenu>().eq(RelRoleMenu::getRoleId, roleId);
-        relRoleMenuMapper.delete(wrapper);
+        var wrapper = new LambdaQueryWrapper<SecurityRoleMenu>().eq(SecurityRoleMenu::getRoleId, roleId);
+        securityRoleMenuMapper.delete(wrapper);
     }
 
     @Override

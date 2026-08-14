@@ -24,8 +24,8 @@ import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import com.devops00.spectra.core.system.service.*;
 import com.devops00.spectra.core.user.javabean.entity.Authority;
-import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
+import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
 import com.devops00.spectra.core.user.service.AuthorityService;
 import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
@@ -119,9 +119,10 @@ class SystemControllerTest {
      */
     @Test
     void initRoles() {
-        var roles = List.of(newRole("运维管理员", "ROLE_DEV_OPS"), newRole("系统管理员", "ROLE_ADMIN_SYSTEM"), newRole("用户", "ROLE_USER"),
-                newRole("审计员", "ROLE_AUDIT"));
-        roleService.saveBatch(roles);
+        for (var role : List.of(newRole("运维管理员", "ROLE_DEV_OPS"), newRole("系统管理员", "ROLE_ADMIN_SYSTEM"), newRole("用户", "ROLE_USER"),
+                newRole("审计员", "ROLE_AUDIT"))) {
+            roleService.created(role);
+        }
     }
 
     /**
@@ -342,12 +343,11 @@ class SystemControllerTest {
         return menu;
     }
 
-    private Role newRole(String name, String code) {
-        var role = new Role();
+    private RoleFrom newRole(String name, String code) {
+        var role = new RoleFrom();
         role.setName(name);
         role.setCode(code);
         role.setState(Boolean.TRUE);
-        role.setBuiltin(Boolean.TRUE);
         return role;
     }
 

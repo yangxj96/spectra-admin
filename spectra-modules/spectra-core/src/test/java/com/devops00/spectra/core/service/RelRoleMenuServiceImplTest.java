@@ -21,13 +21,15 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.core.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
 import com.devops00.spectra.core.system.service.MenuService;
-import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
-import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import com.devops00.spectra.core.user.service.impl.RelRoleMenuServiceImpl;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -46,7 +48,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyCollection;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 /**
@@ -64,7 +65,10 @@ class RelRoleMenuServiceImplTest {
     private MenuConverter menuConverter;
 
     @Mock
-    private RelRoleMenuMapper relRoleMenuMapper;
+    private SecurityRoleMenuMapper securityRoleMenuMapper;
+
+    @Mock
+    private SecurityRoleMapper securityRoleMapper;
 
     @Mock
     private MenuService menuService;
@@ -75,8 +79,8 @@ class RelRoleMenuServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), RelRoleMenu.class);
-        service = new RelRoleMenuServiceImpl(menuConverter, relRoleMenuMapper, menuService);
+        TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""), SecurityRoleMenu.class);
+        service = new RelRoleMenuServiceImpl(menuConverter, securityRoleMenuMapper, securityRoleMapper, menuService);
         validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
@@ -86,34 +90,36 @@ class RelRoleMenuServiceImplTest {
         var menuA = UUID.randomUUID();
         var menuB = UUID.randomUUID();
         var menuC = UUID.randomUUID();
-        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of(new RelRoleMenu(roleId, menuA), new RelRoleMenu(roleId, menuB)));
+        when(securityRoleMapper.selectById(roleId)).thenReturn(activeRole(roleId));
+        when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation(roleId, menuA), relation(roleId, menuB)));
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(menuB, MenuType.MENU), menu(menuC, MenuType.MENU)));
 
         service.grant(roleId, new RoleMenuFrom(roleId, List.of(menuB, menuC)));
 
         var deleteCaptor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
-        verify(relRoleMenuMapper).delete(deleteCaptor.capture());
+        verify(securityRoleMenuMapper).delete(deleteCaptor.capture());
         var deleteWrapper = deleteCaptor.getValue();
         assertTrue(deleteWrapper.getTargetSql().contains("role_id"));
         assertTrue(deleteWrapper.getTargetSql().contains("menu_id"));
         assertTrue(deleteWrapper.getParamNameValuePairs().containsValue(roleId));
         assertTrue(deleteWrapper.getParamNameValuePairs().containsValue(menuA));
 
-        ArgumentCaptor<List<RelRoleMenu>> insertCaptor = ArgumentCaptor.forClass((Class) List.class);
-        verify(relRoleMenuMapper).insert(insertCaptor.capture());
-        assertEquals(List.of(menuC), insertCaptor.getValue().stream().map(RelRoleMenu::getMenuId).toList());
+        ArgumentCaptor<SecurityRoleMenu> insertCaptor = ArgumentCaptor.forClass(SecurityRoleMenu.class);
+        verify(securityRoleMenuMapper).insert(insertCaptor.capture());
+        assertEquals(menuC, insertCaptor.getValue().getMenuId());
     }
 
     @Test
     void grantShouldAllowClearingAllMenus() {
         var roleId = UUID.randomUUID();
         var menuId = UUID.randomUUID();
-        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of(new RelRoleMenu(roleId, menuId)));
+        when(securityRoleMapper.selectById(roleId)).thenReturn(activeRole(roleId));
+        when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation(roleId, menuId)));
 
         service.grant(roleId, new RoleMenuFrom(roleId, List.of()));
 
-        verify(relRoleMenuMapper).delete(org.mockito.ArgumentMatchers.<LambdaQueryWrapper<RelRoleMenu>>any());
-        verify(relRoleMenuMapper, never()).insert(anyList());
+        verify(securityRoleMenuMapper).delete(org.mockito.ArgumentMatchers.<LambdaQueryWrapper<SecurityRoleMenu>>any());
+        verify(securityRoleMenuMapper, never()).insert((SecurityRoleMenu) any());
     }
 
     @Test
@@ -137,14 +143,15 @@ class RelRoleMenuServiceImplTest {
         var roleId = UUID.randomUUID();
         var directoryId = UUID.randomUUID();
         var menuId = UUID.randomUUID();
-        when(relRoleMenuMapper.getByRoleId(roleId)).thenReturn(List.of());
+        when(securityRoleMapper.selectById(roleId)).thenReturn(activeRole(roleId));
+        when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of());
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(directoryId, MenuType.DIRECTORY), menu(menuId, MenuType.MENU)));
 
         service.grant(roleId, new RoleMenuFrom(roleId, List.of(directoryId, menuId)));
 
-        ArgumentCaptor<List<RelRoleMenu>> insertCaptor = ArgumentCaptor.forClass((Class) List.class);
-        verify(relRoleMenuMapper).insert(insertCaptor.capture());
-        assertEquals(List.of(menuId), insertCaptor.getValue().stream().map(RelRoleMenu::getMenuId).toList());
+        ArgumentCaptor<SecurityRoleMenu> insertCaptor = ArgumentCaptor.forClass(SecurityRoleMenu.class);
+        verify(securityRoleMenuMapper).insert(insertCaptor.capture());
+        assertEquals(menuId, insertCaptor.getValue().getMenuId());
     }
 
     @Test
@@ -152,6 +159,7 @@ class RelRoleMenuServiceImplTest {
         var roleId = UUID.randomUUID();
         var knownId = UUID.randomUUID();
         var unknownId = UUID.randomUUID();
+        when(securityRoleMapper.selectById(roleId)).thenReturn(activeRole(roleId));
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(menu(knownId, MenuType.MENU)));
 
         assertThrows(DataNotExistException.class, () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(knownId, unknownId))));
@@ -162,6 +170,7 @@ class RelRoleMenuServiceImplTest {
         var roleId = UUID.randomUUID();
         var deletedMenu = menu(UUID.randomUUID(), MenuType.MENU);
         deletedMenu.setDeleted(Instant.now());
+        when(securityRoleMapper.selectById(roleId)).thenReturn(activeRole(roleId));
         when(menuService.listByIds(anyCollection())).thenReturn(List.of(deletedMenu));
 
         assertThrows(DataNotExistException.class, () -> service.grant(roleId, new RoleMenuFrom(roleId, List.of(deletedMenu.getId()))));
@@ -172,5 +181,19 @@ class RelRoleMenuServiceImplTest {
         menu.setId(id);
         menu.setMenuType(type);
         return menu;
+    }
+
+    private static SecurityRole activeRole(UUID id) {
+        var role = new SecurityRole();
+        role.setId(id);
+        role.setState("ACTIVE");
+        return role;
+    }
+
+    private static SecurityRoleMenu relation(UUID roleId, UUID menuId) {
+        var relation = new SecurityRoleMenu();
+        relation.setRoleId(roleId);
+        relation.setMenuId(menuId);
+        return relation;
     }
 }

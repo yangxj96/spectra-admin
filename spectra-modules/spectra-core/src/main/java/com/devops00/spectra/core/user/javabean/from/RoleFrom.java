@@ -20,6 +20,7 @@ import com.devops00.spectra.common.base.Verify;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -50,6 +51,12 @@ public class RoleFrom {
      */
     @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
+
+    /**
+     * 稳定角色编码；未提供时由后端生成 ROLE_* 编码。
+     */
+    @Pattern(regexp = "^$|ROLE_[A-Z0-9_]+", message = "角色编码格式必须为 ROLE_*", groups = {Verify.Insert.class, Verify.Update.class})
+    private String code;
 
     /**
      * 状态

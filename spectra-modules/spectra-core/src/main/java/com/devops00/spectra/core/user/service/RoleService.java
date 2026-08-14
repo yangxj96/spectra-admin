@@ -17,9 +17,8 @@
 package com.devops00.spectra.core.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.user.javabean.entity.Role;
+import com.devops00.spectra.core.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
@@ -34,7 +33,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2025/6/14 00:00
  */
-public interface RoleService extends BaseService<Role> {
+public interface RoleService {
 
     /**
      * 创建角色
@@ -77,5 +76,5 @@ public interface RoleService extends BaseService<Role> {
      *
      * @return 角色信息
      */
-    Role getSystemDefaultUserRole();
+    SecurityRole getSystemDefaultUserRole();
 }

@@ -65,6 +65,16 @@ public class RoleVO implements Serializable {
     private Boolean builtin;
 
     /**
+     * 管理边界等级。
+     */
+    private Integer authorityLevel;
+
+    /**
+     * 目标角色类型。
+     */
+    private String roleKind;
+
+    /**
      * 备注
      */
     private String remark;

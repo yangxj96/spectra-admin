@@ -34,6 +34,9 @@ public class SecurityRole {
     @TableField(value = "code")
     private String code;
 
+    @TableField(value = "name")
+    private String name;
+
     @TableField(value = "state")
     private String state;
 
@@ -42,6 +45,12 @@ public class SecurityRole {
 
     @TableField(value = "authority_level")
     private Integer authorityLevel;
+
+    @TableField(value = "system_managed")
+    private Boolean systemManaged;
+
+    @TableField(value = "remark")
+    private String remark;
 
     @TableField(value = "version")
     private Long version;

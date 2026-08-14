@@ -35,13 +35,8 @@ import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.mapper.MenuMapper;
 import com.devops00.spectra.core.system.service.MenuService;
-import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
-import com.devops00.spectra.core.user.javabean.entity.Role;
-import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
-import com.devops00.spectra.core.user.service.RelUserRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,29 +62,17 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     private final MenuMapper menuMapper;
 
-    private final RelRoleMenuMapper roleMenuMapper;
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
-    private final RelUserRoleService relUserRoleService;
+    private final SecurityRoleMapper securityRoleMapper;
 
-    private final @Nullable AuthorizationSnapshotProvider authorizationSnapshotProvider;
+    private final SecurityRoleMenuMapper securityRoleMenuMapper;
 
-    private final @Nullable SecurityRoleMapper securityRoleMapper;
-
-    private final @Nullable SecurityRoleMenuMapper securityRoleMenuMapper;
-
-    public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
-                           RelUserRoleService relUserRoleService) {
-        this(menuMapper, menuConverter, roleMenuMapper, relUserRoleService, null, null, null);
-    }
-
-    @Autowired
-    public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
-                           RelUserRoleService relUserRoleService, AuthorizationSnapshotProvider authorizationSnapshotProvider,
+    public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter,
+                           AuthorizationSnapshotProvider authorizationSnapshotProvider,
                            SecurityRoleMapper securityRoleMapper, SecurityRoleMenuMapper securityRoleMenuMapper) {
         this.menuMapper = menuMapper;
         this.menuConverter = menuConverter;
-        this.roleMenuMapper = roleMenuMapper;
-        this.relUserRoleService = relUserRoleService;
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
         this.securityRoleMapper = securityRoleMapper;
         this.securityRoleMenuMapper = securityRoleMenuMapper;
@@ -163,43 +146,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     @Override
     public List<MenuTreeVO> current(UUID userId) {
-        if (authorizationSnapshotProvider != null && securityRoleMapper != null && securityRoleMenuMapper != null) {
-            return currentFromSecurityModel(userId);
-        }
-        var roleIds = relUserRoleService.getRoles(userId).stream().filter(role -> Boolean.TRUE.equals(role.getState())).map(Role::getId).toList();
-        if (CollUtils.isEmpty(roleIds)) {
-            return Collections.emptyList();
-        }
-
-        var relations = roleMenuMapper.selectList(new QueryWrapper<RelRoleMenu>().in("role_id", roleIds).isNull("deleted"));
-        if (CollUtils.isEmpty(relations)) {
-            return Collections.emptyList();
-        }
-
-        var menus = menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
-        if (CollUtils.isEmpty(menus)) {
-            return Collections.emptyList();
-        }
-
-        var menuMap = menus.stream().collect(Collectors.toMap(Menu::getId, Function.identity()));
-        var includedIds = new HashSet<UUID>();
-        for (RelRoleMenu relation : relations) {
-            var menu = menuMap.get(relation.getMenuId());
-            if (menu == null || menu.getMenuType() != MenuType.MENU) {
-                continue;
-            }
-            while (menu != null && includedIds.add(menu.getId())) {
-                menu = menuMap.get(menu.getPid());
-            }
-        }
-
-        var authorizedMenus = menus.stream().filter(menu -> includedIds.contains(menu.getId())).toList();
-        if (CollUtils.isEmpty(authorizedMenus)) {
-            return Collections.emptyList();
-        }
-        var vos = menuConverter.toTreeVOList(authorizedMenus);
-        var tree = new TreeBuilder<>(vos).buildTree(Common.PID);
-        return tree == null ? Collections.emptyList() : tree;
+        return currentFromSecurityModel(userId);
     }
 
     private List<MenuTreeVO> currentFromSecurityModel(UUID userId) {
@@ -253,11 +200,11 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     @Override
     public List<Menu> getByRelRoleId(UUID id) {
-        var relRoleMenus = roleMenuMapper.getByRoleId(id);
+        var relRoleMenus = securityRoleMenuMapper.selectList(new QueryWrapper<SecurityRoleMenu>().eq("role_id", id));
         if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();
         }
-        return menuMapper.selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(RelRoleMenu::getMenuId).toList()).isNull("deleted"))
+        return menuMapper.selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(SecurityRoleMenu::getMenuId).toList()).isNull("deleted"))
                 .stream()
                 .filter(menu -> menu.getMenuType() == MenuType.MENU)
                 .toList();

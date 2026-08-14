@@ -29,10 +29,6 @@ import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.mapper.MenuMapper;
 import com.devops00.spectra.core.system.service.impl.MenuServiceImpl;
-import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
-import com.devops00.spectra.core.user.javabean.entity.Role;
-import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
-import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.security.base.authorization.AuthorizationAssignment;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
@@ -71,39 +67,40 @@ class MenuServiceImplTest {
     private MenuConverter menuConverter;
 
     @Mock
-    private RelRoleMenuMapper relRoleMenuMapper;
-
-    @Mock
-    private RelUserRoleService relUserRoleService;
-
-    @Mock
     private SecurityRoleMapper securityRoleMapper;
 
     @Mock
     private SecurityRoleMenuMapper securityRoleMenuMapper;
 
+    @Mock
+    private AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
     private MenuServiceImpl service;
 
     @BeforeEach
     void setUp() {
-        service = new MenuServiceImpl(menuMapper, menuConverter, relRoleMenuMapper, relUserRoleService);
+        service = new MenuServiceImpl(menuMapper, menuConverter, authorizationSnapshotProvider,
+                securityRoleMapper, securityRoleMenuMapper);
     }
 
     @Test
     void currentShouldMergeRolesIncludeAncestorsPruneEmptyDirectoriesAndSort() {
         var userId = UUID.randomUUID();
-        var activeRoleA = role(true);
-        var activeRoleB = role(true);
-        var inactiveRole = role(false);
+        var activeRoleA = securityRole("ROLE_A");
+        var activeRoleB = securityRole("ROLE_B");
         var system = menu(null, MenuType.DIRECTORY, null, 2);
         var emptyRoot = menu(null, MenuType.DIRECTORY, null, 1);
         var workflow = menu(system.getId(), MenuType.DIRECTORY, null, 2);
         var workflowMenu = menu(workflow.getId(), MenuType.MENU, "SystemWorkflow", 2);
         var userMenu = menu(system.getId(), MenuType.MENU, "SystemUser", 1);
 
-        when(relUserRoleService.getRoles(userId)).thenReturn(List.of(activeRoleA, inactiveRole, activeRoleB));
-        when(relRoleMenuMapper.selectList(any())).thenReturn(List.of(new RelRoleMenu(activeRoleA.getId(), workflowMenu.getId()),
-                new RelRoleMenu(activeRoleB.getId(), workflowMenu.getId()), new RelRoleMenu(activeRoleB.getId(), userMenu.getId())));
+        when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), activeRoleA.getCode(), Map.of(), Map.of()),
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", Map.of(), Map.of()),
+                new AuthorizationAssignment(UUID.randomUUID(), activeRoleB.getCode(), Map.of(), Map.of()))));
+        when(securityRoleMapper.selectList(any())).thenReturn(List.of(activeRoleA, activeRoleB));
+        when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation(activeRoleA.getId(), workflowMenu.getId()),
+                relation(activeRoleB.getId(), workflowMenu.getId()), relation(activeRoleB.getId(), userMenu.getId())));
         when(menuMapper.selectList(any())).thenReturn(List.of(system, emptyRoot, workflow, workflowMenu, userMenu));
         when(menuConverter.toTreeVOList(any())).thenAnswer(invocation -> {
             List<Menu> menus = invocation.getArgument(0);
@@ -115,19 +112,21 @@ class MenuServiceImplTest {
         assertEquals(List.of(system.getId()), result.stream().map(MenuTreeVO::getId).toList());
         assertEquals(List.of(userMenu.getId(), workflow.getId()), result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
         assertEquals(List.of(workflowMenu.getId()), result.getFirst().getChildren().get(1).getChildren().stream().map(MenuTreeVO::getId).toList());
-        verify(relRoleMenuMapper).selectList(argThat(wrapper -> wrapper.getSqlSegment().contains("deleted")));
+        verify(securityRoleMenuMapper).selectList(any());
         verify(menuMapper).selectList(argThat(wrapper -> wrapper.getSqlSegment().contains("deleted")));
     }
 
     @Test
     void currentShouldReturnEmptyWhenUserHasNoEnabledRole() {
         var userId = UUID.randomUUID();
-        when(relUserRoleService.getRoles(userId)).thenReturn(List.of(role(false)));
+        when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", Map.of(), Map.of()))));
+        when(securityRoleMapper.selectList(any())).thenReturn(List.of());
 
         var result = service.current(userId);
 
         assertEquals(List.of(), result);
-        verify(relRoleMenuMapper, never()).selectList(any());
+        verify(securityRoleMenuMapper, never()).selectList(any());
         verify(menuMapper, never()).selectList(any());
     }
 
@@ -146,8 +145,8 @@ class MenuServiceImplTest {
         relation.setMenuId(userMenu.getId());
         AuthorizationSnapshotProvider snapshotProvider = ignored -> AuthorizationSnapshot.of(List.of(
                 new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER", Map.of(), Map.of())));
-        var securityService = new MenuServiceImpl(menuMapper, menuConverter, relRoleMenuMapper, relUserRoleService,
-                snapshotProvider, securityRoleMapper, securityRoleMenuMapper);
+        var securityService = new MenuServiceImpl(menuMapper, menuConverter, snapshotProvider,
+                securityRoleMapper, securityRoleMenuMapper);
 
         when(securityRoleMapper.selectList(any())).thenReturn(List.of(securityRole));
         when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation));
@@ -162,7 +161,7 @@ class MenuServiceImplTest {
         assertEquals(List.of(system.getId()), result.stream().map(MenuTreeVO::getId).toList());
         assertEquals(List.of(userMenu.getId()), result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
         verify(securityRoleMenuMapper).selectList(any());
-        verifyNoInteractions(relUserRoleService, relRoleMenuMapper);
+        verifyNoInteractions(authorizationSnapshotProvider);
     }
 
     @Test
@@ -274,18 +273,26 @@ class MenuServiceImplTest {
         var roleId = UUID.randomUUID();
         var directory = menu(null, MenuType.DIRECTORY, null, 0);
         var leaf = menu(directory.getId(), MenuType.MENU, "SystemUser", 0);
-        when(relRoleMenuMapper.getByRoleId(roleId))
-                .thenReturn(List.of(new RelRoleMenu(roleId, directory.getId()), new RelRoleMenu(roleId, leaf.getId())));
+        when(securityRoleMenuMapper.selectList(any()))
+                .thenReturn(List.of(relation(roleId, directory.getId()), relation(roleId, leaf.getId())));
         when(menuMapper.selectList(any())).thenReturn(List.of(directory, leaf));
 
         assertEquals(List.of(leaf), service.getByRelRoleId(roleId));
     }
 
-    private static Role role(boolean state) {
-        var role = new Role();
+    private static SecurityRole securityRole(String code) {
+        var role = new SecurityRole();
         role.setId(UUID.randomUUID());
-        role.setState(state);
+        role.setCode(code);
+        role.setState("ACTIVE");
         return role;
+    }
+
+    private static SecurityRoleMenu relation(UUID roleId, UUID menuId) {
+        var relation = new SecurityRoleMenu();
+        relation.setRoleId(roleId);
+        relation.setMenuId(menuId);
+        return relation;
     }
 
     private static Menu menu(UUID pid, MenuType menuType, String routeName, int sort) {
