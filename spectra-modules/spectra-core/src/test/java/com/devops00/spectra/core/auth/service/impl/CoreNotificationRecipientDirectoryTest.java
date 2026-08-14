@@ -16,12 +16,17 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-import com.devops00.spectra.common.constant.DataScopeType;
-import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.common.notification.NotificationRecipient;
+import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.security.base.authorization.AuthorizationAssignment;
+import com.devops00.spectra.security.base.authorization.AuthorizationScope;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.security.base.authorization.PermissionBoundary;
+import com.devops00.spectra.security.base.authorization.ScopeMode;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,14 +56,17 @@ class CoreNotificationRecipientDirectoryTest {
 
     private UserService userService;
 
-    private DataScopeProvider dataScopeProvider;
+    private AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private DepartmentService departmentService;
 
     private SecurityContextAccessor security;
 
     @BeforeEach
     void setUp() {
         userService = mock(UserService.class);
-        dataScopeProvider = mock(DataScopeProvider.class);
+        authorizationSnapshotProvider = mock(AuthorizationSnapshotProvider.class);
+        departmentService = mock(DepartmentService.class);
         security = mock(SecurityContextAccessor.class);
         var recipient = new User();
         recipient.setId(RECIPIENT_USER);
@@ -72,8 +80,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     @Test
     void shouldKeepGlobalScopeAbleToTargetAnyUser() {
-        when(dataScopeProvider.resolve(CURRENT_USER))
-                .thenReturn(new DataScopeProvider.EffectiveScope(DataScopeType.GLOBAL, CURRENT_DEPARTMENT, List.of()));
+        allowScope(AuthorizationScope.of(ScopeMode.ALL));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -87,9 +94,7 @@ class CoreNotificationRecipientDirectoryTest {
         recipient.setId(RECIPIENT_USER);
         recipient.setDepartmentId(OTHER_DEPARTMENT);
         when(userService.getById(RECIPIENT_USER)).thenReturn(recipient);
-        when(dataScopeProvider.resolve(CURRENT_USER))
-                .thenReturn(new DataScopeProvider.EffectiveScope(DataScopeType.DEPT, CURRENT_DEPARTMENT,
-                        List.of(CURRENT_DEPARTMENT)));
+        allowScope(new AuthorizationScope(ScopeMode.RULES, java.util.Set.of(CURRENT_DEPARTMENT), false));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -107,8 +112,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     @Test
     void shouldKeepSelfScopeBoundToCurrentUser() {
-        when(dataScopeProvider.resolve(CURRENT_USER))
-                .thenReturn(new DataScopeProvider.EffectiveScope(DataScopeType.SELF, CURRENT_DEPARTMENT, List.of()));
+        allowScope(AuthorizationScope.of(ScopeMode.SELF));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -118,9 +122,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     @Test
     void shouldHonorCustomDepartmentScope() {
-        when(dataScopeProvider.resolve(CURRENT_USER))
-                .thenReturn(new DataScopeProvider.EffectiveScope(DataScopeType.CUSTOM, CURRENT_DEPARTMENT,
-                        List.of(CURRENT_DEPARTMENT)));
+        allowScope(new AuthorizationScope(ScopeMode.RULES, java.util.Set.of(CURRENT_DEPARTMENT), false));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -128,6 +130,13 @@ class CoreNotificationRecipientDirectoryTest {
     }
 
     private CoreNotificationRecipientDirectory directory() {
-        return new CoreNotificationRecipientDirectory(userService, dataScopeProvider, security);
+        return new CoreNotificationRecipientDirectory(userService, authorizationSnapshotProvider, departmentService, security);
+    }
+
+    private void allowScope(AuthorizationScope scope) {
+        when(authorizationSnapshotProvider.load(CURRENT_USER)).thenReturn(AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_TEST",
+                        java.util.Map.of("user:read", new PermissionBoundary("user:read", scope)), java.util.Map.of()))));
+        when(departmentService.getById(CURRENT_DEPARTMENT)).thenReturn(null);
     }
 }

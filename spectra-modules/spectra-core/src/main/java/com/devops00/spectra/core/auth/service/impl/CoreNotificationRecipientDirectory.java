@@ -18,16 +18,21 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.constant.DataScopeType;
-import com.devops00.spectra.common.mybatis.DataScopeProvider;
+import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.security.base.authorization.ScopeMode;
+import com.devops00.spectra.security.base.authorization.ScopeQuery;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -39,7 +44,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
 
     private final UserService userService;
 
-    private final DataScopeProvider dataScopeProvider;
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private final DepartmentService departmentService;
 
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -91,21 +98,33 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         if (currentUserId == null) {
             return true;
         }
-        var scope = dataScopeProvider.resolve(currentUserId);
-        if (scope == null || scope.getScopeType() == null) {
+        AuthorizationSnapshot snapshot = authorizationSnapshotProvider.load(currentUserId);
+        var boundaries = snapshot.accessBoundaries("user:read");
+        if (!boundaries.isEmpty()
+                && boundaries.stream().allMatch(boundary -> boundary.scope().mode()
+                        == ScopeMode.SELF)
+                && !currentUserId.equals(recipientUserId)) {
             return false;
         }
-        if (scope.getScopeType() == DataScopeType.GLOBAL) {
+        if (snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId, null, java.util.Set.of()))) {
             return true;
         }
-        if (scope.getScopeType() == DataScopeType.SELF) {
-            return currentUserId.equals(recipientUserId);
+        var recipient = userService.getById(recipientUserId);
+        if (recipient == null || recipient.getDepartmentId() == null) {
+            return false;
         }
-        User recipient = userService.getById(recipientUserId);
-        return recipient != null
-                && recipient.getDepartmentId() != null
-                && scope.getTargetIds() != null
-                && scope.getTargetIds().contains(recipient.getDepartmentId());
+        return snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId,
+                recipient.getDepartmentId(), departmentLineage(recipient.getDepartmentId())));
+    }
+
+    private Set<UUID> departmentLineage(UUID departmentId) {
+        var lineage = new LinkedHashSet<UUID>();
+        var current = departmentId;
+        while (current != null && lineage.add(current)) {
+            var department = departmentService.getById(current);
+            current = department == null ? null : department.getPid();
+        }
+        return lineage;
     }
 
     private boolean hasText(String value) {

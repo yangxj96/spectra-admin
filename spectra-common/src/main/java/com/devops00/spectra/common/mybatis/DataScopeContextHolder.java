@@ -6,14 +6,13 @@
 
 package com.devops00.spectra.common.mybatis;
 
-import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
  * 数据权限请求上下文。
  * <p>
- * Web 请求由 framework 统一开启和清理；非 Web 线程不会缓存范围，避免线程池 复用时将上一个用户的范围带入下一个任务。绕过隔离只能通过
- * framework 提供 的受控执行器进入，拦截器只消费这里的状态。
+ * Web 请求由 framework 统一开启和清理；当前上下文只记录受控绕过深度，不再缓存旧版全局
+ * EffectiveScope。绕过隔离只能通过 framework 提供的受控执行器进入，拦截器只消费这里的状态。
  *
  * @author yangxj96
  * @version 1.0
@@ -49,28 +48,6 @@ public final class DataScopeContextHolder {
     }
 
     /**
-     * 读取当前用户在请求上下文中的有效数据范围。
-     */
-    public static DataScopeProvider.EffectiveScope getScope(UUID userId) {
-        Context context = CONTEXT.get();
-        if (context == null || !userId.equals(context.userId)) {
-            return null;
-        }
-        return context.scope;
-    }
-
-    /**
-     * 保存当前用户在请求上下文中的有效数据范围。
-     */
-    public static void setScope(UUID userId, DataScopeProvider.EffectiveScope scope) {
-        Context context = CONTEXT.get();
-        if (context != null) {
-            context.userId = userId;
-            context.scope = scope;
-        }
-    }
-
-    /**
      * 在受控范围内执行需要绕过数据隔离的返回值任务。
      */
     public static <T> T withBypass(Supplier<T> action) {
@@ -102,8 +79,6 @@ public final class DataScopeContextHolder {
     }
 
     private static final class Context {
-        private UUID userId;
-        private DataScopeProvider.EffectiveScope scope;
         private int bypassDepth;
     }
 }
