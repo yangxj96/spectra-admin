@@ -60,11 +60,6 @@ public class RoleVO implements Serializable {
     private String code;
 
     /**
-     * 范围
-     */
-    private Integer scope;
-
-    /**
      * 是否内置
      */
     private Boolean builtin;

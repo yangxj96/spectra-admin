@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.core.user.javabean.vo;
 
-import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.core.system.service.impl.DepartmentServiceImpl;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.framework.assembler.NameFill;
@@ -128,16 +127,6 @@ public class UserPageVO implements Serializable {
      */
     @NameFill(lookup = DepartmentServiceImpl.class, sourceField = "departmentId")
     private String departmentName;
-
-    /**
-     * 数据范围
-     */
-    private DataScopeType dataScope;
-
-    /**
-     * 自定义时的目标ID列表
-     */
-    private List<String> targetIds;
 
     /**
      * 创建时间

@@ -20,7 +20,6 @@ import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
-import com.devops00.spectra.common.constant.DataScopeType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -62,12 +61,6 @@ public class Role extends BaseEntity {
      */
     @TableField(value = "state")
     private Boolean state;
-
-    /**
-     * 范围
-     */
-    @TableField(value = "scope")
-    private DataScopeType scope;
 
     /**
      * 是否内置字段,为true则不允许他进行修改删除操作

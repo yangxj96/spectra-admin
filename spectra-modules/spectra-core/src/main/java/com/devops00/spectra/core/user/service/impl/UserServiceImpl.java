@@ -21,7 +21,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -33,16 +32,12 @@ import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
-import com.devops00.spectra.core.user.javabean.entity.UserDataScopeTarget;
 import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
-import com.devops00.spectra.core.user.mapper.UserDataScopeMapper;
-import com.devops00.spectra.core.user.mapper.UserDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
@@ -90,10 +85,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final PasswordCredentialService passwordCredentialService;
 
-    private final UserDataScopeMapper dataScopeMapper;
-
-    private final UserDataScopeTargetMapper dataScopeTargetMapper;
-
     private final NameFillExecutor fillExecutor;
 
     private final SecurityChangeExecutor securityChangeExecutor;
@@ -133,8 +124,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 目标认证模型将身份标识和密码凭证拆分保存；临时密码只保存其哈希。
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
-        // 更新用户数据范围
-        this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
     }
 
@@ -180,9 +169,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getEmail());
         }
 
-        // 数据范围修改
-        this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
-
     }
 
     @Override
@@ -227,15 +213,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             var roles = relUserRoleService.getRoles(vo.getId());
             if (null != roles && !roles.isEmpty()) {
                 vo.setRoles(roles.stream().map(roleConverter::toVO).toList());
-            }
-            // 补充数据范围
-            var scope = dataScopeMapper.findByUserId(vo.getId());
-            if (scope != null) {
-                vo.setDataScope(scope.getScopeType());
-                if (scope.getScopeType() == DataScopeType.CUSTOM) {
-                    var targets = dataScopeTargetMapper.findByUserId(vo.getId());
-                    vo.setTargetIds(targets.stream().map(target -> target.getTargetId().toString()).toList());
-                }
             }
         });
         // 响应
@@ -395,52 +372,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private UUID currentOperatorId() {
         var currentUser = securityContextAccessor.currentUser();
         return currentUser == null ? null : currentUser.getId();
-    }
-
-    /**
-     * 更新用户数据范围
-     *
-     * @param userId    用户ID
-     * @param type      权限范围类型
-     * @param targetIds 自定义权限范围
-     */
-    private void updateUserScope(UUID userId, DataScopeType type, List<UUID> targetIds) {
-        // null 表示继承角色范围，不能偷偷转换成 DEPT 覆盖角色。
-        if (type == null) {
-            dataScopeMapper.removeByUserId(userId);
-            dataScopeTargetMapper.removeByUserId(userId);
-            return;
-        }
-        if (type != null) {
-            LegacyAuthorizationWriteGuard.reject("旧用户 DataScope 写入口");
-        }
-        if (type == DataScopeType.CUSTOM && CollUtils.isEmpty(targetIds)) {
-            throw new DataScopeViolationException("CUSTOM 数据范围必须指定至少一个目标部门");
-        }
-        // 更新或新增用户的权限范围
-        var scope = dataScopeMapper.findByUserId(userId);
-        if (scope == null) {
-            scope = new UserDataScope();
-        }
-        scope.setUserId(userId);
-        scope.setScopeType(type);
-        dataScopeMapper.insertOrUpdate(scope);
-
-        // 先清空自定义范围
-        dataScopeTargetMapper.removeByUserId(userId);
-        // 如果为自定义则添加新的自定义范围
-        if (type == DataScopeType.CUSTOM && CollUtils.isNotEmpty(targetIds)) {
-            var targets = new ArrayList<UserDataScopeTarget>();
-            for (UUID targetId : targetIds) {
-                var target = new UserDataScopeTarget();
-                target.setTargetId(targetId);
-                target.setUserId(userId);
-                target.setTargetType(type.getCode());
-
-                targets.add(target);
-            }
-            dataScopeTargetMapper.insert(targets);
-        }
     }
 
     /**

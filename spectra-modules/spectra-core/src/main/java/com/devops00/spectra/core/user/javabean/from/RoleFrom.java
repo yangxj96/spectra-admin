@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.user.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.constant.DataScopeType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -25,7 +24,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,16 +50,6 @@ public class RoleFrom {
      */
     @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
-
-    /**
-     * 范围
-     */
-    private DataScopeType scope;
-
-    /**
-     * CUSTOM 范围目标部门
-     */
-    private List<UUID> targetIds;
 
     /**
      * 状态

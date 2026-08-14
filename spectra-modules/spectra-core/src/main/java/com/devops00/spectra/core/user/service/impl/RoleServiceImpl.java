@@ -22,22 +22,16 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.common.exception.DefaultDataException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.entity.Role;
-import com.devops00.spectra.core.user.javabean.entity.RoleDataScope;
-import com.devops00.spectra.core.user.javabean.entity.RoleDataScopeTarget;
 import com.devops00.spectra.core.user.javabean.event.RoleDeletedEvent;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
-import com.devops00.spectra.core.user.mapper.RoleDataScopeMapper;
-import com.devops00.spectra.core.user.mapper.RoleDataScopeTargetMapper;
 import com.devops00.spectra.core.user.mapper.RoleMapper;
 import com.devops00.spectra.core.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -65,20 +59,14 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
 
     private final ApplicationEventPublisher publisher;
 
-    private final RoleDataScopeMapper roleDataScopeMapper;
-
-    private final RoleDataScopeTargetMapper roleDataScopeTargetMapper;
-
     @Override
     @Transactional
     public void created(RoleFrom params) {
-        validateScope(params.getScope(), params.getTargetIds());
         Role role = roleConverter.toEntity(params);
         // 生成一个角色 CODE
         role.setCode(IdWorker.get32UUID());
         // 保存角色范围
         this.save(role);
-        syncRoleScope(role.getId(), params.getScope(), params.getTargetIds());
     }
 
     @Override
@@ -105,10 +93,8 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     @Override
     @Transactional
     public void modify(RoleFrom params) {
-        validateScope(params.getScope(), params.getTargetIds());
         Role role = roleConverter.toEntity(params);
         this.updateById(role);
-        syncRoleScope(role.getId(), params.getScope(), params.getTargetIds());
     }
 
     @Override
@@ -133,42 +119,6 @@ public class RoleServiceImpl extends BaseServiceImpl<RoleMapper, Role> implement
     public Role getSystemDefaultUserRole() {
         var wrapper = new LambdaQueryWrapper<Role>().eq(Role::getCode, "ROLE_USER");
         return this.getOne(wrapper);
-    }
-
-    private void validateScope(DataScopeType type, List<UUID> targetIds) {
-        if (type != null) {
-            LegacyAuthorizationWriteGuard.reject("旧角色 DataScope 写入口");
-        }
-    }
-
-    private void syncRoleScope(UUID roleId, DataScopeType type, List<UUID> targetIds) {
-        var current = roleDataScopeMapper
-                .selectOne(new LambdaQueryWrapper<RoleDataScope>().eq(RoleDataScope::getRoleId, roleId).isNull(RoleDataScope::getDeleted));
-        if (type == null) {
-            if (current != null) {
-                roleDataScopeMapper.deleteById(current.getId());
-            }
-            roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>().eq(RoleDataScopeTarget::getRoleId, roleId));
-            return;
-        }
-        if (current == null) {
-            current = new RoleDataScope();
-            current.setRoleId(roleId);
-        }
-        current.setScopeType(type);
-        roleDataScopeMapper.insertOrUpdate(current);
-
-        roleDataScopeTargetMapper.delete(new LambdaQueryWrapper<RoleDataScopeTarget>().eq(RoleDataScopeTarget::getRoleId, roleId));
-        if (type == DataScopeType.CUSTOM) {
-            var targets = targetIds.stream().map(targetId -> {
-                var target = new RoleDataScopeTarget();
-                target.setRoleId(roleId);
-                target.setTargetId(targetId);
-                target.setTargetType(type.getCode());
-                return target;
-            }).toList();
-            roleDataScopeTargetMapper.insert(targets);
-        }
     }
 
 }

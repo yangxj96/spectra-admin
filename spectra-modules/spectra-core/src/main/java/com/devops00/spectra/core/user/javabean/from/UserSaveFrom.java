@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.user.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
@@ -119,13 +118,4 @@ public class UserSaveFrom {
     @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
     private List<UUID> roleIds;
 
-    /**
-     * 数据范围
-     */
-    private DataScopeType dataScope;
-
-    /**
-     * 当数据范围是 {@code DataScopeType#CUSTOM} 的时候这个不能为空
-     */
-    private List<UUID> targetIds;
 }
