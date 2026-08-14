@@ -18,7 +18,7 @@ package com.devops00.spectra.workflow.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskPageFrom;
@@ -45,6 +45,8 @@ public class TaskController {
 
     private final TaskService taskService;
 
+    private final SecurityContextAccessor securityContextAccessor;
+
     /**
      * 查询待办任务
      *
@@ -56,7 +58,7 @@ public class TaskController {
     @GetMapping(value = "/todo", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object todo(PageFrom page, TaskPageFrom params) {
-        String username = SecUtil.getCurrentUsername();
+        String username = securityContextAccessor.currentUsername();
         return taskService.todo(page, username, params.getProcessDefinitionKey());
     }
 
@@ -71,7 +73,7 @@ public class TaskController {
     @GetMapping(value = "/done", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object done(PageFrom page, TaskPageFrom params) {
-        String username = SecUtil.getCurrentUsername();
+        String username = securityContextAccessor.currentUsername();
         return taskService.done(page, username, params.getProcessDefinitionKey());
     }
 
@@ -85,7 +87,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
-        taskService.complete(id, from.getComment(), SecUtil.getCurrentUsername());
+        taskService.complete(id, from.getComment(), securityContextAccessor.currentUsername());
     }
 
     /**
@@ -98,7 +100,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
-        taskService.reject(id, from.getComment(), SecUtil.getCurrentUsername());
+        taskService.reject(id, from.getComment(), securityContextAccessor.currentUsername());
     }
 
     /**
@@ -111,7 +113,7 @@ public class TaskController {
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
-        taskService.transfer(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
+        taskService.transfer(id, from.getTargetUserId(), securityContextAccessor.currentUsername());
     }
 
     /**
@@ -124,6 +126,6 @@ public class TaskController {
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {
-        taskService.delegate(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
+        taskService.delegate(id, from.getTargetUserId(), securityContextAccessor.currentUsername());
     }
 }
