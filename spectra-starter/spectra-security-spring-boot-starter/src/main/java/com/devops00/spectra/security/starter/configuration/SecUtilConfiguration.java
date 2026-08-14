@@ -16,8 +16,10 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
+import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
 import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
+import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -69,6 +71,52 @@ public class SecUtilConfiguration {
     @Bean
     public SecuritySessionQueryPort securitySessionQueryPort(SecHolderStrategy strategy) {
         return strategy::listOnlineUsers;
+    }
+
+    @Bean
+    public SecurityAuthenticationPort securityAuthenticationPort(SecHolderStrategy strategy) {
+        return new SecurityAuthenticationPort() {
+            @Override
+            public com.devops00.spectra.security.base.javabean.vo.TokenVO login(
+                    com.devops00.spectra.security.base.javabean.entity.SecurityUser user) {
+                return strategy.createToken(user);
+            }
+
+            @Override
+            public void logout(String token) {
+                strategy.deleteToken(token);
+            }
+
+            @Override
+            public void logoutByRefreshToken(String refreshToken) {
+                strategy.deleteByRefreshToken(refreshToken);
+            }
+
+            @Override
+            public com.devops00.spectra.security.base.javabean.vo.TokenVO refreshByRefreshToken(String refreshToken) {
+                return strategy.refreshByRefreshToken(refreshToken);
+            }
+
+            @Override
+            public boolean isLockedOut(String username) {
+                return strategy.isLockedOut(username);
+            }
+
+            @Override
+            public void recordLoginFail(String username) {
+                strategy.recordLoginFail(username);
+            }
+
+            @Override
+            public void clearLoginFail(String username) {
+                strategy.clearLoginFail(username);
+            }
+        };
+    }
+
+    @Bean
+    public SecurityUserLookupPort securityUserLookupPort(SecHolderStrategy strategy) {
+        return strategy::getCurrentUser;
     }
 
     /**

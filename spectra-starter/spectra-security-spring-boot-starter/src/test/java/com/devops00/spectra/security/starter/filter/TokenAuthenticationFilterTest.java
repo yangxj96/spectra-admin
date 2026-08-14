@@ -16,7 +16,8 @@
 
 package com.devops00.spectra.security.starter.filter;
 
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import jakarta.servlet.FilterChain;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.RedisConnectionFailureException;
@@ -25,8 +26,8 @@ import org.springframework.mock.web.MockHttpServletResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -39,15 +40,14 @@ class TokenAuthenticationFilterTest {
         var request = new MockHttpServletRequest("GET", "/api/user/profile");
         var response = new MockHttpServletResponse();
         var chain = mock(FilterChain.class);
-        var filter = new TokenAuthenticationFilter();
+        var contextAccessor = mock(SecurityContextAccessor.class);
+        var userLookupPort = mock(SecurityUserLookupPort.class);
+        when(contextAccessor.currentToken()).thenReturn("opaque-token");
+        when(userLookupPort.findByToken("opaque-token"))
+                .thenThrow(new RedisConnectionFailureException("redis unavailable"));
+        var filter = new TokenAuthenticationFilter(contextAccessor, userLookupPort);
 
-        try (var secUtil = mockStatic(SecUtil.class)) {
-            secUtil.when(SecUtil::getCurrentToken).thenReturn("opaque-token");
-            secUtil.when(() -> SecUtil.getCurrentUser("opaque-token"))
-                    .thenThrow(new RedisConnectionFailureException("redis unavailable"));
-
-            filter.doFilter(request, response, chain);
-        }
+        filter.doFilter(request, response, chain);
 
         assertEquals(503, response.getStatus());
         verify(chain, never()).doFilter(request, response);

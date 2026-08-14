@@ -18,7 +18,7 @@ package com.devops00.spectra.ai.base;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -55,13 +55,16 @@ public class ToolExecutor {
 
     private static ObjectMapper objectMapper;
 
+    private static SecurityUserLookupPort securityUserLookupPort;
+
     /**
      * 构造函数注入，用于在 Spring 启动时将容器中配好的 ObjectMapper 赋给静态变量。
      *
      * @param objectMapper 项目全局 Jackson 映射器
      */
-    public ToolExecutor(ObjectMapper objectMapper) {
+    public ToolExecutor(ObjectMapper objectMapper, SecurityUserLookupPort securityUserLookupPort) {
         ToolExecutor.objectMapper = objectMapper;
+        ToolExecutor.securityUserLookupPort = securityUserLookupPort;
     }
 
     /**
@@ -132,7 +135,7 @@ public class ToolExecutor {
 
             // 注入 Security 上下文
             if (StrUtils.isNotBlank(token)) {
-                SecurityUser user = SecUtil.getCurrentUser(token);
+                SecurityUser user = securityUserLookupPort.findByToken(token);
                 if (user == null) {
                     throw new BadCredentialsException("认证失败：Token 已过期或无效");
                 }

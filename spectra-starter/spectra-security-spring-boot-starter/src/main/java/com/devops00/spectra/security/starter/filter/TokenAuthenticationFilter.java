@@ -17,7 +17,8 @@
 package com.devops00.spectra.security.starter.filter;
 
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,13 +44,22 @@ import java.io.IOException;
 @Slf4j
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private final SecurityContextAccessor securityContextAccessor;
+
+    private final SecurityUserLookupPort securityUserLookupPort;
+
+    public TokenAuthenticationFilter(SecurityContextAccessor securityContextAccessor, SecurityUserLookupPort securityUserLookupPort) {
+        this.securityContextAccessor = securityContextAccessor;
+        this.securityUserLookupPort = securityUserLookupPort;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String token = SecUtil.getCurrentToken();
+        String token = securityContextAccessor.currentToken();
         if (StrUtils.isNotBlank(token)) {
             try {
-                SecurityUser user = SecUtil.getCurrentUser(token);
+                SecurityUser user = securityUserLookupPort.findByToken(token);
                 if (user == null) {
                     SecurityContextHolder.clearContext();
                 } else {

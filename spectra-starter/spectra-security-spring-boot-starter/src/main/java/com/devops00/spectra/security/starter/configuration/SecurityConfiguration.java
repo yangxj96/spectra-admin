@@ -17,6 +17,8 @@
 package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.starter.eval.SpectraPermissionEvaluator;
@@ -109,7 +111,9 @@ public class SecurityConfiguration {
      * @return Security过滤器链
      */
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager,
+                                                   SecurityContextAccessor securityContextAccessor,
+                                                   SecurityUserLookupPort securityUserLookupPort) {
         log.debug(LogPrefix.SECURITY.f("配置核心过滤器"));
 
         // 白名单
@@ -130,7 +134,8 @@ public class SecurityConfiguration {
                 // SESSION 规则
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // 注册过滤器
-                .addFilterBefore(new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenAuthenticationFilter(securityContextAccessor, securityUserLookupPort),
+                        UsernamePasswordAuthenticationFilter.class)
                 // 允许同源iframe
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 权限匹配

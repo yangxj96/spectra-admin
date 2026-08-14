@@ -24,7 +24,8 @@ import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.from.EmailCodeFrom;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
@@ -74,22 +75,33 @@ public class AuthController {
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final SecurityAuthenticationPort securityAuthenticationPort;
+
+    private final SecurityContextAccessor securityContextAccessor;
+
     @Autowired
     public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties,
-                          ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider) {
-        this(loginDispatcher, authService, securityProperties, securityAuditWriterProvider.getIfAvailable());
+                          ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider,
+                          SecurityAuthenticationPort securityAuthenticationPort, SecurityContextAccessor securityContextAccessor) {
+        this(loginDispatcher, authService, securityProperties, securityAuditWriterProvider.getIfAvailable(),
+                securityAuthenticationPort, securityContextAccessor);
     }
 
-    public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties) {
-        this(loginDispatcher, authService, securityProperties, (SecurityAuditWriter) null);
+    public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties,
+                          SecurityAuthenticationPort securityAuthenticationPort, SecurityContextAccessor securityContextAccessor) {
+        this(loginDispatcher, authService, securityProperties, (SecurityAuditWriter) null,
+                securityAuthenticationPort, securityContextAccessor);
     }
 
     private AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties,
-                           SecurityAuditWriter securityAuditWriter) {
+                           SecurityAuditWriter securityAuditWriter, SecurityAuthenticationPort securityAuthenticationPort,
+                           SecurityContextAccessor securityContextAccessor) {
         this.loginDispatcher = loginDispatcher;
         this.authService = authService;
         this.securityProperties = securityProperties;
         this.securityAuditWriter = securityAuditWriter;
+        this.securityAuthenticationPort = securityAuthenticationPort;
+        this.securityContextAccessor = securityContextAccessor;
         WebCookiePolicy.validate(securityProperties);
     }
 
@@ -107,7 +119,7 @@ public class AuthController {
         String username = params.getUsername() != null ? params.getUsername() : "";
 
         // 登录锁定检查
-        if (SecUtil.isLockedOut(username)) {
+        if (securityAuthenticationPort.isLockedOut(username)) {
             audit("AUTH_LOGIN_FAILED", null, client(request), "LOCKED_OUT");
             throw new SpectraException("账号已锁定，请稍后再试");
         }
@@ -116,9 +128,9 @@ public class AuthController {
             var authentication = loginDispatcher.authenticate(params);
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if (authentication.getPrincipal() instanceof SecurityUser su) {
-                SecUtil.clearLoginFail(username);
+                securityAuthenticationPort.clearLoginFail(username);
                 audit("AUTH_LOGIN_SUCCEEDED", su.getId(), client(request), null);
-                TokenVO token = SecUtil.login(su);
+                TokenVO token = securityAuthenticationPort.login(su);
                 issueWebCookies(request, response, token.getRefreshToken());
                 if (isWebClient(request)) {
                     token.setRefreshToken(null);
@@ -128,7 +140,7 @@ public class AuthController {
                 throw new UsernameNotFoundException("未找到用户");
             }
         } catch (BadCredentialsException e) {
-            SecUtil.recordLoginFail(username);
+            securityAuthenticationPort.recordLoginFail(username);
             audit("AUTH_LOGIN_FAILED", null, client(request), "BAD_CREDENTIALS");
             throw e;
         }
@@ -137,7 +149,7 @@ public class AuthController {
     /**
      * 用户退出登陆
      */
-    @ULog(value = "'用户['+T(com.devops00.spectra.security.base.holder.SecUtil).getCurrentUsername()+']登出系统'", type = SysLogType.SAFETY)
+    @ULog(value = "'用户登出系统'", type = SysLogType.SAFETY)
     @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
@@ -151,19 +163,19 @@ public class AuthController {
                 refreshToken = readCookie(request, securityProperties.getRefreshCookieName());
             }
         }
-        var token = SecUtil.getCurrentToken();
+        var token = securityContextAccessor.currentToken();
 
         if (StrUtils.isNotBlank(token)) {
-            SecUtil.logout(token);
+            securityAuthenticationPort.logout(token);
         }
 
         if (StrUtils.isNotBlank(refreshToken)) {
-            SecUtil.logoutByRefreshToken(refreshToken);
+            securityAuthenticationPort.logoutByRefreshToken(refreshToken);
         }
         if (webClient) {
             clearWebCookies(response);
         }
-        audit("AUTH_LOGOUT", SecUtil.getCurrentUserId(), client(request), null);
+        audit("AUTH_LOGOUT", securityContextAccessor.currentUserId(), client(request), null);
     }
 
     /**
@@ -230,12 +242,12 @@ public class AuthController {
         }
         TokenVO token;
         try {
-            token = SecUtil.refreshByRefreshToken(refreshToken);
+            token = securityAuthenticationPort.refreshByRefreshToken(refreshToken);
         } catch (RuntimeException exception) {
-            audit("TOKEN_REFRESH_FAILED", SecUtil.getCurrentUserId(), client(request), "REFRESH_REJECTED");
+            audit("TOKEN_REFRESH_FAILED", securityContextAccessor.currentUserId(), client(request), "REFRESH_REJECTED");
             throw exception;
         }
-        audit("TOKEN_REFRESH_SUCCEEDED", SecUtil.getCurrentUserId(), client(request), null);
+        audit("TOKEN_REFRESH_SUCCEEDED", securityContextAccessor.currentUserId(), client(request), null);
         issueWebCookies(request, response, token.getRefreshToken());
         if (webClient) {
             token.setRefreshToken(null);
