@@ -19,6 +19,7 @@ package com.devops00.spectra.core.user.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -54,10 +55,10 @@ public class User extends BaseEntity {
     private String avatar;
 
     /**
-     * 状态 (1:正常 0:禁用)
+     * 生命周期状态：ACTIVE、LOCKED、DISABLED、DEPARTED。
      */
     @TableField(value = "status")
-    private Short status;
+    private UserStatus status;
 
     /**
      * 真实姓名

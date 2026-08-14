@@ -18,6 +18,7 @@ package com.devops00.spectra.core.user.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.constant.DataScopeType;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -62,7 +63,7 @@ public class UserSaveFrom {
      * 用户状态
      */
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    private Short status;
+    private UserStatus status;
 
     /**
      * 性别

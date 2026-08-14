@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.javabean.vo;
 
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -64,7 +65,7 @@ public class UserProfileVO implements Serializable {
     /**
      * 状态
      */
-    private Short status;
+    private UserStatus status;
 
     /**
      * 性别

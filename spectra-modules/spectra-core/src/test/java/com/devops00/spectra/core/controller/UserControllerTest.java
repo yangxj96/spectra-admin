@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.controller;
 
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.service.UserService;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.google.common.collect.Lists;
@@ -46,7 +47,7 @@ class UserControllerTest {
     void initAdminUser() {
         // 最小化新建用户
         UserSaveFrom from = new UserSaveFrom();
-        from.setStatus((short) 0);
+        from.setStatus(UserStatus.DISABLED);
         from.setEmail("admin@devops00.com");
         from.setCountry("China");
         from.setCity("Kunming");

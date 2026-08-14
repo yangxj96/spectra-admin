@@ -18,6 +18,7 @@ package com.devops00.spectra.core.user.javabean.vo;
 
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.core.system.service.impl.DepartmentServiceImpl;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.framework.assembler.NameFill;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,7 +66,7 @@ public class UserPageVO implements Serializable {
     /**
      * 用户状态
      */
-    private Short status;
+    private UserStatus status;
 
     /**
      * 真实姓名

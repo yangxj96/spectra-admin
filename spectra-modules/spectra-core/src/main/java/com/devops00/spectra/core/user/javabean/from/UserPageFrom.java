@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.javabean.from;
 
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,7 +48,7 @@ public class UserPageFrom {
     /**
      * 状态
      */
-    private Boolean status;
+    private UserStatus status;
 
     /**
      * 组织机构ID

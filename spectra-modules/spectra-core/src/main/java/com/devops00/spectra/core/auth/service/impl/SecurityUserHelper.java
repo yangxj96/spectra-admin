@@ -84,7 +84,7 @@ public class SecurityUserHelper {
         var now = Instant.now();
         boolean accountActive = AccountStatus.ACTIVE.getCode().equals(account.getStatus());
         boolean accountNotExpired = account.getExpiresAt() == null || account.getExpiresAt().isAfter(now);
-        boolean userActive = UserStatus.ACTIVE.getCode().equals(u.getStatus());
+        boolean userActive = UserStatus.ACTIVE.equals(u.getStatus());
         boolean accountTypeMatches = loginType.equals(account.getType());
         boolean verified = loginType == LoginType.PASSWORD
                 || Short.valueOf((short) 1).equals(account.getVerified());
