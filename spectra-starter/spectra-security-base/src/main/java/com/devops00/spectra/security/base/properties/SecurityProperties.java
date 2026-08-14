@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.base.properties;
 
 import com.devops00.spectra.security.base.enums.SecMode;
+import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -119,4 +120,43 @@ public class SecurityProperties {
      * Preview/Apply 授权变更 token 的 HMAC 密钥；未配置时相关写入口 fail-closed。
      */
     private String authorizationChangeTokenHmacKey = "";
+
+    /** v2 会话并发策略；正式部署可由 session_policy 表覆盖。 */
+    private SessionConcurrencyMode sessionConcurrencyMode = SessionConcurrencyMode.ALLOW;
+
+    /** v2 用户最大活动会话数。 */
+    private int maxSessions = 5;
+
+    /** TOTP 密钥加密密钥；必须由环境变量或密钥管理系统提供。 */
+    private String mfaEncryptionKey = "";
+
+    /** TOTP 密钥加密版本，用于轮换和回迁。 */
+    private String mfaEncryptionKeyVersion = "v1";
+
+    /** TOTP provisioning URI 的发行方名称。 */
+    private String mfaTotpIssuer = "Spectra";
+
+    /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
+    private boolean mfaRequiredForDevOps = true;
+
+    /** Web Refresh Token 的 Host-only Cookie 名称。*/
+    private String refreshCookieName = "__Host-spectra-refresh";
+
+    /** Web Refresh Cookie 必须默认 Secure。*/
+    private boolean refreshCookieSecure = true;
+
+    /** Web Refresh Cookie 的 SameSite 属性，默认 Strict。*/
+    private String refreshCookieSameSite = "Strict";
+
+    /** Web Refresh Cookie Path；Host-only Cookie 固定为 /。*/
+    private String refreshCookiePath = "/";
+
+    /** Web Refresh Cookie Domain；默认空值表示 Host-only。*/
+    private String refreshCookieDomain = "";
+
+    /** 双提交 CSRF Cookie 名称。*/
+    private String csrfCookieName = "XSRF-TOKEN";
+
+    /** 双提交 CSRF Header 名称。*/
+    private String csrfHeaderName = "X-XSRF-TOKEN";
 }

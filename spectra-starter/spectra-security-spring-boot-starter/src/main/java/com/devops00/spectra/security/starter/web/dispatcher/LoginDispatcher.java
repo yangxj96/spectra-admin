@@ -19,6 +19,7 @@ package com.devops00.spectra.security.starter.web.dispatcher;
 import com.devops00.spectra.security.base.javabean.from.LoginFrom;
 import com.devops00.spectra.security.base.strategy.tokens.EmailAuthenticationToken;
 import com.devops00.spectra.security.base.strategy.tokens.SmsAuthenticationToken;
+import com.devops00.spectra.security.base.strategy.tokens.TotpAuthenticationToken;
 import com.devops00.spectra.security.base.strategy.tokens.UsernamePasswordCaptchaAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -60,7 +61,8 @@ public class LoginDispatcher {
 
             case EMAIL -> authenticationManager.authenticate(new EmailAuthenticationToken(request.getUsername(), request.getEmailCode()));
 
-            case OTP -> throw new BadCredentialsException("不支持的登录类型");
+            case OTP -> authenticationManager.authenticate(new TotpAuthenticationToken(
+                    request.getUsername(), request.getOtp() != null ? request.getOtp() : request.getPrincipal()));
         };
     }
 }

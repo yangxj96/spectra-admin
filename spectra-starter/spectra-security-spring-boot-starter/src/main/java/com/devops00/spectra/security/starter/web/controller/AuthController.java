@@ -28,10 +28,17 @@ import com.devops00.spectra.security.base.javabean.from.LoginFrom;
 import com.devops00.spectra.security.base.javabean.from.RefreshTokenFrom;
 import com.devops00.spectra.security.base.javabean.from.SmsCodeFrom;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
+import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.session.WebCookiePolicy;
+import com.devops00.spectra.security.base.util.TokenDigestService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import com.devops00.spectra.security.starter.web.dispatcher.LoginDispatcher;
 import com.devops00.spectra.security.starter.web.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,9 +62,13 @@ public class AuthController {
 
     private final AuthService authService;
 
-    public AuthController(LoginDispatcher loginDispatcher, AuthService authService) {
+    private final SecurityProperties securityProperties;
+
+    public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties) {
         this.loginDispatcher = loginDispatcher;
         this.authService = authService;
+        this.securityProperties = securityProperties;
+        WebCookiePolicy.validate(securityProperties);
     }
 
     /**
@@ -70,7 +81,7 @@ public class AuthController {
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0+")
-    public TokenVO login(@Validated @RequestBody LoginFrom params) {
+    public TokenVO login(@Validated @RequestBody LoginFrom params, HttpServletRequest request, HttpServletResponse response) {
         String username = params.getUsername() != null ? params.getUsername() : "";
 
         // 登录锁定检查
@@ -83,7 +94,12 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if (authentication.getPrincipal() instanceof SecurityUser su) {
                 SecUtil.clearLoginFail(username);
-                return SecUtil.login(su);
+                TokenVO token = SecUtil.login(su);
+                issueWebCookies(request, response, token.getRefreshToken());
+                if (isWebClient(request)) {
+                    token.setRefreshToken(null);
+                }
+                return token;
             } else {
                 throw new UsernameNotFoundException("未找到用户");
             }
@@ -100,8 +116,16 @@ public class AuthController {
     @PostMapping(value = "/logout", version = "1.0.0+")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
-    public void logout(@RequestBody(required = false) RefreshTokenFrom params) {
+    public void logout(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
+                       HttpServletResponse response) {
         String refreshToken = params != null ? params.getRefreshToken() : null;
+        boolean webClient = isWebClient(request);
+        if (webClient) {
+            validateCsrf(request);
+            if (StrUtils.isBlank(refreshToken)) {
+                refreshToken = readCookie(request, securityProperties.getRefreshCookieName());
+            }
+        }
         var token = SecUtil.getCurrentToken();
 
         if (StrUtils.isNotBlank(token)) {
@@ -110,6 +134,9 @@ public class AuthController {
 
         if (StrUtils.isNotBlank(refreshToken)) {
             SecUtil.logoutByRefreshToken(refreshToken);
+        }
+        if (webClient) {
+            clearWebCookies(response);
         }
     }
 
@@ -164,7 +191,88 @@ public class AuthController {
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0+")
-    public TokenVO refresh(@Validated @RequestBody RefreshTokenFrom params) {
-        return SecUtil.refreshByRefreshToken(params.getRefreshToken());
+    public TokenVO refresh(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
+                           HttpServletResponse response) {
+        boolean webClient = isWebClient(request);
+        if (webClient) {
+            validateCsrf(request);
+        }
+        String cookieRefreshToken = readCookie(request, securityProperties.getRefreshCookieName());
+        String refreshToken = webClient ? cookieRefreshToken : params != null ? params.getRefreshToken() : null;
+        if (StrUtils.isBlank(refreshToken)) {
+            throw new IllegalArgumentException("刷新token不能为空");
+        }
+        TokenVO token = SecUtil.refreshByRefreshToken(refreshToken);
+        issueWebCookies(request, response, token.getRefreshToken());
+        if (webClient) {
+            token.setRefreshToken(null);
+        }
+        return token;
+    }
+
+    private boolean isWebClient(HttpServletRequest request) {
+        String clientType = request.getHeader("X-Client-Type");
+        return clientType == null || clientType.isBlank() || "web".equalsIgnoreCase(clientType);
+    }
+
+    private void issueWebCookies(HttpServletRequest request, HttpServletResponse response, String refreshToken) {
+        if (!isWebClient(request) || StrUtils.isBlank(refreshToken)) {
+            return;
+        }
+        addCookie(response, securityProperties.getRefreshCookieName(), refreshToken, true,
+                securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
+        addCookie(response, securityProperties.getCsrfCookieName(), TokenDigestService.generateToken(), false,
+                securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
+    }
+
+    private void clearWebCookies(HttpServletResponse response) {
+        addCookie(response, securityProperties.getRefreshCookieName(), "", true,
+                securityProperties.getRefreshCookieSameSite(), 0);
+        addCookie(response, securityProperties.getCsrfCookieName(), "", false,
+                securityProperties.getRefreshCookieSameSite(), 0);
+    }
+
+    private void addCookie(HttpServletResponse response, String name, String value, boolean httpOnly,
+                           String sameSite, long maxAgeSeconds) {
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .httpOnly(httpOnly)
+                .secure(securityProperties.isRefreshCookieSecure())
+                .path(securityProperties.getRefreshCookiePath())
+                .sameSite(sameSite)
+                .maxAge(java.time.Duration.ofSeconds(maxAgeSeconds))
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
+    }
+
+    private void validateCsrf(HttpServletRequest request) {
+        String header = request.getHeader(securityProperties.getCsrfHeaderName());
+        String cookie = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie candidate : cookies) {
+                if (securityProperties.getCsrfCookieName().equals(candidate.getName())) {
+                    cookie = candidate.getValue();
+                    break;
+                }
+            }
+        }
+        if (StrUtils.isBlank(header) || StrUtils.isBlank(cookie)
+                || !java.security.MessageDigest.isEqual(header.getBytes(java.nio.charset.StandardCharsets.UTF_8),
+                cookie.getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
+            throw new IllegalArgumentException("CSRF 校验失败");
+        }
+    }
+
+    private String readCookie(HttpServletRequest request, String name) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (name.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
     }
 }

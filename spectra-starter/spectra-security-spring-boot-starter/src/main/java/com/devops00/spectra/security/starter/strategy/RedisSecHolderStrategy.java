@@ -27,7 +27,10 @@ import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
+import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
+import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.RefreshTokenRotationStore;
+import com.devops00.spectra.security.base.util.TokenDigestService;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -60,6 +63,8 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     private static final String HEADER_CLIENT_TYPE = "X-Client-Type";
 
+    private static final String HEADER_DEVICE_ID = "X-Device-Id";
+
     private final ObjectMapper om;
     private final RedisTemplate<String, Object> redis;
     private final SecurityProperties properties;
@@ -91,61 +96,72 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public TokenVO createToken(SecurityUser user, ClientType clientType) {
+        return createToken(user, clientType, UUID.randomUUID().toString());
+    }
+
+    private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId) {
+        if (properties.isMfaRequiredForDevOps() && isRoot(user) && !isMfaVerified(user)) {
+            throw new IllegalStateException("DEV_OPS 必须先完成 MFA 验证");
+        }
         String userId = user.getId().toString();
         String ucKey = AuthRedisKey.USER_CLIENT.format(userId, clientType.getName());
 
-        Duration accessTtl = Duration.ofSeconds(properties.getAccessTokenExpire());
-        Duration refreshTtl = Duration.ofSeconds(properties.getRefreshTokenExpire());
-
-        // 同端复用：检查是否已有有效 token
-        Object oldToken = redis.opsForValue().get(ucKey);
-        if (oldToken != null) {
-            String oldSessionKey = AuthRedisKey.SESSION.format(oldToken);
-            if (Boolean.TRUE.equals(redis.hasKey(oldSessionKey))) {
-                Object oldRefreshToken = redis.opsForValue().get(AuthRedisKey.REFRESH_TOKEN.format(oldToken));
-                if (oldRefreshToken != null) {
-                    this.refreshTTL(oldToken.toString(), userId, clientType.getName());
-                    return buildTokenVO(user, oldToken.toString(), oldRefreshToken.toString());
+        SessionPolicy policy = sessionPolicy();
+        Set<Object> activeTokens = activeTokenDigests(userId);
+        if (policy.concurrencyMode() == SessionConcurrencyMode.KICK_OLD) {
+            for (Object activeToken : activeTokens) {
+                String activeDigest = activeToken.toString();
+                Map<Object, Object> activeSession = redis.opsForHash().entries(AuthRedisKey.SESSION.format(activeDigest));
+                if (clientType.getName().equals(Objects.toString(activeSession.get("clientType"), null))) {
+                    deleteAccessDigest(activeDigest);
                 }
             }
-            // 旧 session 已过期，清理残留
-            redis.delete(ucKey);
+        } else if (policy.concurrencyMode() == SessionConcurrencyMode.REJECT_NEW
+                && activeTokens.size() >= policy.maxSessions()) {
+            throw new IllegalStateException("已达到该账号的最大并发会话数");
         }
 
-        // 生成新 token
-        String token = UUID.randomUUID().toString().toUpperCase();
-        String refreshToken = UUID.randomUUID().toString().toUpperCase();
+        Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
+        Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
+        String token = TokenDigestService.generateToken();
+        String refreshToken = TokenDigestService.generateToken();
+        String tokenDigest = TokenDigestService.digest(token);
+        String refreshDigest = TokenDigestService.digest(refreshToken);
         String ip = IpUtils.getClientIP(this.getHttpServletRequest());
+        long now = System.currentTimeMillis();
 
-        // 构造 session hash（事实源）
+        // Redis 只保存 Session 聚合和摘要，绝不保存完整 SecurityUser 或明文 Token。
         Map<String, Object> session = new LinkedHashMap<>();
         session.put("userId", userId);
         session.put("username", user.getUsername());
         session.put("email", user.getEmail());
         session.put("clientType", clientType.getName());
+        session.put("deviceId", resolveDeviceId());
         session.put("ip", ip);
-        session.put("loginTime", System.currentTimeMillis());
-        session.put("lastActiveTime", System.currentTimeMillis());
-        session.put("user", user);
+        session.put("loginTime", now);
+        session.put("lastActiveTime", now);
+        session.put("familyId", familyId);
+        session.put("aal", isMfaVerified(user) ? "AAL2" : "AAL1");
 
-        String sessionKey = AuthRedisKey.SESSION.format(token);
+        String sessionKey = AuthRedisKey.SESSION.format(tokenDigest);
         String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
-        String rtKey = AuthRedisKey.REFRESH_TOKEN.format(token);
+        String rtKey = AuthRedisKey.REFRESH_TOKEN.format(tokenDigest);
 
         redis.opsForHash().putAll(sessionKey, session);
         redis.expire(sessionKey, accessTtl);
-        redis.opsForValue().set(ucKey, token, accessTtl);
-        redis.opsForSet().add(userTokensKey, token);
+        redis.opsForValue().set(ucKey, tokenDigest, accessTtl);
+        redis.opsForSet().add(userTokensKey, tokenDigest);
         redis.expire(userTokensKey, refreshTtl);
-        // refreshToken 存储：auth:rt:{accessToken} → refreshToken (String)
-        redis.opsForValue().set(rtKey, refreshToken, refreshTtl);
-        // auth:rt:{refreshToken} → Hash{accessToken, userId, user}（会话过期时用于重建）
+        redis.opsForValue().set(rtKey, refreshDigest, refreshTtl);
+        redis.opsForSet().add(AuthRedisKey.SESSION_FAMILY.format(familyId), tokenDigest);
+        redis.expire(AuthRedisKey.SESSION_FAMILY.format(familyId), refreshTtl);
+        // Refresh Hash 只保存摘要、主体标识和 Rotation Family。
         Map<String, Object> rtData = new LinkedHashMap<>();
-        rtData.put("accessToken", token);
+        rtData.put("accessToken", tokenDigest);
         rtData.put("userId", userId);
         rtData.put("clientType", clientType.getName());
-        rtData.put("user", user);
-        String rtRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(refreshToken);
+        rtData.put("familyId", familyId);
+        String rtRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(refreshDigest);
         redis.opsForHash().putAll(rtRefreshKey, rtData);
         redis.expire(rtRefreshKey, refreshTtl);
         redis.opsForSet().add(AuthRedisKey.ONLINE_USERS.getPattern(), userId);
@@ -159,7 +175,8 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public void refreshToken(String token) {
-        String sessionKey = AuthRedisKey.SESSION.format(token);
+        String tokenDigest = TokenDigestService.digest(token);
+        String sessionKey = AuthRedisKey.SESSION.format(tokenDigest);
         Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
         if (userIdObj == null) {
             return;
@@ -168,7 +185,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         Object clientTypeObj = redis.opsForHash().get(sessionKey, "clientType");
         String clientType = clientTypeObj != null ? clientTypeObj.toString() : ClientType.WEB.getName();
 
-        this.refreshTTL(token, userId, clientType);
+        this.refreshTTL(tokenDigest, userId, clientType);
         redis.opsForHash().put(sessionKey, "lastActiveTime", System.currentTimeMillis());
     }
 
@@ -177,16 +194,17 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new IllegalArgumentException("刷新token不能为空");
         }
-        String rtKey = AuthRedisKey.REFRESH_TOKEN.format(refreshToken);
+        String refreshDigest = TokenDigestService.digest(refreshToken);
+        String rtKey = AuthRedisKey.REFRESH_TOKEN.format(refreshDigest);
         Map<Object, Object> rtData = redis.opsForHash().entries(rtKey);
         if (rtData.isEmpty()) {
             throw new IllegalArgumentException("刷新token无效或已过期");
         }
 
-        String accessToken = Objects.toString(rtData.get("accessToken"), null);
+        String accessDigest = Objects.toString(rtData.get("accessToken"), null);
         String userId = Objects.toString(rtData.get("userId"), null);
-        Object userObj = rtData.get("user");
-        if (accessToken == null || userId == null || !(userObj instanceof SecurityUser user)) {
+        String familyId = Objects.toString(rtData.get("familyId"), null);
+        if (accessDigest == null || userId == null || familyId == null) {
             throw new IllegalArgumentException("刷新token数据异常");
         }
         UUID parsedUserId;
@@ -203,36 +221,36 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             throw new IllegalArgumentException("刷新token所属账号当前不可用");
         }
 
-        Duration refreshTtl = Duration.ofSeconds(properties.getRefreshTokenExpire());
-        String replayFenceKey = AuthRedisKey.REFRESH_REPLAY_FENCE.format(userId);
+        Duration refreshTtl = Duration.ofSeconds(sessionPolicy().refreshTtlSeconds());
+        String replayFenceKey = AuthRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
             throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
         }
 
         var claimResult = RefreshTokenRotationStore.claim(redis, rtKey,
-                AuthRedisKey.REFRESH_CLAIM.format(refreshToken), properties.getRefreshTokenExpire());
+                AuthRedisKey.REFRESH_CLAIM.format(refreshDigest), sessionPolicy().refreshTtlSeconds());
         if (claimResult != RefreshTokenRotationStore.ClaimResult.CLAIMED) {
             if (claimResult == RefreshTokenRotationStore.ClaimResult.REPLAY) {
                 redis.opsForValue().set(replayFenceKey, "REVOKED", refreshTtl);
-                revokeUserForRefreshReplay(userId);
-                throw new IllegalArgumentException("刷新token重放，所属会话已撤销");
+                revokeFamilyForRefreshReplay(familyId);
+                throw new IllegalArgumentException("刷新token重放，所属 Token Family 已撤销");
             }
             throw new IllegalArgumentException("刷新token无效或已过期");
         }
 
-        String sessionKey = AuthRedisKey.SESSION.format(accessToken);
+        String sessionKey = AuthRedisKey.SESSION.format(accessDigest);
         Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
         String clientType = Objects.toString(session.get("clientType"),
                 Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
 
         try {
-            removeRotatedAccessSession(accessToken, refreshToken, userId, clientType);
+            removeRotatedAccessSession(accessDigest, refreshDigest, userId, clientType, familyId);
             if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
                 throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
             }
-            return createToken(currentUser, ClientType.fromName(clientType));
+            return createToken(currentUser, ClientType.fromName(clientType), familyId);
         } catch (RuntimeException exception) {
-            revokeUserForRefreshReplay(userId);
+            revokeFamilyForRefreshReplay(familyId);
             throw exception;
         }
     }
@@ -241,7 +259,11 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public void deleteToken(String token) {
-        String sessionKey = AuthRedisKey.SESSION.format(token);
+        deleteAccessDigest(TokenDigestService.digest(token));
+    }
+
+    private void deleteAccessDigest(String tokenDigest) {
+        String sessionKey = AuthRedisKey.SESSION.format(tokenDigest);
         Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
         if (session.isEmpty()) {
             return;
@@ -259,16 +281,19 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
         // 清理 refresh token 映射
         // auth:rt:{accessToken} → refreshToken (String)
-        Object refreshTokenObj = redis.opsForValue().get(AuthRedisKey.REFRESH_TOKEN.format(token));
-        if (refreshTokenObj != null) {
-            // auth:rt:{refreshToken} → Hash，需要删除
-            redis.delete(AuthRedisKey.REFRESH_TOKEN.format(refreshTokenObj.toString()));
+        Object refreshDigestObj = redis.opsForValue().get(AuthRedisKey.REFRESH_TOKEN.format(tokenDigest));
+        if (refreshDigestObj != null) {
+            redis.delete(AuthRedisKey.REFRESH_TOKEN.format(refreshDigestObj.toString()));
         }
-        redis.delete(AuthRedisKey.REFRESH_TOKEN.format(token));
+        redis.delete(AuthRedisKey.REFRESH_TOKEN.format(tokenDigest));
 
         redis.delete(sessionKey);
         redis.delete(ucKey);
-        redis.opsForSet().remove(userTokensKey, token);
+        redis.opsForSet().remove(userTokensKey, tokenDigest);
+        Object familyId = session.get("familyId");
+        if (familyId != null) {
+            redis.opsForSet().remove(AuthRedisKey.SESSION_FAMILY.format(familyId.toString()), tokenDigest);
+        }
 
         // 用户已无任何 token → 移出在线
         Long remain = redis.opsForSet().size(userTokensKey);
@@ -283,20 +308,21 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         if (refreshToken == null || refreshToken.isBlank()) {
             return;
         }
-        String rtRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(refreshToken);
+        String refreshDigest = TokenDigestService.digest(refreshToken);
+        String rtRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(refreshDigest);
         Map<Object, Object> rtData = redis.opsForHash().entries(rtRefreshKey);
         if (rtData.isEmpty()) {
             return;
         }
 
-        String accessToken = Objects.toString(rtData.get("accessToken"), null);
+        String accessDigest = Objects.toString(rtData.get("accessToken"), null);
         String userId = Objects.toString(rtData.get("userId"), null);
 
-        if (accessToken != null) {
-            deleteToken(accessToken);
+        if (accessDigest != null) {
+            deleteAccessDigest(accessDigest);
         }
         redis.delete(rtRefreshKey);
-        if (userId != null && accessToken == null) {
+        if (userId != null && accessDigest == null) {
             redis.opsForSet().remove(AuthRedisKey.ONLINE_USERS.getPattern(), userId);
         }
     }
@@ -309,7 +335,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             return;
         }
         for (Object t : tokens) {
-            this.deleteToken(t.toString());
+            this.deleteAccessDigest(t.toString());
         }
     }
 
@@ -318,7 +344,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         String ucKey = AuthRedisKey.USER_CLIENT.format(userId, clientType.getName());
         Object token = redis.opsForValue().get(ucKey);
         if (token != null) {
-            this.deleteToken(token.toString());
+            this.deleteAccessDigest(token.toString());
         }
     }
 
@@ -349,11 +375,8 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
                     continue;
                 }
 
-                Object userObj = session.get("user");
-                SecurityUser su = userObj != null ? om.convertValue(userObj, SecurityUser.class) : null;
-
                 result.add(userOnlineConverter.toVO(Objects.toString(session.get("userId"), null),
-                        su != null ? su.getUsername() : Objects.toString(session.get("username"), null),
+                        Objects.toString(session.get("username"), null),
                         Objects.toString(session.get("clientType"), null), Objects.toString(session.get("ip"), null),
                         Long.parseLong(Objects.toString(session.get("loginTime"), "0"))));
             }
@@ -378,12 +401,24 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public @Nullable SecurityUser getCurrentUser(String token) {
-        String sessionKey = AuthRedisKey.SESSION.format(token);
-        Object userObj = redis.opsForHash().get(sessionKey, "user");
-        if (userObj == null) {
+        String tokenDigest = TokenDigestService.digest(token);
+        String sessionKey = AuthRedisKey.SESSION.format(tokenDigest);
+        Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
+        if (userIdObj == null || securityUserLoader == null) {
+            if (userIdObj != null && securityUserLoader == null) {
+                throw new IllegalStateException("未配置安全主体加载器，拒绝使用 Redis 快照认证");
+            }
             return null;
         }
-        return om.convertValue(userObj, SecurityUser.class);
+        try {
+            SecurityUser currentUser = securityUserLoader.load(UUID.fromString(userIdObj.toString()));
+            if (currentUser == null) {
+                return null;
+            }
+            return currentUser;
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalStateException("Session 用户标识无效", exception);
+        }
     }
 
     @Override
@@ -444,43 +479,79 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     /**
      * 删除已经被 Rotation 消费的旧 Access Session；消费声明独立保留用于重放检测。
      */
-    private void removeRotatedAccessSession(String accessToken, String refreshToken, String userId, String clientType) {
-        redis.delete(AuthRedisKey.SESSION.format(accessToken));
+    private void removeRotatedAccessSession(String accessDigest, String refreshDigest, String userId, String clientType,
+                                            String familyId) {
+        redis.delete(AuthRedisKey.SESSION.format(accessDigest));
 
-        String accessRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(accessToken);
-        Object mappedRefreshToken = redis.opsForValue().get(accessRefreshKey);
-        if (refreshToken.equals(Objects.toString(mappedRefreshToken, null))) {
+        String accessRefreshKey = AuthRedisKey.REFRESH_TOKEN.format(accessDigest);
+        Object mappedRefreshDigest = redis.opsForValue().get(accessRefreshKey);
+        if (refreshDigest.equals(Objects.toString(mappedRefreshDigest, null))) {
             redis.delete(accessRefreshKey);
         }
 
         String userClientKey = AuthRedisKey.USER_CLIENT.format(userId, clientType);
-        Object mappedAccessToken = redis.opsForValue().get(userClientKey);
-        if (accessToken.equals(Objects.toString(mappedAccessToken, null))) {
+        Object mappedAccessDigest = redis.opsForValue().get(userClientKey);
+        if (accessDigest.equals(Objects.toString(mappedAccessDigest, null))) {
             redis.delete(userClientKey);
         }
-        redis.opsForSet().remove(AuthRedisKey.USER_TOKENS.format(userId), accessToken);
+        redis.opsForSet().remove(AuthRedisKey.USER_TOKENS.format(userId), accessDigest);
+        redis.opsForSet().remove(AuthRedisKey.SESSION_FAMILY.format(familyId), accessDigest);
     }
 
     /**
-     * Refresh Token 重放或 Rotation 写入失败时，撤销该用户的全部旧会话。
+     * Refresh Token 重放或 Rotation 写入失败时，撤销整个 Token Family。
      */
-    private void revokeUserForRefreshReplay(String userId) {
-        try {
-            deleteByUserId(UUID.fromString(userId));
-        } catch (IllegalArgumentException exception) {
-            log.warn("Refresh Token 重放但 userId 无法解析，无法撤销用户会话: {}", userId);
+    private void revokeFamilyForRefreshReplay(String familyId) {
+        Set<Object> familyTokens = redis.opsForSet().members(AuthRedisKey.SESSION_FAMILY.format(familyId));
+        if (familyTokens != null) {
+            for (Object familyToken : familyTokens) {
+                deleteAccessDigest(familyToken.toString());
+            }
         }
+        redis.delete(AuthRedisKey.SESSION_FAMILY.format(familyId));
     }
 
     /**
      * 刷新 session / user-client / user-tokens 三个 key 的 TTL
      */
-    private void refreshTTL(String token, String userId, String clientType) {
-        Duration accessTtl = Duration.ofSeconds(properties.getAccessTokenExpire());
-        Duration refreshTtl = Duration.ofSeconds(properties.getRefreshTokenExpire());
-        redis.expire(AuthRedisKey.SESSION.format(token), accessTtl);
+    private void refreshTTL(String tokenDigest, String userId, String clientType) {
+        SessionPolicy policy = sessionPolicy();
+        Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
+        Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
+        redis.expire(AuthRedisKey.SESSION.format(tokenDigest), accessTtl);
         redis.expire(AuthRedisKey.USER_CLIENT.format(userId, clientType), accessTtl);
         redis.expire(AuthRedisKey.USER_TOKENS.format(userId), refreshTtl);
+    }
+
+    private SessionPolicy sessionPolicy() {
+        return new SessionPolicy(properties.getSessionConcurrencyMode(), properties.getMaxSessions(),
+                properties.getAccessTokenExpire(), properties.getRefreshTokenExpire(), null, null);
+    }
+
+    private Set<Object> activeTokenDigests(String userId) {
+        Set<Object> tokens = redis.opsForSet().members(AuthRedisKey.USER_TOKENS.format(userId));
+        if (tokens == null || tokens.isEmpty()) {
+            return new LinkedHashSet<>();
+        }
+        Set<Object> active = new LinkedHashSet<>();
+        for (Object token : tokens) {
+            String digest = token.toString();
+            if (Boolean.TRUE.equals(redis.hasKey(AuthRedisKey.SESSION.format(digest)))) {
+                active.add(digest);
+            } else {
+                redis.opsForSet().remove(AuthRedisKey.USER_TOKENS.format(userId), digest);
+            }
+        }
+        return active;
+    }
+
+    private boolean isMfaVerified(SecurityUser user) {
+        return user.getExtraData() != null && Boolean.TRUE.equals(user.getExtraData().get("mfaVerified"));
+    }
+
+    private boolean isRoot(SecurityUser user) {
+        return user.getAuthorities().stream().anyMatch(authority -> RootAuthorizationPolicy.ROOT_ROLE
+                .equals(authority.getAuthority()));
     }
 
     /**
@@ -554,6 +625,15 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         }
 
         return ClientType.WEB;
+    }
+
+    private String resolveDeviceId() {
+        HttpServletRequest request = this.getHttpServletRequest();
+        if (request == null) {
+            return "unknown";
+        }
+        String deviceId = request.getHeader(HEADER_DEVICE_ID);
+        return deviceId == null || deviceId.isBlank() ? "unknown" : deviceId;
     }
 
     private @Nullable String getTokenFromSecurityContext() {

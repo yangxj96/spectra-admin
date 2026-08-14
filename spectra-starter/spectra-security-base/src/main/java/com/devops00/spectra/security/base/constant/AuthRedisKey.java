@@ -27,46 +27,46 @@ import com.devops00.spectra.common.constant.RedisKey;
  */
 public enum AuthRedisKey implements RedisKey {
 
-    /**
-     * 会话详情（事实源）Hash: userId, username, email, clientType, ip, loginTime,
-     * lastActiveTime, user(SecurityUser JSON)
-     */
-    SESSION("auth:sess:%s"),
+    /** v2 会话详情（事实源）Hash，格式参数为 Access Token digest。 */
+    SESSION("sec:v2:sess:%s"),
 
     /**
      * 用户+端 → token（同端复用 & 按端踢出）
      */
-    USER_CLIENT("auth:uc:%s:%s"),
+    USER_CLIENT("sec:v2:uc:%s:%s"),
 
     /**
      * 用户所有 token 集合（全端踢出 & 在线查询）
      */
-    USER_TOKENS("auth:ut:%s"),
+    USER_TOKENS("sec:v2:ut:%s"),
 
     /**
      * 在线用户 ID 集合
      */
-    ONLINE_USERS("auth:online"),
+    ONLINE_USERS("sec:v2:online"),
+
+    /** Token Family 下的 Access digest 集合。 */
+    SESSION_FAMILY("sec:v2:family:%s"),
 
     /**
      * 登录失败计数（锁定账号）
      */
-    LOGIN_FAIL("auth:fail:%s"),
+    LOGIN_FAIL("sec:v2:fail:%s"),
 
     /**
      * 刷新token → accessToken 映射
      */
-    REFRESH_TOKEN("auth:rt:%s"),
+    REFRESH_TOKEN("sec:v2:rt:%s"),
 
     /**
      * Refresh Token 重放后的用户级撤销栅栏。
      */
-    REFRESH_REPLAY_FENCE("auth:replay:%s"),
+    REFRESH_REPLAY_FENCE("sec:v2:replay:%s"),
 
     /**
      * Refresh Token 一次性消费声明。与 Refresh Token Hash 分离，避免受 HashValueSerializer 影响。
      */
-    REFRESH_CLAIM("auth:rt:claim:%s");
+    REFRESH_CLAIM("sec:v2:rt:claim:%s");
 
     private final String pattern;
 

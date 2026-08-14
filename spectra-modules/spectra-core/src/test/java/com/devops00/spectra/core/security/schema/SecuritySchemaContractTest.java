@@ -80,6 +80,22 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase5MustKeepClientPolicyAndMfaTablesInBothSchemaSources() throws IOException {
+        String schema = readSql();
+        String migration = readV1();
+        for (String source : List.of(schema, migration)) {
+            assertTrue(source.contains("CREATE TABLE spectra_security.security_client"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.authentication_method"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.session_policy"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.mfa_enrollment"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.totp_credential"));
+            assertTrue(source.contains("CREATE TABLE spectra_security.recovery_code"));
+            assertTrue(source.contains("encrypted_secret BYTEA NOT NULL"));
+            assertTrue(source.contains("code_hash     VARCHAR(255) NOT NULL"));
+        }
+    }
+
+    @Test
     void targetFlywayV1MustBeCompleteAndMustNotReintroduceLegacySecurityOrTenantTables() throws IOException {
         String migration = readV1();
 
