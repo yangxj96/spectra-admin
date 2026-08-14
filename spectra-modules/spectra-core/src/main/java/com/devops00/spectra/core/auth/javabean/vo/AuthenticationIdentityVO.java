@@ -16,57 +16,33 @@
 
 package com.devops00.spectra.core.auth.javabean.vo;
 
-import com.devops00.spectra.security.base.constant.LoginType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
-/**
- * 账号绑定响应VO
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/7/19
- */
+/** 目标认证身份响应；不返回原始标识，只返回摘要对应的元数据。 */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountVO implements Serializable {
+public class AuthenticationIdentityVO implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 账号ID
-     */
     private UUID id;
 
-    /**
-     * 登录类型
-     */
-    private LoginType type;
+    private String methodCode;
 
-    /**
-     * 登录名称（用户名/手机号/邮箱）
-     */
-    private String loginName;
+    private String providerCode;
 
-    /**
-     * 状态（1:正常 2:禁用 3:未验证）
-     */
-    private Short status;
+    private String state;
 
-    /**
-     * 是否已验证（0:未验证 1:已验证）
-     */
-    private Short verified;
+    private Instant verifiedAt;
 
-    /**
-     * 是否为当前登录方式
-     */
     private Boolean current;
 }

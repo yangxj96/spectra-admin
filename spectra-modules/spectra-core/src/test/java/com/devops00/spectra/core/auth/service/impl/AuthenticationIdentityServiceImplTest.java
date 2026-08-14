@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -50,5 +51,37 @@ class AuthenticationIdentityServiceImplTest {
 
         assertThrows(DataSaveException.class,
                 () -> service.createIdentity(UUID.randomUUID(), "EMAIL", "user@example.com"));
+    }
+
+    @Test
+    void listsOnlyTheIdentityRowsReturnedByTheTargetMapper() {
+        var mapper = mock(AuthenticationIdentityMapper.class);
+        var userId = UUID.randomUUID();
+        var identity = new AuthenticationIdentity();
+        identity.setUserId(userId);
+        when(mapper.selectList(any())).thenReturn(java.util.List.of(identity));
+        var service = new AuthenticationIdentityServiceImpl(mapper);
+
+        assertEquals(1, service.listByUserId(userId).size());
+        verify(mapper).selectList(any());
+    }
+
+    @Test
+    void revokesOnlyAnIdentityOwnedByTheRequestedUser() {
+        var mapper = mock(AuthenticationIdentityMapper.class);
+        var userId = UUID.randomUUID();
+        var identityId = UUID.randomUUID();
+        var identity = new AuthenticationIdentity();
+        identity.setId(identityId);
+        identity.setUserId(userId);
+        identity.setState("ACTIVE");
+        when(mapper.selectOne(any())).thenReturn(identity);
+        when(mapper.updateById(identity)).thenReturn(1);
+        var service = new AuthenticationIdentityServiceImpl(mapper);
+
+        service.revokeByUserIdAndId(userId, identityId);
+
+        assertEquals("REVOKED", identity.getState());
+        verify(mapper).updateById(identity);
     }
 }

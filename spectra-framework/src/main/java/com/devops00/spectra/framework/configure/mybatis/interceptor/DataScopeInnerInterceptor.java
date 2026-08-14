@@ -110,7 +110,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         }
 
         // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
-        // 认证流程会在登录前查询 sys_account/sys_user 等基础表，
+        // 认证流程会在登录前查询 authentication_identity/sys_user 等基础表，
         // 这些表不属于数据隔离范围，不能因为当前尚未建立用户上下文而失败。
         UUID userId = securityContextAccessor == null ? null : securityContextAccessor.currentUserId();
         if (userId == null) {

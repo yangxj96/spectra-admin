@@ -104,6 +104,16 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase9LegacyAccountMigrationMustDropOnlyTheRetiredAccountTable() throws IOException {
+        String migration = readMigration("V12__remove_legacy_account.sql");
+
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_account"));
+        assertFalse(migration.contains("CASCADE"));
+        assertFalse(migration.contains("INSERT"));
+        assertFalse(migration.contains("UPDATE"));
+    }
+
+    @Test
     void phase4ConcurrencyAndDelegationColumnsMustRemainInTheDatabaseContract() throws IOException {
         String schema = readSql();
         String migration = readV1();

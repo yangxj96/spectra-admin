@@ -19,6 +19,7 @@ package com.devops00.spectra.core.auth.service;
 import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
 import org.jspecify.annotations.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface AuthenticationIdentityService {
@@ -41,4 +42,10 @@ public interface AuthenticationIdentityService {
 
     /** 撤销指定认证方式的所有身份。 */
     void revokeByUserIdAndMethod(UUID userId, String methodCode);
+
+    /** 返回用户当前有效的目标认证身份。 */
+    List<AuthenticationIdentity> listByUserId(UUID userId);
+
+    /** 仅撤销归属于指定用户的单个目标认证身份。 */
+    void revokeByUserIdAndId(UUID userId, UUID identityId);
 }

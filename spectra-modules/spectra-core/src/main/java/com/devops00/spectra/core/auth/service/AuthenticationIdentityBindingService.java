@@ -14,20 +14,21 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.auth.mapper;
+package com.devops00.spectra.core.auth.service;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
-import org.apache.ibatis.annotations.Mapper;
+import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
 
-/**
- * 账号Mapper
- *
- * @author yangxj96
- * @version 1.0
- * @since 2025/12/11 15:48
- */
-@Mapper
-public interface AccountMapper extends BaseMapper<Account> {
+import java.util.List;
+import java.util.UUID;
 
+/** 当前用户认证身份绑定用例。 */
+public interface AuthenticationIdentityBindingService {
+
+    List<AuthenticationIdentity> listByUserId(UUID userId);
+
+    void bindPhone(UUID userId, String phone, String code);
+
+    void bindEmail(UUID userId, String email, String code);
+
+    void unbind(UUID userId, UUID identityId);
 }

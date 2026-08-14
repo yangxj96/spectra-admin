@@ -102,7 +102,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         identity.setState(STATE_ACTIVE);
         identity.setVerifiedAt(Instant.now());
         if (mapper.insert(identity) != 1) {
-            throw new DataSaveException("创建密码认证身份失败");
+                throw new DataSaveException("创建认证身份失败");
         }
         return identity;
     }
@@ -145,6 +145,32 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         for (AuthenticationIdentity identity : identities) {
             identity.setState(STATE_REVOKED);
             mapper.updateById(identity);
+        }
+    }
+
+    @Override
+    public List<AuthenticationIdentity> listByUserId(UUID userId) {
+        return mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
+                .eq(AuthenticationIdentity::getUserId, userId)
+                .eq(AuthenticationIdentity::getState, STATE_ACTIVE)
+                .orderByAsc(AuthenticationIdentity::getMethodCode)
+                .orderByAsc(AuthenticationIdentity::getCreatedAt));
+    }
+
+    @Override
+    @Transactional
+    public void revokeByUserIdAndId(UUID userId, UUID identityId) {
+        var identity = mapper.selectOne(new LambdaQueryWrapper<AuthenticationIdentity>()
+                .eq(AuthenticationIdentity::getId, identityId)
+                .eq(AuthenticationIdentity::getUserId, userId)
+                .eq(AuthenticationIdentity::getState, STATE_ACTIVE)
+                .last("LIMIT 1"));
+        if (identity == null) {
+            return;
+        }
+        identity.setState(STATE_REVOKED);
+        if (mapper.updateById(identity) != 1) {
+            throw new EntityUpdateException("撤销认证身份失败");
         }
     }
 
