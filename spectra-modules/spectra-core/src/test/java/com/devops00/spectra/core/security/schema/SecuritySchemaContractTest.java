@@ -84,6 +84,17 @@ class SecuritySchemaContractTest {
         assertFalse(migration.contains("CREATE TABLE spectra_core.sys_user_data_scope"));
     }
 
+    @Test
+    void runtimePrivilegesMustProtectAppendOnlyAudit() throws IOException {
+        String migration = readMigration("V2__security_runtime_privileges.sql");
+
+        assertTrue(migration.contains("CREATE ROLE spectra_runtime"));
+        assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_security.security_audit_event TO spectra_runtime"));
+        assertTrue(migration.contains("REVOKE UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER"));
+        assertTrue(migration.contains("CREATE ROLE spectra_migrator"));
+        assertFalse(migration.contains("ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_security\n    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES"));
+    }
+
     private String readSql() throws IOException {
         var candidates = List.of(
                 Path.of("docs", "sql", "spectra_security", "建表.sql"),
@@ -99,20 +110,20 @@ class SecuritySchemaContractTest {
     }
 
     private String readV1() throws IOException {
+        return readMigration("V1__init_target_schema.sql");
+    }
+
+    private String readMigration(String fileName) throws IOException {
         var candidates = List.of(
-                Path.of("spectra-config", "src", "main", "resources", "db", "migration",
-                        "V1__init_target_schema.sql"),
-                Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
-                        "V1__init_target_schema.sql"),
-                Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
-                        "V1__init_target_schema.sql"),
-                Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
-                        "V1__init_target_schema.sql"));
+                Path.of("spectra-config", "src", "main", "resources", "db", "migration", fileName),
+                Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration", fileName),
+                Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration", fileName),
+                Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration", fileName));
         for (var candidate : candidates) {
             if (Files.isRegularFile(candidate)) {
                 return Files.readString(candidate);
             }
         }
-        throw new IOException("找不到目标 Flyway V1 migration");
+        throw new IOException("找不到目标 Flyway migration: " + fileName);
     }
 }
