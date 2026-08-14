@@ -95,6 +95,13 @@ spring:
         loginTimeout: 10
         sslmode: disable
         prepareThreshold: 5
+  flyway:
+    enabled: ${SPECTRA_FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    validate-on-migrate: true
+    out-of-order: false
+    clean-disabled: true
   data:
     redis:
       url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}

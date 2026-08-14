@@ -18,6 +18,7 @@ SSL_ALIAS = "tomcat"
 DB_URL = "jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db"
 DB_USERNAME = "postgres"
 DB_PASSWORD = "change-me"
+SPECTRA_FLYWAY_ENABLED = "true"
 
 # Redis：当前连接串要求密码认证
 REDIS_PORT = "6379"

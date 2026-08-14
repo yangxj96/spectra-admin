@@ -40,6 +40,16 @@
     </properties>
 
     <dependencies>
+        <!-- 目标数据库 schema 由 Flyway V1 起完整管理；不使用 baseline-on-migrate 兼容旧库。 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+
         <!-- === 项目模块-基础功能 === -->
         <!-- 统一通知模块 -->
         <dependency>

@@ -58,6 +58,32 @@ class SecuritySchemaContractTest {
         assertTrue(schema.contains("CREATE TABLE spectra_security.security_change_outbox"));
     }
 
+    @Test
+    void targetFlywayV1MustBeCompleteAndMustNotReintroduceLegacySecurityOrTenantTables() throws IOException {
+        String migration = readV1();
+
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_core"));
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_security"));
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_oa"));
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_ai"));
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_workflow"));
+        assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS spectra_notification"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.role_menu"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_user_department_membership"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
+        assertTrue(migration.contains("CREATE TABLE spectra_core.sys_organization_version"));
+        assertTrue(migration.contains("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA spectra_ai"));
+
+        assertFalse(migration.contains("tenant_id"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_account"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_role"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_authority"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_rel_user_role"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_rel_role_authority"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_role_data_scope"));
+        assertFalse(migration.contains("CREATE TABLE spectra_core.sys_user_data_scope"));
+    }
+
     private String readSql() throws IOException {
         var candidates = List.of(
                 Path.of("docs", "sql", "spectra_security", "建表.sql"),
@@ -70,5 +96,23 @@ class SecuritySchemaContractTest {
             }
         }
         throw new IOException("找不到安全 schema SQL 文件");
+    }
+
+    private String readV1() throws IOException {
+        var candidates = List.of(
+                Path.of("spectra-config", "src", "main", "resources", "db", "migration",
+                        "V1__init_target_schema.sql"),
+                Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
+                        "V1__init_target_schema.sql"),
+                Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
+                        "V1__init_target_schema.sql"),
+                Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration",
+                        "V1__init_target_schema.sql"));
+        for (var candidate : candidates) {
+            if (Files.isRegularFile(candidate)) {
+                return Files.readString(candidate);
+            }
+        }
+        throw new IOException("找不到目标 Flyway V1 migration");
     }
 }
