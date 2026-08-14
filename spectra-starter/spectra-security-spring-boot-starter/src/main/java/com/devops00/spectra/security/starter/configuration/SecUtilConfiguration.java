@@ -24,7 +24,6 @@ import com.devops00.spectra.security.base.holder.SecHolderStrategy;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.starter.holder.SecStrategyBridge;
 import com.devops00.spectra.security.starter.holder.SecHolderSecurityContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
@@ -47,16 +46,6 @@ import tools.jackson.databind.ObjectMapper;
 @Slf4j
 @Configuration
 public class SecUtilConfiguration {
-
-    /**
-     * SecUtil 工具桥接
-     *
-     * @param strategy 具体策略
-     */
-    @Bean
-    public SecStrategyBridge secStrategyBridge(SecHolderStrategy strategy) {
-        return new SecStrategyBridge(strategy);
-    }
 
     @Bean
     public SecurityContextAccessor securityContextAccessor(SecHolderStrategy strategy) {
@@ -120,7 +109,7 @@ public class SecUtilConfiguration {
     }
 
     /**
-     * 使用Redis操作SecUtil具体业务的策略实现
+     * 使用 Redis 提供安全会话和认证端口的具体实现。
      *
      * @param om                  Security使用的ObjectMapper
      * @param redis               Security使用的RedisTemplate

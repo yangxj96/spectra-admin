@@ -67,7 +67,7 @@ public class SecurityProperties {
     private long refreshTokenExpire = 604800L;
 
     /**
-     * SecUtil工具当前类型
+     * 安全会话适配模式。
      */
     private SecMode secMode = SecMode.REDIS;
 
