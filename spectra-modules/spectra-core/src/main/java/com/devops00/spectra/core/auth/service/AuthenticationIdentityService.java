@@ -26,9 +26,19 @@ public interface AuthenticationIdentityService {
     @Nullable
     AuthenticationIdentity findPasswordIdentity(String identifier);
 
+    /** 按目标认证方式查找当前有效身份，业务认证不得回退到旧 Account 表。 */
+    @Nullable
+    AuthenticationIdentity findIdentity(String methodCode, String identifier);
+
     AuthenticationIdentity createPasswordIdentity(UUID userId, String identifier);
+
+    /** 创建或重新激活非密码认证身份。 */
+    AuthenticationIdentity createIdentity(UUID userId, String methodCode, String identifier);
 
     void updatePasswordIdentifier(UUID userId, String identifier);
 
     void revokeByUserId(UUID userId);
+
+    /** 撤销指定认证方式的所有身份。 */
+    void revokeByUserIdAndMethod(UUID userId, String methodCode);
 }

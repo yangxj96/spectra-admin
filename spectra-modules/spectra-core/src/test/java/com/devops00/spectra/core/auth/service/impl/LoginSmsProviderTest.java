@@ -18,7 +18,8 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.auth.service.PasswordCredentialService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
@@ -62,8 +63,8 @@ class LoginSmsProviderTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey(HMAC_KEY);
-        provider = new LoginSmsProvider(redisTemplate, mock(UserService.class), mock(AccountService.class),
-                mock(SecurityUserHelper.class), properties);
+        provider = new LoginSmsProvider(redisTemplate, mock(UserService.class), mock(AuthenticationIdentityService.class),
+                mock(PasswordCredentialService.class), mock(SecurityUserHelper.class), properties);
     }
 
     @Test

@@ -18,7 +18,9 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.auth.service.PasswordCredentialService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.exception.LoginException;
@@ -49,33 +51,38 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private final UserService userService;
 
-    private final AccountService accountService;
+    private final AuthenticationIdentityService identityService;
+
+    private final PasswordCredentialService passwordCredentialService;
 
     private final SecurityUserHelper securityUserHelper;
 
     private final SecurityProperties securityProperties;
 
     public LoginEmailProvider(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate, UserService userService,
-                              AccountService accountService,
+                              AuthenticationIdentityService identityService,
+                              PasswordCredentialService passwordCredentialService,
                               SecurityUserHelper securityUserHelper, SecurityProperties securityProperties) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
-        this.accountService = accountService;
+        this.identityService = identityService;
+        this.passwordCredentialService = passwordCredentialService;
         this.securityUserHelper = securityUserHelper;
         this.securityProperties = securityProperties;
     }
 
     @Override
     public Authentication login(String email, String code) throws AuthenticationException {
-        var account = accountService.getByEmail(email);
-        if (account == null) {
+        AuthenticationIdentity identity = identityService.findIdentity(LoginType.EMAIL.name(), email);
+        if (identity == null) {
             throw new LoginException("账号或验证码错误");
         }
-        var user = userService.getById(account.getUserId());
-        if (user == null) {
+        var user = userService.getById(identity.getUserId());
+        var credential = passwordCredentialService.getByUserId(identity.getUserId());
+        if (user == null || credential == null) {
             throw new LoginException("账号或验证码错误");
         }
-        var su = securityUserHelper.toSecurityUser(LoginType.EMAIL, account, user);
+        var su = securityUserHelper.toSecurityUser(LoginType.EMAIL, identity, credential, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 

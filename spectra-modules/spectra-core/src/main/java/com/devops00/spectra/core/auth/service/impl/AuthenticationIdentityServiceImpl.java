@@ -53,8 +53,13 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
 
     @Override
     public @Nullable AuthenticationIdentity findPasswordIdentity(String identifier) {
+        return findIdentity(METHOD_PASSWORD, identifier);
+    }
+
+    @Override
+    public @Nullable AuthenticationIdentity findIdentity(String methodCode, String identifier) {
         var wrapper = new LambdaQueryWrapper<AuthenticationIdentity>()
-                .eq(AuthenticationIdentity::getMethodCode, METHOD_PASSWORD)
+                .eq(AuthenticationIdentity::getMethodCode, methodCode)
                 .eq(AuthenticationIdentity::getProviderCode, PROVIDER_LOCAL)
                 .eq(AuthenticationIdentity::getIdentifierHash, AuthenticationIdentifierHash.digest(identifier))
                 .eq(AuthenticationIdentity::getState, STATE_ACTIVE)
@@ -65,10 +70,33 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
     @Override
     @Transactional
     public AuthenticationIdentity createPasswordIdentity(UUID userId, String identifier) {
+        return createIdentity(userId, METHOD_PASSWORD, identifier);
+    }
+
+    @Override
+    @Transactional
+    public AuthenticationIdentity createIdentity(UUID userId, String methodCode, String identifier) {
+        var identifierHash = AuthenticationIdentifierHash.digest(identifier);
+        var existing = mapper.selectOne(new LambdaQueryWrapper<AuthenticationIdentity>()
+                .eq(AuthenticationIdentity::getMethodCode, methodCode)
+                .eq(AuthenticationIdentity::getProviderCode, PROVIDER_LOCAL)
+                .eq(AuthenticationIdentity::getIdentifierHash, identifierHash)
+                .last("LIMIT 1"));
+        if (existing != null) {
+            if (!userId.equals(existing.getUserId())) {
+                throw new DataSaveException("认证身份已被其他用户绑定");
+            }
+            existing.setState(STATE_ACTIVE);
+            existing.setVerifiedAt(Instant.now());
+            if (mapper.updateById(existing) != 1) {
+                throw new EntityUpdateException("恢复认证身份失败");
+            }
+            return existing;
+        }
         var identity = new AuthenticationIdentity();
         identity.setId(UUID.randomUUID());
         identity.setUserId(userId);
-        identity.setMethodCode(METHOD_PASSWORD);
+        identity.setMethodCode(methodCode);
         identity.setProviderCode(PROVIDER_LOCAL);
         identity.setIdentifierHash(AuthenticationIdentifierHash.digest(identifier));
         identity.setState(STATE_ACTIVE);
@@ -100,6 +128,19 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
     public void revokeByUserId(UUID userId) {
         var identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getUserId, userId)
+                .eq(AuthenticationIdentity::getState, STATE_ACTIVE));
+        for (AuthenticationIdentity identity : identities) {
+            identity.setState(STATE_REVOKED);
+            mapper.updateById(identity);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void revokeByUserIdAndMethod(UUID userId, String methodCode) {
+        var identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
+                .eq(AuthenticationIdentity::getUserId, userId)
+                .eq(AuthenticationIdentity::getMethodCode, methodCode)
                 .eq(AuthenticationIdentity::getState, STATE_ACTIVE));
         for (AuthenticationIdentity identity : identities) {
             identity.setState(STATE_REVOKED);

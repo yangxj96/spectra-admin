@@ -16,10 +16,7 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-import com.devops00.spectra.common.mybatis.DataScopeProvider;
-import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.converter.AuthConverter;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.auth.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -32,7 +29,6 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,62 +46,11 @@ public class SecurityUserHelper {
 
     private final AuthConverter authConverter;
 
-    private final DataScopeProvider dataScopeProvider;
-
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
-    public SecurityUserHelper(AuthConverter authConverter, DataScopeProvider dataScopeProvider,
-                              AuthorizationSnapshotProvider authorizationSnapshotProvider) {
+    public SecurityUserHelper(AuthConverter authConverter, AuthorizationSnapshotProvider authorizationSnapshotProvider) {
         this.authConverter = authConverter;
-        this.dataScopeProvider = dataScopeProvider;
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
-    }
-
-    /**
-     * 数据库用户实体转SpringSecurity使用的用户对象
-     *
-     * @param loginType 本次登录方式
-     * @param account   数据库账号实体
-     * @param user      数据库用户实体
-     * @return SpringSecurity的用户对象
-     */
-    public SecurityUser toSecurityUser(LoginType loginType, Account account, Object user) {
-        if (loginType == null || account == null || !(user instanceof User u)) {
-            throw new LoginException("账号当前不可用");
-        }
-
-        var now = Instant.now();
-        boolean accountActive = AccountStatus.ACTIVE.getCode().equals(account.getStatus());
-        boolean accountNotExpired = account.getExpiresAt() == null || account.getExpiresAt().isAfter(now);
-        boolean userActive = UserStatus.ACTIVE.equals(u.getStatus());
-        boolean accountTypeMatches = loginType.equals(account.getType());
-        boolean verified = loginType == LoginType.PASSWORD
-                || Short.valueOf((short) 1).equals(account.getVerified());
-
-        if (account.getDeleted() != null
-                || u.getDeleted() != null
-                || !accountTypeMatches
-                || !accountActive
-                || !accountNotExpired
-                || !verified
-                || !userActive) {
-            throw new LoginException("账号当前不可用");
-        }
-
-        var securityUser = authConverter.toSecurityUser(u);
-        securityUser.setEnabled(accountActive && userActive);
-        securityUser.setAccountNonExpired(accountNotExpired);
-        securityUser.setAccountNonLocked(accountActive);
-        securityUser.setCredentialsNonExpired(accountNotExpired && verified);
-        securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
-
-        // 加载数据范围信息
-        var scope = dataScopeProvider.resolve(securityUser.getId());
-        securityUser.setDataScopeType(scope.getScopeType());
-        securityUser.setDepartmentId(scope.getDepartmentId());
-        securityUser.setDataScopeTargetIds(scope.getTargetIds());
-
-        return securityUser;
     }
 
     /**
@@ -133,10 +78,6 @@ public class SecurityUserHelper {
         securityUser.setAccountNonLocked(true);
         securityUser.setCredentialsNonExpired(true);
         securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
-        var scope = dataScopeProvider.resolve(securityUser.getId());
-        securityUser.setDataScopeType(scope.getScopeType());
-        securityUser.setDepartmentId(scope.getDepartmentId());
-        securityUser.setDataScopeTargetIds(scope.getTargetIds());
         return securityUser;
     }
 

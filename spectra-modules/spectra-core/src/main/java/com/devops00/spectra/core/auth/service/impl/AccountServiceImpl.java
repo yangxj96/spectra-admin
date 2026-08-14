@@ -26,6 +26,7 @@ import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.mapper.AccountMapper;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
@@ -56,11 +57,13 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final SecurityProperties securityProperties;
+    private final AuthenticationIdentityService identityService;
 
     public AccountServiceImpl(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
-                              SecurityProperties securityProperties) {
+                              SecurityProperties securityProperties, AuthenticationIdentityService identityService) {
         this.redisTemplate = redisTemplate;
         this.securityProperties = securityProperties;
+        this.identityService = identityService;
     }
 
     @Override
@@ -111,6 +114,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
 
         // 2. 如果当前用户已绑定该手机号，直接返回
         if (existingAccount != null && existingAccount.getUserId().equals(userId)) {
+            identityService.createIdentity(userId, LoginType.SMS.name(), phone);
             return;
         }
 
@@ -125,6 +129,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
         if (!this.save(account)) {
             throw new DataSaveException("绑定手机号失败");
         }
+        identityService.createIdentity(userId, LoginType.SMS.name(), phone);
         log.info("用户 {} 绑定手机号 {} 成功", userId, phone);
     }
 
@@ -140,6 +145,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
 
         // 2. 如果当前用户已绑定该邮箱，直接返回
         if (existingAccount != null && existingAccount.getUserId().equals(userId)) {
+            identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
             return;
         }
 
@@ -154,6 +160,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
         if (!this.save(account)) {
             throw new DataSaveException("绑定邮箱失败");
         }
+        identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
         log.info("用户 {} 绑定邮箱 {} 成功", userId, email);
     }
 
@@ -186,6 +193,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
         if (!this.removeById(accountId)) {
             throw new EntityUpdateException("解绑账号失败");
         }
+        identityService.revokeByUserIdAndMethod(userId, account.getType().name());
         log.info("用户 {} 解绑账号 {} 成功", userId, accountId);
     }
 
