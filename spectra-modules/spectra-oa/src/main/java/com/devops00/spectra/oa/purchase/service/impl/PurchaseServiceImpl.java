@@ -46,7 +46,7 @@ import com.devops00.spectra.oa.purchase.mapper.PurchaseMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptItemMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper;
 import com.devops00.spectra.oa.purchase.service.PurchaseService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,11 +90,12 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     private final ProcessInstanceService processInstanceService;
     private final NotificationGateway notificationGateway;
     private final PurchaseConverter purchaseConverter;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
         var wrapper = new LambdaQueryWrapper<Purchase>();
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -179,7 +180,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
             throw new DataSaveException("采购流程尚未配置");
         }
         applicationService.submit(application.getId());
-        var currentUser = SecUtil.getCurrentUser();
+        var currentUser = securityContextAccessor.currentUser();
         var username = currentUser == null ? null : currentUser.getUsername();
         if (!StringUtils.hasText(username)) {
             throw new DataSaveException("当前用户缺少流程用户名");
@@ -226,7 +227,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (EXECUTION_RECEIVED.equals(entity.getExecutionStatus())) {
             throw new DataSaveException("采购申请已完成收货");
         }
-        var currentUserId = SecUtil.getCurrentUserId();
+        var currentUserId = securityContextAccessor.currentUserId();
         var purchaserId = from == null || from.getPurchaserId() == null ? currentUserId : from.getPurchaserId();
         if (purchaserId == null) {
             throw new DataSaveException("采购执行人不能为空");
@@ -259,7 +260,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (EXECUTION_RECEIVED.equals(entity.getExecutionStatus()) || "CANCELLED".equals(entity.getExecutionStatus())) {
             throw new DataSaveException("当前采购状态不允许收货");
         }
-        var receiverId = from.getReceiverId() == null ? SecUtil.getCurrentUserId() : from.getReceiverId();
+        var receiverId = from.getReceiverId() == null ? securityContextAccessor.currentUserId() : from.getReceiverId();
         if (receiverId == null) {
             throw new DataSaveException("收货人不能为空");
         }
@@ -447,7 +448,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
 
     private Application requireApplicantApplication(Purchase entity) {
         var application = applicationService.require(entity.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), SecUtil.getCurrentUserId())) {
+        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("采购申请不存在或无权操作");
         }
         return application;

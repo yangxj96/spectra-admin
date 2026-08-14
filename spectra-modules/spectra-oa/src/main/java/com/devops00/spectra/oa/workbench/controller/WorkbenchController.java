@@ -28,7 +28,7 @@ import com.devops00.spectra.oa.meeting.service.MeetingService;
 import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import com.devops00.spectra.oa.workbench.javabean.vo.WorkbenchSummaryVO;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +59,7 @@ public class WorkbenchController {
     private final NoticeService noticeService;
     private final CalendarService calendarService;
     private final MeetingService meetingService;
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 查询 OA 工作台摘要。
@@ -72,13 +73,13 @@ public class WorkbenchController {
             var page = new PageFrom();
             page.setPageSize(1L);
             page.setPageNum(1L);
-            result.setTodoCount(taskService.todo(page, SecUtil.getCurrentUsername(), null).getTotal());
+            result.setTodoCount(taskService.todo(page, securityContextAccessor.currentUsername(), null).getTotal());
         } catch (Exception exception) {
             log.warn("OA 工作台待办卡片加载失败", exception);
         }
 
         try {
-            var userId = SecUtil.getCurrentUserId();
+            var userId = securityContextAccessor.currentUserId();
             result.setUnreadNotificationCount(notificationCounter.unreadCount(userId));
         } catch (Exception exception) {
             log.warn("OA 工作台消息卡片加载失败", exception);

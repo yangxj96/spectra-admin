@@ -47,7 +47,7 @@ import com.devops00.spectra.oa.leave.mapper.LeaveApplicationMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveBalanceMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper;
 import com.devops00.spectra.oa.leave.service.LeaveService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +89,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     private final NotificationGateway notificationGateway;
     private final LeaveConverter leaveConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     @Transactional
@@ -136,7 +137,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Override
     public IPage<LeaveVO> page(PageFrom page, LeavePageFrom params) {
         var wrapper = new LambdaQueryWrapper<LeaveApplication>();
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -179,7 +180,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         if (type == null || !StringUtils.hasText(type.getProcessDefinitionKey())) {
             throw new DataSaveException("请假流程尚未配置");
         }
-        var currentUser = SecUtil.getCurrentUser();
+        var currentUser = securityContextAccessor.currentUser();
         var applicant = currentUser == null ? null : currentUser.getUsername();
         if (!StringUtils.hasText(applicant)) {
             throw new DataSaveException("当前用户缺少流程用户名");
@@ -266,7 +267,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
 
     private Application requireApplicantApplication(LeaveApplication detail) {
         var application = applicationService.require(detail.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), SecUtil.getCurrentUserId())) {
+        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("请假申请不存在或无权操作");
         }
         return application;

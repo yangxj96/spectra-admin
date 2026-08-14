@@ -18,7 +18,7 @@ import com.devops00.spectra.oa.supply.javabean.vo.SupplyItemVO;
 import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
 import com.devops00.spectra.oa.supply.mapper.SupplyOperationMapper;
 import com.devops00.spectra.oa.supply.service.SupplyService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,6 +49,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
     private final SupplyOperationMapper operationMapper;
     private final SupplyConverter supplyConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<SupplyItemVO> page(PageFrom page, SupplyPageFrom params) {
@@ -121,7 +122,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         var operationFrom = requireFrom(from);
         var quantity = positiveQuantity(operationFrom).negate();
         if (operationFrom.getUserId() == null) {
-            operationFrom.setUserId(SecUtil.getCurrentUserId());
+            operationFrom.setUserId(securityContextAccessor.currentUserId());
         }
         change(id, OP_ISSUE, quantity, operationFrom);
     }
@@ -132,7 +133,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         var operationFrom = requireFrom(from);
         var quantity = positiveQuantity(operationFrom);
         if (operationFrom.getUserId() == null) {
-            operationFrom.setUserId(SecUtil.getCurrentUserId());
+            operationFrom.setUserId(securityContextAccessor.currentUserId());
         }
         change(id, OP_RETURN, quantity, operationFrom);
     }

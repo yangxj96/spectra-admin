@@ -43,7 +43,7 @@ import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
 import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,11 +81,12 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final NotificationGateway notificationGateway;
     private final ReimbursementConverter reimbursementConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Reimbursement>();
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -130,8 +131,8 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     @Transactional
     public UUID created(ReimbursementSaveFrom from) {
         validate(from);
-        var user = SecUtil.getCurrentUser();
-        if (user == null || SecUtil.getCurrentUserId() == null || user.getDepartmentId() == null) {
+        var user = securityContextAccessor.currentUser();
+        if (user == null || securityContextAccessor.currentUserId() == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
         var application = applicationService.createDraft(TYPE_CODE, null, "费用报销 - " + from.getPurpose());
@@ -178,7 +179,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("报销流程尚未配置");
         }
         applicationService.submit(application.getId());
-        var applicantUsername = SecUtil.getCurrentUser() == null ? null : SecUtil.getCurrentUser().getUsername();
+        var applicantUsername = securityContextAccessor.currentUser() == null ? null : securityContextAccessor.currentUser().getUsername();
         if (!StringUtils.hasText(applicantUsername)) {
             throw new DataSaveException("当前用户缺少流程用户名");
         }
@@ -368,7 +369,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
 
     private Application requireApplicantApplication(Reimbursement entity) {
         var application = applicationService.require(entity.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), SecUtil.getCurrentUserId())) {
+        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("报销单不存在或无权操作");
         }
         return application;

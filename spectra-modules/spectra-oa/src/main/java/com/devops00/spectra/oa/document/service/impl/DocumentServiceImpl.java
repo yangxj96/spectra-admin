@@ -44,7 +44,7 @@ import com.devops00.spectra.oa.document.mapper.DocumentFolderMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
 import com.devops00.spectra.oa.document.service.DocumentService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
@@ -83,12 +83,13 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final NotificationGateway notificationGateway;
     private final UserService userService;
     private final DocumentConverter documentConverter;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Document>();
-        var user = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var user = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -121,7 +122,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Override
     @Transactional
     public UUID created(DocumentSaveFrom from) {
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
@@ -220,7 +221,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     @Override
     public List<DocumentFolderVO> folders() {
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getDepartmentId() == null) {
             return List.of();
         }
@@ -237,7 +238,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Override
     @Transactional
     public UUID createFolder(DocumentFolderSaveFrom from) {
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
@@ -309,7 +310,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private Document requireAccessible(UUID id) {
         var entity = require(id);
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null
                 || user.getDepartmentId() == null
                 || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
@@ -323,7 +324,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private Document requireOwner(UUID id) {
         var entity = require(id);
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || !java.util.Objects.equals(entity.getOwnerId(), user.getId())) {
             throw new DataNotExistException("文档不存在或无权操作");
         }

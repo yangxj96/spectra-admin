@@ -40,7 +40,7 @@ import com.devops00.spectra.oa.contract.mapper.ContractMapper;
 import com.devops00.spectra.oa.contract.mapper.ContractMilestoneMapper;
 import com.devops00.spectra.oa.contract.mapper.ContractVersionMapper;
 import com.devops00.spectra.oa.contract.service.ContractService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
@@ -87,6 +87,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final NotificationGateway notificationGateway;
     private final ContractConverter contractConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -462,7 +463,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     }
 
     private SecurityUser requireCurrentUser() {
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }

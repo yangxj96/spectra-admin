@@ -26,7 +26,7 @@ import com.devops00.spectra.oa.purchase.mapper.PurchaseItemMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptItemMapper;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseReceiptMapper;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +69,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     private final PurchaseReceiptItemMapper receiptItemMapper;
     private final AssetConverter assetConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<AssetVO> page(PageFrom page, AssetPageFrom params) {
@@ -187,7 +188,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
         var operation = operation(entity, OP_ASSIGN, from);
         operation.setToDepartmentId(from == null || from.getToDepartmentId() == null ? entity.getDepartmentId() : from.getToDepartmentId());
-        var targetUserId = from == null || from.getToUserId() == null ? SecUtil.getCurrentUserId() : from.getToUserId();
+        var targetUserId = from == null || from.getToUserId() == null ? securityContextAccessor.currentUserId() : from.getToUserId();
         if (targetUserId == null) {
             throw new DataSaveException("领用人不能为空");
         }
