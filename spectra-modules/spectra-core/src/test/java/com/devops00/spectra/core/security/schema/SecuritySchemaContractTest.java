@@ -22,7 +22,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -95,6 +97,25 @@ class SecuritySchemaContractTest {
         assertFalse(migration.contains("ALTER DEFAULT PRIVILEGES IN SCHEMA spectra_security\n    GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES"));
     }
 
+    @Test
+    void permissionCatalogMustBeFullySeededIntoTargetPermissionTable() throws IOException {
+        String catalog = readCatalog();
+        String seed = readMigration("V3__security_permission_catalog_seed.sql");
+        var codes = catalog.lines()
+                .filter(line -> line.matches("  - code: [a-z][a-z0-9_-]*(:[a-z][a-z0-9_-]*){1,2}"))
+                .map(line -> line.substring("  - code: ".length()))
+                .toList();
+
+        assertEquals(102, codes.size());
+        assertEquals(codes.size(), Set.copyOf(codes).size());
+        assertTrue(seed.contains("INSERT INTO spectra_security.permission"));
+        assertTrue(seed.contains("ON CONFLICT (code) DO NOTHING"));
+        for (String code : codes) {
+            assertTrue(seed.contains("md5('" + code + "')::uuid, '" + code + "'"), code);
+        }
+        assertFalse(seed.contains("ROLE_DEV_OPS"));
+    }
+
     private String readSql() throws IOException {
         var candidates = List.of(
                 Path.of("docs", "sql", "spectra_security", "建表.sql"),
@@ -111,6 +132,19 @@ class SecuritySchemaContractTest {
 
     private String readV1() throws IOException {
         return readMigration("V1__init_target_schema.sql");
+    }
+
+    private String readCatalog() throws IOException {
+        var candidates = List.of(
+                Path.of("..", "..", "docs", "security", "permission-catalog.yaml"),
+                Path.of("..", "..", "..", "docs", "security", "permission-catalog.yaml"),
+                Path.of("..", "..", "..", "..", "docs", "security", "permission-catalog.yaml"));
+        for (var candidate : candidates) {
+            if (Files.isRegularFile(candidate)) {
+                return Files.readString(candidate);
+            }
+        }
+        throw new IOException("找不到 Permission Catalog");
     }
 
     private String readMigration(String fileName) throws IOException {
