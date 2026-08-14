@@ -41,6 +41,7 @@ import com.devops00.spectra.core.authorization.service.RoleChangeImpactAnalyzer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
 import com.devops00.spectra.core.authorization.AuthorizationSnapshotLoader;
@@ -101,6 +102,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private final ObjectProvider<RootAuthorizationPolicy> rootPolicyProvider;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
     @Override
     public RoleAuthorizationChangePreviewVO preview(UUID roleId, RoleAuthorizationChangeFrom from) {
         var prepared = prepare(roleId, from);
@@ -115,6 +118,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
+        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), roleId,
+                Map.of("affectedUserCount", prepared.impact().affectedUserCount()), Map.of(), "Role 授权变更预览");
         return result;
     }
 
@@ -134,13 +139,14 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("Role 授权变更请求已被修改，请重新生成预览");
         }
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_AUTHORIZATION_CHANGED", operatorId, roleId,
+        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, roleId,
                 null, null, null, Map.of("roleId", roleId.toString()),
                 Map.of("affectedUserCount", prepared.impact().affectedUserCount(),
                         "expandsEffectiveAuthority", prepared.impact().expandsEffectiveAuthority()),
                 "通过 Role Authorization Preview/Apply 提交", null, AuditResult.STARTED, null);
         securityChangeExecutor.execute(event, () -> {
             persist(prepared);
+            recordRoleAuthorizationEvents(prepared, roleId);
             return Boolean.TRUE;
         });
     }
@@ -179,7 +185,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (approvalGate != null) {
             approvalGate.assertAllowed("ROLE_AUTHORIZATION_CHANGE", requestHash);
         }
-        return new PreparedChange(operatorId, role, expectedVersion, after, impact, requestHash);
+        return new PreparedChange(operatorId, role, expectedVersion, before, after, impact, requestHash);
     }
 
     private RoleAuthorizationState currentState(UUID roleId, SecurityRole role) {
@@ -321,9 +327,34 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         return operatorId;
     }
 
+    private void recordRoleAuthorizationEvents(PreparedChange prepared, UUID roleId) {
+        if (!prepared.before().permissions().equals(prepared.after().permissions())) {
+            appendAudit("ROLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
+                    Map.of("permissions", prepared.before().permissions()),
+                    Map.of("permissions", prepared.after().permissions()), null);
+        }
+        if (!prepared.before().grantablePermissions().equals(prepared.after().grantablePermissions())) {
+            appendAudit("ROLE_GRANTABLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
+                    Map.of("grantablePermissions", prepared.before().grantablePermissions()),
+                    Map.of("grantablePermissions", prepared.after().grantablePermissions()), null);
+        }
+        if (prepared.before().authorityLevel() != prepared.after().authorityLevel()) {
+            appendAudit("ROLE_AUTHORITY_LEVEL_CHANGED", prepared.operatorId(), roleId,
+                    Map.of("authorityLevel", prepared.before().authorityLevel()),
+                    Map.of("authorityLevel", prepared.after().authorityLevel()), null);
+        }
+    }
+
+    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                             Map<String, Object> after, String reason) {
+        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditResult.SUCCEEDED, null));
+    }
+
     private record PreparedChange(UUID operatorId,
                                   SecurityRole role,
                                   long expectedVersion,
+                                  RoleAuthorizationState before,
                                   RoleAuthorizationState after,
                                   RoleChangeImpact impact,
                                   String requestHash) {

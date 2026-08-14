@@ -36,6 +36,7 @@ import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
 import com.devops00.spectra.security.base.authorization.ScopeMode;
@@ -93,6 +94,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final ObjectProvider<RootAuthorizationPolicy> rootPolicyProvider;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
     @Override
     public OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from) {
         var prepared = prepare(departmentId, from);
@@ -109,6 +112,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
+        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), departmentId,
+                Map.of("organizationVersion", prepared.impact().beforeVersion()), Map.of(), "组织变更预览");
         return result;
     }
 
@@ -128,13 +133,17 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("组织变更请求已被修改，请重新生成预览");
         }
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "ORGANIZATION_CHANGED", operatorId, departmentId,
+        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
                 null, null, null, Map.of("organizationVersion", prepared.impact().beforeVersion()),
                 Map.of("organizationVersion", prepared.impact().afterVersion(), "newParentId",
                         String.valueOf(prepared.newParentId())),
                 "通过组织变更 Preview/Apply 提交", null, AuditResult.STARTED, null);
         securityChangeExecutor.execute(event, () -> {
             persist(prepared);
+            appendAudit("ORGANIZATION_NODE_MOVED", operatorId, departmentId,
+                    Map.of("organizationVersion", prepared.impact().beforeVersion()),
+                    Map.of("organizationVersion", prepared.impact().afterVersion(),
+                            "newParentId", String.valueOf(prepared.newParentId())), null);
             return Boolean.TRUE;
         });
     }
@@ -232,6 +241,12 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
             throw new DataException("无法识别当前安全主体");
         }
         return operatorId;
+    }
+
+    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                             Map<String, Object> after, String reason) {
+        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
     private record PreparedChange(UUID operatorId,

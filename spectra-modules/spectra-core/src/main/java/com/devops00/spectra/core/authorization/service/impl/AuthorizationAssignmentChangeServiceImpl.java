@@ -47,6 +47,7 @@ import com.devops00.spectra.core.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
@@ -112,6 +113,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private final ObjectProvider<RootAuthorizationPolicy> rootAuthorizationPolicy;
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
     @Override
     public AuthorizationChangePreviewVO preview(UUID targetUserId, AuthorizationAssignmentChangeFrom from) {
         var prepared = prepare(targetUserId, from, from.getAssignmentId());
@@ -126,6 +129,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         result.setExpiresAt(expiresAt);
         result.setAffectedAssignmentCount(1);
         result.setAffectedUserCount(1);
+        appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), targetUserId,
+                Map.of("assignmentId", prepared.assignmentId().toString()), Map.of(), "Assignment 授权变更预览");
         return result;
     }
 
@@ -148,12 +153,13 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("授权变更请求已被修改，请重新生成预览");
         }
-        var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_ASSIGNMENT_CHANGED", operatorId, targetUserId,
+        var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
                 null, null, null, Map.of("assignmentId", assignmentId.toString()),
                 Map.of("roleId", prepared.role().getId().toString(), "permissionCount", prepared.requests().size()),
                 "通过 Grant Boundary Preview/Apply 提交", null, AuditResult.STARTED, null);
         securityChangeExecutor.execute(event, () -> {
             persist(prepared, targetUserId);
+            recordAssignmentEvents(prepared, targetUserId);
             epochGuard.advance(targetUserId, prepared.targetSecurityVersion());
             sessionRevocationPort.revokeUserSessions(targetUserId);
             return Boolean.TRUE;
@@ -339,6 +345,29 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
             throw new DataException("无法识别当前安全主体");
         }
         return operatorId;
+    }
+
+    private void recordAssignmentEvents(PreparedChange prepared, UUID targetUserId) {
+        appendAudit(prepared.assignment() == null ? "ROLE_ASSIGNMENT_CREATED" : "ROLE_ASSIGNMENT_UPDATED",
+                prepared.operatorId(), targetUserId, Map.of("assignmentId", prepared.assignmentId().toString()),
+                Map.of("roleId", prepared.role().getId().toString(), "state", "ACTIVE"), null);
+        if (!prepared.requests().isEmpty()) {
+            appendAudit("ASSIGNMENT_PERMISSION_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
+                    Map.of("assignmentId", prepared.assignmentId().toString()),
+                    Map.of("permissionCount", prepared.requests().size()), null);
+        }
+        if (prepared.requests().stream().anyMatch(request -> request.grantScope() != null)) {
+            appendAudit("ASSIGNMENT_GRANT_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
+                    Map.of("assignmentId", prepared.assignmentId().toString()),
+                    Map.of("grantablePermissionCount", prepared.requests().stream()
+                            .filter(request -> request.grantScope() != null).count()), null);
+        }
+    }
+
+    private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
+                             Map<String, Object> after, String reason) {
+        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
     private String requestHash(UUID assignmentId,
