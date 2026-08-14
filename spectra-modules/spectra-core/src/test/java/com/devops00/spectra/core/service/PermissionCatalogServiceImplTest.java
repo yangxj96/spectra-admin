@@ -45,6 +45,7 @@ class PermissionCatalogServiceImplTest {
         assertEquals(List.of("user:read", "user:update-profile"),
                 result.getFirst().getChildren().stream().map(child -> child.getCode()).toList());
         assertEquals(result.getFirst().getId(), result.getFirst().getChildren().getFirst().getPid());
+        assertEquals(List.of(), result.getFirst().getChildren().getFirst().getAllowedScopeModes());
     }
 
     @Test
@@ -56,6 +57,17 @@ class PermissionCatalogServiceImplTest {
 
         assertEquals("menu", result.getFirst().getCode());
         assertEquals(permission.getId(), result.getFirst().getChildren().getFirst().getId());
+    }
+
+    @Test
+    void treeShouldExposeAllowedScopeModesFromPermissionCatalog() {
+        var permission = permission("document:read", "文档查询", "document", "read", "ACTIVE");
+        permission.setAllowedScopeModes("RULES, SELF, RULES");
+        when(permissionMapper.selectList(any())).thenReturn(List.of(permission));
+
+        var result = new PermissionCatalogServiceImpl(permissionMapper).tree();
+
+        assertEquals(List.of("RULES", "SELF"), result.getFirst().getChildren().getFirst().getAllowedScopeModes());
     }
 
     private static Permission permission(String code, String name, String resourceCode, String actionCode, String state) {

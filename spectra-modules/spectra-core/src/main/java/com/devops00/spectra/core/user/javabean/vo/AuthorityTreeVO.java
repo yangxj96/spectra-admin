@@ -62,6 +62,11 @@ public class AuthorityTreeVO implements Tree<AuthorityTreeVO>, Serializable {
     private String code;
 
     /**
+     * Permission 允许的 Scope 模式；资源分组节点为空。
+     */
+    private List<String> allowedScopeModes;
+
+    /**
      * tree必备字段,进行排序用,表中无这个字段,直接写死一个0
      */
     private Integer sort = 0;

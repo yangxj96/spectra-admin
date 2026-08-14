@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -57,6 +58,7 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
             leaf.setPid(group.getId());
             leaf.setName(permission.getName());
             leaf.setCode(permission.getCode());
+            leaf.setAllowedScopeModes(parseScopeModes(permission.getAllowedScopeModes()));
             leaf.setSort(0);
             group.getChildren().add(leaf);
         }
@@ -84,5 +86,17 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
 
     private String valueOrEmpty(String value) {
         return value == null ? "" : value;
+    }
+
+    private List<String> parseScopeModes(String value) {
+        if (value == null || value.isBlank()) {
+            return List.of();
+        }
+        return java.util.Arrays.stream(value.split(","))
+                .map(String::trim)
+                .filter(mode -> !mode.isBlank())
+                .map(mode -> mode.toUpperCase(Locale.ROOT))
+                .distinct()
+                .toList();
     }
 }
