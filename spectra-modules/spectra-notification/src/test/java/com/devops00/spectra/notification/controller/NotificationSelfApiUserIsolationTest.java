@@ -21,9 +21,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.service.NotificationInboxService;
-import com.devops00.spectra.security.base.holder.SecHolderStrategy;
-import com.devops00.spectra.security.base.holder.SecUtil;
-import org.junit.jupiter.api.AfterEach;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +38,7 @@ import static org.mockito.Mockito.when;
 /**
  * Self API 的真实用户 A/B 上下文隔离回归测试。
  *
- * <p>测试直接切换生产使用的 {@link SecUtil} 持有者，覆盖 Controller 到 Service 的完整用户绑定边界；
+ * <p>测试直接切换生产使用的 {@link SecurityContextAccessor}，覆盖 Controller 到 Service 的完整用户绑定边界；
  * 数据库层的收件人谓词由 {@code NotificationInboxServiceImplTest} 和 PostgreSQL 集成测试继续验证。</p>
  *
  * @author yangxj96
@@ -55,24 +53,18 @@ class NotificationSelfApiUserIsolationTest {
 
     private static final UUID MESSAGE_ID = UUID.fromString("00000000-0000-0000-0000-00000000000c");
 
-    private SecHolderStrategy security;
+    private SecurityContextAccessor security;
 
     @BeforeEach
     void setUpSecurityHolder() {
-        security = mock(SecHolderStrategy.class);
-        SecUtil.setHolder(security);
-    }
-
-    @AfterEach
-    void clearSecurityHolder() {
-        SecUtil.setHolder(null);
+        security = mock(SecurityContextAccessor.class);
     }
 
     @Test
     void shouldBindEverySelfOperationToTheActiveUser() {
         var service = mock(NotificationInboxService.class);
-        var controller = new NotificationController(service);
-        when(security.getCurrentUserId()).thenReturn(USER_A);
+        var controller = new NotificationController(service, security);
+        when(security.currentUserId()).thenReturn(USER_A);
         var page = new Page<com.devops00.spectra.notification.javabean.vo.NotificationInboxVO>();
         var params = new NotificationQueryFrom();
         var batch = new NotificationBatchDeleteFrom();
@@ -102,16 +94,16 @@ class NotificationSelfApiUserIsolationTest {
     @Test
     void shouldSwitchIsolationWhenTheAuthenticatedUserChanges() {
         var service = mock(NotificationInboxService.class);
-        var controller = new NotificationController(service);
+        var controller = new NotificationController(service, security);
         var page = new Page<com.devops00.spectra.notification.javabean.vo.NotificationInboxVO>();
         when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_A),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class))).thenReturn(page);
         when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_B),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class))).thenReturn(page);
 
-        when(security.getCurrentUserId()).thenReturn(USER_A);
+        when(security.currentUserId()).thenReturn(USER_A);
         controller.list(new PageFrom(), new NotificationQueryFrom());
-        when(security.getCurrentUserId()).thenReturn(USER_B);
+        when(security.currentUserId()).thenReturn(USER_B);
         controller.list(new PageFrom(), new NotificationQueryFrom());
         controller.detail(MESSAGE_ID);
 
@@ -125,8 +117,8 @@ class NotificationSelfApiUserIsolationTest {
     @Test
     void shouldRejectSelfApiWhenNoUserIsAuthenticated() {
         var service = mock(NotificationInboxService.class);
-        var controller = new NotificationController(service);
-        when(security.getCurrentUserId()).thenReturn(null);
+        var controller = new NotificationController(service, security);
+        when(security.currentUserId()).thenReturn(null);
 
         assertThrows(RuntimeException.class, controller::unreadCount);
     }

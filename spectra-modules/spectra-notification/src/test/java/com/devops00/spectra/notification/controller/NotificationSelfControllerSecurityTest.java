@@ -21,6 +21,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFr
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.service.NotificationInboxService;
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -41,7 +42,7 @@ class NotificationSelfControllerSecurityTest {
 
     @Test
     void shouldRequireNotificationPermissionsForSelfOperations() throws NoSuchMethodException {
-        var controller = new NotificationController(mock(NotificationInboxService.class));
+        var controller = new NotificationController(mock(NotificationInboxService.class), mock(SecurityContextAccessor.class));
         var query = NotificationController.class.getMethod("list", PageFrom.class, NotificationQueryFrom.class);
         var detail = NotificationController.class.getMethod("detail", UUID.class);
         var unread = NotificationController.class.getMethod("unreadCount");
@@ -62,7 +63,7 @@ class NotificationSelfControllerSecurityTest {
 
     @Test
     void shouldRequireSettingPermissionsForLegacySelfApi() throws NoSuchMethodException {
-        var controller = new NotificationSettingController(mock(NotificationPreferenceService.class));
+        var controller = new NotificationSettingController(mock(NotificationPreferenceService.class), mock(SecurityContextAccessor.class));
         var get = NotificationSettingController.class.getMethod("getSetting");
         var update = NotificationSettingController.class.getMethod("updateSetting",
                 com.devops00.spectra.notification.javabean.from.NotificationSettingFrom.class);
@@ -74,7 +75,7 @@ class NotificationSelfControllerSecurityTest {
 
     @Test
     void shouldExposeOnlyAuthenticatedPreferenceOperations() throws NoSuchMethodException {
-        var controller = new NotificationPreferenceController(mock(NotificationPreferenceService.class));
+        var controller = new NotificationPreferenceController(mock(NotificationPreferenceService.class), mock(SecurityContextAccessor.class));
         var list = NotificationPreferenceController.class.getMethod("list");
         var save = NotificationPreferenceController.class.getMethod("save", String.class, String.class,
                 boolean.class, boolean.class);

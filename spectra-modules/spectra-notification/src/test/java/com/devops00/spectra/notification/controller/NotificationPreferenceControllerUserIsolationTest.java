@@ -17,9 +17,7 @@
 package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
-import com.devops00.spectra.security.base.holder.SecHolderStrategy;
-import com.devops00.spectra.security.base.holder.SecUtil;
-import org.junit.jupiter.api.AfterEach;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -44,24 +42,18 @@ class NotificationPreferenceControllerUserIsolationTest {
 
     private static final UUID USER_B = UUID.fromString("00000000-0000-0000-0000-00000000000b");
 
-    private SecHolderStrategy security;
+    private SecurityContextAccessor security;
 
     @BeforeEach
     void setUpSecurityHolder() {
-        security = mock(SecHolderStrategy.class);
-        SecUtil.setHolder(security);
-    }
-
-    @AfterEach
-    void clearSecurityHolder() {
-        SecUtil.setHolder(null);
+        security = mock(SecurityContextAccessor.class);
     }
 
     @Test
     void shouldBindPreferenceReadsAndWritesToTheActiveUser() {
         var service = mock(NotificationPreferenceService.class);
-        var controller = new NotificationPreferenceController(service);
-        when(security.getCurrentUserId()).thenReturn(USER_A, USER_A, USER_B);
+        var controller = new NotificationPreferenceController(service, security);
+        when(security.currentUserId()).thenReturn(USER_A, USER_A, USER_B);
 
         controller.list();
         controller.save("SYSTEM_NOTICE", "IN_APP", false, true);
@@ -75,8 +67,8 @@ class NotificationPreferenceControllerUserIsolationTest {
     @Test
     void shouldRejectPreferenceAccessWithoutAnAuthenticatedUser() {
         var service = mock(NotificationPreferenceService.class);
-        var controller = new NotificationPreferenceController(service);
-        when(security.getCurrentUserId()).thenReturn(null);
+        var controller = new NotificationPreferenceController(service, security);
+        when(security.currentUserId()).thenReturn(null);
 
         assertThrows(IllegalStateException.class, controller::list);
     }

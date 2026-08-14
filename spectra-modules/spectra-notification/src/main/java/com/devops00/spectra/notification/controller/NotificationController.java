@@ -24,7 +24,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFr
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
 import com.devops00.spectra.notification.service.NotificationInboxService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +50,8 @@ public class NotificationController {
      * 当前用户消息中心服务。
      */
     private final NotificationInboxService service;
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 查询当前用户消息列表。
@@ -125,7 +127,7 @@ public class NotificationController {
      * 获取当前登录用户 ID，拒绝匿名访问消息数据。
      */
     private UUID currentUserId() {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new DataNotExistException("当前用户不存在");
         }

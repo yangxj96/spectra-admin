@@ -19,7 +19,7 @@ package com.devops00.spectra.notification.controller;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +43,8 @@ public class NotificationPreferenceController {
      * 用户通知偏好服务。
      */
     private final NotificationPreferenceService service;
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 查询当前用户用途×渠道偏好。
@@ -69,7 +71,7 @@ public class NotificationPreferenceController {
      * 获取当前登录用户 ID。
      */
     private UUID currentUserId() {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new IllegalStateException("当前用户未登录");
         }

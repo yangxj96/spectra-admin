@@ -20,13 +20,13 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.notification.javabean.from.NotificationSettingFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationSettingVO;
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
 import java.time.ZoneId;
+import java.util.UUID;
 
 /**
  * 旧消息中心设置 API 的兼容门面。
@@ -44,6 +44,8 @@ public class NotificationSettingController {
      * 用户通知偏好服务。
      */
     private final NotificationPreferenceService service;
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 查询旧消息中心设置。
@@ -69,7 +71,7 @@ public class NotificationSettingController {
      * 获取当前登录用户 ID。
      */
     private UUID currentUserId() {
-        return SecUtil.getCurrentUserId();
+        return securityContextAccessor.currentUserId();
     }
 
     /**
@@ -77,7 +79,7 @@ public class NotificationSettingController {
      */
     private ZoneId currentUserZone() {
         try {
-            return ZoneId.of(SecUtil.getCurrentUserZoneId());
+            return ZoneId.of(securityContextAccessor.currentUserZoneId());
         } catch (java.time.DateTimeException exception) {
             return ZoneId.of("UTC");
         }
