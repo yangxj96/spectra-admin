@@ -20,11 +20,16 @@ import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
 import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.change.SecurityUserLookupPort;
-import com.devops00.spectra.security.base.holder.SecHolderStrategy;
-import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.security.base.holder.SecurityLoginFailureTracker;
+import com.devops00.spectra.security.base.holder.SecuritySessionIssuer;
+import com.devops00.spectra.security.base.holder.SecuritySessionQuery;
+import com.devops00.spectra.security.base.holder.SecuritySessionReader;
+import com.devops00.spectra.security.base.holder.SecuritySessionRevoker;
+import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
+import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.starter.holder.SecHolderSecurityContextAccessor;
+import com.devops00.spectra.security.starter.holder.SecuritySessionContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +42,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * SecuUtil工具相关配置
+ * Security Session 适配端口配置
  *
  * @author yangxj96
  * @version 1.0
@@ -48,64 +53,67 @@ import tools.jackson.databind.ObjectMapper;
 public class SecUtilConfiguration {
 
     @Bean
-    public SecurityContextAccessor securityContextAccessor(SecHolderStrategy strategy) {
-        return new SecHolderSecurityContextAccessor(strategy);
+    public SecurityContextAccessor securityContextAccessor(SecuritySessionReader sessionReader,
+                                                           SecurityTokenAccessor tokenAccessor) {
+        return new SecuritySessionContextAccessor(sessionReader, tokenAccessor);
     }
 
     @Bean
-    public SecuritySessionRevocationPort securitySessionRevocationPort(SecHolderStrategy strategy) {
-        return strategy::deleteByUserId;
+    public SecuritySessionRevocationPort securitySessionRevocationPort(SecuritySessionRevoker sessionRevoker) {
+        return sessionRevoker::deleteByUserId;
     }
 
     @Bean
-    public SecuritySessionQueryPort securitySessionQueryPort(SecHolderStrategy strategy) {
-        return strategy::listOnlineUsers;
+    public SecuritySessionQueryPort securitySessionQueryPort(SecuritySessionQuery sessionQuery) {
+        return sessionQuery::listOnlineUsers;
     }
 
     @Bean
-    public SecurityAuthenticationPort securityAuthenticationPort(SecHolderStrategy strategy) {
+    public SecurityAuthenticationPort securityAuthenticationPort(SecuritySessionIssuer sessionIssuer,
+                                                                 SecuritySessionRevoker sessionRevoker,
+                                                                 SecurityLoginFailureTracker loginFailureTracker) {
         return new SecurityAuthenticationPort() {
             @Override
             public com.devops00.spectra.security.base.javabean.vo.TokenVO login(
                     com.devops00.spectra.security.base.javabean.entity.SecurityUser user) {
-                return strategy.createToken(user);
+                return sessionIssuer.createToken(user);
             }
 
             @Override
             public void logout(String token) {
-                strategy.deleteToken(token);
+                sessionRevoker.deleteToken(token);
             }
 
             @Override
             public void logoutByRefreshToken(String refreshToken) {
-                strategy.deleteByRefreshToken(refreshToken);
+                sessionRevoker.deleteByRefreshToken(refreshToken);
             }
 
             @Override
             public com.devops00.spectra.security.base.javabean.vo.TokenVO refreshByRefreshToken(String refreshToken) {
-                return strategy.refreshByRefreshToken(refreshToken);
+                return sessionIssuer.refreshByRefreshToken(refreshToken);
             }
 
             @Override
             public boolean isLockedOut(String username) {
-                return strategy.isLockedOut(username);
+                return loginFailureTracker.isLockedOut(username);
             }
 
             @Override
             public void recordLoginFail(String username) {
-                strategy.recordLoginFail(username);
+                loginFailureTracker.recordLoginFail(username);
             }
 
             @Override
             public void clearLoginFail(String username) {
-                strategy.clearLoginFail(username);
+                loginFailureTracker.clearLoginFail(username);
             }
         };
     }
 
     @Bean
-    public SecurityUserLookupPort securityUserLookupPort(SecHolderStrategy strategy) {
-        return strategy::getCurrentUser;
+    public SecurityUserLookupPort securityUserLookupPort(SecuritySessionReader sessionReader) {
+        return token -> sessionReader.getCurrentUser(token);
     }
 
     /**

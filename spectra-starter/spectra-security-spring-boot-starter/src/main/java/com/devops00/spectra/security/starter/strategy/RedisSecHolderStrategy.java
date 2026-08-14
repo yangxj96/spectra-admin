@@ -18,9 +18,14 @@ package com.devops00.spectra.security.starter.strategy;
 
 import com.devops00.spectra.common.utils.IpUtils;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.security.base.constant.SecurityRedisKey;
 import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.holder.SecHolderStrategy;
+import com.devops00.spectra.security.base.constant.SecurityRedisKey;
+import com.devops00.spectra.security.base.holder.SecurityLoginFailureTracker;
+import com.devops00.spectra.security.base.holder.SecuritySessionIssuer;
+import com.devops00.spectra.security.base.holder.SecuritySessionQuery;
+import com.devops00.spectra.security.base.holder.SecuritySessionReader;
+import com.devops00.spectra.security.base.holder.SecuritySessionRevoker;
+import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
@@ -59,7 +64,8 @@ import java.util.*;
  */
 @Slf4j
 @NullMarked
-public class RedisSecHolderStrategy implements SecHolderStrategy {
+public class RedisSecHolderStrategy implements SecuritySessionIssuer, SecuritySessionRevoker, SecuritySessionReader,
+        SecurityTokenAccessor, SecuritySessionQuery, SecurityLoginFailureTracker {
 
     private static final String HEADER_CLIENT_TYPE = "X-Client-Type";
 
@@ -80,11 +86,6 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         this.properties = properties;
         this.userOnlineConverter = userOnlineConverter;
         this.securityUserLoader = securityUserLoader;
-    }
-
-    @Override
-    public String administrators() {
-        return RootAuthorizationPolicy.ROOT_ROLE;
     }
 
     // ==================== Token 创建 & 续期 ====================
@@ -412,24 +413,6 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             return token;
         }
         return this.getTokenFromHttpRequest();
-    }
-
-    @Override
-    public @Nullable UUID getCurrentUserId() {
-        var user = this.getCurrentUser();
-        return user != null ? user.getId() : null;
-    }
-
-    @Override
-    public String getCurrentUserZoneId() {
-        SecurityUser user = this.getCurrentUser();
-        return user != null && user.getTimezone() != null ? user.getTimezone() : "UTC";
-    }
-
-    @Override
-    public String getCurrentUsername() {
-        SecurityUser user = this.getCurrentUser();
-        return user != null ? user.getUsername() : "未找到用户名";
     }
 
     // ==================== 登录锁定 ====================
