@@ -119,4 +119,10 @@ public class User extends BaseEntity {
      */
     @TableField(value = "department_id")
     private UUID departmentId;
+
+    /**
+     * 安全相关变化版本；每次生命周期变化递增，用于 Session/Authorization epoch 校验。
+     */
+    @TableField(value = "security_version")
+    private Long securityVersion;
 }

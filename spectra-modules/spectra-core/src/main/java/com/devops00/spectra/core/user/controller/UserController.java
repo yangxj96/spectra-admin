@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.from.*;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.service.UserService;
@@ -85,6 +86,48 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
     public void passwordResetById(@PathVariable UUID uid) {
         bindService.passwordResetById(uid);
+    }
+
+    @ULog("'锁定用户'")
+    @PutMapping(value = "/lock/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:disable')")
+    public void lock(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.LOCKED, reason);
+    }
+
+    @ULog("'解锁用户'")
+    @PutMapping(value = "/unlock/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:unlock')")
+    public void unlock(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
+    }
+
+    @ULog("'禁用用户'")
+    @PutMapping(value = "/disable/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:disable')")
+    public void disable(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.DISABLED, reason);
+    }
+
+    @ULog("'启用用户'")
+    @PutMapping(value = "/enable/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:unlock')")
+    public void enable(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
+    }
+
+    @ULog("'用户离职'")
+    @PutMapping(value = "/depart/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:disable')")
+    public void depart(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.DEPARTED, reason);
+    }
+
+    @ULog("'用户重新入职'")
+    @PutMapping(value = "/reinstate/{uid}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null ,'user:unlock')")
+    public void reinstate(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
+        bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
     @ULog("'分页查询用户列表'")

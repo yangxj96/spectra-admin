@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
 import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
 import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
@@ -115,4 +116,13 @@ public interface UserService extends BaseService<User> {
      * @param params 修改密码参数
      */
     void changePassword(UUID userId, ChangePasswordFrom params);
+
+    /**
+     * 执行用户生命周期状态变化。状态变更必须经过安全审计事务，并撤销全部 Session。
+     *
+     * @param userId 目标用户
+     * @param target 目标状态
+     * @param reason 操作原因
+     */
+    void changeStatus(UUID userId, UserStatus target, String reason);
 }

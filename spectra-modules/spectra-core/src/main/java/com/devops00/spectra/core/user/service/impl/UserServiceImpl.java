@@ -31,6 +31,7 @@ import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.javabean.entity.UserDataScope;
@@ -48,6 +49,9 @@ import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
+import com.devops00.spectra.security.base.audit.AuditResult;
+import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
@@ -92,9 +96,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final NameFillExecutor fillExecutor;
 
+    private final SecurityChangeExecutor securityChangeExecutor;
+
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
+        if (params.getStatus() != UserStatus.ACTIVE) {
+            throw new DataException("新用户必须以 ACTIVE 状态创建");
+        }
         var entity = userConverter.toEntity(params);
         if (StrUtils.isBlank(entity.getUsername())) {
             entity.setUsername(IdWorker.get32UUID().substring(0, 6));
@@ -142,6 +151,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         var entity = this.getById(params.getId());
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
+        }
+        if (params.getStatus() != entity.getStatus()) {
+            throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
         // 默认账号是否需要修改
         boolean defaultAccountUpdateFlag = params.getEmail().equals(entity.getEmail());
@@ -348,6 +360,62 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 密码变化包括当前设备在内全部 Session 失效。
         SecUtil.kick(userId);
         log.info("用户 {} 修改密码成功", userId);
+    }
+
+    @Override
+    @Transactional
+    public void changeStatus(UUID userId, UserStatus target, String reason) {
+        if (target == null) {
+            throw new DataException("目标用户状态不能为空");
+        }
+        var current = this.getById(userId);
+        if (current == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+        var previous = current.getStatus();
+        if (previous == null) {
+            throw new DataException("用户状态缺失，拒绝执行生命周期变更");
+        }
+        previous.assertTransitionTo(target);
+        if (previous == target) {
+            return;
+        }
+
+        var event = new SecurityAuditEvent(
+                null,
+                "USER_LIFECYCLE_CHANGED",
+                currentOperatorId(),
+                userId,
+                null,
+                null,
+                null,
+                Map.of("status", previous.getCode()),
+                Map.of("status", target.getCode()),
+                reason,
+                null,
+                AuditResult.STARTED,
+                null);
+
+        securityChangeExecutor.execute(event, () -> {
+            current.setStatus(target);
+            current.setSecurityVersion((current.getSecurityVersion() == null ? 0L : current.getSecurityVersion()) + 1L);
+            if (this.baseMapper.updateById(current) == 0) {
+                throw new EntityUpdateException("更新用户生命周期状态失败");
+            }
+            // 离职后的旧 Assignment 不得在重新入职时自动恢复；当前旧关系表没有历史状态，
+            // 因此先撤销运行时关系，后续 RoleAssignment v2 迁移保留可审计撤销记录。
+            if (target == UserStatus.DEPARTED) {
+                relUserRoleService.revoke(userId);
+            }
+            // Redis/Session 核心依赖不可用时 SecUtil.kick 会 fail-closed，事务随之回滚。
+            SecUtil.kick(userId);
+            return Boolean.TRUE;
+        });
+    }
+
+    private UUID currentOperatorId() {
+        var currentUser = SecUtil.getCurrentUser();
+        return currentUser == null ? null : currentUser.getId();
     }
 
     /**
