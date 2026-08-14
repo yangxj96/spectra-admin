@@ -71,8 +71,8 @@ public record SecurityAuditEvent(UUID eventId,
         if (result == null) {
             throw new IllegalArgumentException("安全审计事件结果不能为空");
         }
-        before = immutableCopy(before);
-        after = immutableCopy(after);
+        before = immutableCopy(SecurityAuditSnapshotSanitizer.sanitize(before));
+        after = immutableCopy(SecurityAuditSnapshotSanitizer.sanitize(after));
     }
 
     /**
