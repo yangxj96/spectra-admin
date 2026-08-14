@@ -19,58 +19,44 @@ package com.devops00.spectra.security.base.constant;
 import com.devops00.spectra.common.constant.RedisKey;
 
 /**
- * 登录需要存储的key的枚举
+ * Security Session and login-protection Redis keys.
  *
- * @author yangxj96
- * @version 1.0
- * @since 2026/2/8 18:41
+ * <p>All session keys use the {@code sec:v2:} namespace. Values are token
+ * digests or non-sensitive identifiers; plaintext tokens must never be used
+ * as a key or value.</p>
  */
-public enum AuthRedisKey implements RedisKey {
+public enum SecurityRedisKey implements RedisKey {
 
     /** v2 会话详情（事实源）Hash，格式参数为 Access Token digest。 */
     SESSION("sec:v2:sess:%s"),
 
-    /**
-     * 用户+端 → token（同端复用 & 按端踢出）
-     */
+    /** 用户+端 → token（同端复用 & 按端踢出）。 */
     USER_CLIENT("sec:v2:uc:%s:%s"),
 
-    /**
-     * 用户所有 token 集合（全端踢出 & 在线查询）
-     */
+    /** 用户所有 token 集合（全端踢出 & 在线查询）。 */
     USER_TOKENS("sec:v2:ut:%s"),
 
-    /**
-     * 在线用户 ID 集合
-     */
+    /** 在线用户 ID 集合。 */
     ONLINE_USERS("sec:v2:online"),
 
     /** Token Family 下的 Access digest 集合。 */
     SESSION_FAMILY("sec:v2:family:%s"),
 
-    /**
-     * 登录失败计数（锁定账号）
-     */
+    /** 登录失败计数（锁定账号）。 */
     LOGIN_FAIL("sec:v2:fail:%s"),
 
-    /**
-     * 刷新token → accessToken 映射
-     */
+    /** 刷新 token → access token 映射。 */
     REFRESH_TOKEN("sec:v2:rt:%s"),
 
-    /**
-     * Refresh Token 重放后的用户级撤销栅栏。
-     */
+    /** Refresh Token 重放后的用户级撤销栅栏。 */
     REFRESH_REPLAY_FENCE("sec:v2:replay:%s"),
 
-    /**
-     * Refresh Token 一次性消费声明。与 Refresh Token Hash 分离，避免受 HashValueSerializer 影响。
-     */
+    /** Refresh Token 一次性消费声明。 */
     REFRESH_CLAIM("sec:v2:rt:claim:%s");
 
     private final String pattern;
 
-    AuthRedisKey(String pattern) {
+    SecurityRedisKey(String pattern) {
         this.pattern = pattern;
     }
 
