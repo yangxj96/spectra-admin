@@ -47,19 +47,13 @@ public abstract class SmsAuthenticationProvider implements BasicAuthenticationPr
                 || !StringUtils.hasText(code)) {
             throw new BadCredentialsException("手机号或验证码不能为空");
         }
-        try {
-            kaptchaValidate(phone, code);
-            return login(phone, code);
-        } finally {
-            kaptchaDelete(phone);
-        }
+        kaptchaValidate(phone, code);
+        return login(phone, code);
     }
 
     public abstract Authentication login(String phone, String code) throws AuthenticationException;
 
     public abstract void kaptchaValidate(String phone, String kaptcha);
-
-    public abstract void kaptchaDelete(String phone);
 
     @Override
     public boolean supports(Class<?> authentication) {

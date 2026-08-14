@@ -61,7 +61,7 @@ class AuthServiceImplTest {
         assertTrue(code.matches("\\d{6}"));
         assertEquals("13800138000", request.directAddresses().getFirst().address());
         assertTrue(request.idempotencyKey().startsWith("security:login-code:SMS:13800138000:"));
-        var key = RedisCacheKey.SMS_CODE + "13800138000";
+        var key = RedisCacheKey.LOGIN_SMS_CODE + "13800138000";
         verify(valueOperations).setIfAbsent(eq(key), eq(VerificationCodeDigest.digest(code, "test-verification-hmac-key")),
                 eq(300L), eq(TimeUnit.SECONDS));
     }
@@ -85,6 +85,33 @@ class AuthServiceImplTest {
     }
 
     @Test
+    void shouldUseDedicatedPurposeAndKeyForBindingCode() {
+        var gateway = mock(NotificationGateway.class);
+        var redisTemplate = mock(RedisTemplate.class);
+        var valueOperations = mock(ValueOperations.class);
+        when(gateway.availability(NotificationChannel.SMS))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
+        when(gateway.enqueue(any(NotificationRequest.class)))
+                .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        var properties = new SecurityProperties();
+        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
+        var service = new AuthServiceImpl(gateway, redisTemplate, properties);
+
+        service.sendBindingSmsCode("13800138000");
+
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
+        verify(gateway).enqueue(requestCaptor.capture());
+        var request = requestCaptor.getValue();
+        var code = request.sensitiveParameters().get("code").toString();
+        assertEquals(NotificationPurpose.BIND_PHONE_CODE, request.purpose());
+        assertTrue(request.idempotencyKey().startsWith("security:bind-phone-code:SMS:13800138000:"));
+        verify(valueOperations).setIfAbsent(eq(RedisCacheKey.BIND_PHONE_CODE + "13800138000"),
+                eq(VerificationCodeDigest.digest(code, "test-verification-hmac-key")), eq(300L), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
     void shouldDeleteDigestWhenGatewayEnqueueFails() {
         var gateway = mock(NotificationGateway.class);
         var redisTemplate = mock(RedisTemplate.class);
@@ -100,7 +127,7 @@ class AuthServiceImplTest {
 
         assertThrows(RuntimeException.class, () -> service.sendEmailCode("user@example.com"));
 
-        verify(redisTemplate).delete(RedisCacheKey.EMAIL_CODE + "user@example.com");
+        verify(redisTemplate).delete(RedisCacheKey.LOGIN_EMAIL_CODE + "user@example.com");
     }
 
     @Test

@@ -92,17 +92,21 @@ public class SystemProperties {
         /**
          * 指定允许的源
          */
-        private List<String> originPatterns = Collections.singletonList("*");
+        /**
+         * 精确允许的 Origin 列表；空列表表示不启用跨源访问。
+         */
+        private List<String> originPatterns = Collections.emptyList();
 
         /**
          * 指定允许的方法
          */
-        private List<String> methods = Collections.singletonList("*");
+        private List<String> methods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
 
         /**
          * 指定运行的头信息
          */
-        private List<String> headers = Collections.singletonList("*");
+        private List<String> headers = List.of("Accept", "Authorization", "Content-Type", "Api-Version", "X-Client-Type",
+                "X-CSRF-Token", "X-Requested-With");
 
         /**
          * 是否支持凭证

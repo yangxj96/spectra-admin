@@ -17,10 +17,10 @@
 package com.devops00.spectra.core.common.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
-import com.devops00.spectra.common.exception.KaptchaExpiresException;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
+import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -107,19 +107,12 @@ public class KaptchaServiceImpl implements KaptchaService {
     }
 
     @Override
-    public String getKaptchaCode() {
-        var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
-        var val = redisTemplate.opsForValue().get(key);
-        if (val == null) {
-            throw new KaptchaExpiresException("验证码过期");
+    public boolean consumeKaptchaCode(String code) {
+        if (code == null || code.isBlank()) {
+            return false;
         }
-        // 这里逻辑上确实是有可能为null的
-        return val.toString();
+        var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
+        return VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, code);
     }
 
-    @Override
-    public void deleteBySessionId() {
-        var key = RedisCacheKey.KAPTCHA + request.getSession().getId();
-        redisTemplate.delete(key);
-    }
 }

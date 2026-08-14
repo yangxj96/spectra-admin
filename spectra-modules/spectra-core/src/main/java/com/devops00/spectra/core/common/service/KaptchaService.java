@@ -38,12 +38,11 @@ public interface KaptchaService {
     Boolean isCheck();
 
     /**
-     * 获取验证码
+     * 校验并一次性消费当前会话验证码。
+     *
+     * @param code 用户提交的验证码
+     * @return 是否消费成功
      */
-    String getKaptchaCode();
+    boolean consumeKaptchaCode(String code);
 
-    /**
-     * 根据session id删除验证码
-     */
-    void deleteBySessionId();
 }

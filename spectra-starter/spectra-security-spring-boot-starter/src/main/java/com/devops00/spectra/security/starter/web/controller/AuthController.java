@@ -136,6 +136,28 @@ public class AuthController {
     }
 
     /**
+     * 发送绑定手机号验证码。
+     */
+    @ULog(value = "'发送绑定手机号验证码'", type = SysLogType.SAFETY)
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/bind/sms", version = "1.0.0+")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendBindingSms(@Validated @RequestBody SmsCodeFrom params) {
+        authService.sendBindingSmsCode(params.getPhone());
+    }
+
+    /**
+     * 发送绑定邮箱验证码。
+     */
+    @ULog(value = "'发送绑定邮箱验证码'", type = SysLogType.SAFETY)
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(value = "/bind/email", version = "1.0.0+")
+    @ResponseStatus(HttpStatus.OK)
+    public void sendBindingEmail(@Validated @RequestBody EmailCodeFrom params) {
+        authService.sendBindingEmailCode(params.getEmail());
+    }
+
+    /**
      * 刷新token
      */
     @ULog(value = "'刷新token'", type = SysLogType.SAFETY)

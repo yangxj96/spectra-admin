@@ -49,10 +49,9 @@ public class SecurityProperties {
             "/auth/sms",
             // 发送邮箱验证码
             "/auth/email",
-            // 健康检查
-            "/actuator/**",
-            // 图片预览接口
-            "/file/preview/**",
+            // 健康检查与版本信息；禁止把整个 Actuator 暴露为匿名接口
+            "/actuator/health",
+            "/actuator/info",
             // 获取系统加密配置接口
             "/system/crypto/config"));
 

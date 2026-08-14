@@ -63,8 +63,4 @@ public class UserOnlineVO {
      */
     private LocalDateTime loginTime;
 
-    /**
-     * 访问令牌。
-     */
-    private String token;
 }

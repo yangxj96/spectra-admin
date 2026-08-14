@@ -57,15 +57,30 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void sendSmsCode(String phone) {
-        sendCode(phone, NotificationChannel.SMS, RedisCacheKey.SMS_CODE, "security.login-code.sms");
+        sendCode(phone, NotificationChannel.SMS, RedisCacheKey.LOGIN_SMS_CODE, NotificationPurpose.LOGIN_CODE,
+                "security.login-code.sms", "登录验证码");
     }
 
     @Override
     public void sendEmailCode(String email) {
-        sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.EMAIL_CODE, "security.login-code.email");
+        sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.LOGIN_EMAIL_CODE, NotificationPurpose.LOGIN_CODE,
+                "security.login-code.email", "登录验证码");
     }
 
-    private void sendCode(String address, NotificationChannel channel, String redisPrefix, String templateCode) {
+    @Override
+    public void sendBindingSmsCode(String phone) {
+        sendCode(phone, NotificationChannel.SMS, RedisCacheKey.BIND_PHONE_CODE, NotificationPurpose.BIND_PHONE_CODE,
+                "security.bind-phone-code.sms", "绑定手机号验证码");
+    }
+
+    @Override
+    public void sendBindingEmailCode(String email) {
+        sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.BIND_EMAIL_CODE, NotificationPurpose.BIND_EMAIL_CODE,
+                "security.bind-email-code.email", "绑定邮箱验证码");
+    }
+
+    private void sendCode(String address, NotificationChannel channel, String redisPrefix,
+                          NotificationPurpose purpose, String templateCode, String title) {
         var availability = notificationGateway.availability(channel);
         if (!availability.available()) {
             throw new SpectraException("验证码通知渠道暂不可用: " + availability.reason());
@@ -81,10 +96,13 @@ public class AuthServiceImpl implements AuthService {
             if (Boolean.FALSE.equals(stored)) {
                 return;
             }
-            var request = new NotificationRequest(null, "security:login-code:" + channel.name() + ":" + address + ":" + requestWindow,
-                    NotificationPurpose.LOGIN_CODE, List.of(channel), List.of(),
+            var purposeKey = purpose == NotificationPurpose.LOGIN_CODE
+                    ? "login-code"
+                    : purpose.name().toLowerCase().replace('_', '-');
+            var request = new NotificationRequest(null, "security:" + purposeKey + ":" + channel.name() + ":" + address + ":" + requestWindow,
+                    purpose, List.of(channel), List.of(),
                     List.of(new NotificationDirectAddress(channel, address)), templateCode,
-                    Map.of("title", "登录验证码", "content", "您的验证码为 {{code}}，请在有效期内完成操作。"),
+                    Map.of("title", title, "content", "您的验证码为 {{code}}，请在有效期内完成操作。"),
                     Map.of("code", code), "SECURITY", channel.name() + ":" + address + ":" + requestWindow, "SECURITY", null,
                     Instant.now(), Instant.now().plusSeconds(securityProperties.getVerificationCodeExpire()), 100, null);
             NotificationReceipt receipt = notificationGateway.enqueue(request);

@@ -28,6 +28,8 @@ import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.List;
+
 /**
  * mvc配置
  *
@@ -46,19 +48,30 @@ public class MvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         log.debug(LogPrefix.WEB.f("载入Cors"));
+        List<String> origins = spectraProperties.getCors()
+                .getOriginPatterns()
+                .stream()
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+        if (origins.stream().anyMatch(origin -> origin.contains("*"))) {
+            throw new IllegalStateException("CORS 仅允许精确 Origin，禁止通配符配置");
+        }
+        if (origins.isEmpty()) {
+            log.warn("{}未配置 CORS Origin，跨源访问已关闭", LogPrefix.WEB.p());
+            return;
+        }
         registry
                 // 匹配所有路径
                 .addMapping(spectraProperties.getCors().getMapping())
-                // 指定允许的源
-                // .allowedOrigins("http://localhost:5173")
-                .allowedOriginPatterns(spectraProperties.getCors().getOriginPatterns().toArray(new String[0]))
+                // 只允许部署配置明确列出的 Origin；不使用 allowedOriginPatterns
+                .allowedOrigins(origins.toArray(new String[0]))
                 // 允许的方法
-                // .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedMethods(spectraProperties.getCors().getMethods().toArray(new String[0]))
                 // 允许的头部信息
                 .allowedHeaders(spectraProperties.getCors().getHeaders().toArray(new String[0]))
                 // 是否支持凭证
-                .allowCredentials(spectraProperties.getCors().getCredentials())
+                .allowCredentials(Boolean.TRUE.equals(spectraProperties.getCors().getCredentials()))
                 // 预检后缓存策略时长
                 .maxAge(spectraProperties.getCors().getMaxAge());
     }

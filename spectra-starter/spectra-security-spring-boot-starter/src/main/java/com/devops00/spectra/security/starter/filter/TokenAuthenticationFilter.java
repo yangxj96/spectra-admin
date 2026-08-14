@@ -51,8 +51,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(auth);
-                // 活跃续期
-                SecUtil.refreshToken(token);
             }
         }
         chain.doFilter(request, response);

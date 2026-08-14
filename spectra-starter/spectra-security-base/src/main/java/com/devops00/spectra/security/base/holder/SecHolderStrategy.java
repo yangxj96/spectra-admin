@@ -50,8 +50,9 @@ public interface SecHolderStrategy {
     TokenVO createToken(SecurityUser user, ClientType clientType);
 
     /**
-     * 刷新 token TTL（活跃续期）
+     * 兼容旧会话实现的 TTL 操作；请求过滤器不得调用该方法进行滑动续期。
      */
+    @Deprecated(forRemoval = true)
     void refreshToken(String token);
 
     /**

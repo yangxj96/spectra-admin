@@ -25,7 +25,9 @@ import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.strategy.provider.EmailAuthenticationProvider;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
+import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,7 +55,8 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     private final SecurityProperties securityProperties;
 
-    public LoginEmailProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
+    public LoginEmailProvider(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate, UserService userService,
+                              AccountService accountService,
                               SecurityUserHelper securityUserHelper, SecurityProperties securityProperties) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
@@ -78,8 +81,8 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
 
     @Override
     public void kaptchaValidate(String email, String kaptcha) {
-        var key = RedisCacheKey.EMAIL_CODE + email;
-        var attemptsKey = RedisCacheKey.EMAIL_CODE_ATTEMPTS + email;
+        var key = RedisCacheKey.LOGIN_EMAIL_CODE + email;
+        var attemptsKey = RedisCacheKey.LOGIN_EMAIL_CODE_ATTEMPTS + email;
         var attempts = redisTemplate.opsForValue().increment(attemptsKey);
         if (attempts != null && attempts == 1L) {
             redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), java.util.concurrent.TimeUnit.SECONDS);
@@ -87,24 +90,10 @@ public class LoginEmailProvider extends EmailAuthenticationProvider {
         if (attempts != null && attempts > securityProperties.getVerificationCodeMaxAttempts()) {
             throw new KaptchaNotMatchException("验证码尝试次数过多");
         }
-        var val = redisTemplate.opsForValue().get(key);
-        if (val == null || !matchesDigest(kaptcha, val.toString())) {
+        var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
+        if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
             throw new KaptchaNotMatchException("验证码错误");
         }
     }
 
-    private boolean matchesDigest(String code, String expected) {
-        try {
-            return VerificationCodeDigest.matches(code, expected, securityProperties.getVerificationCodeHmacKey());
-        } catch (RuntimeException exception) {
-            throw new KaptchaNotMatchException("验证码错误");
-        }
-    }
-
-    @Override
-    public void kaptchaDelete(String email) {
-        var key = RedisCacheKey.EMAIL_CODE + email;
-        redisTemplate.delete(key);
-        redisTemplate.delete(RedisCacheKey.EMAIL_CODE_ATTEMPTS + email);
-    }
 }

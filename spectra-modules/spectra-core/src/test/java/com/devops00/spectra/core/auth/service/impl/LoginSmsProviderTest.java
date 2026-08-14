@@ -26,7 +26,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.data.redis.core.script.RedisScript;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -65,19 +67,21 @@ class LoginSmsProviderTest {
     }
 
     @Test
-    void shouldValidateHmacAndStartAttemptWindow() {
-        when(valueOperations.increment(RedisCacheKey.SMS_CODE_ATTEMPTS + PHONE)).thenReturn(1L);
-        when(valueOperations.get(RedisCacheKey.SMS_CODE + PHONE))
-                .thenReturn(VerificationCodeDigest.digest("123456", HMAC_KEY));
+    void shouldConsumeDigestAtomicallyAndStartAttemptWindow() {
+        var key = RedisCacheKey.LOGIN_SMS_CODE + PHONE;
+        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(1L);
+        when(redisTemplate.execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY))))
+                .thenReturn(1L);
 
         provider.kaptchaValidate(PHONE, "123456");
 
-        verify(redisTemplate).expire(RedisCacheKey.SMS_CODE_ATTEMPTS + PHONE, 300L, TimeUnit.SECONDS);
+        verify(redisTemplate).expire(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE, 300L, TimeUnit.SECONDS);
+        verify(redisTemplate).execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY)));
     }
 
     @Test
     void shouldRejectWhenAttemptsExceedLimitBeforeReadingCode() {
-        when(valueOperations.increment(RedisCacheKey.SMS_CODE_ATTEMPTS + PHONE)).thenReturn(6L);
+        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(6L);
 
         assertThrows(KaptchaNotMatchException.class, () -> provider.kaptchaValidate(PHONE, "123456"));
 
@@ -85,10 +89,16 @@ class LoginSmsProviderTest {
     }
 
     @Test
-    void shouldDeleteCodeAndAttemptKeysTogether() {
-        provider.kaptchaDelete(PHONE);
+    void shouldRejectDigestMismatchWithoutReadingOrDeletingInApplicationCode() {
+        var key = RedisCacheKey.LOGIN_SMS_CODE + PHONE;
+        when(valueOperations.increment(RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + PHONE)).thenReturn(1L);
+        when(redisTemplate.execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY))))
+                .thenReturn(0L);
 
-        verify(redisTemplate).delete(eq(RedisCacheKey.SMS_CODE + PHONE));
-        verify(redisTemplate).delete(eq(RedisCacheKey.SMS_CODE_ATTEMPTS + PHONE));
+        assertThrows(KaptchaNotMatchException.class, () -> provider.kaptchaValidate(PHONE, "123456"));
+
+        verify(redisTemplate).execute(any(RedisScript.class), eq(List.of(key)), eq(VerificationCodeDigest.digest("123456", HMAC_KEY)));
+        verify(valueOperations, never()).get(any());
+        verify(redisTemplate, never()).delete(any(String.class));
     }
 }

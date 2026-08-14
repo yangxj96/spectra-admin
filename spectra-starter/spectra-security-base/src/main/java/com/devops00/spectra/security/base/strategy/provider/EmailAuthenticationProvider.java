@@ -47,19 +47,13 @@ public abstract class EmailAuthenticationProvider implements BasicAuthentication
                 || !StringUtils.hasText(code)) {
             throw new BadCredentialsException("邮箱或验证码不能为空");
         }
-        try {
-            kaptchaValidate(email, code);
-            return login(email, code);
-        } finally {
-            kaptchaDelete(email);
-        }
+        kaptchaValidate(email, code);
+        return login(email, code);
     }
 
     public abstract Authentication login(String email, String code) throws AuthenticationException;
 
     public abstract void kaptchaValidate(String email, String kaptcha);
-
-    public abstract void kaptchaDelete(String email);
 
     @Override
     public boolean supports(Class<?> authentication) {

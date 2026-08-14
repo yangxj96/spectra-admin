@@ -373,7 +373,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
                 result.add(userOnlineConverter.toVO(Objects.toString(session.get("userId"), null),
                         su != null ? su.getUsername() : Objects.toString(session.get("username"), null),
                         Objects.toString(session.get("clientType"), null), Objects.toString(session.get("ip"), null),
-                        Long.parseLong(Objects.toString(session.get("loginTime"), "0")), token));
+                        Long.parseLong(Objects.toString(session.get("loginTime"), "0"))));
             }
         }
         return result;

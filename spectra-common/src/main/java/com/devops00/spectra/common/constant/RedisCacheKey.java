@@ -31,24 +31,34 @@ public final class RedisCacheKey {
     public static final String KAPTCHA = "core:common:kaptcha:up:";
 
     /**
-     * 短信验证码
+     * 登录用途的短信验证码。
      */
-    public static final String SMS_CODE = "core:common:kaptcha:sms:";
+    public static final String LOGIN_SMS_CODE = "security:verification:login:sms:";
 
     /**
-     * 邮箱验证码
+     * 登录用途的邮箱验证码。
      */
-    public static final String EMAIL_CODE = "core:common:kaptcha:email:";
+    public static final String LOGIN_EMAIL_CODE = "security:verification:login:email:";
 
     /**
-     * 短信验证码失败尝试次数。
+     * 绑定手机号用途的短信验证码。
      */
-    public static final String SMS_CODE_ATTEMPTS = "core:common:kaptcha:sms:attempts:";
+    public static final String BIND_PHONE_CODE = "security:verification:bind:phone:";
 
     /**
-     * 邮箱验证码失败尝试次数。
+     * 绑定邮箱用途的邮箱验证码。
      */
-    public static final String EMAIL_CODE_ATTEMPTS = "core:common:kaptcha:email:attempts:";
+    public static final String BIND_EMAIL_CODE = "security:verification:bind:email:";
+
+    /**
+     * 登录用途的短信验证码失败尝试次数。
+     */
+    public static final String LOGIN_SMS_CODE_ATTEMPTS = "security:verification:login:sms:attempts:";
+
+    /**
+     * 登录用途的邮箱验证码失败尝试次数。
+     */
+    public static final String LOGIN_EMAIL_CODE_ATTEMPTS = "security:verification:login:email:attempts:";
 
     private RedisCacheKey() {
     }

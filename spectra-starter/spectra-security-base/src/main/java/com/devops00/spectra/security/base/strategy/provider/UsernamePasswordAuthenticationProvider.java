@@ -47,21 +47,14 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
                 || !StringUtils.hasText(password)) {
             throw new BadCredentialsException("用户名或密码不能为空");
         }
-        try {
-            // 验证码验证
-            kaptchaValidate(params.getCaptcha());
-            return login(username, password);
-        } finally {
-            // 不管登录是否失败,都需要删除掉验证码
-            kaptchaDelete();
-        }
+        // 验证码校验成功时已在 Redis 中原子消费；错误尝试保留验证码直到过期或达到尝试上限。
+        kaptchaValidate(params.getCaptcha());
+        return login(username, password);
     }
 
     public abstract Authentication login(String username, String password) throws AuthenticationException;
 
     public abstract void kaptchaValidate(String kaptcha);
-
-    public abstract void kaptchaDelete();
 
     @Override
     public boolean supports(Class<?> authentication) {

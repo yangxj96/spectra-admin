@@ -71,8 +71,4 @@ public class UserOnlineVO {
      */
     private LocalDateTime loginTime;
 
-    /**
-     * 关联的token
-     */
-    private String token;
 }

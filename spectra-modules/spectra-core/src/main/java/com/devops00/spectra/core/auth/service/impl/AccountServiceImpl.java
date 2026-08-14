@@ -18,6 +18,7 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.base.BaseServiceImpl;
+import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
@@ -27,7 +28,12 @@ import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.mapper.AccountMapper;
 import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.security.base.constant.LoginType;
+import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.util.VerificationCodeDigest;
+import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -47,6 +53,15 @@ import java.util.UUID;
 @Service
 @NullMarked
 public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> implements AccountService {
+
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final SecurityProperties securityProperties;
+
+    public AccountServiceImpl(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
+                              SecurityProperties securityProperties) {
+        this.redisTemplate = redisTemplate;
+        this.securityProperties = securityProperties;
+    }
 
     @Override
     public @Nullable Account getByLoginName(String loginName) {
@@ -87,6 +102,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     @Override
     @Transactional
     public void bindPhone(UUID userId, String phone, String code) {
+        consumeBindingCode(RedisCacheKey.BIND_PHONE_CODE, phone, code);
         // 1. 验证手机号是否已被其他用户绑定
         var existingAccount = this.getByPhone(phone);
         if (existingAccount != null && !existingAccount.getUserId().equals(userId)) {
@@ -115,6 +131,7 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
     @Override
     @Transactional
     public void bindEmail(UUID userId, String email, String code) {
+        consumeBindingCode(RedisCacheKey.BIND_EMAIL_CODE, email, code);
         // 1. 验证邮箱是否已被其他用户绑定
         var existingAccount = this.getByEmail(email);
         if (existingAccount != null && !existingAccount.getUserId().equals(userId)) {
@@ -170,5 +187,16 @@ public class AccountServiceImpl extends BaseServiceImpl<AccountMapper, Account> 
             throw new EntityUpdateException("解绑账号失败");
         }
         log.info("用户 {} 解绑账号 {} 成功", userId, accountId);
+    }
+
+    private void consumeBindingCode(String prefix, String address, String code) {
+        if (code == null || code.isBlank()) {
+            throw new SpectraException("绑定验证码不能为空");
+        }
+        var key = prefix + address;
+        var digest = VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
+        if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
+            throw new SpectraException("绑定验证码无效或已过期");
+        }
     }
 }

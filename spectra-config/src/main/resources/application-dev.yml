@@ -5,6 +5,8 @@ spectra:
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
   system:
     base-dir: files
+    cors:
+      origin-patterns: ${SPECTRA_CORS_ORIGIN_ALLOWLIST:http://localhost:5173,http://127.0.0.1:5173}
   user:
     default-password: ${DEFAULT_PASSWORD}
   kaptcha:

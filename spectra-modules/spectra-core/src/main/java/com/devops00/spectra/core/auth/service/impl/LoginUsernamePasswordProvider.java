@@ -77,15 +77,10 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
     @Override
     public void kaptchaValidate(String kaptcha) {
         if (kaptchaService.isCheck() == Boolean.TRUE) {
-            var code = kaptchaService.getKaptchaCode();
-            if (kaptcha == null || !kaptcha.equals(code)) {
+            if (!kaptchaService.consumeKaptchaCode(kaptcha)) {
                 throw new KaptchaNotMatchException("验证码错误");
             }
         }
     }
 
-    @Override
-    public void kaptchaDelete() {
-        kaptchaService.deleteBySessionId();
-    }
 }

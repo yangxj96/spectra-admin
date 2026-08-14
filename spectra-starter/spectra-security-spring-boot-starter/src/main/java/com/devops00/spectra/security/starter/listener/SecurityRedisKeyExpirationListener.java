@@ -49,7 +49,6 @@ public class SecurityRedisKeyExpirationListener implements MessageListener {
             return;
         }
 
-        var token = expiredKey.substring(SESSION_PREFIX.length());
-        log.debug("{}Session过期, token={}", LogPrefix.SECURITY.p(), token);
+        log.debug("{}SecuritySession 已过期", LogPrefix.SECURITY.p());
     }
 }

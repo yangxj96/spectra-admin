@@ -25,7 +25,9 @@ import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.strategy.provider.SmsAuthenticationProvider;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
+import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,7 +55,8 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     private final SecurityProperties securityProperties;
 
-    public LoginSmsProvider(RedisTemplate<String, Object> redisTemplate, UserService userService, AccountService accountService,
+    public LoginSmsProvider(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate, UserService userService,
+                            AccountService accountService,
                             SecurityUserHelper securityUserHelper, SecurityProperties securityProperties) {
         this.redisTemplate = redisTemplate;
         this.userService = userService;
@@ -78,8 +81,8 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     @Override
     public void kaptchaValidate(String phone, String kaptcha) {
-        var key = RedisCacheKey.SMS_CODE + phone;
-        var attemptsKey = RedisCacheKey.SMS_CODE_ATTEMPTS + phone;
+        var key = RedisCacheKey.LOGIN_SMS_CODE + phone;
+        var attemptsKey = RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + phone;
         var attempts = redisTemplate.opsForValue().increment(attemptsKey);
         if (attempts != null && attempts == 1L) {
             redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), java.util.concurrent.TimeUnit.SECONDS);
@@ -87,24 +90,10 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
         if (attempts != null && attempts > securityProperties.getVerificationCodeMaxAttempts()) {
             throw new KaptchaNotMatchException("验证码尝试次数过多");
         }
-        var val = redisTemplate.opsForValue().get(key);
-        if (val == null || !matchesDigest(kaptcha, val.toString())) {
+        var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
+        if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
             throw new KaptchaNotMatchException("验证码错误");
         }
     }
 
-    private boolean matchesDigest(String code, String expected) {
-        try {
-            return VerificationCodeDigest.matches(code, expected, securityProperties.getVerificationCodeHmacKey());
-        } catch (RuntimeException exception) {
-            throw new KaptchaNotMatchException("验证码错误");
-        }
-    }
-
-    @Override
-    public void kaptchaDelete(String phone) {
-        var key = RedisCacheKey.SMS_CODE + phone;
-        redisTemplate.delete(key);
-        redisTemplate.delete(RedisCacheKey.SMS_CODE_ATTEMPTS + phone);
-    }
 }

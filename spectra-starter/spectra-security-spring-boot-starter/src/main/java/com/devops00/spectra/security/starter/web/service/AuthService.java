@@ -38,4 +38,18 @@ public interface AuthService {
      * @param email 邮箱
      */
     void sendEmailCode(String email);
+
+    /**
+     * 发送绑定手机号验证码。
+     *
+     * @param phone 手机号
+     */
+    void sendBindingSmsCode(String phone);
+
+    /**
+     * 发送绑定邮箱验证码。
+     *
+     * @param email 邮箱
+     */
+    void sendBindingEmailCode(String email);
 }
