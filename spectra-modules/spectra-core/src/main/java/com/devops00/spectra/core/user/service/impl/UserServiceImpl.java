@@ -50,6 +50,7 @@ import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
+import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -97,6 +98,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final SecuritySessionQueryPort securitySessionQueryPort;
 
     private final SecuritySessionRevocationPort securitySessionRevocationPort;
+
+    private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
 
     @Override
     public User getByEmail(String email) {
@@ -254,6 +257,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (passwordEncoder.matches(params.getNewPassword(), credential.getPasswordHash())) {
             throw new SpectraException("新密码不能与旧密码相同");
         }
+
+        securityPasswordPolicyProvider.current().assertAccepts(params.getNewPassword());
 
         // 6. 加密新密码并更新
         passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false);

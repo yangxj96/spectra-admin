@@ -77,6 +77,21 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase8SecurityPolicyDefaultsMustBeSeededIdempotently() throws IOException {
+        String migration = readMigration("V13__seed_security_policy_defaults.sql");
+
+        assertTrue(migration.contains("INSERT INTO spectra_security.security_client"));
+        assertTrue(migration.contains("'web', 'Web 浏览器', 'ACTIVE'"));
+        assertTrue(migration.contains("'app', '移动 App', 'ACTIVE'"));
+        assertTrue(migration.contains("'mini', '微信小程序', 'ACTIVE'"));
+        assertTrue(migration.contains("FROM spectra_security.security_client"));
+        assertTrue(migration.contains("ON CONFLICT (client_id) DO NOTHING"));
+        assertTrue(migration.contains("INSERT INTO spectra_security.password_policy"));
+        assertTrue(migration.contains("VALUES ('SYSTEM', 12, TRUE, TRUE, TRUE, TRUE, NULL)"));
+        assertTrue(migration.contains("ON CONFLICT (policy_key) DO NOTHING"));
+    }
+
+    @Test
     void phase9LegacyDataScopeMigrationMustDropOnlyKnownLegacyObjects() throws IOException {
         String migration = readMigration("V10__remove_legacy_data_scope.sql");
 

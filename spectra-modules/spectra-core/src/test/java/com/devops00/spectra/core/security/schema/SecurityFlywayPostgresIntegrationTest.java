@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV12() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV13() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,10 +70,14 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"), versions);
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"),
+                    versions);
             assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "security_audit_archive_manifest"));
             assertTrue(tableExists(connection, "spectra_security", "assignment_permission_boundary"));
+            assertTrue(tableExists(connection, "spectra_security", "security_client"));
+            assertTrue(tableExists(connection, "spectra_security", "session_policy"));
+            assertTrue(tableExists(connection, "spectra_security", "password_policy"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope_target"));
@@ -88,6 +92,23 @@ class SecurityFlywayPostgresIntegrationTest {
                     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.permission")) {
                 resultSet.next();
                 assertEquals(115, resultSet.getInt(1));
+            }
+            try (var statement = connection.createStatement();
+                    var resultSet = statement.executeQuery(
+                            "SELECT COUNT(*) FROM spectra_security.security_client WHERE state = 'ACTIVE'")) {
+                resultSet.next();
+                assertEquals(3, resultSet.getInt(1));
+            }
+            try (var statement = connection.createStatement();
+                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.session_policy")) {
+                resultSet.next();
+                assertEquals(3, resultSet.getInt(1));
+            }
+            try (var statement = connection.createStatement();
+                    var resultSet = statement.executeQuery(
+                            "SELECT min_length FROM spectra_security.password_policy WHERE policy_key = 'SYSTEM'")) {
+                assertTrue(resultSet.next());
+                assertEquals(12, resultSet.getInt(1));
             }
         }
     }

@@ -28,6 +28,7 @@ import com.devops00.spectra.security.base.holder.SecuritySessionReader;
 import com.devops00.spectra.security.base.holder.SecuritySessionRevoker;
 import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
+import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecuritySessionContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository;
@@ -131,8 +132,10 @@ public class SecuritySessionPortConfiguration {
                                                          @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
                                                          SecurityProperties properties,
                                                          UserOnlineConverter userOnlineConverter,
+                                                         ObjectProvider<SecuritySessionPolicyProvider> sessionPolicyProvider,
                                                          ObjectProvider<SecurityUserLoader> securityUserLoaderProvider) {
         return new RedisSecuritySessionRepository(om, redis, properties, userOnlineConverter,
+                sessionPolicyProvider.getIfAvailable(),
                 securityUserLoaderProvider.getIfAvailable());
     }
 }

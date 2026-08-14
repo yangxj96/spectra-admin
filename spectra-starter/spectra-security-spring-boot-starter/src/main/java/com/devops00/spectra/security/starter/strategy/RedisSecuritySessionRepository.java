@@ -30,6 +30,7 @@ import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
+import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
@@ -76,15 +77,19 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
     private final SecurityProperties properties;
     private final UserOnlineConverter userOnlineConverter;
 
+    private final @Nullable SecuritySessionPolicyProvider sessionPolicyProvider;
+
     private final @Nullable SecurityUserLoader securityUserLoader;
 
     public RedisSecuritySessionRepository(@Qualifier("securityObjectMapper") ObjectMapper om,
                                   @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
-                                  UserOnlineConverter userOnlineConverter, @Nullable SecurityUserLoader securityUserLoader) {
+                                  UserOnlineConverter userOnlineConverter, @Nullable SecuritySessionPolicyProvider sessionPolicyProvider,
+                                  @Nullable SecurityUserLoader securityUserLoader) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
         this.userOnlineConverter = userOnlineConverter;
+        this.sessionPolicyProvider = sessionPolicyProvider;
         this.securityUserLoader = securityUserLoader;
     }
 
@@ -107,7 +112,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         String userId = user.getId().toString();
         String ucKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType.getName());
 
-        SessionPolicy policy = sessionPolicy();
+        SessionPolicy policy = sessionPolicy(clientType.getName());
         Set<Object> activeTokens = activeTokenDigests(userId);
         if (policy.concurrencyMode() == SessionConcurrencyMode.KICK_OLD) {
             for (Object activeToken : activeTokens) {
@@ -206,14 +211,18 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
             throw new IllegalArgumentException("刷新token所属账号当前不可用");
         }
 
-        Duration refreshTtl = Duration.ofSeconds(sessionPolicy().refreshTtlSeconds());
+        String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
+        Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
+        String clientType = Objects.toString(session.get("clientType"),
+                Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
+        Duration refreshTtl = Duration.ofSeconds(sessionPolicy(clientType).refreshTtlSeconds());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
             throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
         }
 
         var claimResult = RefreshTokenRotationStore.claim(redis, rtKey,
-                SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest), sessionPolicy().refreshTtlSeconds());
+                SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest), sessionPolicy(clientType).refreshTtlSeconds());
         if (claimResult != RefreshTokenRotationStore.ClaimResult.CLAIMED) {
             if (claimResult == RefreshTokenRotationStore.ClaimResult.REPLAY) {
                 redis.opsForValue().set(replayFenceKey, "REVOKED", refreshTtl);
@@ -222,11 +231,6 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
             }
             throw new IllegalArgumentException("刷新token无效或已过期");
         }
-
-        String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
-        Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
-        String clientType = Objects.toString(session.get("clientType"),
-                Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
 
         try {
             removeRotatedAccessSession(accessDigest, refreshDigest, userId, clientType, familyId);
@@ -478,7 +482,17 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         redis.delete(SecurityRedisKey.SESSION_FAMILY.format(familyId));
     }
 
-    private SessionPolicy sessionPolicy() {
+    private SessionPolicy sessionPolicy(ClientType clientType) {
+        return sessionPolicy(clientType.getName());
+    }
+
+    private SessionPolicy sessionPolicy(String clientCode) {
+        if (sessionPolicyProvider != null) {
+            SessionPolicy databasePolicy = sessionPolicyProvider.find(clientCode);
+            if (databasePolicy != null) {
+                return databasePolicy;
+            }
+        }
         return new SessionPolicy(properties.getSessionConcurrencyMode(), properties.getMaxSessions(),
                 properties.getAccessTokenExpire(), properties.getRefreshTokenExpire(), null, null);
     }
