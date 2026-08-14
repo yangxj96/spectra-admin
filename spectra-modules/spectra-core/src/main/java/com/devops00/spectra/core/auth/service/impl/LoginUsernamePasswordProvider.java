@@ -17,8 +17,9 @@
 package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
-import com.devops00.spectra.core.auth.service.AccountService;
 import com.devops00.spectra.core.common.service.KaptchaService;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.auth.service.PasswordCredentialService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.exception.LoginException;
@@ -45,32 +46,41 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
 
     private final UserService userService;
 
-    private final AccountService accountService;
+    private final AuthenticationIdentityService authenticationIdentityService;
+
+    private final PasswordCredentialService passwordCredentialService;
 
     private final PasswordEncoder passwordEncoder;
 
     private final SecurityUserHelper securityUserHelper;
 
-    public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService, AccountService accountService,
+    public LoginUsernamePasswordProvider(KaptchaService kaptchaService, UserService userService,
+                                         AuthenticationIdentityService authenticationIdentityService,
+                                         PasswordCredentialService passwordCredentialService,
                                          PasswordEncoder passwordEncoder, SecurityUserHelper securityUserHelper) {
         this.kaptchaService = kaptchaService;
         this.userService = userService;
-        this.accountService = accountService;
+        this.authenticationIdentityService = authenticationIdentityService;
+        this.passwordCredentialService = passwordCredentialService;
         this.passwordEncoder = passwordEncoder;
         this.securityUserHelper = securityUserHelper;
     }
 
     @Override
     public Authentication login(String username, String password) throws AuthenticationException {
-        var account = accountService.getByLoginName(username);
-        if (account == null || !passwordEncoder.matches(password, account.getPassword())) {
+        var identity = authenticationIdentityService.findPasswordIdentity(username);
+        if (identity == null) {
             throw new LoginException("账号或密码错误");
         }
-        var user = userService.getById(account.getUserId());
+        var credential = passwordCredentialService.getByUserId(identity.getUserId());
+        if (credential == null || !passwordEncoder.matches(password, credential.getPasswordHash())) {
+            throw new LoginException("账号或密码错误");
+        }
+        var user = userService.getById(identity.getUserId());
         if (user == null) {
             throw new LoginException("账号或密码错误");
         }
-        var su = securityUserHelper.toSecurityUser(LoginType.PASSWORD, account, user);
+        var su = securityUserHelper.toSecurityUser(LoginType.PASSWORD, identity, credential, user);
         return new UsernamePasswordAuthenticationToken(su, null, su.getAuthorities());
     }
 

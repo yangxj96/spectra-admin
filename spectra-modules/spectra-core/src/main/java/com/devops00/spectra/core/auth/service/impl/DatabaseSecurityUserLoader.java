@@ -16,8 +16,10 @@
 
 package com.devops00.spectra.core.auth.service.impl;
 
-import com.devops00.spectra.core.auth.javabean.entity.Account;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.auth.javabean.entity.PasswordCredential;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.auth.service.PasswordCredentialService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
@@ -40,20 +42,25 @@ public class DatabaseSecurityUserLoader implements SecurityUserLoader {
 
     private final UserService userService;
 
-    private final AccountService accountService;
+    private final AuthenticationIdentityService authenticationIdentityService;
+
+    private final PasswordCredentialService passwordCredentialService;
 
     private final SecurityUserHelper securityUserHelper;
 
     @Override
     public @Nullable SecurityUser load(UUID userId) {
         User user = userService.getById(userId);
-        Account account = accountService.getDefaultByUserId(userId);
-        if (user == null || account == null) {
+        if (user == null || user.getEmail() == null) {
+            return null;
+        }
+        AuthenticationIdentity identity = authenticationIdentityService.findPasswordIdentity(user.getEmail());
+        PasswordCredential credential = passwordCredentialService.getByUserId(userId);
+        if (identity == null || credential == null) {
             return null;
         }
         try {
-            // 当前模型的默认账号是 PASSWORD；后续多 Factor 模型会由 AuthenticationIdentity 直接选择凭证。
-            return securityUserHelper.toSecurityUser(LoginType.PASSWORD, account, user);
+            return securityUserHelper.toSecurityUser(LoginType.PASSWORD, identity, credential, user);
         } catch (RuntimeException exception) {
             return null;
         }

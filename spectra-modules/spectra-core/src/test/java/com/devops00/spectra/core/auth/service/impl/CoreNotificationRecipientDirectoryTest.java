@@ -19,9 +19,7 @@ package com.devops00.spectra.core.auth.service.impl;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.common.notification.NotificationRecipient;
-import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.holder.SecHolderStrategy;
@@ -53,8 +51,6 @@ class CoreNotificationRecipientDirectoryTest {
 
     private static final UUID OTHER_DEPARTMENT = UUID.randomUUID();
 
-    private AccountService accountService;
-
     private UserService userService;
 
     private DataScopeProvider dataScopeProvider;
@@ -63,17 +59,15 @@ class CoreNotificationRecipientDirectoryTest {
 
     @BeforeEach
     void setUp() {
-        accountService = mock(AccountService.class);
         userService = mock(UserService.class);
         dataScopeProvider = mock(DataScopeProvider.class);
         security = mock(SecHolderStrategy.class);
         SecUtil.setHolder(security);
-        var account = new Account();
-        account.setStatus(AccountStatus.ACTIVE.getCode());
-        account.setVerified((short) 1);
-        when(accountService.listByUserId(RECIPIENT_USER)).thenReturn(List.of(account));
         var recipient = new User();
         recipient.setId(RECIPIENT_USER);
+        recipient.setStatus(UserStatus.ACTIVE);
+        recipient.setEmail("recipient@example.com");
+        recipient.setPhone("13800138000");
         recipient.setDepartmentId(CURRENT_DEPARTMENT);
         when(userService.getById(RECIPIENT_USER)).thenReturn(recipient);
         when(security.getCurrentUserId()).thenReturn(CURRENT_USER);
@@ -127,7 +121,7 @@ class CoreNotificationRecipientDirectoryTest {
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
         assertEquals(0, result.stream().filter(NotificationRecipient::active).count());
-        verify(accountService, never()).listByUserId(RECIPIENT_USER);
+        verify(userService, never()).getById(RECIPIENT_USER);
     }
 
     @Test
@@ -142,6 +136,6 @@ class CoreNotificationRecipientDirectoryTest {
     }
 
     private CoreNotificationRecipientDirectory directory() {
-        return new CoreNotificationRecipientDirectory(accountService, userService, dataScopeProvider);
+        return new CoreNotificationRecipientDirectory(userService, dataScopeProvider);
     }
 }

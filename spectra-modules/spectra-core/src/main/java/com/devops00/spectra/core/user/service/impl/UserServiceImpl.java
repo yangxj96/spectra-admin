@@ -25,9 +25,8 @@ import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
-import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.auth.service.PasswordCredentialService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
@@ -52,7 +51,6 @@ import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
-import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import lombok.RequiredArgsConstructor;
@@ -88,7 +86,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final PasswordEncoder passwordEncoder;
 
-    private final AccountService accountService;
+    private final AuthenticationIdentityService authenticationIdentityService;
+
+    private final PasswordCredentialService passwordCredentialService;
 
     private final UserDataScopeMapper dataScopeMapper;
 
@@ -97,6 +97,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final NameFillExecutor fillExecutor;
 
     private final SecurityChangeExecutor securityChangeExecutor;
+
+    @Override
+    public User getByEmail(String email) {
+        if (StrUtils.isBlank(email)) {
+            return null;
+        }
+        return this.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email).last("LIMIT 1"));
+    }
 
     @Override
     @Transactional
@@ -111,17 +119,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!this.save(entity)) {
             throw new DataSaveException("保存用户信息异常");
         }
-        // 创建一个默认的账号密码登录
-        var defaultAccount = new Account();
-        defaultAccount.setUserId(entity.getId());
-        defaultAccount.setType(LoginType.PASSWORD);
-        defaultAccount.setLoginName(entity.getEmail());
-        defaultAccount.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
-        defaultAccount.setProvider("DEFAULT");
-        defaultAccount.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
-        if (!accountService.save(defaultAccount)) {
-            throw new DataSaveException("保存用户信息异常");
-        }
+        // 目标认证模型将身份标识和密码凭证拆分保存；临时密码只保存其哈希。
+        authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
+        passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         // 关联角色
         relUserRoleService.grant(entity.getId(), params.getRoleIds());
         // 更新用户数据范围
@@ -139,8 +139,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         SecUtil.kick(user.getId());
         // 先删除角色关联
         relUserRoleService.revoke(user.getId());
-        // 删除账号信息
-        accountService.deleteByUserId(user.getId());
+        // 撤销认证身份；目标 schema 保留身份历史，不物理删除安全事实。
+        authenticationIdentityService.revokeByUserId(user.getId());
         // 删除用户信息
         this.removeById(user);
     }
@@ -162,11 +162,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new EntityUpdateException("更新用户发生错误");
         }
 
-        // 默认账号处理
+        // 默认密码身份处理
         if (!defaultAccountUpdateFlag) {
-            Account account = accountService.getDefaultByUserId(entity.getId());
-            account.setLoginName(entity.getEmail());
-            accountService.updateById(account);
+            authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getEmail());
         }
 
         // 数据范围修改
@@ -234,15 +232,11 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (user == null) {
             throw new DataNotExistException("用户不存在");
         }
-        Account account = accountService.getDefaultByUserId(user.getId());
-        if (account == null) {
-            throw new DataNotExistException("账号不存在");
+        var credential = passwordCredentialService.getByUserId(user.getId());
+        if (credential == null) {
+            throw new DataNotExistException("密码凭证不存在");
         }
-        account.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
-        account.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
-        if (!accountService.updateById(account)) {
-            throw new EntityUpdateException("重置密码失败");
-        }
+        passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         // 密码凭证变化后，所有设备必须重新认证。
         SecUtil.kick(uid);
     }
@@ -331,13 +325,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
 
         // 2. 获取用户的默认账号
-        var account = accountService.getDefaultByUserId(userId);
-        if (account == null) {
-            throw new DataNotExistException("账号不存在");
+        var credential = passwordCredentialService.getByUserId(userId);
+        if (credential == null) {
+            throw new DataNotExistException("密码凭证不存在");
         }
 
         // 3. 验证旧密码
-        if (!passwordEncoder.matches(params.getOldPassword(), account.getPassword())) {
+        if (!passwordEncoder.matches(params.getOldPassword(), credential.getPasswordHash())) {
             throw new SpectraException("旧密码错误");
         }
 
@@ -347,16 +341,12 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
 
         // 5. 验证新密码不能与旧密码相同
-        if (passwordEncoder.matches(params.getNewPassword(), account.getPassword())) {
+        if (passwordEncoder.matches(params.getNewPassword(), credential.getPasswordHash())) {
             throw new SpectraException("新密码不能与旧密码相同");
         }
 
         // 6. 加密新密码并更新
-        account.setPassword(passwordEncoder.encode(params.getNewPassword()));
-        account.setStatus(AccountStatus.ACTIVE.getCode());
-        if (!accountService.updateById(account)) {
-            throw new EntityUpdateException("修改密码失败");
-        }
+        passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false);
         // 密码变化包括当前设备在内全部 Session 失效。
         SecUtil.kick(userId);
         log.info("用户 {} 修改密码成功", userId);

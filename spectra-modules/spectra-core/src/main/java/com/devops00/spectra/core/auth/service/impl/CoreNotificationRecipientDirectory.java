@@ -20,9 +20,7 @@ import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.constant.DataScopeType;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
-import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
-import com.devops00.spectra.core.auth.javabean.entity.Account;
-import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.holder.SecUtil;
@@ -38,8 +36,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CoreNotificationRecipientDirectory implements NotificationRecipientDirectory {
-
-    private final AccountService accountService;
 
     private final UserService userService;
 
@@ -65,9 +61,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         return loginNames.stream()
                 .filter(this::hasText)
                 .distinct()
-                .map(accountService::getByLoginName)
+                .map(userService::getByEmail)
                 .filter(java.util.Objects::nonNull)
-                .map(Account::getUserId)
+                .map(User::getId)
                 .filter(java.util.Objects::nonNull)
                 .flatMap(userId -> resolve(List.of(userId)).stream())
                 .toList();
@@ -77,24 +73,11 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         if (!allowedByCurrentUserScope(userId)) {
             return new NotificationRecipient(userId, null, null, false, false, null);
         }
-        var accounts = accountService.listByUserId(userId);
-        var active = accounts.stream().anyMatch(this::isActive);
-        var verified = accounts.stream()
-                .anyMatch(account -> isActive(account)
-                        && Short.valueOf((short) 1).equals(account.getVerified()));
-        var phone = accounts.stream()
-                .filter(this::isUsable)
-                .map(Account::getPhone)
-                .filter(this::hasText)
-                .findFirst()
-                .orElse(null);
-        var email = accounts.stream()
-                .filter(this::isUsable)
-                .map(Account::getEmail)
-                .filter(this::hasText)
-                .findFirst()
-                .orElse(null);
         var user = userService.getById(userId);
+        var active = user != null && UserStatus.ACTIVE.equals(user.getStatus());
+        var phone = user == null ? null : user.getPhone();
+        var email = user == null ? null : user.getEmail();
+        var verified = active && (hasText(phone) || hasText(email));
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }
 
@@ -121,14 +104,6 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 && recipient.getDepartmentId() != null
                 && scope.getTargetIds() != null
                 && scope.getTargetIds().contains(recipient.getDepartmentId());
-    }
-
-    private boolean isUsable(Account account) {
-        return isActive(account) && Short.valueOf((short) 1).equals(account.getVerified());
-    }
-
-    private boolean isActive(Account account) {
-        return account != null && AccountStatus.ACTIVE.getCode().equals(account.getStatus());
     }
 
     private boolean hasText(String value) {

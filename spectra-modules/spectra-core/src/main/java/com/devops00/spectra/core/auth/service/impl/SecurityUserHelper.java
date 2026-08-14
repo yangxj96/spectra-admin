@@ -22,6 +22,8 @@ import com.devops00.spectra.common.utils.ObjUtils;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.converter.AuthConverter;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
+import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.auth.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -112,6 +114,38 @@ public class SecurityUserHelper {
         securityUser.setDepartmentId(scope.getDepartmentId());
         securityUser.setDataScopeTargetIds(scope.getTargetIds());
 
+        return securityUser;
+    }
+
+    /**
+     * 使用目标 authentication_identity/password_credential 模型构建安全主体。
+     */
+    public SecurityUser toSecurityUser(LoginType loginType, AuthenticationIdentity identity, PasswordCredential credential, Object user) {
+        if (loginType == null || identity == null || credential == null || !(user instanceof User u)) {
+            throw new LoginException("账号当前不可用");
+        }
+        if (!loginType.name().equals(identity.getMethodCode())
+                || !"ACTIVE".equals(identity.getState())
+                || Boolean.TRUE.equals(credential.getMustChange())) {
+            throw new LoginException("账号当前不可用");
+        }
+        if (identity.getUserId() == null || !identity.getUserId().equals(u.getId())) {
+            throw new LoginException("账号当前不可用");
+        }
+        if (u.getDeleted() != null || !UserStatus.ACTIVE.equals(u.getStatus())) {
+            throw new LoginException("账号当前不可用");
+        }
+
+        var securityUser = authConverter.toSecurityUser(u);
+        securityUser.setEnabled(true);
+        securityUser.setAccountNonExpired(true);
+        securityUser.setAccountNonLocked(true);
+        securityUser.setCredentialsNonExpired(true);
+        securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
+        var scope = dataScopeProvider.resolve(securityUser.getId());
+        securityUser.setDataScopeType(scope.getScopeType());
+        securityUser.setDepartmentId(scope.getDepartmentId());
+        securityUser.setDataScopeTargetIds(scope.getTargetIds());
         return securityUser;
     }
 
