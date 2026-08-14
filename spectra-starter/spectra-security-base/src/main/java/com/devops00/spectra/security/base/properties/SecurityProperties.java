@@ -66,11 +66,6 @@ public class SecurityProperties {
     private long refreshTokenExpire = 604800L;
 
     /**
-     * 超管角色名称
-     */
-    private String administrators = "ROLE_DEV_OPS";
-
-    /**
      * SecUtil工具当前类型
      */
     private SecMode secMode = SecMode.REDIS;
@@ -109,11 +104,6 @@ public class SecurityProperties {
      * 验证码长度。当前只允许 6 位数字。
      */
     private int verificationCodeLength = 6;
-
-    /**
-     * Root 角色编码。ROLE_DEV_OPS 为系统安全根身份，不应由普通业务配置替换。
-     */
-    private String rootRoleCode = "ROLE_DEV_OPS";
 
     /**
      * Root 最少有效用户数；首版始终保护最后一个有效 Root。

@@ -45,7 +45,7 @@ public class SecurityAutoConfiguration {
      * 统一 Root 判定入口。Root 仍必须经过审计、Session 和 DataScope 等其他安全边界。
      */
     @Bean
-    public RootAuthorizationPolicy rootAuthorizationPolicy(SecurityProperties properties) {
-        return new DefaultRootAuthorizationPolicy(properties);
+    public RootAuthorizationPolicy rootAuthorizationPolicy() {
+        return new DefaultRootAuthorizationPolicy();
     }
 }

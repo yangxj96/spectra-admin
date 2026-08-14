@@ -26,6 +26,7 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.base.util.RefreshTokenRotationStore;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,7 +79,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public String administrators() {
-        return properties.getRootRoleCode();
+        return RootAuthorizationPolicy.ROOT_ROLE;
     }
 
     // ==================== Token 创建 & 续期 ====================

@@ -16,9 +16,7 @@
 
 package com.devops00.spectra.security.starter.root;
 
-import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 
 /**
@@ -30,17 +28,15 @@ import org.springframework.security.core.Authentication;
  * @version 1.0
  * @since 2026/8/14
  */
-@RequiredArgsConstructor
 public class DefaultRootAuthorizationPolicy implements RootAuthorizationPolicy {
-
-    private final SecurityProperties properties;
 
     @Override
     public boolean isRoot(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
-        String rootRole = properties.getRootRoleCode();
-        return authentication.getAuthorities().stream().anyMatch(authority -> rootRole.equals(authority.getAuthority()));
+        return authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority -> RootAuthorizationPolicy.ROOT_ROLE.equals(authority.getAuthority()));
     }
 }

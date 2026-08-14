@@ -31,7 +31,7 @@ class RootAuthorizationPolicyTest {
 
     @Test
     void shouldRecognizeOnlyConfiguredDevOpsRoleAsRoot() {
-        var policy = new DefaultRootAuthorizationPolicy(new SecurityProperties());
+        var policy = new DefaultRootAuthorizationPolicy();
         var root = UsernamePasswordAuthenticationToken.authenticated("root", "N/A",
                 java.util.List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
         var administrator = UsernamePasswordAuthenticationToken.authenticated("admin", "N/A",
