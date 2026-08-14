@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.javabean.converter;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -32,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  */
 class NotificationAdminConverterTest {
 
-    private final NotificationAdminConverter converter = new NotificationAdminConverterImpl(new TimeMapper());
+    private final NotificationAdminConverter converter = new NotificationAdminConverterImpl(
+            new TimeMapper(org.mockito.Mockito.mock(SecurityContextAccessor.class)));
 
     @Test
     void shouldMaskTaskAddressAndSensitiveError() {

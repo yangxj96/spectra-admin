@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.configure.mybatis;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.devops00.spectra.common.constant.LogPrefix;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.github.f4b6a3.uuid.UuidCreator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
@@ -34,6 +34,12 @@ import java.time.Instant;
  */
 @Slf4j
 public class MetaObjectHandlerImpl implements MetaObjectHandler {
+
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public MetaObjectHandlerImpl(SecurityContextAccessor securityContextAccessor) {
+        this.securityContextAccessor = securityContextAccessor;
+    }
 
     /**
      * 主键ID
@@ -71,13 +77,13 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
             setFieldValByName(ID, UuidCreator.getTimeOrderedEpoch(), metaObject);
         }
         if (getFieldValByName(CREATED_BY, metaObject) == null) {
-            setFieldValByName(CREATED_BY, SecUtil.getCurrentUserId(), metaObject);
+            setFieldValByName(CREATED_BY, securityContextAccessor.currentUserId(), metaObject);
         }
         if (getFieldValByName(CREATED_AT, metaObject) == null) {
             setFieldValByName(CREATED_AT, Instant.now(), metaObject);
         }
         if (getFieldValByName(UPDATED_BY, metaObject) == null) {
-            setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
+            setFieldValByName(UPDATED_BY, securityContextAccessor.currentUserId(), metaObject);
         }
         if (getFieldValByName(UPDATED_AT, metaObject) == null) {
             setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
@@ -86,7 +92,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
         // 系统任务没有用户上下文时保留显式值，由专用服务/受控执行器负责赋值。
         if (metaObject.hasSetter(DEPARTMENT_ID) && getFieldValByName(DEPARTMENT_ID, metaObject) == null) {
             try {
-                var currentUser = SecUtil.getCurrentUser();
+                var currentUser = securityContextAccessor.currentUser();
                 if (currentUser != null && currentUser.getDepartmentId() != null) {
                     setFieldValByName(DEPARTMENT_ID, currentUser.getDepartmentId(), metaObject);
                 }
@@ -99,7 +105,7 @@ public class MetaObjectHandlerImpl implements MetaObjectHandler {
     @Override
     public void updateFill(MetaObject metaObject) {
         log.debug(LogPrefix.PERSISTENCE.f("updateFill"));
-        setFieldValByName(UPDATED_BY, SecUtil.getCurrentUserId(), metaObject);
+        setFieldValByName(UPDATED_BY, securityContextAccessor.currentUserId(), metaObject);
         setFieldValByName(UPDATED_AT, Instant.now(), metaObject);
     }
 }

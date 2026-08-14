@@ -19,6 +19,7 @@ package com.devops00.spectra.log.starter;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.log.base.aspect.ULogAspect;
 import com.devops00.spectra.log.base.publisher.ULogEventPublisher;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,8 +54,8 @@ public class ULogConfiguration {
      * 日志切面
      */
     @Bean
-    public ULogAspect uLogAspect() {
+    public ULogAspect uLogAspect(SecurityContextAccessor securityContextAccessor) {
         log.debug(LogPrefix.LOG.f("载入ULogAspect"));
-        return new ULogAspect();
+        return new ULogAspect(securityContextAccessor);
     }
 }

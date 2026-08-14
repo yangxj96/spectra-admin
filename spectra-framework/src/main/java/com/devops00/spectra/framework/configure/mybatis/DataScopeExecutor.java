@@ -8,7 +8,8 @@ package com.devops00.spectra.framework.configure.mybatis;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
 import com.devops00.spectra.common.mybatis.DataScopeContextHolder;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Supplier;
@@ -24,7 +25,10 @@ import java.util.function.Supplier;
  * @since 2026/8/9
  */
 @Component
+@RequiredArgsConstructor
 public class DataScopeExecutor {
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     /**
      * 在系统运维权限校验通过后执行有返回值的隔离绕过任务。
@@ -43,7 +47,7 @@ public class DataScopeExecutor {
     }
 
     private void requireSystemOperator() {
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null
                 || user.getAuthorities()
                         .stream()

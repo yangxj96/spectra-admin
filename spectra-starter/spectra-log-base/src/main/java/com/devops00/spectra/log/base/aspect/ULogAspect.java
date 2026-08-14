@@ -22,7 +22,7 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.entity.ULogEntity;
 import com.devops00.spectra.log.base.enums.SysLogType;
 import com.devops00.spectra.log.base.publisher.ULogEventPublisher;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,6 +54,12 @@ import java.util.Arrays;
 @Slf4j
 @Aspect
 public class ULogAspect {
+
+    private final SecurityContextAccessor securityContextAccessor;
+
+    public ULogAspect(SecurityContextAccessor securityContextAccessor) {
+        this.securityContextAccessor = securityContextAccessor;
+    }
 
     private final ExpressionParser parser = new SpelExpressionParser();
 
@@ -138,7 +144,7 @@ public class ULogAspect {
             datum.setTimeCost(timeCost);
 
             // 6. 异步发布事件
-            datum.setCurrentId(SecUtil.getCurrentUserId());
+            datum.setCurrentId(securityContextAccessor.currentUserId());
             publisher.save(datum);
         } catch (Exception ex) {
             // AOP 本身绝对不能向外抛出任何异常，绝不能因为记录日志失败而导致原本成功的业务回滚

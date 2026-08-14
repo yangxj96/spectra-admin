@@ -24,6 +24,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.framework.configure.mybatis.interceptor.DataScopeInnerInterceptor;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -65,19 +66,19 @@ public class MyBatisPlusConfiguration {
      * 添加注释
      */
     @Bean
-    public MetaObjectHandler metaObjectHandler() {
+    public MetaObjectHandler metaObjectHandler(SecurityContextAccessor securityContextAccessor) {
         log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));
-        return new MetaObjectHandlerImpl();
+        return new MetaObjectHandlerImpl(securityContextAccessor);
     }
 
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor() {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(SecurityContextAccessor securityContextAccessor) {
         log.debug(LogPrefix.PERSISTENCE.f("载入MybatisPlusInterceptor"));
         // 数据权限必须先于分页插件处理原始查询。PaginationInnerInterceptor
         // 会在 willDoQuery 阶段生成 count SQL；若顺序反过来，count 查询会
         // 先执行而绕过数据权限谓词，导致分页总数发生越权。
         var dataPermissionInterceptor = new DataPermissionInterceptor(new DataScopeInnerInterceptor(
-                dataScopeProvider, authorizationSnapshotProvider, dataScopeEntityRegistry));
+                dataScopeProvider, authorizationSnapshotProvider, dataScopeEntityRegistry, securityContextAccessor));
         // 分页插件
         var pageInterceptor = new PaginationInnerInterceptor();
         pageInterceptor.setOverflow(true);

@@ -26,7 +26,7 @@ import com.devops00.spectra.framework.configure.mybatis.DataScopeEntityRegistry;
 import com.devops00.spectra.framework.configure.mybatis.security.ScopeSqlPolicy;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -41,6 +41,7 @@ import net.sf.jsqlparser.schema.Table;
 import net.sf.jsqlparser.statement.select.ParenthesedSelect;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.jspecify.annotations.Nullable;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -74,20 +75,24 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
 
     private final DataScopeEntityRegistry dataScopeEntityRegistry;
 
+    private final @Nullable SecurityContextAccessor securityContextAccessor;
+
     /**
      * 保留给框架单测和没有新授权模块的独立使用场景；正式应用使用三参数构造器。
      */
     public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider, DataScopeEntityRegistry dataScopeEntityRegistry) {
-        this(dataScopeProvider, null, dataScopeEntityRegistry);
+        this(dataScopeProvider, null, dataScopeEntityRegistry, null);
     }
 
     @Autowired
     public DataScopeInnerInterceptor(ObjectProvider<DataScopeProvider> dataScopeProvider,
                                      ObjectProvider<AuthorizationSnapshotProvider> authorizationSnapshotProvider,
-                                     DataScopeEntityRegistry dataScopeEntityRegistry) {
+                                     DataScopeEntityRegistry dataScopeEntityRegistry,
+                                     SecurityContextAccessor securityContextAccessor) {
         this.dataScopeProvider = dataScopeProvider;
         this.authorizationSnapshotProvider = authorizationSnapshotProvider;
         this.dataScopeEntityRegistry = dataScopeEntityRegistry;
+        this.securityContextAccessor = securityContextAccessor;
     }
 
     @Override
@@ -119,7 +124,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
         // 认证流程会在登录前查询 sys_account/sys_user 等基础表，
         // 这些表不属于数据隔离范围，不能因为当前尚未建立用户上下文而失败。
-        UUID userId = SecUtil.getCurrentUserId();
+        UUID userId = securityContextAccessor == null ? null : securityContextAccessor.currentUserId();
         if (userId == null) {
             throw new DataScopeViolationException("数据权限 SQL 缺少当前用户上下文");
         }
@@ -156,7 +161,7 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         }
 
         // 构建 SQL WHERE 条件
-        Expression scopeExpression = buildScopeExpression(table, annotation, scope);
+        Expression scopeExpression = buildScopeExpression(table, annotation, scope, userId);
         if (scopeExpression == null) {
             return null;
         }
@@ -170,9 +175,9 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
     /**
      * 构建数据范围 SQL 表达式
      */
-    private Expression buildScopeExpression(Table table, DataScope annotation, DataScopeProvider.EffectiveScope scope) {
+    private Expression buildScopeExpression(Table table, DataScope annotation, DataScopeProvider.EffectiveScope scope,
+                                            UUID currentUserId) {
         String columnName = annotation != null ? annotation.column() : "department_id";
-        UUID currentUserId = SecUtil.getCurrentUserId();
 
         Expression structuralExpr = buildStructuralExpression(table, annotation, columnName, scope, currentUserId);
 

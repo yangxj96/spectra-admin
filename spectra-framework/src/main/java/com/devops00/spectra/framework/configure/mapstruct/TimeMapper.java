@@ -16,7 +16,8 @@
 
 package com.devops00.spectra.framework.configure.mapstruct;
 
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -38,7 +39,10 @@ import java.util.Date;
  * @since 2025/12/10 11:13
  */
 @Component
+@RequiredArgsConstructor
 public class TimeMapper {
+
+    private final SecurityContextAccessor securityContextAccessor;
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
@@ -48,7 +52,7 @@ public class TimeMapper {
      * @return 时区
      */
     public ZoneId getUserZoneId() {
-        return ZoneId.of(SecUtil.getCurrentUserZoneId());
+        return ZoneId.of(securityContextAccessor.currentUserZoneId());
         //return ZoneId.of("UTC");
     }
 
