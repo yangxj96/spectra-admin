@@ -50,28 +50,28 @@ public class AuthorityController {
 
     @ULog("'创建权限'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'permission:manage')")
     public void createdAuthority(@Validated(Verify.Insert.class) @RequestBody AuthoritySaveFrom params) {
         bindService.created(params);
     }
 
     @ULog("'删除权限'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'permission:manage')")
     public void deleteAuthority(@PathVariable UUID id) {
         bindService.deleteById(id);
     }
 
     @ULog("'修改权限信息'")
     @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'permission:manage')")
     public void modifyAuthority(@Validated(Verify.Update.class) @RequestBody AuthoritySaveFrom params) {
         bindService.modify(params);
     }
 
     @ULog("'获取权限树列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'AUTHORITY:QUERY')")
+    @PreAuthorize("hasPermission(null, 'permission:read')")
     public @Nullable List<AuthorityTreeVO> tree() {
         return bindService.tree();
     }

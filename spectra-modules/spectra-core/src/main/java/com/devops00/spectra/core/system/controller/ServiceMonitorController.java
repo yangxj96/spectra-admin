@@ -52,7 +52,7 @@ public class ServiceMonitorController {
      */
     @ULog("'获取CPU信息'")
     @GetMapping(value = "/getCPUInfo", version = "1.0.0+")
-    @PreAuthorize("hasRole(@sec.administrators())")
+    @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public CPUInfoVO getCPUInfo() {
         return bindService.getCPUInfo();
     }
@@ -64,7 +64,7 @@ public class ServiceMonitorController {
      */
     @ULog("'获取内存信息'")
     @GetMapping(value = "/getRAMInfo", version = "1.0.0+")
-    @PreAuthorize("hasRole(@sec.administrators())")
+    @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public RAMInfoVO getRAMInfo() {
         return bindService.getRAMInfo();
     }
@@ -76,7 +76,7 @@ public class ServiceMonitorController {
      */
     @ULog("'获取JVM信息'")
     @GetMapping(value = "/getJVMInfo", version = "1.0.0+")
-    @PreAuthorize("hasRole(@sec.administrators())")
+    @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public JVMInfoVO getJVMInfo() {
         return bindService.getJVMInfo();
     }

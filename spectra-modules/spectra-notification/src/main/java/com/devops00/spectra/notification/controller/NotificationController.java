@@ -56,7 +56,7 @@ public class NotificationController {
      */
     @ULog("'查询消息列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
+    @PreAuthorize("hasPermission(null ,'notification:read')")
     public IPage<NotificationInboxVO> list(PageFrom page, NotificationQueryFrom params) {
         return service.page(page, currentUserId(), params);
     }
@@ -66,7 +66,7 @@ public class NotificationController {
      */
     @ULog("'查询消息详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
+    @PreAuthorize("hasPermission(null ,'notification:read')")
     public NotificationInboxVO detail(@PathVariable UUID id) {
         return service.detail(id, currentUserId());
     }
@@ -76,7 +76,7 @@ public class NotificationController {
      */
     @ULog("'获取未读消息数'")
     @GetMapping(value = "/unread-count", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
+    @PreAuthorize("hasPermission(null ,'notification:read')")
     public long unreadCount() {
         return service.unreadCount(currentUserId());
     }
@@ -86,7 +86,7 @@ public class NotificationController {
      */
     @ULog("'标记消息已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAsRead(@PathVariable UUID id) {
         service.markAsRead(id, currentUserId());
     }
@@ -96,7 +96,7 @@ public class NotificationController {
      */
     @ULog("'全部标记已读'")
     @PutMapping(value = "/read-all", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAllAsRead() {
         service.markAllAsRead(currentUserId());
     }
@@ -106,7 +106,7 @@ public class NotificationController {
      */
     @ULog("'删除消息'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
+    @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void deleteById(@PathVariable UUID id) {
         service.deleteById(id, currentUserId());
     }
@@ -116,7 +116,7 @@ public class NotificationController {
      */
     @ULog("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
+    @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {
         service.batchDelete(from.getIds(), currentUserId());
     }

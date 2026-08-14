@@ -53,7 +53,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'查询流程定义列表'")
     @GetMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public List<ProcessDefinitionVO> definitions() {
         return processDefinitionService.listAll();
     }
@@ -63,7 +63,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'查询流程定义详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public ProcessDefinitionVO definitionDetail(@PathVariable String id) {
         return processDefinitionService.getDetail(id);
     }
@@ -73,7 +73,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'获取流程定义图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public byte[] getDiagram(@PathVariable String id) {
         return processDefinitionService.getDiagram(id);
     }
@@ -83,7 +83,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'挂起流程定义'")
     @PostMapping(value = "/{id}/suspend", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:update')")
     public void suspend(@PathVariable String id) {
         processDefinitionService.suspend(id);
     }
@@ -93,7 +93,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'激活流程定义'")
     @PostMapping(value = "/{id}/activate", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:update')")
     public void activate(@PathVariable String id) {
         processDefinitionService.activate(id);
     }
@@ -103,7 +103,7 @@ public class ProcessDefinitionController {
      */
     @ULog("'获取流程定义BPMN资源'")
     @GetMapping(value = "/{id}/resource", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public ProcessDefinitionResourceVO getResource(@PathVariable String id) {
         return processDefinitionService.getResource(id);
     }
@@ -114,7 +114,7 @@ public class ProcessDefinitionController {
     @XssCleanIgnore
     @ULog("'部署流程定义'")
     @PostMapping(value = "/deploy", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_PROCESS:INSERT')")
+    @PreAuthorize("hasPermission(null, 'workflow:process:create')")
     public ProcessDefinitionVO deploy(@RequestBody @Valid DeployProcessFrom from) {
         return processDefinitionService.deploy(from);
     }

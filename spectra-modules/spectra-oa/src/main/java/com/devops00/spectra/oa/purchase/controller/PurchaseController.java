@@ -51,7 +51,7 @@ public class PurchaseController {
      */
     @ULog("'创建采购申请草稿'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:INSERT')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody PurchaseSaveFrom from) {
         return purchaseService.created(from);
     }
@@ -61,7 +61,7 @@ public class PurchaseController {
      */
     @ULog("'修改采购申请草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody PurchaseSaveFrom from) {
         purchaseService.modify(id, from);
     }
@@ -71,7 +71,7 @@ public class PurchaseController {
      */
     @ULog("'分页查询采购申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
         return purchaseService.page(page, params);
     }
@@ -81,7 +81,7 @@ public class PurchaseController {
      */
     @ULog("'查询采购申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public PurchaseVO get(@PathVariable UUID id) {
         return purchaseService.get(id);
     }
@@ -91,7 +91,7 @@ public class PurchaseController {
      */
     @ULog("'提交采购申请审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void submit(@PathVariable UUID id, @RequestBody(required = false) PurchaseSubmitFrom from) {
         purchaseService.submit(id, from);
     }
@@ -101,7 +101,7 @@ public class PurchaseController {
      */
     @ULog("'撤回采购申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void withdraw(@PathVariable UUID id) {
         purchaseService.withdraw(id);
     }
@@ -111,7 +111,7 @@ public class PurchaseController {
      */
     @ULog("'取消采购申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void cancel(@PathVariable UUID id) {
         purchaseService.cancel(id);
     }
@@ -121,7 +121,7 @@ public class PurchaseController {
      */
     @ULog("'登记采购执行'")
     @PostMapping(value = "/{id}/execute", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:EXECUTE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:execute')")
     public void execute(@PathVariable UUID id, @RequestBody PurchaseExecuteFrom from) {
         purchaseService.execute(id, from);
     }
@@ -131,7 +131,7 @@ public class PurchaseController {
      */
     @ULog("'登记采购收货'")
     @PostMapping(value = "/{id}/receipts", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_PURCHASE:RECEIVE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:receive')")
     public void receive(@PathVariable UUID id, @Validated(Verify.Insert.class) @RequestBody PurchaseReceiptFrom from) {
         purchaseService.receive(id, from);
     }

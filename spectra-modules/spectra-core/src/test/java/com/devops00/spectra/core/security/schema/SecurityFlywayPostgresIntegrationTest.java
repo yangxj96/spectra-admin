@@ -70,14 +70,14 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3"), versions);
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8"), versions);
             assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "assignment_permission_boundary"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.permission")) {
                 resultSet.next();
-                assertEquals(102, resultSet.getInt(1));
+                assertEquals(115, resultSet.getInt(1));
             }
         }
     }

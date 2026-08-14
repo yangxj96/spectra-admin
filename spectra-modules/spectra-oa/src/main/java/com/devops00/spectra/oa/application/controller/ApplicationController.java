@@ -53,7 +53,7 @@ public class ApplicationController {
      */
     @ULog("'分页查询 OA 申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:application:read')")
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
         return applicationService.page(page, params);
     }
@@ -63,7 +63,7 @@ public class ApplicationController {
      */
     @ULog("'查询 OA 申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:application:read')")
     public ApplicationVO get(@PathVariable UUID id) {
         return applicationService.get(id);
     }
@@ -73,7 +73,7 @@ public class ApplicationController {
      */
     @ULog("'查询 OA 申请类型'")
     @GetMapping(value = "/types", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:application:read')")
     public List<ApplicationTypeVO> listTypes() {
         return applicationService.listTypes();
     }
@@ -83,7 +83,7 @@ public class ApplicationController {
      */
     @ULog("'查询全部 OA 申请类型配置'")
     @GetMapping(value = "/types/all", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:application-type:read')")
     public List<ApplicationTypeVO> listAllTypes() {
         return applicationService.listAllTypes();
     }
@@ -93,7 +93,7 @@ public class ApplicationController {
      */
     @ULog("'创建 OA 申请类型配置'")
     @PostMapping(value = "/types", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:INSERT')")
+    @PreAuthorize("hasPermission(null, 'oa:application-type:create')")
     public UUID createdType(@Validated @RequestBody ApplicationTypeSaveFrom from) {
         return applicationService.createdType(from);
     }
@@ -103,7 +103,7 @@ public class ApplicationController {
      */
     @ULog("'修改 OA 申请类型配置'")
     @org.springframework.web.bind.annotation.PutMapping(value = "/types/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:application-type:update')")
     public void modifyType(@PathVariable UUID id, @Validated @RequestBody ApplicationTypeSaveFrom from) {
         applicationService.modifyType(id, from);
     }
@@ -113,7 +113,7 @@ public class ApplicationController {
      */
     @ULog("'删除 OA 申请类型配置'")
     @DeleteMapping(value = "/types/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION_TYPE:DELETE')")
+    @PreAuthorize("hasPermission(null, 'oa:application-type:disable')")
     public void deleteType(@PathVariable UUID id) {
         applicationService.deleteType(id);
     }
@@ -123,7 +123,7 @@ public class ApplicationController {
      */
     @ULog("'撤回 OA 申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:application:update')")
     public void withdraw(@PathVariable UUID id) {
         applicationService.withdraw(id);
     }
@@ -133,7 +133,7 @@ public class ApplicationController {
      */
     @ULog("'取消 OA 申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_APPLICATION:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:application:update')")
     public void cancel(@PathVariable UUID id) {
         applicationService.cancel(id);
     }

@@ -167,17 +167,19 @@ class SecuritySchemaContractTest {
     void permissionCatalogMustBeFullySeededIntoTargetPermissionTable() throws IOException {
         String catalog = readCatalog();
         String seed = readMigration("V3__security_permission_catalog_seed.sql");
+        String phase7Seed = readMigration("V8__security_permission_catalog_phase7.sql");
         var codes = catalog.lines()
                 .filter(line -> line.matches("  - code: [a-z][a-z0-9_-]*(:[a-z][a-z0-9_-]*){1,2}"))
                 .map(line -> line.substring("  - code: ".length()))
                 .toList();
 
-        assertEquals(102, codes.size());
+        assertEquals(115, codes.size());
         assertEquals(codes.size(), Set.copyOf(codes).size());
         assertTrue(seed.contains("INSERT INTO spectra_security.permission"));
         assertTrue(seed.contains("ON CONFLICT (code) DO NOTHING"));
         for (String code : codes) {
-            assertTrue(seed.contains("md5('" + code + "')::uuid, '" + code + "'"), code);
+            assertTrue(seed.contains("md5('" + code + "')::uuid, '" + code + "'")
+                    || phase7Seed.contains("md5('" + code + "')::uuid, '" + code + "'"), code);
         }
         assertFalse(seed.contains("ROLE_DEV_OPS"));
     }

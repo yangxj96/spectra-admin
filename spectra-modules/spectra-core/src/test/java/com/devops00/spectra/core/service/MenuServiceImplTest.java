@@ -18,6 +18,10 @@ package com.devops00.spectra.core.service;
 
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.core.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
@@ -29,6 +33,9 @@ import com.devops00.spectra.core.user.javabean.entity.RelRoleMenu;
 import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
+import com.devops00.spectra.security.base.authorization.AuthorizationAssignment;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +45,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,6 +75,12 @@ class MenuServiceImplTest {
 
     @Mock
     private RelUserRoleService relUserRoleService;
+
+    @Mock
+    private SecurityRoleMapper securityRoleMapper;
+
+    @Mock
+    private SecurityRoleMenuMapper securityRoleMenuMapper;
 
     private MenuServiceImpl service;
 
@@ -115,6 +129,40 @@ class MenuServiceImplTest {
         assertEquals(List.of(), result);
         verify(relRoleMenuMapper, never()).selectList(any());
         verify(menuMapper, never()).selectList(any());
+    }
+
+    @Test
+    void currentShouldUseSecurityRoleAssignmentAndRoleMenu() {
+        var userId = UUID.randomUUID();
+        var roleId = UUID.randomUUID();
+        var securityRole = new SecurityRole();
+        securityRole.setId(roleId);
+        securityRole.setCode("ROLE_MANAGER");
+        securityRole.setState("ACTIVE");
+        var system = menu(null, MenuType.DIRECTORY, null, 1);
+        var userMenu = menu(system.getId(), MenuType.MENU, "SystemUser", 1);
+        var relation = new SecurityRoleMenu();
+        relation.setRoleId(roleId);
+        relation.setMenuId(userMenu.getId());
+        AuthorizationSnapshotProvider snapshotProvider = ignored -> AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER", Map.of(), Map.of())));
+        var securityService = new MenuServiceImpl(menuMapper, menuConverter, relRoleMenuMapper, relUserRoleService,
+                snapshotProvider, securityRoleMapper, securityRoleMenuMapper);
+
+        when(securityRoleMapper.selectList(any())).thenReturn(List.of(securityRole));
+        when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation));
+        when(menuMapper.selectList(any())).thenReturn(List.of(system, userMenu));
+        when(menuConverter.toTreeVOList(any())).thenAnswer(invocation -> {
+            List<Menu> menus = invocation.getArgument(0);
+            return menus.stream().map(MenuServiceImplTest::toTreeVO).toList();
+        });
+
+        var result = securityService.current(userId);
+
+        assertEquals(List.of(system.getId()), result.stream().map(MenuTreeVO::getId).toList());
+        assertEquals(List.of(userMenu.getId()), result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
+        verify(securityRoleMenuMapper).selectList(any());
+        verifyNoInteractions(relUserRoleService, relRoleMenuMapper);
     }
 
     @Test

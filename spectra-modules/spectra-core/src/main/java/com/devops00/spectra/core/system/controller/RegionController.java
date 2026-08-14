@@ -60,21 +60,21 @@ public class RegionController {
      */
     @ULog("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'region:read')")
     public List<RegionVO> lazyTree(RegionLazyFrom from) {
         return bindService.lazyTree(from.getLevel(), from.getId());
     }
 
     @ULog("'分页查询行政区划'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'region:read')")
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
         return bindService.page(page, params);
     }
 
     @ULog("'获取行政区划路径'")
     @GetMapping(value = "/path/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'REGION:QUERY')")
+    @PreAuthorize("hasPermission(null, 'region:read')")
     public RegionPathVO getPath(@PathVariable UUID id) {
         return bindService.getPath(id);
     }
@@ -87,7 +87,7 @@ public class RegionController {
      */
     @ULog("'新增行政区划'")
     @PostMapping(value = "/created", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'region:create')")
     public RegionVO created(@Validated(Verify.Insert.class) @RequestBody RegionFrom params) {
         return bindService.created(params);
     }
@@ -100,7 +100,7 @@ public class RegionController {
      */
     @ULog("'修改行政区划'")
     @PutMapping(value = "/modify", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'region:update')")
     public RegionVO modify(@Validated(Verify.Update.class) @RequestBody RegionFrom params) {
         return bindService.modify(params);
     }
@@ -112,7 +112,7 @@ public class RegionController {
      */
     @ULog("'删除行政区划'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'region:disable')")
     public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
     }

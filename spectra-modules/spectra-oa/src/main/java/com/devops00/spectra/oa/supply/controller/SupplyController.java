@@ -35,7 +35,7 @@ public class SupplyController {
      */
     @ULog("'创建办公用品'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:INSERT')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody SupplySaveFrom from) {
         return supplyService.created(from);
     }
@@ -45,7 +45,7 @@ public class SupplyController {
      */
     @ULog("'修改办公用品'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody SupplySaveFrom from) {
         supplyService.modify(id, from);
     }
@@ -55,7 +55,7 @@ public class SupplyController {
      */
     @ULog("'分页查询办公用品库存'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public IPage<SupplyItemVO> page(PageFrom page, SupplyPageFrom params) {
         return supplyService.page(page, params);
     }
@@ -65,7 +65,7 @@ public class SupplyController {
      */
     @ULog("'查询办公用品详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public SupplyItemVO get(@PathVariable UUID id) {
         return supplyService.get(id);
     }
@@ -75,7 +75,7 @@ public class SupplyController {
      */
     @ULog("'查询低库存办公用品'")
     @GetMapping(value = "/low-stock", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public List<SupplyItemVO> lowStock() {
         return supplyService.lowStock();
     }
@@ -85,7 +85,7 @@ public class SupplyController {
      */
     @ULog("'办公用品入库'")
     @PostMapping(value = "/{id}/inbound", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void inbound(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
         supplyService.inbound(id, from);
     }
@@ -95,7 +95,7 @@ public class SupplyController {
      */
     @ULog("'办公用品领用'")
     @PostMapping(value = "/{id}/issue", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void issue(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
         supplyService.issue(id, from);
     }
@@ -105,7 +105,7 @@ public class SupplyController {
      */
     @ULog("'办公用品退库'")
     @PostMapping(value = "/{id}/return", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void returnStock(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
         supplyService.returnStock(id, from);
     }
@@ -115,7 +115,7 @@ public class SupplyController {
      */
     @ULog("'办公用品盘点调整'")
     @PostMapping(value = "/{id}/adjust", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_ASSET:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void adjust(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
         supplyService.adjust(id, from);
     }

@@ -76,7 +76,7 @@ public class CryptoController {
     @ULog("'获取客户端私钥'")
     @Encrypt(response = false)
     @GetMapping(value = "/keypair/client-private", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoClientKeyVO getClientPrivateKey() {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
     }
@@ -86,7 +86,7 @@ public class CryptoController {
      */
     @ULog("'生成RSA密钥对'")
     @PostMapping(value = "/keypair/generate", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoKeyPairVO generateKeyPair() {
         try {
             KeyPair serverPair = RSAUtils.generateKeyPair();
@@ -119,7 +119,7 @@ public class CryptoController {
      */
     @ULog("'重新加载加解密密钥'")
     @PostMapping(value = "/keypair/refresh", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public void refreshKeys() {
         cryptoKeyManager.refresh();
         log.info("密钥已手动刷新");

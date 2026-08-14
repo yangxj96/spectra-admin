@@ -40,7 +40,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/file/info")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ROLE_DEV_OPS')")
+@PreAuthorize("hasPermission(null, 'file:admin:read')")
 public class FileInfoController {
 
     private final FileInfoService fileInfoService;
@@ -59,6 +59,7 @@ public class FileInfoController {
      */
     @ULog("'删除文件'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @PreAuthorize("hasPermission(null, 'file:admin:delete')")
     public void deleteById(@PathVariable UUID id) {
         fileInfoService.deleteById(id);
     }

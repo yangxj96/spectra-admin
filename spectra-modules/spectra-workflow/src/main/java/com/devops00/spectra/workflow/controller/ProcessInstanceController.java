@@ -53,7 +53,7 @@ public class ProcessInstanceController {
      */
     @ULog("'启动流程'")
     @PostMapping(value = "/start", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:INSERT')")
+    @PreAuthorize("hasPermission(null, 'workflow:instance:create')")
     public String start(@Validated @RequestBody ProcessInstanceStartFrom from) {
         return processInstanceService.start(from.getProcessDefinitionKey(), from.getBusinessKey(), from.getVariables());
     }
@@ -66,7 +66,7 @@ public class ProcessInstanceController {
      */
     @ULog("'查询流程实例状态'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public ProcessInstanceVO getStatus(@PathVariable String id) {
         return processInstanceService.getStatus(id);
     }
@@ -79,7 +79,7 @@ public class ProcessInstanceController {
      */
     @ULog("'查询流程变量'")
     @GetMapping(value = "/{id}/variables", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public Map<String, Object> getVariables(@PathVariable String id) {
         return processInstanceService.getVariables(id);
     }
@@ -92,7 +92,7 @@ public class ProcessInstanceController {
      */
     @ULog("'终止流程'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:instance:update')")
     public void terminate(@PathVariable String id, @RequestBody ProcessInstanceTerminateFrom from) {
         processInstanceService.terminate(id, from.getReason());
     }
@@ -105,7 +105,7 @@ public class ProcessInstanceController {
      */
     @ULog("'获取流程实例图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0+", produces = MediaType.IMAGE_PNG_VALUE)
-    @PreAuthorize("hasPermission(null, 'WF_INSTANCE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public byte[] getDiagram(@PathVariable String id) {
         return processInstanceService.getDiagram(id);
     }

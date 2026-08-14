@@ -50,13 +50,13 @@ class NotificationSelfControllerSecurityTest {
         var delete = NotificationController.class.getMethod("deleteById", UUID.class);
         var batchDelete = NotificationController.class.getMethod("batchDelete", NotificationBatchDeleteFrom.class);
 
-        assertEquals("hasPermission(null ,'NOTIFICATION:QUERY')", query.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:QUERY')", detail.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:QUERY')", unread.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:UPDATE')", markRead.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:UPDATE')", markAll.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:DELETE')", delete.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION:DELETE')", batchDelete.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:read')", query.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:read')", detail.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:read')", unread.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:update')", markRead.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:update')", markAll.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:delete')", delete.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification:delete')", batchDelete.getAnnotation(PreAuthorize.class).value());
         assertNotNull(controller);
     }
 
@@ -67,8 +67,8 @@ class NotificationSelfControllerSecurityTest {
         var update = NotificationSettingController.class.getMethod("updateSetting",
                 com.devops00.spectra.notification.javabean.from.NotificationSettingFrom.class);
 
-        assertEquals("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')", get.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')", update.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification-setting:read')", get.getAnnotation(PreAuthorize.class).value());
+        assertEquals("hasPermission(null ,'notification-setting:update')", update.getAnnotation(PreAuthorize.class).value());
         assertNotNull(controller);
     }
 

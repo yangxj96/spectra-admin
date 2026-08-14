@@ -50,7 +50,7 @@ public class NotificationSettingController {
      */
     @ULog("'查询消息设置'")
     @GetMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')")
+    @PreAuthorize("hasPermission(null ,'notification-setting:read')")
     public NotificationSettingVO getSetting() {
         return service.legacy(currentUserId(), currentUserZone());
     }
@@ -60,7 +60,7 @@ public class NotificationSettingController {
      */
     @ULog("'更新消息设置'")
     @PutMapping(value = "", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')")
+    @PreAuthorize("hasPermission(null ,'notification-setting:update')")
     public void updateSetting(@RequestBody NotificationSettingFrom from) {
         service.saveLegacy(currentUserId(), from, currentUserZone());
     }

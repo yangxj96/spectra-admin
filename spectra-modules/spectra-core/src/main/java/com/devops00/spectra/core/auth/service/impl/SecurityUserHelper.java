@@ -17,19 +17,14 @@
 package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.mybatis.DataScopeProvider;
-import com.devops00.spectra.common.utils.CollUtils;
-import com.devops00.spectra.common.utils.ObjUtils;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.converter.AuthConverter;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.auth.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
-import com.devops00.spectra.core.user.javabean.entity.Role;
 import com.devops00.spectra.core.user.javabean.entity.User;
-import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
-import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
-import com.devops00.spectra.core.user.service.RelUserRoleService;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.exception.LoginException;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
@@ -39,7 +34,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,20 +48,17 @@ import java.util.UUID;
 @NullMarked
 public class SecurityUserHelper {
 
-    private final RelRoleAuthorityService relRoleAuthorityService;
-
-    private final RelUserRoleService relUserRoleService;
-
     private final AuthConverter authConverter;
 
     private final DataScopeProvider dataScopeProvider;
 
-    public SecurityUserHelper(RelRoleAuthorityService relRoleAuthorityService, RelUserRoleService relUserRoleService, AuthConverter authConverter,
-                              DataScopeProvider dataScopeProvider) {
-        this.relRoleAuthorityService = relRoleAuthorityService;
-        this.relUserRoleService = relUserRoleService;
+    private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    public SecurityUserHelper(AuthConverter authConverter, DataScopeProvider dataScopeProvider,
+                              AuthorizationSnapshotProvider authorizationSnapshotProvider) {
         this.authConverter = authConverter;
         this.dataScopeProvider = dataScopeProvider;
+        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
     }
 
     /**
@@ -156,45 +147,19 @@ public class SecurityUserHelper {
      * @return 权限列表
      */
     public List<SimpleGrantedAuthority> buildAuthorities(UUID userId) {
+        if (userId == null) {
+            return List.of();
+        }
+        var snapshot = authorizationSnapshotProvider.load(userId);
         var authorities = new ArrayList<SimpleGrantedAuthority>();
-        List<Role> roles = getUserRole(userId);
-
-        if (CollUtils.isNotEmpty(roles)) {
-            authorities.addAll(roles.stream().map(i -> new SimpleGrantedAuthority(i.getCode())).toList());
-
-            List<UUID> roleIds = roles.stream().map(Role::getId).toList();
-
-            List<AuthorityVO> authorityVOs = getUserAuthority(roleIds);
-            if (CollUtils.isNotEmpty(authorityVOs)) {
-                authorities.addAll(authorityVOs.stream().map(i -> new SimpleGrantedAuthority(i.getCode())).toList());
-            }
-        }
-
-        return authorities;
-    }
-
-    /**
-     * 获取用户角色信息
-     *
-     * @param userId 用户ID
-     * @return 角色列表
-     */
-    public List<Role> getUserRole(UUID userId) {
-        var roles = relUserRoleService.getRoles(userId);
-        return roles == null ? Collections.emptyList() : new ArrayList<>(roles);
-    }
-
-    /**
-     * 获取角色包含的权限信息
-     *
-     * @param roles 角色ID列表
-     * @return 权限列表
-     */
-    public List<AuthorityVO> getUserAuthority(List<UUID> roles) {
-        if (roles.isEmpty()) {
-            return Collections.emptyList();
-        }
-        var authorities = relRoleAuthorityService.get(roles);
-        return authorities == null ? Collections.emptyList() : ObjUtils.castList(new ArrayList<>(authorities), AuthorityVO.class);
+        snapshot.assignments().stream()
+                .map(assignment -> assignment.roleCode())
+                .distinct()
+                .map(SimpleGrantedAuthority::new)
+                .forEach(authorities::add);
+        snapshot.permissions().stream()
+                .map(SimpleGrantedAuthority::new)
+                .forEach(authorities::add);
+        return List.copyOf(authorities);
     }
 }

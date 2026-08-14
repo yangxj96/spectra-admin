@@ -56,35 +56,35 @@ public class UserController {
 
     @ULog("'创建用户'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:INSERT')")
+    @PreAuthorize("hasPermission(null, 'user:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
         bindService.create(params);
     }
 
     @ULog("'根据ID删除用户'")
     @DeleteMapping(value = "/{uid}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:DELETE')")
+    @PreAuthorize("hasPermission(null, 'user:disable')")
     public void deleteById(@PathVariable UUID uid) {
         bindService.deleteById(uid);
     }
 
     @ULog("'根据ID更新用户信息'")
     @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'user:update')")
     public void modify(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.modify(params);
     }
 
     @ULog("'覆盖用户角色'")
     @PutMapping(value = "/{uid}/roles", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'user:assign-role')")
     public void replaceRoles(@PathVariable UUID uid, @Validated @RequestBody UserRelevanceRolesFrom from) {
         LegacyAuthorizationWriteGuard.reject("旧用户角色覆盖写入口");
     }
 
     @ULog("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'user:reset-password')")
     public void passwordResetById(@PathVariable UUID uid) {
         bindService.passwordResetById(uid);
     }
@@ -133,14 +133,14 @@ public class UserController {
 
     @ULog("'分页查询用户列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'USER:QUERY')")
+    @PreAuthorize("hasPermission(null, 'user:read')")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         return bindService.page(page, params);
     }
 
     @ULog("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'MONITOR:QUERY')")
+    @PreAuthorize("hasPermission(null, 'session:read')")
     public List<UserOnlineVO> online(PageFrom page) {
         return bindService.online(page);
     }

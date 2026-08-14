@@ -22,6 +22,7 @@ import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,6 +30,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
+import java.io.Serializable;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,17 +47,31 @@ class NotificationAdminControllerRoleMatrixTest {
 
     private final DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
 
+    NotificationAdminControllerRoleMatrixTest() {
+        handler.setPermissionEvaluator(new PermissionEvaluator() {
+            @Override
+            public boolean hasPermission(Authentication authentication, Object targetDomainObject, Object permission) {
+                return authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(String.valueOf(permission)));
+            }
+
+            @Override
+            public boolean hasPermission(Authentication authentication, Serializable targetId, String targetType, Object permission) {
+                return hasPermission(authentication, null, permission);
+            }
+        });
+    }
+
     @Test
-    void shouldAllowBothOperationsToDevOpsButOnlyReadToAudit() throws Exception {
+    void shouldAllowCatalogPermissionsIndependently() throws Exception {
         var controller = new NotificationAdminController(mock(NotificationAdminService.class));
         var query = NotificationAdminController.class.getMethod("pageRequests",
                 com.devops00.spectra.common.base.javabean.from.PageFrom.class, NotificationAdminQueryFrom.class);
         var retry = NotificationAdminController.class.getMethod("retry", java.util.UUID.class);
 
-        assertTrue(evaluate(query, controller, authentication("ROLE_DEV_OPS")));
-        assertTrue(evaluate(retry, controller, authentication("ROLE_DEV_OPS")));
-        assertTrue(evaluate(query, controller, authentication("ROLE_AUDIT")));
-        assertFalse(evaluate(retry, controller, authentication("ROLE_AUDIT")));
+        assertTrue(evaluate(query, controller, authentication("notification:admin:read", "notification:admin:retry")));
+        assertTrue(evaluate(retry, controller, authentication("notification:admin:retry")));
+        assertTrue(evaluate(query, controller, authentication("notification:admin:read")));
+        assertFalse(evaluate(retry, controller, authentication("notification:admin:read")));
     }
 
     @Test
@@ -64,7 +80,7 @@ class NotificationAdminControllerRoleMatrixTest {
         var channel = NotificationAdminController.class.getMethod("availability", NotificationChannel.class);
         var cancel = NotificationAdminController.class.getMethod("cancel", java.util.UUID.class);
 
-        var ordinary = authentication("ROLE_USER");
+        var ordinary = authentication("user:read");
         assertFalse(evaluate(channel, controller, ordinary));
         assertFalse(evaluate(cancel, controller, ordinary));
     }
@@ -79,8 +95,8 @@ class NotificationAdminControllerRoleMatrixTest {
         return Boolean.TRUE.equals(parser.parseExpression(annotation.value()).getValue(context, Boolean.class));
     }
 
-    private Authentication authentication(String role) {
+    private Authentication authentication(String... authorities) {
         return new UsernamePasswordAuthenticationToken("test-user",
-                "test-token", List.of(new SimpleGrantedAuthority(role)));
+                "test-token", java.util.Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList());
     }
 }

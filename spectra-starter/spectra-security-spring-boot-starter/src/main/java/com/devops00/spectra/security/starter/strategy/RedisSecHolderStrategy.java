@@ -558,24 +558,20 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
      * 构造 TokenVO
      */
     private TokenVO buildTokenVO(SecurityUser user, String token, String refreshToken) {
-        var roles = new ArrayList<String>();
-        var authorities = new ArrayList<String>();
+        var permissions = new ArrayList<String>();
         for (GrantedAuthority ga : user.getAuthorities()) {
             String a = ga.getAuthority();
             if (a == null)
                 continue;
-            if (a.startsWith("ROLE"))
-                roles.add(a);
-            else
-                authorities.add(a);
+            if (!a.startsWith("ROLE_"))
+                permissions.add(a);
         }
         return TokenVO.builder()
                 .id(user.getId())
                 .username(user.getEmail())
                 .accessToken(token)
                 .refreshToken(refreshToken)
-                .authorities(authorities)
-                .roles(roles)
+                .permissions(permissions)
                 .build();
     }
 

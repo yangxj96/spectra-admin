@@ -24,6 +24,10 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.common.utils.TreeBuilder;
+import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
+import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;
@@ -37,6 +41,7 @@ import com.devops00.spectra.core.user.mapper.RelRoleMenuMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,12 +71,28 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     private final RelUserRoleService relUserRoleService;
 
+    private final @Nullable AuthorizationSnapshotProvider authorizationSnapshotProvider;
+
+    private final @Nullable SecurityRoleMapper securityRoleMapper;
+
+    private final @Nullable SecurityRoleMenuMapper securityRoleMenuMapper;
+
     public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
                            RelUserRoleService relUserRoleService) {
+        this(menuMapper, menuConverter, roleMenuMapper, relUserRoleService, null, null, null);
+    }
+
+    @Autowired
+    public MenuServiceImpl(MenuMapper menuMapper, MenuConverter menuConverter, RelRoleMenuMapper roleMenuMapper,
+                           RelUserRoleService relUserRoleService, AuthorizationSnapshotProvider authorizationSnapshotProvider,
+                           SecurityRoleMapper securityRoleMapper, SecurityRoleMenuMapper securityRoleMenuMapper) {
         this.menuMapper = menuMapper;
         this.menuConverter = menuConverter;
         this.roleMenuMapper = roleMenuMapper;
         this.relUserRoleService = relUserRoleService;
+        this.authorizationSnapshotProvider = authorizationSnapshotProvider;
+        this.securityRoleMapper = securityRoleMapper;
+        this.securityRoleMenuMapper = securityRoleMenuMapper;
     }
 
     @Override
@@ -142,6 +163,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
 
     @Override
     public List<MenuTreeVO> current(UUID userId) {
+        if (authorizationSnapshotProvider != null && securityRoleMapper != null && securityRoleMenuMapper != null) {
+            return currentFromSecurityModel(userId);
+        }
         var roleIds = relUserRoleService.getRoles(userId).stream().filter(role -> Boolean.TRUE.equals(role.getState())).map(Role::getId).toList();
         if (CollUtils.isEmpty(roleIds)) {
             return Collections.emptyList();
@@ -169,6 +193,55 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             }
         }
 
+        var authorizedMenus = menus.stream().filter(menu -> includedIds.contains(menu.getId())).toList();
+        if (CollUtils.isEmpty(authorizedMenus)) {
+            return Collections.emptyList();
+        }
+        var vos = menuConverter.toTreeVOList(authorizedMenus);
+        var tree = new TreeBuilder<>(vos).buildTree(Common.PID);
+        return tree == null ? Collections.emptyList() : tree;
+    }
+
+    private List<MenuTreeVO> currentFromSecurityModel(UUID userId) {
+        var roleCodes = authorizationSnapshotProvider.load(userId).assignments().stream()
+                .map(assignment -> assignment.roleCode())
+                .distinct()
+                .toList();
+        if (CollUtils.isEmpty(roleCodes)) {
+            return Collections.emptyList();
+        }
+
+        var roles = securityRoleMapper.selectList(new QueryWrapper<com.devops00.spectra.core.authorization.entity.SecurityRole>()
+                .select("id", "code")
+                .in("code", roleCodes)
+                .eq("state", "ACTIVE"));
+        if (CollUtils.isEmpty(roles)) {
+            return Collections.emptyList();
+        }
+        var roleIds = roles.stream().map(role -> role.getId()).toList();
+        var relations = securityRoleMenuMapper.selectList(new QueryWrapper<SecurityRoleMenu>().in("role_id", roleIds));
+        if (CollUtils.isEmpty(relations)) {
+            return Collections.emptyList();
+        }
+        return buildCurrentTree(relations.stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet()));
+    }
+
+    private List<MenuTreeVO> buildCurrentTree(java.util.Set<UUID> menuIds) {
+        var menus = menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
+        if (CollUtils.isEmpty(menus)) {
+            return Collections.emptyList();
+        }
+        var menuMap = menus.stream().collect(Collectors.toMap(Menu::getId, Function.identity()));
+        var includedIds = new HashSet<UUID>();
+        for (UUID menuId : menuIds) {
+            var menu = menuMap.get(menuId);
+            if (menu == null || menu.getMenuType() != MenuType.MENU) {
+                continue;
+            }
+            while (menu != null && includedIds.add(menu.getId())) {
+                menu = menuMap.get(menu.getPid());
+            }
+        }
         var authorizedMenus = menus.stream().filter(menu -> includedIds.contains(menu.getId())).toList();
         if (CollUtils.isEmpty(authorizedMenus)) {
             return Collections.emptyList();

@@ -49,7 +49,7 @@ public class ContactController {
      */
     @ULog("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CONTACT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:contact:read')")
     public IPage<ContactVO> page(PageFrom page, ContactPageFrom params) {
         return contactService.page(page, params.getKeyword());
     }

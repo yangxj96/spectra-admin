@@ -54,7 +54,7 @@ public class TaskController {
      */
     @ULog("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object todo(PageFrom page, TaskPageFrom params) {
         String username = SecUtil.getCurrentUsername();
         return taskService.todo(page, username, params.getProcessDefinitionKey());
@@ -69,7 +69,7 @@ public class TaskController {
      */
     @ULog("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:QUERY')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object done(PageFrom page, TaskPageFrom params) {
         String username = SecUtil.getCurrentUsername();
         return taskService.done(page, username, params.getProcessDefinitionKey());
@@ -83,7 +83,7 @@ public class TaskController {
      */
     @ULog("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.complete(id, from.getComment(), SecUtil.getCurrentUsername());
     }
@@ -96,7 +96,7 @@ public class TaskController {
      */
     @ULog("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.reject(id, from.getComment(), SecUtil.getCurrentUsername());
     }
@@ -109,7 +109,7 @@ public class TaskController {
      */
     @ULog("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
         taskService.transfer(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
     }
@@ -122,7 +122,7 @@ public class TaskController {
      */
     @ULog("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'WF_TASK:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {
         taskService.delegate(id, from.getTargetUserId(), SecUtil.getCurrentUsername());
     }

@@ -56,7 +56,7 @@ public class NotificationAdminController {
      */
     @ULog("'查询通知渠道状态'")
     @GetMapping(value = "/channels/{channel}", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationChannelAvailability availability(@PathVariable NotificationChannel channel) {
         return service.availability(channel);
     }
@@ -66,7 +66,7 @@ public class NotificationAdminController {
      */
     @ULog("'查询通知请求'")
     @GetMapping(value = "/requests", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
         return service.pageRequests(page, params);
     }
@@ -76,7 +76,7 @@ public class NotificationAdminController {
      */
     @ULog("'查询通知任务'")
     @GetMapping(value = "/tasks", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
         return service.pageTasks(page, params);
     }
@@ -86,7 +86,7 @@ public class NotificationAdminController {
      */
     @ULog("'查询通知投递记录'")
     @GetMapping(value = "/deliveries", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
         return service.pageDeliveries(page, params);
     }
@@ -96,7 +96,7 @@ public class NotificationAdminController {
      */
     @ULog("'重试通知任务'")
     @PostMapping(value = "/tasks/{id}/retry", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:retry')")
     public void retry(@PathVariable UUID id) {
         service.retry(id);
     }
@@ -106,7 +106,7 @@ public class NotificationAdminController {
      */
     @ULog("'取消通知任务'")
     @DeleteMapping(value = "/tasks/{id}", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'notification:admin:cancel')")
     public void cancel(@PathVariable UUID id) {
         service.cancel(id);
     }

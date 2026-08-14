@@ -54,7 +54,7 @@ public class ReportController {
      */
     @ULog("'查询部门维度统计'")
     @GetMapping(value = "/department", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public List<DepartmentStatsVO> department(DepartmentStatsFrom from) {
         return departmentStatsService.list(from);
     }
@@ -64,7 +64,7 @@ public class ReportController {
      */
     @ULog("'导出部门维度统计'")
     @GetMapping(value = "/department/export", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_REPORT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public ResponseEntity<byte[]> exportDepartment(DepartmentStatsFrom from) {
         String filename = URLEncoder.encode("部门统计.xlsx", StandardCharsets.UTF_8).replace("+", "%20");
         return ResponseEntity.ok()

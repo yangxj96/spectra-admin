@@ -65,7 +65,7 @@ public class WorkbenchController {
      */
     @ULog("'查询 OA 工作台摘要'")
     @GetMapping(value = "/summary", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_WORKBENCH:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:workbench:read')")
     public WorkbenchSummaryVO summary() {
         var result = new WorkbenchSummaryVO();
         try {

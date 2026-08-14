@@ -56,7 +56,7 @@ public class DepartmentController {
      */
     @ULog("'新增组织机构'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DEPT:INSERT')")
+    @PreAuthorize("hasPermission(null, 'department:create')")
     public void created(@RequestBody @Validated(Verify.Insert.class) DepartmentFrom from) {
         LegacyAuthorizationWriteGuard.reject("旧部门创建写入口");
     }
@@ -68,7 +68,7 @@ public class DepartmentController {
      */
     @ULog("'删除组织机构'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DEPT:DELETE')")
+    @PreAuthorize("hasPermission(null, 'department:disable')")
     public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
     }
@@ -80,7 +80,7 @@ public class DepartmentController {
      */
     @ULog("'编辑组织机构'")
     @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DEPT:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'department:update')")
     public void modify(@RequestBody @Validated(Verify.Update.class) DepartmentFrom from) {
         LegacyAuthorizationWriteGuard.reject("旧部门修改写入口");
     }
@@ -92,7 +92,7 @@ public class DepartmentController {
      */
     @ULog("'获取组织机构树形列表'")
     @GetMapping(value = "/tree", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DEPT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'department:read')")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();
     }

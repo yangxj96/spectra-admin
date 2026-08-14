@@ -63,14 +63,14 @@ public class RoleController {
 
     @ULog("'创建角色'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:INSERT')")
+    @PreAuthorize("hasPermission(null, 'role:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
         bindService.created(params);
     }
 
     @ULog("'删除角色'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:DELETE')")
+    @PreAuthorize("hasPermission(null, 'role:disable')")
     public void deleteById(@PathVariable UUID id) {
         try {
             bindService.deleteById(id);
@@ -81,7 +81,7 @@ public class RoleController {
 
     @ULog("'修改角色'")
     @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'role:update')")
     public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
         bindService.modify(params);
     }
@@ -90,14 +90,14 @@ public class RoleController {
 
     @ULog("'分页查询角色列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'role:read')")
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         return bindService.page(page, params);
     }
 
     @ULog("'查询角色列表'")
     @GetMapping(value = "/list", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'role:read')")
     public List<RoleVO> list() {
         return bindService.all();
     }
@@ -106,7 +106,7 @@ public class RoleController {
 
     @ULog("'获取角色关联的权限列表'")
     @GetMapping(value = "/{roleId}/authority", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'role:read')")
     public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleAuthorityService.get(roleId);
@@ -118,7 +118,7 @@ public class RoleController {
 
     @ULog("'获取角色关联的菜单列表'")
     @GetMapping(value = "/{roleId}/menu", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'role:read')")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {
         try {
             return relRoleMenuService.get(roleId);
@@ -130,14 +130,14 @@ public class RoleController {
 
     @ULog("'保存角色关联的权限列表'")
     @PutMapping(value = "/{roleId}/authorities", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'role:grant')")
     public void saveRoleRelAuthorityByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleAuthorityFrom from) {
         LegacyAuthorizationWriteGuard.reject("旧角色权限关联写入口");
     }
 
     @ULog("'保存角色关联的菜单列表'")
     @PutMapping(value = "/{roleId}/menus", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'ROLE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'role:assign')")
     public void saveRoleRelMenuByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleMenuFrom from) {
         try {
             relRoleMenuService.grant(roleId, from);

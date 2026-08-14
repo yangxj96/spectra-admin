@@ -56,7 +56,7 @@ public class DictController {
      */
     @ULog("'创建字典组'")
     @PostMapping(value = "/group", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
+    @PreAuthorize("hasPermission(null, 'dictionary:create')")
     public void createGroup(@Validated(Verify.Insert.class) @RequestBody DictGroupFrom params) {
         bindService.createGroup(params);
     }
@@ -68,7 +68,7 @@ public class DictController {
      */
     @ULog("'删除字典组'")
     @DeleteMapping(value = "/group/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
+    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
     public void deleteGroup(@PathVariable UUID id) {
         bindService.deleteGroup(id);
     }
@@ -80,7 +80,7 @@ public class DictController {
      */
     @ULog("'修改字典组'")
     @PutMapping(value = "/group", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     public void modifyGroup(@Validated(Verify.Update.class) @RequestBody DictGroupFrom params) {
         bindService.modifyGroup(params);
     }
@@ -92,7 +92,7 @@ public class DictController {
      */
     @ULog("'创建字典数据'")
     @PostMapping(value = "/data", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:INSERT')")
+    @PreAuthorize("hasPermission(null, 'dictionary:create')")
     public void createData(@Validated(Verify.Insert.class) @RequestBody DictItemFrom params) {
         bindService.createData(params);
     }
@@ -104,7 +104,7 @@ public class DictController {
      */
     @ULog("'删除字典项'")
     @DeleteMapping(value = "/data/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:DELETE')")
+    @PreAuthorize("hasPermission(null, 'dictionary:disable')")
     public void deleteData(@PathVariable UUID id) {
         bindService.deleteData(id);
     }
@@ -116,7 +116,7 @@ public class DictController {
      */
     @ULog("'修改字典数据'")
     @PutMapping(value = "/data", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'dictionary:update')")
     public void modifyData(@Validated(Verify.Update.class) @RequestBody DictItemFrom params) {
         bindService.modifyData(params);
     }
@@ -128,7 +128,7 @@ public class DictController {
      */
     @ULog("'获取所有字典类型的树形列表'")
     @GetMapping(value = "/group/tree", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'dictionary:read')")
     public List<DictGroupTreeVO> listDictGroupWrapTree() {
         return bindService.listDictGroupWrapTree();
     }
@@ -141,7 +141,7 @@ public class DictController {
      */
     @ULog("'根据类型编码获取字典数据'")
     @GetMapping(value = "/data/{code}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null ,'DICT:QUERY')")
+    @PreAuthorize("hasPermission(null, 'dictionary:read')")
     public List<DictItemVO> listDictDataByGroupCode(@PathVariable String code) {
         return bindService.listDictDataByGroupCode(code);
     }

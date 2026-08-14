@@ -52,7 +52,7 @@ public class LeaveController {
      */
     @ULog("'创建请假申请'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:INSERT')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:create')")
     public UUID create(@Validated @RequestBody LeaveCreateFrom from) {
         return leaveService.create(from);
     }
@@ -62,7 +62,7 @@ public class LeaveController {
      */
     @ULog("'修改请假申请'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void update(@PathVariable UUID id, @Validated @RequestBody LeaveCreateFrom from) {
         leaveService.update(id, from);
     }
@@ -72,7 +72,7 @@ public class LeaveController {
      */
     @ULog("'分页查询请假申请'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:read')")
     public IPage<LeaveVO> page(PageFrom page, LeavePageFrom params) {
         return leaveService.page(page, params);
     }
@@ -82,7 +82,7 @@ public class LeaveController {
      */
     @ULog("'查询请假申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:read')")
     public LeaveVO get(@PathVariable UUID id) {
         return leaveService.get(id);
     }
@@ -92,7 +92,7 @@ public class LeaveController {
      */
     @ULog("'提交请假申请'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void submit(@PathVariable UUID id, @RequestBody(required = false) LeaveSubmitFrom from) {
         leaveService.submit(id, from);
     }
@@ -102,7 +102,7 @@ public class LeaveController {
      */
     @ULog("'撤回请假申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void withdraw(@PathVariable UUID id) {
         leaveService.withdraw(id);
     }
@@ -112,7 +112,7 @@ public class LeaveController {
      */
     @ULog("'取消请假申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_LEAVE:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void cancel(@PathVariable UUID id) {
         leaveService.cancel(id);
     }

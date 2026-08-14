@@ -52,7 +52,7 @@ public class CalendarController {
      */
     @ULog("'查询日程列表'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:calendar:read')")
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
         return calendarService.page(page, params);
     }
@@ -62,7 +62,7 @@ public class CalendarController {
      */
     @ULog("'获取日程详情'")
     @GetMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:QUERY')")
+    @PreAuthorize("hasPermission(null, 'oa:calendar:read')")
     public CalendarVO get(@PathVariable UUID id) {
         return calendarService.get(id);
     }
@@ -72,7 +72,7 @@ public class CalendarController {
      */
     @ULog("'创建日程'")
     @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:INSERT')")
+    @PreAuthorize("hasPermission(null, 'oa:calendar:create')")
     public CalendarVO create(@Validated(Verify.Insert.class) @RequestBody CalendarSaveFrom from) {
         return calendarService.create(from);
     }
@@ -82,7 +82,7 @@ public class CalendarController {
      */
     @ULog("'更新日程'")
     @PutMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:UPDATE')")
+    @PreAuthorize("hasPermission(null, 'oa:calendar:update')")
     public CalendarVO update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody CalendarSaveFrom from) {
         return calendarService.update(id, from);
     }
@@ -92,7 +92,7 @@ public class CalendarController {
      */
     @ULog("'删除日程'")
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'OA_CALENDAR:DELETE')")
+    @PreAuthorize("hasPermission(null, 'oa:calendar:delete')")
     public void delete(@PathVariable UUID id) {
         calendarService.delete(id);
     }

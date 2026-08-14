@@ -70,12 +70,9 @@ public class TokenVO implements Serializable {
     private String refreshToken;
 
     /**
-     * 权限列表
+     * 当前会话可使用的稳定 Permission code 列表。
+     * <p>
+     * RoleAssignment 和角色名称不是客户端授权事实，不随 Token 暴露。
      */
-    private List<String> authorities;
-
-    /**
-     * 角色列表
-     */
-    private List<String> roles;
+    private List<String> permissions;
 }

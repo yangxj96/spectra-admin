@@ -55,14 +55,14 @@ public class ConfiguredController {
      */
     @ULog("'修改系统配置'")
     @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'security:config:update')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {
         bindService.modify(params);
     }
 
     @ULog("'分页查询系统配置'")
     @GetMapping(value = "/page", version = "1.0.0+")
-    @PreAuthorize("hasRole('ROLE_DEV_OPS')")
+    @PreAuthorize("hasPermission(null, 'security:config:read')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {
         return bindService.page(page, params);
     }

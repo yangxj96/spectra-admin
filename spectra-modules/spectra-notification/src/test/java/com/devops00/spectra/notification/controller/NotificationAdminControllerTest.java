@@ -40,8 +40,8 @@ class NotificationAdminControllerTest {
         var retry = NotificationAdminController.class.getMethod("retry", UUID.class)
                 .getAnnotation(PreAuthorize.class);
 
-        assertEquals("hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')", read.value());
-        assertEquals("hasRole('ROLE_DEV_OPS')", retry.value());
+        assertEquals("hasPermission(null, 'notification:admin:read')", read.value());
+        assertEquals("hasPermission(null, 'notification:admin:retry')", retry.value());
         assertEquals("ROLE_DEV_OPS", "ROLE_DEV_OPS");
         assertEquals("ROLE_AUDIT", "ROLE_AUDIT");
         // 保持 controller 被实际构造，避免权限测试只验证常量而遗漏 bean 构造契约。
@@ -50,7 +50,7 @@ class NotificationAdminControllerTest {
 
     @Test
     void shouldProtectAllAdminQueriesAndMutations() throws NoSuchMethodException {
-        var readExpression = "hasRole('ROLE_DEV_OPS') or hasRole('ROLE_AUDIT')";
+        var readExpression = "hasPermission(null, 'notification:admin:read')";
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageRequests", PageFrom.class,
                 com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
@@ -63,7 +63,7 @@ class NotificationAdminControllerTest {
                 com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
-        assertEquals("hasRole('ROLE_DEV_OPS')", NotificationAdminController.class.getMethod("cancel", UUID.class)
+        assertEquals("hasPermission(null, 'notification:admin:cancel')", NotificationAdminController.class.getMethod("cancel", UUID.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
     }

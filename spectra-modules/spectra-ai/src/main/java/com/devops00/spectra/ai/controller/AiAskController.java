@@ -60,7 +60,7 @@ public class AiAskController {
 
     @ULog("'AI对话流式问答'")
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'AI:INSERT')")
+    @PreAuthorize("hasPermission(null, 'ai:create')")
     public Flux<String> stream(@Validated @RequestBody AiAskFrom from) {
         UUID conversationId = from.getConversationId();
         if (conversationId == null) {
