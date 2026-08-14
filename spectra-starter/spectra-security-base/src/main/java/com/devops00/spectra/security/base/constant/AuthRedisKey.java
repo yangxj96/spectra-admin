@@ -56,7 +56,17 @@ public enum AuthRedisKey implements RedisKey {
     /**
      * 刷新token → accessToken 映射
      */
-    REFRESH_TOKEN("auth:rt:%s");
+    REFRESH_TOKEN("auth:rt:%s"),
+
+    /**
+     * Refresh Token 重放后的用户级撤销栅栏。
+     */
+    REFRESH_REPLAY_FENCE("auth:replay:%s"),
+
+    /**
+     * Refresh Token 一次性消费声明。与 Refresh Token Hash 分离，避免受 HashValueSerializer 影响。
+     */
+    REFRESH_CLAIM("auth:rt:claim:%s");
 
     private final String pattern;
 

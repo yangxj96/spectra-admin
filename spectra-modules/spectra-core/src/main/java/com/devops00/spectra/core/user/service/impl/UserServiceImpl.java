@@ -211,21 +211,28 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         relUserRoleService.revoke(userId);
         relUserRoleService.grant(userId, List.copyOf(targetIds));
+        // RoleAssignment 变化立即撤销该用户的全部 Session，避免旧权限继续生效。
+        SecUtil.kick(userId);
     }
 
     @Override
     @Transactional
     public void passwordResetById(UUID uid) {
-        try {
-            var user = this.getById(uid);
-            Account account = accountService.getDefaultByUserId(user.getId());
-            account.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
-            account.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
-            accountService.updateById(account);
-        } catch (Exception e) {
-            log.error("用户不存在", e);
+        var user = this.getById(uid);
+        if (user == null) {
             throw new DataNotExistException("用户不存在");
         }
+        Account account = accountService.getDefaultByUserId(user.getId());
+        if (account == null) {
+            throw new DataNotExistException("账号不存在");
+        }
+        account.setPassword(passwordEncoder.encode(generateTemporaryPassword()));
+        account.setStatus(AccountStatus.PASSWORD_RESET_REQUIRED.getCode());
+        if (!accountService.updateById(account)) {
+            throw new EntityUpdateException("重置密码失败");
+        }
+        // 密码凭证变化后，所有设备必须重新认证。
+        SecUtil.kick(uid);
     }
 
     @Override
@@ -338,6 +345,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!accountService.updateById(account)) {
             throw new EntityUpdateException("修改密码失败");
         }
+        // 密码变化包括当前设备在内全部 Session 失效。
+        SecUtil.kick(userId);
         log.info("用户 {} 修改密码成功", userId);
     }
 

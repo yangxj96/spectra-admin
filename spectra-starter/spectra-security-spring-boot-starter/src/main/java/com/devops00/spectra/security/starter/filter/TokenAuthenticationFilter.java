@@ -23,7 +23,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -38,6 +40,7 @@ import java.io.IOException;
  * @since 2025/12/2 23:45
  */
 @NullMarked
+@Slf4j
 public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
@@ -45,12 +48,20 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String token = SecUtil.getCurrentToken();
         if (StrUtils.isNotBlank(token)) {
-            SecurityUser user = SecUtil.getCurrentUser(token);
-            if (user == null) {
+            try {
+                SecurityUser user = SecUtil.getCurrentUser(token);
+                if (user == null) {
+                    SecurityContextHolder.clearContext();
+                } else {
+                    var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                }
+            } catch (DataAccessException exception) {
+                // Redis 是当前 opaque session 的事实源；依赖不可用时禁止请求继续进入业务层。
                 SecurityContextHolder.clearContext();
-            } else {
-                var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                log.warn("Redis 会话依赖不可用，拒绝当前请求: {} {}", request.getMethod(), request.getRequestURI(), exception);
+                response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE, "安全会话服务暂不可用");
+                return;
             }
         }
         chain.doFilter(request, response);
