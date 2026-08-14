@@ -280,7 +280,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
         String userTokensKey = AuthRedisKey.USER_TOKENS.format(userId);
 
         // 清理 refresh token 映射
-        // auth:rt:{accessToken} → refreshToken (String)
+        // sec:v2:rt:{accessDigest} → refreshDigest (String)
         Object refreshDigestObj = redis.opsForValue().get(AuthRedisKey.REFRESH_TOKEN.format(tokenDigest));
         if (refreshDigestObj != null) {
             redis.delete(AuthRedisKey.REFRESH_TOKEN.format(refreshDigestObj.toString()));

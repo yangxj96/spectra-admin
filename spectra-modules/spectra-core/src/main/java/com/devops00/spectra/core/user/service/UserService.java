@@ -70,13 +70,6 @@ public interface UserService extends BaseService<User> {
     void modify(UserSaveFrom params);
 
     /**
-     * 根据用户ID删除用户信息
-     *
-     * @param uid 用户ID
-     */
-    void deleteById(UUID uid);
-
-    /**
      * 重置用户密码
      *
      * @param uid 用户ID

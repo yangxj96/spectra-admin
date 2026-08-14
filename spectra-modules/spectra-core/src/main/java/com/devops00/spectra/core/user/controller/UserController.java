@@ -63,13 +63,6 @@ public class UserController {
         bindService.create(params);
     }
 
-    @ULog("'根据ID删除用户'")
-    @DeleteMapping(value = "/{uid}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'user:disable')")
-    public void deleteById(@PathVariable UUID uid) {
-        bindService.deleteById(uid);
-    }
-
     @ULog("'根据ID更新用户信息'")
     @PutMapping(version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'user:update')")

@@ -127,23 +127,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void deleteById(UUID uid) {
-        var user = this.getById(uid);
-        if (null == user) {
-            throw new DataNotExistException("用户不存在");
-        }
-        // 根据用户强制注销账号登录信息
-        securitySessionRevocationPort.revokeUserSessions(user.getId());
-        // 先撤销目标授权实例；历史 Assignment 保留，避免回收时再次启用旧授权。
-        revokeActiveAssignments(user.getId());
-        // 撤销认证身份；目标 schema 保留身份历史，不物理删除安全事实。
-        authenticationIdentityService.revokeByUserId(user.getId());
-        // 删除用户信息
-        this.removeById(user);
-    }
-
-    @Override
-    @Transactional
     public void modify(UserSaveFrom params) {
         var entity = this.getById(params.getId());
         if (null == entity) {

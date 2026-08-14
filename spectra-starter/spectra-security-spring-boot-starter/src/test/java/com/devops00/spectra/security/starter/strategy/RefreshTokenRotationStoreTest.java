@@ -34,33 +34,35 @@ import static org.mockito.Mockito.when;
  */
 class RefreshTokenRotationStoreTest {
 
+    private static final List<String> REFRESH_KEYS = List.of("sec:v2:rt:refresh-digest", "sec:v2:rt:claim:refresh-digest");
+
     @Test
     void shouldMapFirstClaimToClaimed() {
         var redis = mock(RedisTemplate.class);
-        when(redis.execute(any(RedisScript.class), eq(List.of("auth:rt:refresh", "auth:rt:claim")), eq(604800L)))
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
                 .thenReturn(1L);
 
         assertEquals(RefreshTokenRotationStore.ClaimResult.CLAIMED,
-                RefreshTokenRotationStore.claim(redis, "auth:rt:refresh", "auth:rt:claim", 604800L));
+                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
     }
 
     @Test
     void shouldMapSecondClaimToReplay() {
         var redis = mock(RedisTemplate.class);
-        when(redis.execute(any(RedisScript.class), eq(List.of("auth:rt:refresh", "auth:rt:claim")), eq(604800L)))
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
                 .thenReturn(0L);
 
         assertEquals(RefreshTokenRotationStore.ClaimResult.REPLAY,
-                RefreshTokenRotationStore.claim(redis, "auth:rt:refresh", "auth:rt:claim", 604800L));
+                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
     }
 
     @Test
     void shouldFailClosedWhenRedisReturnsMissingResult() {
         var redis = mock(RedisTemplate.class);
-        when(redis.execute(any(RedisScript.class), eq(List.of("auth:rt:refresh", "auth:rt:claim")), eq(604800L)))
+        when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
                 .thenReturn(null);
 
         assertEquals(RefreshTokenRotationStore.ClaimResult.MISSING,
-                RefreshTokenRotationStore.claim(redis, "auth:rt:refresh", "auth:rt:claim", 604800L));
+                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
     }
 }
