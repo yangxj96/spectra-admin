@@ -25,8 +25,8 @@ import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.auth.service.PasswordCredentialService;
+import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.system.service.DepartmentService;
-import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -36,6 +36,7 @@ import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
+import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
@@ -71,9 +72,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final UserConverter userConverter;
 
-    private final RoleConverter roleConverter;
-
     private final RelUserRoleService relUserRoleService;
+
+    private final AuthorizationAssignmentQueryService authorizationAssignmentQueryService;
 
     private final DepartmentService departmentService;
 
@@ -196,10 +197,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 扩展字段补充
         result.getRecords().forEach(vo -> {
-            var roles = relUserRoleService.getRoles(vo.getId());
-            if (null != roles && !roles.isEmpty()) {
-                vo.setRoles(roles.stream().map(roleConverter::toVO).toList());
-            }
+            vo.setRoles(targetRoles(vo.getId()));
         });
         // 响应
         return result;
@@ -225,10 +223,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             }
         }
         // 填充角色列表
-        var roles = relUserRoleService.getRoles(userId);
-        if (roles != null && !roles.isEmpty()) {
-            vo.setRoles(roles.stream().map(roleConverter::toVO).toList());
-        }
+        vo.setRoles(targetRoles(userId));
         return vo;
     }
 
@@ -353,6 +348,30 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                               Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
                 null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
+    }
+
+    private List<RoleVO> targetRoles(UUID userId) {
+        return authorizationAssignmentQueryService.findByUserId(userId).stream()
+                .filter(assignment -> "ACTIVE".equals(assignment.state()))
+                .collect(java.util.stream.Collectors.toMap(
+                        assignment -> assignment.roleId(),
+                        assignment -> assignment,
+                        (first, ignored) -> first,
+                        java.util.LinkedHashMap::new))
+                .values().stream()
+                .map(assignment -> {
+                    var role = new RoleVO();
+                    role.setId(assignment.roleId());
+                    role.setName(assignment.roleName());
+                    role.setCode(assignment.roleCode());
+                    role.setState(true);
+                    role.setBuiltin(Boolean.TRUE.equals(assignment.roleSystemManaged()));
+                    role.setAuthorityLevel(null);
+                    role.setVersion(assignment.roleVersion());
+                    role.setRoleKind(assignment.roleKind());
+                    return role;
+                })
+                .toList();
     }
 
     private UUID currentOperatorId() {

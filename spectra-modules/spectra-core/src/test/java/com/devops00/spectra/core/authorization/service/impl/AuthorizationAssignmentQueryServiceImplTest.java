@@ -77,6 +77,10 @@ class AuthorizationAssignmentQueryServiceImplTest {
         role.setId(roleId);
         role.setCode("ROLE_MANAGER");
         role.setRoleKind("BUSINESS");
+        role.setName("业务管理员");
+        role.setSystemManaged(false);
+        role.setVersion(3L);
+        assignment.setVersion(4L);
         var accessPermission = permission(accessPermissionId, "order:read");
         var grantPermission = permission(grantPermissionId, "user:read");
         var accessBoundary = boundary(assignmentId, accessPermissionId, accessScopeId);
@@ -100,6 +104,10 @@ class AuthorizationAssignmentQueryServiceImplTest {
         var result = service().findByUserId(userId);
 
         assertThat(result).hasSize(1);
+        assertThat(result.getFirst().roleName()).isEqualTo("业务管理员");
+        assertThat(result.getFirst().roleSystemManaged()).isFalse();
+        assertThat(result.getFirst().roleVersion()).isEqualTo(3L);
+        assertThat(result.getFirst().version()).isEqualTo(4L);
         assertThat(result.getFirst().accessBoundaries()).extracting("permissionCode")
                 .containsExactly("order:read");
         assertThat(result.getFirst().grantBoundaries()).extracting("permissionCode")
