@@ -174,22 +174,6 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
     }
 
     @Override
-    public void refreshToken(String token) {
-        String tokenDigest = TokenDigestService.digest(token);
-        String sessionKey = AuthRedisKey.SESSION.format(tokenDigest);
-        Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
-        if (userIdObj == null) {
-            return;
-        }
-        String userId = userIdObj.toString();
-        Object clientTypeObj = redis.opsForHash().get(sessionKey, "clientType");
-        String clientType = clientTypeObj != null ? clientTypeObj.toString() : ClientType.WEB.getName();
-
-        this.refreshTTL(tokenDigest, userId, clientType);
-        redis.opsForHash().put(sessionKey, "lastActiveTime", System.currentTimeMillis());
-    }
-
-    @Override
     public TokenVO refreshByRefreshToken(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new IllegalArgumentException("刷新token不能为空");
@@ -509,18 +493,6 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
             }
         }
         redis.delete(AuthRedisKey.SESSION_FAMILY.format(familyId));
-    }
-
-    /**
-     * 刷新 session / user-client / user-tokens 三个 key 的 TTL
-     */
-    private void refreshTTL(String tokenDigest, String userId, String clientType) {
-        SessionPolicy policy = sessionPolicy();
-        Duration accessTtl = Duration.ofSeconds(policy.accessTtlSeconds());
-        Duration refreshTtl = Duration.ofSeconds(policy.refreshTtlSeconds());
-        redis.expire(AuthRedisKey.SESSION.format(tokenDigest), accessTtl);
-        redis.expire(AuthRedisKey.USER_CLIENT.format(userId, clientType), accessTtl);
-        redis.expire(AuthRedisKey.USER_TOKENS.format(userId), refreshTtl);
     }
 
     private SessionPolicy sessionPolicy() {

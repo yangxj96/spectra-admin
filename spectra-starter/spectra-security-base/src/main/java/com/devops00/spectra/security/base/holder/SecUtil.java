@@ -107,13 +107,6 @@ public class SecUtil {
     }
 
     /**
-     * 刷新 token（活跃续期）
-     */
-    public static void refreshToken(String token) {
-        getStrategy().refreshToken(token);
-    }
-
-    /**
      * 根据刷新token签发新的token对
      */
     public static TokenVO refreshByRefreshToken(String refreshToken) {
