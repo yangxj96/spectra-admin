@@ -21,6 +21,9 @@ import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.security.base.audit.AuditResult;
+import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.from.EmailCodeFrom;
@@ -37,6 +40,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.devops00.spectra.security.starter.web.dispatcher.LoginDispatcher;
 import com.devops00.spectra.security.starter.web.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,6 +50,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 认证处理器
@@ -64,10 +72,24 @@ public class AuthController {
 
     private final SecurityProperties securityProperties;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
+    @Autowired
+    public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties,
+                          ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider) {
+        this(loginDispatcher, authService, securityProperties, securityAuditWriterProvider.getIfAvailable());
+    }
+
     public AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties) {
+        this(loginDispatcher, authService, securityProperties, (SecurityAuditWriter) null);
+    }
+
+    private AuthController(LoginDispatcher loginDispatcher, AuthService authService, SecurityProperties securityProperties,
+                           SecurityAuditWriter securityAuditWriter) {
         this.loginDispatcher = loginDispatcher;
         this.authService = authService;
         this.securityProperties = securityProperties;
+        this.securityAuditWriter = securityAuditWriter;
         WebCookiePolicy.validate(securityProperties);
     }
 
@@ -86,6 +108,7 @@ public class AuthController {
 
         // 登录锁定检查
         if (SecUtil.isLockedOut(username)) {
+            audit("AUTH_LOGIN_FAILED", null, client(request), "LOCKED_OUT");
             throw new SpectraException("账号已锁定，请稍后再试");
         }
 
@@ -94,6 +117,7 @@ public class AuthController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             if (authentication.getPrincipal() instanceof SecurityUser su) {
                 SecUtil.clearLoginFail(username);
+                audit("AUTH_LOGIN_SUCCEEDED", su.getId(), client(request), null);
                 TokenVO token = SecUtil.login(su);
                 issueWebCookies(request, response, token.getRefreshToken());
                 if (isWebClient(request)) {
@@ -105,6 +129,7 @@ public class AuthController {
             }
         } catch (BadCredentialsException e) {
             SecUtil.recordLoginFail(username);
+            audit("AUTH_LOGIN_FAILED", null, client(request), "BAD_CREDENTIALS");
             throw e;
         }
     }
@@ -138,6 +163,7 @@ public class AuthController {
         if (webClient) {
             clearWebCookies(response);
         }
+        audit("AUTH_LOGOUT", SecUtil.getCurrentUserId(), client(request), null);
     }
 
     /**
@@ -202,12 +228,33 @@ public class AuthController {
         if (StrUtils.isBlank(refreshToken)) {
             throw new IllegalArgumentException("刷新token不能为空");
         }
-        TokenVO token = SecUtil.refreshByRefreshToken(refreshToken);
+        TokenVO token;
+        try {
+            token = SecUtil.refreshByRefreshToken(refreshToken);
+        } catch (RuntimeException exception) {
+            audit("TOKEN_REFRESH_FAILED", SecUtil.getCurrentUserId(), client(request), "REFRESH_REJECTED");
+            throw exception;
+        }
+        audit("TOKEN_REFRESH_SUCCEEDED", SecUtil.getCurrentUserId(), client(request), null);
         issueWebCookies(request, response, token.getRefreshToken());
         if (webClient) {
             token.setRefreshToken(null);
         }
         return token;
+    }
+
+    private String client(HttpServletRequest request) {
+        String clientType = request.getHeader("X-Client-Type");
+        return clientType == null || clientType.isBlank() ? "WEB" : clientType.trim().toUpperCase(java.util.Locale.ROOT);
+    }
+
+    private void audit(String eventType, UUID operatorId, String client, String reason) {
+        if (securityAuditWriter == null) {
+            return;
+        }
+        AuditResult result = eventType.endsWith("_FAILED") ? AuditResult.FAILED : AuditResult.SUCCEEDED;
+        securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, client, null, null,
+                Map.of(), Map.of(), reason, null, result, null));
     }
 
     private boolean isWebClient(HttpServletRequest request) {

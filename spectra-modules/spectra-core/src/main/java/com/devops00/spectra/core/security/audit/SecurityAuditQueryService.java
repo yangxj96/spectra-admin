@@ -22,6 +22,7 @@ import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.AuditVisibilityPolicy;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditSnapshotSanitizer;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.AccessDeniedException;
@@ -67,6 +68,10 @@ public class SecurityAuditQueryService {
 
     private final AuditVisibilityPolicy visibilityPolicy;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityAuditMetrics metrics;
+
     /**
      * 分页查询审计事件。
      */
@@ -90,6 +95,7 @@ public class SecurityAuditQueryService {
         List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow).stream()
                 .filter(event -> visibilityPolicy.canView(viewer, toEvent(event)))
                 .toList();
+        recordOperation(viewer, "SECURITY_AUDIT_VIEWED", "PAGE");
         return new SecurityAuditPageVO(records, total == null ? 0L : total, pageNum, pageSize);
     }
 
@@ -114,6 +120,7 @@ public class SecurityAuditQueryService {
         if (records.isEmpty()) {
             throw new DataNotExistException("安全审计事件不存在或当前主体不可见");
         }
+        recordOperation(viewer, "SECURITY_AUDIT_VIEWED", "DETAIL");
         return records.getFirst();
     }
 
@@ -148,6 +155,7 @@ public class SecurityAuditQueryService {
                     .append(csvCell(record.result())).append(',')
                     .append(csvCell(record.correlationId())).append('\n');
         }
+        recordOperation(viewer, "SECURITY_AUDIT_EXPORTED", "EXPORT");
         return csv.toString();
     }
 
@@ -273,6 +281,13 @@ public class SecurityAuditQueryService {
         if (viewer == null || !viewer.isAuthenticated()) {
             throw new AccessDeniedException("需要登录后查询安全审计");
         }
+    }
+
+    private void recordOperation(Authentication viewer, String eventType, String operation) {
+        metrics.recordQuery(operation, "SUCCEEDED");
+        var operatorId = visibilityPolicy.viewerId(viewer);
+        securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, null, null, null,
+                Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED, null));
     }
 
     private record QueryPlan(String whereSql, List<Object> arguments) {
