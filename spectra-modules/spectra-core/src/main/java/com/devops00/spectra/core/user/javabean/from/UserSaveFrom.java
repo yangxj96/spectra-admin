@@ -21,12 +21,10 @@ import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -111,11 +109,5 @@ public class UserSaveFrom {
      */
     @NotNull(message = "所属组织不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private UUID departmentId;
-
-    /**
-     * 角色ID列表
-     */
-    @Size(message = "角色ID列表不能为空,最少需要有一个角色", min = 1, groups = {Verify.Insert.class, Verify.Update.class})
-    private List<UUID> roleIds;
 
 }

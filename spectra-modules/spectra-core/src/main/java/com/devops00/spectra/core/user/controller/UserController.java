@@ -18,7 +18,6 @@ package com.devops00.spectra.core.user.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.from.*;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -76,13 +75,6 @@ public class UserController {
     @PreAuthorize("hasPermission(null, 'user:update')")
     public void modify(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
         bindService.modify(params);
-    }
-
-    @ULog("'覆盖用户角色'")
-    @PutMapping(value = "/{uid}/roles", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'user:assign-role')")
-    public void replaceRoles(@PathVariable UUID uid, @Validated @RequestBody UserRelevanceRolesFrom from) {
-        LegacyAuthorizationWriteGuard.reject("旧用户角色覆盖写入口");
     }
 
     @ULog("'重置用户密码'")

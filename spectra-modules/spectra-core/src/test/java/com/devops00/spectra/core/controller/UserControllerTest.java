@@ -20,7 +20,6 @@ import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.service.UserService;
 import com.github.f4b6a3.uuid.UuidCreator;
-import com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +51,6 @@ class UserControllerTest {
         from.setCountry("China");
         from.setCity("Kunming");
         from.setDepartmentId(UuidCreator.getTimeOrderedEpoch());
-        from.setRoleIds(Lists.newArrayList(UuidCreator.getTimeOrderedEpoch()));
 
         userService.create(from);
 

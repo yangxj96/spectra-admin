@@ -22,11 +22,9 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.*;
-import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.auth.service.PasswordCredentialService;
-import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.RoleConverter;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
@@ -108,9 +106,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void create(UserSaveFrom params) {
-        if (CollUtils.isNotEmpty(params.getRoleIds())) {
-            LegacyAuthorizationWriteGuard.reject("旧用户角色关联写入口");
-        }
         if (params.getStatus() != UserStatus.ACTIVE) {
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
@@ -151,9 +146,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
         }
-        if (params.getRoleIds() != null) {
-            LegacyAuthorizationWriteGuard.reject("旧用户角色关联写入口");
-        }
         if (params.getStatus() != entity.getStatus()) {
             throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
@@ -169,12 +161,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getEmail());
         }
 
-    }
-
-    @Override
-    @Transactional
-    public void replaceRoles(UUID userId, List<UUID> roleIds) {
-        LegacyAuthorizationWriteGuard.reject("旧用户角色覆盖写入口");
     }
 
     @Override
