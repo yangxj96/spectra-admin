@@ -16,6 +16,9 @@ import com.devops00.spectra.core.security.authentication.mapper.MfaEnrollmentMap
 import com.devops00.spectra.core.security.authentication.mapper.RecoveryCodeMapper;
 import com.devops00.spectra.core.security.authentication.mapper.TotpCredentialMapper;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.audit.AuditResult;
+import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.security.mfa.RecoveryCodeHasher;
 import com.devops00.spectra.security.base.security.mfa.TotpCodeService;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /** 默认 PostgreSQL MFA 实现。 */
@@ -42,15 +46,18 @@ public class MfaServiceImpl implements MfaService {
     private final TotpCredentialMapper credentialMapper;
     private final RecoveryCodeMapper recoveryCodeMapper;
     private final SecurityProperties properties;
+    private final SecurityAuditWriter securityAuditWriter;
     private final Clock clock = Clock.systemUTC();
     private final SecureRandom random = new SecureRandom();
 
     public MfaServiceImpl(MfaEnrollmentMapper enrollmentMapper, TotpCredentialMapper credentialMapper,
-                          RecoveryCodeMapper recoveryCodeMapper, SecurityProperties properties) {
+                          RecoveryCodeMapper recoveryCodeMapper, SecurityProperties properties,
+                          SecurityAuditWriter securityAuditWriter) {
         this.enrollmentMapper = enrollmentMapper;
         this.credentialMapper = credentialMapper;
         this.recoveryCodeMapper = recoveryCodeMapper;
         this.properties = properties;
+        this.securityAuditWriter = securityAuditWriter;
     }
 
     @Override
@@ -83,6 +90,8 @@ public class MfaServiceImpl implements MfaService {
         String uri = "otpauth://totp/" + label + "?secret="
                 + secret
                 + "&issuer=" + issuer + "&algorithm=SHA1&digits=6&period=30";
+        appendAudit("AUTH_CHALLENGE_CREATED", userId, Map.of("factorType", FACTOR_TOTP),
+                Map.of("state", PENDING), "TOTP 登记开始");
         return new MfaEnrollmentResult(enrollment.getId(), uri, secret);
     }
 
@@ -92,6 +101,8 @@ public class MfaServiceImpl implements MfaService {
         MfaEnrollment enrollment = findEnrollment(userId, enrollmentId, PENDING);
         String secret = decryptSecret(enrollment);
         if (!TotpCodeService.matches(secret, code, clock, 1)) {
+            appendAudit("AUTH_CHALLENGE_FAILED", userId, Map.of("factorType", FACTOR_TOTP),
+                    Map.of("state", PENDING), "TOTP 登记验证码错误");
             throw new IllegalArgumentException("TOTP 验证码错误");
         }
         enrollment.setState(ACTIVE);
@@ -113,13 +124,19 @@ public class MfaServiceImpl implements MfaService {
             }
             recoveryCodes.add(recoveryCode);
         }
+        appendAudit("AUTH_CHALLENGE_SUCCEEDED", userId, Map.of("factorType", FACTOR_TOTP, "state", PENDING),
+                Map.of("factorType", FACTOR_TOTP, "state", ACTIVE), "TOTP 登记确认");
+        appendAudit("MFA_FACTOR_ENROLLED", userId, Map.of(), Map.of("factorType", FACTOR_TOTP), null);
         return List.copyOf(recoveryCodes);
     }
 
     @Override
     public boolean verifyTotp(UUID userId, String code) {
         MfaEnrollment enrollment = findActiveEnrollment(userId);
-        return enrollment != null && TotpCodeService.matches(decryptSecret(enrollment), code, clock, 1);
+        boolean verified = enrollment != null && TotpCodeService.matches(decryptSecret(enrollment), code, clock, 1);
+        appendAudit(verified ? "MFA_FACTOR_VERIFIED" : "AUTH_CHALLENGE_FAILED", userId,
+                Map.of("factorType", FACTOR_TOTP), Map.of("verified", verified), "TOTP 校验");
+        return verified;
     }
 
     @Override
@@ -127,6 +144,8 @@ public class MfaServiceImpl implements MfaService {
     public boolean consumeRecoveryCode(UUID userId, String code) {
         MfaEnrollment enrollment = findActiveEnrollment(userId);
         if (enrollment == null || code == null || code.isBlank()) {
+            appendAudit("AUTH_CHALLENGE_FAILED", userId, Map.of("factorType", "RECOVERY_CODE"),
+                    Map.of("verified", false), "Recovery Code 校验失败");
             return false;
         }
         List<RecoveryCode> codes = recoveryCodeMapper.selectList(new LambdaQueryWrapper<RecoveryCode>()
@@ -140,10 +159,33 @@ public class MfaServiceImpl implements MfaService {
                         .isNull(RecoveryCode::getUsedAt)
                         .set(RecoveryCode::getUsedAt, Instant.now(clock))
                         .set(RecoveryCode::getVersion, recoveryCode.getVersion() + 1));
+                if (updated == 1) {
+                    appendAudit("MFA_RECOVERY_CODE_USED", userId, Map.of(), Map.of("factorType", "RECOVERY_CODE"), null);
+                }
                 return updated == 1;
             }
         }
+        boolean replayed = recoveryCodeMapper.selectList(new LambdaQueryWrapper<RecoveryCode>()
+                        .eq(RecoveryCode::getEnrollmentId, enrollment.getId())
+                        .isNotNull(RecoveryCode::getUsedAt))
+                .stream().anyMatch(recoveryCode -> RecoveryCodeHasher.matches(code, recoveryCode.getCodeHash()));
+        appendAudit(replayed ? "MFA_RECOVERY_CODE_REPLAYED" : "AUTH_CHALLENGE_FAILED", userId,
+                Map.of("factorType", "RECOVERY_CODE"), Map.of("verified", false),
+                replayed ? "Recovery Code 重放" : "Recovery Code 校验失败");
         return false;
+    }
+
+    private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
+                             Map<String, Object> after, String reason) {
+        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, targetId, targetId,
+                null, null, null, before, after, reason, null, auditResult(eventType), null));
+    }
+
+    private AuditResult auditResult(String eventType) {
+        return switch (eventType) {
+            case "AUTH_CHALLENGE_FAILED", "MFA_RECOVERY_CODE_REPLAYED" -> AuditResult.FAILED;
+            default -> AuditResult.SUCCEEDED;
+        };
     }
 
     private MfaEnrollment findActiveEnrollment(UUID userId) {

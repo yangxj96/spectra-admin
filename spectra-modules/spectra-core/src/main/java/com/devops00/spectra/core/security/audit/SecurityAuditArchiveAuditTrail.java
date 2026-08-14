@@ -53,6 +53,15 @@ public class SecurityAuditArchiveAuditTrail {
                 "partitionName", partitionName == null ? "UNKNOWN" : partitionName,
                 "detail", detail == null ? "" : detail);
         securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, "OPS", null, null,
-                Map.of(), snapshot, null, null, AuditResult.SUCCEEDED, null));
+                Map.of(), snapshot, null, null, resultFor(eventType), null));
+    }
+
+    private static AuditResult resultFor(String eventType) {
+        return switch (eventType) {
+            case "SECURITY_AUDIT_ARCHIVE_STARTED" -> AuditResult.STARTED;
+            case "SECURITY_AUDIT_ARCHIVE_FAILED" -> AuditResult.FAILED;
+            case "SECURITY_AUDIT_ARCHIVE_COMPLETED", "SECURITY_AUDIT_ARCHIVE_VERIFIED" -> AuditResult.SUCCEEDED;
+            default -> throw new IllegalArgumentException("非法的审计归档事件类型");
+        };
     }
 }

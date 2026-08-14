@@ -49,6 +49,7 @@ import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
+import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
 import com.devops00.spectra.security.base.holder.SecUtil;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
@@ -95,6 +96,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final SecurityChangeExecutor securityChangeExecutor;
 
+    private final SecurityAuditWriter securityAuditWriter;
+
     @Override
     public User getByEmail(String email) {
         if (StrUtils.isBlank(email)) {
@@ -124,6 +127,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         // 更新用户数据范围
         this.updateUserScope(entity.getId(), params.getDataScope(), params.getTargetIds());
+        appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
     }
 
     @Override
@@ -191,6 +195,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataNotExistException("密码凭证不存在");
         }
         passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
+        appendAudit("PASSWORD_RESET", uid, Map.of(), Map.of("mustChange", true), "管理员重置密码");
         // 密码凭证变化后，所有设备必须重新认证。
         SecUtil.kick(uid);
     }
@@ -301,6 +306,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 6. 加密新密码并更新
         passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false);
+        appendAudit("PASSWORD_CHANGED", userId, Map.of(), Map.of("mustChange", false), "用户修改密码");
         // 密码变化包括当前设备在内全部 Session 失效。
         SecUtil.kick(userId);
         log.info("用户 {} 修改密码成功", userId);
@@ -327,7 +333,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         var event = new SecurityAuditEvent(
                 null,
-                "USER_LIFECYCLE_CHANGED",
+                lifecycleEventType(previous, target),
                 currentOperatorId(),
                 userId,
                 null,
@@ -355,6 +361,27 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             SecUtil.kick(userId);
             return Boolean.TRUE;
         });
+    }
+
+    private String lifecycleEventType(UserStatus previous, UserStatus target) {
+        if (target == UserStatus.LOCKED) {
+            return "ACCOUNT_LOCKED";
+        }
+        if (previous == UserStatus.LOCKED && target == UserStatus.ACTIVE) {
+            return "ACCOUNT_UNLOCKED";
+        }
+        return switch (target) {
+            case ACTIVE -> previous == UserStatus.DEPARTED ? "USER_REINSTATED" : "USER_ENABLED";
+            case DISABLED -> "USER_DISABLED";
+            case DEPARTED -> "USER_DEPARTED";
+            case LOCKED -> "ACCOUNT_LOCKED";
+        };
+    }
+
+    private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
+                              Map<String, Object> after, String reason) {
+        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
+                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
     private UUID currentOperatorId() {

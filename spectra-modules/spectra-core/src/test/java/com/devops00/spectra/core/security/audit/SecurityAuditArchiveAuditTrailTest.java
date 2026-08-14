@@ -36,6 +36,9 @@ class SecurityAuditArchiveAuditTrailTest {
         trail.append("SECURITY_AUDIT_ARCHIVE_FAILED", null, "security_audit_2025_01", "checksum mismatch");
 
         assertEquals("SECURITY_AUDIT_ARCHIVE_FAILED", writer.events.getFirst().eventType());
+        assertEquals(com.devops00.spectra.security.base.audit.AuditResult.FAILED, writer.events.getFirst().result());
+        trail.append("SECURITY_AUDIT_ARCHIVE_STARTED", null, "security_audit_2025_02", "copy started");
+        assertEquals(com.devops00.spectra.security.base.audit.AuditResult.STARTED, writer.events.get(1).result());
         assertThrows(IllegalArgumentException.class,
                 () -> trail.append("SECURITY_AUDIT_ARCHIVE_DELETED", null, "security_audit_2025_01", "not allowed"));
     }
