@@ -77,6 +77,20 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase9LegacyDataScopeMigrationMustDropOnlyKnownLegacyObjects() throws IOException {
+        String migration = readMigration("V10__remove_legacy_data_scope.sql");
+
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_user_data_scope_target"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_user_data_scope"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_role_data_scope_target"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_role_data_scope"));
+        assertTrue(migration.contains("ALTER TABLE IF EXISTS spectra_core.sys_role"));
+        assertTrue(migration.contains("DROP COLUMN IF EXISTS scope"));
+        assertFalse(migration.contains("CASCADE"));
+        assertTrue(migration.contains("Historical user/role scope is not converted automatically"));
+    }
+
+    @Test
     void phase4ConcurrencyAndDelegationColumnsMustRemainInTheDatabaseContract() throws IOException {
         String schema = readSql();
         String migration = readV1();

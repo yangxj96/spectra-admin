@@ -347,7 +347,6 @@ class SystemControllerTest {
         role.setName(name);
         role.setCode(code);
         role.setState(Boolean.TRUE);
-        //role.setScope(DataScopeType.ALL);
         role.setBuiltin(Boolean.TRUE);
         return role;
     }
