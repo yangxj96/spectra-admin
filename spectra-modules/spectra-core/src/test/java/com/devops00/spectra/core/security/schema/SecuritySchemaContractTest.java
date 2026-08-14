@@ -57,7 +57,23 @@ class SecuritySchemaContractTest {
         assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_event_default"));
         assertTrue(schema.contains("CREATE TRIGGER trg_security_audit_event_immutable"));
         assertTrue(schema.contains("REVOKE UPDATE, DELETE ON spectra_security.security_audit_event FROM PUBLIC"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_retention_policy"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_archive_manifest"));
+        assertTrue(schema.contains("hot_retention_months >= 12"));
+        assertTrue(schema.contains("total_retention_years >= 5"));
         assertTrue(schema.contains("CREATE TABLE spectra_security.security_change_outbox"));
+    }
+
+    @Test
+    void phase8ArchiveMetadataMustBeVersionedAndReadOnlyForRuntime() throws IOException {
+        String migration = readMigration("V9__security_audit_retention_and_archive_manifest.sql");
+
+        assertTrue(migration.contains("CREATE TABLE IF NOT EXISTS spectra_security.security_audit_retention_policy"));
+        assertTrue(migration.contains("CREATE TABLE IF NOT EXISTS spectra_security.security_audit_archive_manifest"));
+        assertTrue(migration.contains("GRANT SELECT ON spectra_security.security_audit_retention_policy TO spectra_runtime"));
+        assertTrue(migration.contains("REVOKE INSERT, UPDATE, DELETE, TRUNCATE"));
+        assertTrue(migration.contains("content_sha256"));
+        assertTrue(migration.contains("SystemSecurityAudit"));
     }
 
     @Test

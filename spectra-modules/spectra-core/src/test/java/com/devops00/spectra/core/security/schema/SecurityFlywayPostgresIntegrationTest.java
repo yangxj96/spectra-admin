@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV3() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV9() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,8 +70,9 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8"), versions);
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9"), versions);
             assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
+            assertTrue(tableExists(connection, "spectra_security", "security_audit_archive_manifest"));
             assertTrue(tableExists(connection, "spectra_security", "assignment_permission_boundary"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
             try (var statement = connection.createStatement();
