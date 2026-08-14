@@ -21,15 +21,11 @@ import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
-import com.devops00.spectra.core.user.javabean.from.RoleAuthorityFrom;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
-import com.devops00.spectra.core.user.javabean.vo.AuthorityVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
-import com.devops00.spectra.core.user.service.RelRoleAuthorityService;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
 import com.devops00.spectra.core.user.service.RoleService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -58,8 +54,6 @@ public class RoleController {
     private final RoleService bindService;
 
     private final RelRoleMenuService relRoleMenuService;
-
-    private final RelRoleAuthorityService relRoleAuthorityService;
 
     @ULog("'创建角色'")
     @PostMapping(version = "1.0.0+")
@@ -104,18 +98,6 @@ public class RoleController {
 
     /* 关联处理部分 */
 
-    @ULog("'获取角色关联的权限列表'")
-    @GetMapping(value = "/{roleId}/authority", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'role:read')")
-    public List<AuthorityVO> getRoleRelAuthorityByRoleId(@PathVariable UUID roleId) {
-        try {
-            return relRoleAuthorityService.get(roleId);
-        } catch (Exception e) {
-            log.error("{}获取角色关联的权限列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new DataException("参数转换失败");
-        }
-    }
-
     @ULog("'获取角色关联的菜单列表'")
     @GetMapping(value = "/{roleId}/menu", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -126,13 +108,6 @@ public class RoleController {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
             throw new DataException("参数转换失败");
         }
-    }
-
-    @ULog("'保存角色关联的权限列表'")
-    @PutMapping(value = "/{roleId}/authorities", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'role:grant')")
-    public void saveRoleRelAuthorityByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleAuthorityFrom from) {
-        LegacyAuthorizationWriteGuard.reject("旧角色权限关联写入口");
     }
 
     @ULog("'保存角色关联的菜单列表'")

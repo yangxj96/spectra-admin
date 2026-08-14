@@ -91,6 +91,19 @@ class SecuritySchemaContractTest {
     }
 
     @Test
+    void phase9LegacyAuthorizationMigrationMustDropOnlyRetiredObjects() throws IOException {
+        String migration = readMigration("V11__remove_legacy_authorization_runtime.sql");
+
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_rel_role_authority"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_rel_role_menu"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_rel_user_role"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_authority"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_role"));
+        assertFalse(migration.contains("CASCADE"));
+        assertFalse(migration.contains("sys_account"));
+    }
+
+    @Test
     void phase4ConcurrencyAndDelegationColumnsMustRemainInTheDatabaseContract() throws IOException {
         String schema = readSql();
         String migration = readV1();

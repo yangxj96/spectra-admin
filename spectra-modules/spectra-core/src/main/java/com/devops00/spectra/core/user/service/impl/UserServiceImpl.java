@@ -25,6 +25,8 @@ import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.auth.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.auth.service.PasswordCredentialService;
+import com.devops00.spectra.core.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
@@ -38,7 +40,6 @@ import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.core.user.service.RelUserRoleService;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.security.base.audit.AuditResult;
@@ -56,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -72,9 +74,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final UserConverter userConverter;
 
-    private final RelUserRoleService relUserRoleService;
-
     private final AuthorizationAssignmentQueryService authorizationAssignmentQueryService;
+
+    private final RoleAssignmentMapper roleAssignmentMapper;
 
     private final DepartmentService departmentService;
 
@@ -132,8 +134,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         // 根据用户强制注销账号登录信息
         securitySessionRevocationPort.revokeUserSessions(user.getId());
-        // 先删除角色关联
-        relUserRoleService.revoke(user.getId());
+        // 先撤销目标授权实例；历史 Assignment 保留，避免回收时再次启用旧授权。
+        revokeActiveAssignments(user.getId());
         // 撤销认证身份；目标 schema 保留身份历史，不物理删除安全事实。
         authenticationIdentityService.revokeByUserId(user.getId());
         // 删除用户信息
@@ -318,10 +320,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             if (this.baseMapper.updateById(current) == 0) {
                 throw new EntityUpdateException("更新用户生命周期状态失败");
             }
-            // 离职后的旧 Assignment 不得在重新入职时自动恢复；当前旧关系表没有历史状态，
-            // 因此先撤销运行时关系，后续 RoleAssignment v2 迁移保留可审计撤销记录。
+            // 离职后的旧 Assignment 不得在重新入职时自动恢复；REVOKED 历史记录保留在目标模型。
             if (target == UserStatus.DEPARTED) {
-                relUserRoleService.revoke(userId);
+                revokeActiveAssignments(userId);
             }
             // Redis/Session 核心依赖不可用时撤销端口会 fail-closed，事务随之回滚。
             securitySessionRevocationPort.revokeUserSessions(userId);
@@ -348,6 +349,21 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                               Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
                 null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
+    }
+
+    private void revokeActiveAssignments(UUID userId) {
+        var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
+                .eq(RoleAssignment::getUserId, userId)
+                .eq(RoleAssignment::getState, "ACTIVE"));
+        var revokedAt = Instant.now();
+        for (var assignment : assignments) {
+            assignment.setState("REVOKED");
+            assignment.setValidUntil(revokedAt);
+            assignment.setVersion((assignment.getVersion() == null ? 0L : assignment.getVersion()) + 1L);
+            if (roleAssignmentMapper.updateById(assignment) != 1) {
+                throw new EntityUpdateException("撤销用户 RoleAssignment 失败");
+            }
+        }
     }
 
     private List<RoleVO> targetRoles(UUID userId) {
