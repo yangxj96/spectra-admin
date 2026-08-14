@@ -38,7 +38,7 @@ import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
 import com.devops00.spectra.oa.notice.mapper.NoticeMapper;
 import com.devops00.spectra.oa.notice.mapper.NoticeReaderMapper;
 import com.devops00.spectra.oa.notice.service.NoticeService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,12 +65,13 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private final UserService userService;
     private final NoticeConverter noticeConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     @Transactional
     public IPage<NoticeVO> page(PageFrom page, NoticePageFrom params) {
-        var currentUser = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var currentUser = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (currentUser == null || userId == null) {
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
@@ -98,7 +99,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     @Override
     public NoticeVO get(UUID id) {
         var notice = require(id);
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (userId == null || !isVisible(notice, userId)) {
             throw new DataNotExistException("公告不存在或无权访问");
         }
@@ -108,8 +109,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     @Override
     @Transactional
     public Notice createDraft(NoticeCreateFrom from) {
-        var user = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var user = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null) {
             throw new DataSaveException("当前用户上下文不可用");
         }
@@ -166,7 +167,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     @Override
     @Transactional
     public void markRead(UUID id) {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         var notice = require(id);
         if (userId == null || !isVisible(notice, userId)) {
             throw new DataNotExistException("公告不存在或无权访问");
@@ -186,7 +187,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     }
 
     private NoticeVO assembleView(Notice notice) {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             return noticeConverter.toVO(notice);
         }
@@ -213,7 +214,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     }
 
     private void ensurePublisher(Notice notice) {
-        if (!Objects.equals(notice.getPublisherId(), SecUtil.getCurrentUserId())) {
+        if (!Objects.equals(notice.getPublisherId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("公告不存在或无权操作");
         }
     }

@@ -34,7 +34,7 @@ import com.devops00.spectra.oa.application.javabean.vo.ApplicationVO;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.service.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -67,11 +67,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     private final ApplicationMapper applicationMapper;
     private final ApplicationConverter applicationConverter;
     private final TaskService taskService;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<ApplicationVO> page(PageFrom page, ApplicationPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Application>();
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
             return new Page<>(page.getPageNum(), page.getPageSize(), 0);
         }
@@ -101,14 +102,14 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     @Override
     public Application requireVisible(UUID id) {
         var entity = require(id);
-        var user = SecUtil.getCurrentUser();
+        var user = securityContextAccessor.currentUser();
         if (user != null
                 && user.getId() != null
                 && user.getDepartmentId() != null
                 && (user.getId().equals(entity.getApplicantId()) || user.getDepartmentId().equals(entity.getDepartmentId()))) {
             return entity;
         }
-        String username = SecUtil.getCurrentUsername();
+        String username = securityContextAccessor.currentUsername();
         if (StringUtils.hasText(entity.getProcessInstanceId()) && taskService.canAccessProcess(entity.getProcessInstanceId(), username)) {
             return entity;
         }
@@ -185,8 +186,8 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         if (type == null) {
             throw new DataNotExistException("申请类型不存在或已停用: " + typeCode);
         }
-        var currentUser = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var currentUser = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (currentUser == null || userId == null || currentUser.getDepartmentId() == null) {
             throw new DataSaveException("当前用户没有可用的组织归属");
         }
@@ -291,7 +292,7 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
 
     @Override
     public long countMine(String status) {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
             return 0;
         }

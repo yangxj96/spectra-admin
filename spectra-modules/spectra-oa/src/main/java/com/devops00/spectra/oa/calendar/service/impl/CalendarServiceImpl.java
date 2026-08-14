@@ -31,7 +31,7 @@ import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
 import com.devops00.spectra.oa.calendar.mapper.CalendarMapper;
 import com.devops00.spectra.oa.calendar.service.CalendarService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,11 +54,12 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
 
     private final CalendarConverter calendarConverter;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
-        var user = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var user = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null) {
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
@@ -93,8 +94,8 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
     @Override
     @Transactional
     public CalendarVO create(CalendarSaveFrom from) {
-        var user = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var user = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
@@ -158,7 +159,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
     }
 
     private void ensureOwner(Calendar calendar) {
-        if (!Objects.equals(calendar.getOwnerId(), SecUtil.getCurrentUserId())) {
+        if (!Objects.equals(calendar.getOwnerId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("日程不存在或无权访问");
         }
     }

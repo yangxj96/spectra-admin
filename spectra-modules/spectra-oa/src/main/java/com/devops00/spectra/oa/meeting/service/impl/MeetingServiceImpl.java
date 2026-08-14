@@ -41,7 +41,7 @@ import com.devops00.spectra.oa.meeting.mapper.MeetingMapper;
 import com.devops00.spectra.oa.meeting.mapper.MeetingParticipantMapper;
 import com.devops00.spectra.oa.meeting.mapper.MeetingRecordMapper;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
-import com.devops00.spectra.security.base.holder.SecUtil;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,12 +68,13 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final NotificationGateway notificationGateway;
     private final UserService userService;
     private final TimeMapper timeMapper;
+    private final SecurityContextAccessor securityContextAccessor;
 
     @Override
     @Transactional
     public void created(MeetingCreateFrom from) {
-        var user = SecUtil.getCurrentUser();
-        var userId = SecUtil.getCurrentUserId();
+        var user = securityContextAccessor.currentUser();
+        var userId = securityContextAccessor.currentUserId();
         if (user == null || userId == null || user.getDepartmentId() == null) {
             throw new DataSaveException("当前用户组织信息不可用");
         }
@@ -141,7 +142,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     @Override
     @Transactional
     public void respond(UUID meetingId, MeetingResponseFrom from) {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
                 .eq(MeetingParticipant::getMeetingId, meetingId.toString())
                 .eq(MeetingParticipant::getUserId, userId));
@@ -160,7 +161,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     @Override
     @Transactional
     public void checkIn(UUID meetingId) {
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         var participant = participantMapper.selectOne(new LambdaQueryWrapper<MeetingParticipant>()
                 .eq(MeetingParticipant::getMeetingId, meetingId.toString())
                 .eq(MeetingParticipant::getUserId, userId));
@@ -176,7 +177,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     @Transactional
     public void saveRecord(UUID meetingId, MeetingRecordFrom from) {
         var meeting = this.getById(meetingId);
-        var userId = SecUtil.getCurrentUserId();
+        var userId = securityContextAccessor.currentUserId();
         if (meeting == null || !userId.toString().equals(meeting.getInitiatorId())) {
             throw new DataNotExistException("只有会议发起人可以维护纪要");
         }
