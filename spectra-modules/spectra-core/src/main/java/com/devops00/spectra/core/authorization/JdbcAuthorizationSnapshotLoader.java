@@ -89,7 +89,8 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         var assignmentQuery = new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getUserId, userId)
                 .eq(RoleAssignment::getState, ACTIVE);
-        var assignments = roleAssignmentMapper.selectList(assignmentQuery).stream()
+        var assignments = roleAssignmentMapper.selectList(assignmentQuery)
+                .stream()
                 .filter(assignment -> assignment.getValidFrom() == null
                         || !assignment.getValidFrom().isAfter(now))
                 .filter(assignment -> assignment.getValidUntil() == null
@@ -139,9 +140,10 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         var scopeRows = scopeIds.isEmpty()
                 ? List.<com.devops00.spectra.core.authorization.entity.AuthorizationScope>of()
                 : authorizationScopeMapper.selectBatchIds(scopeIds);
-        var scopes = scopeRows.stream().collect(Collectors.toMap(
-                com.devops00.spectra.core.authorization.entity.AuthorizationScope::getId,
-                Function.identity()));
+        var scopes = scopeRows.stream()
+                .collect(Collectors.toMap(
+                        com.devops00.spectra.core.authorization.entity.AuthorizationScope::getId,
+                        Function.identity()));
         var rules = scopeIds.isEmpty()
                 ? List.<ScopeRule>of()
                 : scopeRuleMapper.selectList(
@@ -180,7 +182,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
             return Map.of();
         }
         return rolePermissionMapper.selectList(
-                        new LambdaQueryWrapper<RolePermission>().in(RolePermission::getRoleId, roleIds))
+                new LambdaQueryWrapper<RolePermission>().in(RolePermission::getRoleId, roleIds))
                 .stream()
                 .collect(Collectors.groupingBy(
                         RolePermission::getRoleId,
@@ -192,8 +194,8 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
             return Map.of();
         }
         return roleGrantablePermissionMapper.selectList(
-                        new LambdaQueryWrapper<RoleGrantablePermission>()
-                                .in(RoleGrantablePermission::getRoleId, roleIds))
+                new LambdaQueryWrapper<RoleGrantablePermission>()
+                        .in(RoleGrantablePermission::getRoleId, roleIds))
                 .stream()
                 .collect(Collectors.groupingBy(
                         RoleGrantablePermission::getRoleId,
@@ -201,11 +203,11 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
     }
 
     private Map<String, PermissionBoundary> toAccessBoundaries(
-            List<AssignmentPermissionBoundary> rows,
-            Map<UUID, Permission> permissions,
-            Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
-            List<ScopeRule> rules,
-            Set<UUID> rolePermissionIds) {
+                                                               List<AssignmentPermissionBoundary> rows,
+                                                               Map<UUID, Permission> permissions,
+                                                               Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
+                                                               List<ScopeRule> rules,
+                                                               Set<UUID> rolePermissionIds) {
         var result = new HashMap<String, PermissionBoundary>();
         for (var row : rows) {
             requireRolePermission(rolePermissionIds, row.getPermissionId());
@@ -217,11 +219,11 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
     }
 
     private Map<String, PermissionBoundary> toGrantBoundaries(
-            List<AssignmentGrantBoundary> rows,
-            Map<UUID, Permission> permissions,
-            Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
-            List<ScopeRule> rules,
-            Set<UUID> roleGrantablePermissionIds) {
+                                                              List<AssignmentGrantBoundary> rows,
+                                                              Map<UUID, Permission> permissions,
+                                                              Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
+                                                              List<ScopeRule> rules,
+                                                              Set<UUID> roleGrantablePermissionIds) {
         var result = new HashMap<String, PermissionBoundary>();
         for (var row : rows) {
             requireRolePermission(roleGrantablePermissionIds, row.getPermissionId());
@@ -233,9 +235,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
     }
 
     private AuthorizationScope toScope(
-            Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
-            List<ScopeRule> rules,
-            UUID scopeId) {
+                                       Map<UUID, com.devops00.spectra.core.authorization.entity.AuthorizationScope> scopes,
+                                       List<ScopeRule> rules,
+                                       UUID scopeId) {
         var scope = scopes.get(scopeId);
         if (scope == null || scope.getScopeMode() == null) {
             throw new IllegalStateException("授权边界引用了不存在的 scope: " + scopeId);

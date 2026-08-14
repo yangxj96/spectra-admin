@@ -55,8 +55,7 @@ class JdbcAuthorizationSnapshotLoaderTest {
 
     private final RolePermissionMapper rolePermissionMapper = mock(RolePermissionMapper.class);
 
-    private final RoleGrantablePermissionMapper roleGrantablePermissionMapper =
-            mock(RoleGrantablePermissionMapper.class);
+    private final RoleGrantablePermissionMapper roleGrantablePermissionMapper = mock(RoleGrantablePermissionMapper.class);
 
     private final PermissionMapper permissionMapper = mock(PermissionMapper.class);
 
@@ -64,8 +63,7 @@ class JdbcAuthorizationSnapshotLoaderTest {
 
     private final ScopeRuleMapper scopeRuleMapper = mock(ScopeRuleMapper.class);
 
-    private final AssignmentPermissionBoundaryMapper permissionBoundaryMapper =
-            mock(AssignmentPermissionBoundaryMapper.class);
+    private final AssignmentPermissionBoundaryMapper permissionBoundaryMapper = mock(AssignmentPermissionBoundaryMapper.class);
 
     private final AssignmentGrantBoundaryMapper grantBoundaryMapper = mock(AssignmentGrantBoundaryMapper.class);
 
@@ -211,7 +209,7 @@ class JdbcAuthorizationSnapshotLoaderTest {
     }
 
     private static com.devops00.spectra.core.authorization.entity.AuthorizationScope scope(
-            UUID id, String mode) {
+                                                                                           UUID id, String mode) {
         var value = new com.devops00.spectra.core.authorization.entity.AuthorizationScope();
         value.setId(id);
         value.setScopeMode(mode);
