@@ -60,6 +60,18 @@
             <artifactId>mica-core</artifactId>
         </dependency>
 
+        <!-- 可显式启用的目标 schema PostgreSQL/Flyway 集成测试依赖。 -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 
 </project>
