@@ -64,7 +64,7 @@ import java.util.*;
  */
 @Slf4j
 @NullMarked
-public class RedisSecHolderStrategy implements SecuritySessionIssuer, SecuritySessionRevoker, SecuritySessionReader,
+public class RedisSecuritySessionRepository implements SecuritySessionIssuer, SecuritySessionRevoker, SecuritySessionReader,
         SecurityTokenAccessor, SecuritySessionQuery, SecurityLoginFailureTracker {
 
     private static final String HEADER_CLIENT_TYPE = "X-Client-Type";
@@ -78,7 +78,7 @@ public class RedisSecHolderStrategy implements SecuritySessionIssuer, SecuritySe
 
     private final @Nullable SecurityUserLoader securityUserLoader;
 
-    public RedisSecHolderStrategy(@Qualifier("securityObjectMapper") ObjectMapper om,
+    public RedisSecuritySessionRepository(@Qualifier("securityObjectMapper") ObjectMapper om,
                                   @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
                                   UserOnlineConverter userOnlineConverter, @Nullable SecurityUserLoader securityUserLoader) {
         this.om = om;

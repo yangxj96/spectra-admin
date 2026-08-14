@@ -30,7 +30,7 @@ import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecuritySessionContextAccessor;
-import com.devops00.spectra.security.starter.strategy.RedisSecHolderStrategy;
+import com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,7 +50,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Slf4j
 @Configuration
-public class SecUtilConfiguration {
+public class SecuritySessionPortConfiguration {
 
     @Bean
     public SecurityContextAccessor securityContextAccessor(SecuritySessionReader sessionReader,
@@ -126,13 +126,13 @@ public class SecUtilConfiguration {
      */
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
-    public RedisSecHolderStrategy redisSecHolderStrategy(
+    public RedisSecuritySessionRepository redisSecuritySessionRepository(
                                                          @Qualifier("securityObjectMapper") ObjectMapper om,
                                                          @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
                                                          SecurityProperties properties,
                                                          UserOnlineConverter userOnlineConverter,
                                                          ObjectProvider<SecurityUserLoader> securityUserLoaderProvider) {
-        return new RedisSecHolderStrategy(om, redis, properties, userOnlineConverter,
+        return new RedisSecuritySessionRepository(om, redis, properties, userOnlineConverter,
                 securityUserLoaderProvider.getIfAvailable());
     }
 }
