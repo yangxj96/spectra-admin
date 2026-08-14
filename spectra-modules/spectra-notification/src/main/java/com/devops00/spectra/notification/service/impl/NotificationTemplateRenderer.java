@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +62,39 @@ public class NotificationTemplateRenderer {
      * 校验模板变量是否完整，并拒绝把模板当作表达式执行。
      */
     public void validate(String template, Map<String, ?> variables) {
+        validateAll(variables, template);
+    }
+
+    /**
+     * 校验标题和正文共同使用的模板参数，并拒绝未被模板消费的参数。
+     *
+     * @param variables 模板参数
+     * @param templates 标题、正文等模板
+     */
+    public void validateAll(Map<String, ?> variables, String... templates) {
+        Set<String> referenced = new LinkedHashSet<>();
+        if (templates != null) {
+            for (var template : templates) {
+                collectVariables(template, referenced);
+            }
+        }
+        Map<String, ?> values = variables == null ? Map.of() : variables;
+        for (var variable : referenced) {
+            if (!values.containsKey(variable) || values.get(variable) == null) {
+                throw new DataSaveException("通知模板缺少参数: " + variable);
+            }
+        }
+        for (var key : values.keySet()) {
+            if (!referenced.contains(key)) {
+                throw new DataSaveException("通知模板包含未使用参数: " + key);
+            }
+        }
+    }
+
+    /**
+     * 校验没有持久化模板时的标题和正文回退值；回退值允许业务参数直接作为正文快照。
+     */
+    public void validateFallback(String template, Map<String, ?> variables) {
         if (!StringUtils.hasText(template)) {
             throw new DataSaveException("通知模板不能为空");
         }
@@ -68,6 +103,16 @@ public class NotificationTemplateRenderer {
             if (variables == null || !variables.containsKey(matcher.group(1)) || variables.get(matcher.group(1)) == null) {
                 throw new DataSaveException("通知模板缺少参数: " + matcher.group(1));
             }
+        }
+    }
+
+    private void collectVariables(String template, Set<String> referenced) {
+        if (!StringUtils.hasText(template)) {
+            return;
+        }
+        var matcher = VARIABLE.matcher(template);
+        while (matcher.find()) {
+            referenced.add(matcher.group(1));
         }
     }
 

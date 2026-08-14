@@ -40,6 +40,16 @@ public final class RedisCacheKey {
      */
     public static final String EMAIL_CODE = "core:common:kaptcha:email:";
 
+    /**
+     * 短信验证码失败尝试次数。
+     */
+    public static final String SMS_CODE_ATTEMPTS = "core:common:kaptcha:sms:attempts:";
+
+    /**
+     * 邮箱验证码失败尝试次数。
+     */
+    public static final String EMAIL_CODE_ATTEMPTS = "core:common:kaptcha:email:attempts:";
+
     private RedisCacheKey() {
     }
 }

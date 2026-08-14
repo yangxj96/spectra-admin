@@ -18,10 +18,14 @@ package com.devops00.spectra.core.auth.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.constant.DataScopeType;
+import com.devops00.spectra.common.mybatis.DataScopeProvider;
 import com.devops00.spectra.core.auth.javabean.constant.AccountStatus;
 import com.devops00.spectra.core.auth.javabean.entity.Account;
 import com.devops00.spectra.core.auth.service.AccountService;
+import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.security.base.holder.SecUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +42,8 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
     private final AccountService accountService;
 
     private final UserService userService;
+
+    private final DataScopeProvider dataScopeProvider;
 
     @Override
     public List<NotificationRecipient> resolve(List<UUID> userIds) {
@@ -63,11 +69,14 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .filter(java.util.Objects::nonNull)
                 .map(Account::getUserId)
                 .filter(java.util.Objects::nonNull)
-                .map(userId -> resolve(List.of(userId)).getFirst())
+                .flatMap(userId -> resolve(List.of(userId)).stream())
                 .toList();
     }
 
     private NotificationRecipient resolveOne(UUID userId) {
+        if (!allowedByCurrentUserScope(userId)) {
+            return new NotificationRecipient(userId, null, null, false, false, null);
+        }
         var accounts = accountService.listByUserId(userId);
         var active = accounts.stream().anyMatch(this::isActive);
         var verified = accounts.stream()
@@ -87,6 +96,31 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .orElse(null);
         var user = userService.getById(userId);
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
+    }
+
+    /**
+     * 当前登录用户发起的通知必须遵守其有效数据范围；无登录上下文的定时任务由服务身份负责授权。
+     */
+    private boolean allowedByCurrentUserScope(UUID recipientUserId) {
+        var currentUserId = SecUtil.getCurrentUserId();
+        if (currentUserId == null) {
+            return true;
+        }
+        var scope = dataScopeProvider.resolve(currentUserId);
+        if (scope == null || scope.getScopeType() == null) {
+            return false;
+        }
+        if (scope.getScopeType() == DataScopeType.GLOBAL) {
+            return true;
+        }
+        if (scope.getScopeType() == DataScopeType.SELF) {
+            return currentUserId.equals(recipientUserId);
+        }
+        User recipient = userService.getById(recipientUserId);
+        return recipient != null
+                && recipient.getDepartmentId() != null
+                && scope.getTargetIds() != null
+                && scope.getTargetIds().contains(recipient.getDepartmentId());
     }
 
     private boolean isUsable(Account account) {

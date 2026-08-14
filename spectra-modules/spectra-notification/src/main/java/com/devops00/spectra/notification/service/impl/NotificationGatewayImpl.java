@@ -281,16 +281,15 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 .orderByDesc(NotificationTemplateEntity::getVersionNo)
                 .last("LIMIT 1"));
         if (template != null) {
-            templateRenderer.validate(template.getTitleTemplate(), parameters);
-            templateRenderer.validate(template.getContentTemplate(), parameters);
+            templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());
             return new RenderedContent(template.getId(), templateRenderer.render(template.getTitleTemplate(), parameters),
                     templateRenderer.render(template.getContentTemplate(), parameters));
         }
         var title = String.valueOf(parameters.getOrDefault("title", "通知"));
         var content = String.valueOf(parameters.getOrDefault("content", ""));
-        templateRenderer.validate(title, parameters);
-        templateRenderer.validate(content, parameters);
+        templateRenderer.validateFallback(title, parameters);
+        templateRenderer.validateFallback(content, parameters);
         title = templateRenderer.render(title, parameters);
         content = templateRenderer.render(content, parameters);
         if (!StringUtils.hasText(title)) {
@@ -358,9 +357,21 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (StringUtils.hasText(request.link())
                 && (!request.link().startsWith("/")
                         || request.link().startsWith("//")
-                        || request.link().contains(".."))) {
+                        || request.link().contains("..")
+                        || request.link().contains("\\")
+                        || request.link().toLowerCase(Locale.ROOT).contains("%2e")
+                        || !isAllowedLink(request.link()))) {
             throw new DataSaveException("通知跳转链接不合法");
         }
+    }
+
+    /**
+     * 只允许已登记的前端站内路由前缀；动态业务 ID 由前缀后的路径承载。
+     */
+    private boolean isAllowedLink(String link) {
+        return properties.allowedLinkPrefixes()
+                .stream()
+                .anyMatch(prefix -> prefix.endsWith("/") ? link.startsWith(prefix) : link.equals(prefix));
     }
 
     /**

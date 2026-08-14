@@ -19,8 +19,8 @@ package com.devops00.spectra.security.starter.web.service.impl;
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.notification.*;
-import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.util.VerificationCodeDigest;
 import com.devops00.spectra.security.starter.web.service.AuthService;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -70,15 +70,22 @@ public class AuthServiceImpl implements AuthService {
         if (!availability.available()) {
             throw new SpectraException("验证码通知渠道暂不可用: " + availability.reason());
         }
-        var code = generateCode();
         var redisKey = redisPrefix + address;
+        requireHmacKey();
+        var code = generateCode();
         try {
-            redisTemplate.opsForValue().set(redisKey, digest(code), securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
-            var request = new NotificationRequest(null, "security:login-code:" + UUID.randomUUID(),
+            var requestWindow = Instant.now().getEpochSecond() / Math.max(1L, securityProperties.getVerificationCodeExpire());
+            var stored = redisTemplate.opsForValue()
+                    .setIfAbsent(redisKey, digest(code),
+                            securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
+            if (Boolean.FALSE.equals(stored)) {
+                return;
+            }
+            var request = new NotificationRequest(null, "security:login-code:" + channel.name() + ":" + address + ":" + requestWindow,
                     NotificationPurpose.LOGIN_CODE, List.of(channel), List.of(),
                     List.of(new NotificationDirectAddress(channel, address)), templateCode,
                     Map.of("title", "登录验证码", "content", "您的验证码为 {{code}}，请在有效期内完成操作。"),
-                    Map.of("code", code), "SECURITY", UUID.randomUUID().toString(), "SECURITY", null,
+                    Map.of("code", code), "SECURITY", channel.name() + ":" + address + ":" + requestWindow, "SECURITY", null,
                     Instant.now(), Instant.now().plusSeconds(securityProperties.getVerificationCodeExpire()), 100, null);
             NotificationReceipt receipt = notificationGateway.enqueue(request);
             if (receipt.taskCount() == 0) {
@@ -101,10 +108,13 @@ public class AuthServiceImpl implements AuthService {
     }
 
     private String digest(String code) {
-        try {
-            return SHA256Utils.hash(code);
-        } catch (Exception exception) {
-            throw new SpectraException("验证码摘要生成失败", exception);
+        return VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
+    }
+
+    private void requireHmacKey() {
+        if (securityProperties.getVerificationCodeHmacKey() == null
+                || securityProperties.getVerificationCodeHmacKey().isBlank()) {
+            throw new SpectraException("验证码安全密钥未配置");
         }
     }
 }

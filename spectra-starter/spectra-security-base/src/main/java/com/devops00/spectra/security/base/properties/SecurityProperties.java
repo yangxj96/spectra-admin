@@ -97,6 +97,16 @@ public class SecurityProperties {
     private long verificationCodeExpire = 300L;
 
     /**
+     * 验证码 HMAC 密钥；必须通过环境变量或密钥管理系统提供。
+     */
+    private String verificationCodeHmacKey = "";
+
+    /**
+     * 单个验证码窗口允许的最大校验尝试次数。
+     */
+    private int verificationCodeMaxAttempts = 5;
+
+    /**
      * 验证码长度。当前只允许 6 位数字。
      */
     private int verificationCodeLength = 6;

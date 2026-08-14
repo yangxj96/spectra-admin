@@ -216,6 +216,21 @@ class NotificationGatewayImplTest {
     }
 
     @Test
+    void shouldRejectExternalAndUnregisteredLinks() {
+        var gateway = gateway(mock(NotificationRequestMapper.class), mock(NotificationTaskMapper.class),
+                mock(NotificationTemplateMapper.class), mock(NotificationUserPreferenceMapper.class),
+                mock(NotificationRecipientDirectory.class));
+        var recipientId = UUID.randomUUID();
+        var external = NotificationRequest.inApp("test:external-link", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(recipientId), "test", "标题", "正文", "TEST", "1", "TEST", "https://evil.example/redirect");
+        var unknown = NotificationRequest.inApp("test:unknown-link", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(recipientId), "test", "标题", "正文", "TEST", "2", "TEST", "/admin/secrets");
+
+        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class, () -> gateway.enqueue(external));
+        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class, () -> gateway.enqueue(unknown));
+    }
+
+    @Test
     void shouldSkipOptionalChannelDuringDoNotDisturb() {
         var requestMapper = mock(NotificationRequestMapper.class);
         var taskMapper = mock(NotificationTaskMapper.class);

@@ -101,6 +101,7 @@ public interface NotificationAdminConverter {
         }
         return value.replaceAll("(?i)[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}", "[邮箱已脱敏]")
                 .replaceAll("(?<!\\d)1\\d{10}(?!\\d)", "[手机号已脱敏]")
+                .replaceAll("(?<!\\d)\\d{6}(?!\\d)", "[验证码已脱敏]")
                 .replaceAll("(?i)(code|captcha|token|secret|password)\\s*[:=]\\s*[^,; ]+", "$1=[敏感值已脱敏]");
     }
 

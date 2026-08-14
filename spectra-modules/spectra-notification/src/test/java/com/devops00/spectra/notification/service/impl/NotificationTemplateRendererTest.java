@@ -45,6 +45,12 @@ class NotificationTemplateRendererTest {
     }
 
     @Test
+    void shouldRejectUnusedVariables() {
+        assertThrows(DataSaveException.class,
+                () -> renderer.validate("正文 {{content}}", Map.of("content", "通知", "unused", "禁止")));
+    }
+
+    @Test
     void shouldRejectUnsafeHtml() {
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<img src=x onerror=alert(1) />"));
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<a href=\"javascript:alert(1)\">x</a>"));

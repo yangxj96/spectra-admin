@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -178,8 +179,8 @@ public class NotificationTaskWorker {
                 metrics.recordTask(task.getChannel(), result.status(), task.getPurpose());
             }
         } catch (RuntimeException exception) {
-            var message = exception.getMessage() == null ? "通知渠道调用失败" : exception.getMessage();
-            finishFailure(task, message.length() > 1000 ? message.substring(0, 1000) : message);
+            var safeMessage = sanitizeProviderSummary(exception.getMessage());
+            finishFailure(task, safeMessage == null ? "PROVIDER_FAILURE" : safeMessage);
             if (metrics != null) {
                 metrics.recordRetry(task.getChannel(), "PROVIDER_FAILURE");
             }
@@ -202,8 +203,10 @@ public class NotificationTaskWorker {
         delivery.setStartedAt(completedAt);
         delivery.setCompletedAt(completedAt);
         delivery.setResultStatus(result.status());
-        delivery.setErrorCode("SENT".equals(result.status()) ? null : result.summary());
-        delivery.setResponseSummary(result.summary() == null ? Map.of() : Map.of("summary", result.summary()));
+        var safeSummary = sanitizeProviderSummary(result.summary());
+        delivery.setErrorCode("SENT".equals(result.status()) ? null : safeSummary);
+        delivery.setErrorMessageSanitized(safeSummary);
+        delivery.setResponseSummary(safeSummary == null ? Map.of() : Map.of("summary", safeSummary));
         if (deliveryMapper.insert(delivery) != 1) {
             throw new DataSaveException("记录通知投递结果失败");
         }
@@ -234,6 +237,20 @@ public class NotificationTaskWorker {
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
         log.warn("通知任务处理失败: taskId={}, attemptCount={}, status={}", task.getId(), attemptCount, status);
+    }
+
+    /**
+     * 仅保留可用于重试分类的脱敏错误摘要，避免 Provider 异常携带验证码或其他敏感值落库。
+     */
+    private String sanitizeProviderSummary(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        var safe = value.trim()
+                .replaceAll("(?i)(code|captcha|token|secret|password)\\s*[:=]\\s*[^,; ]+", "$1=[REDACTED]")
+                .replaceAll("(?<!\\d)\\d{6}(?!\\d)", "[REDACTED]");
+        safe = safe.length() > 200 ? safe.substring(0, 200) : safe;
+        return safe.toUpperCase(Locale.ROOT).contains("REDACTED") ? safe : "PROVIDER_FAILURE";
     }
 
     /**

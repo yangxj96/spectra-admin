@@ -18,8 +18,8 @@ package com.devops00.spectra.security.starter.web.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.notification.*;
-import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.util.VerificationCodeDigest;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -47,7 +47,10 @@ class AuthServiceImplTest {
         when(gateway.enqueue(any(NotificationRequest.class)))
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        var service = new AuthServiceImpl(gateway, redisTemplate, new SecurityProperties());
+        when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        var properties = new SecurityProperties();
+        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
+        var service = new AuthServiceImpl(gateway, redisTemplate, properties);
 
         service.sendSmsCode("13800138000");
 
@@ -57,8 +60,28 @@ class AuthServiceImplTest {
         var code = request.sensitiveParameters().get("code").toString();
         assertTrue(code.matches("\\d{6}"));
         assertEquals("13800138000", request.directAddresses().getFirst().address());
+        assertTrue(request.idempotencyKey().startsWith("security:login-code:SMS:13800138000:"));
         var key = RedisCacheKey.SMS_CODE + "13800138000";
-        verify(valueOperations).set(eq(key), eq(SHA256Utils.hash(code)), eq(300L), eq(TimeUnit.SECONDS));
+        verify(valueOperations).setIfAbsent(eq(key), eq(VerificationCodeDigest.digest(code, "test-verification-hmac-key")),
+                eq(300L), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    void shouldNotCreateAnotherRequestWhenCodeWindowAlreadyExists() {
+        var gateway = mock(NotificationGateway.class);
+        var redisTemplate = mock(RedisTemplate.class);
+        var valueOperations = mock(ValueOperations.class);
+        when(gateway.availability(NotificationChannel.SMS))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(false);
+        var properties = new SecurityProperties();
+        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
+        var service = new AuthServiceImpl(gateway, redisTemplate, properties);
+
+        service.sendSmsCode("13800138000");
+
+        verify(gateway, never()).enqueue(any(NotificationRequest.class));
     }
 
     @Test
@@ -70,7 +93,10 @@ class AuthServiceImplTest {
                 .thenReturn(new NotificationChannelAvailability(NotificationChannel.EMAIL, true, "AVAILABLE"));
         when(gateway.enqueue(any(NotificationRequest.class))).thenThrow(new IllegalStateException("mock failure"));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
-        var service = new AuthServiceImpl(gateway, redisTemplate, new SecurityProperties());
+        when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        var properties = new SecurityProperties();
+        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
+        var service = new AuthServiceImpl(gateway, redisTemplate, properties);
 
         assertThrows(RuntimeException.class, () -> service.sendEmailCode("user@example.com"));
 
@@ -88,5 +114,19 @@ class AuthServiceImplTest {
         assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
 
         verifyNoInteractions(redisTemplate);
+    }
+
+    @Test
+    void shouldRejectMissingHmacKeyBeforeWritingRedis() {
+        var gateway = mock(NotificationGateway.class);
+        var redisTemplate = mock(RedisTemplate.class);
+        when(gateway.availability(NotificationChannel.SMS))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
+        var service = new AuthServiceImpl(gateway, redisTemplate, new SecurityProperties());
+
+        assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
+
+        verifyNoInteractions(redisTemplate);
+        verify(gateway, never()).enqueue(any(NotificationRequest.class));
     }
 }

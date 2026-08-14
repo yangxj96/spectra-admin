@@ -138,6 +138,25 @@ class NotificationTaskWorkerTest {
         assertTrue(failureUpdate.containsValue(1));
     }
 
+    @Test
+    void shouldNotAutomaticallyRetryUnknownTask() {
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var sender = mock(NotificationSender.class);
+        var task = task("UNKNOWN", Instant.now().minusSeconds(1), Instant.now().plusSeconds(60));
+        when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
+        when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(0);
+        when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(task));
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+
+        assertEquals(1, worker.processPending(50));
+
+        verify(sender, never()).send(any(NotificationTaskEntity.class));
+        verify(deliveryMapper, never()).insert(any(NotificationDeliveryEntity.class));
+        verify(taskMapper, times(2)).update(isNull(), any(LambdaUpdateWrapper.class));
+    }
+
     private NotificationTaskWorker worker(NotificationTaskMapper taskMapper,
                                           NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
                                           List<NotificationSender> senders) {

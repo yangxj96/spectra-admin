@@ -1,5 +1,8 @@
 # ==================== 项目自定义配置 ====================
 spectra:
+  security:
+    verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
+    verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
   system:
     base-dir: files
   user:
@@ -31,6 +34,7 @@ spectra:
     enabled: ${NOTIFICATION_ENABLED:true}
     address-encryption-key: ${NOTIFICATION_ADDRESS_ENCRYPTION_KEY:}
     sensitive-payload-key: ${NOTIFICATION_SENSITIVE_PAYLOAD_KEY:}
+    allowed-link-prefixes: ${NOTIFICATION_ALLOWED_LINK_PREFIXES:/login,/auth/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/}
     worker:
       fixed-delay-ms: ${NOTIFICATION_WORKER_FIXED_DELAY_MS:5000}
       processing-timeout-seconds: ${NOTIFICATION_WORKER_PROCESSING_TIMEOUT_SECONDS:300}
