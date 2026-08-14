@@ -137,6 +137,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         vo.setRemark(role.getRemark());
         vo.setAuthorityLevel(role.getAuthorityLevel());
         vo.setRoleKind(role.getRoleKind());
+        vo.setVersion(role.getVersion() == null ? 0L : role.getVersion());
         return vo;
     }
 

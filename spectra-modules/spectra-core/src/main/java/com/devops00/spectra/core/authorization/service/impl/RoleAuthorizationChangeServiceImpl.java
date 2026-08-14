@@ -30,6 +30,7 @@ import com.devops00.spectra.core.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationChangeFrom;
 import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationStateVO;
 import com.devops00.spectra.core.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.authorization.mapper.RoleGrantablePermissionMapper;
@@ -105,6 +106,22 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    @Override
+    public RoleAuthorizationStateVO current(UUID roleId) {
+        var role = roleMapper.selectById(roleId);
+        if (role == null || !"ACTIVE".equals(role.getState())) {
+            throw new DataNotExistException("目标 Role 不存在或已停用");
+        }
+        var state = currentState(roleId, role);
+        var result = new RoleAuthorizationStateVO();
+        result.setRoleId(roleId);
+        result.setVersion(role.getVersion() == null ? 0L : role.getVersion());
+        result.setAuthorityLevel(state.authorityLevel());
+        result.setPermissionCodes(state.permissions());
+        result.setGrantablePermissionCodes(state.grantablePermissions());
+        return result;
+    }
 
     @Override
     public RoleAuthorizationChangePreviewVO preview(UUID roleId, RoleAuthorizationChangeFrom from) {

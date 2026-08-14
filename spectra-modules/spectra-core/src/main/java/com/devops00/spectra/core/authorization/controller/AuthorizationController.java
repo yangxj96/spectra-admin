@@ -25,6 +25,7 @@ import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationCh
 import com.devops00.spectra.core.authorization.javabean.vo.AuthorizationChangePreviewVO;
 import com.devops00.spectra.core.authorization.javabean.vo.OrganizationChangePreviewVO;
 import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationStateVO;
 import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.authorization.service.OrganizationChangeService;
@@ -65,6 +66,13 @@ public class AuthorizationController {
     private final RoleAuthorizationChangeService roleChangeService;
 
     private final OrganizationChangeService organizationChangeService;
+
+    @ULog("'查询 Role 授权能力'")
+    @GetMapping(value = "/roles/{roleId}", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'role:read')")
+    public RoleAuthorizationStateVO roleState(@PathVariable UUID roleId) {
+        return roleChangeService.current(roleId);
+    }
 
     @ULog("'预览部门移动影响'")
     @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "2.0.0+")

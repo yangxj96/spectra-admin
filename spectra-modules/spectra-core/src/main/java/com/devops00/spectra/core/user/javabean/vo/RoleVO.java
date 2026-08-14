@@ -70,6 +70,11 @@ public class RoleVO implements Serializable {
     private Integer authorityLevel;
 
     /**
+     * 目标角色授权并发版本。
+     */
+    private Long version;
+
+    /**
      * 目标角色类型。
      */
     private String roleKind;

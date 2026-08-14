@@ -19,6 +19,7 @@ package com.devops00.spectra.core.authorization.service;
 import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationChangeFrom;
 import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationChangePreviewVO;
+import com.devops00.spectra.core.authorization.javabean.vo.RoleAuthorizationStateVO;
 
 import java.util.UUID;
 
@@ -30,6 +31,8 @@ import java.util.UUID;
  * @since 2026/8/14
  */
 public interface RoleAuthorizationChangeService {
+
+    RoleAuthorizationStateVO current(UUID roleId);
 
     RoleAuthorizationChangePreviewVO preview(UUID roleId, RoleAuthorizationChangeFrom from);
 
