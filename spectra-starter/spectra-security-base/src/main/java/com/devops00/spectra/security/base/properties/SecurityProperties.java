@@ -109,4 +109,19 @@ public class SecurityProperties {
      * 验证码长度。当前只允许 6 位数字。
      */
     private int verificationCodeLength = 6;
+
+    /**
+     * Root 角色编码。ROLE_DEV_OPS 为系统安全根身份，不应由普通业务配置替换。
+     */
+    private String rootRoleCode = "ROLE_DEV_OPS";
+
+    /**
+     * Root 最少有效用户数；首版始终保护最后一个有效 Root。
+     */
+    private int minEffectiveDevOpsUsers = 1;
+
+    /**
+     * Root 最大用户数，默认 3（推荐 2 个日常 Root + 1 个 break-glass）。
+     */
+    private int maxDevOpsUsers = 3;
 }

@@ -17,10 +17,13 @@
 package com.devops00.spectra.security.starter.autoconfiguration;
 
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.starter.configuration.SecurityConfiguration;
+import com.devops00.spectra.security.starter.root.DefaultRootAuthorizationPolicy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 
@@ -38,4 +41,11 @@ import org.springframework.context.annotation.Import;
 @ComponentScan("com.devops00.spectra.security.starter.web")
 public class SecurityAutoConfiguration {
 
+    /**
+     * 统一 Root 判定入口。Root 仍必须经过审计、Session 和 DataScope 等其他安全边界。
+     */
+    @Bean
+    public RootAuthorizationPolicy rootAuthorizationPolicy(SecurityProperties properties) {
+        return new DefaultRootAuthorizationPolicy(properties);
+    }
 }

@@ -78,7 +78,7 @@ public class RedisSecHolderStrategy implements SecHolderStrategy {
 
     @Override
     public String administrators() {
-        return properties.getAdministrators();
+        return properties.getRootRoleCode();
     }
 
     // ==================== Token 创建 & 续期 ====================

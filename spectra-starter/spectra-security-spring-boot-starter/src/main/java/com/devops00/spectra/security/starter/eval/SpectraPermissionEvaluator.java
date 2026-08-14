@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.security.starter.eval;
 
-import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -66,12 +66,12 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
     });
 
     /**
-     * Security自定义配置
+     * 统一 Root 判定策略。
      */
-    private final SecurityProperties securityProperties;
+    private final RootAuthorizationPolicy rootAuthorizationPolicy;
 
-    public SpectraPermissionEvaluator(SecurityProperties securityProperties) {
-        this.securityProperties = securityProperties;
+    public SpectraPermissionEvaluator(RootAuthorizationPolicy rootAuthorizationPolicy) {
+        this.rootAuthorizationPolicy = rootAuthorizationPolicy;
     }
 
     /**
@@ -216,18 +216,11 @@ public class SpectraPermissionEvaluator implements PermissionEvaluator {
      * 判断用户是否拥有绝对权限:
      *
      * <ul>
-     * <li>ADMINISTRATORS（即 ROLE_DEV_OPS）</li>
-     * <li>或权限字符串为 "*"（全权限）</li>
+     * <li>统一 RootAuthorizationPolicy 识别的 ROLE_DEV_OPS</li>
      * </ul>
      */
     private boolean hasAbsolutePrivilege(Authentication authentication) {
-        for (var ga : authentication.getAuthorities()) {
-            var authority = ga.getAuthority();
-            if (securityProperties.getAdministrators().equals(authority) || "*".equals(authority)) {
-                return true;
-            }
-        }
-        return false;
+        return rootAuthorizationPolicy.isRoot(authentication);
     }
 
     /**

@@ -18,6 +18,7 @@ package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.starter.eval.SpectraPermissionEvaluator;
 import com.devops00.spectra.security.starter.filter.TokenAuthenticationFilter;
 import jakarta.servlet.DispatcherType;
@@ -65,6 +66,8 @@ public class SecurityConfiguration {
 
     private final SecurityProperties properties;
 
+    private final RootAuthorizationPolicy rootAuthorizationPolicy;
+
     private final AuthenticationEntryPoint restAuthenticationEntryPoint;
 
     private final AccessDeniedHandler restAccessDeniedHandler;
@@ -74,7 +77,7 @@ public class SecurityConfiguration {
      */
     @Bean
     public SpectraPermissionEvaluator spectraPermissionEvaluator() {
-        return new SpectraPermissionEvaluator(properties);
+        return new SpectraPermissionEvaluator(rootAuthorizationPolicy);
     }
 
     /**
