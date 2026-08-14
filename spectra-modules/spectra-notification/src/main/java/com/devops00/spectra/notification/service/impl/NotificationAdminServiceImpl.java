@@ -61,10 +61,6 @@ import java.util.UUID;
 public class NotificationAdminServiceImpl implements NotificationAdminService {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-    /**
      * 允许人工重新排队的终态。
      */
     private static final Set<String> RETRYABLE_STATUSES = Set.of("FAILED", "BLOCKED", "UNKNOWN");
@@ -103,13 +99,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
-     * 分页查询通知请求，并限制在系统租户范围内。
+     * 分页查询通知请求。
      */
     @Override
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
-        var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getTenantId, SYSTEM_TENANT_ID)
-                .orderByDesc(NotificationRequestEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>().orderByDesc(NotificationRequestEntity::getCreatedAt);
         if (params != null) {
             if (StringUtils.hasText(params.getStatus())) {
                 wrapper.eq(NotificationRequestEntity::getStatus, params.getStatus());
@@ -134,13 +128,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
-     * 分页查询通知任务，并限制在系统租户范围内。
+     * 分页查询通知任务。
      */
     @Override
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
-        var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getTenantId, SYSTEM_TENANT_ID)
-                .orderByDesc(NotificationTaskEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>().orderByDesc(NotificationTaskEntity::getCreatedAt);
         if (params != null) {
             if (params.getRequestId() != null) {
                 wrapper.eq(NotificationTaskEntity::getNotificationRequestId, params.getRequestId());
@@ -165,13 +157,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
-     * 分页查询渠道投递记录，并限制在系统租户范围内。
+     * 分页查询渠道投递记录。
      */
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
-        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>()
-                .eq(NotificationDeliveryEntity::getTenantId, SYSTEM_TENANT_ID)
-                .orderByDesc(NotificationDeliveryEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>().orderByDesc(NotificationDeliveryEntity::getCreatedAt);
         if (params != null) {
             if (params.getTaskId() != null) {
                 wrapper.eq(NotificationDeliveryEntity::getNotificationTaskId, params.getTaskId());
@@ -237,12 +227,10 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
-     * 查询指定系统租户下的通知任务。
+     * 查询指定通知任务。
      */
     private NotificationTaskEntity getTask(UUID taskId) {
-        var task = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getId, taskId)
-                .eq(NotificationTaskEntity::getTenantId, SYSTEM_TENANT_ID));
+        var task = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>().eq(NotificationTaskEntity::getId, taskId));
         if (task == null) {
             throw new DataNotExistException("通知任务不存在");
         }

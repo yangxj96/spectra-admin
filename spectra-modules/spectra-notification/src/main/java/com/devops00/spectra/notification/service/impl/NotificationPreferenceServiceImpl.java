@@ -64,12 +64,11 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      * 查询指定用户的用途与渠道偏好。
      */
     @Override
-    public List<NotificationUserPreferenceEntity> list(UUID tenantId, UUID userId) {
-        return mapper
-                .selectList(new LambdaQueryWrapper<NotificationUserPreferenceEntity>().eq(NotificationUserPreferenceEntity::getTenantId, tenantId)
-                        .eq(NotificationUserPreferenceEntity::getUserId, userId)
-                        .orderByAsc(NotificationUserPreferenceEntity::getPurpose)
-                        .orderByAsc(NotificationUserPreferenceEntity::getChannel));
+    public List<NotificationUserPreferenceEntity> list(UUID userId) {
+        return mapper.selectList(new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
+                .eq(NotificationUserPreferenceEntity::getUserId, userId)
+                .orderByAsc(NotificationUserPreferenceEntity::getPurpose)
+                .orderByAsc(NotificationUserPreferenceEntity::getChannel));
     }
 
     /**
@@ -77,8 +76,8 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     @Transactional
-    public void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb) {
-        save(tenantId, userId, purpose, channel, enabled, doNotDisturb, null, null);
+    public void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb) {
+        save(userId, purpose, channel, enabled, doNotDisturb, null, null);
     }
 
     /**
@@ -86,9 +85,9 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     @Transactional
-    public void save(UUID tenantId, UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
+    public void save(UUID userId, String purpose, String channel, boolean enabled, boolean doNotDisturb,
                      Instant doNotDisturbStart, Instant doNotDisturbEnd) {
-        if (tenantId == null || userId == null || !StringUtils.hasText(purpose) || !StringUtils.hasText(channel)) {
+        if (userId == null || !StringUtils.hasText(purpose) || !StringUtils.hasText(channel)) {
             throw new DataSaveException("通知偏好参数不完整");
         }
         var normalizedPurpose = purpose.toUpperCase();
@@ -109,7 +108,7 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
             doNotDisturbStart = null;
             doNotDisturbEnd = null;
         }
-        var query = new LambdaQueryWrapper<NotificationUserPreferenceEntity>().eq(NotificationUserPreferenceEntity::getTenantId, tenantId)
+        var query = new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
                 .eq(NotificationUserPreferenceEntity::getUserId, userId)
                 .eq(NotificationUserPreferenceEntity::getPurpose, normalizedPurpose)
                 .eq(NotificationUserPreferenceEntity::getChannel, normalizedChannel);
@@ -118,7 +117,6 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         if (!existing) {
             entity = new NotificationUserPreferenceEntity();
             entity.setId(UUID.randomUUID());
-            entity.setTenantId(tenantId);
             entity.setUserId(userId);
             entity.setPurpose(normalizedPurpose);
             entity.setChannel(normalizedChannel);
@@ -144,18 +142,18 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      * 将用途与渠道偏好聚合为旧消息中心设置结构。
      */
     @Override
-    public NotificationSettingVO legacy(UUID tenantId, UUID userId) {
-        return legacy(tenantId, userId, ZoneOffset.UTC);
+    public NotificationSettingVO legacy(UUID userId) {
+        return legacy(userId, ZoneOffset.UTC);
     }
 
     /**
      * 按用户时区将用途与渠道偏好聚合为旧消息中心设置结构。
      */
     @Override
-    public NotificationSettingVO legacy(UUID tenantId, UUID userId, ZoneId userZone) {
+    public NotificationSettingVO legacy(UUID userId, ZoneId userZone) {
         var result = new NotificationSettingVO();
         result.setUserId(userId);
-        var preferences = list(tenantId, userId);
+        var preferences = list(userId);
         var values = preferences.stream()
                 .filter(item -> "IN_APP".equals(item.getChannel()))
                 .collect(java.util.stream.Collectors.toMap(NotificationUserPreferenceEntity::getPurpose,
@@ -183,8 +181,8 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     @Transactional
-    public void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from) {
-        saveLegacy(tenantId, userId, from, ZoneOffset.UTC);
+    public void saveLegacy(UUID userId, NotificationSettingFrom from) {
+        saveLegacy(userId, from, ZoneOffset.UTC);
     }
 
     /**
@@ -192,7 +190,7 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
      */
     @Override
     @Transactional
-    public void saveLegacy(UUID tenantId, UUID userId, NotificationSettingFrom from, ZoneId userZone) {
+    public void saveLegacy(UUID userId, NotificationSettingFrom from, ZoneId userZone) {
         if (from == null) {
             throw new DataSaveException("通知设置不能为空");
         }
@@ -205,15 +203,15 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         }
         var startInstant = doNotDisturb && start != null ? toInstant(start, zone) : null;
         var endInstant = doNotDisturb && end != null ? toInstant(end, zone) : null;
-        save(tenantId, userId, "SYSTEM_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getSystemEnabled()), doNotDisturb,
+        save(userId, "SYSTEM_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getSystemEnabled()), doNotDisturb,
                 startInstant, endInstant);
-        save(tenantId, userId, "WORKFLOW_TODO", "IN_APP", Boolean.TRUE.equals(from.getWorkflowEnabled()), doNotDisturb,
+        save(userId, "WORKFLOW_TODO", "IN_APP", Boolean.TRUE.equals(from.getWorkflowEnabled()), doNotDisturb,
                 startInstant, endInstant);
-        save(tenantId, userId, "OA_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getOaEnabled()), doNotDisturb,
+        save(userId, "OA_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getOaEnabled()), doNotDisturb,
                 startInstant, endInstant);
-        save(tenantId, userId, "INNER_MESSAGE", "IN_APP", Boolean.TRUE.equals(from.getInnerMailEnabled()), doNotDisturb,
+        save(userId, "INNER_MESSAGE", "IN_APP", Boolean.TRUE.equals(from.getInnerMailEnabled()), doNotDisturb,
                 startInstant, endInstant);
-        save(tenantId, userId, "WORKFLOW_RESULT", "IN_APP", Boolean.TRUE.equals(from.getApprovalEnabled()), doNotDisturb,
+        save(userId, "WORKFLOW_RESULT", "IN_APP", Boolean.TRUE.equals(from.getApprovalEnabled()), doNotDisturb,
                 startInstant, endInstant);
     }
 

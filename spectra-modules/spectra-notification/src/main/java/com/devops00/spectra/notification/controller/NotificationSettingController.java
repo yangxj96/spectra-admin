@@ -41,11 +41,6 @@ import java.time.ZoneId;
 public class NotificationSettingController {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-
-    /**
      * 用户通知偏好服务。
      */
     private final NotificationPreferenceService service;
@@ -57,7 +52,7 @@ public class NotificationSettingController {
     @GetMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:QUERY')")
     public NotificationSettingVO getSetting() {
-        return service.legacy(SYSTEM_TENANT_ID, currentUserId(), currentUserZone());
+        return service.legacy(currentUserId(), currentUserZone());
     }
 
     /**
@@ -67,7 +62,7 @@ public class NotificationSettingController {
     @PutMapping(value = "", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION_SETTING:UPDATE')")
     public void updateSetting(@RequestBody NotificationSettingFrom from) {
-        service.saveLegacy(SYSTEM_TENANT_ID, currentUserId(), from, currentUserZone());
+        service.saveLegacy(currentUserId(), from, currentUserZone());
     }
 
     /**

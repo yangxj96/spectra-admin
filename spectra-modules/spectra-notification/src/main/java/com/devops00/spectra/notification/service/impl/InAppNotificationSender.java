@@ -63,7 +63,6 @@ public class InAppNotificationSender implements NotificationSender {
         if (exists == null) {
             var inbox = new NotificationInboxEntity();
             inbox.setId(UUID.randomUUID());
-            inbox.setTenantId(task.getTenantId());
             inbox.setReceiverUserId(task.getReceiverUserId());
             inbox.setNotificationRequestId(task.getNotificationRequestId());
             inbox.setNotificationTaskId(task.getId());

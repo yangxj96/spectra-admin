@@ -36,35 +36,35 @@ public interface NotificationInboxService {
     /**
      * 查询当前用户消息，查询条件始终附带收件人所有权。
      */
-    IPage<NotificationInboxVO> page(PageFrom page, UUID tenantId, UUID userId, NotificationQueryFrom params);
+    IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom params);
 
     /**
      * 查询当前用户未读数。
      */
-    long unreadCount(UUID tenantId, UUID userId);
+    long unreadCount(UUID userId);
 
     /**
      * 查询当前用户消息详情。
      */
-    NotificationInboxVO detail(UUID id, UUID tenantId, UUID userId);
+    NotificationInboxVO detail(UUID id, UUID userId);
 
     /**
      * 标记单条已读。
      */
-    void markAsRead(UUID id, UUID tenantId, UUID userId);
+    void markAsRead(UUID id, UUID userId);
 
     /**
      * 标记当前用户全部已读。
      */
-    void markAllAsRead(UUID tenantId, UUID userId);
+    void markAllAsRead(UUID userId);
 
     /**
      * 删除当前用户消息。
      */
-    void deleteById(UUID id, UUID tenantId, UUID userId);
+    void deleteById(UUID id, UUID userId);
 
     /**
      * 批量删除当前用户消息，混合 ID 不影响其他用户记录。
      */
-    void batchDelete(List<UUID> ids, UUID tenantId, UUID userId);
+    void batchDelete(List<UUID> ids, UUID userId);
 }

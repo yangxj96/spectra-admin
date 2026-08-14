@@ -60,9 +60,9 @@ class NotificationSqlContractTest {
         assertTrue(schema.contains("recipient_key_hash"));
         assertTrue(schema.contains("attempt_no"));
         assertTrue(schema.contains("is_read"));
-        assertTrue(schema.contains("tenant_id"));
+        assertFalse(schema.contains("tenant_id"), "通知模块目标 schema 不应恢复已移除的 tenant_id");
         var tableColumns = tableColumns(schema);
-        assertEquals(131, tableColumns.size());
+        assertEquals(125, tableColumns.size());
         assertEquals(tableColumns, commentedColumns(schema));
     }
 

@@ -68,9 +68,8 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      * 分页查询指定用户仍可见的消息。
      */
     @Override
-    public IPage<NotificationInboxVO> page(PageFrom page, UUID tenantId, UUID userId, NotificationQueryFrom params) {
-        var query = new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getTenantId, tenantId)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
+    public IPage<NotificationInboxVO> page(PageFrom page, UUID userId, NotificationQueryFrom params) {
+        var query = new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .orderByDesc(NotificationInboxEntity::getCreatedAt);
         if (params != null) {
@@ -101,9 +100,8 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      * 统计指定用户的未读消息数量。
      */
     @Override
-    public long unreadCount(UUID tenantId, UUID userId) {
-        return mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getTenantId, tenantId)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
+    public long unreadCount(UUID userId) {
+        return mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .eq(NotificationInboxEntity::getIsRead, false)
                 .isNull(NotificationInboxEntity::getDeleted));
     }
@@ -112,8 +110,8 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      * 查询指定用户拥有的消息详情。
      */
     @Override
-    public NotificationInboxVO detail(UUID id, UUID tenantId, UUID userId) {
-        return converter.toVO(owned(id, tenantId, userId));
+    public NotificationInboxVO detail(UUID id, UUID userId) {
+        return converter.toVO(owned(id, userId));
     }
 
     /**
@@ -121,10 +119,9 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      */
     @Override
     @Transactional
-    public void markAsRead(UUID id, UUID tenantId, UUID userId) {
+    public void markAsRead(UUID id, UUID userId) {
         var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>()
                 .eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getTenantId, tenantId)
                 .eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .eq(NotificationInboxEntity::getIsRead, false)
@@ -133,7 +130,6 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         if (updated == 0
                 && mapper.selectCount(new LambdaQueryWrapper<NotificationInboxEntity>()
                         .eq(NotificationInboxEntity::getId, id)
-                        .eq(NotificationInboxEntity::getTenantId, tenantId)
                         .eq(NotificationInboxEntity::getReceiverUserId, userId)
                         .isNull(NotificationInboxEntity::getDeleted)) == 0) {
             throw new DataNotExistException("消息不存在");
@@ -145,9 +141,8 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      */
     @Override
     @Transactional
-    public void markAllAsRead(UUID tenantId, UUID userId) {
-        mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getTenantId, tenantId)
-                .eq(NotificationInboxEntity::getReceiverUserId, userId)
+    public void markAllAsRead(UUID userId) {
+        mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .eq(NotificationInboxEntity::getIsRead, false)
                 .set(NotificationInboxEntity::getIsRead, true)
@@ -159,9 +154,8 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      */
     @Override
     @Transactional
-    public void deleteById(UUID id, UUID tenantId, UUID userId) {
+    public void deleteById(UUID id, UUID userId) {
         var updated = mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getTenantId, tenantId)
                 .eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .set(NotificationInboxEntity::getDeleted, Instant.now()));
@@ -175,23 +169,21 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
      */
     @Override
     @Transactional
-    public void batchDelete(List<UUID> ids, UUID tenantId, UUID userId) {
+    public void batchDelete(List<UUID> ids, UUID userId) {
         if (ids == null || ids.isEmpty()) {
             return;
         }
         mapper.update(null, new LambdaUpdateWrapper<NotificationInboxEntity>().in(NotificationInboxEntity::getId, ids)
-                .eq(NotificationInboxEntity::getTenantId, tenantId)
                 .eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted)
                 .set(NotificationInboxEntity::getDeleted, Instant.now()));
     }
 
     /**
-     * 按租户和收件人约束查询消息，避免越权读取。
+     * 按收件人约束查询消息，避免越权读取。
      */
-    private NotificationInboxEntity owned(UUID id, UUID tenantId, UUID userId) {
+    private NotificationInboxEntity owned(UUID id, UUID userId) {
         var entity = mapper.selectOne(new LambdaQueryWrapper<NotificationInboxEntity>().eq(NotificationInboxEntity::getId, id)
-                .eq(NotificationInboxEntity::getTenantId, tenantId)
                 .eq(NotificationInboxEntity::getReceiverUserId, userId)
                 .isNull(NotificationInboxEntity::getDeleted));
         if (entity == null) {

@@ -23,7 +23,6 @@
                type="com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity">
         <!--@mbg.generated-->
         <!--@Table spectra_notification.ntf_request-->
-        <result column="tenant_id"                       property="tenantId"/>
         <result column="external_request_id"             property="externalRequestId"/>
         <result column="idempotency_key"                 property="idempotencyKey"/>
         <result column="purpose"                         property="purpose"/>
@@ -49,7 +48,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        tenant_id,
         external_request_id,
         idempotency_key,
         purpose,

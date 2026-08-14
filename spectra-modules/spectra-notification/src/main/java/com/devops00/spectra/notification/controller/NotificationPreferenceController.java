@@ -40,11 +40,6 @@ import java.util.UUID;
 public class NotificationPreferenceController {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-
-    /**
      * 用户通知偏好服务。
      */
     private final NotificationPreferenceService service;
@@ -56,7 +51,7 @@ public class NotificationPreferenceController {
     @GetMapping(version = "1.0.0+")
     @PreAuthorize("isAuthenticated()")
     public List<NotificationUserPreferenceEntity> list() {
-        return service.list(SYSTEM_TENANT_ID, currentUserId());
+        return service.list(currentUserId());
     }
 
     /**
@@ -67,7 +62,7 @@ public class NotificationPreferenceController {
     @PreAuthorize("isAuthenticated()")
     public void save(@RequestParam String purpose, @RequestParam String channel, @RequestParam boolean enabled,
                      @RequestParam(defaultValue = "false") boolean doNotDisturb) {
-        service.save(SYSTEM_TENANT_ID, currentUserId(), purpose, channel, enabled, doNotDisturb);
+        service.save(currentUserId(), purpose, channel, enabled, doNotDisturb);
     }
 
     /**

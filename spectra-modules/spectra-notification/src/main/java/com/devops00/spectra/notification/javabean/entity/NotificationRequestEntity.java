@@ -43,11 +43,6 @@ import java.util.UUID;
 public class NotificationRequestEntity extends BaseEntity {
 
     /**
-     * 租户 ID。
-     */
-    @TableField("tenant_id")
-    private UUID tenantId;
-    /**
      * 调用方生成的外部请求 ID。
      */
     @TableField("external_request_id")

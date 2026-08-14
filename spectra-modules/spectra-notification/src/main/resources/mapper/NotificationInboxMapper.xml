@@ -23,7 +23,6 @@
                type="com.devops00.spectra.notification.javabean.entity.NotificationInboxEntity">
         <!--@mbg.generated-->
         <!--@Table spectra_notification.ntf_inbox_message-->
-        <result column="tenant_id"               property="tenantId"/>
         <result column="receiver_user_id"        property="receiverUserId"/>
         <result column="notification_request_id" property="notificationRequestId"/>
         <result column="notification_task_id"    property="notificationTaskId"/>
@@ -41,7 +40,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        tenant_id,
         receiver_user_id,
         notification_request_id,
         notification_task_id,

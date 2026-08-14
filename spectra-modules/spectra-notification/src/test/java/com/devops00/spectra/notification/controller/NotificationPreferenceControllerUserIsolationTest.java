@@ -40,8 +40,6 @@ import static org.mockito.Mockito.when;
  */
 class NotificationPreferenceControllerUserIsolationTest {
 
-    private static final UUID TENANT_ID = new UUID(0L, 0L);
-
     private static final UUID USER_A = UUID.fromString("00000000-0000-0000-0000-00000000000a");
 
     private static final UUID USER_B = UUID.fromString("00000000-0000-0000-0000-00000000000b");
@@ -69,9 +67,9 @@ class NotificationPreferenceControllerUserIsolationTest {
         controller.save("SYSTEM_NOTICE", "IN_APP", false, true);
         controller.save("OA_NOTICE", "IN_APP", false, false);
 
-        verify(service).list(TENANT_ID, USER_A);
-        verify(service).save(TENANT_ID, USER_A, "SYSTEM_NOTICE", "IN_APP", false, true);
-        verify(service).save(TENANT_ID, USER_B, "OA_NOTICE", "IN_APP", false, false);
+        verify(service).list(USER_A);
+        verify(service).save(USER_A, "SYSTEM_NOTICE", "IN_APP", false, true);
+        verify(service).save(USER_B, "OA_NOTICE", "IN_APP", false, false);
     }
 
     @Test

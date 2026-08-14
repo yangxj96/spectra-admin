@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * 管理端租户边界和查询条件测试。
+ * 管理端查询条件测试。
  */
 class NotificationAdminServiceImplTest {
 
@@ -58,7 +58,7 @@ class NotificationAdminServiceImplTest {
     }
 
     @Test
-    void shouldAddSystemTenantFilterToDeliveryQuery() {
+    void shouldQueryDeliveriesWithoutLegacyTenantFilter() {
         var requestMapper = mock(NotificationRequestMapper.class);
         var taskMapper = mock(NotificationTaskMapper.class);
         var deliveryMapper = mock(NotificationDeliveryMapper.class);
@@ -73,11 +73,11 @@ class NotificationAdminServiceImplTest {
 
         var wrapperCaptor = org.mockito.ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(deliveryMapper).selectPage(any(), wrapperCaptor.capture());
-        assertTrue(wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
+        assertTrue(!wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
     }
 
     @Test
-    void shouldRejectRetryWhenTaskIsOutsideNotificationTenant() {
+    void shouldRejectRetryWhenTaskDoesNotExist() {
         var taskMapper = mock(NotificationTaskMapper.class);
         when(taskMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
@@ -88,6 +88,6 @@ class NotificationAdminServiceImplTest {
 
         var wrapperCaptor = org.mockito.ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(taskMapper).selectOne(wrapperCaptor.capture());
-        assertTrue(wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
+        assertTrue(!wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
     }
 }

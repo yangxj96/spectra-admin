@@ -49,8 +49,6 @@ import static org.mockito.Mockito.when;
  */
 class NotificationSelfApiUserIsolationTest {
 
-    private static final UUID TENANT_ID = new UUID(0L, 0L);
-
     private static final UUID USER_A = UUID.fromString("00000000-0000-0000-0000-00000000000a");
 
     private static final UUID USER_B = UUID.fromString("00000000-0000-0000-0000-00000000000b");
@@ -79,10 +77,10 @@ class NotificationSelfApiUserIsolationTest {
         var params = new NotificationQueryFrom();
         var batch = new NotificationBatchDeleteFrom();
         batch.setIds(List.of(MESSAGE_ID));
-        doNothing().when(service).markAsRead(MESSAGE_ID, TENANT_ID, USER_A);
-        doNothing().when(service).markAllAsRead(TENANT_ID, USER_A);
-        doNothing().when(service).deleteById(MESSAGE_ID, TENANT_ID, USER_A);
-        doNothing().when(service).batchDelete(List.of(MESSAGE_ID), TENANT_ID, USER_A);
+        doNothing().when(service).markAsRead(MESSAGE_ID, USER_A);
+        doNothing().when(service).markAllAsRead(USER_A);
+        doNothing().when(service).deleteById(MESSAGE_ID, USER_A);
+        doNothing().when(service).batchDelete(List.of(MESSAGE_ID), USER_A);
 
         controller.list(new PageFrom(), params);
         controller.unreadCount();
@@ -92,13 +90,13 @@ class NotificationSelfApiUserIsolationTest {
         controller.deleteById(MESSAGE_ID);
         controller.batchDelete(batch);
 
-        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(TENANT_ID), eq(USER_A), eq(params));
-        verify(service).unreadCount(TENANT_ID, USER_A);
-        verify(service).detail(MESSAGE_ID, TENANT_ID, USER_A);
-        verify(service).markAsRead(MESSAGE_ID, TENANT_ID, USER_A);
-        verify(service).markAllAsRead(TENANT_ID, USER_A);
-        verify(service).deleteById(MESSAGE_ID, TENANT_ID, USER_A);
-        verify(service).batchDelete(List.of(MESSAGE_ID), TENANT_ID, USER_A);
+        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_A), eq(params));
+        verify(service).unreadCount(USER_A);
+        verify(service).detail(MESSAGE_ID, USER_A);
+        verify(service).markAsRead(MESSAGE_ID, USER_A);
+        verify(service).markAllAsRead(USER_A);
+        verify(service).deleteById(MESSAGE_ID, USER_A);
+        verify(service).batchDelete(List.of(MESSAGE_ID), USER_A);
     }
 
     @Test
@@ -106,9 +104,9 @@ class NotificationSelfApiUserIsolationTest {
         var service = mock(NotificationInboxService.class);
         var controller = new NotificationController(service);
         var page = new Page<com.devops00.spectra.notification.javabean.vo.NotificationInboxVO>();
-        when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(TENANT_ID), eq(USER_A),
+        when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_A),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class))).thenReturn(page);
-        when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(TENANT_ID), eq(USER_B),
+        when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_B),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class))).thenReturn(page);
 
         when(security.getCurrentUserId()).thenReturn(USER_A);
@@ -117,11 +115,11 @@ class NotificationSelfApiUserIsolationTest {
         controller.list(new PageFrom(), new NotificationQueryFrom());
         controller.detail(MESSAGE_ID);
 
-        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(TENANT_ID), eq(USER_A),
+        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_A),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class));
-        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(TENANT_ID), eq(USER_B),
+        verify(service).page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_B),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class));
-        verify(service).detail(MESSAGE_ID, TENANT_ID, USER_B);
+        verify(service).detail(MESSAGE_ID, USER_B);
     }
 
     @Test

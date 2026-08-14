@@ -60,13 +60,12 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldRollbackRequestAndTaskTogether() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         try (var connection = openConnection()) {
             connection.setAutoCommit(false);
-            insertRequest(connection, tenantId, requestId, "rollback-" + requestId);
-            insertTask(connection, tenantId, requestId, taskId, "rollback-recipient", Instant.now().plusSeconds(60),
+            insertRequest(connection, requestId, "rollback-" + requestId);
+            insertTask(connection, requestId, taskId, "rollback-recipient", Instant.now().plusSeconds(60),
                     "PENDING");
             connection.rollback();
         }
@@ -78,21 +77,20 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldAllowOnlyOneConcurrentRequestIdempotencyKey() throws Exception {
-        var tenantId = UUID.randomUUID();
         var firstRequestId = UUID.randomUUID();
         var secondRequestId = UUID.randomUUID();
         var key = "concurrent-" + UUID.randomUUID();
         try (var first = openConnection(); var second = openConnection()) {
             first.setAutoCommit(false);
             second.setAutoCommit(false);
-            insertRequest(first, tenantId, firstRequestId, key);
+            insertRequest(first, firstRequestId, key);
 
             var started = new CountDownLatch(1);
             try (var executor = Executors.newSingleThreadExecutor()) {
                 var duplicate = executor.submit(() -> {
                     started.countDown();
                     try {
-                        insertRequest(second, tenantId, secondRequestId, key);
+                        insertRequest(second, secondRequestId, key);
                         second.commit();
                         return null;
                     } catch (Throwable exception) {
@@ -111,24 +109,23 @@ class NotificationPostgresIntegrationTest {
             }
         }
         try (var connection = openConnection()) {
-            assertEquals(1, countByTenantAndKey(connection, tenantId, key));
+            assertEquals(1, countByKey(connection, key));
             deleteRequest(connection, firstRequestId);
         }
     }
 
     @Test
     void shouldRejectDuplicateTaskRecipientAndChannel() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var firstTaskId = UUID.randomUUID();
         var secondTaskId = UUID.randomUUID();
         var recipientKey = "same-recipient-" + UUID.randomUUID();
         try (var connection = openConnection()) {
-            insertRequest(connection, tenantId, requestId, "task-unique-" + requestId);
-            insertTask(connection, tenantId, requestId, firstTaskId, recipientKey, Instant.now().plusSeconds(60),
+            insertRequest(connection, requestId, "task-unique-" + requestId);
+            insertTask(connection, requestId, firstTaskId, recipientKey, Instant.now().plusSeconds(60),
                     "PENDING");
             try {
-                insertTask(connection, tenantId, requestId, secondTaskId, recipientKey, Instant.now().plusSeconds(60),
+                insertTask(connection, requestId, secondTaskId, recipientKey, Instant.now().plusSeconds(60),
                         "PENDING");
                 fail("同一 Request、接收人和渠道的重复任务必须失败");
             } catch (SQLException exception) {
@@ -144,16 +141,15 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldAllowOnlyOneInboxMessagePerTask() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         try (var connection = openConnection()) {
-            insertRequest(connection, tenantId, requestId, "inbox-unique-" + requestId);
-            insertTask(connection, tenantId, requestId, taskId, "inbox-recipient", Instant.now().plusSeconds(60),
+            insertRequest(connection, requestId, "inbox-unique-" + requestId);
+            insertTask(connection, requestId, taskId, "inbox-recipient", Instant.now().plusSeconds(60),
                     "PENDING");
-            insertInboxMessage(connection, tenantId, requestId, taskId);
+            insertInboxMessage(connection, requestId, taskId);
             try {
-                insertInboxMessage(connection, tenantId, requestId, taskId);
+                insertInboxMessage(connection, requestId, taskId);
                 fail("同一任务不得生成重复站内信");
             } catch (SQLException exception) {
                 assertEquals("23505", exception.getSQLState());
@@ -169,20 +165,19 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldSkipTaskLockedByAnotherWorker() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         try (var first = openConnection(); var second = openConnection()) {
             first.setAutoCommit(false);
-            insertRequest(first, tenantId, requestId, "worker-lock-" + requestId);
-            insertTask(first, tenantId, requestId, taskId, "worker-recipient", Instant.now().minusSeconds(1),
+            insertRequest(first, requestId, "worker-lock-" + requestId);
+            insertTask(first, requestId, taskId, "worker-recipient", Instant.now().minusSeconds(1),
                     "PENDING");
             first.commit();
             first.setAutoCommit(false);
             second.setAutoCommit(false);
 
-            assertEquals(List.of(taskId), selectPendingTaskIds(first, tenantId));
-            assertTrue(selectPendingTaskIds(second, tenantId).isEmpty(), "第二个 Worker 不应领取已加行锁的任务");
+            assertEquals(List.of(taskId), selectPendingTaskIds(first));
+            assertTrue(selectPendingTaskIds(second).isEmpty(), "第二个 Worker 不应领取已加行锁的任务");
 
             first.rollback();
             second.rollback();
@@ -196,14 +191,13 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldRecoverExpiredWorkerLeaseWithCompareAndSet() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         var completedTaskId = UUID.randomUUID();
         var lockedAt = Instant.now().minusSeconds(600);
         try (var connection = openConnection()) {
-            insertRequest(connection, tenantId, requestId, "lease-" + requestId);
-            insertTask(connection, tenantId, requestId, taskId, "lease-recipient", Instant.now().minusSeconds(60),
+            insertRequest(connection, requestId, "lease-" + requestId);
+            insertTask(connection, requestId, taskId, "lease-recipient", Instant.now().minusSeconds(60),
                     "PROCESSING");
             try (var lock = connection.prepareStatement(
                     "UPDATE spectra_notification.ntf_task SET locked_by = ?, locked_at = ? WHERE id = ?")) {
@@ -236,7 +230,7 @@ class NotificationPostgresIntegrationTest {
                     assertEquals("WORKER_LEASE_EXPIRED", result.getString("last_error_code"));
                 }
             }
-            insertTask(connection, tenantId, requestId, completedTaskId, "completed-recipient",
+            insertTask(connection, requestId, completedTaskId, "completed-recipient",
                     Instant.now().minusSeconds(60), "SENT");
             try (var lock = connection.prepareStatement(
                     "UPDATE spectra_notification.ntf_task SET locked_by = ?, locked_at = ? WHERE id = ?")) {
@@ -265,12 +259,11 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldExcludeExpiredTaskFromPendingQueue() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         try (var connection = openConnection()) {
-            insertRequest(connection, tenantId, requestId, "expired-" + requestId);
-            insertTask(connection, tenantId, requestId, taskId, "expired-recipient", Instant.now().minusSeconds(60),
+            insertRequest(connection, requestId, "expired-" + requestId);
+            insertTask(connection, requestId, taskId, "expired-recipient", Instant.now().minusSeconds(60),
                     "PENDING", Instant.now().minusSeconds(1));
             try (var query = connection.prepareStatement("""
                     SELECT COUNT(*)
@@ -351,12 +344,11 @@ class NotificationPostgresIntegrationTest {
 
     @Test
     void shouldClearExpiredSensitivePayloadsWithoutTouchingBusinessContent() throws Exception {
-        var tenantId = UUID.randomUUID();
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
         try (var connection = openConnection()) {
-            insertRequest(connection, tenantId, requestId, "cleanup-" + requestId);
-            insertTask(connection, tenantId, requestId, taskId, "cleanup-recipient", Instant.now().minusSeconds(60),
+            insertRequest(connection, requestId, "cleanup-" + requestId);
+            insertTask(connection, requestId, taskId, "cleanup-recipient", Instant.now().minusSeconds(60),
                     "SENT", Instant.now().minusSeconds(1));
             try (var requestUpdate = connection.prepareStatement("""
                     UPDATE spectra_notification.ntf_request
@@ -481,22 +473,21 @@ class NotificationPostgresIntegrationTest {
         return value;
     }
 
-    private void insertRequest(Connection connection, UUID tenantId, UUID requestId, String idempotencyKey)
+    private void insertRequest(Connection connection, UUID requestId, String idempotencyKey)
             throws SQLException {
         try (var insert = connection.prepareStatement("""
                 INSERT INTO spectra_notification.ntf_request
-                    (id, tenant_id, external_request_id, idempotency_key, purpose, template_group_code,
+                    (id, external_request_id, idempotency_key, purpose, template_group_code,
                      source_module, business_type, business_id, initiator_type, parameters, status,
                      recipient_count, task_count, scheduled_at)
-                VALUES (?, ?, ?, ?, 'SYSTEM_NOTICE', 'integration-test', 'notification', 'integration', ?,
+                VALUES (?, ?, ?, 'SYSTEM_NOTICE', 'integration-test', 'notification', 'integration', ?,
                         'SYSTEM', '{}'::jsonb, 'ACCEPTED', 0, 0, ?)
                 """)) {
             insert.setObject(1, requestId);
-            insert.setObject(2, tenantId);
-            insert.setString(3, "external-" + requestId);
-            insert.setString(4, idempotencyKey);
-            insert.setString(5, requestId.toString());
-            setInstant(insert, 6, Instant.now());
+            insert.setString(2, "external-" + requestId);
+            insert.setString(3, idempotencyKey);
+            insert.setString(4, requestId.toString());
+            setInstant(insert, 5, Instant.now());
             insert.executeUpdate();
         }
     }
@@ -537,60 +528,57 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
-    private void insertTask(Connection connection, UUID tenantId, UUID requestId, UUID taskId, String recipientKey,
+    private void insertTask(Connection connection, UUID requestId, UUID taskId, String recipientKey,
                             Instant scheduledAt, String status)
             throws SQLException {
-        insertTask(connection, tenantId, requestId, taskId, recipientKey, scheduledAt, status, null);
+        insertTask(connection, requestId, taskId, recipientKey, scheduledAt, status, null);
     }
 
-    private void insertTask(Connection connection, UUID tenantId, UUID requestId, UUID taskId, String recipientKey,
+    private void insertTask(Connection connection, UUID requestId, UUID taskId, String recipientKey,
                             Instant scheduledAt, String status, Instant expiresAt)
             throws SQLException {
         try (var insert = connection.prepareStatement("""
                 INSERT INTO spectra_notification.ntf_task
-                    (id, tenant_id, notification_request_id, channel, receiver_user_id, recipient_key_hash,
+                    (id, notification_request_id, channel, receiver_user_id, recipient_key_hash,
                      purpose, title, content, scheduled_at, expires_at, status)
-                VALUES (?, ?, ?, 'IN_APP', ?, ?, 'SYSTEM_NOTICE', 'Integration title', 'Integration content', ?, ?, ?)
+                VALUES (?, ?, 'IN_APP', ?, ?, 'SYSTEM_NOTICE', 'Integration title', 'Integration content', ?, ?, ?)
                 """)) {
             insert.setObject(1, taskId);
-            insert.setObject(2, tenantId);
-            insert.setObject(3, requestId);
-            insert.setObject(4, UUID.randomUUID());
-            insert.setString(5, recipientKey);
-            setInstant(insert, 6, scheduledAt);
+            insert.setObject(2, requestId);
+            insert.setObject(3, UUID.randomUUID());
+            insert.setString(4, recipientKey);
+            setInstant(insert, 5, scheduledAt);
             if (expiresAt == null) {
-                insert.setNull(7, Types.TIMESTAMP_WITH_TIMEZONE);
+                insert.setNull(6, Types.TIMESTAMP_WITH_TIMEZONE);
             } else {
-                setInstant(insert, 7, expiresAt);
+                setInstant(insert, 6, expiresAt);
             }
-            insert.setString(8, status);
+            insert.setString(7, status);
             insert.executeUpdate();
         }
     }
 
-    private void insertInboxMessage(Connection connection, UUID tenantId, UUID requestId, UUID taskId)
+    private void insertInboxMessage(Connection connection, UUID requestId, UUID taskId)
             throws SQLException {
         try (var insert = connection.prepareStatement("""
                 INSERT INTO spectra_notification.ntf_inbox_message
-                    (id, tenant_id, notification_task_id, notification_request_id, receiver_user_id,
+                    (id, notification_task_id, notification_request_id, receiver_user_id,
                      purpose, title, content)
-                VALUES (?, ?, ?, ?, ?, 'SYSTEM_NOTICE', 'Inbox title', 'Inbox content')
+                VALUES (?, ?, ?, ?, 'SYSTEM_NOTICE', 'Inbox title', 'Inbox content')
                 """)) {
             insert.setObject(1, UUID.randomUUID());
-            insert.setObject(2, tenantId);
-            insert.setObject(3, taskId);
-            insert.setObject(4, requestId);
-            insert.setObject(5, UUID.randomUUID());
+            insert.setObject(2, taskId);
+            insert.setObject(3, requestId);
+            insert.setObject(4, UUID.randomUUID());
             insert.executeUpdate();
         }
     }
 
-    private List<UUID> selectPendingTaskIds(Connection connection, UUID tenantId) throws SQLException {
+    private List<UUID> selectPendingTaskIds(Connection connection) throws SQLException {
         try (var query = connection.prepareStatement("""
                 SELECT id
                   FROM spectra_notification.ntf_task
-                 WHERE tenant_id = ?
-                   AND deleted IS NULL
+                 WHERE deleted IS NULL
                    AND status IN ('PENDING', 'RETRYING')
                    AND scheduled_at <= ?
                    AND (next_retry_at IS NULL OR next_retry_at <= ?)
@@ -600,10 +588,9 @@ class NotificationPostgresIntegrationTest {
                  FOR UPDATE SKIP LOCKED
                 """)) {
             var now = Instant.now();
-            query.setObject(1, tenantId);
+            setInstant(query, 1, now);
             setInstant(query, 2, now);
             setInstant(query, 3, now);
-            setInstant(query, 4, now);
             try (var result = query.executeQuery()) {
                 var ids = new java.util.ArrayList<UUID>();
                 while (result.next()) {
@@ -628,11 +615,10 @@ class NotificationPostgresIntegrationTest {
         statement.setTimestamp(index, Timestamp.from(value));
     }
 
-    private long countByTenantAndKey(Connection connection, UUID tenantId, String idempotencyKey) throws SQLException {
+    private long countByKey(Connection connection, String idempotencyKey) throws SQLException {
         try (var query = connection.prepareStatement(
-                "SELECT COUNT(*) FROM spectra_notification.ntf_request WHERE tenant_id = ? AND idempotency_key = ?")) {
-            query.setObject(1, tenantId);
-            query.setString(2, idempotencyKey);
+                "SELECT COUNT(*) FROM spectra_notification.ntf_request WHERE idempotency_key = ?")) {
+            query.setString(1, idempotencyKey);
             try (var result = query.executeQuery()) {
                 result.next();
                 return result.getLong(1);

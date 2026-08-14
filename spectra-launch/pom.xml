@@ -42,8 +42,8 @@
     <dependencies>
         <!-- 目标数据库 schema 由 Flyway V1 起完整管理；不使用 baseline-on-migrate 兼容旧库。 -->
         <dependency>
-            <groupId>org.flywaydb</groupId>
-            <artifactId>flyway-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>

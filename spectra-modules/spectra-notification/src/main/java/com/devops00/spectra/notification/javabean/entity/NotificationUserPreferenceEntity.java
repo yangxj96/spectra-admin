@@ -40,11 +40,6 @@ import java.util.UUID;
 public class NotificationUserPreferenceEntity extends BaseEntity {
 
     /**
-     * 租户 ID。
-     */
-    @TableField("tenant_id")
-    private UUID tenantId;
-    /**
      * 用户 ID。
      */
     @TableField("user_id")

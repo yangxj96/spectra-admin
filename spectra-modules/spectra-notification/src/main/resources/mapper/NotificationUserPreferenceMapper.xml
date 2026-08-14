@@ -23,7 +23,6 @@
                type="com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity">
         <!--@mbg.generated-->
         <!--@Table spectra_notification.ntf_user_preference-->
-        <result column="tenant_id"            property="tenantId"/>
         <result column="user_id"              property="userId"/>
         <result column="purpose"              property="purpose"/>
         <result column="channel"              property="channel"/>
@@ -36,7 +35,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        tenant_id,
         user_id,
         purpose,
         channel,

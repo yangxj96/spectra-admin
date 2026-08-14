@@ -59,10 +59,6 @@ import java.util.*;
 public class NotificationGatewayImpl implements NotificationGateway {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-    /**
      * 普通参数中禁止出现的敏感字段关键词。
      */
     private static final Set<String> SENSITIVE_KEYS = Set.of("code", "captcha", "password", "token", "secret");
@@ -150,7 +146,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var channels = policy.resolve(request.purpose(), request.channels());
         var recipients = recipientDirectory.resolve(request.recipientUserIds());
         var existing = requestMapper.selectOne(new LambdaQueryWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationRequestEntity::getIdempotencyKey, request.idempotencyKey()));
         if (existing != null) {
             var count = taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
@@ -162,7 +157,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var now = Instant.now();
         var entity = new NotificationRequestEntity();
         entity.setId(requestId);
-        entity.setTenantId(SYSTEM_TENANT_ID);
         entity.setBusinessType(defaultValue(request.businessType(), "SYSTEM"));
         entity.setBusinessId(defaultValue(request.businessId(), requestId.toString()));
         entity.setExternalRequestId(requestId.toString());
@@ -236,7 +230,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var task = new NotificationTaskEntity();
         task.setId(UUID.randomUUID());
         task.setNotificationRequestId(requestId);
-        task.setTenantId(SYSTEM_TENANT_ID);
         task.setReceiverUserId(recipientUserId);
         task.setRecipientKeyHash(recipientKeyHash);
         task.setRecipientMasked(maskAddress(address));
@@ -273,7 +266,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
     private RenderedContent render(NotificationRequest request, NotificationChannel channel,
                                    Map<String, Object> parameters) {
         var template = templateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .eq(NotificationTemplateEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
                 .eq(NotificationTemplateEntity::getChannel, channel.name())
                 .eq(NotificationTemplateEntity::getEnabled, true)
@@ -311,7 +303,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
             return true;
         }
         var preference = preferenceMapper.selectOne(new LambdaQueryWrapper<NotificationUserPreferenceEntity>()
-                .eq(NotificationUserPreferenceEntity::getTenantId, SYSTEM_TENANT_ID)
                 .eq(NotificationUserPreferenceEntity::getUserId, recipient.userId())
                 .eq(NotificationUserPreferenceEntity::getPurpose, purpose.name())
                 .eq(NotificationUserPreferenceEntity::getChannel, channel.name()));

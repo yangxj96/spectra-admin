@@ -195,7 +195,6 @@ public class NotificationTaskWorker {
         var delivery = new NotificationDeliveryEntity();
         var completedAt = Instant.now();
         delivery.setId(UUID.randomUUID());
-        delivery.setTenantId(task.getTenantId());
         delivery.setNotificationTaskId(task.getId());
         delivery.setAttemptNo((task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1);
         delivery.setProvider(result.providerCode());

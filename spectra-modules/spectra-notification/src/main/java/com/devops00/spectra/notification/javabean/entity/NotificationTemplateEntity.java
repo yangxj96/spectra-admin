@@ -26,7 +26,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 通知模板实体。
@@ -41,11 +40,6 @@ import java.util.UUID;
 @TableName(value = "ntf_template", schema = "spectra_notification", autoResultMap = true)
 public class NotificationTemplateEntity extends BaseEntity {
 
-    /**
-     * 租户 ID。
-     */
-    @TableField("tenant_id")
-    private UUID tenantId;
     /**
      * 逻辑模板组编码。
      */

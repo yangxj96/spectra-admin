@@ -51,7 +51,7 @@ class NotificationPreferenceServiceImplTest {
         when(mapper.selectOne(any())).thenReturn(null);
         when(mapper.insert(any(NotificationUserPreferenceEntity.class))).thenReturn(1);
 
-        service.save(UUID.randomUUID(), UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", true, false);
+        service.save(UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", true, false);
 
         verify(mapper).insert(any(NotificationUserPreferenceEntity.class));
         verify(mapper, never()).updateById(any(NotificationUserPreferenceEntity.class));
@@ -64,7 +64,7 @@ class NotificationPreferenceServiceImplTest {
         when(mapper.selectOne(any())).thenReturn(existing);
         when(mapper.updateById(any(NotificationUserPreferenceEntity.class))).thenReturn(1);
 
-        service.save(UUID.randomUUID(), UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", false, true);
+        service.save(UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", false, true);
 
         verify(mapper).updateById(existing);
         verify(mapper, never()).insert(any(NotificationUserPreferenceEntity.class));
@@ -75,7 +75,7 @@ class NotificationPreferenceServiceImplTest {
         when(mapper.selectOne(any())).thenReturn(null);
         when(mapper.insert(any(NotificationUserPreferenceEntity.class))).thenReturn(1);
 
-        service.save(UUID.randomUUID(), UUID.randomUUID(), "security_alert", "in_app", false, true);
+        service.save(UUID.randomUUID(), "security_alert", "in_app", false, true);
 
         verify(mapper).insert(argThat((NotificationUserPreferenceEntity entity) -> Boolean.TRUE.equals(entity.getEnabled())
                 && Boolean.FALSE.equals(entity.getDoNotDisturb())
@@ -96,7 +96,7 @@ class NotificationPreferenceServiceImplTest {
                 .atZone(ZoneId.of("Asia/Shanghai"))
                 .toInstant();
 
-        service.save(UUID.randomUUID(), UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", true, true, start, end);
+        service.save(UUID.randomUUID(), "SYSTEM_NOTICE", "IN_APP", true, true, start, end);
 
         verify(mapper).insert(argThat((NotificationUserPreferenceEntity entity) -> start.equals(entity.getDoNotDisturbStart())
                 && end.equals(entity.getDoNotDisturbEnd())));
@@ -117,7 +117,7 @@ class NotificationPreferenceServiceImplTest {
         from.setDoNotDisturbEnd("08:00:00");
         var zone = ZoneId.of("Asia/Shanghai");
 
-        service.saveLegacy(UUID.randomUUID(), UUID.randomUUID(), from, zone);
+        service.saveLegacy(UUID.randomUUID(), from, zone);
 
         var captor = org.mockito.ArgumentCaptor.forClass(NotificationUserPreferenceEntity.class);
         verify(mapper, times(5)).insert(captor.capture());
@@ -139,7 +139,7 @@ class NotificationPreferenceServiceImplTest {
         preference.setDoNotDisturbEnd(java.time.LocalDate.of(2026, 8, 14).atTime(8, 0).atZone(zone).toInstant());
         when(mapper.selectList(any())).thenReturn(List.of(preference));
 
-        var result = service.legacy(UUID.randomUUID(), UUID.randomUUID(), zone);
+        var result = service.legacy(UUID.randomUUID(), zone);
 
         assertTrue(Boolean.TRUE.equals(result.getDoNotDisturb()));
         org.junit.jupiter.api.Assertions.assertEquals(LocalTime.of(22, 0), result.getDoNotDisturbStart());

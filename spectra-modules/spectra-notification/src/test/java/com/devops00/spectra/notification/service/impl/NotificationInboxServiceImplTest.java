@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verify;
 
 /**
- * 消息中心 Self API 服务的租户和收件人所有权测试。
+ * 消息中心 Self API 服务的收件人所有权测试。
  *
  * @author yangxj96
  * @version 1.0
@@ -58,8 +58,6 @@ import static org.mockito.Mockito.verify;
  */
 @ExtendWith(MockitoExtension.class)
 class NotificationInboxServiceImplTest {
-
-    private static final UUID TENANT_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     private static final UUID USER_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
 
@@ -86,19 +84,19 @@ class NotificationInboxServiceImplTest {
     }
 
     @Test
-    void shouldScopePageAndUnreadCountToTenantAndReceiver() {
+    void shouldScopePageAndUnreadCountToReceiver() {
         var page = new Page<NotificationInboxEntity>();
         when(mapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class))).thenReturn(page);
         when(converter.toVOPage(page)).thenReturn(new Page<>());
         when(mapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(2L);
 
-        service.page(new PageFrom(), TENANT_ID, USER_ID, new NotificationQueryFrom());
+        service.page(new PageFrom(), USER_ID, new NotificationQueryFrom());
         var pageCaptor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(mapper).selectPage(any(Page.class), pageCaptor.capture());
         var pageQuery = (LambdaQueryWrapper<NotificationInboxEntity>) pageCaptor.getValue();
         assertScoped(pageQuery);
 
-        assertEquals(2L, service.unreadCount(TENANT_ID, USER_ID));
+        assertEquals(2L, service.unreadCount(USER_ID));
         var unreadCaptor = ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(mapper).selectCount(unreadCaptor.capture());
         var unreadQuery = (LambdaQueryWrapper<NotificationInboxEntity>) unreadCaptor.getValue();
@@ -109,7 +107,7 @@ class NotificationInboxServiceImplTest {
     void shouldHideForeignMessageAsNotFound() {
         when(mapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
 
-        assertThrows(DataNotExistException.class, () -> service.detail(MESSAGE_ID, TENANT_ID, USER_ID));
+        assertThrows(DataNotExistException.class, () -> service.detail(MESSAGE_ID, USER_ID));
 
         var query = captureQuery();
         assertScoped(query);
@@ -121,11 +119,11 @@ class NotificationInboxServiceImplTest {
         when(mapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(0);
         when(mapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
 
-        assertThrows(DataNotExistException.class, () -> service.markAsRead(MESSAGE_ID, TENANT_ID, USER_ID));
+        assertThrows(DataNotExistException.class, () -> service.markAsRead(MESSAGE_ID, USER_ID));
         var readUpdate = captureUpdate();
         assertScoped(readUpdate);
 
-        assertThrows(DataNotExistException.class, () -> service.deleteById(MESSAGE_ID, TENANT_ID, USER_ID));
+        assertThrows(DataNotExistException.class, () -> service.deleteById(MESSAGE_ID, USER_ID));
         var deleteUpdate = captureUpdate();
         assertScoped(deleteUpdate);
     }
@@ -135,11 +133,11 @@ class NotificationInboxServiceImplTest {
         when(mapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
         var otherMessageId = UUID.randomUUID();
 
-        service.markAllAsRead(TENANT_ID, USER_ID);
+        service.markAllAsRead(USER_ID);
         var markAllUpdate = captureUpdate();
         assertScoped(markAllUpdate);
 
-        service.batchDelete(List.of(MESSAGE_ID, otherMessageId), TENANT_ID, USER_ID);
+        service.batchDelete(List.of(MESSAGE_ID, otherMessageId), USER_ID);
         var batchUpdate = captureUpdate();
         assertScoped(batchUpdate);
         assertTrue(batchUpdate.getParamNameValuePairs().containsValue(MESSAGE_ID));
@@ -159,8 +157,6 @@ class NotificationInboxServiceImplTest {
     }
 
     private void assertScoped(com.baomidou.mybatisplus.core.conditions.AbstractWrapper<?, ?, ?> wrapper) {
-        assertTrue(wrapper.getSqlSegment().contains("tenant_id"),
-                () -> wrapper.getSqlSegment() + " / " + wrapper.getParamNameValuePairs());
         assertTrue(wrapper.getSqlSegment().contains("receiver_user_id"),
                 () -> wrapper.getSqlSegment() + " / " + wrapper.getParamNameValuePairs());
     }

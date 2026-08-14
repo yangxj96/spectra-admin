@@ -45,7 +45,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Worker 的租约、过期、失败和 Delivery 隔离测试。
+ * Worker 的租约、过期、失败和 Delivery 测试。
  */
 class NotificationTaskWorkerTest {
 
@@ -59,7 +59,7 @@ class NotificationTaskWorkerTest {
     }
 
     @Test
-    void shouldSendTaskAndKeepDeliveryInSameTenant() {
+    void shouldSendTaskAndCreateDelivery() {
         var taskMapper = mock(NotificationTaskMapper.class);
         var deliveryMapper = mock(NotificationDeliveryMapper.class);
         var requestMapper = mock(NotificationRequestMapper.class);
@@ -68,7 +68,6 @@ class NotificationTaskWorkerTest {
         var completed = task("SENT", task.getScheduledAt(), task.getExpiresAt());
         completed.setId(task.getId());
         completed.setNotificationRequestId(task.getNotificationRequestId());
-        completed.setTenantId(task.getTenantId());
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(completed));
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
@@ -81,7 +80,6 @@ class NotificationTaskWorkerTest {
 
         var deliveryCaptor = org.mockito.ArgumentCaptor.forClass(NotificationDeliveryEntity.class);
         verify(deliveryMapper).insert(deliveryCaptor.capture());
-        assertEquals(task.getTenantId(), deliveryCaptor.getValue().getTenantId());
         assertEquals("SENT", deliveryCaptor.getValue().getResultStatus());
         verify(sender).send(task);
     }
@@ -96,7 +94,6 @@ class NotificationTaskWorkerTest {
         var expired = task("EXPIRED", task.getScheduledAt(), task.getExpiresAt());
         expired.setId(task.getId());
         expired.setNotificationRequestId(task.getNotificationRequestId());
-        expired.setTenantId(task.getTenantId());
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(expired));
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
@@ -119,7 +116,6 @@ class NotificationTaskWorkerTest {
         var retrying = task("RETRYING", task.getScheduledAt(), task.getExpiresAt());
         retrying.setId(task.getId());
         retrying.setNotificationRequestId(task.getNotificationRequestId());
-        retrying.setTenantId(task.getTenantId());
         retrying.setAttemptCount(1);
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(retrying));
@@ -170,7 +166,6 @@ class NotificationTaskWorkerTest {
         var task = new NotificationTaskEntity();
         task.setId(UUID.randomUUID());
         task.setNotificationRequestId(UUID.randomUUID());
-        task.setTenantId(UUID.randomUUID());
         task.setChannel(NotificationChannel.SMS.name());
         task.setStatus(status);
         task.setAttemptCount(0);

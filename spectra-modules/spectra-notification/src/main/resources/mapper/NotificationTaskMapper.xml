@@ -23,7 +23,6 @@
                type="com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity">
         <!--@mbg.generated-->
         <!--@Table spectra_notification.ntf_task-->
-        <result column="tenant_id"                       property="tenantId"/>
         <result column="notification_request_id"        property="notificationRequestId"/>
         <result column="channel"                         property="channel"/>
         <result column="receiver_user_id"                property="receiverUserId"/>
@@ -52,7 +51,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        tenant_id,
         notification_request_id,
         channel,
         receiver_user_id,

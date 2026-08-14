@@ -47,11 +47,6 @@ import java.util.UUID;
 public class NotificationController {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-
-    /**
      * 当前用户消息中心服务。
      */
     private final NotificationInboxService service;
@@ -63,7 +58,7 @@ public class NotificationController {
     @GetMapping(value = "/list", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
     public IPage<NotificationInboxVO> list(PageFrom page, NotificationQueryFrom params) {
-        return service.page(page, SYSTEM_TENANT_ID, currentUserId(), params);
+        return service.page(page, currentUserId(), params);
     }
 
     /**
@@ -73,7 +68,7 @@ public class NotificationController {
     @GetMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
     public NotificationInboxVO detail(@PathVariable UUID id) {
-        return service.detail(id, SYSTEM_TENANT_ID, currentUserId());
+        return service.detail(id, currentUserId());
     }
 
     /**
@@ -83,7 +78,7 @@ public class NotificationController {
     @GetMapping(value = "/unread-count", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:QUERY')")
     public long unreadCount() {
-        return service.unreadCount(SYSTEM_TENANT_ID, currentUserId());
+        return service.unreadCount(currentUserId());
     }
 
     /**
@@ -93,7 +88,7 @@ public class NotificationController {
     @PutMapping(value = "/{id}/read", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
     public void markAsRead(@PathVariable UUID id) {
-        service.markAsRead(id, SYSTEM_TENANT_ID, currentUserId());
+        service.markAsRead(id, currentUserId());
     }
 
     /**
@@ -103,7 +98,7 @@ public class NotificationController {
     @PutMapping(value = "/read-all", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:UPDATE')")
     public void markAllAsRead() {
-        service.markAllAsRead(SYSTEM_TENANT_ID, currentUserId());
+        service.markAllAsRead(currentUserId());
     }
 
     /**
@@ -113,7 +108,7 @@ public class NotificationController {
     @DeleteMapping(value = "/{id}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
     public void deleteById(@PathVariable UUID id) {
-        service.deleteById(id, SYSTEM_TENANT_ID, currentUserId());
+        service.deleteById(id, currentUserId());
     }
 
     /**
@@ -123,7 +118,7 @@ public class NotificationController {
     @PostMapping(value = "/batch-delete", version = "1.0.0+")
     @PreAuthorize("hasPermission(null ,'NOTIFICATION:DELETE')")
     public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {
-        service.batchDelete(from.getIds(), SYSTEM_TENANT_ID, currentUserId());
+        service.batchDelete(from.getIds(), currentUserId());
     }
 
     /**

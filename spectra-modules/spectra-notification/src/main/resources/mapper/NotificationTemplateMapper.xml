@@ -23,7 +23,6 @@
                type="com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity">
         <!--@mbg.generated-->
         <!--@Table spectra_notification.ntf_template-->
-        <result column="tenant_id"              property="tenantId"/>
         <result column="template_group_code"    property="templateGroupCode"/>
         <result column="channel"                property="channel"/>
         <result column="purpose"                property="purpose"/>
@@ -39,7 +38,6 @@
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        tenant_id,
         template_group_code,
         channel,
         purpose,

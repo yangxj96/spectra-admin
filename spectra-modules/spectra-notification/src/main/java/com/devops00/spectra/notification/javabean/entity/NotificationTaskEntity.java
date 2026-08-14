@@ -43,11 +43,6 @@ import java.util.UUID;
 public class NotificationTaskEntity extends BaseEntity {
 
     /**
-     * 租户 ID。
-     */
-    @TableField("tenant_id")
-    private UUID tenantId;
-    /**
      * 所属逻辑通知请求 ID。
      */
     @TableField("notification_request_id")

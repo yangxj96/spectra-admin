@@ -35,11 +35,6 @@ import java.util.UUID;
 public class NotificationCounterImpl implements NotificationCounter {
 
     /**
-     * 独立通知模块使用的系统租户。
-     */
-    private static final UUID SYSTEM_TENANT_ID = new UUID(0L, 0L);
-
-    /**
      * 消息中心服务。
      */
     private final NotificationInboxService inboxService;
@@ -49,6 +44,6 @@ public class NotificationCounterImpl implements NotificationCounter {
      */
     @Override
     public long unreadCount(UUID userId) {
-        return userId == null ? 0 : inboxService.unreadCount(SYSTEM_TENANT_ID, userId);
+        return userId == null ? 0 : inboxService.unreadCount(userId);
     }
 }
