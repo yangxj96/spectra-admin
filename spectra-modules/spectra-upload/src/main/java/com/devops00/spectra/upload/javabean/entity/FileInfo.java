@@ -34,7 +34,7 @@ import lombok.*;
 @EqualsAndHashCode(callSuper = true)
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName(value = "file_info", schema = "spectra_upload")
+@TableName(value = "file_info", schema = "spectra_core")
 public class FileInfo extends BaseEntity {
 
     /**

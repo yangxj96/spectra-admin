@@ -25,6 +25,7 @@ import org.springframework.stereotype.Repository;
 import tools.jackson.databind.ObjectMapper;
 
 import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.sql.Types;
 
 /**
@@ -78,7 +79,10 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
                 statement.setString(8, before);
                 statement.setString(9, after);
                 statement.setString(10, event.reason());
-                statement.setObject(11, event.occurredAt());
+                // PostgreSQL's driver does not accept java.time.Instant directly for
+                // this column. Timestamp.from preserves the instant and is compatible
+                // with the TIMESTAMP WITH TIME ZONE audit column.
+                statement.setTimestamp(11, Timestamp.from(event.occurredAt()));
                 statement.setString(12, event.result().name());
                 statement.setString(13, event.correlationId());
                 return statement;

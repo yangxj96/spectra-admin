@@ -45,7 +45,7 @@ public class PurchaseSaveFrom {
     /**
      * 预计日期。
      */
-    @NotNull(message = "期望到货日期不能为空")
+    @NotBlank(message = "期望到货日期不能为空")
     private String expectedDate;
 
     /**

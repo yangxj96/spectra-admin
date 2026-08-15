@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.authorization.service;
 
 import com.devops00.spectra.core.authorization.domain.OrganizationChangeImpact;
+import org.springframework.stereotype.Component;
 
 /**
  * 组织版本与授权影响的纯分析器。
@@ -25,15 +26,16 @@ import com.devops00.spectra.core.authorization.domain.OrganizationChangeImpact;
  * @version 1.0
  * @since 2026/8/14
  */
+@Component
 public class OrganizationImpactAnalyzer {
 
     /**
      * 生成组织变更影响摘要；具体受影响对象由数据库 Closure 查询提供。
      */
     public OrganizationChangeImpact analyze(long beforeVersion,
-                                             int affectedAssignmentCount,
-                                             int affectedUserCount,
-                                             boolean expandsEffectiveAuthority) {
+                                            int affectedAssignmentCount,
+                                            int affectedUserCount,
+                                            boolean expandsEffectiveAuthority) {
         return new OrganizationChangeImpact(beforeVersion, beforeVersion + 1,
                 expandsEffectiveAuthority, affectedAssignmentCount, affectedUserCount);
     }

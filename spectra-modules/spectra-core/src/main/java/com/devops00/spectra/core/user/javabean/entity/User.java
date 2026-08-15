@@ -115,9 +115,9 @@ public class User extends BaseEntity {
     private String timezone;
 
     /**
-     * 组织机构ID
+     * 主部门 ID；用户的完整组织关系由 sys_user_department_membership 保存。
      */
-    @TableField(value = "department_id")
+    @TableField(value = "primary_department_id")
     private UUID departmentId;
 
     /**

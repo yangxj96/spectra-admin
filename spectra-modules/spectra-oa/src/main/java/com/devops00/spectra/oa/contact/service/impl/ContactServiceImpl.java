@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -39,7 +40,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ContactServiceImpl implements ContactService {
 
-    private static final short ENABLED = 1;
+    private static final UserStatus ENABLED = UserStatus.ACTIVE;
 
     private final UserMapper userMapper;
     private final DepartmentMapper departmentMapper;

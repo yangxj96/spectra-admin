@@ -267,6 +267,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private void validate(ReimbursementSaveFrom from) {
+        if (from == null || from.getItems() == null || from.getItems().isEmpty()) {
+            throw new DataSaveException("报销参数和费用明细不能为空");
+        }
         var expenseStart = timeMapper.toInstant(from.getExpenseStart());
         var expenseEnd = timeMapper.toInstant(from.getExpenseEnd());
         if (expenseEnd.isBefore(expenseStart)) {

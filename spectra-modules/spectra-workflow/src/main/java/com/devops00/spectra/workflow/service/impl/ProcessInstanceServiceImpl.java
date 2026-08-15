@@ -138,6 +138,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             throw new DataNotExistException("无法获取流程模型: " + processInstanceId);
         }
 
+        BpmnDiagramSupport.ensureGraphicInfo(model);
+
         // 使用 ProcessDiagramGenerator 生成流程图（高亮当前节点）
         try (var diagramStream = processDiagramGenerator.generateDiagram(model, "png", activeActivityIds, Collections.emptyList(), "宋体", "宋体", "宋体",
                 this.getClass().getClassLoader(), 1.0, false)) {

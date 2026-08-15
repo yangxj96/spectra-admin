@@ -370,6 +370,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     }
 
     private void validate(PurchaseSaveFrom from) {
+        if (from == null || from.getItems() == null || from.getItems().isEmpty()) {
+            throw new DataSaveException("采购参数和采购明细不能为空");
+        }
         var estimate = from.getItems()
                 .stream()
                 .map(item -> item.getQuantity().multiply(item.getEstimatedUnitPrice()))

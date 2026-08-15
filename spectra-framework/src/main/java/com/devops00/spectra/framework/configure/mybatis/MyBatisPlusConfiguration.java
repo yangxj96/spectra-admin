@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.RollbackOn;
 
@@ -59,16 +60,27 @@ public class MyBatisPlusConfiguration {
     private DataScopeEntityRegistry dataScopeEntityRegistry;
 
     /**
-     * 添加注释
+     * 添加审计字段自动填充处理器。
+     *
+     * <p>安全上下文访问器的实现会读取安全会话，而安全会话的用户加载器又会使用
+     * MyBatis。这里延迟注入只把访问器的解析推迟到实际填充审计字段时，避免
+     * MyBatis 基础设施初始化阶段形成反向依赖；不会改变运行期的当前用户解析行为。</p>
      */
     @Bean
-    public MetaObjectHandler metaObjectHandler(SecurityContextAccessor securityContextAccessor) {
+    public MetaObjectHandler metaObjectHandler(@Lazy SecurityContextAccessor securityContextAccessor) {
         log.debug(LogPrefix.PERSISTENCE.f("载入元数据处理器"));
         return new MetaObjectHandlerImpl(securityContextAccessor);
     }
 
+    /**
+     * 创建 MyBatis-Plus 拦截器链。
+     *
+     * <p>数据权限拦截器只在 SQL 执行时读取当前用户。使用延迟代理可以让数据库与
+     * 安全会话基础设施先完成初始化，避免出现
+     * {@code SecurityContextAccessor -> sec -> SecurityUserLoader -> MyBatis} 的启动环。</p>
+     */
     @Bean
-    public MybatisPlusInterceptor mybatisPlusInterceptor(SecurityContextAccessor securityContextAccessor) {
+    public MybatisPlusInterceptor mybatisPlusInterceptor(@Lazy SecurityContextAccessor securityContextAccessor) {
         log.debug(LogPrefix.PERSISTENCE.f("载入MybatisPlusInterceptor"));
         // 数据权限必须先于分页插件处理原始查询。PaginationInnerInterceptor
         // 会在 willDoQuery 阶段生成 count SQL；若顺序反过来，count 查询会

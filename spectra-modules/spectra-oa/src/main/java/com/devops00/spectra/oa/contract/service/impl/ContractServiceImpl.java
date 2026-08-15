@@ -92,11 +92,16 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
         var wrapper = new LambdaQueryWrapper<Contract>();
-        var user = requireCurrentUser();
-        wrapper.and(query -> query.eq(Contract::getOwnerId, user.getId())
-                .or()
-                .eq(Contract::getVisibility, "PUBLIC")
-                .or(q -> q.eq(Contract::getVisibility, "DEPARTMENT").eq(Contract::getDepartmentId, user.getDepartmentId())));
+        var user = securityContextAccessor.currentUser();
+        if (user == null || user.getId() == null) {
+            return new Page<>(page.getPageNum(), page.getPageSize(), 0);
+        }
+        wrapper.and(query -> {
+            query.eq(Contract::getOwnerId, user.getId()).or().eq(Contract::getVisibility, "PUBLIC");
+            if (user.getDepartmentId() != null) {
+                query.or(q -> q.eq(Contract::getVisibility, "DEPARTMENT").eq(Contract::getDepartmentId, user.getDepartmentId()));
+            }
+        });
         if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(query -> query.like(Contract::getContractNo, params.getKeyword())
                     .or()

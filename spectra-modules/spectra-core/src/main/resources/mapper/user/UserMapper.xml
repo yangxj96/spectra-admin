@@ -35,7 +35,7 @@
         <result column="city"          property="city"/>
         <result column="language"      property="language"/>
         <result column="timezone"      property="timezone"/>
-        <result column="department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+        <result column="primary_department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -53,7 +53,7 @@
         city,
         "language",
         timezone,
-        department_id,
+        primary_department_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

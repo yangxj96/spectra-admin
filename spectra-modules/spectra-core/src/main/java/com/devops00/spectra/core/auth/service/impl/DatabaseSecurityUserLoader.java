@@ -25,9 +25,9 @@ import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -37,7 +37,6 @@ import java.util.UUID;
  */
 @Component
 @NullMarked
-@RequiredArgsConstructor
 public class DatabaseSecurityUserLoader implements SecurityUserLoader {
 
     private final UserService userService;
@@ -47,6 +46,28 @@ public class DatabaseSecurityUserLoader implements SecurityUserLoader {
     private final PasswordCredentialService passwordCredentialService;
 
     private final SecurityUserHelper securityUserHelper;
+
+    /**
+     * 延迟解析用户业务服务，避免安全会话仓储初始化时反向创建完整的用户服务依赖图。
+     * <p>
+     * 安全会话仓储在启动阶段只需要注册用户加载器；真正加载用户发生在请求认证期间，
+     * 此时安全上下文和 MyBatis 基础设施已经完成初始化，因此不会改变认证行为。
+     *
+     * @param userService                   用户业务服务
+     * @param authenticationIdentityService 密码身份服务
+     * @param passwordCredentialService     密码凭证服务
+     * @param securityUserHelper            安全用户转换器
+     */
+    public DatabaseSecurityUserLoader(
+                                      @Lazy UserService userService,
+                                      AuthenticationIdentityService authenticationIdentityService,
+                                      PasswordCredentialService passwordCredentialService,
+                                      SecurityUserHelper securityUserHelper) {
+        this.userService = userService;
+        this.authenticationIdentityService = authenticationIdentityService;
+        this.passwordCredentialService = passwordCredentialService;
+        this.securityUserHelper = securityUserHelper;
+    }
 
     @Override
     public @Nullable SecurityUser load(UUID userId) {

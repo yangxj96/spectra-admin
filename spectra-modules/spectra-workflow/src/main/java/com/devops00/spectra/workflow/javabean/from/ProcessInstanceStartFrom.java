@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.workflow.javabean.from;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.Map;
@@ -33,11 +34,13 @@ public class ProcessInstanceStartFrom {
     /**
      * 流程定义KEY
      */
+    @NotBlank(message = "流程定义KEY不能为空")
     private String processDefinitionKey;
 
     /**
      * 业务KEY
      */
+    @NotBlank(message = "业务KEY不能为空")
     private String businessKey;
 
     /**

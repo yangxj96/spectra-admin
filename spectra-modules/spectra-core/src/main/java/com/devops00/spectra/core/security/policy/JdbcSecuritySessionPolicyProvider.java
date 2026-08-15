@@ -54,11 +54,15 @@ public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyP
                             resultSet.getInt("max_sessions"),
                             resultSet.getLong("access_ttl_seconds"),
                             resultSet.getLong("refresh_ttl_seconds"),
-                            resultSet.getObject("absolute_ttl_seconds", Long.class),
-                            resultSet.getObject("idle_ttl_seconds", Long.class)),
+                            toLong(resultSet.getObject("absolute_ttl_seconds", Integer.class)),
+                            toLong(resultSet.getObject("idle_ttl_seconds", Integer.class))),
                     clientCode.trim()).stream().findFirst().orElse(null);
         } catch (DataAccessException | IllegalArgumentException exception) {
             throw new SecurityPolicyUnavailableException("会话策略存储不可用，拒绝创建或刷新会话", exception);
         }
+    }
+
+    private static Long toLong(Integer value) {
+        return value == null ? null : value.longValue();
     }
 }

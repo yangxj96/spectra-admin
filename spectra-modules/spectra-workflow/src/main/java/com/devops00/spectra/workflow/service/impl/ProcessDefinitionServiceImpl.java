@@ -84,6 +84,8 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             throw new DataNotExistException("无法获取流程模型: " + id);
         }
 
+        BpmnDiagramSupport.ensureGraphicInfo(model);
+
         try (var diagramStream = processDiagramGenerator.generateDiagram(model, "png", Collections.emptyList(), Collections.emptyList(), "宋体", "宋体",
                 "宋体", this.getClass().getClassLoader(), 1.0, false)) {
             if (diagramStream == null) {

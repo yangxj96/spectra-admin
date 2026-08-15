@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.common.base;
 
+import jakarta.validation.groups.Default;
+
 /**
  * 验证分组
  *
@@ -28,12 +30,12 @@ public class Verify {
     /**
      * 校验新增分组
      */
-    public interface Insert {
+    public interface Insert extends Default {
     }
 
     /**
      * 校验修改分组
      */
-    public interface Update {
+    public interface Update extends Default {
     }
 }

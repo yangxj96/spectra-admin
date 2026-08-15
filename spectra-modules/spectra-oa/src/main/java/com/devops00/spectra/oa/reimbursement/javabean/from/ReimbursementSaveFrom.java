@@ -45,13 +45,13 @@ public class ReimbursementSaveFrom {
     /**
      * 费用开始日期。
      */
-    @NotNull(message = "费用开始日期不能为空")
+    @NotBlank(message = "费用开始日期不能为空")
     private String expenseStart;
 
     /**
      * 费用结束日期。
      */
-    @NotNull(message = "费用结束日期不能为空")
+    @NotBlank(message = "费用结束日期不能为空")
     private String expenseEnd;
 
     /**

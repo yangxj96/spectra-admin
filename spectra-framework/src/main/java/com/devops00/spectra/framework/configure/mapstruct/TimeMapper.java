@@ -17,8 +17,8 @@
 package com.devops00.spectra.framework.configure.mapstruct;
 
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -39,10 +39,21 @@ import java.util.Date;
  * @since 2025/12/10 11:13
  */
 @Component
-@RequiredArgsConstructor
 public class TimeMapper {
 
     private final SecurityContextAccessor securityContextAccessor;
+
+    /**
+     * 延迟解析安全上下文，打断安全会话适配器与 MapStruct 时间转换器之间的启动期依赖环。
+     * <p>
+     * TimeMapper 仍在实际转换时读取当前用户时区，不改变原有业务行为；这里只避免在 Spring 创建
+     * UserOnlineConverter 时提前反向创建 SecurityContextAccessor。
+     *
+     * @param securityContextAccessor 当前安全上下文访问器
+     */
+    public TimeMapper(@Lazy SecurityContextAccessor securityContextAccessor) {
+        this.securityContextAccessor = securityContextAccessor;
+    }
 
     private static final DateTimeFormatter ISO_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 

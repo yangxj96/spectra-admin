@@ -75,17 +75,22 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (currentUser == null || userId == null) {
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
-        var wrapper = new LambdaQueryWrapper<Notice>()
-                .and(q -> q.eq(Notice::getPublisherId, userId)
-                        .or()
-                        .eq(Notice::getStatus, "PUBLISHED")
-                        .or(w -> w.eq(Notice::getStatus, "SCHEDULED").le(Notice::getPublishAt, Instant.now())))
-                .and(q -> q.eq(Notice::getTargetType, "ALL")
-                        .or(w -> w.eq(Notice::getTargetType, "DEPARTMENT").eq(Notice::getTargetDepartmentId, currentUser.getDepartmentId())));
-        if (StringUtils.hasText(params.getKeyword())) {
+        var wrapper = new LambdaQueryWrapper<Notice>();
+        wrapper.and(q -> q.eq(Notice::getPublisherId, userId)
+                .or()
+                .eq(Notice::getStatus, "PUBLISHED")
+                .or(w -> w.eq(Notice::getStatus, "SCHEDULED").le(Notice::getPublishAt, Instant.now())));
+        wrapper.and(q -> {
+            q.eq(Notice::getTargetType, "ALL");
+            if (currentUser.getDepartmentId() != null) {
+                q.or(w -> w.eq(Notice::getTargetType, "DEPARTMENT")
+                        .eq(Notice::getTargetDepartmentId, currentUser.getDepartmentId()));
+            }
+        });
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.and(q -> q.like(Notice::getTitle, params.getKeyword()).or().like(Notice::getSummary, params.getKeyword()));
         }
-        if (StringUtils.hasText(params.getStatus())) {
+        if (params != null && StringUtils.hasText(params.getStatus())) {
             wrapper.eq(Notice::getStatus, params.getStatus());
         }
         wrapper.orderByDesc(Notice::getPublishAt).orderByDesc(Notice::getCreatedAt);

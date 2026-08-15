@@ -63,19 +63,21 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         if (user == null || userId == null) {
             return new Page<>(page.getPageNum(), page.getPageSize());
         }
-        var wrapper = new LambdaQueryWrapper<Calendar>()
-                .and(q -> q.eq(Calendar::getOwnerId, userId)
-                        .or()
-                        .eq(Calendar::getVisibility, "ALL")
-                        .or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT").eq(Calendar::getDepartmentId, user.getDepartmentId())))
-                .orderByAsc(Calendar::getStartTime);
-        if (StringUtils.hasText(params.getKeyword())) {
+        var wrapper = new LambdaQueryWrapper<Calendar>();
+        wrapper.and(q -> {
+            q.eq(Calendar::getOwnerId, userId).or().eq(Calendar::getVisibility, "ALL");
+            if (user.getDepartmentId() != null) {
+                q.or(w -> w.eq(Calendar::getVisibility, "DEPARTMENT").eq(Calendar::getDepartmentId, user.getDepartmentId()));
+            }
+        });
+        wrapper.orderByAsc(Calendar::getStartTime);
+        if (params != null && StringUtils.hasText(params.getKeyword())) {
             wrapper.like(Calendar::getTitle, params.getKeyword());
         }
-        if (StringUtils.hasText(params.getStartTime())) {
+        if (params != null && StringUtils.hasText(params.getStartTime())) {
             wrapper.ge(Calendar::getEndTime, parseTime(params.getStartTime()));
         }
-        if (StringUtils.hasText(params.getEndTime())) {
+        if (params != null && StringUtils.hasText(params.getEndTime())) {
             wrapper.le(Calendar::getStartTime, parseTime(params.getEndTime()));
         }
         var result = this.page(page.toPage(), wrapper);

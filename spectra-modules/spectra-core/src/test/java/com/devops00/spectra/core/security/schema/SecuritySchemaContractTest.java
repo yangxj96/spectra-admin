@@ -212,6 +212,7 @@ class SecuritySchemaContractTest {
         assertTrue(migration.contains("CREATE TABLE spectra_security.role_permission"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.role_grantable_permission"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_user_department_membership"));
+        assertTrue(migration.contains("primary_department_id UUID"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_organization_version"));
         assertTrue(migration.contains("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA spectra_ai"));

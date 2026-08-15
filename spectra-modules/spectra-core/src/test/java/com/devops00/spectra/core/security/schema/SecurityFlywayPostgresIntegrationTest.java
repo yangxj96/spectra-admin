@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV14() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV16() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,7 +70,7 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"),
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"),
                     versions);
             assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "security_audit_archive_manifest"));
@@ -78,6 +78,15 @@ class SecurityFlywayPostgresIntegrationTest {
             assertTrue(tableExists(connection, "spectra_security", "security_client"));
             assertTrue(tableExists(connection, "spectra_security", "session_policy"));
             assertTrue(tableExists(connection, "spectra_security", "password_policy"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "type"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "explain"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "status"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "method"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "url"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "args"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "result"));
+            assertTrue(columnExists(connection, "spectra_core", "sys_log", "time_cost"));
+            assertEquals("text", columnType(connection, "spectra_core", "sys_log", "explain"));
             assertFalse(tableExists(connection, "spectra_core", "sys_account"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope"));
             assertFalse(tableExists(connection, "spectra_core", "sys_user_data_scope_target"));
@@ -151,6 +160,36 @@ class SecurityFlywayPostgresIntegrationTest {
             try (var resultSet = statement.executeQuery()) {
                 resultSet.next();
                 return resultSet.getBoolean(1);
+            }
+        }
+    }
+
+    private static boolean columnExists(Connection connection, String schema, String table, String column)
+            throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT EXISTS (SELECT 1 FROM information_schema.columns "
+                        + "WHERE table_schema = ? AND table_name = ? AND column_name = ?)")) {
+            statement.setString(1, schema);
+            statement.setString(2, table);
+            statement.setString(3, column);
+            try (var resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getBoolean(1);
+            }
+        }
+    }
+
+    private static String columnType(Connection connection, String schema, String table, String column)
+            throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT data_type FROM information_schema.columns "
+                        + "WHERE table_schema = ? AND table_name = ? AND column_name = ?")) {
+            statement.setString(1, schema);
+            statement.setString(2, table);
+            statement.setString(3, column);
+            try (var resultSet = statement.executeQuery()) {
+                assertTrue(resultSet.next());
+                return resultSet.getString(1);
             }
         }
     }
