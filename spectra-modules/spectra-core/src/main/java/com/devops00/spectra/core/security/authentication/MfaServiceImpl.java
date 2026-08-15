@@ -99,7 +99,7 @@ public class MfaServiceImpl implements MfaService {
     @Transactional
     public List<String> confirmTotpEnrollment(UUID userId, UUID enrollmentId, String code) {
         MfaEnrollment enrollment = findEnrollment(userId, enrollmentId, PENDING);
-        String secret = decryptSecret(enrollment);
+        String secret = decryptSecret(enrollment).secret();
         if (!TotpCodeService.matches(secret, code, clock, 1)) {
             appendAudit("AUTH_CHALLENGE_FAILED", userId, Map.of("factorType", FACTOR_TOTP),
                     Map.of("state", PENDING), "TOTP 登记验证码错误");
@@ -111,19 +111,7 @@ public class MfaServiceImpl implements MfaService {
             throw new IllegalStateException("激活 MFA 登记失败");
         }
 
-        List<String> recoveryCodes = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            String recoveryCode = generateRecoveryCode();
-            RecoveryCode entity = new RecoveryCode();
-            entity.setId(UUID.randomUUID());
-            entity.setEnrollmentId(enrollmentId);
-            entity.setCodeHash(RecoveryCodeHasher.hash(recoveryCode));
-            entity.setVersion(0L);
-            if (recoveryCodeMapper.insert(entity) != 1) {
-                throw new IllegalStateException("保存 Recovery Code 失败");
-            }
-            recoveryCodes.add(recoveryCode);
-        }
+        List<String> recoveryCodes = createRecoveryCodes(enrollmentId);
         appendAudit("AUTH_CHALLENGE_SUCCEEDED", userId, Map.of("factorType", FACTOR_TOTP, "state", PENDING),
                 Map.of("factorType", FACTOR_TOTP, "state", ACTIVE), "TOTP 登记确认");
         appendAudit("MFA_FACTOR_ENROLLED", userId, Map.of(), Map.of("factorType", FACTOR_TOTP), null);
@@ -131,9 +119,14 @@ public class MfaServiceImpl implements MfaService {
     }
 
     @Override
+    @Transactional
     public boolean verifyTotp(UUID userId, String code) {
         MfaEnrollment enrollment = findActiveEnrollment(userId);
-        boolean verified = enrollment != null && TotpCodeService.matches(decryptSecret(enrollment), code, clock, 1);
+        DecryptedSecret decrypted = enrollment == null ? null : decryptSecret(enrollment);
+        boolean verified = decrypted != null && TotpCodeService.matches(decrypted.secret(), code, clock, 1);
+        if (verified) {
+            migrateSecretIfRequired(enrollment, decrypted);
+        }
         appendAudit(verified ? "MFA_FACTOR_VERIFIED" : "AUTH_CHALLENGE_FAILED", userId,
                 Map.of("factorType", FACTOR_TOTP), Map.of("verified", verified), "TOTP 校验");
         return verified;
@@ -166,13 +159,49 @@ public class MfaServiceImpl implements MfaService {
             }
         }
         boolean replayed = recoveryCodeMapper.selectList(new LambdaQueryWrapper<RecoveryCode>()
-                        .eq(RecoveryCode::getEnrollmentId, enrollment.getId())
-                        .isNotNull(RecoveryCode::getUsedAt))
-                .stream().anyMatch(recoveryCode -> RecoveryCodeHasher.matches(code, recoveryCode.getCodeHash()));
+                .eq(RecoveryCode::getEnrollmentId, enrollment.getId())
+                .isNotNull(RecoveryCode::getUsedAt))
+                .stream()
+                .anyMatch(recoveryCode -> RecoveryCodeHasher.matches(code, recoveryCode.getCodeHash()));
         appendAudit(replayed ? "MFA_RECOVERY_CODE_REPLAYED" : "AUTH_CHALLENGE_FAILED", userId,
                 Map.of("factorType", "RECOVERY_CODE"), Map.of("verified", false),
                 replayed ? "Recovery Code 重放" : "Recovery Code 校验失败");
         return false;
+    }
+
+    @Override
+    @Transactional
+    public List<String> rotateRecoveryCodes(UUID userId) {
+        MfaEnrollment enrollment = findActiveEnrollment(userId);
+        if (enrollment == null) {
+            throw new IllegalStateException("当前用户没有激活的 TOTP MFA");
+        }
+        recoveryCodeMapper.update(null, new LambdaUpdateWrapper<RecoveryCode>()
+                .eq(RecoveryCode::getEnrollmentId, enrollment.getId())
+                .isNull(RecoveryCode::getUsedAt)
+                .set(RecoveryCode::getUsedAt, Instant.now(clock))
+                .setSql("version = version + 1"));
+        List<String> recoveryCodes = createRecoveryCodes(enrollment.getId());
+        appendAudit("MFA_RECOVERY_CODES_ROTATED", userId, Map.of(),
+                Map.of("factorType", "RECOVERY_CODE", "count", recoveryCodes.size()), "Recovery Code 轮换");
+        return List.copyOf(recoveryCodes);
+    }
+
+    private List<String> createRecoveryCodes(UUID enrollmentId) {
+        List<String> recoveryCodes = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            String recoveryCode = generateRecoveryCode();
+            RecoveryCode entity = new RecoveryCode();
+            entity.setId(UUID.randomUUID());
+            entity.setEnrollmentId(enrollmentId);
+            entity.setCodeHash(RecoveryCodeHasher.hash(recoveryCode));
+            entity.setVersion(0L);
+            if (recoveryCodeMapper.insert(entity) != 1) {
+                throw new IllegalStateException("保存 Recovery Code 失败");
+            }
+            recoveryCodes.add(recoveryCode);
+        }
+        return recoveryCodes;
     }
 
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
@@ -208,17 +237,39 @@ public class MfaServiceImpl implements MfaService {
         return enrollment;
     }
 
-    private String decryptSecret(MfaEnrollment enrollment) {
+    private DecryptedSecret decryptSecret(MfaEnrollment enrollment) {
         TotpCredential credential = credentialMapper.selectById(enrollment.getId());
         if (credential == null) {
             throw new IllegalStateException("MFA 密钥不存在");
         }
-        return new TotpSecretCipher(properties).decrypt(credential.getKeyVersion(), credential.getEncryptedSecret());
+        TotpSecretCipher cipher = new TotpSecretCipher(properties);
+        return new DecryptedSecret(credential, cipher.decrypt(credential.getKeyVersion(), credential.getEncryptedSecret()), cipher);
+    }
+
+    private void migrateSecretIfRequired(MfaEnrollment enrollment, DecryptedSecret decrypted) {
+        if (decrypted.cipher().isCurrentVersion(decrypted.credential().getKeyVersion())) {
+            return;
+        }
+        TotpSecretCipher.EncryptedSecret encrypted = decrypted.cipher()
+                .reencrypt(decrypted.credential().getKeyVersion(), decrypted.credential().getEncryptedSecret());
+        int updated = credentialMapper.update(null, new LambdaUpdateWrapper<TotpCredential>()
+                .eq(TotpCredential::getEnrollmentId, enrollment.getId())
+                .eq(TotpCredential::getKeyVersion, decrypted.credential().getKeyVersion())
+                .set(TotpCredential::getEncryptedSecret, encrypted.combined())
+                .set(TotpCredential::getKeyVersion, encrypted.keyVersion()));
+        if (updated == 1) {
+            appendAudit("MFA_FACTOR_REKEYED", enrollment.getUserId(),
+                    Map.of("keyVersion", decrypted.credential().getKeyVersion()),
+                    Map.of("keyVersion", encrypted.keyVersion()), "TOTP 密钥轮换迁移");
+        }
     }
 
     private String generateRecoveryCode() {
         byte[] bytes = new byte[8];
         random.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).toUpperCase(java.util.Locale.ROOT);
+    }
+
+    private record DecryptedSecret(TotpCredential credential, String secret, TotpSecretCipher cipher) {
     }
 }

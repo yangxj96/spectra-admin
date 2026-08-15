@@ -28,6 +28,7 @@ import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -58,9 +59,13 @@ public class MvcConfiguration implements WebMvcConfigurer {
             throw new IllegalStateException("CORS 仅允许精确 Origin，禁止通配符配置");
         }
         if (origins.isEmpty()) {
+            if (spectraProperties.getCors().isRequired()) {
+                throw new IllegalStateException("生产 CORS 必须显式配置精确 Origin allowlist");
+            }
             log.warn("{}未配置 CORS Origin，跨源访问已关闭", LogPrefix.WEB.p());
             return;
         }
+        origins.forEach(MvcConfiguration::validateOrigin);
         registry
                 // 匹配所有路径
                 .addMapping(spectraProperties.getCors().getMapping())
@@ -74,6 +79,32 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .allowCredentials(Boolean.TRUE.equals(spectraProperties.getCors().getCredentials()))
                 // 预检后缓存策略时长
                 .maxAge(spectraProperties.getCors().getMaxAge());
+    }
+
+    private static void validateOrigin(String origin) {
+        try {
+            URI parsed = URI.create(origin);
+            String scheme = parsed.getScheme();
+            if (!("https".equalsIgnoreCase(scheme)
+                    || ("http".equalsIgnoreCase(scheme) && isLoopback(parsed.getHost())))
+                    || parsed.getHost() == null
+                    || parsed.getHost().isBlank()
+                    || parsed.getUserInfo() != null
+                    || parsed.getPath() != null && !parsed.getPath().isEmpty()
+                    || parsed.getQuery() != null
+                    || parsed.getFragment() != null) {
+                throw new IllegalStateException("CORS Origin 必须为 HTTPS 精确 Origin；开发环境仅允许 HTTP loopback: " + origin);
+            }
+        } catch (IllegalArgumentException exception) {
+            throw new IllegalStateException("CORS Origin 格式无效: " + origin, exception);
+        }
+    }
+
+    private static boolean isLoopback(String host) {
+        return "localhost".equalsIgnoreCase(host)
+                || "127.0.0.1".equals(host)
+                || "[::1]".equalsIgnoreCase(host)
+                || "::1".equals(host);
     }
 
     @Override

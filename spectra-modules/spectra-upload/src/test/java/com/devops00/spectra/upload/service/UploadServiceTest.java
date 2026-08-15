@@ -145,6 +145,7 @@ public class UploadServiceTest {
     /**
      * 尝试读取文件类型
      */
+    @Disabled("手工读取旧上传 schema 数据；当前目标表位于 spectra_core.file_type")
     @Test
     void getFileType() {
         List<FileType> fileTypes = fileTypeService.list();

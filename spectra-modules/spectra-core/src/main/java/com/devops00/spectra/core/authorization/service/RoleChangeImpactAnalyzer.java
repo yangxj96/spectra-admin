@@ -18,6 +18,7 @@ package com.devops00.spectra.core.authorization.service;
 
 import com.devops00.spectra.core.authorization.domain.RoleAuthorizationState;
 import com.devops00.spectra.core.authorization.domain.RoleChangeImpact;
+import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
 
@@ -28,6 +29,7 @@ import java.util.HashSet;
  * @version 1.0
  * @since 2026/8/14
  */
+@Component
 public class RoleChangeImpactAnalyzer {
 
     /**

@@ -98,6 +98,11 @@ public class SystemProperties {
         private List<String> originPatterns = Collections.emptyList();
 
         /**
+         * 是否要求部署必须显式提供至少一个跨源 Origin。生产 Web 部署开启，纯同源/API 部署可关闭。
+         */
+        private boolean required;
+
+        /**
          * 指定允许的方法
          */
         private List<String> methods = List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
@@ -106,7 +111,7 @@ public class SystemProperties {
          * 指定运行的头信息
          */
         private List<String> headers = List.of("Accept", "Authorization", "Content-Type", "Api-Version", "X-Client-Type",
-                "X-CSRF-Token", "X-Requested-With");
+                "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With");
 
         /**
          * 是否支持凭证

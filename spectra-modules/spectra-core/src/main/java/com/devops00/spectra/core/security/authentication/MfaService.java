@@ -20,4 +20,7 @@ public interface MfaService {
     boolean verifyTotp(UUID userId, String code);
 
     boolean consumeRecoveryCode(UUID userId, String code);
+
+    /** 原子作废旧 Recovery Code 并生成一组新码；明文只在本次响应中返回。 */
+    List<String> rotateRecoveryCodes(UUID userId);
 }

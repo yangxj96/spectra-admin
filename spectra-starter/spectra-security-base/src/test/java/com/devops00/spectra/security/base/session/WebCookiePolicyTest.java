@@ -30,4 +30,25 @@ class WebCookiePolicyTest {
         domain.setRefreshCookieDomain("example.com");
         assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(domain));
     }
+
+    @Test
+    void shouldRequireExplicitApprovalForCrossSiteCookie() {
+        SecurityProperties crossSite = new SecurityProperties();
+        crossSite.setRefreshCookieSameSite("None");
+        assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(crossSite));
+
+        crossSite.setRefreshCookieSameSiteNoneAllowed(true);
+        assertDoesNotThrow(() -> WebCookiePolicy.validate(crossSite));
+    }
+
+    @Test
+    void shouldRejectInvalidCsrfNames() {
+        SecurityProperties duplicate = new SecurityProperties();
+        duplicate.setCsrfHeaderName(duplicate.getCsrfCookieName());
+        assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(duplicate));
+
+        SecurityProperties blank = new SecurityProperties();
+        blank.setCsrfCookieName(" ");
+        assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(blank));
+    }
 }

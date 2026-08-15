@@ -61,6 +61,12 @@ public class MfaController {
         }
     }
 
+    @PostMapping("/recovery/rotate")
+    @PreAuthorize("isAuthenticated()")
+    public List<String> rotateRecoveryCodes() {
+        return mfaService.rotateRecoveryCodes(currentUserId());
+    }
+
     private UUID currentUserId() {
         UUID userId = securityContextAccessor.currentUserId();
         if (userId == null) {

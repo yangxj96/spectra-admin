@@ -57,6 +57,32 @@ class CorsConfigurationSecurityTest {
                 .addCorsMappings(new InspectableCorsRegistry()));
     }
 
+    @Test
+    void shouldRejectMissingRequiredOriginAllowlist() {
+        var properties = new SystemProperties();
+        properties.getCors().setRequired(true);
+
+        assertThrows(IllegalStateException.class, () -> new MvcConfiguration(properties)
+                .addCorsMappings(new InspectableCorsRegistry()));
+    }
+
+    @Test
+    void shouldRejectInsecureNonLoopbackOrigin() {
+        var properties = new SystemProperties();
+        properties.getCors().setOriginPatterns(List.of("http://admin.example.com"));
+
+        assertThrows(IllegalStateException.class, () -> new MvcConfiguration(properties)
+                .addCorsMappings(new InspectableCorsRegistry()));
+    }
+
+    @Test
+    void shouldAllowHttpLoopbackForDevelopment() {
+        var properties = new SystemProperties();
+        properties.getCors().setOriginPatterns(List.of("http://localhost:5173"));
+
+        new MvcConfiguration(properties).addCorsMappings(new InspectableCorsRegistry());
+    }
+
     private static final class InspectableCorsRegistry extends CorsRegistry {
 
         private Map<String, CorsConfiguration> configurations() {

@@ -40,5 +40,11 @@ public class S3Properties {
 
     private String bucket;
 
+    /** 安全审计归档专用 bucket，必须开启 Object Lock/WORM。 */
+    private String archiveBucket;
+
+    /** 安全审计归档对象前缀。 */
+    private String archivePrefix = "security-audit/";
+
     private Integer previewMinutes = 10;
 }

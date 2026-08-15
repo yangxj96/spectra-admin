@@ -128,30 +128,42 @@ public class SecurityProperties {
     /** TOTP 密钥加密版本，用于轮换和回迁。 */
     private String mfaEncryptionKeyVersion = "v1";
 
+    /** TOTP 密钥轮换期间允许解密旧设备密钥的上一版本；只用于迁移，不用于新加密。 */
+    private String mfaPreviousEncryptionKey = "";
+
+    /** 上一 TOTP 密钥的版本号；必须和上一密钥同时配置。 */
+    private String mfaPreviousEncryptionKeyVersion = "";
+
     /** TOTP provisioning URI 的发行方名称。 */
     private String mfaTotpIssuer = "Spectra";
 
     /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
     private boolean mfaRequiredForDevOps = true;
 
-    /** Web Refresh Token 的 Host-only Cookie 名称。*/
+    /** Web Refresh Token 的 Host-only Cookie 名称。 */
     private String refreshCookieName = "__Host-spectra-refresh";
 
-    /** Web Refresh Cookie 必须默认 Secure。*/
+    /** Web Refresh Cookie 必须默认 Secure。 */
     private boolean refreshCookieSecure = true;
 
-    /** Web Refresh Cookie 的 SameSite 属性，默认 Strict。*/
+    /** Web Refresh Cookie 的 SameSite 属性，默认 Strict。 */
     private String refreshCookieSameSite = "Strict";
 
-    /** Web Refresh Cookie Path；Host-only Cookie 固定为 /。*/
+    /**
+     * 是否经过部署评审允许 Web Refresh Cookie 使用 SameSite=None。
+     * <p>跨站 Cookie 必须同时满足 Secure、精确 Origin allowlist 和 CSRF 校验。</p>
+     */
+    private boolean refreshCookieSameSiteNoneAllowed;
+
+    /** Web Refresh Cookie Path；Host-only Cookie 固定为 /。 */
     private String refreshCookiePath = "/";
 
-    /** Web Refresh Cookie Domain；默认空值表示 Host-only。*/
+    /** Web Refresh Cookie Domain；默认空值表示 Host-only。 */
     private String refreshCookieDomain = "";
 
-    /** 双提交 CSRF Cookie 名称。*/
+    /** 双提交 CSRF Cookie 名称。 */
     private String csrfCookieName = "XSRF-TOKEN";
 
-    /** 双提交 CSRF Header 名称。*/
+    /** 双提交 CSRF Header 名称。 */
     private String csrfHeaderName = "X-XSRF-TOKEN";
 }
