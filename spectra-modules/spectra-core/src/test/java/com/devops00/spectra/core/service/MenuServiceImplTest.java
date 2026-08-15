@@ -165,6 +165,29 @@ class MenuServiceImplTest {
     }
 
     @Test
+    void currentShouldReturnAllMenusForRootWithoutRoleMenuRelations() {
+        var userId = UUID.randomUUID();
+        var system = menu(null, MenuType.DIRECTORY, null, 1);
+        var userMenu = menu(system.getId(), MenuType.MENU, "SystemUser", 1);
+        var workflowMenu = menu(system.getId(), MenuType.MENU, "SystemWorkflow", 2);
+
+        when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", Map.of(), Map.of()))));
+        when(menuMapper.selectList(any())).thenReturn(List.of(system, userMenu, workflowMenu));
+        when(menuConverter.toTreeVOList(any())).thenAnswer(invocation -> {
+            List<Menu> menus = invocation.getArgument(0);
+            return menus.stream().map(MenuServiceImplTest::toTreeVO).toList();
+        });
+
+        var result = service.current(userId);
+
+        assertEquals(List.of(system.getId()), result.stream().map(MenuTreeVO::getId).toList());
+        assertEquals(List.of(userMenu.getId(), workflowMenu.getId()),
+                result.getFirst().getChildren().stream().map(MenuTreeVO::getId).toList());
+        verify(securityRoleMenuMapper, never()).selectList(any());
+    }
+
+    @Test
     void createdShouldRejectDirectoryWithRouteName() {
         var from = new MenuSaveFrom();
         from.setMenuType(MenuType.DIRECTORY);

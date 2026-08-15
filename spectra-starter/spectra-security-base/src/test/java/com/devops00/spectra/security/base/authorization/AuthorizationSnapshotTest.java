@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AuthorizationSnapshotTest {
@@ -35,6 +36,19 @@ class AuthorizationSnapshotTest {
     private static final UUID OTHER_USER = UUID.fromString("00000000-0000-0000-0000-000000000003");
 
     private static final UUID OWNER = UUID.fromString("00000000-0000-0000-0000-000000000004");
+
+    @Test
+    void rootAssignmentHasImplicitPermissionsAndGlobalAccess() {
+        var snapshot = AuthorizationSnapshot.of(List.of(
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", Map.of(), Map.of())));
+
+        assertTrue(snapshot.isRoot());
+        assertEquals(Set.of("*"), snapshot.permissions());
+        assertEquals(Set.of("*"), snapshot.grantablePermissions());
+        assertTrue(snapshot.hasPermission("system:secret:delete"));
+        assertTrue(snapshot.canAccess("system:secret:read", query(OTHER_USER, OWNER, OTHER_USER)));
+        assertTrue(snapshot.canGrant("system:secret:read", query(OTHER_USER, OWNER, OTHER_USER)));
+    }
 
     @Test
     void shouldUnionScopesOnlyForTheSamePermission() {

@@ -108,10 +108,11 @@ public class SecurityAuditQueryService {
             throw new DataNotExistException("安全审计事件不存在");
         }
         QueryPlan plan = buildPlan(viewer, null);
+        String detailWhere = plan.whereSql().isBlank() ? " WHERE event_id = ?" : plan.whereSql() + " AND event_id = ?";
         String sql = "SELECT event_id, event_type, operator_id, target_id, client, ip, user_agent, "
                 + "before_snapshot::text AS before_snapshot, after_snapshot::text AS after_snapshot, reason, "
-                + "occurred_at, result, correlation_id FROM " + TABLE + plan.whereSql()
-                + " AND event_id = ? ORDER BY occurred_at DESC LIMIT 1";
+                + "occurred_at, result, correlation_id FROM " + TABLE + detailWhere
+                + " ORDER BY occurred_at DESC LIMIT 1";
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(eventId);
         List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow).stream()

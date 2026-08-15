@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.security.audit;
+package com.devops00.spectra.core.security.audit.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.security.audit.SecurityAuditPageVO;
+import com.devops00.spectra.core.security.audit.SecurityAuditQueryFrom;
+import com.devops00.spectra.core.security.audit.SecurityAuditQueryService;
+import com.devops00.spectra.core.security.audit.SecurityAuditRetentionVO;
+import com.devops00.spectra.core.security.audit.SecurityAuditVO;
+import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -44,22 +51,26 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/security/audit")
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityAuditController {
 
     private final SecurityAuditQueryService queryService;
 
+    @ULog("'分页查询安全审计'")
     @GetMapping(value = "/page", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditPageVO page(PageFrom page, SecurityAuditQueryFrom query, Authentication viewer) {
         return queryService.page(viewer, page, query);
     }
 
+    @ULog("'查询安全审计详情'")
     @GetMapping(value = "/{eventId}", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditVO detail(@PathVariable UUID eventId, Authentication viewer) {
         return queryService.detail(viewer, eventId);
     }
 
+    @ULog("'导出安全审计'")
     @GetMapping(value = "/export", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'audit:export')")
     public ResponseEntity<byte[]> export(SecurityAuditQueryFrom query, Authentication viewer) {
@@ -70,6 +81,7 @@ public class SecurityAuditController {
         return ResponseEntity.ok().headers(headers).body(content);
     }
 
+    @ULog("'查询安全审计保留策略'")
     @GetMapping(value = "/retention", version = "1.0.0+")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditRetentionVO retention() {

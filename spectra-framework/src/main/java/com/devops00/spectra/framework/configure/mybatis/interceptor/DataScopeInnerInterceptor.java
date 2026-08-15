@@ -27,7 +27,6 @@ import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotPro
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
 import net.sf.jsqlparser.schema.Table;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,24 +117,22 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         }
 
         AuthorizationSnapshotProvider snapshotProvider = authorizationSnapshotProvider == null
-                ? null : authorizationSnapshotProvider.getIfAvailable();
+                ? null
+                : authorizationSnapshotProvider.getIfAvailable();
         if (snapshotProvider == null) {
             throw new DataScopeViolationException("授权快照提供者未配置，已拒绝访问");
         }
         String permission = ScopeSqlPolicy.permissionFor(annotation, mappedStatementId);
         if (permission == null) {
-            return where;
+            return null;
         }
         AuthorizationSnapshot snapshot = snapshotProvider.load(userId);
+        if (snapshot.isRoot()) {
+            return null;
+        }
         Expression scopeExpression = ScopeSqlPolicy.build(table, annotation,
                 snapshot.accessBoundaries(permission), userId);
-        if (scopeExpression == null) {
-            return where;
-        }
-        if (where == null) {
-            return scopeExpression;
-        }
-        return new AndExpression(where, scopeExpression);
+        return scopeExpression;
     }
 
     /**

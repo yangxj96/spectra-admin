@@ -150,7 +150,12 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
     }
 
     private List<MenuTreeVO> currentFromSecurityModel(UUID userId) {
-        var roleCodes = authorizationSnapshotProvider.load(userId).assignments().stream()
+        var snapshot = authorizationSnapshotProvider.load(userId);
+        if (snapshot.isRoot()) {
+            return buildAllCurrentTree();
+        }
+
+        var roleCodes = snapshot.assignments().stream()
                 .map(assignment -> assignment.roleCode())
                 .distinct()
                 .toList();
@@ -173,8 +178,20 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return buildCurrentTree(relations.stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet()));
     }
 
+    private List<MenuTreeVO> buildAllCurrentTree() {
+        var menus = loadActiveMenus();
+        var menuIds = menus.stream()
+                .filter(menu -> menu.getMenuType() == MenuType.MENU)
+                .map(Menu::getId)
+                .collect(Collectors.toSet());
+        return buildCurrentTree(menuIds, menus);
+    }
+
     private List<MenuTreeVO> buildCurrentTree(java.util.Set<UUID> menuIds) {
-        var menus = menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
+        return buildCurrentTree(menuIds, loadActiveMenus());
+    }
+
+    private List<MenuTreeVO> buildCurrentTree(java.util.Set<UUID> menuIds, List<Menu> menus) {
         if (CollUtils.isEmpty(menus)) {
             return Collections.emptyList();
         }
@@ -196,6 +213,10 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         var vos = menuConverter.toTreeVOList(authorizedMenus);
         var tree = new TreeBuilder<>(vos).buildTree(Common.PID);
         return tree == null ? Collections.emptyList() : tree;
+    }
+
+    private List<Menu> loadActiveMenus() {
+        return menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
     }
 
     @Override

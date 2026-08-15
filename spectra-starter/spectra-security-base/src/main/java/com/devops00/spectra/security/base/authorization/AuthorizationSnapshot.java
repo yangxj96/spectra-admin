@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.security.base.authorization;
 
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -34,12 +36,16 @@ public final class AuthorizationSnapshot {
 
     private final List<AuthorizationAssignment> assignments;
 
+    private final boolean root;
+
     private final Map<String, List<PermissionBoundary>> accessBoundaries;
 
     private final Map<String, List<PermissionBoundary>> grantBoundaries;
 
     private AuthorizationSnapshot(List<AuthorizationAssignment> assignments) {
         this.assignments = List.copyOf(assignments == null ? List.of() : assignments);
+        this.root = this.assignments.stream()
+                .anyMatch(assignment -> RootAuthorizationPolicy.ROOT_ROLE.equals(assignment.roleCode()));
         this.accessBoundaries = index(this.assignments, true);
         this.grantBoundaries = index(this.assignments, false);
     }
@@ -52,24 +58,39 @@ public final class AuthorizationSnapshot {
         return assignments;
     }
 
+    /**
+     * 当前主体是否拥有系统 Root 角色。
+     *
+     * <p>Root 的隐式能力必须由授权快照统一暴露，菜单、Token、资源授权和数据范围不能各自重复判断角色。</p>
+     */
+    public boolean isRoot() {
+        return root;
+    }
+
     public Set<String> permissions() {
+        if (root) {
+            return Set.of("*");
+        }
         return Collections.unmodifiableSet(new LinkedHashSet<>(accessBoundaries.keySet()));
     }
 
     public Set<String> grantablePermissions() {
+        if (root) {
+            return Set.of("*");
+        }
         return Collections.unmodifiableSet(new LinkedHashSet<>(grantBoundaries.keySet()));
     }
 
     public boolean hasPermission(String permission) {
-        return permission != null && accessBoundaries.containsKey(permission);
+        return permission != null && (root || accessBoundaries.containsKey(permission));
     }
 
     public boolean canAccess(String permission, ScopeQuery query) {
-        return allows(accessBoundaries.get(permission), query);
+        return permission != null && (root || allows(accessBoundaries.get(permission), query));
     }
 
     public boolean canGrant(String permission, ScopeQuery query) {
-        return allows(grantBoundaries.get(permission), query);
+        return permission != null && (root || allows(grantBoundaries.get(permission), query));
     }
 
     public List<PermissionBoundary> accessBoundaries(String permission) {
