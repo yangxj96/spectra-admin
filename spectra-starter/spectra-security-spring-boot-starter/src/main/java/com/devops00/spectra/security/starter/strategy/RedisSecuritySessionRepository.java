@@ -72,6 +72,12 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     private static final String HEADER_DEVICE_ID = "X-Device-Id";
 
+    private static final String SESSION_ASSURANCE_FIELD = "aal";
+
+    private static final String ASSURANCE_LEVEL_ONE = "AAL1";
+
+    private static final String ASSURANCE_LEVEL_TWO = "AAL2";
+
     private final ObjectMapper om;
     private final RedisTemplate<String, Object> redis;
     private final SecurityProperties properties;
@@ -106,7 +112,11 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
     }
 
     private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId) {
-        if (properties.isMfaRequiredForDevOps() && isRoot(user) && !isMfaVerified(user)) {
+        return createToken(user, clientType, familyId, isMfaVerified(user));
+    }
+
+    private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId, boolean mfaVerified) {
+        if (properties.isMfaRequiredForDevOps() && isRoot(user) && !mfaVerified) {
             throw new IllegalStateException("DEV_OPS 必须先完成 MFA 验证");
         }
         String userId = user.getId().toString();
@@ -147,7 +157,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         session.put("loginTime", now);
         session.put("lastActiveTime", now);
         session.put("familyId", familyId);
-        session.put("aal", isMfaVerified(user) ? "AAL2" : "AAL1");
+        session.put(SESSION_ASSURANCE_FIELD, mfaVerified ? ASSURANCE_LEVEL_TWO : ASSURANCE_LEVEL_ONE);
 
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
@@ -218,6 +228,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
         String clientType = Objects.toString(session.get("clientType"),
                 Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
+        boolean mfaVerified = isMfaAssuredSession(session);
         Duration refreshTtl = Duration.ofSeconds(sessionPolicy(clientType).refreshTtlSeconds());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
@@ -240,7 +251,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
             if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
                 throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
             }
-            return createToken(currentUser, ClientType.fromName(clientType), familyId);
+            return createToken(currentUser, ClientType.fromName(clientType), familyId, mfaVerified);
         } catch (RuntimeException exception) {
             revokeFamilyForRefreshReplay(familyId);
             throw exception;
@@ -547,6 +558,10 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     private boolean isMfaVerified(SecurityUser user) {
         return user.getExtraData() != null && Boolean.TRUE.equals(user.getExtraData().get("mfaVerified"));
+    }
+
+    private boolean isMfaAssuredSession(Map<Object, Object> session) {
+        return ASSURANCE_LEVEL_TWO.equals(Objects.toString(session.get(SESSION_ASSURANCE_FIELD), null));
     }
 
     private boolean isRoot(SecurityUser user) {

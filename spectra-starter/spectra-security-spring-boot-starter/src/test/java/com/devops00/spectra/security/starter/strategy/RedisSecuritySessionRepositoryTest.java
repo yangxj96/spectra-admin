@@ -17,6 +17,8 @@
 package com.devops00.spectra.security.starter.strategy;
 
 import com.devops00.spectra.security.base.constant.SecurityRedisKey;
+import com.devops00.spectra.security.base.holder.SecurityUserLoader;
+import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.util.TokenDigestService;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
@@ -24,11 +26,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -40,6 +49,48 @@ import static org.mockito.Mockito.when;
  * Redis Security Session 撤销测试。
  */
 class RedisSecuritySessionRepositoryTest {
+
+    @Test
+    void shouldPreserveMfaAssuranceWhenRefreshingDevOpsSession() {
+        String refreshToken = "refresh-token";
+        String refreshDigest = TokenDigestService.digest(refreshToken);
+        String accessDigest = "access-digest";
+        String familyId = "family-id";
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
+        String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
+
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
+        SecurityUserLoader userLoader = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
+        when(hashes.entries(eq(refreshKey))).thenReturn(Map.of(
+                "accessToken", accessDigest,
+                "userId", userId.toString(),
+                "clientType", "WEB",
+                "familyId", familyId));
+        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of(
+                "clientType", "WEB",
+                "aal", "AAL2"));
+        when(sets.members(anyString())).thenReturn(Set.of());
+        when(redis.hasKey(anyString())).thenReturn(false);
+        when(redis.execute(any(), anyList(), any())).thenReturn(1L);
+
+        SecurityUser user = new SecurityUser();
+        user.setId(userId);
+        user.setEmail("devops00.com");
+        user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
+        when(userLoader.load(userId)).thenReturn(user);
+
+        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
+                new SecurityProperties(), mock(UserOnlineConverter.class), null, userLoader);
+
+        assertDoesNotThrow(() -> repository.refreshByRefreshToken(refreshToken));
+    }
 
     @Test
     void shouldDeleteRotatedRefreshTokensAndClaimsWhenLoggingOutByRefreshToken() {
