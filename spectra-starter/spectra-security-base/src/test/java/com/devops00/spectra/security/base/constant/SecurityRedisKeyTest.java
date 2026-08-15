@@ -19,6 +19,7 @@ class SecurityRedisKeyTest {
         assertTrue(SecurityRedisKey.SESSION.format("digest").startsWith("sec:v2:"));
         assertTrue(SecurityRedisKey.REFRESH_TOKEN.format("digest").startsWith("sec:v2:"));
         assertTrue(SecurityRedisKey.SESSION_FAMILY.format("family").startsWith("sec:v2:"));
+        assertTrue(SecurityRedisKey.REFRESH_FAMILY.format("family").startsWith("sec:v2:"));
         assertFalse(SecurityRedisKey.SESSION.format("plaintext-token").contains("auth:"));
     }
 }

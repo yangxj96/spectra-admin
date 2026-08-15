@@ -42,6 +42,9 @@ public enum SecurityRedisKey implements RedisKey {
     /** Token Family 下的 Access digest 集合。 */
     SESSION_FAMILY("sec:v2:family:%s"),
 
+    /** Token Family 下的 Refresh digest 集合，用于整条会话链撤销时清理轮换残留。 */
+    REFRESH_FAMILY("sec:v2:rt:family:%s"),
+
     /** 登录失败计数（锁定账号）。 */
     LOGIN_FAIL("sec:v2:fail:%s"),
 

@@ -170,6 +170,9 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         String rtRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
         redis.opsForHash().putAll(rtRefreshKey, rtData);
         redis.expire(rtRefreshKey, refreshTtl);
+        String refreshFamilyKey = SecurityRedisKey.REFRESH_FAMILY.format(familyId);
+        redis.opsForSet().add(refreshFamilyKey, refreshDigest);
+        redis.expire(refreshFamilyKey, refreshTtl);
         redis.opsForSet().add(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
 
         // 设置 SecurityContext
@@ -272,7 +275,9 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         // sec:v2:rt:{accessDigest} → refreshDigest (String)
         Object refreshDigestObj = redis.opsForValue().get(SecurityRedisKey.REFRESH_TOKEN.format(tokenDigest));
         if (refreshDigestObj != null) {
-            redis.delete(SecurityRedisKey.REFRESH_TOKEN.format(refreshDigestObj.toString()));
+            String refreshDigest = refreshDigestObj.toString();
+            redis.delete(SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest));
+            redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
         }
         redis.delete(SecurityRedisKey.REFRESH_TOKEN.format(tokenDigest));
 
@@ -281,6 +286,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         redis.opsForSet().remove(userTokensKey, tokenDigest);
         Object familyId = session.get("familyId");
         if (familyId != null) {
+            deleteRefreshFamily(familyId.toString());
             redis.opsForSet().remove(SecurityRedisKey.SESSION_FAMILY.format(familyId.toString()), tokenDigest);
         }
 
@@ -301,16 +307,22 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         String rtRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
         Map<Object, Object> rtData = redis.opsForHash().entries(rtRefreshKey);
         if (rtData.isEmpty()) {
+            redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
             return;
         }
 
         String accessDigest = Objects.toString(rtData.get("accessToken"), null);
         String userId = Objects.toString(rtData.get("userId"), null);
+        String familyId = Objects.toString(rtData.get("familyId"), null);
 
         if (accessDigest != null) {
             deleteAccessDigest(accessDigest);
         }
+        if (familyId != null) {
+            deleteRefreshFamily(familyId);
+        }
         redis.delete(rtRefreshKey);
+        redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
         if (userId != null && accessDigest == null) {
             redis.opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
         }
@@ -467,6 +479,25 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         }
         redis.opsForSet().remove(SecurityRedisKey.USER_TOKENS.format(userId), accessDigest);
         redis.opsForSet().remove(SecurityRedisKey.SESSION_FAMILY.format(familyId), accessDigest);
+    }
+
+    /**
+     * 删除 Token Family 下所有 Refresh Token 及其轮换声明。
+     *
+     * <p>正常 Rotation 会故意保留旧 Refresh Hash 和 claim 以检测重放；显式登出或撤销整条会话时，
+     * 则必须把这部分防重放状态一并清理。</p>
+     */
+    private void deleteRefreshFamily(String familyId) {
+        String refreshFamilyKey = SecurityRedisKey.REFRESH_FAMILY.format(familyId);
+        Set<Object> refreshDigests = redis.opsForSet().members(refreshFamilyKey);
+        if (refreshDigests != null) {
+            for (Object refreshDigest : refreshDigests) {
+                String digest = refreshDigest.toString();
+                redis.delete(SecurityRedisKey.REFRESH_TOKEN.format(digest));
+                redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(digest));
+            }
+        }
+        redis.delete(refreshFamilyKey);
     }
 
     /**
