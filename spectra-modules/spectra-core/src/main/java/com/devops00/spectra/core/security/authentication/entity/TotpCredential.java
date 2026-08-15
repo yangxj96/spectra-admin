@@ -19,7 +19,7 @@ import java.util.UUID;
 /** 加密后的 TOTP 密钥；明文只存在于登记/校验的短生命周期内。 */
 @Data
 @NoArgsConstructor
-@TableName(value = "totp_credential", schema = "spectra_security")
+@TableName(value = "sec_totp_credential", schema = "spectra_security")
 public class TotpCredential {
 
     @TableId(value = "enrollment_id")

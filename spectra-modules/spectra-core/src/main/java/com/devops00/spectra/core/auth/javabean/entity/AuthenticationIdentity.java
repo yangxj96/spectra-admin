@@ -33,7 +33,7 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(value = "authentication_identity", schema = "spectra_security")
+@TableName(value = "sec_authentication_identity", schema = "spectra_security")
 public class AuthenticationIdentity {
 
     @TableId(value = "id", type = IdType.INPUT)

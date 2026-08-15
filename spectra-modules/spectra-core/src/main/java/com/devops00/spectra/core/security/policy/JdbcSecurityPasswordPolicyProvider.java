@@ -35,11 +35,11 @@ public class JdbcSecurityPasswordPolicyProvider implements SecurityPasswordPolic
     public PasswordPolicy current() {
         try {
             return jdbcTemplate.queryForObject("""
-                            SELECT min_length, require_uppercase, require_lowercase,
-                                   require_digit, require_special, max_age_days
-                            FROM spectra_security.password_policy
-                            WHERE policy_key = 'SYSTEM'
-                            """,
+                    SELECT min_length, require_uppercase, require_lowercase,
+                           require_digit, require_special, max_age_days
+                    FROM spectra_security.sec_password_policy
+                    WHERE policy_key = 'SYSTEM'
+                    """,
                     (resultSet, _) -> new PasswordPolicy(
                             resultSet.getInt("min_length"),
                             resultSet.getBoolean("require_uppercase"),

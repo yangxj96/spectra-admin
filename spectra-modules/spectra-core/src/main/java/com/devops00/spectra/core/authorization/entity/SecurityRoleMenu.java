@@ -16,7 +16,7 @@ import java.util.UUID;
  * 目标授权模型中的角色-菜单导航关系。菜单可见性与 Permission 保持独立。
  */
 @Data
-@TableName(value = "role_menu", schema = "spectra_security")
+@TableName(value = "sec_role_menu", schema = "spectra_security")
 public class SecurityRoleMenu {
 
     @TableField(value = "role_id")

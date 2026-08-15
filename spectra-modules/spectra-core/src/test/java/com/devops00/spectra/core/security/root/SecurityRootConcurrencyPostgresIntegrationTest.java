@@ -107,28 +107,28 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
             assertEquals(3, effectiveDevOpsCount(jdbc));
         } finally {
             for (UUID assignment : assignments) {
-                jdbc.update("DELETE FROM spectra_security.role_assignment WHERE id = ?", assignment);
+                jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignment);
             }
             for (UUID user : users) {
-                jdbc.update("DELETE FROM spectra_security.authentication_identity WHERE user_id = ?", user);
+                jdbc.update("DELETE FROM spectra_security.sec_authentication_identity WHERE user_id = ?", user);
             }
             for (UUID user : users) {
                 jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", user);
             }
-            jdbc.update("DELETE FROM spectra_security.role WHERE id = ?", roleId);
+            jdbc.update("DELETE FROM spectra_security.sec_role WHERE id = ?", roleId);
         }
     }
 
     private static void insertFixtures(JdbcTemplate jdbc, UUID roleId, List<UUID> users) {
         jdbc.update("""
-                INSERT INTO spectra_security.role (id, code, name, authority_level, state, role_kind)
+                INSERT INTO spectra_security.sec_role (id, code, name, authority_level, state, role_kind)
                 VALUES (?, 'ROLE_DEV_OPS', 'Concurrency Test Root', 100, 'ACTIVE', 'DEV_OPS')
                 """, roleId);
         for (UUID user : users) {
             jdbc.update("INSERT INTO spectra_core.sys_user (id, username, status) VALUES (?, ?, 'ACTIVE')", user,
                     "root-concurrency-" + user);
             jdbc.update("""
-                    INSERT INTO spectra_security.authentication_identity
+                    INSERT INTO spectra_security.sec_authentication_identity
                         (id, user_id, method_code, provider_code, identifier_hash, state)
                     VALUES (?, ?, 'PASSWORD', 'LOCAL', ?, 'ACTIVE')
                     """, UUID.randomUUID(), user, "hash-" + user);
@@ -137,31 +137,31 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
 
     private static void insertAssignment(JdbcTemplate jdbc, UUID assignmentId, UUID userId, UUID roleId) {
         jdbc.update("""
-                INSERT INTO spectra_security.role_assignment (id, user_id, role_id, state)
+                INSERT INTO spectra_security.sec_role_assignment (id, user_id, role_id, state)
                 VALUES (?, ?, ?, 'ACTIVE')
                 """, assignmentId, userId, roleId);
     }
 
     private static void revokeAssignment(JdbcTemplate jdbc, UUID assignmentId) {
-        jdbc.update("UPDATE spectra_security.role_assignment SET state = 'REVOKED' WHERE id = ?", assignmentId);
+        jdbc.update("UPDATE spectra_security.sec_role_assignment SET state = 'REVOKED' WHERE id = ?", assignmentId);
     }
 
     private static void reactivateAssignment(JdbcTemplate jdbc, UUID assignmentId) {
-        jdbc.update("UPDATE spectra_security.role_assignment SET state = 'ACTIVE' WHERE id = ?", assignmentId);
+        jdbc.update("UPDATE spectra_security.sec_role_assignment SET state = 'ACTIVE' WHERE id = ?", assignmentId);
     }
 
     private static long effectiveDevOpsCount(JdbcTemplate jdbc) {
         Long count = jdbc.queryForObject("""
                 SELECT COUNT(DISTINCT assignment.user_id)
-                FROM spectra_security.role_assignment assignment
-                JOIN spectra_security.role role ON role.id = assignment.role_id
+                FROM spectra_security.sec_role_assignment assignment
+                JOIN spectra_security.sec_role role ON role.id = assignment.role_id
                 JOIN spectra_core.sys_user user_account ON user_account.id = assignment.user_id
                 WHERE role.code = 'ROLE_DEV_OPS'
                   AND role.state = 'ACTIVE'
                   AND assignment.state = 'ACTIVE'
                   AND user_account.status = 'ACTIVE'
                   AND EXISTS (
-                      SELECT 1 FROM spectra_security.authentication_identity identity
+                      SELECT 1 FROM spectra_security.sec_authentication_identity identity
                       WHERE identity.user_id = assignment.user_id AND identity.state = 'ACTIVE'
                   )
                 """, Long.class);
@@ -224,9 +224,11 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
     private static final class AvailableAuditWriter implements SecurityAuditWriter {
 
         @Override
-        public void assertAvailable() {}
+        public void assertAvailable() {
+        }
 
         @Override
-        public void append(SecurityAuditEvent event) {}
+        public void append(SecurityAuditEvent event) {
+        }
     }
 }

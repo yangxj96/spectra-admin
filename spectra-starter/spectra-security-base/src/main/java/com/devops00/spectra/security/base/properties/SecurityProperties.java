@@ -44,6 +44,11 @@ public class SecurityProperties {
             "/common/kaptcha",
             // 用户登陆
             "/auth/login",
+            // MFA 二阶段登录与首次 TOTP 登记
+            "/auth/mfa/verify",
+            "/auth/mfa/complete",
+            "/security/mfa/setup/totp/enroll",
+            "/security/mfa/setup/totp/confirm",
             // 刷新token
             "/auth/refresh",
             // 发送短信验证码
@@ -140,11 +145,23 @@ public class SecurityProperties {
     /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
     private boolean mfaRequiredForDevOps = true;
 
+    /** MFA 登录预认证挑战有效期（秒）。 */
+    private long mfaChallengeExpire = 300L;
+
+    /** 单个 MFA 登录预认证挑战允许的最大失败次数。 */
+    private int mfaChallengeMaxAttempts = 5;
+
     /** Web Refresh Token 的 Host-only Cookie 名称。 */
     private String refreshCookieName = "__Host-spectra-refresh";
 
     /** Web Refresh Cookie 必须默认 Secure。 */
     private boolean refreshCookieSecure = true;
+
+    /**
+     * 是否显式允许开发环境使用 HTTP Web Cookie。
+     * <p>生产环境必须保持关闭；开启后不得使用 {@code __Host-} Cookie 名称。</p>
+     */
+    private boolean allowInsecureRefreshCookie;
 
     /** Web Refresh Cookie 的 SameSite 属性，默认 Strict。 */
     private String refreshCookieSameSite = "Strict";

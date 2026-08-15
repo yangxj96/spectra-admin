@@ -39,16 +39,16 @@ public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyP
         }
         try {
             return jdbcTemplate.query("""
-                            SELECT policy.concurrency_mode,
-                                   policy.max_sessions,
-                                   policy.access_ttl_seconds,
-                                   policy.refresh_ttl_seconds,
-                                   policy.absolute_ttl_seconds,
-                                   policy.idle_ttl_seconds
-                            FROM spectra_security.session_policy policy
-                            JOIN spectra_security.security_client client ON client.id = policy.client_id
-                            WHERE client.code = ? AND client.state = 'ACTIVE'
-                            """,
+                    SELECT policy.concurrency_mode,
+                           policy.max_sessions,
+                           policy.access_ttl_seconds,
+                           policy.refresh_ttl_seconds,
+                           policy.absolute_ttl_seconds,
+                           policy.idle_ttl_seconds
+                    FROM spectra_security.sec_session_policy policy
+                    JOIN spectra_security.sec_security_client client ON client.id = policy.client_id
+                    WHERE client.code = ? AND client.state = 'ACTIVE'
+                    """,
                     (resultSet, _) -> new SessionPolicy(
                             SessionConcurrencyMode.valueOf(resultSet.getString("concurrency_mode")),
                             resultSet.getInt("max_sessions"),

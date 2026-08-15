@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Data
-@TableName(value = "role_assignment", schema = "spectra_security")
+@TableName(value = "sec_role_assignment", schema = "spectra_security")
 public class RoleAssignment {
 
     @TableId(value = "id", type = IdType.INPUT)

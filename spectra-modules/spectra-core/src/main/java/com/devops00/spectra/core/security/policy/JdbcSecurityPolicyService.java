@@ -48,9 +48,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JdbcSecurityPolicyService implements SecurityPolicyService {
 
-    private static final String SESSION_TABLE = "spectra_security.session_policy";
+    private static final String SESSION_TABLE = "spectra_security.sec_session_policy";
 
-    private static final String PASSWORD_TABLE = "spectra_security.password_policy";
+    private static final String PASSWORD_TABLE = "spectra_security.sec_password_policy";
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -61,22 +61,22 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     @Override
     public List<SecuritySessionPolicyVO> sessionPolicies() {
         return jdbcTemplate.query("""
-                        SELECT client.id AS client_id,
-                               client.code AS client_code,
-                               client.name AS client_name,
-                               policy.concurrency_mode,
-                               policy.allow_concurrent,
-                               policy.max_sessions,
-                               policy.access_ttl_seconds,
-                               policy.refresh_ttl_seconds,
-                               policy.absolute_ttl_seconds,
-                               policy.idle_ttl_seconds,
-                               policy.version
-                        FROM spectra_security.session_policy policy
-                        JOIN spectra_security.security_client client ON client.id = policy.client_id
-                        WHERE client.state = 'ACTIVE'
-                        ORDER BY client.code
-                        """,
+                SELECT client.id AS client_id,
+                       client.code AS client_code,
+                       client.name AS client_name,
+                       policy.concurrency_mode,
+                       policy.allow_concurrent,
+                       policy.max_sessions,
+                       policy.access_ttl_seconds,
+                       policy.refresh_ttl_seconds,
+                       policy.absolute_ttl_seconds,
+                       policy.idle_ttl_seconds,
+                       policy.version
+                FROM spectra_security.sec_session_policy policy
+                JOIN spectra_security.sec_security_client client ON client.id = policy.client_id
+                WHERE client.state = 'ACTIVE'
+                ORDER BY client.code
+                """,
                 (resultSet, rowNumber) -> mapSessionPolicy(resultSet, rowNumber));
     }
 
@@ -96,12 +96,12 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         var event = auditEvent("SESSION_POLICY_CHANGED", clientId, snapshot(before), snapshot(after));
         return securityChangeExecutor.execute(event, () -> {
             int updated = jdbcTemplate.update("""
-                            UPDATE spectra_security.session_policy
-                            SET concurrency_mode = ?, allow_concurrent = ?, max_sessions = ?,
-                                access_ttl_seconds = ?, refresh_ttl_seconds = ?, absolute_ttl_seconds = ?,
-                                idle_ttl_seconds = ?, version = version + 1
-                            WHERE client_id = ? AND version = ?
-                            """,
+                    UPDATE spectra_security.sec_session_policy
+                    SET concurrency_mode = ?, allow_concurrent = ?, max_sessions = ?,
+                        access_ttl_seconds = ?, refresh_ttl_seconds = ?, absolute_ttl_seconds = ?,
+                        idle_ttl_seconds = ?, version = version + 1
+                    WHERE client_id = ? AND version = ?
+                    """,
                     requested.concurrencyMode().name(), from.getAllowConcurrent(), from.getMaxSessions(),
                     from.getAccessTtlSeconds(), from.getRefreshTtlSeconds(), from.getAbsoluteTtlSeconds(),
                     from.getIdleTtlSeconds(), clientId, from.getExpectedVersion());
@@ -139,11 +139,11 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         var event = auditEvent("PASSWORD_POLICY_CHANGED", null, snapshot(before), snapshot(after));
         return securityChangeExecutor.execute(event, () -> {
             int updated = jdbcTemplate.update("""
-                            UPDATE spectra_security.password_policy
-                            SET min_length = ?, require_uppercase = ?, require_lowercase = ?, require_digit = ?,
-                                require_special = ?, max_age_days = ?, version = version + 1
-                            WHERE policy_key = 'SYSTEM' AND version = ?
-                            """,
+                    UPDATE spectra_security.sec_password_policy
+                    SET min_length = ?, require_uppercase = ?, require_lowercase = ?, require_digit = ?,
+                        require_special = ?, max_age_days = ?, version = version + 1
+                    WHERE policy_key = 'SYSTEM' AND version = ?
+                    """,
                     requested.minLength(), requested.requireUppercase(), requested.requireLowercase(),
                     requested.requireDigit(), requested.requireSpecial(), requested.maxAgeDays(), from.getExpectedVersion());
             if (updated != 1) {
@@ -157,21 +157,21 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     private SecuritySessionPolicyVO loadSessionPolicy(UUID clientId, boolean lock) {
         String suffix = lock ? " FOR UPDATE" : "";
         List<SecuritySessionPolicyVO> policies = jdbcTemplate.query("""
-                        SELECT client.id AS client_id,
-                               client.code AS client_code,
-                               client.name AS client_name,
-                               policy.concurrency_mode,
-                               policy.allow_concurrent,
-                               policy.max_sessions,
-                               policy.access_ttl_seconds,
-                               policy.refresh_ttl_seconds,
-                               policy.absolute_ttl_seconds,
-                               policy.idle_ttl_seconds,
-                               policy.version
-                        FROM spectra_security.session_policy policy
-                        JOIN spectra_security.security_client client ON client.id = policy.client_id
-                        WHERE client.id = ? AND client.state = 'ACTIVE'
-                        """ + suffix, (resultSet, rowNumber) -> mapSessionPolicy(resultSet, rowNumber), clientId);
+                SELECT client.id AS client_id,
+                       client.code AS client_code,
+                       client.name AS client_name,
+                       policy.concurrency_mode,
+                       policy.allow_concurrent,
+                       policy.max_sessions,
+                       policy.access_ttl_seconds,
+                       policy.refresh_ttl_seconds,
+                       policy.absolute_ttl_seconds,
+                       policy.idle_ttl_seconds,
+                       policy.version
+                FROM spectra_security.sec_session_policy policy
+                JOIN spectra_security.sec_security_client client ON client.id = policy.client_id
+                WHERE client.id = ? AND client.state = 'ACTIVE'
+                """ + suffix, (resultSet, rowNumber) -> mapSessionPolicy(resultSet, rowNumber), clientId);
         if (policies.isEmpty()) {
             throw new DataNotExistException("会话策略不存在或客户端未启用");
         }
@@ -181,11 +181,11 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     private SecurityPasswordPolicyVO loadPasswordPolicy(boolean lock) {
         String suffix = lock ? " FOR UPDATE" : "";
         List<SecurityPasswordPolicyVO> policies = jdbcTemplate.query("""
-                        SELECT policy_key, min_length, require_uppercase, require_lowercase,
-                               require_digit, require_special, max_age_days, version
-                        FROM spectra_security.password_policy
-                        WHERE policy_key = 'SYSTEM'
-                        """ + suffix,
+                SELECT policy_key, min_length, require_uppercase, require_lowercase,
+                       require_digit, require_special, max_age_days, version
+                FROM spectra_security.sec_password_policy
+                WHERE policy_key = 'SYSTEM'
+                """ + suffix,
                 (resultSet, _) -> new SecurityPasswordPolicyVO(
                         resultSet.getString("policy_key"),
                         resultSet.getInt("min_length"),

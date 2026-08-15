@@ -25,7 +25,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-@TableName(value = "permission", schema = "spectra_security")
+@TableName(value = "sec_permission", schema = "spectra_security")
 public class Permission {
 
     @TableId(value = "id", type = IdType.INPUT)

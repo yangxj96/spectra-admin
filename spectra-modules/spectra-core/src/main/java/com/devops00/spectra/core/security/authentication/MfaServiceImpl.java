@@ -204,6 +204,11 @@ public class MfaServiceImpl implements MfaService {
         return recoveryCodes;
     }
 
+    @Override
+    public boolean hasActiveTotp(UUID userId) {
+        return findActiveEnrollment(userId) != null;
+    }
+
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, targetId, targetId,

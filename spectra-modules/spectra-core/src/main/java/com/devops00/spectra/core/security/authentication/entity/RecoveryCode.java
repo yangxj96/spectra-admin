@@ -20,7 +20,7 @@ import java.util.UUID;
 /** 单次消费 Recovery Code；只保存 PBKDF2 摘要。 */
 @Data
 @NoArgsConstructor
-@TableName(value = "recovery_code", schema = "spectra_security")
+@TableName(value = "sec_recovery_code", schema = "spectra_security")
 public class RecoveryCode {
 
     @TableId(value = "id", type = IdType.INPUT)

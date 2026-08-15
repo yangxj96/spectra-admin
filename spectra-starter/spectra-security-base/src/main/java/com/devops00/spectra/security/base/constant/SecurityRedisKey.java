@@ -55,7 +55,10 @@ public enum SecurityRedisKey implements RedisKey {
     REFRESH_REPLAY_FENCE("sec:v2:replay:%s"),
 
     /** Refresh Token 一次性消费声明。 */
-    REFRESH_CLAIM("sec:v2:rt:claim:%s");
+    REFRESH_CLAIM("sec:v2:rt:claim:%s"),
+
+    /** MFA 登录预认证挑战；只保存短期非敏感的用户标识和挑战状态。 */
+    MFA_CHALLENGE("sec:v2:mfa:challenge:%s");
 
     private final String pattern;
 

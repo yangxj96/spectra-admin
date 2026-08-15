@@ -40,10 +40,10 @@ class SecuritySchemaContractTest {
         String schema = readSql();
 
         assertTrue(schema.contains("CREATE SCHEMA IF NOT EXISTS spectra_security"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.assignment_permission_boundary"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.assignment_grant_boundary"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_permission_boundary"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_grant_boundary"));
         assertTrue(schema.contains("scope_mode IN ('NONE', 'ALL', 'SELF', 'RULES')"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.root_policy"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_root_policy"));
         assertTrue(schema.contains("VALUES ('SYSTEM', 1, 3)"));
         assertFalse(schema.contains("ManagementScope"));
         assertFalse(schema.contains("scope_access_union"));
@@ -54,14 +54,14 @@ class SecuritySchemaContractTest {
         String schema = readSql();
 
         assertTrue(schema.contains("PARTITION BY RANGE (occurred_at)"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_event_default"));
-        assertTrue(schema.contains("CREATE TRIGGER trg_security_audit_event_immutable"));
-        assertTrue(schema.contains("REVOKE UPDATE, DELETE ON spectra_security.security_audit_event FROM PUBLIC"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_retention_policy"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.security_audit_archive_manifest"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_event_default"));
+        assertTrue(schema.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
+        assertTrue(schema.contains("REVOKE UPDATE, DELETE ON spectra_security.sec_security_audit_event FROM PUBLIC"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_retention_policy"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_archive_manifest"));
         assertTrue(schema.contains("hot_retention_months >= 12"));
         assertTrue(schema.contains("total_retention_years >= 5"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.security_change_outbox"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
     }
 
     @Test
@@ -133,14 +133,16 @@ class SecuritySchemaContractTest {
         String schema = readSql();
         String migration = readV1();
 
-        for (String source : List.of(schema, migration)) {
-            assertTrue(source.contains("authority_level SMALLINT NOT NULL"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.role_assignment"));
-            assertTrue(source.contains("version       BIGINT NOT NULL DEFAULT 0"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.assignment_permission_boundary"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.assignment_grant_boundary"));
-            assertTrue(source.contains("PRIMARY KEY (assignment_id, permission_id)"));
-        }
+        assertTrue(schema.contains("authority_level SMALLINT NOT NULL"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_role_assignment"));
+        assertTrue(schema.contains("version       BIGINT NOT NULL DEFAULT 0"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_permission_boundary"));
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_grant_boundary"));
+        assertTrue(schema.contains("PRIMARY KEY (assignment_id, permission_id)"));
+        assertTrue(migration.contains("authority_level SMALLINT NOT NULL"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.role_assignment"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.assignment_permission_boundary"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.assignment_grant_boundary"));
         assertTrue(migration.contains("security_version      BIGINT NOT NULL DEFAULT 0"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_organization_version"));
@@ -151,16 +153,18 @@ class SecuritySchemaContractTest {
     void phase5MustKeepClientPolicyAndMfaTablesInBothSchemaSources() throws IOException {
         String schema = readSql();
         String migration = readV1();
-        for (String source : List.of(schema, migration)) {
-            assertTrue(source.contains("CREATE TABLE spectra_security.security_client"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.authentication_method"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.session_policy"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.mfa_enrollment"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.totp_credential"));
-            assertTrue(source.contains("CREATE TABLE spectra_security.recovery_code"));
-            assertTrue(source.contains("encrypted_secret BYTEA NOT NULL"));
-            assertTrue(source.contains("code_hash     VARCHAR(255) NOT NULL"));
+        for (String table : List.of("sec_security_client", "sec_authentication_method", "sec_session_policy",
+                "sec_mfa_enrollment", "sec_totp_credential", "sec_recovery_code")) {
+            assertTrue(schema.contains("CREATE TABLE spectra_security." + table));
         }
+        for (String table : List.of("security_client", "authentication_method", "session_policy",
+                "mfa_enrollment", "totp_credential", "recovery_code")) {
+            assertTrue(migration.contains("CREATE TABLE spectra_security." + table));
+        }
+        assertTrue(schema.contains("encrypted_secret BYTEA NOT NULL"));
+        assertTrue(schema.contains("code_hash     VARCHAR(255) NOT NULL"));
+        assertTrue(migration.contains("encrypted_secret BYTEA NOT NULL"));
+        assertTrue(migration.contains("code_hash     VARCHAR(255) NOT NULL"));
     }
 
     @Test
@@ -257,6 +261,24 @@ class SecuritySchemaContractTest {
                     || phase7Seed.contains("md5('" + code + "')::uuid, '" + code + "'"), code);
         }
         assertFalse(seed.contains("ROLE_DEV_OPS"));
+    }
+
+    @Test
+    void phase10MustRenameDeployedSecurityTablesAndDatabaseObjectsToSecPrefix() throws IOException {
+        String schema = readSql();
+        String migration = readMigration("V18__normalize_security_object_names.sql");
+
+        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_permission"));
+        assertTrue(schema.contains("CONSTRAINT pk_sec_permission PRIMARY KEY"));
+        assertTrue(schema.contains("CONSTRAINT fk_sec_role_permission_role_id"));
+        assertTrue(schema.contains("CREATE INDEX idx_sec_role_assignment_user_state"));
+        assertFalse(schema.contains("CREATE TABLE spectra_security.permission"));
+        assertFalse(schema.contains("+-- spectra_security: table and column comments"));
+
+        assertTrue(migration.contains("ALTER TABLE spectra_security.permission RENAME TO sec_permission"));
+        assertTrue(migration.contains("ALTER TABLE spectra_security.role RENAME TO sec_role"));
+        assertTrue(migration.contains("ALTER TABLE spectra_security.sec_permission RENAME CONSTRAINT permission_pkey TO pk_sec_permission"));
+        assertTrue(migration.contains("ALTER FUNCTION spectra_security.reject_audit_mutation() RENAME TO sec_reject_audit_mutation"));
     }
 
     private String readSql() throws IOException {

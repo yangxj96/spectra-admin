@@ -7,11 +7,13 @@
 
 package com.devops00.spectra.core.security.authentication;
 
+import com.devops00.spectra.security.base.mfa.SecurityMfaVerifier;
+
 import java.util.List;
 import java.util.UUID;
 
 /** MFA 登记、挑战和 Recovery Code 应用服务。 */
-public interface MfaService {
+public interface MfaService extends SecurityMfaVerifier {
 
     MfaEnrollmentResult beginTotpEnrollment(UUID userId);
 

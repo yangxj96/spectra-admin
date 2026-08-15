@@ -20,7 +20,7 @@ import java.util.UUID;
 /** MFA 因子登记聚合。 */
 @Data
 @NoArgsConstructor
-@TableName(value = "mfa_enrollment", schema = "spectra_security")
+@TableName(value = "sec_mfa_enrollment", schema = "spectra_security")
 public class MfaEnrollment {
 
     @TableId(value = "id", type = IdType.INPUT)

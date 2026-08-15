@@ -14,26 +14,22 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.authorization.entity;
+package com.devops00.spectra.security.base.mfa;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.UUID;
 
-@Data
-@TableName(value = "sec_authorization_scope", schema = "spectra_security")
-public class AuthorizationScope {
+/** MFA 校验窄端口；安全适配层不依赖具体 MFA 数据库实现。 */
+@NullMarked
+public interface SecurityMfaVerifier {
 
-    @TableId(value = "id", type = IdType.INPUT)
-    private UUID id;
+    /** 判断用户是否已经激活 TOTP 因子。 */
+    boolean hasActiveTotp(UUID userId);
 
-    @TableField(value = "scope_mode")
-    private String scopeMode;
+    /** 校验 TOTP 验证码。 */
+    boolean verifyTotp(UUID userId, String code);
 
-    @TableField(value = "resource_code")
-    private String resourceCode;
+    /** 原子消费 Recovery Code。 */
+    boolean consumeRecoveryCode(UUID userId, String code);
 }

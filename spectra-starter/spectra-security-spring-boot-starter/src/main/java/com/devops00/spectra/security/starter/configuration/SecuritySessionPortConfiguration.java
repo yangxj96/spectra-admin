@@ -28,10 +28,12 @@ import com.devops00.spectra.security.base.holder.SecuritySessionReader;
 import com.devops00.spectra.security.base.holder.SecuritySessionRevoker;
 import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
+import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecuritySessionContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository;
+import com.devops00.spectra.security.starter.strategy.RedisMfaLoginChallengeRepository;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -137,5 +139,12 @@ public class SecuritySessionPortConfiguration {
         return new RedisSecuritySessionRepository(om, redis, properties, userOnlineConverter,
                 sessionPolicyProvider.getIfAvailable(),
                 securityUserLoaderProvider.getIfAvailable());
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
+    public SecurityMfaChallengePort securityMfaChallengePort(
+            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties) {
+        return new RedisMfaLoginChallengeRepository(redis, properties);
     }
 }

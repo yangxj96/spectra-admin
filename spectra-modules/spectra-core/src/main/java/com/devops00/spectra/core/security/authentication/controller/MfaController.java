@@ -7,13 +7,21 @@
 
 package com.devops00.spectra.core.security.authentication.controller;
 
+import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.core.security.authentication.MfaEnrollmentResult;
 import com.devops00.spectra.core.security.authentication.MfaService;
+import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
+import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,9 +43,13 @@ public class MfaController {
 
     private final SecurityContextAccessor securityContextAccessor;
 
-    public MfaController(MfaService mfaService, SecurityContextAccessor securityContextAccessor) {
+    private final SecurityMfaChallengePort mfaChallengePort;
+
+    public MfaController(MfaService mfaService, SecurityContextAccessor securityContextAccessor,
+                         ObjectProvider<SecurityMfaChallengePort> mfaChallengeProvider) {
         this.mfaService = mfaService;
         this.securityContextAccessor = securityContextAccessor;
+        this.mfaChallengePort = mfaChallengeProvider.getIfAvailable();
     }
 
     @PostMapping("/totp/enroll")
@@ -46,10 +58,36 @@ public class MfaController {
         return mfaService.beginTotpEnrollment(currentUserId());
     }
 
+    @ULog(value = "'开始首次 MFA 登记'", type = SysLogType.SAFETY)
+    @Encrypt(response = false)
+    @PostMapping(value = "/setup/totp/enroll", version = "1.0.0+")
+    @PreAuthorize("permitAll()")
+    public MfaEnrollmentResult beginSetupTotpEnrollment(@Valid @RequestBody SetupChallengeFrom from,
+                                                        HttpServletRequest request) {
+        MfaLoginChallenge challenge = setupChallenge(from.challengeId());
+        validateChallengeClient(challenge, request);
+        return mfaService.beginTotpEnrollment(challenge.userId());
+    }
+
     @PostMapping("/totp/confirm")
     @PreAuthorize("isAuthenticated()")
     public List<String> confirmTotpEnrollment(@Valid @RequestBody ConfirmFrom from) {
         return mfaService.confirmTotpEnrollment(currentUserId(), from.enrollmentId(), from.code());
+    }
+
+    @ULog(value = "'确认首次 MFA 登记'", type = SysLogType.SAFETY)
+    @Encrypt(response = false)
+    @PostMapping(value = "/setup/totp/confirm", version = "1.0.0+")
+    @PreAuthorize("permitAll()")
+    public List<String> confirmSetupTotpEnrollment(@Valid @RequestBody SetupConfirmFrom from,
+                                                   HttpServletRequest request) {
+        MfaLoginChallenge challenge = setupChallenge(from.challengeId());
+        validateChallengeClient(challenge, request);
+        List<String> recoveryCodes = mfaService.confirmTotpEnrollment(challenge.userId(), from.enrollmentId(), from.code());
+        if (!requireChallengePort().markEnrollmentCompleted(from.challengeId())) {
+            throw new IllegalStateException("MFA 挑战状态更新失败");
+        }
+        return recoveryCodes;
     }
 
     @PostMapping("/recovery/verify")
@@ -75,7 +113,37 @@ public class MfaController {
         return userId;
     }
 
+    private MfaLoginChallenge setupChallenge(String challengeId) {
+        MfaLoginChallenge challenge = requireChallengePort().find(challengeId);
+        if (challenge == null || !challenge.enrollmentRequired() || challenge.enrollmentCompleted()) {
+            throw new IllegalArgumentException("MFA 登记挑战不存在或已失效");
+        }
+        return challenge;
+    }
+
+    private SecurityMfaChallengePort requireChallengePort() {
+        if (mfaChallengePort == null) {
+            throw new IllegalStateException("MFA 挑战存储未配置");
+        }
+        return mfaChallengePort;
+    }
+
+    private void validateChallengeClient(MfaLoginChallenge challenge, HttpServletRequest request) {
+        String clientType = request.getHeader("X-Client-Type");
+        ClientType actual = ClientType.fromName(clientType);
+        if (challenge.clientType() != actual) {
+            throw new IllegalArgumentException("MFA 挑战客户端不匹配");
+        }
+    }
+
     public record ConfirmFrom(@NotNull UUID enrollmentId, @NotBlank String code) {
+    }
+
+    public record SetupChallengeFrom(@NotBlank String challengeId) {
+    }
+
+    public record SetupConfirmFrom(@NotBlank String challengeId, @NotNull UUID enrollmentId,
+                                   @NotBlank String code) {
     }
 
     public record RecoveryCodeFrom(@NotBlank String code) {

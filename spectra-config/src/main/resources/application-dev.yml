@@ -3,8 +3,10 @@ spectra:
   security:
     verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
-    refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:__Host-spectra-refresh}
-    refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}
+    # 默认 HTTP 开发服务使用普通 Host-only Cookie；生产环境必须切换为 Secure 的 __Host- Cookie。
+    refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:spectra-refresh}
+    refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:false}
+    allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:true}
     refresh-cookie-same-site: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE:Strict}
     refresh-cookie-same-site-none-allowed: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE_NONE_ALLOWED:false}
     refresh-cookie-path: ${SPECTRA_SECURITY_REFRESH_COOKIE_PATH:/}
@@ -15,6 +17,8 @@ spectra:
     mfa-encryption-key-version: ${SPECTRA_SECURITY_MFA_ENCRYPTION_KEY_VERSION:v1}
     mfa-previous-encryption-key: ${SPECTRA_SECURITY_MFA_PREVIOUS_ENCRYPTION_KEY:}
     mfa-previous-encryption-key-version: ${SPECTRA_SECURITY_MFA_PREVIOUS_ENCRYPTION_KEY_VERSION:}
+    mfa-challenge-expire: ${SPECTRA_SECURITY_MFA_CHALLENGE_EXPIRE:300}
+    mfa-challenge-max-attempts: ${SPECTRA_SECURITY_MFA_CHALLENGE_MAX_ATTEMPTS:5}
     audit-archive-backend: ${SPECTRA_SECURITY_AUDIT_ARCHIVE_BACKEND:PENDING}
   system:
     base-dir: files
@@ -67,11 +71,11 @@ spectra:
 server:
   port: ${SERVER_PORT:4004}
   forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:framework}
-  ssl:
-    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
-    key-store-password: ${SSL_PASSWORD}
-    key-store-type: ${SSL_TYPE}
-    key-alias: ${SSL_ALIAS}
+#  ssl:
+#    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+#    key-store-password: ${SSL_PASSWORD}
+#    key-store-type: ${SSL_TYPE}
+#    key-alias: ${SSL_ALIAS}
   servlet:
     context-path: /api
     session:

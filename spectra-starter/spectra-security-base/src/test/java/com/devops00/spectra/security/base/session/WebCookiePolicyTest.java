@@ -26,6 +26,12 @@ class WebCookiePolicyTest {
         insecure.setRefreshCookieSecure(false);
         assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(insecure));
 
+        SecurityProperties development = new SecurityProperties();
+        development.setRefreshCookieName("spectra-refresh");
+        development.setRefreshCookieSecure(false);
+        development.setAllowInsecureRefreshCookie(true);
+        assertDoesNotThrow(() -> WebCookiePolicy.validate(development));
+
         SecurityProperties domain = new SecurityProperties();
         domain.setRefreshCookieDomain("example.com");
         assertThrows(IllegalStateException.class, () -> WebCookiePolicy.validate(domain));

@@ -23,7 +23,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-@TableName(value = "assignment_permission_boundary", schema = "spectra_security")
+@TableName(value = "sec_assignment_permission_boundary", schema = "spectra_security")
 public class AssignmentPermissionBoundary {
 
     @TableField(value = "assignment_id")

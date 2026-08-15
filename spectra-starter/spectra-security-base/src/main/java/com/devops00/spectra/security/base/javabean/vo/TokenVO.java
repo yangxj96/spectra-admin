@@ -75,4 +75,16 @@ public class TokenVO implements Serializable {
      * RoleAssignment 和角色名称不是客户端授权事实，不随 Token 暴露。
      */
     private List<String> permissions;
+
+    /** 是否需要在创建正式会话前完成 MFA。 */
+    private boolean mfaRequired;
+
+    /** 是否需要先完成首次 TOTP 登记。 */
+    private boolean mfaEnrollmentRequired;
+
+    /** MFA 预认证挑战 ID；仅短期有效，不是 Access Token。 */
+    private String mfaChallengeId;
+
+    /** MFA 预认证挑战过期时间（毫秒时间戳）。 */
+    private Long mfaChallengeExpiresAt;
 }

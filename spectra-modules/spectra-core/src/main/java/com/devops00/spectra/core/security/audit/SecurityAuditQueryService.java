@@ -54,9 +54,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SecurityAuditQueryService {
 
-    private static final String TABLE = "spectra_security.security_audit_event";
+    private static final String TABLE = "spectra_security.sec_security_audit_event";
 
-    private static final String RETENTION_TABLE = "spectra_security.security_audit_retention_policy";
+    private static final String RETENTION_TABLE = "spectra_security.sec_security_audit_retention_policy";
 
     private static final int MAX_PAGE_SIZE = 100;
 
@@ -92,7 +92,8 @@ public class SecurityAuditQueryService {
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(pageSize);
         arguments.add(offset);
-        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow).stream()
+        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow)
+                .stream()
                 .filter(event -> visibilityPolicy.canView(viewer, toEvent(event)))
                 .toList();
         recordOperation(viewer, "SECURITY_AUDIT_VIEWED", "PAGE");
@@ -115,7 +116,8 @@ public class SecurityAuditQueryService {
                 + " ORDER BY occurred_at DESC LIMIT 1";
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(eventId);
-        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow).stream()
+        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow)
+                .stream()
                 .filter(event -> visibilityPolicy.canView(viewer, toEvent(event)))
                 .toList();
         if (records.isEmpty()) {
@@ -137,24 +139,39 @@ public class SecurityAuditQueryService {
                 + " ORDER BY occurred_at DESC, event_id DESC LIMIT ?";
         var arguments = new ArrayList<>(plan.arguments());
         arguments.add(MAX_EXPORT_ROWS);
-        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow).stream()
+        List<SecurityAuditVO> records = jdbcTemplate.query(sql, arguments.toArray(), this::mapVisibleRow)
+                .stream()
                 .filter(event -> visibilityPolicy.canView(viewer, toEvent(event)))
                 .toList();
-        var csv = new StringBuilder("event_id,event_type,operator_id,target_id,client,ip,user_agent,before,after,reason,occurred_at,result,correlation_id\n");
+        var csv = new StringBuilder(
+                "event_id,event_type,operator_id,target_id,client,ip,user_agent,before,after,reason,occurred_at,result,correlation_id\n");
         for (SecurityAuditVO record : records) {
-            csv.append(csvCell(record.eventId())).append(',')
-                    .append(csvCell(record.eventType())).append(',')
-                    .append(csvCell(record.operatorId())).append(',')
-                    .append(csvCell(record.targetId())).append(',')
-                    .append(csvCell(record.client())).append(',')
-                    .append(csvCell(record.ip())).append(',')
-                    .append(csvCell(record.userAgent())).append(',')
-                    .append(csvCell(toJson(record.before()))).append(',')
-                    .append(csvCell(toJson(record.after()))).append(',')
-                    .append(csvCell(record.reason())).append(',')
-                    .append(csvCell(record.occurredAt())).append(',')
-                    .append(csvCell(record.result())).append(',')
-                    .append(csvCell(record.correlationId())).append('\n');
+            csv.append(csvCell(record.eventId()))
+                    .append(',')
+                    .append(csvCell(record.eventType()))
+                    .append(',')
+                    .append(csvCell(record.operatorId()))
+                    .append(',')
+                    .append(csvCell(record.targetId()))
+                    .append(',')
+                    .append(csvCell(record.client()))
+                    .append(',')
+                    .append(csvCell(record.ip()))
+                    .append(',')
+                    .append(csvCell(record.userAgent()))
+                    .append(',')
+                    .append(csvCell(toJson(record.before())))
+                    .append(',')
+                    .append(csvCell(toJson(record.after())))
+                    .append(',')
+                    .append(csvCell(record.reason()))
+                    .append(',')
+                    .append(csvCell(record.occurredAt()))
+                    .append(',')
+                    .append(csvCell(record.result()))
+                    .append(',')
+                    .append(csvCell(record.correlationId()))
+                    .append('\n');
         }
         recordOperation(viewer, "SECURITY_AUDIT_EXPORTED", "EXPORT");
         return csv.toString();
@@ -165,7 +182,7 @@ public class SecurityAuditQueryService {
      */
     public SecurityAuditRetentionVO retention() {
         return jdbcTemplate.queryForObject("SELECT policy_key, hot_retention_months, total_retention_years, "
-                        + "archive_backend, state, version FROM " + RETENTION_TABLE + " WHERE policy_key = 'DEFAULT'",
+                + "archive_backend, state, version FROM " + RETENTION_TABLE + " WHERE policy_key = 'DEFAULT'",
                 (resultSet, ignored) -> new SecurityAuditRetentionVO(
                         resultSet.getString("policy_key"),
                         resultSet.getInt("hot_retention_months"),

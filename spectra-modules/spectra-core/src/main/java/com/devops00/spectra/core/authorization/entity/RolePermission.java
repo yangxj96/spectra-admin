@@ -23,7 +23,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-@TableName(value = "role_permission", schema = "spectra_security")
+@TableName(value = "sec_role_permission", schema = "spectra_security")
 public class RolePermission {
 
     @TableField(value = "role_id")

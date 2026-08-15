@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class JdbcRootPolicyRepository implements RootPolicyRepository {
 
-    private static final String TABLE = "spectra_security.root_policy";
+    private static final String TABLE = "spectra_security.sec_root_policy";
     private static final String SINGLETON_KEY = "SYSTEM";
 
     private final JdbcTemplate jdbcTemplate;
@@ -73,8 +73,8 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
         try {
             Long count = jdbcTemplate.queryForObject("""
                     SELECT COUNT(DISTINCT assignment.user_id)
-                    FROM spectra_security.role_assignment assignment
-                    JOIN spectra_security.role role ON role.id = assignment.role_id
+                    FROM spectra_security.sec_role_assignment assignment
+                    JOIN spectra_security.sec_role role ON role.id = assignment.role_id
                     JOIN spectra_core.sys_user user_account ON user_account.id = assignment.user_id
                     WHERE role.code = 'ROLE_DEV_OPS'
                       AND role.state = 'ACTIVE'
@@ -82,7 +82,7 @@ public class JdbcRootPolicyRepository implements RootPolicyRepository {
                       AND user_account.status = 'ACTIVE'
                       AND EXISTS (
                           SELECT 1
-                          FROM spectra_security.authentication_identity identity
+                          FROM spectra_security.sec_authentication_identity identity
                           WHERE identity.user_id = assignment.user_id
                             AND identity.state = 'ACTIVE'
                       )

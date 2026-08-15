@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV16() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV18() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,14 +70,21 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"),
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"),
                     versions);
-            assertTrue(tableExists(connection, "spectra_security", "security_audit_event"));
-            assertTrue(tableExists(connection, "spectra_security", "security_audit_archive_manifest"));
-            assertTrue(tableExists(connection, "spectra_security", "assignment_permission_boundary"));
-            assertTrue(tableExists(connection, "spectra_security", "security_client"));
-            assertTrue(tableExists(connection, "spectra_security", "session_policy"));
-            assertTrue(tableExists(connection, "spectra_security", "password_policy"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_event"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_archive_manifest"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_assignment_permission_boundary"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_security_client"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_session_policy"));
+            assertTrue(tableExists(connection, "spectra_security", "sec_password_policy"));
+            assertFalse(tableExists(connection, "spectra_security", "security_audit_event"));
+            assertFalse(tableExists(connection, "spectra_security", "permission"));
+            assertTrue(constraintExists(connection, "spectra_security", "sec_permission", "pk_sec_permission"));
+            assertTrue(constraintExists(
+                    connection, "spectra_security", "sec_role_permission", "fk_sec_role_permission_role_id"));
+            assertTrue(indexExists(connection, "spectra_security", "idx_sec_role_assignment_user_state"));
+            assertTrue(indexExists(connection, "spectra_security", "uk_sec_scope_rule_department"));
             assertTrue(columnExists(connection, "spectra_core", "sys_log", "type"));
             assertTrue(columnExists(connection, "spectra_core", "sys_log", "explain"));
             assertTrue(columnExists(connection, "spectra_core", "sys_log", "status"));
@@ -98,24 +105,24 @@ class SecurityFlywayPostgresIntegrationTest {
             assertFalse(tableExists(connection, "spectra_core", "sys_authority"));
             assertFalse(tableExists(connection, "spectra_core", "sys_role"));
             try (var statement = connection.createStatement();
-                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.permission")) {
+                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.sec_permission")) {
                 resultSet.next();
                 assertEquals(115, resultSet.getInt(1));
             }
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery(
-                            "SELECT COUNT(*) FROM spectra_security.security_client WHERE state = 'ACTIVE'")) {
+                            "SELECT COUNT(*) FROM spectra_security.sec_security_client WHERE state = 'ACTIVE'")) {
                 resultSet.next();
                 assertEquals(3, resultSet.getInt(1));
             }
             try (var statement = connection.createStatement();
-                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.session_policy")) {
+                    var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.sec_session_policy")) {
                 resultSet.next();
                 assertEquals(3, resultSet.getInt(1));
             }
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery(
-                            "SELECT min_length FROM spectra_security.password_policy WHERE policy_key = 'SYSTEM'")) {
+                            "SELECT min_length FROM spectra_security.sec_password_policy WHERE policy_key = 'SYSTEM'")) {
                 assertTrue(resultSet.next());
                 assertEquals(12, resultSet.getInt(1));
             }
@@ -172,6 +179,38 @@ class SecurityFlywayPostgresIntegrationTest {
             statement.setString(1, schema);
             statement.setString(2, table);
             statement.setString(3, column);
+            try (var resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getBoolean(1);
+            }
+        }
+    }
+
+    private static boolean constraintExists(Connection connection, String schema, String table, String constraint)
+            throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT EXISTS (SELECT 1 FROM pg_constraint constraint_row "
+                        + "JOIN pg_class table_row ON table_row.oid = constraint_row.conrelid "
+                        + "JOIN pg_namespace schema_row ON schema_row.oid = table_row.relnamespace "
+                        + "WHERE schema_row.nspname = ? AND table_row.relname = ? "
+                        + "AND constraint_row.conname = ?)")) {
+            statement.setString(1, schema);
+            statement.setString(2, table);
+            statement.setString(3, constraint);
+            try (var resultSet = statement.executeQuery()) {
+                resultSet.next();
+                return resultSet.getBoolean(1);
+            }
+        }
+    }
+
+    private static boolean indexExists(Connection connection, String schema, String index) throws SQLException {
+        try (var statement = connection.prepareStatement(
+                "SELECT EXISTS (SELECT 1 FROM pg_class index_row "
+                        + "JOIN pg_namespace schema_row ON schema_row.oid = index_row.relnamespace "
+                        + "WHERE schema_row.nspname = ? AND index_row.relname = ? AND index_row.relkind = 'i')")) {
+            statement.setString(1, schema);
+            statement.setString(2, index);
             try (var resultSet = statement.executeQuery()) {
                 resultSet.next();
                 return resultSet.getBoolean(1);

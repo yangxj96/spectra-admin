@@ -23,13 +23,19 @@ public final class WebCookiePolicy {
         String path = properties.getRefreshCookiePath();
         String sameSite = properties.getRefreshCookieSameSite();
         String domain = properties.getRefreshCookieDomain();
-        if (name == null
-                || !name.startsWith("__Host-")
-                || !properties.isRefreshCookieSecure()
-                || path == null
-                || !"/".equals(path)
-                || (domain != null && !domain.isBlank())) {
-            throw new IllegalStateException("Web Refresh Cookie 必须为 Secure、Host-only、Path=/ 的 __Host- Cookie");
+        boolean secure = properties.isRefreshCookieSecure();
+        if (name == null || name.isBlank()) {
+            throw new IllegalStateException("Web Refresh Cookie 名称不能为空");
+        }
+        boolean hostCookie = name.startsWith("__Host-");
+        if (path == null || !"/".equals(path) || (domain != null && !domain.isBlank())) {
+            throw new IllegalStateException("Web Refresh Cookie 必须为 Host-only、Path=/ 且不能设置 Domain");
+        }
+        if (secure && !hostCookie) {
+            throw new IllegalStateException("Secure Web Refresh Cookie 必须使用 __Host- 名称");
+        }
+        if (!secure && (!properties.isAllowInsecureRefreshCookie() || hostCookie)) {
+            throw new IllegalStateException("非 Secure Web Refresh Cookie 仅允许开发环境显式开启，且不得使用 __Host- 名称");
         }
         if (sameSite == null
                 || !("Strict".equalsIgnoreCase(sameSite)
@@ -37,8 +43,9 @@ public final class WebCookiePolicy {
                         || "None".equalsIgnoreCase(sameSite))) {
             throw new IllegalStateException("Web Refresh Cookie SameSite 只能为 Strict、Lax 或 None");
         }
-        if ("None".equalsIgnoreCase(sameSite) && !properties.isRefreshCookieSameSiteNoneAllowed()) {
-            throw new IllegalStateException("SameSite=None 必须经过部署安全评审并显式允许");
+        if ("None".equalsIgnoreCase(sameSite)
+                && (!secure || !properties.isRefreshCookieSameSiteNoneAllowed())) {
+            throw new IllegalStateException("SameSite=None 必须在 Secure Cookie 下经过部署安全评审并显式允许");
         }
         String csrfCookieName = properties.getCsrfCookieName();
         String csrfHeaderName = properties.getCsrfHeaderName();

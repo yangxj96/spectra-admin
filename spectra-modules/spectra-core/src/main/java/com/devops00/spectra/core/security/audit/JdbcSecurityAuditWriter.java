@@ -41,7 +41,7 @@ import java.sql.Types;
 @RequiredArgsConstructor
 public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
 
-    private static final String TABLE = "spectra_security.security_audit_event";
+    private static final String TABLE = "spectra_security.sec_security_audit_event";
 
     private static final String INSERT_SQL = "INSERT INTO " + TABLE
             + " (event_id, event_type, operator_id, target_id, client, ip, user_agent, before_snapshot, after_snapshot, reason, occurred_at, result, correlation_id)"

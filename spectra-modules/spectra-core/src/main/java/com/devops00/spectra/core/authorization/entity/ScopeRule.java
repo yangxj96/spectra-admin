@@ -25,7 +25,7 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-@TableName(value = "scope_rule", schema = "spectra_security")
+@TableName(value = "sec_scope_rule", schema = "spectra_security")
 public class ScopeRule {
 
     @TableId(value = "id", type = IdType.INPUT)
