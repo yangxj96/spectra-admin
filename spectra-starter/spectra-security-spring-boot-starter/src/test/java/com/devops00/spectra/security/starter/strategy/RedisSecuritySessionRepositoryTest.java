@@ -72,10 +72,10 @@ class RedisSecuritySessionRepositoryTest {
                 "accessToken", accessDigest,
                 "userId", userId.toString(),
                 "clientType", "WEB",
-                "familyId", familyId));
-        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of(
-                "clientType", "WEB",
+                "familyId", familyId,
                 "aal", "AAL2"));
+        // Access Session 已过期时仍必须依据 Refresh Hash 保留的 AAL2 刷新成功。
+        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of());
         when(sets.members(anyString())).thenReturn(Set.of());
         when(redis.hasKey(anyString())).thenReturn(false);
         when(redis.execute(any(), anyList(), any())).thenReturn(1L);

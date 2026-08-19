@@ -16,16 +16,20 @@
 
 package com.devops00.spectra.core.authorization.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.authorization.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.authorization.domain.OrganizationChangeImpact;
+import com.devops00.spectra.core.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.from.OrganizationCreateApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.vo.OrganizationChangePreviewVO;
-import com.devops00.spectra.core.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.authorization.mapper.RoleAssignmentMapper;
+import com.devops00.spectra.core.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.authorization.service.OrganizationChangeService;
 import com.devops00.spectra.core.authorization.service.OrganizationImpactAnalyzer;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -63,12 +67,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
- * 部门移动的组织版本与授权影响门禁。
+ * 部门新增、编辑和移动的组织版本与授权影响门禁。
  * <p>
- * 组织树变化统一提升 organizationVersion，并对当前可能受层级规则影响的用户执行安全版本
- * 与 Session 撤销；后续 Closure Table 维护在同一事务中接入。
+ * 所有改变组织树或组织节点属性的写操作都必须经过同一套 Preview/Apply 流程：
+ * Preview 固化请求摘要和 organizationVersion，Apply 再次校验并在事务中完成数据库变更、闭包重建、
+ * organizationVersion 递增和受影响会话撤销。
  *
  * @author yangxj96
  * @version 1.0
@@ -85,7 +91,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final UserMapper userMapper;
     private final DepartmentService departmentService;
     private final AuthorizationSnapshotLoader snapshotLoader;
-    private final com.devops00.spectra.core.authorization.service.GrantBoundaryService grantBoundaryService;
+    private final GrantBoundaryService grantBoundaryService;
     private final OrganizationImpactAnalyzer impactAnalyzer;
     private final AuthorizationChangeTokenService tokenService;
     private final AuthorizationEpochGuard epochGuard;
@@ -99,14 +105,28 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private final SecurityAuditWriter securityAuditWriter;
 
     @Override
+    public long currentOrganizationVersion() {
+        return readCurrentOrganizationVersion();
+    }
+
+    @Override
     public OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from) {
-        var prepared = prepare(departmentId, from);
+        return preview(departmentId, from, ChangeType.UPDATE);
+    }
+
+    @Override
+    public OrganizationChangePreviewVO previewCreate(OrganizationChangeFrom from) {
+        return preview(UUID.randomUUID(), from, ChangeType.CREATE);
+    }
+
+    private OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
+        var prepared = prepare(departmentId, from, changeType);
         var expiresAt = Instant.now().plusSeconds(300);
         var token = new AuthorizationChangeToken(UUID.randomUUID(), prepared.operatorId(), prepared.operatorId(),
                 departmentId, UUID.randomUUID(), prepared.impact().beforeVersion(), prepared.requestHash(), expiresAt);
         var result = new OrganizationChangePreviewVO();
         result.setDepartmentId(departmentId);
-        result.setNewParentId(prepared.newParentId());
+        result.setNewParentId(prepared.requestedDepartment().getPid());
         result.setPreviewToken(tokenService.issue(token));
         result.setExpectedOrganizationVersion(prepared.impact().beforeVersion());
         result.setAfterOrganizationVersion(prepared.impact().afterVersion());
@@ -115,97 +135,179 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());
         appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), departmentId,
-                Map.of("organizationVersion", prepared.impact().beforeVersion()), Map.of(), "组织变更预览");
+                Map.of("organizationVersion", prepared.impact().beforeVersion(), "operation", changeType.name()),
+                Map.of(), "组织变更预览");
         return result;
     }
 
     @Override
     @Transactional
     public void apply(UUID departmentId, OrganizationChangeApplyFrom from) {
+        var prepared = verifyAndPrepare(departmentId, from, ChangeType.UPDATE);
+        execute(prepared);
+    }
+
+    @Override
+    @Transactional
+    public void applyCreate(OrganizationCreateApplyFrom from) {
+        if (from == null || from.getDepartmentId() == null) {
+            throw new DataException("新增部门 Apply 必须提供 Preview 返回的部门 ID");
+        }
+        var prepared = verifyAndPrepare(from.getDepartmentId(), from, ChangeType.CREATE);
+        execute(prepared);
+    }
+
+    private PreparedChange verifyAndPrepare(UUID departmentId, OrganizationChangeApplyFrom from,
+                                            ChangeType changeType) {
+        if (from == null || from.getPreviewToken() == null || from.getPreviewToken().isBlank()) {
+            throw new DataException("组织变更 Preview token 不能为空");
+        }
+        if (from.getExpectedOrganizationVersion() == null) {
+            throw new DataException("组织变更 organizationVersion 不能为空");
+        }
         var token = tokenService.verify(from.getPreviewToken());
         var operatorId = currentOperatorId();
-        if (!operatorId.equals(token.operatorId()) || !operatorId.equals(token.targetUserId())
+        if (!operatorId.equals(token.operatorId())
+                || !operatorId.equals(token.targetUserId())
                 || !departmentId.equals(token.roleId())) {
             throw new DataException("组织变更 token 与当前操作者或目标部门不匹配");
         }
         if (!from.getExpectedOrganizationVersion().equals(token.expectedVersion())) {
             throw new DataException("组织变更 token 与 organizationVersion 不匹配");
         }
-        var prepared = prepare(departmentId, from);
+        var prepared = prepare(departmentId, from, changeType);
         if (!prepared.requestHash().equals(token.requestHash())) {
             throw new DataException("组织变更请求已被修改，请重新生成预览");
         }
+        return prepared;
+    }
+
+    private void execute(PreparedChange prepared) {
+        UUID operatorId = prepared.operatorId();
+        UUID departmentId = prepared.departmentId();
         var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, departmentId,
                 null, null, null, Map.of("organizationVersion", prepared.impact().beforeVersion()),
-                Map.of("organizationVersion", prepared.impact().afterVersion(), "newParentId",
-                        String.valueOf(prepared.newParentId())),
+                Map.of("organizationVersion", prepared.impact().afterVersion(), "operation",
+                        prepared.changeType().name()),
                 "通过组织变更 Preview/Apply 提交", null, AuditResult.STARTED, null);
         securityChangeExecutor.execute(event, () -> {
             persist(prepared);
-            appendAudit("ORGANIZATION_NODE_MOVED", operatorId, departmentId,
+            String eventType = prepared.changeType() == ChangeType.CREATE
+                    ? "ORGANIZATION_NODE_CREATED"
+                    : "ORGANIZATION_NODE_UPDATED";
+            appendAudit(eventType, operatorId, departmentId,
                     Map.of("organizationVersion", prepared.impact().beforeVersion()),
-                    Map.of("organizationVersion", prepared.impact().afterVersion(),
-                            "newParentId", String.valueOf(prepared.newParentId())), null);
+                    Map.of("organizationVersion", prepared.impact().afterVersion(), "parentId",
+                            String.valueOf(prepared.requestedDepartment().getPid()), "name",
+                            prepared.requestedDepartment().getName()),
+                    null);
             return Boolean.TRUE;
         });
     }
 
-    private PreparedChange prepare(UUID departmentId, OrganizationChangeFrom from) {
-        if (departmentId == null || from == null || from.getExpectedOrganizationVersion() == null) {
+    private PreparedChange prepare(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
+        if (departmentId == null
+                || from == null
+                || from.getExpectedOrganizationVersion() == null
+                || from.getName() == null
+                || from.getName().isBlank()
+                || from.getType() == null
+                || from.getRegionId() == null) {
             throw new DataException("组织变更参数不能为空");
         }
-        var department = departmentMapper.selectById(departmentId);
-        if (department == null) {
+        var existing = departmentMapper.selectById(departmentId);
+        if (changeType == ChangeType.CREATE && existing != null) {
+            throw new DataException("预览创建的部门 ID 已被占用，请重新发起新增");
+        }
+        if (changeType == ChangeType.UPDATE && existing == null) {
             throw new DataNotExistException("目标部门不存在");
         }
-        var currentVersion = currentOrganizationVersion();
+
+        var currentVersion = readCurrentOrganizationVersion();
         if (currentVersion != from.getExpectedOrganizationVersion()) {
             throw new DataException("organizationVersion 已变化，请重新生成预览");
         }
-        var newParentId = from.getNewParentId();
-        if (Objects.equals(departmentId, newParentId)) {
-            throw new DataException("部门不能移动到自身");
-        }
-        if (newParentId != null) {
-            if (departmentMapper.selectById(newParentId) == null) {
-                throw new DataNotExistException("新的上级部门不存在");
-            }
-            if (departmentService.getSelfAndDescendantIds(departmentId).contains(newParentId)) {
-                throw new DataException("部门不能移动到自己的下级节点");
-            }
-        }
-        var assignments = roleAssignmentMapper.selectList(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<RoleAssignment>()
+        validateParent(departmentId, from.getNewParentId(), existing);
+
+        var requestedDepartment = requestedDepartment(departmentId, from);
+        var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getState, "ACTIVE"));
-        var userIds = assignments.stream().map(RoleAssignment::getUserId).collect(java.util.stream.Collectors.toSet());
+        var userIds = assignments.stream().map(RoleAssignment::getUserId).collect(Collectors.toSet());
         var impact = impactAnalyzer.analyze(currentVersion, assignments.size(), userIds.size(), true);
         var operatorId = currentOperatorId();
         var rootPolicy = rootPolicyProvider.getIfAvailable();
         boolean root = rootPolicy != null && rootPolicy.isRoot(SecurityContextHolder.getContext().getAuthentication());
+        String permission = changeType == ChangeType.CREATE ? "department:create" : "department:update";
         grantBoundaryService.evaluate(snapshotLoader.load(operatorId), operatorId, null,
-                List.of(new AuthorizationGrantRequest("department:update", AuthorizationScope.of(ScopeMode.NONE),
-                        AuthorizationScope.of(ScopeMode.NONE), 1)), root);
-        var requestHash = requestHash(departmentId, newParentId, currentVersion);
+                List.of(new AuthorizationGrantRequest(permission, AuthorizationScope.of(ScopeMode.NONE),
+                        AuthorizationScope.of(ScopeMode.NONE), 1)),
+                root);
+        var requestHash = requestHash(departmentId, changeType, requestedDepartment, currentVersion);
         var approvalGate = approvalGateProvider.getIfAvailable();
         if (approvalGate != null) {
-            approvalGate.assertAllowed("ORGANIZATION_CHANGE", requestHash);
+            approvalGate.assertAllowed(changeType == ChangeType.CREATE ? "ORGANIZATION_CREATE" : "ORGANIZATION_CHANGE",
+                    requestHash);
         }
-        return new PreparedChange(operatorId, department, newParentId, impact, requestHash, userIds);
+        return new PreparedChange(operatorId, departmentId, changeType, requestedDepartment, impact, requestHash,
+                userIds);
     }
 
-    private long currentOrganizationVersion() {
+    private void validateParent(UUID departmentId, UUID newParentId, Department existing) {
+        if (Objects.equals(departmentId, newParentId)) {
+            throw new DataException("部门不能移动到自身");
+        }
+        if (newParentId == null) {
+            return;
+        }
+        if (departmentMapper.selectById(newParentId) == null) {
+            throw new DataNotExistException("新的上级部门不存在");
+        }
+        if (existing != null && departmentService.getSelfAndDescendantIds(departmentId).contains(newParentId)) {
+            throw new DataException("部门不能移动到自己的下级节点");
+        }
+    }
+
+    private Department requestedDepartment(UUID departmentId, OrganizationChangeFrom from) {
+        var department = new Department();
+        department.setId(departmentId);
+        department.setPid(from.getNewParentId());
+        department.setName(from.getName().trim());
+        department.setType(from.getType().toString());
+        department.setRegionId(from.getRegionId());
+        department.setSort(from.getSort());
+        department.setRemark(from.getRemark());
+        return department;
+    }
+
+    private long readCurrentOrganizationVersion() {
         var row = organizationVersionMapper.selectById("SYSTEM");
         return row == null || row.getVersion() == null ? 0L : row.getVersion();
     }
 
     private void persist(PreparedChange prepared) {
-        var departmentUpdate = new LambdaUpdateWrapper<Department>().eq(Department::getId, prepared.department().getId())
-                .set(Department::getPid, prepared.newParentId());
-        if (departmentMapper.update(null, departmentUpdate) != 1) {
-            throw new DataException("部门移动失败");
+        var department = prepared.requestedDepartment();
+        if (prepared.changeType() == ChangeType.CREATE) {
+            department.setCode(IdWorker.get32UUID().toUpperCase());
+            if (departmentMapper.insert(department) != 1) {
+                throw new DataException("新增部门失败");
+            }
+        } else {
+            var departmentUpdate = new LambdaUpdateWrapper<Department>()
+                    .eq(Department::getId, prepared.departmentId())
+                    .set(Department::getPid, department.getPid())
+                    .set(Department::getName, department.getName())
+                    .set(Department::getType, department.getType())
+                    .set(Department::getRegionId, department.getRegionId())
+                    .set(Department::getSort, department.getSort())
+                    .set(Department::getRemark, department.getRemark());
+            if (departmentMapper.update(null, departmentUpdate) != 1) {
+                throw new DataException("编辑部门失败");
+            }
         }
         departmentMapper.clearClosure();
         departmentMapper.rebuildClosure();
-        var versionUpdate = new LambdaUpdateWrapper<OrganizationVersion>().eq(OrganizationVersion::getSingletonKey, "SYSTEM")
+        var versionUpdate = new LambdaUpdateWrapper<OrganizationVersion>()
+                .eq(OrganizationVersion::getSingletonKey, "SYSTEM")
                 .eq(OrganizationVersion::getVersion, prepared.impact().beforeVersion())
                 .setSql("version = version + 1");
         if (organizationVersionMapper.update(null, versionUpdate) != 1) {
@@ -223,8 +325,14 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         }
     }
 
-    private String requestHash(UUID departmentId, UUID newParentId, long version) {
-        var canonical = departmentId + "|" + newParentId + "|" + version;
+    private String requestHash(UUID departmentId, ChangeType changeType, Department department, long version) {
+        String canonical = List.of(changeType.name(), departmentId.toString(), Long.toString(version),
+                canonicalValue(department.getPid()), canonicalValue(department.getName()),
+                canonicalValue(department.getType()), canonicalValue(department.getRegionId()),
+                canonicalValue(department.getSort()), canonicalValue(department.getRemark()))
+                .stream()
+                .map(this::canonicalValue)
+                .collect(Collectors.joining("|"));
         try {
             var digest = MessageDigest.getInstance("SHA-256").digest(canonical.getBytes(StandardCharsets.UTF_8));
             var result = new StringBuilder();
@@ -235,6 +343,14 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         } catch (Exception exception) {
             throw new IllegalStateException("计算组织变更摘要失败", exception);
         }
+    }
+
+    private String canonicalValue(Object value) {
+        if (value == null) {
+            return "-";
+        }
+        String text = value.toString();
+        return text.length() + ":" + text;
     }
 
     private UUID currentOperatorId() {
@@ -251,9 +367,15 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
                 before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
+    private enum ChangeType {
+        CREATE,
+        UPDATE
+    }
+
     private record PreparedChange(UUID operatorId,
-                                  Department department,
-                                  UUID newParentId,
+                                  UUID departmentId,
+                                  ChangeType changeType,
+                                  Department requestedDepartment,
                                   OrganizationChangeImpact impact,
                                   String requestHash,
                                   Set<UUID> affectedUserIds) {

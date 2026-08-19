@@ -28,7 +28,7 @@
 | PostgreSQL | 18 |
 | Redis | 本地开发必需 |
 
-复制 `.mise.local.toml.example` 为 `.mise.local.toml`。模板默认使用 HTTP 4004；数据库和 Redis 必须改成真实可连接的本机值，S3、AI 和 RAG 的占位地址只保证配置完整，使用相应功能前必须接入真实 Provider。该本机文件可能包含凭据，不得提交。
+复制 `.mise.local.toml.example` 为 `.mise.local.toml`。模板默认使用 HTTPS 4004，首次启动前需要准备 `files/ssl/keystore.p12` 并填写对应密码；数据库和 Redis 必须改成真实可连接的本机值，S3、AI 和 RAG 的占位地址只保证配置完整，使用相应功能前必须接入真实 Provider。该本机文件可能包含凭据，不得提交。
 
 ```powershell
 Copy-Item .mise.local.toml.example .mise.local.toml

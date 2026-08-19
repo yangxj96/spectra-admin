@@ -18,6 +18,7 @@ package com.devops00.spectra.core.authorization.controller;
 
 import com.devops00.spectra.core.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.from.OrganizationCreateApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeFrom;
 import com.devops00.spectra.core.authorization.javabean.from.RoleAuthorizationApplyFrom;
@@ -67,6 +68,31 @@ public class AuthorizationController {
 
     private final OrganizationChangeService organizationChangeService;
 
+    @ULog("'查询组织结构安全版本'")
+    @GetMapping(value = "/departments/organization-version", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'department:read')")
+    public long organizationVersion() {
+        return organizationChangeService.currentOrganizationVersion();
+    }
+
+    @ULog("'预览新增部门影响'")
+    @PostMapping(value = "/departments/impact-preview", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'department:create')")
+    public OrganizationChangePreviewVO departmentCreatePreview(
+                                                               @Validated @RequestBody OrganizationChangeFrom from) {
+        log.debug("预览新增部门影响: expectedOrganizationVersion={}", from.getExpectedOrganizationVersion());
+        return organizationChangeService.previewCreate(from);
+    }
+
+    @ULog("'提交新增部门变更'")
+    @PostMapping(value = "/departments/impact-apply", version = "2.0.0+")
+    @PreAuthorize("hasPermission(null ,'department:create')")
+    public void departmentCreateApply(@Validated @RequestBody OrganizationCreateApplyFrom from) {
+        log.debug("提交新增部门变更: departmentId={}, expectedOrganizationVersion={}", from.getDepartmentId(),
+                from.getExpectedOrganizationVersion());
+        organizationChangeService.applyCreate(from);
+    }
+
     @ULog("'查询 Role 授权能力'")
     @GetMapping(value = "/roles/{roleId}", version = "2.0.0+")
     @PreAuthorize("hasPermission(null ,'role:read')")
@@ -74,22 +100,22 @@ public class AuthorizationController {
         return roleChangeService.current(roleId);
     }
 
-    @ULog("'预览部门移动影响'")
+    @ULog("'预览部门编辑与移动影响'")
     @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "2.0.0+")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public OrganizationChangePreviewVO departmentPreview(@PathVariable UUID departmentId,
-                                                          @Validated @RequestBody OrganizationChangeFrom from) {
-        log.debug("预览部门移动影响: departmentId={}, expectedOrganizationVersion={}", departmentId,
+                                                         @Validated @RequestBody OrganizationChangeFrom from) {
+        log.debug("预览部门编辑与移动影响: departmentId={}, expectedOrganizationVersion={}", departmentId,
                 from.getExpectedOrganizationVersion());
         return organizationChangeService.preview(departmentId, from);
     }
 
-    @ULog("'提交部门移动变更'")
+    @ULog("'提交部门编辑与移动变更'")
     @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "2.0.0+")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public void departmentApply(@PathVariable UUID departmentId,
                                 @Validated @RequestBody OrganizationChangeApplyFrom from) {
-        log.debug("提交部门移动变更: departmentId={}, expectedOrganizationVersion={}", departmentId,
+        log.debug("提交部门编辑与移动变更: departmentId={}, expectedOrganizationVersion={}", departmentId,
                 from.getExpectedOrganizationVersion());
         organizationChangeService.apply(departmentId, from);
     }
@@ -98,7 +124,7 @@ public class AuthorizationController {
     @PostMapping(value = "/roles/{roleId}/impact-preview", version = "2.0.0+")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public RoleAuthorizationChangePreviewVO rolePreview(@PathVariable UUID roleId,
-                                                         @Validated @RequestBody RoleAuthorizationChangeFrom from) {
+                                                        @Validated @RequestBody RoleAuthorizationChangeFrom from) {
         log.debug("预览 Role 授权能力变更: roleId={}, expectedVersion={}", roleId, from.getExpectedVersion());
         return roleChangeService.preview(roleId, from);
     }

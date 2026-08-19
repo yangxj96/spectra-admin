@@ -18,6 +18,7 @@ package com.devops00.spectra.core.authorization.service;
 
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.from.OrganizationChangeFrom;
+import com.devops00.spectra.core.authorization.javabean.from.OrganizationCreateApplyFrom;
 import com.devops00.spectra.core.authorization.javabean.vo.OrganizationChangePreviewVO;
 
 import java.util.UUID;
@@ -31,7 +32,13 @@ import java.util.UUID;
  */
 public interface OrganizationChangeService {
 
+    long currentOrganizationVersion();
+
     OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from);
 
     void apply(UUID departmentId, OrganizationChangeApplyFrom from);
+
+    OrganizationChangePreviewVO previewCreate(OrganizationChangeFrom from);
+
+    void applyCreate(OrganizationCreateApplyFrom from);
 }

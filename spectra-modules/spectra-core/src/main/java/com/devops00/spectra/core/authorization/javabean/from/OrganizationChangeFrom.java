@@ -16,13 +16,14 @@
 
 package com.devops00.spectra.core.authorization.javabean.from;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.UUID;
 
 /**
- * 部门移动 Preview 请求。
+ * 部门新增、编辑和移动 Preview 请求。
  *
  * @author yangxj96
  * @version 1.0
@@ -35,4 +36,17 @@ public class OrganizationChangeFrom {
     private Long expectedOrganizationVersion;
 
     private UUID newParentId;
+
+    @NotBlank
+    private String name;
+
+    @NotNull
+    private Short type;
+
+    @NotNull
+    private UUID regionId;
+
+    private Integer sort;
+
+    private String remark;
 }

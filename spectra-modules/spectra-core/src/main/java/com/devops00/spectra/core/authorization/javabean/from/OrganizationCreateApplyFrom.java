@@ -16,21 +16,23 @@
 
 package com.devops00.spectra.core.authorization.javabean.from;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.UUID;
+
 /**
- * 部门编辑和移动 Apply 请求。
+ * 部门新增 Apply 请求。部门 ID 在 Preview 阶段由服务端生成并返回。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/14
+ * @since 2026/8/19
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class OrganizationChangeApplyFrom extends OrganizationChangeFrom {
+public class OrganizationCreateApplyFrom extends OrganizationChangeApplyFrom {
 
-    @NotBlank
-    private String previewToken;
+    @NotNull
+    private UUID departmentId;
 }

@@ -171,12 +171,13 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         redis.opsForValue().set(rtKey, refreshDigest, refreshTtl);
         redis.opsForSet().add(SecurityRedisKey.SESSION_FAMILY.format(familyId), tokenDigest);
         redis.expire(SecurityRedisKey.SESSION_FAMILY.format(familyId), refreshTtl);
-        // Refresh Hash 只保存摘要、主体标识和 Rotation Family。
+        // Refresh Hash 保存刷新轮换所需的不可变会话声明；AAL 必须随 Refresh Token 轮换，不能依赖已过期的 Access Session。
         Map<String, Object> rtData = new LinkedHashMap<>();
         rtData.put("accessToken", tokenDigest);
         rtData.put("userId", userId);
         rtData.put("clientType", clientType.getName());
         rtData.put("familyId", familyId);
+        rtData.put(SESSION_ASSURANCE_FIELD, mfaVerified ? ASSURANCE_LEVEL_TWO : ASSURANCE_LEVEL_ONE);
         String rtRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
         redis.opsForHash().putAll(rtRefreshKey, rtData);
         redis.expire(rtRefreshKey, refreshTtl);
@@ -228,7 +229,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
         String clientType = Objects.toString(session.get("clientType"),
                 Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
-        boolean mfaVerified = isMfaAssuredSession(session);
+        boolean mfaVerified = refreshAssurance(rtData);
         Duration refreshTtl = Duration.ofSeconds(sessionPolicy(clientType).refreshTtlSeconds());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
@@ -560,8 +561,21 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         return user.getExtraData() != null && Boolean.TRUE.equals(user.getExtraData().get("mfaVerified"));
     }
 
-    private boolean isMfaAssuredSession(Map<Object, Object> session) {
-        return ASSURANCE_LEVEL_TWO.equals(Objects.toString(session.get(SESSION_ASSURANCE_FIELD), null));
+    /**
+     * Refresh Token 的认证等级是创建会话时固化的安全声明。
+     * <p>
+     * Access Session 只有短 TTL，刷新时不能以它是否仍存在作为 MFA 是否完成的依据；
+     * 同时拒绝缺失或未知等级，避免不完整的旧格式刷新数据被降级解释为 AAL1。
+     */
+    private boolean refreshAssurance(Map<Object, Object> refreshData) {
+        String assurance = Objects.toString(refreshData.get(SESSION_ASSURANCE_FIELD), null);
+        if (ASSURANCE_LEVEL_ONE.equals(assurance)) {
+            return false;
+        }
+        if (ASSURANCE_LEVEL_TWO.equals(assurance)) {
+            return true;
+        }
+        throw new IllegalArgumentException("刷新token认证等级异常，请重新登录");
     }
 
     private boolean isRoot(SecurityUser user) {

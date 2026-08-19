@@ -71,11 +71,11 @@ spectra:
 server:
   port: ${SERVER_PORT:4004}
   forward-headers-strategy: ${SERVER_FORWARD_HEADERS_STRATEGY:framework}
-#  ssl:
-#    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
-#    key-store-password: ${SSL_PASSWORD}
-#    key-store-type: ${SSL_TYPE}
-#    key-alias: ${SSL_ALIAS}
+  ssl:
+    key-store: ${spectra.system.base-dir}/ssl/keystore.p12
+    key-store-password: ${SSL_PASSWORD}
+    key-store-type: ${SSL_TYPE}
+    key-alias: ${SSL_ALIAS}
   servlet:
     context-path: /api
     session:
