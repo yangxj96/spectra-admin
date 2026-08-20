@@ -17,7 +17,6 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.log.base.enums.SysLogType;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,7 +68,7 @@ public class SystemInitializationController {
     @Encrypt(response = false)
     @PostMapping(value = "/complete", version = "1.0.0")
     @PreAuthorize("permitAll()")
-    public TokenVO complete(@Valid @RequestBody SystemInitializationCompleteFrom from) {
-        return initializationService.complete(from);
+    public void complete(@Valid @RequestBody SystemInitializationCompleteFrom from) {
+        initializationService.complete(from);
     }
 }

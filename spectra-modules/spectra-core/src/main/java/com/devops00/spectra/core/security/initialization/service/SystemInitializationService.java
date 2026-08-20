@@ -13,7 +13,6 @@ import com.devops00.spectra.core.security.initialization.javabean.from.SystemIni
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationMfaConfirmVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStartVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
-import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 
 /** 系统首次初始化流程。 */
 public interface SystemInitializationService {
@@ -24,5 +23,5 @@ public interface SystemInitializationService {
 
     SystemInitializationMfaConfirmVO confirmMfa(SystemInitializationMfaConfirmFrom from);
 
-    TokenVO complete(SystemInitializationCompleteFrom from);
+    void complete(SystemInitializationCompleteFrom from);
 }

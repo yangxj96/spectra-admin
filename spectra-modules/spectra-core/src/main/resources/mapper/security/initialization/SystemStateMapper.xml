@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~  Copyright 2018-2026 yangxj96
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~      http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  -->
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper">
+    <!-- @formatter:off -->
+    <resultMap id="BaseResultMap"
+               extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.security.initialization.javabean.entity.SystemState">
+        <result column="state_key"        property="stateKey"/>
+        <result column="state"            property="state"/>
+        <result column="initialization_id" property="initializationId"
+                typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+        <result column="initialized_at"    property="initializedAt"/>
+        <result column="initialized_by"    property="initializedBy"
+                typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+    </resultMap>
+    <!-- @formatter:on -->
+
+    <select id="selectForUpdateByStateKey" resultMap="BaseResultMap">
+        SELECT state_key,
+               state,
+               initialization_id,
+               initialized_at,
+               initialized_by,
+               <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
+        FROM spectra_core.sys_system_state
+        WHERE state_key = #{stateKey}
+        FOR UPDATE
+    </select>
+</mapper>

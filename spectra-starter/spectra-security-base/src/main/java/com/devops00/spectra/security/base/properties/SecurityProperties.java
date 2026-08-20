@@ -150,9 +150,6 @@ public class SecurityProperties {
     /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
     private boolean mfaRequiredForDevOps = true;
 
-    /** 首次系统初始化令牌；为空时匿名初始化接口 fail-closed。 */
-    private String initializationToken = "";
-
     /** MFA 登录预认证挑战有效期（秒）。 */
     private long mfaChallengeExpire = 300L;
 

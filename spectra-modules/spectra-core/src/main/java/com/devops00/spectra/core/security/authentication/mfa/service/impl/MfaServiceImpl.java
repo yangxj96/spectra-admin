@@ -18,6 +18,8 @@ import com.devops00.spectra.core.security.authentication.mfa.mapper.RecoveryCode
 import com.devops00.spectra.core.security.authentication.mfa.mapper.TotpCredentialMapper;
 import com.devops00.spectra.core.security.authentication.mfa.service.MfaService;
 import com.devops00.spectra.core.security.authentication.mfa.util.TotpSecretCipher;
+import com.devops00.spectra.core.user.javabean.entity.User;
+import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -48,17 +50,19 @@ public class MfaServiceImpl implements MfaService {
     private final MfaEnrollmentMapper enrollmentMapper;
     private final TotpCredentialMapper credentialMapper;
     private final RecoveryCodeMapper recoveryCodeMapper;
+    private final UserMapper userMapper;
     private final SecurityProperties properties;
     private final SecurityAuditWriter securityAuditWriter;
     private final Clock clock = Clock.systemUTC();
     private final SecureRandom random = new SecureRandom();
 
     public MfaServiceImpl(MfaEnrollmentMapper enrollmentMapper, TotpCredentialMapper credentialMapper,
-                          RecoveryCodeMapper recoveryCodeMapper, SecurityProperties properties,
+                          RecoveryCodeMapper recoveryCodeMapper, UserMapper userMapper, SecurityProperties properties,
                           SecurityAuditWriter securityAuditWriter) {
         this.enrollmentMapper = enrollmentMapper;
         this.credentialMapper = credentialMapper;
         this.recoveryCodeMapper = recoveryCodeMapper;
+        this.userMapper = userMapper;
         this.properties = properties;
         this.securityAuditWriter = securityAuditWriter;
     }
@@ -86,7 +90,7 @@ public class MfaServiceImpl implements MfaService {
         if (credentialMapper.insert(credential) != 1) {
             throw new IllegalStateException("保存 MFA 密钥失败");
         }
-        String account = userId.toString();
+        String account = resolveAccount(userId);
         String issuer = java.net.URLEncoder.encode(properties.getMfaTotpIssuer(), StandardCharsets.UTF_8);
         String label = java.net.URLEncoder.encode(properties.getMfaTotpIssuer() + ":" + account, StandardCharsets.UTF_8);
         String uri = "otpauth://totp/" + label + "?secret="
@@ -95,6 +99,21 @@ public class MfaServiceImpl implements MfaService {
         appendAudit("AUTH_CHALLENGE_CREATED", userId, Map.of("factorType", FACTOR_TOTP),
                 Map.of("state", PENDING), "TOTP 登记开始");
         return new MfaEnrollmentResult(enrollment.getId(), uri, secret);
+    }
+
+    private String resolveAccount(UUID userId) {
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new IllegalStateException("MFA 登记用户不存在");
+        }
+        String account = user.getEmail();
+        if (account == null || account.isBlank()) {
+            account = user.getUsername();
+        }
+        if (account == null || account.isBlank()) {
+            throw new IllegalStateException("MFA 登记用户登录账号不存在");
+        }
+        return account.trim();
     }
 
     @Override

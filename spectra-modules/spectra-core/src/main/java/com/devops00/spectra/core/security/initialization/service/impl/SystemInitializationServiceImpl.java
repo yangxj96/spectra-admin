@@ -27,27 +27,19 @@ import com.devops00.spectra.core.security.initialization.service.SystemInitializ
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
 import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
-import com.devops00.spectra.security.base.properties.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /** PostgreSQL + Redis 的系统首次初始化实现。 */
@@ -69,11 +61,9 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private final AuthenticationIdentityService authenticationIdentityService;
     private final PasswordCredentialService passwordCredentialService;
     private final MfaService mfaService;
-    private final SecurityProperties securityProperties;
+    private final SystemInitializationTokenManager initializationTokenManager;
     private final SecurityPasswordPolicyProvider passwordPolicyProvider;
     private final PasswordEncoder passwordEncoder;
-    private final SecurityAuthenticationPort securityAuthenticationPort;
-    private final SecurityUserLoader securityUserLoader;
     private final JdbcTemplate jdbcTemplate;
     private final ObjectProvider<SecurityMfaChallengePort> challengeProvider;
 
@@ -87,7 +77,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     @Override
     @Transactional
     public SystemInitializationStartVO start(SystemInitializationStartFrom from, String initializationToken) {
-        assertInitializationToken(initializationToken);
+        initializationTokenManager.assertToken(initializationToken);
         lockInitialization();
         SystemState state = loadState(true);
         if (!UNINITIALIZED.equals(state.getState())) {
@@ -146,7 +136,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
     @Override
     @Transactional
-    public com.devops00.spectra.security.base.javabean.vo.TokenVO complete(SystemInitializationCompleteFrom from) {
+    public void complete(SystemInitializationCompleteFrom from) {
         MfaLoginChallenge challenge = requireInitializationChallenge(from.getInitializationId(), true);
         lockInitialization();
         SystemState state = loadState(true);
@@ -194,30 +184,10 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
             throw new IllegalStateException("完成系统初始化失败");
         }
 
-        var securityUser = securityUserLoader.load(user.getId());
-        if (securityUser == null) {
-            throw new IllegalStateException("初始化用户安全主体加载失败");
-        }
-        Map<String, Object> extraData = new HashMap<>();
-        extraData.put("mfaVerified", true);
-        extraData.put("authenticationAssurance", "AAL2");
-        securityUser.setExtraData(extraData);
-
         if (!requireChallengePort().consume(challenge.id())) {
             throw new IllegalStateException("初始化 MFA 挑战已失效");
         }
-        return securityAuthenticationPort.login(securityUser);
-    }
-
-    private void assertInitializationToken(String token) {
-        String expected = securityProperties.getInitializationToken();
-        if (expected == null
-                || expected.isBlank()
-                || token == null
-                || !MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
-                        token.getBytes(StandardCharsets.UTF_8))) {
-            throw new AccessDeniedException("系统初始化令牌无效");
-        }
+        initializationTokenManager.clear();
     }
 
     private User findExistingUser(String username) {
@@ -228,11 +198,10 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     }
 
     private SystemState loadState(boolean lock) {
-        var query = new LambdaQueryWrapper<SystemState>().eq(SystemState::getStateKey, SYSTEM_KEY);
-        if (lock) {
-            query.last("FOR UPDATE");
-        }
-        SystemState state = stateMapper.selectOne(query);
+        SystemState state = lock
+                ? stateMapper.selectForUpdateByStateKey(SYSTEM_KEY)
+                : stateMapper.selectOne(new LambdaQueryWrapper<SystemState>()
+                        .eq(SystemState::getStateKey, SYSTEM_KEY));
         if (state == null) {
             throw new IllegalStateException("系统初始化状态不存在");
         }
