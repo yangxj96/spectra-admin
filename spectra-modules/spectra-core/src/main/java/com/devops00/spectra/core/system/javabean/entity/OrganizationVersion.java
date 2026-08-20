@@ -17,9 +17,12 @@
 package com.devops00.spectra.core.system.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import java.time.Instant;
 
 /**
  * 组织树安全版本。
@@ -29,12 +32,16 @@ import lombok.Data;
  * @since 2026/8/14
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "sys_organization_version", schema = "spectra_core")
-public class OrganizationVersion {
+public class OrganizationVersion extends BaseEntity {
 
-    @TableId(value = "singleton_key")
+    @TableField(value = "singleton_key")
     private String singletonKey;
 
-    @TableField(value = "version")
-    private Long version;
+    @TableField(value = "organization_version")
+    private Long organizationVersion;
+
+    @TableField(value = "changed_at")
+    private Instant changedAt;
 }

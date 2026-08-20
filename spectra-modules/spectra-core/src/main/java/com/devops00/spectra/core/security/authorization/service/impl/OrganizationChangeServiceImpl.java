@@ -276,8 +276,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     }
 
     private long readCurrentOrganizationVersion() {
-        var row = organizationVersionMapper.selectById("SYSTEM");
-        return row == null || row.getVersion() == null ? 0L : row.getVersion();
+        var row = organizationVersionMapper.selectOne(new LambdaQueryWrapper<OrganizationVersion>()
+                .eq(OrganizationVersion::getSingletonKey, "SYSTEM"));
+        return row == null || row.getOrganizationVersion() == null ? 0L : row.getOrganizationVersion();
     }
 
     private UUID persist(PreparedChange prepared) {
@@ -304,8 +305,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         departmentMapper.rebuildClosure();
         var versionUpdate = new LambdaUpdateWrapper<OrganizationVersion>()
                 .eq(OrganizationVersion::getSingletonKey, "SYSTEM")
-                .eq(OrganizationVersion::getVersion, prepared.impact().beforeVersion())
-                .setSql("version = version + 1");
+                .eq(OrganizationVersion::getOrganizationVersion, prepared.impact().beforeVersion())
+                .setSql("organization_version = organization_version + 1");
         if (organizationVersionMapper.update(null, versionUpdate) != 1) {
             throw new DataException("organizationVersion 并发变化，组织变更已拒绝");
         }

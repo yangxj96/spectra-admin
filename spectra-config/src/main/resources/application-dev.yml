@@ -3,6 +3,7 @@ spectra:
   security:
     verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
+    initialization-token: ${SPECTRA_SECURITY_INITIALIZATION_TOKEN:}
     # 默认开发服务使用 HTTPS，因此刷新 Cookie 默认启用 Secure；生产环境仍需按部署域名切换为 __Host- Cookie。
     refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:spectra-refresh}
     refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}

@@ -49,6 +49,11 @@ public class SecurityProperties {
             "/auth/mfa/complete",
             "/security/mfa/setup/totp/enroll",
             "/security/mfa/setup/totp/confirm",
+            // 首次系统初始化；接口内部仍要求一次性初始化令牌或 Redis Challenge
+            "/system/initialization/status",
+            "/system/initialization/start",
+            "/system/initialization/mfa/confirm",
+            "/system/initialization/complete",
             // 刷新token
             "/auth/refresh",
             // 发送短信验证码
@@ -144,6 +149,9 @@ public class SecurityProperties {
 
     /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
     private boolean mfaRequiredForDevOps = true;
+
+    /** 首次系统初始化令牌；为空时匿名初始化接口 fail-closed。 */
+    private String initializationToken = "";
 
     /** MFA 登录预认证挑战有效期（秒）。 */
     private long mfaChallengeExpire = 300L;
