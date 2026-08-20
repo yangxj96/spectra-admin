@@ -42,7 +42,7 @@ public class BaseEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 数据id
+     * 数据 ID。新增时由全局 MyBatis-Plus MetaObjectHandler 生成 UUID v7。
      */
     @TableId(value = "id", type = IdType.INPUT)
     private UUID id;

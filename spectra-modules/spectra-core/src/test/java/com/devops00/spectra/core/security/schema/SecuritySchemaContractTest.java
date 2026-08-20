@@ -138,7 +138,8 @@ class SecuritySchemaContractTest {
         assertTrue(schema.contains("version       BIGINT NOT NULL DEFAULT 0"));
         assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_permission_boundary"));
         assertTrue(schema.contains("CREATE TABLE spectra_security.sec_assignment_grant_boundary"));
-        assertTrue(schema.contains("PRIMARY KEY (assignment_id, permission_id)"));
+        assertTrue(schema.contains(
+                "CONSTRAINT uk_sec_assignment_permission_boundary_assignment_permission UNIQUE (assignment_id, permission_id)"));
         assertTrue(migration.contains("authority_level SMALLINT NOT NULL"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.role_assignment"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.assignment_permission_boundary"));
@@ -290,6 +291,62 @@ class SecuritySchemaContractTest {
         assertTrue(migration.contains("UPDATE spectra_security.sec_permission"));
         assertTrue(migration.contains("WHERE code = 'department:disable'"));
         assertTrue(migration.contains("SET state = 'DEPRECATED'"));
+    }
+
+    @Test
+    void phase12MustNormalizeEverySecurityTableToTheCommonFieldContract() throws IOException {
+        String schema = readSql();
+        List<String> tables = List.of(
+                "sec_permission",
+                "sec_role",
+                "sec_role_permission",
+                "sec_role_grantable_permission",
+                "sec_role_assignment",
+                "sec_authorization_scope",
+                "sec_assignment_permission_boundary",
+                "sec_assignment_grant_boundary",
+                "sec_scope_rule",
+                "sec_authentication_identity",
+                "sec_password_credential",
+                "sec_security_client",
+                "sec_authentication_method",
+                "sec_client_auth_method",
+                "sec_session_policy",
+                "sec_password_policy",
+                "sec_mfa_enrollment",
+                "sec_totp_credential",
+                "sec_recovery_code",
+                "sec_root_policy",
+                "sec_security_audit_event",
+                "sec_security_audit_retention_policy",
+                "sec_security_audit_archive_manifest",
+                "sec_security_change_outbox",
+                "sec_role_menu");
+        for (String table : tables) {
+            String marker = "CREATE TABLE spectra_security." + table + " (";
+            int start = schema.indexOf(marker);
+            assertTrue(start >= 0, table);
+            int end = schema.indexOf("\n);", start);
+            assertTrue(end > start, table);
+            String definition = schema.substring(start, end);
+            for (String column : List.of("id", "created_by", "created_at", "updated_by", "updated_at", "deleted", "version")) {
+                assertTrue(definition.lines().anyMatch(line -> line.matches("\\s+" + column + "\\s+.*")),
+                        table + "." + column);
+            }
+        }
+    }
+
+    @Test
+    void phase12MigrationMustPreserveBusinessKeysWhileIntroducingTechnicalIds() throws IOException {
+        String migration = readMigration("V20__normalize_security_common_fields.sql");
+
+        assertTrue(migration.contains("ADD COLUMN IF NOT EXISTS deleted TIMESTAMP(6) WITH TIME ZONE"));
+        assertTrue(migration.contains("ADD COLUMN IF NOT EXISTS id UUID NOT NULL DEFAULT gen_random_uuid()"));
+        assertTrue(migration.contains("uk_sec_role_permission_role_permission"));
+        assertTrue(migration.contains("uk_sec_password_credential_user"));
+        assertTrue(migration.contains("uk_sec_session_policy_client"));
+        assertTrue(migration.contains("uk_sec_totp_credential_enrollment"));
+        assertTrue(migration.contains("The audit event remains partitioned and append-only"));
     }
 
     private String readSql() throws IOException {

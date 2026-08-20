@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.user.controller;
 
-import com.devops00.spectra.core.authorization.service.PermissionCatalogService;
+import com.devops00.spectra.core.security.authorization.service.PermissionCatalogService;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
 import com.devops00.spectra.log.base.annotation.ULog;
 import org.springframework.security.access.prepost.PreAuthorize;

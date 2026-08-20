@@ -17,11 +17,11 @@
 package com.devops00.spectra.core.security.audit.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.security.audit.SecurityAuditPageVO;
-import com.devops00.spectra.core.security.audit.SecurityAuditQueryFrom;
-import com.devops00.spectra.core.security.audit.SecurityAuditQueryService;
-import com.devops00.spectra.core.security.audit.SecurityAuditRetentionVO;
-import com.devops00.spectra.core.security.audit.SecurityAuditVO;
+import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
+import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
+import com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService;
+import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
+import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
 import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -153,13 +153,12 @@ public class NotificationGatewayImpl implements NotificationGateway {
             return new NotificationReceipt(existing.getId(), existing.getStatus(), Math.toIntExact(count), true);
         }
 
-        var requestId = request.requestId() == null ? UUID.randomUUID() : request.requestId();
+        var externalRequestId = request.requestId() == null ? UUID.randomUUID() : request.requestId();
         var now = Instant.now();
         var entity = new NotificationRequestEntity();
-        entity.setId(requestId);
         entity.setBusinessType(defaultValue(request.businessType(), "SYSTEM"));
-        entity.setBusinessId(defaultValue(request.businessId(), requestId.toString()));
-        entity.setExternalRequestId(requestId.toString());
+        entity.setBusinessId(defaultValue(request.businessId(), externalRequestId.toString()));
+        entity.setExternalRequestId(externalRequestId.toString());
         entity.setIdempotencyKey(request.idempotencyKey());
         entity.setTemplateGroupCode(request.templateGroupCode());
         entity.setPurpose(request.purpose().name());
@@ -176,6 +175,10 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setPriority(request.priority() == null ? 0 : request.priority());
         if (requestMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知请求失败");
+        }
+        UUID requestId = entity.getId();
+        if (requestId == null) {
+            throw new DataSaveException("通知请求主键生成失败");
         }
         if (metrics != null) {
             metrics.recordRequest(request.purpose().name(), "ACCEPTED");
@@ -228,7 +231,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var rendered = render(request, channel, renderParameters);
         var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
         var task = new NotificationTaskEntity();
-        task.setId(UUID.randomUUID());
         task.setNotificationRequestId(requestId);
         task.setReceiverUserId(recipientUserId);
         task.setRecipientKeyHash(recipientKeyHash);

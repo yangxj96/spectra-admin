@@ -14,9 +14,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.core.authorization.entity.SecurityRole;
-import com.devops00.spectra.core.authorization.mapper.RoleAssignmentMapper;
-import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
@@ -42,7 +42,6 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     @Transactional
     public void created(RoleFrom params) {
         var role = new SecurityRole();
-        role.setId(UUID.randomUUID());
         role.setCode(hasText(params.getCode()) ? params.getCode() : generatedCode());
         role.setName(params.getName());
         role.setState(Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE");
@@ -68,9 +67,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         if (Boolean.TRUE.equals(role.getSystemManaged())) {
             throw new BuiltinDataException("系统维护角色不可删除");
         }
-        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.authorization.entity.RoleAssignment>()
-                .eq(com.devops00.spectra.core.authorization.entity.RoleAssignment::getRoleId, id)
-                .eq(com.devops00.spectra.core.authorization.entity.RoleAssignment::getState, "ACTIVE")) > 0) {
+        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.security.authorization.entity.RoleAssignment>()
+                .eq(com.devops00.spectra.core.security.authorization.entity.RoleAssignment::getRoleId, id)
+                .eq(com.devops00.spectra.core.security.authorization.entity.RoleAssignment::getState, "ACTIVE")) > 0) {
             throw new DataException("角色仍有有效授权实例，不可停用");
         }
         role.setState("DISABLED");

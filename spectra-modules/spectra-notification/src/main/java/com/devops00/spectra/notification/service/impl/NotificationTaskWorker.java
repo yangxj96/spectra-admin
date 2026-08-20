@@ -194,7 +194,6 @@ public class NotificationTaskWorker {
     private void finish(NotificationTaskEntity task, ChannelSendResult result) {
         var delivery = new NotificationDeliveryEntity();
         var completedAt = Instant.now();
-        delivery.setId(UUID.randomUUID());
         delivery.setNotificationTaskId(task.getId());
         delivery.setAttemptNo((task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1);
         delivery.setProvider(result.providerCode());

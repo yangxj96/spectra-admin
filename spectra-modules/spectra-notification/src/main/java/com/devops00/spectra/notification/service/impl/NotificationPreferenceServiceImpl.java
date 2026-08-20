@@ -110,7 +110,6 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         var existing = entity != null;
         if (!existing) {
             entity = new NotificationUserPreferenceEntity();
-            entity.setId(UUID.randomUUID());
             entity.setUserId(userId);
             entity.setPurpose(normalizedPurpose);
             entity.setChannel(normalizedChannel);

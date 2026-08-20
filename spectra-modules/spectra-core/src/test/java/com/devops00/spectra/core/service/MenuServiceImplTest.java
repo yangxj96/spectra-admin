@@ -18,10 +18,10 @@ package com.devops00.spectra.core.service;
 
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.core.authorization.entity.SecurityRole;
-import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
-import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
-import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
 import com.devops00.spectra.core.system.javabean.enums.MenuType;

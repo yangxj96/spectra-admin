@@ -1,0 +1,42 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.core.security.authorization.service;
+
+import com.devops00.spectra.core.security.authorization.domain.OrganizationChangeImpact;
+import org.springframework.stereotype.Component;
+
+/**
+ * 组织版本与授权影响的纯分析器。
+ *
+ * @author yangxj96
+ * @version 1.0
+ * @since 2026/8/14
+ */
+@Component
+public class OrganizationImpactAnalyzer {
+
+    /**
+     * 生成组织变更影响摘要；具体受影响对象由数据库 Closure 查询提供。
+     */
+    public OrganizationChangeImpact analyze(long beforeVersion,
+                                            int affectedAssignmentCount,
+                                            int affectedUserCount,
+                                            boolean expandsEffectiveAuthority) {
+        return new OrganizationChangeImpact(beforeVersion, beforeVersion + 1,
+                expandsEffectiveAuthority, affectedAssignmentCount, affectedUserCount);
+    }
+}

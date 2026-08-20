@@ -18,7 +18,7 @@ package com.devops00.spectra.core.user.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;

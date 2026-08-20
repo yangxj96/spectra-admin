@@ -7,9 +7,9 @@
 
 package com.devops00.spectra.upload.configure;
 
-import com.devops00.spectra.core.security.audit.SecurityAuditArchiveBackend;
-import com.devops00.spectra.core.security.audit.SecurityAuditArchiveIntegrity;
-import com.devops00.spectra.core.security.audit.SecurityAuditArchiveReceipt;
+import com.devops00.spectra.core.security.audit.domain.SecurityAuditArchiveBackend;
+import com.devops00.spectra.core.security.audit.util.SecurityAuditArchiveIntegrity;
+import com.devops00.spectra.core.security.audit.domain.SecurityAuditArchiveReceipt;
 import com.devops00.spectra.upload.properties.S3Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

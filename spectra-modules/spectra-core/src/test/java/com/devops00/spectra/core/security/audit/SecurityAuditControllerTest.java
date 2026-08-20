@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.audit;
 
 import com.devops00.spectra.core.security.audit.controller.SecurityAuditController;
+import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 

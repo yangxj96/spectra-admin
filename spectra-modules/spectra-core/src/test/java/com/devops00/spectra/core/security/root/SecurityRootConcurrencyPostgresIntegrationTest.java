@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.security.root;
 
+import com.devops00.spectra.core.security.root.repository.JdbcRootPolicyRepository;
+import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.root.RootGovernanceException;

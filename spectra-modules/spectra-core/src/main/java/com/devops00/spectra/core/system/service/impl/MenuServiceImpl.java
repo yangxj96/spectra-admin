@@ -24,9 +24,9 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.common.utils.TreeBuilder;
-import com.devops00.spectra.core.authorization.entity.SecurityRoleMenu;
-import com.devops00.spectra.core.authorization.mapper.SecurityRoleMapper;
-import com.devops00.spectra.core.authorization.mapper.SecurityRoleMenuMapper;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRoleMenu;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.core.system.javabean.converter.MenuConverter;
 import com.devops00.spectra.core.system.javabean.entity.Menu;
@@ -164,7 +164,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             return Collections.emptyList();
         }
 
-        var roles = securityRoleMapper.selectList(new QueryWrapper<com.devops00.spectra.core.authorization.entity.SecurityRole>()
+        var roles = securityRoleMapper.selectList(new QueryWrapper<com.devops00.spectra.core.security.authorization.entity.SecurityRole>()
                 .select("id", "code")
                 .in("code", roleCodes)
                 .eq("state", "ACTIVE"));

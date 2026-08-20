@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.core.security;
 
-import com.devops00.spectra.core.security.change.DefaultSecurityChangeExecutor;
-import com.devops00.spectra.core.security.root.JdbcLastEffectiveDevOpsGuard;
+import com.devops00.spectra.core.security.change.service.impl.DefaultSecurityChangeExecutor;
+import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditUnavailableException;

@@ -57,7 +57,6 @@ public class AiConversationServiceImpl
     @Override
     public UUID create(UUID userId, String firstMessage) {
         AiConversation conversation = new AiConversation();
-        conversation.setId(UUID.randomUUID());
         conversation.setUserId(userId);
         conversation.setTitle(generateTitle(firstMessage));
         conversation.setStatus("active");

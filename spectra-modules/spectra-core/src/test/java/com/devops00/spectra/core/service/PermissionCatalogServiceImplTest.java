@@ -7,9 +7,9 @@
 
 package com.devops00.spectra.core.service;
 
-import com.devops00.spectra.core.authorization.entity.Permission;
-import com.devops00.spectra.core.authorization.mapper.PermissionMapper;
-import com.devops00.spectra.core.authorization.service.impl.PermissionCatalogServiceImpl;
+import com.devops00.spectra.core.security.authorization.entity.Permission;
+import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
+import com.devops00.spectra.core.security.authorization.service.impl.PermissionCatalogServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
