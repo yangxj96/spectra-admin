@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * <p>
  * 该测试默认禁用，不会连接或修改开发机数据库。只有显式设置
  * {@code SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST=true} 后才会执行；连接信息
- * 通过专用测试环境变量提供，并且必须使用可丢弃的隔离数据库。V2 会创建数据库角色，
- * 因此测试账号需要具备 CREATEROLE 权限。
+ * 通过专用测试环境变量提供，并且必须使用可丢弃的隔离数据库。当前 V1 基线会创建数据库角色，
+ * 测试只验证当前单一 V1 基线，不会创建额外数据库角色。
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST", matches = "true")
 class SecurityFlywayPostgresIntegrationTest {
@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV19() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,8 +70,7 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"),
-                    versions);
+            assertEquals(List.of("1"), versions);
             assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_archive_manifest"));
             assertTrue(tableExists(connection, "spectra_security", "sec_assignment_permission_boundary"));
