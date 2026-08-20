@@ -43,7 +43,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping({"/notification", "/notification-center/inbox"})
+@RequestMapping("/notification")
 public class NotificationController {
 
     /**
@@ -57,7 +57,7 @@ public class NotificationController {
      * 查询当前用户消息列表。
      */
     @ULog("'查询消息列表'")
-    @GetMapping(value = "/list", version = "1.0.0+")
+    @GetMapping(value = "/list", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public IPage<NotificationInboxVO> list(PageFrom page, NotificationQueryFrom params) {
         return service.page(page, currentUserId(), params);
@@ -67,7 +67,7 @@ public class NotificationController {
      * 查询当前用户消息详情。
      */
     @ULog("'查询消息详情'")
-    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public NotificationInboxVO detail(@PathVariable UUID id) {
         return service.detail(id, currentUserId());
@@ -77,7 +77,7 @@ public class NotificationController {
      * 查询当前用户未读数量。
      */
     @ULog("'获取未读消息数'")
-    @GetMapping(value = "/unread-count", version = "1.0.0+")
+    @GetMapping(value = "/unread-count", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public long unreadCount() {
         return service.unreadCount(currentUserId());
@@ -87,7 +87,7 @@ public class NotificationController {
      * 标记单条消息已读。
      */
     @ULog("'标记消息已读'")
-    @PutMapping(value = "/{id}/read", version = "1.0.0+")
+    @PutMapping(value = "/{id}/read", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAsRead(@PathVariable UUID id) {
         service.markAsRead(id, currentUserId());
@@ -97,7 +97,7 @@ public class NotificationController {
      * 标记当前用户全部消息已读。
      */
     @ULog("'全部标记已读'")
-    @PutMapping(value = "/read-all", version = "1.0.0+")
+    @PutMapping(value = "/read-all", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAllAsRead() {
         service.markAllAsRead(currentUserId());
@@ -107,7 +107,7 @@ public class NotificationController {
      * 删除当前用户的一条消息。
      */
     @ULog("'删除消息'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void deleteById(@PathVariable UUID id) {
         service.deleteById(id, currentUserId());
@@ -117,7 +117,7 @@ public class NotificationController {
      * 仅删除当前用户拥有的消息，混合用户 ID 不会影响其他收件人。
      */
     @ULog("'批量删除消息'")
-    @PostMapping(value = "/batch-delete", version = "1.0.0+")
+    @PostMapping(value = "/batch-delete", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {
         service.batchDelete(from.getIds(), currentUserId());

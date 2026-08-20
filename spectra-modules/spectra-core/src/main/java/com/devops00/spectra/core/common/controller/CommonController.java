@@ -48,7 +48,7 @@ public class CommonController {
      * 获取验证码
      */
     @ULog("'获取验证码'")
-    @GetMapping(value = "/kaptcha", version = "1.0.0+")
+    @GetMapping(value = "/kaptcha", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public void kaptcha() throws IOException {
         kaptchaService.generate();

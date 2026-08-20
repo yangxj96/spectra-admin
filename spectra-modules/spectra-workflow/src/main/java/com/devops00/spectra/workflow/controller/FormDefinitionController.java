@@ -53,7 +53,7 @@ public class FormDefinitionController {
      * 分页查询表单列表
      */
     @ULog("'查询表单列表'")
-    @GetMapping(value = "", version = "1.0.0+")
+    @GetMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:read')")
     public Object page(PageFrom page, FormPageFrom params) {
         return formDefinitionService.page(page, params);
@@ -63,7 +63,7 @@ public class FormDefinitionController {
      * 查询表单详情（含当前版本内容）
      */
     @ULog("'查询表单详情'")
-    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:read')")
     public FormDefinitionVO getDetail(@PathVariable UUID id) {
         return formDefinitionService.getDetail(id);
@@ -73,7 +73,7 @@ public class FormDefinitionController {
      * 创建表单（同时创建版本1）
      */
     @ULog("'创建表单定义'")
-    @PostMapping(value = "", version = "1.0.0+")
+    @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.created(from);
@@ -83,7 +83,7 @@ public class FormDefinitionController {
      * 更新表单元数据
      */
     @ULog("'更新表单定义'")
-    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:update')")
     public void modify(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody FormDefinitionSaveFrom from) {
         formDefinitionService.modify(id, from);
@@ -93,7 +93,7 @@ public class FormDefinitionController {
      * 删除表单（级联删除版本）
      */
     @ULog("'删除表单定义'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:disable')")
     public void deleteById(@PathVariable UUID id) {
         formDefinitionService.deleteById(id);
@@ -103,7 +103,7 @@ public class FormDefinitionController {
      * 保存新版本（版本号自增）
      */
     @ULog("'保存表单新版本'")
-    @PostMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PostMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:create')")
     public void saveVersion(@PathVariable UUID id, @Validated @RequestBody FormVersionSaveFrom from) {
         formDefinitionService.saveVersion(id, from);
@@ -113,7 +113,7 @@ public class FormDefinitionController {
      * 查询版本历史
      */
     @ULog("'查询表单版本历史'")
-    @GetMapping(value = "/{id}/versions", version = "1.0.0+")
+    @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:read')")
     public List<FormVersionVO> getVersions(@PathVariable UUID id) {
         return formDefinitionService.getVersions(id);
@@ -123,7 +123,7 @@ public class FormDefinitionController {
      * 查询指定版本详情
      */
     @ULog("'查询表单版本详情'")
-    @GetMapping(value = "/{id}/versions/{version}", version = "1.0.0+")
+    @GetMapping(value = "/{id}/versions/{version}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:form:read')")
     public FormVersionVO getVersion(@PathVariable UUID id, @PathVariable Integer version) {
         return formDefinitionService.getVersion(id, version);

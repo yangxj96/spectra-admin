@@ -71,10 +71,8 @@ public final class RefreshTokenRotationStore {
      */
     public static ClaimResult claim(RedisTemplate<String, Object> redis, String refreshHashKey, String claimKey,
                                     long ttlSeconds) {
-        Long result = redis.execute(CLAIM_SCRIPT, List.of(refreshHashKey, claimKey), ttlSeconds);
-        if (result == null) {
-            return ClaimResult.MISSING;
-        }
+        Long result = SecurityRedisExecutor.require("消费 Refresh Token",
+                () -> redis.execute(CLAIM_SCRIPT, List.of(refreshHashKey, claimKey), ttlSeconds));
         return switch (result.intValue()) {
             case 1 -> ClaimResult.CLAIMED;
             case 0 -> ClaimResult.REPLAY;

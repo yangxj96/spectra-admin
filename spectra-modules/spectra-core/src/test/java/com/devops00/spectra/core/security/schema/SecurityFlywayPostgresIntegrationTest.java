@@ -49,7 +49,7 @@ class SecurityFlywayPostgresIntegrationTest {
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
     @Test
-    void shouldMigrateEmptyTargetDatabaseFromV1ToV18() throws SQLException {
+    void shouldMigrateEmptyTargetDatabaseFromV1ToV19() throws SQLException {
         DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
@@ -70,7 +70,7 @@ class SecurityFlywayPostgresIntegrationTest {
                 }
             }
 
-            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18"),
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"),
                     versions);
             assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_event"));
             assertTrue(tableExists(connection, "spectra_security", "sec_security_audit_archive_manifest"));
@@ -104,6 +104,8 @@ class SecurityFlywayPostgresIntegrationTest {
             assertFalse(tableExists(connection, "spectra_core", "sys_rel_role_menu"));
             assertFalse(tableExists(connection, "spectra_core", "sys_authority"));
             assertFalse(tableExists(connection, "spectra_core", "sys_role"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_notification"));
+            assertFalse(tableExists(connection, "spectra_core", "sys_notification_setting"));
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.sec_permission")) {
                 resultSet.next();

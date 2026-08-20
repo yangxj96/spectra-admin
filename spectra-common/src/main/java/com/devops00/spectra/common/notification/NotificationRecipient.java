@@ -35,13 +35,6 @@ public record NotificationRecipient(UUID userId, String phone, String email, boo
                                     String timezone) {
 
     /**
-     * 兼容未提供用户时区的调用方。
-     */
-    public NotificationRecipient(UUID userId, String phone, String email, boolean active, boolean verified) {
-        this(userId, phone, email, active, verified, null);
-    }
-
-    /**
      * 返回指定外部渠道的已验证地址。用户不可用、地址未验证或渠道为站内信时返回空。
      *
      * @param channel 待解析地址的通知渠道

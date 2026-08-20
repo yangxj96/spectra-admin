@@ -20,6 +20,7 @@ import com.devops00.spectra.common.utils.IpUtils;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.constant.SecurityRedisKey;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import com.devops00.spectra.security.base.holder.SecurityLoginFailureTracker;
 import com.devops00.spectra.security.base.holder.SecuritySessionIssuer;
 import com.devops00.spectra.security.base.holder.SecuritySessionQuery;
@@ -31,6 +32,7 @@ import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
+import com.devops00.spectra.security.base.policy.SecurityPolicyUnavailableException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
@@ -65,8 +67,14 @@ import java.util.*;
  */
 @Slf4j
 @NullMarked
-public class RedisSecuritySessionRepository implements SecuritySessionIssuer, SecuritySessionRevoker, SecuritySessionReader,
-        SecurityTokenAccessor, SecuritySessionQuery, SecurityLoginFailureTracker {
+public class RedisSecuritySessionRepository
+        implements
+            SecuritySessionIssuer,
+            SecuritySessionRevoker,
+            SecuritySessionReader,
+            SecurityTokenAccessor,
+            SecuritySessionQuery,
+            SecurityLoginFailureTracker {
 
     private static final String HEADER_CLIENT_TYPE = "X-Client-Type";
 
@@ -88,9 +96,9 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
     private final @Nullable SecurityUserLoader securityUserLoader;
 
     public RedisSecuritySessionRepository(@Qualifier("securityObjectMapper") ObjectMapper om,
-                                  @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
-                                  UserOnlineConverter userOnlineConverter, @Nullable SecuritySessionPolicyProvider sessionPolicyProvider,
-                                  @Nullable SecurityUserLoader securityUserLoader) {
+                                          @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties,
+                                          UserOnlineConverter userOnlineConverter, @Nullable SecuritySessionPolicyProvider sessionPolicyProvider,
+                                          @Nullable SecurityUserLoader securityUserLoader) {
         this.om = om;
         this.redis = redis;
         this.properties = properties;
@@ -103,12 +111,12 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public TokenVO createToken(SecurityUser user) {
-        return this.createToken(user, resolveClientType());
+        return SecurityRedisExecutor.execute("签发安全会话", () -> this.createToken(user, resolveClientType()));
     }
 
     @Override
     public TokenVO createToken(SecurityUser user, ClientType clientType) {
-        return createToken(user, clientType, UUID.randomUUID().toString());
+        return SecurityRedisExecutor.execute("签发安全会话", () -> createToken(user, clientType, UUID.randomUUID().toString()));
     }
 
     private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId) {
@@ -127,7 +135,8 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         if (policy.concurrencyMode() == SessionConcurrencyMode.KICK_OLD) {
             for (Object activeToken : activeTokens) {
                 String activeDigest = activeToken.toString();
-                Map<Object, Object> activeSession = redis.opsForHash().entries(SecurityRedisKey.SESSION.format(activeDigest));
+                Map<Object, Object> activeSession = SecurityRedisExecutor.require("读取安全会话",
+                        () -> redis.opsForHash().entries(SecurityRedisKey.SESSION.format(activeDigest)));
                 if (clientType.getName().equals(Objects.toString(activeSession.get("clientType"), null))) {
                     deleteAccessDigest(activeDigest);
                 }
@@ -195,12 +204,17 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public TokenVO refreshByRefreshToken(String refreshToken) {
+        return SecurityRedisExecutor.execute("刷新安全会话", () -> refreshByRefreshTokenInternal(refreshToken));
+    }
+
+    private TokenVO refreshByRefreshTokenInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new IllegalArgumentException("刷新token不能为空");
         }
         String refreshDigest = TokenDigestService.digest(refreshToken);
         String rtKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
-        Map<Object, Object> rtData = redis.opsForHash().entries(rtKey);
+        Map<Object, Object> rtData = SecurityRedisExecutor.require("读取 Refresh Token",
+                () -> redis.opsForHash().entries(rtKey));
         if (rtData.isEmpty()) {
             throw new IllegalArgumentException("刷新token无效或已过期");
         }
@@ -226,13 +240,14 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         }
 
         String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
-        Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
+        Map<Object, Object> session = SecurityRedisExecutor.require("读取安全会话",
+                () -> redis.opsForHash().entries(sessionKey));
         String clientType = Objects.toString(session.get("clientType"),
                 Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
         boolean mfaVerified = refreshAssurance(rtData);
         Duration refreshTtl = Duration.ofSeconds(sessionPolicy(clientType).refreshTtlSeconds());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
-        if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
+        if (redisHasKey(replayFenceKey)) {
             throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
         }
 
@@ -249,7 +264,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
         try {
             removeRotatedAccessSession(accessDigest, refreshDigest, userId, clientType, familyId);
-            if (Boolean.TRUE.equals(redis.hasKey(replayFenceKey))) {
+            if (redisHasKey(replayFenceKey)) {
                 throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
             }
             return createToken(currentUser, ClientType.fromName(clientType), familyId, mfaVerified);
@@ -263,12 +278,13 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public void deleteToken(String token) {
-        deleteAccessDigest(TokenDigestService.digest(token));
+        SecurityRedisExecutor.run("撤销 Access Token", () -> deleteAccessDigest(TokenDigestService.digest(token)));
     }
 
     private void deleteAccessDigest(String tokenDigest) {
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
-        Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
+        Map<Object, Object> session = SecurityRedisExecutor.require("读取安全会话",
+                () -> redis.opsForHash().entries(sessionKey));
         if (session.isEmpty()) {
             return;
         }
@@ -284,7 +300,7 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
 
         // 清理 refresh token 映射
-        // sec:v2:rt:{accessDigest} → refreshDigest (String)
+        // sec:rt:{accessDigest} → refreshDigest (String)
         Object refreshDigestObj = redis.opsForValue().get(SecurityRedisKey.REFRESH_TOKEN.format(tokenDigest));
         if (refreshDigestObj != null) {
             String refreshDigest = refreshDigestObj.toString();
@@ -312,12 +328,17 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public void deleteByRefreshToken(String refreshToken) {
+        SecurityRedisExecutor.run("按 Refresh Token 撤销会话", () -> deleteByRefreshTokenInternal(refreshToken));
+    }
+
+    private void deleteByRefreshTokenInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             return;
         }
         String refreshDigest = TokenDigestService.digest(refreshToken);
         String rtRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
-        Map<Object, Object> rtData = redis.opsForHash().entries(rtRefreshKey);
+        Map<Object, Object> rtData = SecurityRedisExecutor.require("读取 Refresh Token",
+                () -> redis.opsForHash().entries(rtRefreshKey));
         if (rtData.isEmpty()) {
             redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
             return;
@@ -342,6 +363,10 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public void deleteByUserId(UUID userId) {
+        SecurityRedisExecutor.run("按用户撤销会话", () -> deleteByUserIdInternal(userId));
+    }
+
+    private void deleteByUserIdInternal(UUID userId) {
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
         Set<Object> tokens = redis.opsForSet().members(userTokensKey);
         if (tokens == null || tokens.isEmpty()) {
@@ -354,17 +379,23 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public void deleteByUserIdAndClient(String userId, ClientType clientType) {
-        String ucKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType.getName());
-        Object token = redis.opsForValue().get(ucKey);
-        if (token != null) {
-            this.deleteAccessDigest(token.toString());
-        }
+        SecurityRedisExecutor.run("按用户和客户端撤销会话", () -> {
+            String ucKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType.getName());
+            Object token = redis.opsForValue().get(ucKey);
+            if (token != null) {
+                this.deleteAccessDigest(token.toString());
+            }
+        });
     }
 
     // ==================== 在线用户 ====================
 
     @Override
     public List<UserOnlineVO> listOnlineUsers() {
+        return SecurityRedisExecutor.execute("查询在线用户", this::listOnlineUsersInternal);
+    }
+
+    private List<UserOnlineVO> listOnlineUsersInternal() {
         Set<Object> userIds = redis.opsForSet().members(SecurityRedisKey.ONLINE_USERS.getPattern());
         if (userIds == null || userIds.isEmpty()) {
             return List.of();
@@ -382,7 +413,8 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
             for (Object tokenObj : tokens) {
                 String token = tokenObj.toString();
                 String sessionKey = SecurityRedisKey.SESSION.format(token);
-                Map<Object, Object> session = redis.opsForHash().entries(sessionKey);
+                Map<Object, Object> session = SecurityRedisExecutor.require("读取安全会话",
+                        () -> redis.opsForHash().entries(sessionKey));
                 if (session.isEmpty()) {
                     redis.opsForSet().remove(userTokensKey, token);
                     continue;
@@ -414,6 +446,10 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public @Nullable SecurityUser getCurrentUser(String token) {
+        return SecurityRedisExecutor.execute("读取安全会话主体", () -> getCurrentUserInternal(token));
+    }
+
+    private @Nullable SecurityUser getCurrentUserInternal(String token) {
         String tokenDigest = TokenDigestService.digest(token);
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
         Object userIdObj = redis.opsForHash().get(sessionKey, "userId");
@@ -447,26 +483,31 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
 
     @Override
     public void recordLoginFail(String username) {
-        String key = SecurityRedisKey.LOGIN_FAIL.format(username);
-        Long count = redis.opsForValue().increment(key);
-        if (count != null && count == 1 && properties.getLockoutSeconds() > 0) {
-            redis.expire(key, Duration.ofSeconds(properties.getLockoutSeconds()));
-        }
+        SecurityRedisExecutor.run("记录登录失败次数", () -> {
+            String key = SecurityRedisKey.LOGIN_FAIL.format(username);
+            Long count = SecurityRedisExecutor.require("记录登录失败次数",
+                    () -> redis.opsForValue().increment(key));
+            if (count == 1 && properties.getLockoutSeconds() > 0) {
+                redis.expire(key, Duration.ofSeconds(properties.getLockoutSeconds()));
+            }
+        });
     }
 
     @Override
     public boolean isLockedOut(String username) {
-        if (properties.getLockoutSeconds() <= 0) {
-            return false;
-        }
-        String key = SecurityRedisKey.LOGIN_FAIL.format(username);
-        Object count = redis.opsForValue().get(key);
-        return count != null && Long.parseLong(count.toString()) >= properties.getLockoutMaxAttempts();
+        return SecurityRedisExecutor.execute("读取登录失败锁定状态", () -> {
+            if (properties.getLockoutSeconds() <= 0) {
+                return false;
+            }
+            String key = SecurityRedisKey.LOGIN_FAIL.format(username);
+            Object count = redis.opsForValue().get(key);
+            return count != null && Long.parseLong(count.toString()) >= properties.getLockoutMaxAttempts();
+        });
     }
 
     @Override
     public void clearLoginFail(String username) {
-        redis.delete(SecurityRedisKey.LOGIN_FAIL.format(username));
+        SecurityRedisExecutor.run("清理登录失败次数", () -> redis.delete(SecurityRedisKey.LOGIN_FAIL.format(username)));
     }
 
     // ==================== 内部辅助 ====================
@@ -530,14 +571,14 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
     }
 
     private SessionPolicy sessionPolicy(String clientCode) {
-        if (sessionPolicyProvider != null) {
-            SessionPolicy databasePolicy = sessionPolicyProvider.find(clientCode);
-            if (databasePolicy != null) {
-                return databasePolicy;
-            }
+        if (sessionPolicyProvider == null) {
+            throw new SecurityPolicyUnavailableException("会话策略 Provider 未配置，拒绝创建或刷新会话", null);
         }
-        return new SessionPolicy(properties.getSessionConcurrencyMode(), properties.getMaxSessions(),
-                properties.getAccessTokenExpire(), properties.getRefreshTokenExpire(), null, null);
+        SessionPolicy databasePolicy = sessionPolicyProvider.find(clientCode);
+        if (databasePolicy == null) {
+            throw new SecurityPolicyUnavailableException("客户端会话策略不存在，拒绝创建或刷新会话", null);
+        }
+        return databasePolicy;
     }
 
     private Set<Object> activeTokenDigests(String userId) {
@@ -548,13 +589,17 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
         Set<Object> active = new LinkedHashSet<>();
         for (Object token : tokens) {
             String digest = token.toString();
-            if (Boolean.TRUE.equals(redis.hasKey(SecurityRedisKey.SESSION.format(digest)))) {
+            if (redisHasKey(SecurityRedisKey.SESSION.format(digest))) {
                 active.add(digest);
             } else {
                 redis.opsForSet().remove(SecurityRedisKey.USER_TOKENS.format(userId), digest);
             }
         }
         return active;
+    }
+
+    private boolean redisHasKey(String key) {
+        return SecurityRedisExecutor.require("检查安全 Redis Key", () -> redis.hasKey(key));
     }
 
     private boolean isMfaVerified(SecurityUser user) {
@@ -579,8 +624,10 @@ public class RedisSecuritySessionRepository implements SecuritySessionIssuer, Se
     }
 
     private boolean isRoot(SecurityUser user) {
-        return user.getAuthorities().stream().anyMatch(authority -> RootAuthorizationPolicy.ROOT_ROLE
-                .equals(authority.getAuthority()));
+        return user.getAuthorities()
+                .stream()
+                .anyMatch(authority -> RootAuthorizationPolicy.ROOT_ROLE
+                        .equals(authority.getAuthority()));
     }
 
     /**

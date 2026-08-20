@@ -17,12 +17,11 @@
 package com.devops00.spectra.security.base.policy;
 
 import com.devops00.spectra.security.base.session.SessionPolicy;
-import org.jspecify.annotations.Nullable;
 
 /**
  * 读取登录端会话策略的窄端口。
  * <p>
- * 基础安全适配层只依赖该端口，不依赖具体数据库实现；没有提供策略时由适配层使用部署默认值。
+ * 基础安全适配层只依赖该端口，不依赖具体数据库实现；策略缺失或存储不可用时必须拒绝会话操作。
  *
  * @author yangxj96
  * @version 1.0
@@ -34,8 +33,8 @@ public interface SecuritySessionPolicyProvider {
      * 按登录端 code 读取活动策略。
      *
      * @param clientCode 登录端 code，例如 web/app/mini
-     * @return 数据库策略，不存在时返回 null
+     * @return 活动客户端的数据库策略
+     * @throws SecurityPolicyUnavailableException 策略不存在或存储不可用
      */
-    @Nullable
     SessionPolicy find(String clientCode);
 }

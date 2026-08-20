@@ -19,7 +19,9 @@ package com.devops00.spectra.security.starter.strategy;
 import com.devops00.spectra.security.base.constant.SecurityRedisKey;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.TokenDigestService;
 import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
 import org.junit.jupiter.api.Test;
@@ -71,7 +73,7 @@ class RedisSecuritySessionRepositoryTest {
         when(hashes.entries(eq(refreshKey))).thenReturn(Map.of(
                 "accessToken", accessDigest,
                 "userId", userId.toString(),
-                "clientType", "WEB",
+                "clientType", "web",
                 "familyId", familyId,
                 "aal", "AAL2"));
         // Access Session 已过期时仍必须依据 Refresh Hash 保留的 AAL2 刷新成功。
@@ -85,9 +87,11 @@ class RedisSecuritySessionRepositoryTest {
         user.setEmail("devops00.com");
         user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
         when(userLoader.load(userId)).thenReturn(user);
+        SecuritySessionPolicyProvider policyProvider = mock();
+        when(policyProvider.find("web")).thenReturn(SessionPolicy.defaults(900, 86400));
 
         var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), null, userLoader);
+                new SecurityProperties(), mock(UserOnlineConverter.class), policyProvider, userLoader);
 
         assertDoesNotThrow(() -> repository.refreshByRefreshToken(refreshToken));
     }

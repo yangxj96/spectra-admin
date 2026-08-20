@@ -41,13 +41,6 @@ public record NotificationModuleProperties(boolean enabled, String addressEncryp
             "/ai/");
 
     /**
-     * 兼容现有测试和本地构造方式。
-     */
-    public NotificationModuleProperties(boolean enabled, String addressEncryptionKey, String sensitivePayloadKey) {
-        this(enabled, addressEncryptionKey, sensitivePayloadKey, DEFAULT_ALLOWED_LINK_PREFIXES);
-    }
-
-    /**
      * 将未配置的可选密钥归一化为空字符串，实际使用时再明确拒绝。
      */
     @ConstructorBinding

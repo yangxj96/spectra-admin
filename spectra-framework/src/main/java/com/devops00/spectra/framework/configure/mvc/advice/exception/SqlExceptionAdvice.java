@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.configure.mvc.advice.exception;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.response.R;
+import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -115,6 +116,16 @@ public class SqlExceptionAdvice {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         log.error("{}数据访问异常（兜底）: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
         return R.failure("系统内部错误,请联系管理员");
+    }
+
+    /**
+     * 安全 Redis 不可用时必须停止 Token、Session、MFA 和防重放相关请求，不能返回普通 500 或继续降级。
+     */
+    @ExceptionHandler(SecurityRedisUnavailableException.class)
+    public R<Object> handleSecurityRedisUnavailable(SecurityRedisUnavailableException e, HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        log.warn("{}安全 Redis 不可用，请求被拒绝: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
+        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, "安全会话服务暂不可用");
     }
 
     /**

@@ -21,6 +21,7 @@ import com.devops00.spectra.security.base.constant.SecurityRedisKey;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -78,20 +79,22 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
 
     @Override
     public MfaLoginChallenge create(UUID userId, String username, ClientType clientType, boolean enrollmentRequired) {
-        String id = UUID.randomUUID().toString();
-        long expiresAt = Instant.now().plusSeconds(Math.max(1L, properties.getMfaChallengeExpire())).toEpochMilli();
-        Map<String, Object> challenge = new LinkedHashMap<>();
-        challenge.put(FIELD_USER_ID, userId.toString());
-        challenge.put(FIELD_USERNAME, username);
-        challenge.put(FIELD_CLIENT_TYPE, clientType.getName());
-        challenge.put(FIELD_STATE, enrollmentRequired ? STATE_ENROLLMENT_REQUIRED : STATE_VERIFICATION_REQUIRED);
-        challenge.put(FIELD_FAILURES, 0L);
-        challenge.put(FIELD_EXPIRES_AT, expiresAt);
+        return SecurityRedisExecutor.execute("创建 MFA Challenge", () -> {
+            String id = UUID.randomUUID().toString();
+            long expiresAt = Instant.now().plusSeconds(Math.max(1L, properties.getMfaChallengeExpire())).toEpochMilli();
+            Map<String, Object> challenge = new LinkedHashMap<>();
+            challenge.put(FIELD_USER_ID, userId.toString());
+            challenge.put(FIELD_USERNAME, username);
+            challenge.put(FIELD_CLIENT_TYPE, clientType.getName());
+            challenge.put(FIELD_STATE, enrollmentRequired ? STATE_ENROLLMENT_REQUIRED : STATE_VERIFICATION_REQUIRED);
+            challenge.put(FIELD_FAILURES, 0L);
+            challenge.put(FIELD_EXPIRES_AT, expiresAt);
 
-        String key = key(id);
-        redis.opsForHash().putAll(key, challenge);
-        redis.expire(key, Duration.ofSeconds(Math.max(1L, properties.getMfaChallengeExpire())));
-        return new MfaLoginChallenge(id, userId, username, clientType, enrollmentRequired, false, expiresAt);
+            String key = key(id);
+            redis.opsForHash().putAll(key, challenge);
+            redis.expire(key, Duration.ofSeconds(Math.max(1L, properties.getMfaChallengeExpire())));
+            return new MfaLoginChallenge(id, userId, username, clientType, enrollmentRequired, false, expiresAt);
+        });
     }
 
     @Override
@@ -99,7 +102,12 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
         if (challengeId == null || challengeId.isBlank()) {
             return null;
         }
-        Map<Object, Object> values = redis.opsForHash().entries(key(challengeId));
+        return SecurityRedisExecutor.execute("读取 MFA Challenge", () -> findInternal(challengeId));
+    }
+
+    private MfaLoginChallenge findInternal(String challengeId) {
+        Map<Object, Object> values = SecurityRedisExecutor.require("读取 MFA Challenge",
+                () -> redis.opsForHash().entries(key(challengeId)));
         if (values.isEmpty()) {
             return null;
         }
@@ -123,25 +131,36 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
 
     @Override
     public boolean recordFailure(String challengeId) {
-        Long result = redis.execute(RECORD_FAILURE_SCRIPT, Collections.singletonList(key(challengeId)),
-                Integer.toString(Math.max(1, properties.getMfaChallengeMaxAttempts())));
-        return result != null && result > 0;
+        return SecurityRedisExecutor.execute("记录 MFA Challenge 失败次数", () -> {
+            Long result = SecurityRedisExecutor.require("记录 MFA Challenge 失败次数",
+                    () -> redis.execute(RECORD_FAILURE_SCRIPT, Collections.singletonList(key(challengeId)),
+                            Integer.toString(Math.max(1, properties.getMfaChallengeMaxAttempts()))));
+            return result > 0;
+        });
     }
 
     @Override
     public boolean markEnrollmentCompleted(String challengeId) {
-        MfaLoginChallenge challenge = find(challengeId);
-        if (challenge == null || !challenge.enrollmentRequired() || challenge.enrollmentCompleted()) {
+        if (challengeId == null || challengeId.isBlank()) {
             return false;
         }
-        redis.opsForHash().put(key(challengeId), FIELD_STATE, STATE_ENROLLMENT_COMPLETED);
-        return true;
+        return SecurityRedisExecutor.execute("完成 MFA enrollment", () -> {
+            MfaLoginChallenge challenge = findInternal(challengeId);
+            if (challenge == null || !challenge.enrollmentRequired() || challenge.enrollmentCompleted()) {
+                return false;
+            }
+            redis.opsForHash().put(key(challengeId), FIELD_STATE, STATE_ENROLLMENT_COMPLETED);
+            return true;
+        });
     }
 
     @Override
     public boolean consume(String challengeId) {
-        Long result = redis.execute(CONSUME_SCRIPT, Collections.singletonList(key(challengeId)));
-        return result != null && result > 0;
+        return SecurityRedisExecutor.execute("消费 MFA Challenge", () -> {
+            Long result = SecurityRedisExecutor.require("消费 MFA Challenge",
+                    () -> redis.execute(CONSUME_SCRIPT, Collections.singletonList(key(challengeId))));
+            return result > 0;
+        });
     }
 
     private String key(String challengeId) {

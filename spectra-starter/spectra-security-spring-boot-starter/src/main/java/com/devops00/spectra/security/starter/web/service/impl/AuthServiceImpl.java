@@ -20,7 +20,9 @@ import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import com.devops00.spectra.security.starter.web.service.AuthService;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -90,9 +92,9 @@ public class AuthServiceImpl implements AuthService {
         var code = generateCode();
         try {
             var requestWindow = Instant.now().getEpochSecond() / Math.max(1L, securityProperties.getVerificationCodeExpire());
-            var stored = redisTemplate.opsForValue()
+            var stored = SecurityRedisExecutor.require("写入验证码", () -> redisTemplate.opsForValue()
                     .setIfAbsent(redisKey, digest(code),
-                            securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
+                            securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS));
             if (Boolean.FALSE.equals(stored)) {
                 return;
             }
@@ -109,8 +111,10 @@ public class AuthServiceImpl implements AuthService {
             if (receipt.taskCount() == 0) {
                 throw new SpectraException("验证码通知未生成投递任务");
             }
+        } catch (SecurityRedisUnavailableException exception) {
+            throw exception;
         } catch (RuntimeException exception) {
-            redisTemplate.delete(redisKey);
+            SecurityRedisExecutor.run("清理验证码", () -> redisTemplate.delete(redisKey));
             if (exception instanceof SpectraException) {
                 throw exception;
             }

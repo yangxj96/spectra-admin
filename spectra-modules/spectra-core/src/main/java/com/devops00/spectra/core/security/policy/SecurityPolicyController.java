@@ -46,14 +46,14 @@ public class SecurityPolicyController {
     private final SecurityPolicyService policyService;
 
     @ULog("'查询会话策略'")
-    @GetMapping(value = "/session", version = "1.0.0+")
+    @GetMapping(value = "/session", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
     public List<SecuritySessionPolicyVO> sessionPolicies() {
         return policyService.sessionPolicies();
     }
 
     @ULog("'修改会话策略'")
-    @PutMapping(value = "/session/{clientId}", version = "1.0.0+")
+    @PutMapping(value = "/session/{clientId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
     public SecuritySessionPolicyVO modifySessionPolicy(@PathVariable UUID clientId,
                                                        @Validated @RequestBody SecuritySessionPolicyFrom from) {
@@ -61,14 +61,14 @@ public class SecurityPolicyController {
     }
 
     @ULog("'查询密码策略'")
-    @GetMapping(value = "/password", version = "1.0.0+")
+    @GetMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
     public SecurityPasswordPolicyVO passwordPolicy() {
         return policyService.passwordPolicy();
     }
 
     @ULog("'修改密码策略'")
-    @PutMapping(value = "/password", version = "1.0.0+")
+    @PutMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
     public SecurityPasswordPolicyVO modifyPasswordPolicy(@Validated @RequestBody SecurityPasswordPolicyFrom from) {
         return policyService.modifyPasswordPolicy(from);

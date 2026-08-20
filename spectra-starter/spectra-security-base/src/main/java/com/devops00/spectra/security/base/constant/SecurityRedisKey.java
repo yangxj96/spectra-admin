@@ -21,44 +21,44 @@ import com.devops00.spectra.common.constant.RedisKey;
 /**
  * Security Session and login-protection Redis keys.
  *
- * <p>All session keys use the {@code sec:v2:} namespace. Values are token
+ * <p>All session keys use the {@code sec:} namespace. Values are token
  * digests or non-sensitive identifiers; plaintext tokens must never be used
  * as a key or value.</p>
  */
 public enum SecurityRedisKey implements RedisKey {
 
-    /** v2 会话详情（事实源）Hash，格式参数为 Access Token digest。 */
-    SESSION("sec:v2:sess:%s"),
+    /** 会话详情（事实源）Hash，格式参数为 Access Token digest。 */
+    SESSION("sec:sess:%s"),
 
     /** 用户+端 → token（同端复用 & 按端踢出）。 */
-    USER_CLIENT("sec:v2:uc:%s:%s"),
+    USER_CLIENT("sec:uc:%s:%s"),
 
     /** 用户所有 token 集合（全端踢出 & 在线查询）。 */
-    USER_TOKENS("sec:v2:ut:%s"),
+    USER_TOKENS("sec:ut:%s"),
 
     /** 在线用户 ID 集合。 */
-    ONLINE_USERS("sec:v2:online"),
+    ONLINE_USERS("sec:online"),
 
     /** Token Family 下的 Access digest 集合。 */
-    SESSION_FAMILY("sec:v2:family:%s"),
+    SESSION_FAMILY("sec:family:%s"),
 
     /** Token Family 下的 Refresh digest 集合，用于整条会话链撤销时清理轮换残留。 */
-    REFRESH_FAMILY("sec:v2:rt:family:%s"),
+    REFRESH_FAMILY("sec:rt:family:%s"),
 
     /** 登录失败计数（锁定账号）。 */
-    LOGIN_FAIL("sec:v2:fail:%s"),
+    LOGIN_FAIL("sec:fail:%s"),
 
     /** 刷新 token → access token 映射。 */
-    REFRESH_TOKEN("sec:v2:rt:%s"),
+    REFRESH_TOKEN("sec:rt:%s"),
 
     /** Refresh Token 重放后的用户级撤销栅栏。 */
-    REFRESH_REPLAY_FENCE("sec:v2:replay:%s"),
+    REFRESH_REPLAY_FENCE("sec:replay:%s"),
 
     /** Refresh Token 一次性消费声明。 */
-    REFRESH_CLAIM("sec:v2:rt:claim:%s"),
+    REFRESH_CLAIM("sec:rt:claim:%s"),
 
     /** MFA 登录预认证挑战；只保存短期非敏感的用户标识和挑战状态。 */
-    MFA_CHALLENGE("sec:v2:mfa:challenge:%s");
+    MFA_CHALLENGE("sec:mfa:challenge:%s");
 
     private final String pattern;
 

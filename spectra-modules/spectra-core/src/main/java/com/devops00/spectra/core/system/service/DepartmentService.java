@@ -18,7 +18,6 @@ package com.devops00.spectra.core.system.service;
 
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import org.jspecify.annotations.Nullable;
 
@@ -34,27 +33,6 @@ import java.util.UUID;
  * @since 2025/6/15 00:00
  */
 public interface DepartmentService extends BaseService<Department> {
-
-    /**
-     * 新增组织机构
-     *
-     * @param from 请求入参
-     */
-    void created(DepartmentFrom from);
-
-    /**
-     * 根据ID删除组织机构
-     *
-     * @param id ID
-     */
-    void deleteById(UUID id);
-
-    /**
-     * 编辑组织机构
-     *
-     * @param from 请求入参
-     */
-    void modify(DepartmentFrom from);
 
     /**
      * 计算组织机构路径

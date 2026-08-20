@@ -65,7 +65,7 @@ public class CryptoController {
     @ULog("'获取加解密配置'")
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
-    @GetMapping(value = "/config", version = "1.0.0+")
+    @GetMapping(value = "/config", version = "1.0.0")
     public CryptoConfigVO getConfig() {
         return new CryptoConfigVO(cryptoKeyManager.isEnabled(), cryptoKeyManager.getServerPublicKeyBase64());
     }
@@ -75,7 +75,7 @@ public class CryptoController {
      */
     @ULog("'获取客户端私钥'")
     @Encrypt(response = false)
-    @GetMapping(value = "/keypair/client-private", version = "1.0.0+")
+    @GetMapping(value = "/keypair/client-private", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoClientKeyVO getClientPrivateKey() {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
@@ -85,7 +85,7 @@ public class CryptoController {
      * 生成新的 RSA 密钥对
      */
     @ULog("'生成RSA密钥对'")
-    @PostMapping(value = "/keypair/generate", version = "1.0.0+")
+    @PostMapping(value = "/keypair/generate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoKeyPairVO generateKeyPair() {
         try {
@@ -118,7 +118,7 @@ public class CryptoController {
      * 手动重新加载密钥
      */
     @ULog("'重新加载加解密密钥'")
-    @PostMapping(value = "/keypair/refresh", version = "1.0.0+")
+    @PostMapping(value = "/keypair/refresh", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public void refreshKeys() {
         cryptoKeyManager.refresh();

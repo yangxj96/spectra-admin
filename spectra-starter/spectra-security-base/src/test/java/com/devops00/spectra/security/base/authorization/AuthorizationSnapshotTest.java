@@ -40,7 +40,7 @@ class AuthorizationSnapshotTest {
     @Test
     void rootAssignmentHasImplicitPermissionsAndGlobalAccess() {
         var snapshot = AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", Map.of(), Map.of())));
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", 1, Map.of(), Map.of())));
 
         assertTrue(snapshot.isRoot());
         assertEquals(Set.of("*"), snapshot.permissions());
@@ -56,6 +56,7 @@ class AuthorizationSnapshotTest {
                 new AuthorizationAssignment(
                         UUID.randomUUID(),
                         "ROLE_A",
+                        1,
                         Map.of(
                                 "order:read", boundary("order:read", rules(JAVA, false)),
                                 "salary:read", boundary("salary:read", self())),
@@ -63,6 +64,7 @@ class AuthorizationSnapshotTest {
                 new AuthorizationAssignment(
                         UUID.randomUUID(),
                         "ROLE_B",
+                        1,
                         Map.of(
                                 "order:read", boundary("order:read", rules(FRONTEND, false)),
                                 "salary:read", boundary("salary:read", rules(JAVA, false))),
@@ -84,6 +86,7 @@ class AuthorizationSnapshotTest {
                 new AuthorizationAssignment(
                         UUID.randomUUID(),
                         "ROLE_MANAGER",
+                        1,
                         Map.of("user:read", boundary("user:read", AuthorizationScope.of(ScopeMode.ALL))),
                         Map.of("user:read", boundary("user:read", rules(JAVA, false))))));
 
@@ -95,9 +98,9 @@ class AuthorizationSnapshotTest {
     @Test
     void shouldSupportDescendantRulesWithoutExpandingExplicitDepartmentSets() {
         var snapshot = AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_A",
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_A", 1,
                         Map.of("order:read", boundary("order:read", rules(JAVA, true))), Map.of()),
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_B",
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_B", 1,
                         Map.of("salary:read", boundary("salary:read", rules(JAVA, false))), Map.of())));
 
         assertTrue(snapshot.canAccess("order:read", new ScopeQuery(OTHER_USER, OWNER, FRONTEND, Set.of(FRONTEND, JAVA))));

@@ -28,6 +28,7 @@ import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.strategy.provider.SmsAuthenticationProvider;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
 import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -88,19 +89,22 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
 
     @Override
     public void kaptchaValidate(String phone, String kaptcha) {
-        var key = RedisCacheKey.LOGIN_SMS_CODE + phone;
-        var attemptsKey = RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + phone;
-        var attempts = redisTemplate.opsForValue().increment(attemptsKey);
-        if (attempts != null && attempts == 1L) {
-            redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), java.util.concurrent.TimeUnit.SECONDS);
-        }
-        if (attempts != null && attempts > securityProperties.getVerificationCodeMaxAttempts()) {
-            throw new KaptchaNotMatchException("验证码尝试次数过多");
-        }
-        var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
-        if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
-            throw new KaptchaNotMatchException("验证码错误");
-        }
+        SecurityRedisExecutor.run("校验短信登录验证码", () -> {
+            var key = RedisCacheKey.LOGIN_SMS_CODE + phone;
+            var attemptsKey = RedisCacheKey.LOGIN_SMS_CODE_ATTEMPTS + phone;
+            var attempts = SecurityRedisExecutor.require("记录短信验证码失败次数",
+                    () -> redisTemplate.opsForValue().increment(attemptsKey));
+            if (attempts == 1L) {
+                redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), java.util.concurrent.TimeUnit.SECONDS);
+            }
+            if (attempts > securityProperties.getVerificationCodeMaxAttempts()) {
+                throw new KaptchaNotMatchException("验证码尝试次数过多");
+            }
+            var digest = VerificationCodeDigest.digest(kaptcha, securityProperties.getVerificationCodeHmacKey());
+            if (!VerificationCodeRedisStore.compareAndDelete(redisTemplate, key, digest)) {
+                throw new KaptchaNotMatchException("验证码错误");
+            }
+        });
     }
 
 }

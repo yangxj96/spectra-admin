@@ -37,7 +37,7 @@ class NotificationHealthIndicatorTest {
     @Test
     void shouldReportDownWhenInAppIsUnavailable() {
         var sender = sender(NotificationChannel.IN_APP, false);
-        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", ""),
+        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
                 List.of(sender));
 
         assertEquals(Status.DOWN, indicator.health().getStatus());
@@ -46,7 +46,7 @@ class NotificationHealthIndicatorTest {
     @Test
     void shouldReportUpWhenInAppIsAvailable() {
         var sender = sender(NotificationChannel.IN_APP, true);
-        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", ""),
+        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
                 List.of(sender));
 
         assertEquals(Status.UP, indicator.health().getStatus());

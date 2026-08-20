@@ -30,16 +30,6 @@ public record AuthorizationAssignment(UUID assignmentId,
                                       Map<String, PermissionBoundary> accessBoundaries,
                                       Map<String, PermissionBoundary> grantBoundaries) {
 
-    /**
-     * 兼容 Phase 3 的构造方式；未从旧快照提供等级时使用最低有效等级。
-     */
-    public AuthorizationAssignment(UUID assignmentId,
-                                   String roleCode,
-                                   Map<String, PermissionBoundary> accessBoundaries,
-                                   Map<String, PermissionBoundary> grantBoundaries) {
-        this(assignmentId, roleCode, 1, accessBoundaries, grantBoundaries);
-    }
-
     public AuthorizationAssignment {
         if (assignmentId == null) {
             throw new IllegalArgumentException("assignmentId 不能为空");

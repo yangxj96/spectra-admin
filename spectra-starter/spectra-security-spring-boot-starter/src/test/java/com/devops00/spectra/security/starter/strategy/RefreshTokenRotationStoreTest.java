@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.security.starter.strategy;
 
+import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.security.base.util.RefreshTokenRotationStore;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +24,7 @@ import org.springframework.data.redis.core.script.RedisScript;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,7 +36,7 @@ import static org.mockito.Mockito.when;
  */
 class RefreshTokenRotationStoreTest {
 
-    private static final List<String> REFRESH_KEYS = List.of("sec:v2:rt:refresh-digest", "sec:v2:rt:claim:refresh-digest");
+    private static final List<String> REFRESH_KEYS = List.of("sec:rt:refresh-digest", "sec:rt:claim:refresh-digest");
 
     @Test
     void shouldMapFirstClaimToClaimed() {
@@ -57,12 +59,12 @@ class RefreshTokenRotationStoreTest {
     }
 
     @Test
-    void shouldFailClosedWhenRedisReturnsMissingResult() {
+    void shouldRejectWhenRedisReturnsNoScriptResult() {
         var redis = mock(RedisTemplate.class);
         when(redis.execute(any(RedisScript.class), eq(REFRESH_KEYS), eq(604800L)))
                 .thenReturn(null);
 
-        assertEquals(RefreshTokenRotationStore.ClaimResult.MISSING,
-                RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
+        assertThrows(SecurityRedisUnavailableException.class,
+                () -> RefreshTokenRotationStore.claim(redis, REFRESH_KEYS.get(0), REFRESH_KEYS.get(1), 604800L));
     }
 }

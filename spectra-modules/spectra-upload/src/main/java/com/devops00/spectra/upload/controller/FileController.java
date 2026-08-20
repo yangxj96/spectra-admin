@@ -52,7 +52,7 @@ public class FileController {
      * 文件上传预处理
      */
     @ULog("'文件上传预处理'")
-    @PostMapping(value = "/pre", version = "1.0.0+")
+    @PostMapping(value = "/pre", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public FileUploadPreVO pre(@RequestBody FileUploadPreFrom from) {
         return bindService.pre(from);
@@ -64,7 +64,7 @@ public class FileController {
      * @param from 文件直接保存的参数
      */
     @ULog("'普通上传'")
-    @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
+    @PostMapping(value = "/uploadSingle", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public FileUploadVO uploadSingle(@ModelAttribute FileUploadFrom from) {
         return bindService.upload(from);
@@ -76,7 +76,7 @@ public class FileController {
      * @param from 文件分片上传参数
      */
     @ULog("'分片上传'")
-    @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0+")
+    @PostMapping(value = "/uploadChunk", consumes = MediaType.MULTIPART_FORM_DATA_VALUE, version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public FileUploadChunkVO uploadChunk(@ModelAttribute FileUploadChunkFrom from) {
         return bindService.chunk(from);
@@ -88,7 +88,7 @@ public class FileController {
      * @param uploadId 上传id
      */
     @ULog("'分片上传'")
-    @PostMapping(value = "/merge/{uploadId}", version = "1.0.0+")
+    @PostMapping(value = "/merge/{uploadId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public FileUploadVO merge(@PathVariable String uploadId) {
         return bindService.merge(uploadId);
@@ -101,7 +101,7 @@ public class FileController {
      */
     @ULog("'附件预览'")
     @PreAuthorize("hasPermission(null, 'file:read')")
-    @GetMapping(value = "/preview/{id}", version = "1.0.0+")
+    @GetMapping(value = "/preview/{id}", version = "1.0.0")
     public void preview(@PathVariable UUID id) {
         bindService.preview(id);
     }
@@ -112,7 +112,7 @@ public class FileController {
      * @param id 文件ID
      */
     @ULog("'下载文件'")
-    @GetMapping(value = "/download/{id}", version = "1.0.0+")
+    @GetMapping(value = "/download/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:read')")
     public void download(@PathVariable UUID id) {
         bindService.download(id);

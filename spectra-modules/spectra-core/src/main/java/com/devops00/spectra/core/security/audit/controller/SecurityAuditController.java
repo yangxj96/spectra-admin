@@ -57,21 +57,21 @@ public class SecurityAuditController {
     private final SecurityAuditQueryService queryService;
 
     @ULog("'分页查询安全审计'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditPageVO page(PageFrom page, SecurityAuditQueryFrom query, Authentication viewer) {
         return queryService.page(viewer, page, query);
     }
 
     @ULog("'查询安全审计详情'")
-    @GetMapping(value = "/{eventId}", version = "1.0.0+")
+    @GetMapping(value = "/{eventId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditVO detail(@PathVariable UUID eventId, Authentication viewer) {
         return queryService.detail(viewer, eventId);
     }
 
     @ULog("'导出安全审计'")
-    @GetMapping(value = "/export", version = "1.0.0+")
+    @GetMapping(value = "/export", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:export')")
     public ResponseEntity<byte[]> export(SecurityAuditQueryFrom query, Authentication viewer) {
         byte[] content = queryService.export(viewer, query).getBytes(StandardCharsets.UTF_8);
@@ -82,7 +82,7 @@ public class SecurityAuditController {
     }
 
     @ULog("'查询安全审计保留策略'")
-    @GetMapping(value = "/retention", version = "1.0.0+")
+    @GetMapping(value = "/retention", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")
     public SecurityAuditRetentionVO retention() {
         return queryService.retention();

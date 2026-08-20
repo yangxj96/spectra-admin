@@ -29,9 +29,9 @@ import lombok.Data;
 public class NotificationQueryFrom {
 
     /**
-     * 消息分类。
+     * 通知用途。
      */
-    private String type;
+    private String purpose;
     /**
      * 是否只查询已读或未读消息。
      */

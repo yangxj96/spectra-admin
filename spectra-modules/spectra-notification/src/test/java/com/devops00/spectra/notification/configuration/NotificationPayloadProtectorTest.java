@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -35,7 +36,7 @@ class NotificationPayloadProtectorTest {
     @Test
     void shouldEncryptAddressAndSensitiveParameters() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
-        var properties = new NotificationModuleProperties(true, key, key);
+        var properties = new NotificationModuleProperties(true, key, key, List.of());
         var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
 
         var address = protector.protectAddress("13800138000");
@@ -48,7 +49,7 @@ class NotificationPayloadProtectorTest {
 
     @Test
     void shouldRejectMissingEncryptionKey() {
-        var properties = new NotificationModuleProperties(true, "", "");
+        var properties = new NotificationModuleProperties(true, "", "", List.of());
         var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
 
         assertThrows(DataSaveException.class, () -> protector.protectAddress("13800138000"));

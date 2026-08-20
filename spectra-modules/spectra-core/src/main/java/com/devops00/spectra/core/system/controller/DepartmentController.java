@@ -16,20 +16,14 @@
 
 package com.devops00.spectra.core.system.controller;
 
-import com.devops00.spectra.common.base.Verify;
-import com.devops00.spectra.core.authorization.LegacyAuthorizationWriteGuard;
-import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.log.base.annotation.ULog;
-import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 组织机构控制器
@@ -38,7 +32,6 @@ import java.util.UUID;
  * @version 1.0
  * @since 2025/7/14 00:00
  */
-@Slf4j
 @RestController
 @RequestMapping("/department")
 public class DepartmentController {
@@ -50,48 +43,12 @@ public class DepartmentController {
     }
 
     /**
-     * 新增组织机构
-     *
-     * @param from 请求入参
-     */
-    @ULog("'新增组织机构'")
-    @PostMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'department:create')")
-    public void created(@RequestBody @Validated(Verify.Insert.class) DepartmentFrom from) {
-        LegacyAuthorizationWriteGuard.reject("旧部门创建写入口");
-    }
-
-    /**
-     * 删除组织机构
-     *
-     * @param id 组织机构ID
-     */
-    @ULog("'删除组织机构'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'department:disable')")
-    public void deleteById(@PathVariable UUID id) {
-        bindService.deleteById(id);
-    }
-
-    /**
-     * 编辑组织机构
-     *
-     * @param from 请求入参
-     */
-    @ULog("'编辑组织机构'")
-    @PutMapping(version = "1.0.0+")
-    @PreAuthorize("hasPermission(null, 'department:update')")
-    public void modify(@RequestBody @Validated(Verify.Update.class) DepartmentFrom from) {
-        LegacyAuthorizationWriteGuard.reject("旧部门修改写入口");
-    }
-
-    /**
      * 组织机构树形结构
      *
      * @return 组织机构树形结构数组
      */
     @ULog("'获取组织机构树形列表'")
-    @GetMapping(value = "/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'department:read')")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {
         return bindService.tree();

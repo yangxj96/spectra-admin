@@ -49,7 +49,7 @@ public class FileInfoController {
      * 分页查询文件列表
      */
     @ULog("'分页查询文件列表'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     public IPage<FileInfoVO> page(PageFrom page, FilePageFrom params) {
         return fileInfoService.page(page, params);
     }
@@ -58,7 +58,7 @@ public class FileInfoController {
      * 删除文件(软删除)
      */
     @ULog("'删除文件'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:delete')")
     public void deleteById(@PathVariable UUID id) {
         fileInfoService.deleteById(id);

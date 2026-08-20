@@ -67,11 +67,6 @@ public @interface DataScope {
     String ownerColumn() default "created_by";
 
     /**
-     * 兼容旧源码的标记；受保护业务实体不得设置为 true，拦截器会 fail-closed。
-     */
-    boolean ignore() default false;
-
-    /**
      * 关系维度——本实体涉及的关联表
      */
     Relation[] relations() default {};

@@ -22,6 +22,8 @@ import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
+import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.core.MethodParameter;
@@ -163,6 +165,8 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
             return new DecryptedHttpInputMessage(inputMessage, decryptedJson.getBytes(StandardCharsets.UTF_8));
         } catch (EncryptException e) {
             throw e;
+        } catch (SecurityRedisUnavailableException e) {
+            throw e;
         } catch (Exception e) {
             log.error("请求解密失败: {}", e.getMessage(), e);
             throw new EncryptException("请求解密失败", e);
@@ -226,7 +230,8 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         // 防重放：Nonce 去重（Redis 缓存）
         if (nonce != null && !nonce.isEmpty()) {
             String nonceKey = NONCE_PREFIX + nonce;
-            Boolean success = redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS));
+            Boolean success = SecurityRedisExecutor.require("记录加密请求 nonce",
+                    () -> redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS)));
             if (Boolean.FALSE.equals(success)) {
                 throw new EncryptException("重复请求（nonce 已使用）");
             }

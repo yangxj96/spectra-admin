@@ -69,14 +69,14 @@ public class AuthorizationController {
     private final OrganizationChangeService organizationChangeService;
 
     @ULog("'查询组织结构安全版本'")
-    @GetMapping(value = "/departments/organization-version", version = "2.0.0+")
+    @GetMapping(value = "/departments/organization-version", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:read')")
     public long organizationVersion() {
         return organizationChangeService.currentOrganizationVersion();
     }
 
     @ULog("'预览新增部门影响'")
-    @PostMapping(value = "/departments/impact-preview", version = "2.0.0+")
+    @PostMapping(value = "/departments/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
     public OrganizationChangePreviewVO departmentCreatePreview(
                                                                @Validated @RequestBody OrganizationChangeFrom from) {
@@ -85,7 +85,7 @@ public class AuthorizationController {
     }
 
     @ULog("'提交新增部门变更'")
-    @PostMapping(value = "/departments/impact-apply", version = "2.0.0+")
+    @PostMapping(value = "/departments/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
     public void departmentCreateApply(@Validated @RequestBody OrganizationCreateApplyFrom from) {
         log.debug("提交新增部门变更: departmentId={}, expectedOrganizationVersion={}", from.getDepartmentId(),
@@ -94,14 +94,14 @@ public class AuthorizationController {
     }
 
     @ULog("'查询 Role 授权能力'")
-    @GetMapping(value = "/roles/{roleId}", version = "2.0.0+")
+    @GetMapping(value = "/roles/{roleId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
     public RoleAuthorizationStateVO roleState(@PathVariable UUID roleId) {
         return roleChangeService.current(roleId);
     }
 
     @ULog("'预览部门编辑与移动影响'")
-    @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "2.0.0+")
+    @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public OrganizationChangePreviewVO departmentPreview(@PathVariable UUID departmentId,
                                                          @Validated @RequestBody OrganizationChangeFrom from) {
@@ -111,7 +111,7 @@ public class AuthorizationController {
     }
 
     @ULog("'提交部门编辑与移动变更'")
-    @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "2.0.0+")
+    @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public void departmentApply(@PathVariable UUID departmentId,
                                 @Validated @RequestBody OrganizationChangeApplyFrom from) {
@@ -121,7 +121,7 @@ public class AuthorizationController {
     }
 
     @ULog("'预览 Role 授权能力变更'")
-    @PostMapping(value = "/roles/{roleId}/impact-preview", version = "2.0.0+")
+    @PostMapping(value = "/roles/{roleId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public RoleAuthorizationChangePreviewVO rolePreview(@PathVariable UUID roleId,
                                                         @Validated @RequestBody RoleAuthorizationChangeFrom from) {
@@ -130,7 +130,7 @@ public class AuthorizationController {
     }
 
     @ULog("'提交 Role 授权能力变更'")
-    @PostMapping(value = "/roles/{roleId}/impact-apply", version = "2.0.0+")
+    @PostMapping(value = "/roles/{roleId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public void roleApply(@PathVariable UUID roleId,
                           @Validated @RequestBody RoleAuthorizationApplyFrom from) {
@@ -139,14 +139,14 @@ public class AuthorizationController {
     }
 
     @ULog("'查询用户授权实例'")
-    @GetMapping(value = "/users/{userId}/assignments", version = "2.0.0+")
+    @GetMapping(value = "/users/{userId}/assignments", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
     public List<AuthorizationAssignmentView> assignments(@PathVariable UUID userId) {
         return queryService.findByUserId(userId);
     }
 
     @ULog("'预览用户授权实例变更'")
-    @PostMapping(value = "/users/{userId}/assignments/preview", version = "2.0.0+")
+    @PostMapping(value = "/users/{userId}/assignments/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")
     public AuthorizationChangePreviewVO preview(@PathVariable UUID userId,
                                                 @Validated @RequestBody AuthorizationAssignmentChangeFrom from) {
@@ -155,7 +155,7 @@ public class AuthorizationController {
     }
 
     @ULog("'提交用户授权实例变更'")
-    @PostMapping(value = "/users/{userId}/assignments/apply", version = "2.0.0+")
+    @PostMapping(value = "/users/{userId}/assignments/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")
     public void apply(@PathVariable UUID userId,
                       @Validated @RequestBody AuthorizationAssignmentApplyFrom from) {

@@ -44,7 +44,7 @@ public class AuthorityController {
     }
 
     @ULog("'获取 Permission Catalog 树列表'")
-    @GetMapping(value = "/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'permission:read')")
     public List<AuthorityTreeVO> tree() {
         return permissionCatalogService.tree();

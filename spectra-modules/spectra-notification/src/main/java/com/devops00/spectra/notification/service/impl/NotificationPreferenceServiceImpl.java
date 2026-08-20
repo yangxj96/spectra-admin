@@ -21,8 +21,6 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
-import com.devops00.spectra.notification.javabean.from.NotificationSettingFrom;
-import com.devops00.spectra.notification.javabean.vo.NotificationSettingVO;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
 import lombok.RequiredArgsConstructor;
@@ -31,10 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -138,99 +132,4 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
         }
     }
 
-    /**
-     * 将用途与渠道偏好聚合为旧消息中心设置结构。
-     */
-    @Override
-    public NotificationSettingVO legacy(UUID userId) {
-        return legacy(userId, ZoneOffset.UTC);
-    }
-
-    /**
-     * 按用户时区将用途与渠道偏好聚合为旧消息中心设置结构。
-     */
-    @Override
-    public NotificationSettingVO legacy(UUID userId, ZoneId userZone) {
-        var result = new NotificationSettingVO();
-        result.setUserId(userId);
-        var preferences = list(userId);
-        var values = preferences.stream()
-                .filter(item -> "IN_APP".equals(item.getChannel()))
-                .collect(java.util.stream.Collectors.toMap(NotificationUserPreferenceEntity::getPurpose,
-                        item -> Boolean.TRUE.equals(item.getEnabled()), (left, right) -> right));
-        result.setSystemEnabled(values.getOrDefault("SYSTEM_NOTICE", true));
-        result.setWorkflowEnabled(values.getOrDefault("WORKFLOW_TODO", true));
-        result.setOaEnabled(values.getOrDefault("OA_NOTICE", true));
-        result.setInnerMailEnabled(values.getOrDefault("INNER_MESSAGE", true));
-        result.setApprovalEnabled(values.getOrDefault("WORKFLOW_RESULT", true));
-        var dndPreference = preferences.stream()
-                .filter(item -> Boolean.TRUE.equals(item.getDoNotDisturb()))
-                .findFirst()
-                .orElse(null);
-        result.setDoNotDisturb(dndPreference != null);
-        if (dndPreference != null) {
-            var zone = userZone == null ? ZoneOffset.UTC : userZone;
-            result.setDoNotDisturbStart(toLocalTime(dndPreference.getDoNotDisturbStart(), zone));
-            result.setDoNotDisturbEnd(toLocalTime(dndPreference.getDoNotDisturbEnd(), zone));
-        }
-        return result;
-    }
-
-    /**
-     * 将旧消息中心设置展开保存为站内信用途偏好。
-     */
-    @Override
-    @Transactional
-    public void saveLegacy(UUID userId, NotificationSettingFrom from) {
-        saveLegacy(userId, from, ZoneOffset.UTC);
-    }
-
-    /**
-     * 按用户时区将旧消息中心设置展开保存为站内信用途偏好。
-     */
-    @Override
-    @Transactional
-    public void saveLegacy(UUID userId, NotificationSettingFrom from, ZoneId userZone) {
-        if (from == null) {
-            throw new DataSaveException("通知设置不能为空");
-        }
-        var doNotDisturb = Boolean.TRUE.equals(from.getDoNotDisturb());
-        var zone = userZone == null ? ZoneOffset.UTC : userZone;
-        var start = doNotDisturb ? parseTime(from.getDoNotDisturbStart(), "免打扰开始时间") : null;
-        var end = doNotDisturb ? parseTime(from.getDoNotDisturbEnd(), "免打扰结束时间") : null;
-        if (doNotDisturb && (start == null) != (end == null)) {
-            throw new DataSaveException("免打扰开始和结束时间必须同时填写");
-        }
-        var startInstant = doNotDisturb && start != null ? toInstant(start, zone) : null;
-        var endInstant = doNotDisturb && end != null ? toInstant(end, zone) : null;
-        save(userId, "SYSTEM_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getSystemEnabled()), doNotDisturb,
-                startInstant, endInstant);
-        save(userId, "WORKFLOW_TODO", "IN_APP", Boolean.TRUE.equals(from.getWorkflowEnabled()), doNotDisturb,
-                startInstant, endInstant);
-        save(userId, "OA_NOTICE", "IN_APP", Boolean.TRUE.equals(from.getOaEnabled()), doNotDisturb,
-                startInstant, endInstant);
-        save(userId, "INNER_MESSAGE", "IN_APP", Boolean.TRUE.equals(from.getInnerMailEnabled()), doNotDisturb,
-                startInstant, endInstant);
-        save(userId, "WORKFLOW_RESULT", "IN_APP", Boolean.TRUE.equals(from.getApprovalEnabled()), doNotDisturb,
-                startInstant, endInstant);
-    }
-
-    private LocalTime parseTime(String value, String fieldName) {
-        if (!StringUtils.hasText(value)) {
-            return null;
-        }
-        try {
-            return LocalTime.parse(value.trim());
-        } catch (java.time.format.DateTimeParseException exception) {
-            throw new DataSaveException(fieldName + "格式不合法");
-        }
-    }
-
-    private Instant toInstant(LocalTime value, ZoneId zone) {
-        return LocalDate.now(zone).atTime(value).atZone(zone).toInstant();
-    }
-
-    private LocalTime toLocalTime(Instant value, ZoneId zone) {
-        return value == null ? null : value.atZone(zone).toLocalTime();
-    }
 }

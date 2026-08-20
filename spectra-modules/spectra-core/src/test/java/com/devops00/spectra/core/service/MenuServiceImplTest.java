@@ -95,9 +95,9 @@ class MenuServiceImplTest {
         var userMenu = menu(system.getId(), MenuType.MENU, "SystemUser", 1);
 
         when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), activeRoleA.getCode(), Map.of(), Map.of()),
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", Map.of(), Map.of()),
-                new AuthorizationAssignment(UUID.randomUUID(), activeRoleB.getCode(), Map.of(), Map.of()))));
+                new AuthorizationAssignment(UUID.randomUUID(), activeRoleA.getCode(), 1, Map.of(), Map.of()),
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", 1, Map.of(), Map.of()),
+                new AuthorizationAssignment(UUID.randomUUID(), activeRoleB.getCode(), 1, Map.of(), Map.of()))));
         when(securityRoleMapper.selectList(any())).thenReturn(List.of(activeRoleA, activeRoleB));
         when(securityRoleMenuMapper.selectList(any())).thenReturn(List.of(relation(activeRoleA.getId(), workflowMenu.getId()),
                 relation(activeRoleB.getId(), workflowMenu.getId()), relation(activeRoleB.getId(), userMenu.getId())));
@@ -120,7 +120,7 @@ class MenuServiceImplTest {
     void currentShouldReturnEmptyWhenUserHasNoEnabledRole() {
         var userId = UUID.randomUUID();
         when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", Map.of(), Map.of()))));
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DISABLED", 1, Map.of(), Map.of()))));
         when(securityRoleMapper.selectList(any())).thenReturn(List.of());
 
         var result = service.current(userId);
@@ -144,7 +144,7 @@ class MenuServiceImplTest {
         relation.setRoleId(roleId);
         relation.setMenuId(userMenu.getId());
         AuthorizationSnapshotProvider snapshotProvider = ignored -> AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER", Map.of(), Map.of())));
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER", 1, Map.of(), Map.of())));
         var securityService = new MenuServiceImpl(menuMapper, menuConverter, snapshotProvider,
                 securityRoleMapper, securityRoleMenuMapper);
 
@@ -172,7 +172,7 @@ class MenuServiceImplTest {
         var workflowMenu = menu(system.getId(), MenuType.MENU, "SystemWorkflow", 2);
 
         when(authorizationSnapshotProvider.load(userId)).thenReturn(AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", Map.of(), Map.of()))));
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_DEV_OPS", 1, Map.of(), Map.of()))));
         when(menuMapper.selectList(any())).thenReturn(List.of(system, userMenu, workflowMenu));
         when(menuConverter.toTreeVOList(any())).thenAnswer(invocation -> {
             List<Menu> menus = invocation.getArgument(0);

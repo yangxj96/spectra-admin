@@ -62,18 +62,6 @@ class NotificationSelfControllerSecurityTest {
     }
 
     @Test
-    void shouldRequireSettingPermissionsForLegacySelfApi() throws NoSuchMethodException {
-        var controller = new NotificationSettingController(mock(NotificationPreferenceService.class), mock(SecurityContextAccessor.class));
-        var get = NotificationSettingController.class.getMethod("getSetting");
-        var update = NotificationSettingController.class.getMethod("updateSetting",
-                com.devops00.spectra.notification.javabean.from.NotificationSettingFrom.class);
-
-        assertEquals("hasPermission(null ,'notification-setting:read')", get.getAnnotation(PreAuthorize.class).value());
-        assertEquals("hasPermission(null ,'notification-setting:update')", update.getAnnotation(PreAuthorize.class).value());
-        assertNotNull(controller);
-    }
-
-    @Test
     void shouldExposeOnlyAuthenticatedPreferenceOperations() throws NoSuchMethodException {
         var controller = new NotificationPreferenceController(mock(NotificationPreferenceService.class), mock(SecurityContextAccessor.class));
         var list = NotificationPreferenceController.class.getMethod("list");

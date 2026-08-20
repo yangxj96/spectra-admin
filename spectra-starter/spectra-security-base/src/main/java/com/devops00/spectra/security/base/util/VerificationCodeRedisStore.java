@@ -55,7 +55,8 @@ public final class VerificationCodeRedisStore {
         if (expectedValue == null || expectedValue.isBlank()) {
             return false;
         }
-        Long result = redisTemplate.execute(COMPARE_AND_DELETE_SCRIPT, List.of(key), expectedValue);
+        Long result = SecurityRedisExecutor.require("消费验证码",
+                () -> redisTemplate.execute(COMPARE_AND_DELETE_SCRIPT, List.of(key), expectedValue));
         return Long.valueOf(1L).equals(result);
     }
 }

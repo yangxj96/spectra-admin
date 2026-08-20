@@ -79,11 +79,11 @@ class NotificationGatewayImplTest {
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(null);
         when(directory.resolve(any())).thenReturn(List.of(
-                new NotificationRecipient(first, null, null, true, true),
-                new NotificationRecipient(second, null, null, true, true)));
+                new NotificationRecipient(first, null, null, true, true, null),
+                new NotificationRecipient(second, null, null, true, true, null)));
 
         var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
-                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", ""),
+                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
                 directory, protector, List.of());
         var receipt = gateway
                 .enqueue(NotificationRequest.inApp("test:expand", com.devops00.spectra.common.notification.NotificationPurpose.SYSTEM_NOTICE,
@@ -107,7 +107,7 @@ class NotificationGatewayImplTest {
 
         var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, mock(NotificationTemplateMapper.class),
                 mock(NotificationUserPreferenceMapper.class), new NotificationTemplateRenderer(), new NotificationPolicy(),
-                new NotificationModuleProperties(true, "", ""), directory, protector(), List.of());
+                new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
         var receipt = gateway
                 .enqueue(NotificationRequest.inApp("test:replay", com.devops00.spectra.common.notification.NotificationPurpose.SYSTEM_NOTICE,
                         List.of(UUID.randomUUID()), "test", "标题", "正文", "TEST", "2", "TEST", null));
@@ -133,10 +133,10 @@ class NotificationGatewayImplTest {
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(null);
         when(directory.resolve(any())).thenReturn(List.of(
-                new NotificationRecipient(recipientId, null, null, true, true)));
+                new NotificationRecipient(recipientId, null, null, true, true, null)));
 
         var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
-                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", ""),
+                new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
                 directory, protectorWithKey(), List.of());
         var request = new NotificationRequest(null, "test:sensitive", NotificationPurpose.SYSTEM_NOTICE,
                 List.of(NotificationChannel.IN_APP), List.of(recipientId), List.of(), "login",
@@ -172,7 +172,7 @@ class NotificationGatewayImplTest {
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(preference);
         when(directory.resolve(any())).thenReturn(List.of(
-                new NotificationRecipient(recipientId, "13800138000", null, true, true)));
+                new NotificationRecipient(recipientId, "13800138000", null, true, true, null)));
 
         var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
         var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.SMS, recipientId,
@@ -202,7 +202,7 @@ class NotificationGatewayImplTest {
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(preference);
         when(directory.resolve(any())).thenReturn(List.of(
-                new NotificationRecipient(recipientId, null, null, true, true)));
+                new NotificationRecipient(recipientId, null, null, true, true, null)));
 
         var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
         var request = request(NotificationPurpose.SECURITY_ALERT, NotificationChannel.IN_APP, recipientId,
@@ -247,7 +247,7 @@ class NotificationGatewayImplTest {
         when(templateMapper.selectOne(any())).thenReturn(null);
         when(preferenceMapper.selectOne(any())).thenReturn(preference);
         when(directory.resolve(any())).thenReturn(List.of(
-                new NotificationRecipient(recipientId, null, "user@example.com", true, true)));
+                new NotificationRecipient(recipientId, null, "user@example.com", true, true, null)));
 
         var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
         var request = request(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.EMAIL, recipientId,
@@ -298,7 +298,7 @@ class NotificationGatewayImplTest {
                                             NotificationRecipientDirectory directory) {
         return new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
                 new NotificationTemplateRenderer(), new NotificationPolicy(),
-                new NotificationModuleProperties(true, "", ""), directory, protector(), List.of());
+                new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
     }
 
     private NotificationRequest request(NotificationPurpose purpose, NotificationChannel channel, UUID recipientId,
@@ -309,12 +309,12 @@ class NotificationGatewayImplTest {
     }
 
     private NotificationPayloadProtector protector() {
-        return new NotificationPayloadProtector(new NotificationModuleProperties(true, "", ""), new ObjectMapper());
+        return new NotificationPayloadProtector(new NotificationModuleProperties(true, "", "", List.of()), new ObjectMapper());
     }
 
     private NotificationPayloadProtector protectorWithKey() {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
         return new NotificationPayloadProtector(
-                new NotificationModuleProperties(true, key, key), new ObjectMapper());
+                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
     }
 }

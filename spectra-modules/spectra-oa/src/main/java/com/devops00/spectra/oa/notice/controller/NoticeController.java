@@ -51,7 +51,7 @@ public class NoticeController {
      * 查询公告列表。
      */
     @ULog("'查询公告列表'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:read')")
     public IPage<NoticeVO> page(PageFrom page, NoticePageFrom params) {
         return noticeService.page(page, params);
@@ -61,7 +61,7 @@ public class NoticeController {
      * 获取公告详情。
      */
     @ULog("'获取公告详情'")
-    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:read')")
     public NoticeVO get(@PathVariable UUID id) {
         return noticeService.get(id);
@@ -71,7 +71,7 @@ public class NoticeController {
      * 创建公告草稿。
      */
     @ULog("'创建公告草稿'")
-    @PostMapping(version = "1.0.0+")
+    @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:create')")
     public NoticeVO create(@Validated(Verify.Insert.class) @RequestBody NoticeCreateFrom from) {
         return noticeService.get(noticeService.createDraft(from).getId());
@@ -81,7 +81,7 @@ public class NoticeController {
      * 发布公告。
      */
     @ULog("'发布公告'")
-    @PostMapping(value = "/{id}/publish", version = "1.0.0+")
+    @PostMapping(value = "/{id}/publish", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void publish(@PathVariable UUID id) {
         noticeService.publish(id);
@@ -91,7 +91,7 @@ public class NoticeController {
      * 撤回公告。
      */
     @ULog("'撤回公告'")
-    @PostMapping(value = "/{id}/revoke", version = "1.0.0+")
+    @PostMapping(value = "/{id}/revoke", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void revoke(@PathVariable UUID id) {
         noticeService.revoke(id);
@@ -101,7 +101,7 @@ public class NoticeController {
      * 标记公告已读。
      */
     @ULog("'标记公告已读'")
-    @PutMapping(value = "/{id}/read", version = "1.0.0+")
+    @PutMapping(value = "/{id}/read", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void markRead(@PathVariable UUID id) {
         noticeService.markRead(id);

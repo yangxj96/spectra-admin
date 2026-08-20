@@ -14,23 +14,23 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.authorization;
+package com.devops00.spectra.security.base.exception;
 
-import com.devops00.spectra.common.exception.DataException;
+import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
- * Phase 4 期间冻结旧的用户角色、角色权限和用户 Scope 写入口。
+ * 安全 Redis 依赖不可用异常。
+ *
+ * <p>安全 Redis 是 Token、Session、MFA Challenge、验证码和防重放状态的事实源。
+ * 发生连接、超时或命令执行失败时，调用方不得把故障解释为“数据不存在”并继续处理请求。</p>
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/14
+ * @since 2026/8/20
  */
-public final class LegacyAuthorizationWriteGuard {
+public final class SecurityRedisUnavailableException extends DataAccessResourceFailureException {
 
-    private LegacyAuthorizationWriteGuard() {
-    }
-
-    public static void reject(String operation) {
-        throw new DataException(operation + " 已冻结，请使用 /security/authorization 的 Preview/Apply API");
+    public SecurityRedisUnavailableException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

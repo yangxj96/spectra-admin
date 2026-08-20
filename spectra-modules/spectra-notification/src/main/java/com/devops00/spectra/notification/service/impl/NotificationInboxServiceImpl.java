@@ -73,7 +73,7 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
                 .isNull(NotificationInboxEntity::getDeleted)
                 .orderByDesc(NotificationInboxEntity::getCreatedAt);
         if (params != null) {
-            applyType(query, params.getType());
+            applyPurpose(query, params.getPurpose());
             if (params.getIsRead() != null) {
                 if (params.getIsRead()) {
                     query.eq(NotificationInboxEntity::getIsRead, true);
@@ -193,21 +193,13 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
     }
 
     /**
-     * 将兼容接口的消息分类转换为通知用途查询条件。
+     * 按通知用途筛选消息。
      */
-    private void applyType(LambdaQueryWrapper<NotificationInboxEntity> query, String type) {
-        if (!StringUtils.hasText(type) || "all".equalsIgnoreCase(type)) {
+    private void applyPurpose(LambdaQueryWrapper<NotificationInboxEntity> query, String purpose) {
+        if (!StringUtils.hasText(purpose) || "all".equalsIgnoreCase(purpose)) {
             return;
         }
-        var normalized = type.trim().toLowerCase();
-        switch (normalized) {
-            case "system" -> query.eq(NotificationInboxEntity::getPurpose, "SYSTEM_NOTICE");
-            case "workflow" -> query.in(NotificationInboxEntity::getPurpose, "WORKFLOW_TODO", "WORKFLOW_RESULT");
-            case "oa" -> query.in(NotificationInboxEntity::getPurpose, "OA_NOTICE", "OA_REMINDER");
-            case "inner_mail" -> query.eq(NotificationInboxEntity::getPurpose, "INNER_MESSAGE");
-            case "approval" -> query.eq(NotificationInboxEntity::getPurpose, "WORKFLOW_TODO");
-            default -> query.eq(NotificationInboxEntity::getPurpose, normalized.toUpperCase());
-        }
+        query.eq(NotificationInboxEntity::getPurpose, purpose.trim().toUpperCase());
     }
 
     /**

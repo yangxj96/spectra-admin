@@ -45,7 +45,6 @@ import java.util.UUID;
  *
  * <h3>跳过规则</h3>
  * <ul>
- * <li>业务实体设置 {@link DataScope#ignore()} = true 会 fail-closed，不能绕过登记</li>
  * <li>ALL/NONE 等特殊 Boundary 由统一的 ScopeSqlPolicy 解释</li>
  * <li>缺少登录上下文时拒绝执行（fail-closed）</li>
  * </ul>
@@ -104,10 +103,6 @@ public class DataScopeInnerInterceptor implements MultiDataPermissionHandler {
         if (annotation == null) {
             return null;
         }
-        if (annotation.ignore()) {
-            throw new DataScopeViolationException("受保护资源不得使用未登记的 ignore=true 数据范围策略");
-        }
-
         // 只有明确标注了 @DataScope 的业务表才需要登录上下文。
         // 认证流程会在登录前查询 authentication_identity/sys_user 等基础表，
         // 这些表不属于数据隔离范围，不能因为当前尚未建立用户上下文而失败。

@@ -16,18 +16,14 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.constant.Common;
-import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.exception.NotImplementedException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.common.utils.TreeBuilder;
 import com.devops00.spectra.core.system.javabean.converter.OrganizationConverter;
 import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
@@ -38,7 +34,6 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -71,32 +66,6 @@ public class DepartmentServiceImpl extends BaseServiceImpl<DepartmentMapper, Dep
             return Collections.emptyMap();
         }
         return lambdaQuery().in(BaseEntity::getId, ids).list().stream().collect(Collectors.toMap(BaseEntity::getId, Department::getPath));
-    }
-
-    @Override
-    @Transactional
-    public void created(DepartmentFrom from) {
-        var entity = organizationConverter.toEntity(from);
-        entity.setCode(IdWorker.get32UUID().toUpperCase());
-        this.save(entity);
-    }
-
-    @Override
-    @Transactional
-    public void deleteById(UUID id) {
-        // this.removeById(Long.parseLong(id))
-        throw new NotImplementedException("暂未实现");
-    }
-
-    @Override
-    @Transactional
-    public void modify(DepartmentFrom from) {
-        var organization = this.getById(from.getId());
-        if (null == organization) {
-            throw new DataNotExistException("没找到组织机构信息");
-        }
-        var entity = organizationConverter.toEntity(from);
-        this.updateById(entity);
     }
 
     @Override

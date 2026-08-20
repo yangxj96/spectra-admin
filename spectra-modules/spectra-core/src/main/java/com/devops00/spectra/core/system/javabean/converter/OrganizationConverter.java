@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.system.javabean.converter;
 
 import com.devops00.spectra.core.system.javabean.entity.Department;
-import com.devops00.spectra.core.system.javabean.from.DepartmentFrom;
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.framework.configure.mapstruct.GlobalMapperConfig;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
@@ -51,11 +50,4 @@ public interface OrganizationConverter {
      */
     List<DepartmentTreeVo> toTreeVOList(List<Department> source);
 
-    /**
-     * 入参转实体
-     *
-     * @param source 入参
-     * @return 实体
-     */
-    Department toEntity(DepartmentFrom source);
 }

@@ -65,33 +65,6 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
     }
 
     /**
-     * 兼容尚未迁移的调用方；敏感参数默认为空，业务方不得把验证码等敏感值放入普通参数。
-     *
-     * @param requestId          调用方请求 ID
-     * @param idempotencyKey     业务幂等键
-     * @param purpose            通知用途
-     * @param channels           投递渠道
-     * @param recipientUserIds   接收用户 ID
-     * @param templateGroupCode  模板组编码
-     * @param parameters         非敏感模板参数
-     * @param businessType       业务类型
-     * @param businessId         业务 ID
-     * @param sourceModule       来源模块
-     * @param sourceDepartmentId 来源部门 ID
-     * @param scheduledAt        计划投递时间
-     * @param expiresAt          投递截止时间
-     * @param priority           任务优先级
-     * @param link               客户端站内跳转路径
-     */
-    public NotificationRequest(UUID requestId, String idempotencyKey, NotificationPurpose purpose,
-                               List<NotificationChannel> channels, List<UUID> recipientUserIds, String templateGroupCode,
-                               Map<String, Object> parameters, String businessType, String businessId, String sourceModule,
-                               UUID sourceDepartmentId, Instant scheduledAt, Instant expiresAt, Integer priority, String link) {
-        this(requestId, idempotencyKey, purpose, channels, recipientUserIds, List.of(), templateGroupCode, parameters, Map.of(),
-                businessType, businessId, sourceModule, sourceDepartmentId, scheduledAt, expiresAt, priority, link);
-    }
-
-    /**
      * 创建只投递站内信的业务通知请求，标题和正文作为非敏感模板参数进入通知模块。
      *
      * @param idempotencyKey    业务幂等键

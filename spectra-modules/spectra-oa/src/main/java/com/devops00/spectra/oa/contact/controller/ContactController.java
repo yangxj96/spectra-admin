@@ -48,7 +48,7 @@ public class ContactController {
      * 分页查询通讯录。
      */
     @ULog("'分页查通讯录'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contact:read')")
     public IPage<ContactVO> page(PageFrom page, ContactPageFrom params) {
         return contactService.page(page, params.getKeyword());

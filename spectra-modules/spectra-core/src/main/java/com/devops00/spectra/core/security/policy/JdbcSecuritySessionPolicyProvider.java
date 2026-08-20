@@ -35,7 +35,7 @@ public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyP
     @Override
     public SessionPolicy find(String clientCode) {
         if (clientCode == null || clientCode.isBlank()) {
-            return null;
+            throw new SecurityPolicyUnavailableException("客户端 code 不能为空，拒绝创建或刷新会话", null);
         }
         try {
             return jdbcTemplate.query("""
@@ -56,7 +56,11 @@ public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyP
                             resultSet.getLong("refresh_ttl_seconds"),
                             toLong(resultSet.getObject("absolute_ttl_seconds", Integer.class)),
                             toLong(resultSet.getObject("idle_ttl_seconds", Integer.class))),
-                    clientCode.trim()).stream().findFirst().orElse(null);
+                    clientCode.trim())
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(
+                            () -> new SecurityPolicyUnavailableException("客户端会话策略不存在，拒绝创建或刷新会话", null));
         } catch (DataAccessException | IllegalArgumentException exception) {
             throw new SecurityPolicyUnavailableException("会话策略存储不可用，拒绝创建或刷新会话", exception);
         }

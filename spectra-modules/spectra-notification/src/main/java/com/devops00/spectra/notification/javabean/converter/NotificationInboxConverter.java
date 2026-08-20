@@ -35,12 +35,8 @@ import org.mapstruct.Mapping;
 public interface NotificationInboxConverter {
 
     /**
-     * 将收件箱实体转换为兼容消息中心字段的响应对象。
+     * 将收件箱实体转换为当前消息中心响应对象。
      */
-    @Mapping(target = "type", expression = "java(toLegacyType(source.getPurpose()))")
-    @Mapping(source = "senderUserId", target = "senderId")
-    @Mapping(source = "receiverUserId", target = "receiverId")
-    @Mapping(source = "isRead", target = "isRead")
     NotificationInboxVO toVO(NotificationInboxEntity source);
 
     /**
@@ -49,19 +45,4 @@ public interface NotificationInboxConverter {
     @Mapping(target = "pages", ignore = true)
     Page<NotificationInboxVO> toVOPage(Page<NotificationInboxEntity> source);
 
-    /**
-     * 将通知用途映射为旧消息中心分类。
-     */
-    default String toLegacyType(String purpose) {
-        if (purpose == null) {
-            return "system";
-        }
-        return switch (purpose) {
-            case "WORKFLOW_TODO", "WORKFLOW_RESULT" -> "workflow";
-            case "OA_NOTICE", "OA_REMINDER" -> "oa";
-            case "INNER_MESSAGE" -> "inner_mail";
-            case "SECURITY_ALERT" -> "security";
-            default -> "system";
-        };
-    }
 }

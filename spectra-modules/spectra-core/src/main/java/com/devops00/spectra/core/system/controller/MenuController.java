@@ -56,14 +56,14 @@ public class MenuController {
      * @param params 菜单信息
      */
     @ULog("'新增菜单'")
-    @PostMapping(value = "/created", version = "1.0.0+")
+    @PostMapping(value = "/created", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
         bindService.created(params);
     }
 
     @ULog("'删除菜单'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:disable')")
     public void deleteById(@PathVariable UUID id) {
         bindService.deleteById(id);
@@ -75,7 +75,7 @@ public class MenuController {
      * @param params 菜单信息
      */
     @ULog("'修改菜单'")
-    @PutMapping(value = "/modify", version = "1.0.0+")
+    @PutMapping(value = "/modify", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:update')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
         bindService.modify(params);
@@ -87,7 +87,7 @@ public class MenuController {
      * @return 构建的树形菜单
      */
     @ULog(value = "'获取树形菜单'")
-    @GetMapping(value = "/tree", version = "1.0.0+")
+    @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:read')")
     public @Nullable List<MenuTreeVO> tree() {
         return bindService.tree();
@@ -100,7 +100,7 @@ public class MenuController {
      * @return 当前用户授权菜单树
      */
     @ULog(value = "'获取当前用户菜单'")
-    @GetMapping(value = "/current", version = "1.0.0+")
+    @GetMapping(value = "/current", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<MenuTreeVO> current(@AuthenticationPrincipal SecurityUser user) {
         return bindService.current(user.getId());

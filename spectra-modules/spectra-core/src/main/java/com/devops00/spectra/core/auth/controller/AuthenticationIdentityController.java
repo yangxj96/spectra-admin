@@ -49,7 +49,7 @@ public class AuthenticationIdentityController {
     private final SecurityContextAccessor securityContextAccessor;
 
     @ULog("'获取认证身份列表'")
-    @GetMapping(version = "1.0.0+")
+    @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:read')")
     public List<AuthenticationIdentityVO> list() {
         UUID userId = securityContextAccessor.currentUserId();
@@ -66,21 +66,21 @@ public class AuthenticationIdentityController {
     }
 
     @ULog("'绑定手机号认证身份'")
-    @PostMapping(value = "/phone", version = "1.0.0+")
+    @PostMapping(value = "/phone", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindPhone(@Validated @RequestBody BindPhoneFrom params) {
         bindingService.bindPhone(securityContextAccessor.currentUserId(), params.getPhone(), params.getCode());
     }
 
     @ULog("'绑定邮箱认证身份'")
-    @PostMapping(value = "/email", version = "1.0.0+")
+    @PostMapping(value = "/email", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindEmail(@Validated @RequestBody BindEmailFrom params) {
         bindingService.bindEmail(securityContextAccessor.currentUserId(), params.getEmail(), params.getCode());
     }
 
     @ULog("'撤销认证身份'")
-    @DeleteMapping(value = "/{identityId}", version = "1.0.0+")
+    @DeleteMapping(value = "/{identityId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void unbind(@PathVariable UUID identityId) {
         bindingService.unbind(securityContextAccessor.currentUserId(), identityId);

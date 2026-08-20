@@ -2,28 +2,17 @@
 # Git Attributes
 # Purpose: Normalize line endings & file behavior
 # Platform: Windows + IDEA + CLI
-# =========================================
 
 # -----------------------------------------
 # 默认规则：所有文本文件统一 LF
-# -----------------------------------------
 * text=auto eol=lf
-
-# -----------------------------------------
 # Windows脚本（必须 CRLF）
-# -----------------------------------------
 *.bat   text eol=crlf
 *.cmd   text eol=crlf
 *.ps1   text eol=crlf
-
-# -----------------------------------------
 # Shell/Unix脚本（必须 LF）
-# -----------------------------------------
 *.sh    text eol=lf
-
-# -----------------------------------------
 # 常见开发语言（强制 LF）
-# -----------------------------------------
 *.java  text eol=lf
 *.kt    text eol=lf
 *.go    text eol=lf
@@ -42,10 +31,7 @@
 *.json  text eol=lf
 *.md    text eol=lf
 *.sql   text eol=lf
-
-# -----------------------------------------
 # 配置/构建/容器
-# -----------------------------------------
 Dockerfile        text eol=lf
 *.dockerfile      text eol=lf
 *.env              text eol=lf
@@ -55,28 +41,19 @@ Dockerfile        text eol=lf
 *.gradle          text eol=lf
 *.kts             text eol=lf
 *.pom             text eol=lf
-
-# -----------------------------------------
 # Git/CI相关
-# -----------------------------------------
 .gitattributes    text eol=lf
 .gitignore        text eol=lf
 .github/*         text eol=lf
 .gitlab-ci.yml    text eol=lf
-
 #----------------------------------------
 # Node/包管理器 Lock 文件
-#----------------------------------------
-
 package-lock.json text eol=lf
 yarn.lock text eol=lf
 pnpm-lock.yaml text eol=lf
 bun.lockb binary
-
-#----------------------------------------
 # Diff优化（让 git diff 更清晰）
 #-----------------------------------------
-
 *.md diff=markdown
 *.java diff=java
 *.ts diff=typescript
@@ -90,11 +67,7 @@ bun.lockb binary
 *.json diff=json
 *.yml diff=yaml
 *.yaml diff=yaml
-
-
-# -----------------------------------------
 # 二进制文件（禁止行尾转换）
-# -----------------------------------------
 *.png   binary
 *.jpg   binary
 *.jpeg  binary
@@ -111,8 +84,6 @@ bun.lockb binary
 *.war   binary
 *.exe   binary
 *.dll   binary
-
-# -----------------------------------------
 # Git LFS（大文件存储）
-# -----------------------------------------
 *.dump filter=lfs diff=lfs merge=lfs -text
+spectra-config/src/main/resources/db/migration/V1__init_target_schema.sql filter=lfs diff=lfs merge=lfs -text

@@ -52,7 +52,7 @@ public class AiConversationController {
      * 获取当前用户的会话列表
      */
     @ULog("'查询AI会话列表'")
-    @GetMapping(value = "/list", version = "1.0.0+")
+    @GetMapping(value = "/list", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'ai:read')")
     public List<AiConversation> list() {
         return conversationService.listByUser(securityContextAccessor.currentUserId());
@@ -62,7 +62,7 @@ public class AiConversationController {
      * 重命名会话
      */
     @ULog("'重命名AI会话'")
-    @PutMapping(value = "/{id}/title", version = "1.0.0+")
+    @PutMapping(value = "/{id}/title", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'ai:update')")
     public void rename(@PathVariable UUID id, @Validated @ModelAttribute AiConversationRenameFrom from) {
         conversationService.rename(id, securityContextAccessor.currentUserId(), from.getTitle());
@@ -72,7 +72,7 @@ public class AiConversationController {
      * 删除会话
      */
     @ULog("'删除AI会话'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'ai:delete')")
     public void deleteById(@PathVariable UUID id) {
         conversationService.delete(id, securityContextAccessor.currentUserId());
@@ -82,7 +82,7 @@ public class AiConversationController {
      * 获取对话历史消息
      */
     @ULog("'查询AI对话历史'")
-    @GetMapping(value = "/{id}/messages", version = "1.0.0+")
+    @GetMapping(value = "/{id}/messages", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'ai:read')")
     public List<ChatMessageVO> messages(@PathVariable UUID id) {
         return conversationService.getMessages(id, securityContextAccessor.currentUserId());

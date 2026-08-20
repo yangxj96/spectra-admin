@@ -51,7 +51,7 @@ public class MeetingController {
      * 创建一个会议
      */
     @ULog("'创建会议'")
-    @PostMapping(version = "1.0.0+")
+    @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MeetingCreateFrom from) {
         bindService.created(from);
@@ -61,7 +61,7 @@ public class MeetingController {
      * 分页查询会议
      */
     @ULog("'分页查询会议'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:read')")
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
         return bindService.page(page, params);
@@ -71,7 +71,7 @@ public class MeetingController {
      * 响应会议邀请。
      */
     @ULog("'响应会议邀请'")
-    @PostMapping(value = "/{id}/response", version = "1.0.0+")
+    @PostMapping(value = "/{id}/response", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void respond(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingResponseFrom from) {
         bindService.respond(id, from);
@@ -81,7 +81,7 @@ public class MeetingController {
      * 会议签到。
      */
     @ULog("'会议签到'")
-    @PostMapping(value = "/{id}/check-in", version = "1.0.0+")
+    @PostMapping(value = "/{id}/check-in", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void checkIn(@PathVariable java.util.UUID id) {
         bindService.checkIn(id);
@@ -91,7 +91,7 @@ public class MeetingController {
      * 保存会议纪要。
      */
     @ULog("'保存会议纪要'")
-    @PostMapping(value = "/{id}/record", version = "1.0.0+")
+    @PostMapping(value = "/{id}/record", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void saveRecord(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingRecordFrom from) {
         bindService.saveRecord(id, from);

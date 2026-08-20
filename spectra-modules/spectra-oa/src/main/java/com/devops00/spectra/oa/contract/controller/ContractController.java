@@ -52,7 +52,7 @@ public class ContractController {
      * 分页查询合同。
      */
     @ULog("'分页查询合同'")
-    @GetMapping(value = "/page", version = "1.0.0+")
+    @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
         return contractService.page(page, params);
@@ -62,7 +62,7 @@ public class ContractController {
      * 查询合同详情。
      */
     @ULog("'查询合同详情'")
-    @GetMapping(value = "/{id}", version = "1.0.0+")
+    @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public ContractVO get(@PathVariable UUID id) {
         return contractService.get(id);
@@ -72,7 +72,7 @@ public class ContractController {
      * 创建合同台账。
      */
     @ULog("'创建合同台账'")
-    @PostMapping(version = "1.0.0+")
+    @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:create')")
     public UUID created(@Validated @RequestBody ContractSaveFrom from) {
         return contractService.created(from);
@@ -82,7 +82,7 @@ public class ContractController {
      * 修改合同台账。
      */
     @ULog("'修改合同台账'")
-    @PutMapping(value = "/{id}", version = "1.0.0+")
+    @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void modify(@PathVariable UUID id, @Validated @RequestBody ContractSaveFrom from) {
         contractService.modify(id, from);
@@ -92,7 +92,7 @@ public class ContractController {
      * 删除合同台账。
      */
     @ULog("'删除合同台账'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0+")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:delete')")
     public void deleteById(@PathVariable UUID id) {
         contractService.deleteById(id);
@@ -102,7 +102,7 @@ public class ContractController {
      * 新增合同版本。
      */
     @ULog("'新增合同版本'")
-    @PostMapping(value = "/{id}/versions", version = "1.0.0+")
+    @PostMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public UUID addVersion(@PathVariable UUID id, @Validated @RequestBody ContractVersionFrom from) {
         return contractService.addVersion(id, from);
@@ -112,7 +112,7 @@ public class ContractController {
      * 查询合同版本。
      */
     @ULog("'查询合同版本'")
-    @GetMapping(value = "/{id}/versions", version = "1.0.0+")
+    @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public List<ContractVersionVO> versions(@PathVariable UUID id) {
         return contractService.versions(id);
@@ -122,7 +122,7 @@ public class ContractController {
      * 创建合同履约节点。
      */
     @ULog("'创建合同履约节点'")
-    @PostMapping(value = "/{id}/milestones", version = "1.0.0+")
+    @PostMapping(value = "/{id}/milestones", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public UUID createMilestone(@PathVariable UUID id, @Validated @RequestBody ContractMilestoneSaveFrom from) {
         return contractService.createMilestone(id, from);
@@ -132,7 +132,7 @@ public class ContractController {
      * 查询合同履约节点。
      */
     @ULog("'查询合同履约节点'")
-    @GetMapping(value = "/{id}/milestones", version = "1.0.0+")
+    @GetMapping(value = "/{id}/milestones", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public List<ContractMilestoneVO> milestones(@PathVariable UUID id) {
         return contractService.milestones(id);
@@ -142,7 +142,7 @@ public class ContractController {
      * 更新合同履约节点。
      */
     @ULog("'更新合同履约节点'")
-    @PutMapping(value = "/{id}/milestones/{milestoneId}", version = "1.0.0+")
+    @PutMapping(value = "/{id}/milestones/{milestoneId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void updateMilestone(@PathVariable UUID id, @PathVariable UUID milestoneId, @Validated @RequestBody ContractMilestoneUpdateFrom from) {
         contractService.updateMilestone(id, milestoneId, from);
@@ -152,7 +152,7 @@ public class ContractController {
      * 标记合同已签署。
      */
     @ULog("'标记合同已签署'")
-    @PostMapping(value = "/{id}/sign", version = "1.0.0+")
+    @PostMapping(value = "/{id}/sign", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void sign(@PathVariable UUID id) {
         contractService.sign(id);
@@ -162,7 +162,7 @@ public class ContractController {
      * 启用合同。
      */
     @ULog("'启用合同'")
-    @PostMapping(value = "/{id}/activate", version = "1.0.0+")
+    @PostMapping(value = "/{id}/activate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void activate(@PathVariable UUID id) {
         contractService.activate(id);
@@ -172,7 +172,7 @@ public class ContractController {
      * 终止合同。
      */
     @ULog("'终止合同'")
-    @PostMapping(value = "/{id}/terminate", version = "1.0.0+")
+    @PostMapping(value = "/{id}/terminate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void terminate(@PathVariable UUID id) {
         contractService.terminate(id);
@@ -182,7 +182,7 @@ public class ContractController {
      * 归档合同。
      */
     @ULog("'归档合同'")
-    @PostMapping(value = "/{id}/archive", version = "1.0.0+")
+    @PostMapping(value = "/{id}/archive", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public void archive(@PathVariable UUID id) {
         contractService.archive(id);
@@ -192,7 +192,7 @@ public class ContractController {
      * 执行合同履约提醒扫描。
      */
     @ULog("'执行合同履约提醒扫描'")
-    @PostMapping(value = "/reminders/run", version = "1.0.0+")
+    @PostMapping(value = "/reminders/run", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:update')")
     public int runReminders() {
         return contractService.sendDueMilestoneReminders();
@@ -202,7 +202,7 @@ public class ContractController {
      * 预览合同版本。
      */
     @ULog("'预览合同版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0+")
+    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public void preview(@PathVariable UUID id, @PathVariable UUID versionId) {
         contractService.preview(id, versionId);
@@ -212,7 +212,7 @@ public class ContractController {
      * 下载合同版本。
      */
     @ULog("'下载合同版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0+")
+    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contract:read')")
     public void download(@PathVariable UUID id, @PathVariable UUID versionId) {
         contractService.download(id, versionId);

@@ -136,7 +136,7 @@ public class AuthController {
     @ULog(value = "'用户[' + #params.username + ']进行登陆'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/login", version = "1.0.0+")
+    @PostMapping(value = "/login", version = "1.0.0")
     public TokenVO login(@Validated @RequestBody LoginFrom params, HttpServletRequest request, HttpServletResponse response) {
         String username = params.getUsername() != null ? params.getUsername() : "";
 
@@ -172,7 +172,7 @@ public class AuthController {
     @ULog(value = "'完成 MFA 登录验证'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/mfa/verify", version = "1.0.0+")
+    @PostMapping(value = "/mfa/verify", version = "1.0.0")
     public TokenVO verifyMfa(@Validated @RequestBody MfaVerifyFrom params, HttpServletRequest request,
                             HttpServletResponse response) {
         MfaLoginChallenge challenge = requireChallenge(params.challengeId());
@@ -202,7 +202,7 @@ public class AuthController {
     @ULog(value = "'完成首次 MFA 登记登录'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/mfa/complete", version = "1.0.0+")
+    @PostMapping(value = "/mfa/complete", version = "1.0.0")
     public TokenVO completeMfaEnrollment(@Validated @RequestBody MfaCompleteFrom params,
                                          HttpServletRequest request, HttpServletResponse response) {
         MfaLoginChallenge challenge = requireChallenge(params.challengeId());
@@ -222,7 +222,7 @@ public class AuthController {
      * 用户退出登陆
      */
     @ULog(value = "'用户登出系统'", type = SysLogType.SAFETY)
-    @PostMapping(value = "/logout", version = "1.0.0+")
+    @PostMapping(value = "/logout", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
     public void logout(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
@@ -255,7 +255,7 @@ public class AuthController {
      */
     @ULog(value = "'发送短信验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/sms", version = "1.0.0+")
+    @PostMapping(value = "/sms", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendSms(@Validated @RequestBody SmsCodeFrom params) {
         authService.sendSmsCode(params.getPhone());
@@ -266,7 +266,7 @@ public class AuthController {
      */
     @ULog(value = "'发送邮箱验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/email", version = "1.0.0+")
+    @PostMapping(value = "/email", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendEmail(@Validated @RequestBody EmailCodeFrom params) {
         authService.sendEmailCode(params.getEmail());
@@ -277,7 +277,7 @@ public class AuthController {
      */
     @ULog(value = "'发送绑定手机号验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("isAuthenticated()")
-    @PostMapping(value = "/bind/sms", version = "1.0.0+")
+    @PostMapping(value = "/bind/sms", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendBindingSms(@Validated @RequestBody SmsCodeFrom params) {
         authService.sendBindingSmsCode(params.getPhone());
@@ -288,7 +288,7 @@ public class AuthController {
      */
     @ULog(value = "'发送绑定邮箱验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("isAuthenticated()")
-    @PostMapping(value = "/bind/email", version = "1.0.0+")
+    @PostMapping(value = "/bind/email", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     public void sendBindingEmail(@Validated @RequestBody EmailCodeFrom params) {
         authService.sendBindingEmailCode(params.getEmail());
@@ -300,7 +300,7 @@ public class AuthController {
     @ULog(value = "'刷新token'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
-    @PostMapping(value = "/refresh", version = "1.0.0+")
+    @PostMapping(value = "/refresh", version = "1.0.0")
     public TokenVO refresh(@RequestBody(required = false) RefreshTokenFrom params, HttpServletRequest request,
                            HttpServletResponse response) {
         boolean webClient = isWebClient(request);

@@ -60,7 +60,7 @@ public class MfaController {
 
     @ULog(value = "'开始首次 MFA 登记'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
-    @PostMapping(value = "/setup/totp/enroll", version = "1.0.0+")
+    @PostMapping(value = "/setup/totp/enroll", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public MfaEnrollmentResult beginSetupTotpEnrollment(@Valid @RequestBody SetupChallengeFrom from,
                                                         HttpServletRequest request) {
@@ -77,7 +77,7 @@ public class MfaController {
 
     @ULog(value = "'确认首次 MFA 登记'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
-    @PostMapping(value = "/setup/totp/confirm", version = "1.0.0+")
+    @PostMapping(value = "/setup/totp/confirm", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public List<String> confirmSetupTotpEnrollment(@Valid @RequestBody SetupConfirmFrom from,
                                                    HttpServletRequest request) {

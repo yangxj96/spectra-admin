@@ -53,7 +53,7 @@ public class ReportController {
      * 查询部门维度统计。
      */
     @ULog("'查询部门维度统计'")
-    @GetMapping(value = "/department", version = "1.0.0+")
+    @GetMapping(value = "/department", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public List<DepartmentStatsVO> department(DepartmentStatsFrom from) {
         return departmentStatsService.list(from);
@@ -63,7 +63,7 @@ public class ReportController {
      * 导出部门维度统计。
      */
     @ULog("'导出部门维度统计'")
-    @GetMapping(value = "/department/export", version = "1.0.0+")
+    @GetMapping(value = "/department/export", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public ResponseEntity<byte[]> exportDepartment(DepartmentStatsFrom from) {
         String filename = URLEncoder.encode("部门统计.xlsx", StandardCharsets.UTF_8).replace("+", "%20");

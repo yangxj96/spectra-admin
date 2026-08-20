@@ -68,7 +68,7 @@ class TaskServiceImplNotificationTest {
         when(historicProcessQuery.processInstanceId("process-1")).thenReturn(historicProcessQuery);
         when(historicProcessQuery.singleResult()).thenReturn(null);
         when(recipientDirectory.resolveByLoginNames(List.of("alice")))
-                .thenReturn(List.of(new NotificationRecipient(userId, null, null, true, true)));
+                .thenReturn(List.of(new NotificationRecipient(userId, null, null, true, true, null)));
         when(notificationGateway.enqueue(any(NotificationRequest.class)))
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
 

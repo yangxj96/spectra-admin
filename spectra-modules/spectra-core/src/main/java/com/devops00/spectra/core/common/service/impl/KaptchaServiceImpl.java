@@ -21,6 +21,7 @@ import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;
 import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
+import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import com.google.code.kaptcha.Producer;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -92,7 +93,8 @@ public class KaptchaServiceImpl implements KaptchaService {
         }
 
         // 存储到缓存中
-        redisTemplate.opsForValue().set(RedisCacheKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration());
+        SecurityRedisExecutor.run("写入图形验证码",
+                () -> redisTemplate.opsForValue().set(RedisCacheKey.KAPTCHA + request.getSession().getId(), code, properties.getDuration()));
 
         var out = response.getOutputStream();
         try (out) {

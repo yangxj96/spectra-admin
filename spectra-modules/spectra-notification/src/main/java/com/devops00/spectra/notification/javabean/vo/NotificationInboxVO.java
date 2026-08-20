@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * 消息中心响应对象，保留旧消息中心字段兼容性。
+ * 当前用户消息中心响应对象。
  *
  * @author yangxj96
  * @version 1.0
@@ -45,13 +45,13 @@ public class NotificationInboxVO {
      */
     private String content;
     /**
-     * 兼容旧消息中心的消息分类。
+     * 通知用途。
      */
-    private String type;
+    private String purpose;
     /**
      * 发件用户 ID。
      */
-    private UUID senderId;
+    private UUID senderUserId;
     /**
      * 发件人名称。
      */
@@ -71,7 +71,7 @@ public class NotificationInboxVO {
     /**
      * 收件用户 ID。
      */
-    private UUID receiverId;
+    private UUID receiverUserId;
     /**
      * 非敏感扩展参数。
      */

@@ -28,7 +28,7 @@ class ScopedAuthorizationTest {
         var read = new PermissionBoundary(READ, new AuthorizationScope(ScopeMode.RULES, Set.of(DEPARTMENT), false));
         var update = new PermissionBoundary(UPDATE, AuthorizationScope.of(ScopeMode.SELF));
         var assignment = new AuthorizationAssignment(UUID.randomUUID(), "ROLE_MANAGER",
-                Map.of(READ, read, UPDATE, update), Map.of());
+                1, Map.of(READ, read, UPDATE, update), Map.of());
         var authorization = new ScopedAuthorization(SUBJECT, AuthorizationSnapshot.of(List.of(assignment)));
 
         var departmentQuery = new ScopeQuery(SUBJECT, UUID.randomUUID(), DEPARTMENT, Set.of(DEPARTMENT));

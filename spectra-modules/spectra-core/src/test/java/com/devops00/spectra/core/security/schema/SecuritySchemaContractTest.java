@@ -281,6 +281,17 @@ class SecuritySchemaContractTest {
         assertTrue(migration.contains("ALTER FUNCTION spectra_security.reject_audit_mutation() RENAME TO sec_reject_audit_mutation"));
     }
 
+    @Test
+    void phase11MustRemoveLegacyNotificationRuntimeTablesAndFreezeDepartmentDeletePermission() throws IOException {
+        String migration = readMigration("V19__remove_legacy_notification_runtime.sql");
+
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_notification_setting"));
+        assertTrue(migration.contains("DROP TABLE IF EXISTS spectra_core.sys_notification"));
+        assertTrue(migration.contains("UPDATE spectra_security.sec_permission"));
+        assertTrue(migration.contains("WHERE code = 'department:disable'"));
+        assertTrue(migration.contains("SET state = 'DEPRECATED'"));
+    }
+
     private String readSql() throws IOException {
         var candidates = List.of(
                 Path.of("docs", "sql", "spectra_security", "建表.sql"),

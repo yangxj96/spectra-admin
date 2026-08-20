@@ -50,7 +50,7 @@ public class NotificationPreferenceController {
      * 查询当前用户用途×渠道偏好。
      */
     @ULog("'查询通知偏好'")
-    @GetMapping(version = "1.0.0+")
+    @GetMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<NotificationUserPreferenceEntity> list() {
         return service.list(currentUserId());
@@ -60,7 +60,7 @@ public class NotificationPreferenceController {
      * 保存当前用户可选通知偏好。
      */
     @ULog("'更新通知偏好'")
-    @PutMapping(version = "1.0.0+")
+    @PutMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public void save(@RequestParam String purpose, @RequestParam String channel, @RequestParam boolean enabled,
                      @RequestParam(defaultValue = "false") boolean doNotDisturb) {

@@ -55,7 +55,7 @@ public class TaskController {
      * @return 待办任务列表
      */
     @ULog("'查询待办任务'")
-    @GetMapping(value = "/todo", version = "1.0.0+")
+    @GetMapping(value = "/todo", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object todo(PageFrom page, TaskPageFrom params) {
         String username = securityContextAccessor.currentUsername();
@@ -70,7 +70,7 @@ public class TaskController {
      * @return 已办任务列表
      */
     @ULog("'查询已办任务'")
-    @GetMapping(value = "/done", version = "1.0.0+")
+    @GetMapping(value = "/done", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object done(PageFrom page, TaskPageFrom params) {
         String username = securityContextAccessor.currentUsername();
@@ -84,7 +84,7 @@ public class TaskController {
      * @param from 完成参数
      */
     @ULog("'完成任务'")
-    @PostMapping(value = "/{id}/complete", version = "1.0.0+")
+    @PostMapping(value = "/{id}/complete", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.complete(id, from.getComment(), securityContextAccessor.currentUsername());
@@ -97,7 +97,7 @@ public class TaskController {
      * @param from 完成参数
      */
     @ULog("'驳回任务'")
-    @PostMapping(value = "/{id}/reject", version = "1.0.0+")
+    @PostMapping(value = "/{id}/reject", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
         taskService.reject(id, from.getComment(), securityContextAccessor.currentUsername());
@@ -110,7 +110,7 @@ public class TaskController {
      * @param from 转办参数
      */
     @ULog("'转办任务'")
-    @PostMapping(value = "/{id}/transfer", version = "1.0.0+")
+    @PostMapping(value = "/{id}/transfer", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
         taskService.transfer(id, from.getTargetUserId(), securityContextAccessor.currentUsername());
@@ -123,7 +123,7 @@ public class TaskController {
      * @param from 委派参数
      */
     @ULog("'委派任务'")
-    @PostMapping(value = "/{id}/delegate", version = "1.0.0+")
+    @PostMapping(value = "/{id}/delegate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {
         taskService.delegate(id, from.getTargetUserId(), securityContextAccessor.currentUsername());

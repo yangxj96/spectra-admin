@@ -18,6 +18,7 @@ package com.devops00.spectra.security.starter.strategy;
 
 import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.constant.SecurityRedisKey;
+import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.HashOperations;
@@ -31,6 +32,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -104,5 +106,17 @@ class RedisMfaLoginChallengeRepositoryTest {
 
         assertTrue(repository.recordFailure(challengeId));
         assertFalse(repository.recordFailure(challengeId));
+    }
+
+    @Test
+    void shouldRejectWhenRedisDoesNotReturnFailureCounterResult() {
+        RedisTemplate<String, Object> redis = mock();
+        String challengeId = UUID.randomUUID().toString();
+        List<String> keys = List.of(SecurityRedisKey.MFA_CHALLENGE.format(challengeId));
+        when(redis.execute(any(RedisScript.class), eq(keys), eq("5"))).thenReturn(null);
+
+        var repository = new RedisMfaLoginChallengeRepository(redis, new SecurityProperties());
+
+        assertThrows(SecurityRedisUnavailableException.class, () -> repository.recordFailure(challengeId));
     }
 }

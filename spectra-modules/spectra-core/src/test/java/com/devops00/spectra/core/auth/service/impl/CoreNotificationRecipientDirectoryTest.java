@@ -135,7 +135,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     private void allowScope(AuthorizationScope scope) {
         when(authorizationSnapshotProvider.load(CURRENT_USER)).thenReturn(AuthorizationSnapshot.of(List.of(
-                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_TEST",
+                new AuthorizationAssignment(UUID.randomUUID(), "ROLE_TEST", 1,
                         java.util.Map.of("user:read", new PermissionBoundary("user:read", scope)), java.util.Map.of()))));
         when(departmentService.getById(CURRENT_DEPARTMENT)).thenReturn(null);
     }
