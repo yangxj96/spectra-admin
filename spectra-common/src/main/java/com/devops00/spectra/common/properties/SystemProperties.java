@@ -90,9 +90,6 @@ public class SystemProperties {
         private String mapping = "/**";
 
         /**
-         * 指定允许的源
-         */
-        /**
          * 精确允许的 Origin 列表；空列表表示不启用跨源访问。
          */
         private List<String> originPatterns = Collections.emptyList();
@@ -111,7 +108,7 @@ public class SystemProperties {
          * 指定运行的头信息
          */
         private List<String> headers = List.of("Accept", "Authorization", "Content-Type", "Api-Version", "X-Client-Type",
-                "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With");
+                "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With","X-Spectra-Initialization-Token");
 
         /**
          * 是否支持凭证
