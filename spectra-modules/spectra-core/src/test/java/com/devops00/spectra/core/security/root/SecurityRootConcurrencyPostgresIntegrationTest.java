@@ -66,14 +66,14 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
 
         var dataSource = new DriverManagerDataSource(database.url(), database.username(), database.password());
         var jdbc = new JdbcTemplate(dataSource);
-        var roleId = UUID.randomUUID();
+        var roleId = existingDevOpsRoleId(jdbc);
+        var seededAssignmentId = existingDevOpsAssignmentId(jdbc);
         var users = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
         var assignments = List.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID());
 
         try {
-            insertFixtures(jdbc, roleId, users);
+            insertFixtures(jdbc, users);
             insertAssignment(jdbc, assignments.get(0), users.get(0), roleId);
-            insertAssignment(jdbc, assignments.get(1), users.get(1), roleId);
 
             var guard = new JdbcLastEffectiveDevOpsGuard(new JdbcRootPolicyRepository(jdbc), new AvailableAuditWriter());
             var transaction = new TransactionTemplate(new DataSourceTransactionManager(dataSource));
@@ -85,13 +85,13 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
                     },
                     () -> {
                         guard.assertCanRemoveDevOps();
-                        revokeAssignment(jdbc, assignments.get(1));
+                        revokeAssignment(jdbc, seededAssignmentId);
                     }));
             assertEquals(1, successfulRemovals);
             assertEquals(1, effectiveDevOpsCount(jdbc));
 
             reactivateAssignment(jdbc, assignments.get(0));
-            reactivateAssignment(jdbc, assignments.get(1));
+            reactivateAssignment(jdbc, seededAssignmentId);
             assertEquals(2, effectiveDevOpsCount(jdbc));
 
             int successfulAdditions = runConcurrent(transaction, List.of(
@@ -106,6 +106,7 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
             assertEquals(1, successfulAdditions);
             assertEquals(3, effectiveDevOpsCount(jdbc));
         } finally {
+            reactivateAssignment(jdbc, seededAssignmentId);
             for (UUID assignment : assignments) {
                 jdbc.update("DELETE FROM spectra_security.sec_role_assignment WHERE id = ?", assignment);
             }
@@ -115,15 +116,28 @@ class SecurityRootConcurrencyPostgresIntegrationTest {
             for (UUID user : users) {
                 jdbc.update("DELETE FROM spectra_core.sys_user WHERE id = ?", user);
             }
-            jdbc.update("DELETE FROM spectra_security.sec_role WHERE id = ?", roleId);
         }
     }
 
-    private static void insertFixtures(JdbcTemplate jdbc, UUID roleId, List<UUID> users) {
-        jdbc.update("""
-                INSERT INTO spectra_security.sec_role (id, code, name, authority_level, state, role_kind)
-                VALUES (?, 'ROLE_DEV_OPS', 'Concurrency Test Root', 100, 'ACTIVE', 'DEV_OPS')
-                """, roleId);
+    private static UUID existingDevOpsRoleId(JdbcTemplate jdbc) {
+        return jdbc.queryForObject(
+                "SELECT id FROM spectra_security.sec_role WHERE code = 'ROLE_DEV_OPS' AND state = 'ACTIVE'",
+                UUID.class);
+    }
+
+    private static UUID existingDevOpsAssignmentId(JdbcTemplate jdbc) {
+        return jdbc.queryForObject("""
+                SELECT assignment.id
+                FROM spectra_security.sec_role_assignment assignment
+                JOIN spectra_security.sec_role role ON role.id = assignment.role_id
+                WHERE role.code = 'ROLE_DEV_OPS'
+                  AND role.state = 'ACTIVE'
+                  AND assignment.state = 'ACTIVE'
+                LIMIT 1
+                """, UUID.class);
+    }
+
+    private static void insertFixtures(JdbcTemplate jdbc, List<UUID> users) {
         for (UUID user : users) {
             jdbc.update("INSERT INTO spectra_core.sys_user (id, username, status) VALUES (?, ?, 'ACTIVE')", user,
                     "root-concurrency-" + user);

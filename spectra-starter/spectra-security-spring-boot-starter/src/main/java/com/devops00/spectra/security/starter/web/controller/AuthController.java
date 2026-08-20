@@ -174,7 +174,7 @@ public class AuthController {
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/mfa/verify", version = "1.0.0")
     public TokenVO verifyMfa(@Validated @RequestBody MfaVerifyFrom params, HttpServletRequest request,
-                            HttpServletResponse response) {
+                             HttpServletResponse response) {
         MfaLoginChallenge challenge = requireChallenge(params.challengeId());
         if (challenge.enrollmentRequired() || challenge.enrollmentCompleted()) {
             throw new LoginException("请先完成 MFA 登记");
@@ -352,9 +352,10 @@ public class AuthController {
     }
 
     private TokenVO issueAuthenticatedToken(SecurityUser user, HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextHolder.getContext().setAuthentication(
-                new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
-                        user, null, user.getAuthorities()));
+        SecurityContextHolder.getContext()
+                .setAuthentication(
+                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                user, null, user.getAuthorities()));
         securityAuthenticationPort.clearLoginFail(user.getUsername());
         audit("AUTH_LOGIN_SUCCEEDED", user.getId(), client(request), null);
         TokenVO token = securityAuthenticationPort.login(user);
@@ -471,9 +472,10 @@ public class AuthController {
                 }
             }
         }
-        if (StrUtils.isBlank(header) || StrUtils.isBlank(cookie)
+        if (StrUtils.isBlank(header)
+                || StrUtils.isBlank(cookie)
                 || !java.security.MessageDigest.isEqual(header.getBytes(java.nio.charset.StandardCharsets.UTF_8),
-                cookie.getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
+                        cookie.getBytes(java.nio.charset.StandardCharsets.UTF_8))) {
             throw new IllegalArgumentException("CSRF 校验失败");
         }
     }

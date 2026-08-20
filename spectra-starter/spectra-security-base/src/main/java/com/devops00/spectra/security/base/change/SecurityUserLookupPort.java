@@ -18,5 +18,6 @@ import org.jspecify.annotations.Nullable;
 public interface SecurityUserLookupPort {
 
     /** 查询 token 对应的主体；无效或过期 token 返回 {@code null}。 */
-    @Nullable SecurityUser findByToken(String token);
+    @Nullable
+    SecurityUser findByToken(String token);
 }

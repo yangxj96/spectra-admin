@@ -19,12 +19,12 @@ package com.devops00.spectra.security.base.policy;
 /**
  * 系统密码策略快照。
  *
- * @param minLength 最小长度
+ * @param minLength        最小长度
  * @param requireUppercase 是否要求大写字母
  * @param requireLowercase 是否要求小写字母
- * @param requireDigit 是否要求数字
- * @param requireSpecial 是否要求特殊字符
- * @param maxAgeDays 密码最大有效天数，可为空
+ * @param requireDigit     是否要求数字
+ * @param requireSpecial   是否要求特殊字符
+ * @param maxAgeDays       密码最大有效天数，可为空
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/15
@@ -46,7 +46,8 @@ public record PasswordPolicy(int minLength,
      * 校验用户主动设置的新密码，不记录或返回密码原文。
      */
     public void assertAccepts(String password) {
-        if (password == null || password.length() < minLength
+        if (password == null
+                || password.length() < minLength
                 || requireUppercase && password.chars().noneMatch(Character::isUpperCase)
                 || requireLowercase && password.chars().noneMatch(Character::isLowerCase)
                 || requireDigit && password.chars().noneMatch(Character::isDigit)

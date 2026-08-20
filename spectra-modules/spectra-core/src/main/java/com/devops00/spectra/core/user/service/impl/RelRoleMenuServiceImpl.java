@@ -98,8 +98,10 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
 
         // 当前角色关联的菜单信息
         var currentIds = securityRoleMenuMapper.selectList(new LambdaQueryWrapper<SecurityRoleMenu>()
-                        .eq(SecurityRoleMenu::getRoleId, roleId))
-                .stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet());
+                .eq(SecurityRoleMenu::getRoleId, roleId))
+                .stream()
+                .map(SecurityRoleMenu::getMenuId)
+                .collect(Collectors.toSet());
 
         // 计算删除且删除
         var removeIds = new HashSet<>(currentIds);

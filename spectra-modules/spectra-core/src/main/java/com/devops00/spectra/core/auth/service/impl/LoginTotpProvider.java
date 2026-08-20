@@ -48,8 +48,10 @@ public class LoginTotpProvider implements AuthenticationProvider {
         if (!(authentication instanceof TotpAuthenticationToken token)) {
             return null;
         }
-        if (!(token.getPrincipal() instanceof String identifier) || identifier.isBlank()
-                || !(token.getCredentials() instanceof String code) || code.isBlank()) {
+        if (!(token.getPrincipal() instanceof String identifier)
+                || identifier.isBlank()
+                || !(token.getCredentials() instanceof String code)
+                || code.isBlank()) {
             throw new BadCredentialsException("账号或 MFA 验证码不能为空");
         }
         AuthenticationIdentity identity = identityService.findPasswordIdentity(identifier);

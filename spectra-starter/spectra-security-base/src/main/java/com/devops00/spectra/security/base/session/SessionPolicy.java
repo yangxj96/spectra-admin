@@ -10,12 +10,12 @@ package com.devops00.spectra.security.base.session;
 /**
  * 登录端的会话策略快照。
  *
- * @param concurrencyMode 并发模式
- * @param maxSessions 最大活动会话数
- * @param accessTtlSeconds Access TTL
- * @param refreshTtlSeconds Refresh TTL
+ * @param concurrencyMode    并发模式
+ * @param maxSessions        最大活动会话数
+ * @param accessTtlSeconds   Access TTL
+ * @param refreshTtlSeconds  Refresh TTL
  * @param absoluteTtlSeconds 绝对 TTL，可为空
- * @param idleTtlSeconds 空闲 TTL，可为空
+ * @param idleTtlSeconds     空闲 TTL，可为空
  */
 public record SessionPolicy(SessionConcurrencyMode concurrencyMode, int maxSessions, long accessTtlSeconds,
                             long refreshTtlSeconds, Long absoluteTtlSeconds, Long idleTtlSeconds) {

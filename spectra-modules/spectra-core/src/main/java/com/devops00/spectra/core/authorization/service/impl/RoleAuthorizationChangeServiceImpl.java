@@ -147,7 +147,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     public void apply(UUID roleId, RoleAuthorizationApplyFrom from) {
         var token = tokenService.verify(from.getPreviewToken());
         var operatorId = currentOperatorId();
-        if (!operatorId.equals(token.operatorId()) || !operatorId.equals(token.targetUserId())
+        if (!operatorId.equals(token.operatorId())
+                || !operatorId.equals(token.targetUserId())
                 || !roleId.equals(token.roleId())) {
             throw new DataException("Role 授权变更 token 与当前操作者或目标 Role 不匹配");
         }
@@ -171,8 +172,12 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     }
 
     private PreparedChange prepare(UUID roleId, RoleAuthorizationChangeFrom from) {
-        if (roleId == null || from == null || from.getExpectedVersion() == null || from.getAuthorityLevel() == null
-                || from.getPermissionCodes() == null || from.getGrantablePermissionCodes() == null) {
+        if (roleId == null
+                || from == null
+                || from.getExpectedVersion() == null
+                || from.getAuthorityLevel() == null
+                || from.getPermissionCodes() == null
+                || from.getGrantablePermissionCodes() == null) {
             throw new DataException("Role 授权变更参数不能为空");
         }
         var operatorId = currentOperatorId();
@@ -211,7 +216,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         var permissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
                 .eq(RolePermission::getRoleId, roleId)).stream().map(RolePermission::getPermissionId).collect(Collectors.toSet());
         var grantableIds = roleGrantablePermissionMapper.selectList(new LambdaQueryWrapper<RoleGrantablePermission>()
-                .eq(RoleGrantablePermission::getRoleId, roleId)).stream().map(RoleGrantablePermission::getPermissionId)
+                .eq(RoleGrantablePermission::getRoleId, roleId))
+                .stream()
+                .map(RoleGrantablePermission::getPermissionId)
                 .collect(Collectors.toSet());
         return new RoleAuthorizationState(role.getAuthorityLevel() == null ? 1 : role.getAuthorityLevel(),
                 permissionCodes(permissionIds), permissionCodes(grantableIds));
@@ -236,7 +243,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
 
     private void validatePermissionCodes(Set<String> codes) {
         var rows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes));
-        var active = rows.stream().filter(permission -> "ACTIVE".equals(permission.getState())).map(Permission::getCode)
+        var active = rows.stream()
+                .filter(permission -> "ACTIVE".equals(permission.getState()))
+                .map(Permission::getCode)
                 .collect(Collectors.toSet());
         if (active.size() != codes.size() || !active.containsAll(codes)) {
             throw new DataNotExistException("Role Permission Catalog 中存在无效或停用 Permission");
@@ -252,7 +261,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (added.isEmpty() && after.authorityLevel() > before.authorityLevel()) {
             added.add("role:authority-level:update");
         }
-        return added.stream().sorted()
+        return added.stream()
+                .sorted()
                 .map(permission -> new AuthorizationGrantRequest(permission, AuthorizationScope.of(
                         com.devops00.spectra.security.base.authorization.ScopeMode.NONE),
                         AuthorizationScope.of(com.devops00.spectra.security.base.authorization.ScopeMode.NONE),
@@ -262,7 +272,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
 
     private List<RoleAssignment> activeAssignments(UUID roleId) {
         return roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getRoleId, roleId).eq(RoleAssignment::getState, "ACTIVE"));
+                .eq(RoleAssignment::getRoleId, roleId)
+                .eq(RoleAssignment::getState, "ACTIVE"));
     }
 
     private Set<UUID> affectedUserIds(UUID roleId) {
@@ -301,9 +312,13 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (codes.isEmpty()) {
             return Set.of();
         }
-        return permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes)).stream()
-                .collect(Collectors.toMap(Permission::getCode, Function.identity())).values().stream()
-                .map(Permission::getId).collect(Collectors.toUnmodifiableSet());
+        return permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes))
+                .stream()
+                .collect(Collectors.toMap(Permission::getCode, Function.identity()))
+                .values()
+                .stream()
+                .map(Permission::getId)
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     private void insertRolePermissions(UUID roleId, Set<UUID> permissionIds, boolean grantable) {

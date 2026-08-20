@@ -31,8 +31,8 @@ public interface DepartmentHierarchy {
     /**
      * 判断 descendant 是否为 ancestor 本身或其下级。
      *
-     * @param ancestor    祖先部门
-     * @param descendant  后代部门
+     * @param ancestor   祖先部门
+     * @param descendant 后代部门
      * @return 是否属于该组织子树
      */
     boolean contains(UUID ancestor, UUID descendant);

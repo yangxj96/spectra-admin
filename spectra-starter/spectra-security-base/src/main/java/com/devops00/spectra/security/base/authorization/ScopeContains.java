@@ -62,7 +62,8 @@ public final class ScopeContains {
             return false;
         }
         for (var requestedDepartment : requested.departmentIds()) {
-            boolean covered = container.departmentIds().stream()
+            boolean covered = container.departmentIds()
+                    .stream()
                     .anyMatch(containerDepartment -> containerDepartment.equals(requestedDepartment)
                             || (container.includeDescendants() && hierarchy.contains(containerDepartment, requestedDepartment)));
             if (!covered) {

@@ -38,7 +38,7 @@ public final class GrantBoundaryPolicy {
      * @param operatorId       操作者 ID
      * @param targetUserId     目标用户 ID
      * @param requests         按 Permission 拆分的变更请求
-     * @param root              是否通过统一 RootPolicy 判定
+     * @param root             是否通过统一 RootPolicy 判定
      */
     public static void assertAllowed(AuthorizationSnapshot operatorSnapshot,
                                      UUID operatorId,
@@ -58,7 +58,8 @@ public final class GrantBoundaryPolicy {
             throw new GrantBoundaryViolationException("授权变更不能为空");
         }
         for (var request : requests) {
-            var candidates = operatorSnapshot.assignments().stream()
+            var candidates = operatorSnapshot.assignments()
+                    .stream()
                     .filter(assignment -> assignment.authorityLevel() > request.targetAuthorityLevel())
                     .filter(assignment -> assignment.grantBoundaries().containsKey(request.permission()))
                     .filter(assignment -> request.accessScope() == null

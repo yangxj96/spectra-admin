@@ -67,7 +67,7 @@ java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
     -jar $jar.FullName
 ```
 
-默认开发端口为 `4004`，API 上下文为 `/api`。示例配置首次启动地址是 `http://127.0.0.1:4004/api`；只有设置 `SERVER_SSL_ENABLED=true` 并提供 `files/ssl/keystore.p12` 后才使用 HTTPS。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
+默认开发端口为 `4004`，API 上下文为 `/api`。示例配置首次启动地址是 `https://127.0.0.1:4004/api`；模板默认启用 HTTPS，启动前需准备 `files/ssl/keystore.p12` 并填写 `SSL_PASSWORD`。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
 
 ## 文档入口
 

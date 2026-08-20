@@ -78,7 +78,7 @@ public class SecuritySessionPortConfiguration {
         return new SecurityAuthenticationPort() {
             @Override
             public com.devops00.spectra.security.base.javabean.vo.TokenVO login(
-                    com.devops00.spectra.security.base.javabean.entity.SecurityUser user) {
+                                                                                com.devops00.spectra.security.base.javabean.entity.SecurityUser user) {
                 return sessionIssuer.createToken(user);
             }
 
@@ -130,12 +130,12 @@ public class SecuritySessionPortConfiguration {
     @Bean(name = "sec")
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
     public RedisSecuritySessionRepository redisSecuritySessionRepository(
-                                                         @Qualifier("securityObjectMapper") ObjectMapper om,
-                                                         @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
-                                                         SecurityProperties properties,
-                                                         UserOnlineConverter userOnlineConverter,
-                                                         ObjectProvider<SecuritySessionPolicyProvider> sessionPolicyProvider,
-                                                         ObjectProvider<SecurityUserLoader> securityUserLoaderProvider) {
+                                                                         @Qualifier("securityObjectMapper") ObjectMapper om,
+                                                                         @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+                                                                         SecurityProperties properties,
+                                                                         UserOnlineConverter userOnlineConverter,
+                                                                         ObjectProvider<SecuritySessionPolicyProvider> sessionPolicyProvider,
+                                                                         ObjectProvider<SecurityUserLoader> securityUserLoaderProvider) {
         return new RedisSecuritySessionRepository(om, redis, properties, userOnlineConverter,
                 sessionPolicyProvider.getIfAvailable(),
                 securityUserLoaderProvider.getIfAvailable());
@@ -144,7 +144,8 @@ public class SecuritySessionPortConfiguration {
     @Bean
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
     public SecurityMfaChallengePort securityMfaChallengePort(
-            @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis, SecurityProperties properties) {
+                                                             @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis,
+                                                             SecurityProperties properties) {
         return new RedisMfaLoginChallengeRepository(redis, properties);
     }
 }

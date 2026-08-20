@@ -73,8 +73,10 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     @Transactional
     public void unbind(UUID userId, UUID identityId) {
         var identities = identityService.listByUserId(userId);
-        var identity = identities.stream().filter(item -> identityId.equals(item.getId())).findFirst().orElseThrow(() ->
-                new DataNotExistException("认证身份不存在"));
+        var identity = identities.stream()
+                .filter(item -> identityId.equals(item.getId()))
+                .findFirst()
+                .orElseThrow(() -> new DataNotExistException("认证身份不存在"));
         if (LoginType.PASSWORD.name().equals(identity.getMethodCode())) {
             throw new SpectraException("密码认证身份不允许解绑");
         }

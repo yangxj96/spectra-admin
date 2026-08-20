@@ -53,7 +53,8 @@ public class RoleChangeImpactAnalyzer {
         var addedGrantable = difference(after.grantablePermissions(), before.grantablePermissions());
         var removedGrantable = difference(before.grantablePermissions(), after.grantablePermissions());
         boolean levelChanged = before.authorityLevel() != after.authorityLevel();
-        boolean expands = !addedPermissions.isEmpty() || !addedGrantable.isEmpty()
+        boolean expands = !addedPermissions.isEmpty()
+                || !addedGrantable.isEmpty()
                 || after.authorityLevel() > before.authorityLevel();
         return new RoleChangeImpact(addedPermissions, removedPermissions, addedGrantable, removedGrantable,
                 levelChanged, expands, affectedAssignmentCount, affectedUserCount);

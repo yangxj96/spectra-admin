@@ -45,7 +45,8 @@ final class BpmnDiagramSupport {
             return;
         }
 
-        List<FlowNode> nodes = process.getFlowElements().stream()
+        List<FlowNode> nodes = process.getFlowElements()
+                .stream()
                 .filter(FlowNode.class::isInstance)
                 .map(FlowNode.class::cast)
                 .toList();

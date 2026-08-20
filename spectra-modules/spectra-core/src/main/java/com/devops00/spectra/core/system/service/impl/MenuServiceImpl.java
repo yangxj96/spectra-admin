@@ -155,7 +155,8 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
             return buildAllCurrentTree();
         }
 
-        var roleCodes = snapshot.assignments().stream()
+        var roleCodes = snapshot.assignments()
+                .stream()
                 .map(assignment -> assignment.roleCode())
                 .distinct()
                 .toList();
@@ -225,7 +226,8 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         if (CollUtils.isEmpty(relRoleMenus)) {
             return Collections.emptyList();
         }
-        return menuMapper.selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(SecurityRoleMenu::getMenuId).toList()).isNull("deleted"))
+        return menuMapper
+                .selectList(new QueryWrapper<Menu>().in("id", relRoleMenus.stream().map(SecurityRoleMenu::getMenuId).toList()).isNull("deleted"))
                 .stream()
                 .filter(menu -> menu.getMenuType() == MenuType.MENU)
                 .toList();

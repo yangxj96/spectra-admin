@@ -91,8 +91,7 @@ class DataScopeIsolationTest {
         return TestResource.class.getAnnotation(DataScope.class);
     }
 
-    @DataScope(readPermission = READ_PERMISSION, column = "department_id", ownerColumn = "owner_id",
-            relations = @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id"))
+    @DataScope(readPermission = READ_PERMISSION, column = "department_id", ownerColumn = "owner_id", relations = @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id"))
     private static class TestResource {
     }
 }

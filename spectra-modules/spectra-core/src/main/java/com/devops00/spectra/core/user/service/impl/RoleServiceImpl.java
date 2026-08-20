@@ -89,7 +89,8 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         if (Boolean.TRUE.equals(role.getSystemManaged())) {
             throw new BuiltinDataException("系统维护角色不可修改");
         }
-        if (hasText(params.getCode()) && !params.getCode().equals(role.getCode())
+        if (hasText(params.getCode())
+                && !params.getCode().equals(role.getCode())
                 && count(new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, params.getCode())) > 0) {
             throw new DataException("角色编码已存在");
         }
@@ -117,14 +118,18 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     @Override
     public List<RoleVO> all() {
         return getBaseMapper().selectList(new LambdaQueryWrapper<SecurityRole>()
-                        .eq(SecurityRole::getState, "ACTIVE").orderByAsc(true, SecurityRole::getId))
-                .stream().map(this::toVO).toList();
+                .eq(SecurityRole::getState, "ACTIVE")
+                .orderByAsc(true, SecurityRole::getId))
+                .stream()
+                .map(this::toVO)
+                .toList();
     }
 
     @Override
     public SecurityRole getSystemDefaultUserRole() {
         return getBaseMapper().selectOne(new LambdaQueryWrapper<SecurityRole>()
-                .eq(SecurityRole::getCode, "ROLE_USER").eq(SecurityRole::getState, "ACTIVE"));
+                .eq(SecurityRole::getCode, "ROLE_USER")
+                .eq(SecurityRole::getState, "ACTIVE"));
     }
 
     private RoleVO toVO(SecurityRole role) {

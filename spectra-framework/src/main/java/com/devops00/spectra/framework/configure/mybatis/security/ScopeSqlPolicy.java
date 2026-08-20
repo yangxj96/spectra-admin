@@ -55,8 +55,11 @@ public final class ScopeSqlPolicy {
         if (method.contains("export")) {
             return required(annotation.exportPermission(), "exportPermission");
         }
-        if ((method.contains("delete") || method.contains("remove") || method.contains("update")
-                || method.contains("modify") || method.contains("batch")) && !method.contains("select")) {
+        if ((method.contains("delete")
+                || method.contains("remove")
+                || method.contains("update")
+                || method.contains("modify")
+                || method.contains("batch")) && !method.contains("select")) {
             return required(annotation.writePermission(), "writePermission");
         }
         return required(annotation.readPermission(), "readPermission");
@@ -111,7 +114,8 @@ public final class ScopeSqlPolicy {
                         : new AndExpression(relationPredicate, userPredicate);
             }
             if (relationPredicate != null) {
-                relations = relations == null ? relationPredicate
+                relations = relations == null
+                        ? relationPredicate
                         : new OrExpression(relations, relationPredicate);
             }
         }
@@ -127,8 +131,10 @@ public final class ScopeSqlPolicy {
             return falsePredicate();
         }
         Column left = new Column(table, column);
-        ExpressionList<Expression> ids = new ExpressionList<>(scope.departmentIds().stream()
-                .map(id -> (Expression) new StringValue(id.toString())).collect(Collectors.toList()));
+        ExpressionList<Expression> ids = new ExpressionList<>(scope.departmentIds()
+                .stream()
+                .map(id -> (Expression) new StringValue(id.toString()))
+                .collect(Collectors.toList()));
         InExpression direct = new InExpression(left, ids);
         if (!scope.includeDescendants()) {
             return direct;

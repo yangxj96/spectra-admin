@@ -101,8 +101,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         AuthorizationSnapshot snapshot = authorizationSnapshotProvider.load(currentUserId);
         var boundaries = snapshot.accessBoundaries("user:read");
         if (!boundaries.isEmpty()
-                && boundaries.stream().allMatch(boundary -> boundary.scope().mode()
-                        == ScopeMode.SELF)
+                && boundaries.stream().allMatch(boundary -> boundary.scope().mode() == ScopeMode.SELF)
                 && !currentUserId.equals(recipientUserId)) {
             return false;
         }

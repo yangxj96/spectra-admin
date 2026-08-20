@@ -229,11 +229,15 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                 .in(Permission::getCode, boundaries.stream().map(AuthorizationBoundaryFrom::getPermission).toList()));
         var permissions = permissionRows.stream().collect(Collectors.toMap(Permission::getCode, value -> value));
         var rolePermissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
-                        .eq(RolePermission::getRoleId, role.getId()))
-                .stream().map(RolePermission::getPermissionId).collect(Collectors.toSet());
+                .eq(RolePermission::getRoleId, role.getId()))
+                .stream()
+                .map(RolePermission::getPermissionId)
+                .collect(Collectors.toSet());
         var grantableIds = roleGrantablePermissionMapper.selectList(new LambdaQueryWrapper<RoleGrantablePermission>()
-                        .eq(RoleGrantablePermission::getRoleId, role.getId()))
-                .stream().map(RoleGrantablePermission::getPermissionId).collect(Collectors.toSet());
+                .eq(RoleGrantablePermission::getRoleId, role.getId()))
+                .stream()
+                .map(RoleGrantablePermission::getPermissionId)
+                .collect(Collectors.toSet());
         var seen = new HashSet<String>();
         var result = new ArrayList<AuthorizationGrantRequest>();
         for (var boundary : boundaries) {
@@ -261,7 +265,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
             throw new DataException("Scope 参数不能为空");
         }
         return new AuthorizationScope(source.getMode(), source.getDepartmentIds() == null
-                ? Set.of() : Set.copyOf(source.getDepartmentIds()), source.isIncludeDescendants());
+                ? Set.of()
+                : Set.copyOf(source.getDepartmentIds()), source.isIncludeDescendants());
     }
 
     private void persist(PreparedChange prepared, UUID targetUserId) {
@@ -361,8 +366,11 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         if (prepared.requests().stream().anyMatch(request -> request.grantScope() != null)) {
             appendAudit("ASSIGNMENT_GRANT_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
                     Map.of("assignmentId", prepared.assignmentId().toString()),
-                    Map.of("grantablePermissionCount", prepared.requests().stream()
-                            .filter(request -> request.grantScope() != null).count()), null);
+                    Map.of("grantablePermissionCount", prepared.requests()
+                            .stream()
+                            .filter(request -> request.grantScope() != null)
+                            .count()),
+                    null);
         }
     }
 
@@ -377,11 +385,24 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                                long expectedVersion,
                                long targetSecurityVersion,
                                List<AuthorizationGrantRequest> requests) {
-        var canonical = new StringBuilder().append(assignmentId).append('|').append(roleId).append('|')
-                .append(expectedVersion).append('|').append(targetSecurityVersion);
-        requests.stream().sorted(Comparator.comparing(AuthorizationGrantRequest::permission)).forEach(request -> canonical
-                .append('|').append(request.permission()).append(':').append(scopeText(request.accessScope())).append(':')
-                .append(scopeText(request.grantScope())).append(':').append(request.targetAuthorityLevel()));
+        var canonical = new StringBuilder().append(assignmentId)
+                .append('|')
+                .append(roleId)
+                .append('|')
+                .append(expectedVersion)
+                .append('|')
+                .append(targetSecurityVersion);
+        requests.stream()
+                .sorted(Comparator.comparing(AuthorizationGrantRequest::permission))
+                .forEach(request -> canonical
+                        .append('|')
+                        .append(request.permission())
+                        .append(':')
+                        .append(scopeText(request.accessScope()))
+                        .append(':')
+                        .append(scopeText(request.grantScope()))
+                        .append(':')
+                        .append(request.targetAuthorityLevel()));
         try {
             var digest = MessageDigest.getInstance("SHA-256").digest(canonical.toString().getBytes(StandardCharsets.UTF_8));
             var result = new StringBuilder();

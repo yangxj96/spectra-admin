@@ -76,9 +76,9 @@ class CorsConfigurationSecurityTest {
     }
 
     @Test
-    void shouldAllowHttpLoopbackForDevelopment() {
+    void shouldAllowHttpsLoopbackForDevelopment() {
         var properties = new SystemProperties();
-        properties.getCors().setOriginPatterns(List.of("http://localhost:5173"));
+        properties.getCors().setOriginPatterns(List.of("https://localhost:5173"));
 
         new MvcConfiguration(properties).addCorsMappings(new InspectableCorsRegistry());
     }

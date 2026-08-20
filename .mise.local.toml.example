@@ -43,7 +43,7 @@ SSL_TYPE = "PKCS12"
 SSL_ALIAS = "tomcat"
 
 # PostgreSQL：必须改成当前机器真实可连接的值
-DB_URL = "jdbc:postgresql://127.0.0.1:5432/devops00_spectra_db"
+DB_URL = "jdbc:postgresql://127.0.0.1:5432/spectra_db"
 DB_USERNAME = "postgres"
 DB_PASSWORD = "change-me"
 SPECTRA_FLYWAY_ENABLED = "true"

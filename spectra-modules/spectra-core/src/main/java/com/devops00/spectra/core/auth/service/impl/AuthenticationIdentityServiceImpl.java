@@ -102,7 +102,7 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         identity.setState(STATE_ACTIVE);
         identity.setVerifiedAt(Instant.now());
         if (mapper.insert(identity) != 1) {
-                throw new DataSaveException("创建认证身份失败");
+            throw new DataSaveException("创建认证身份失败");
         }
         return identity;
     }

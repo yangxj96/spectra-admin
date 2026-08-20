@@ -39,8 +39,7 @@ import java.util.UUID;
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_purchase_receipt", schema = "spectra_oa")
 @DataScope(readPermission = "oa:purchase:read", writePermission = "oa:purchase:update", column = "", relations = {
-        @DataScope.Relation(schema = "spectra_oa", table = "oa_purchase", joinColumn = "id", userColumn = "",
-                mainColumn = "purchase_id", departmentColumn = "department_id")})
+        @DataScope.Relation(schema = "spectra_oa", table = "oa_purchase", joinColumn = "id", userColumn = "", mainColumn = "purchase_id", departmentColumn = "department_id")})
 public class PurchaseReceipt extends BaseEntity {
 
     /**

@@ -3,10 +3,10 @@ spectra:
   security:
     verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
-    # 默认 HTTP 开发服务使用普通 Host-only Cookie；生产环境必须切换为 Secure 的 __Host- Cookie。
+    # 默认开发服务使用 HTTPS，因此刷新 Cookie 默认启用 Secure；生产环境仍需按部署域名切换为 __Host- Cookie。
     refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:spectra-refresh}
-    refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:false}
-    allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:true}
+    refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}
+    allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:false}
     refresh-cookie-same-site: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE:Strict}
     refresh-cookie-same-site-none-allowed: ${SPECTRA_SECURITY_REFRESH_COOKIE_SAME_SITE_NONE_ALLOWED:false}
     refresh-cookie-path: ${SPECTRA_SECURITY_REFRESH_COOKIE_PATH:/}
@@ -24,7 +24,7 @@ spectra:
     base-dir: files
     cors:
       required: ${SPECTRA_CORS_REQUIRED:false}
-      origin-patterns: ${SPECTRA_CORS_ORIGIN_ALLOWLIST:http://localhost:5173,http://127.0.0.1:5173}
+      origin-patterns: ${SPECTRA_CORS_ORIGIN_ALLOWLIST:https://localhost:5173,https://127.0.0.1:5173,https://localhost:5174,https://127.0.0.1:5174}
   user:
     default-password: ${DEFAULT_PASSWORD}
   kaptcha:

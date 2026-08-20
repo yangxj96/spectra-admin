@@ -93,12 +93,14 @@ public class SecurityUserHelper {
         }
         var snapshot = authorizationSnapshotProvider.load(userId);
         var authorities = new ArrayList<SimpleGrantedAuthority>();
-        snapshot.assignments().stream()
+        snapshot.assignments()
+                .stream()
                 .map(assignment -> assignment.roleCode())
                 .distinct()
                 .map(SimpleGrantedAuthority::new)
                 .forEach(authorities::add);
-        snapshot.permissions().stream()
+        snapshot.permissions()
+                .stream()
                 .map(SimpleGrantedAuthority::new)
                 .forEach(authorities::add);
         return List.copyOf(authorities);

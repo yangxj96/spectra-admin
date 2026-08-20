@@ -56,9 +56,7 @@ class ScopeSqlPolicyTest {
         assertThrows(IllegalStateException.class, () -> ScopeSqlPolicy.permissionFor(annotation, "MeetingMapper.export"));
     }
 
-    @DataScope(readPermission = "oa:meeting:read", writePermission = "oa:meeting:update",
-            column = "department_id", relations = @DataScope.Relation(
-                    schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id"))
+    @DataScope(readPermission = "oa:meeting:read", writePermission = "oa:meeting:update", column = "department_id", relations = @DataScope.Relation(schema = "spectra_oa", table = "oa_meeting_participant", joinColumn = "meeting_id"))
     private static class Resource {
     }
 

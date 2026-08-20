@@ -11,10 +11,10 @@ import java.util.UUID;
 /**
  * 一次资源操作的最小安全上下文。
  *
- * @param subjectId 当前操作者
+ * @param subjectId    当前操作者
  * @param resourceCode 资源编码，例如 {@code oa:meeting}
- * @param operation 资源动作
- * @param permission 显式 Permission；为空时由 resourceCode + operation 推导
+ * @param operation    资源动作
+ * @param permission   显式 Permission；为空时由 resourceCode + operation 推导
  */
 public record ExecutionContext(UUID subjectId, String resourceCode, ResourceOperation operation, String permission) {
 

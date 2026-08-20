@@ -334,7 +334,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
-                              Map<String, Object> after, String reason) {
+                             Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
                 null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
@@ -355,14 +355,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     private List<RoleVO> targetRoles(UUID userId) {
-        return authorizationAssignmentQueryService.findByUserId(userId).stream()
+        return authorizationAssignmentQueryService.findByUserId(userId)
+                .stream()
                 .filter(assignment -> "ACTIVE".equals(assignment.state()))
                 .collect(java.util.stream.Collectors.toMap(
                         assignment -> assignment.roleId(),
                         assignment -> assignment,
                         (first, ignored) -> first,
                         java.util.LinkedHashMap::new))
-                .values().stream()
+                .values()
+                .stream()
                 .map(assignment -> {
                     var role = new RoleVO();
                     role.setId(assignment.roleId());

@@ -7,7 +7,7 @@ Spectra Admin 是 Spectra 系统的**后端 API 服务**，同时为 Web 管理�
 - 技术栈：Java 25, Spring Boot 4, Maven 多模块
 - 启动入口：`com.devops00.spectra.launch.LaunchApplication`
 - 开发端口：**4004**（通过 `.mise.local.toml` 中的 `SERVER_PORT` 设置）
-- 新克隆模板默认使用 `http://127.0.0.1:4004/`；维护者本机启用证书后可覆盖为 HTTPS，两个前端必须保持同一协议和端口
+- 新克隆模板默认使用 `https://127.0.0.1:4004/`；后端与两个前端统一使用本机 HTTPS 和对应证书配置
 
 ## mise、构建与运行
 
@@ -77,7 +77,7 @@ spectra-launch       → 应用入口，运行此模块
 - `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL 连接
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` - Redis 连接
 - `DEFAULT_PASSWORD` - 默认用户密码
-- `SERVER_SSL_ENABLED`, `SSL_*` - SSL 配置（模板默认关闭 HTTPS）
+- `SERVER_SSL_ENABLED`, `SSL_*` - SSL 配置（模板默认启用 HTTPS，证书使用 `files/ssl/keystore.p12`）
 - `S3_*` - 启动时保留完整配置，使用上传功能前连接真实 S3/MinIO
 - `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - 启动时保留完整配置，使用 AI 前连接真实服务
 - `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - 启动时保留完整配置，使用 RAG 前连接真实服务并准备 pgvector
