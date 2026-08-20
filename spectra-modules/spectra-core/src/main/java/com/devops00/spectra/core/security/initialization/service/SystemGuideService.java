@@ -14,24 +14,25 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.framework.configure.mvc.properties;
+package com.devops00.spectra.core.security.initialization.service;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.devops00.spectra.core.security.initialization.javabean.from.SystemGuideCompleteFrom;
+import com.devops00.spectra.core.security.initialization.javabean.vo.SystemGuideStatusVO;
 
-/**
- * 用户配置相关
- *
- * @author yangxj96
- * @version 1.0
- * @since 2025/6/16 00:00
- */
-@Data
-@ConfigurationProperties(prefix = "spectra.user")
-public class UserProperties {
+/** DEV_OPS 首次进入系统时的设置引导。 */
+public interface SystemGuideService {
 
     /**
-     * 默认密码
+     * 查询当前用户的引导状态。
+     *
+     * @return 引导状态
      */
-    private String defaultPassword;
+    SystemGuideStatusVO status();
+
+    /**
+     * 保存引导设置并完成引导。
+     *
+     * @param from 引导设置
+     */
+    void complete(SystemGuideCompleteFrom from);
 }

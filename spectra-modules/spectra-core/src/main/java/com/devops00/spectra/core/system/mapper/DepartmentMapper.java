@@ -38,7 +38,7 @@ public interface DepartmentMapper extends BaseMapper<Department> {
     /**
      * 清理组织闭包表，调用方必须在同一事务中随后重建。
      */
-    @Delete("DELETE FROM spectra_core.sys_department_closure")
+    @Delete("DELETE FROM spectra_core.sys_department_closure WHERE id IS NOT NULL")
     int clearClosure();
 
     /**

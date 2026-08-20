@@ -21,6 +21,8 @@ import com.devops00.spectra.core.security.authentication.mfa.entity.TotpCredenti
 import com.devops00.spectra.core.security.authentication.mfa.mapper.MfaEnrollmentMapper;
 import com.devops00.spectra.core.security.authentication.mfa.mapper.RecoveryCodeMapper;
 import com.devops00.spectra.core.security.authentication.mfa.mapper.TotpCredentialMapper;
+import com.devops00.spectra.core.system.constant.SystemConfigKeys;
+import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
@@ -29,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,6 +48,7 @@ class MfaServiceImplTest {
         var credentialMapper = mock(TotpCredentialMapper.class);
         var recoveryCodeMapper = mock(RecoveryCodeMapper.class);
         var userMapper = mock(UserMapper.class);
+        var configuredService = mock(ConfiguredService.class);
         var securityAuditWriter = mock(SecurityAuditWriter.class);
         var properties = new SecurityProperties();
         properties.setMfaEncryptionKey("01234567890123456789012345678901");
@@ -57,6 +61,7 @@ class MfaServiceImplTest {
         user.setEmail("devops00.com");
         user.setUsername("DEV_OPS");
         when(userMapper.selectById(userId)).thenReturn(user);
+        when(configuredService.findValue(SystemConfigKeys.SYSTEM_NAME)).thenReturn(Optional.of("DevOps00"));
         when(enrollmentMapper.insert(any(MfaEnrollment.class))).thenAnswer(invocation -> {
             invocation.getArgument(0, MfaEnrollment.class).setId(enrollmentId);
             return 1;
@@ -64,12 +69,12 @@ class MfaServiceImplTest {
         when(credentialMapper.insert(any(TotpCredential.class))).thenReturn(1);
 
         var service = new MfaServiceImpl(enrollmentMapper, credentialMapper, recoveryCodeMapper, userMapper,
-                properties, securityAuditWriter);
+                configuredService, properties, securityAuditWriter);
 
         String provisioningUri = service.beginTotpEnrollment(userId).provisioningUri();
         String decodedUri = URLDecoder.decode(provisioningUri, StandardCharsets.UTF_8);
 
-        assertTrue(decodedUri.contains("Spectra:devops00.com"));
+        assertTrue(decodedUri.contains("DevOps00:devops00.com"));
         assertFalse(decodedUri.contains(userId.toString()));
     }
 }

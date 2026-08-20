@@ -15,6 +15,7 @@ import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
 import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
@@ -24,6 +25,8 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 import com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper;
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
+import com.devops00.spectra.core.system.constant.SystemConfigKeys;
+import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
@@ -31,6 +34,8 @@ import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
+import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.common.exception.DataSaveException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DuplicateKeyException;
@@ -40,6 +45,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.UUID;
 
 /** PostgreSQL + Redis 的系统首次初始化实现。 */
@@ -47,15 +53,12 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SystemInitializationServiceImpl implements SystemInitializationService {
 
-    private static final String SYSTEM_KEY = "SYSTEM";
-    private static final String UNINITIALIZED = "UNINITIALIZED";
-    private static final String INITIALIZING = "INITIALIZING";
-    private static final String INITIALIZED = "INITIALIZED";
     private static final String DEV_OPS_ROLE = "ROLE_DEV_OPS";
     private static final String ADVISORY_LOCK = "spectra:system-initialization";
 
     private final SystemStateMapper stateMapper;
     private final UserMapper userMapper;
+    private final ConfiguredService configuredService;
     private final SecurityRoleMapper securityRoleMapper;
     private final RoleAssignmentMapper roleAssignmentMapper;
     private final AuthenticationIdentityService authenticationIdentityService;
@@ -70,8 +73,8 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     @Override
     public SystemInitializationStatusVO status() {
         SystemState state = loadState(false);
-        return new SystemInitializationStatusVO(state.getState(), INITIALIZED.equals(state.getState()),
-                !INITIALIZED.equals(state.getState()));
+        return new SystemInitializationStatusVO(state.getState(), SystemStateKeys.INITIALIZED.equals(state.getState()),
+                !SystemStateKeys.INITIALIZED.equals(state.getState()));
     }
 
     @Override
@@ -80,9 +83,12 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         initializationTokenManager.assertToken(initializationToken);
         lockInitialization();
         SystemState state = loadState(true);
-        if (!UNINITIALIZED.equals(state.getState())) {
+        if (!SystemStateKeys.UNINITIALIZED.equals(state.getState())) {
             throw new IllegalStateException("系统已经初始化或已有初始化流程进行中");
         }
+
+        InitialSystemSettings settings = resolveInitialSystemSettings(from);
+        saveInitialSystemSettings(settings);
 
         String username = normalize(from.getUsername());
         passwordPolicyProvider.current().assertAccepts(from.getPassword());
@@ -97,8 +103,8 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         user.setRealName(from.getRealName() == null || from.getRealName().isBlank()
                 ? username
                 : from.getRealName().trim());
-        user.setLanguage("zh-CN");
-        user.setTimezone("Asia/Shanghai");
+        user.setLanguage(settings.defaultLocale());
+        user.setTimezone(settings.defaultTimezone());
         user.setSecurityVersion(0L);
         if (userMapper.insert(user) != 1) {
             throw new IllegalStateException("创建初始化用户失败");
@@ -111,7 +117,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 user.getId(), username, ClientType.WEB, true);
         UUID initializationId = UUID.fromString(challenge.id());
 
-        state.setState(INITIALIZING);
+        state.setState(SystemStateKeys.INITIALIZING);
         state.setInitializationId(initializationId);
         if (stateMapper.updateById(state) != 1) {
             throw new IllegalStateException("保存初始化状态失败");
@@ -140,7 +146,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         MfaLoginChallenge challenge = requireInitializationChallenge(from.getInitializationId(), true);
         lockInitialization();
         SystemState state = loadState(true);
-        if (!INITIALIZING.equals(state.getState())
+        if (!SystemStateKeys.INITIALIZING.equals(state.getState())
                 || !challenge.id().equals(String.valueOf(state.getInitializationId()))) {
             throw new IllegalStateException("初始化状态已变化，请重新开始初始化");
         }
@@ -177,7 +183,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
             }
         }
 
-        state.setState(INITIALIZED);
+        state.setState(SystemStateKeys.INITIALIZED);
         state.setInitializedAt(Instant.now());
         state.setInitializedBy(user.getId());
         if (stateMapper.updateById(state) != 1) {
@@ -199,9 +205,9 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
     private SystemState loadState(boolean lock) {
         SystemState state = lock
-                ? stateMapper.selectForUpdateByStateKey(SYSTEM_KEY)
+                ? stateMapper.selectForUpdateByStateKey(SystemStateKeys.SYSTEM)
                 : stateMapper.selectOne(new LambdaQueryWrapper<SystemState>()
-                        .eq(SystemState::getStateKey, SYSTEM_KEY));
+                        .eq(SystemState::getStateKey, SystemStateKeys.SYSTEM));
         if (state == null) {
             throw new IllegalStateException("系统初始化状态不存在");
         }
@@ -221,7 +227,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
             throw new IllegalArgumentException("初始化挑战无效", exception);
         }
         SystemState state = loadState(false);
-        if (!INITIALIZING.equals(state.getState()) || !challengeUuid.equals(state.getInitializationId())) {
+        if (!SystemStateKeys.INITIALIZING.equals(state.getState()) || !challengeUuid.equals(state.getInitializationId())) {
             throw new IllegalStateException("初始化状态不存在或已完成");
         }
         MfaLoginChallenge challenge = requireChallengePort().find(initializationId);
@@ -243,5 +249,61 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
     private String normalize(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private InitialSystemSettings resolveInitialSystemSettings(SystemInitializationStartFrom from) {
+        String systemName = normalize(from.getSystemName());
+        if (systemName.isBlank()) {
+            throw new DataSaveException("系统名称不能为空");
+        }
+        String systemShortName = normalize(from.getSystemShortName());
+        if (systemShortName.isBlank()) {
+            systemShortName = systemName;
+        }
+        String systemLogo = normalize(from.getSystemLogo());
+        String defaultLocale = normalize(from.getDefaultLocale());
+        if (defaultLocale.isBlank()) {
+            defaultLocale = "zh-CN";
+        }
+        if (!"zh-CN".equals(defaultLocale) && !"en-US".equals(defaultLocale)) {
+            throw new DataSaveException("默认语言只支持 zh-CN 或 en-US");
+        }
+        String defaultTimezone = normalize(from.getDefaultTimezone());
+        if (defaultTimezone.isBlank()) {
+            defaultTimezone = "Asia/Shanghai";
+        }
+        try {
+            ZoneId.of(defaultTimezone);
+        } catch (RuntimeException exception) {
+            throw new DataSaveException("默认时区无效");
+        }
+        String securityProfile = normalize(from.getSecurityProfile());
+        if (securityProfile.isBlank()) {
+            securityProfile = "STANDARD";
+        }
+        if (!"STANDARD".equals(securityProfile) && !"STRICT".equals(securityProfile)) {
+            throw new DataSaveException("安全策略只支持 STANDARD 或 STRICT");
+        }
+        return new InitialSystemSettings(systemName, systemShortName, systemLogo, defaultLocale,
+                defaultTimezone, securityProfile);
+    }
+
+    private void saveInitialSystemSettings(InitialSystemSettings settings) {
+        configuredService.upsert(SystemConfigKeys.SYSTEM_NAME, settings.systemName(), ConfiguredValueType.TEXT,
+                "系统名称");
+        configuredService.upsert(SystemConfigKeys.SYSTEM_SHORT_NAME, settings.systemShortName(), ConfiguredValueType.TEXT,
+                "系统简称");
+        configuredService.upsert(SystemConfigKeys.SYSTEM_LOGO, settings.systemLogo(), ConfiguredValueType.TEXT,
+                "系统 Logo 地址或文件标识");
+        configuredService.upsert(SystemConfigKeys.SYSTEM_DEFAULT_LOCALE, settings.defaultLocale(), ConfiguredValueType.TEXT,
+                "系统默认语言");
+        configuredService.upsert(SystemConfigKeys.SYSTEM_DEFAULT_TIMEZONE, settings.defaultTimezone(), ConfiguredValueType.TEXT,
+                "系统默认时区");
+        configuredService.upsert(SystemConfigKeys.SECURITY_PROFILE, settings.securityProfile(), ConfiguredValueType.SELECT,
+                "初始化时选择的安全策略，STANDARD 或 STRICT");
+    }
+
+    private record InitialSystemSettings(String systemName, String systemShortName, String systemLogo,
+                                         String defaultLocale, String defaultTimezone, String securityProfile) {
     }
 }

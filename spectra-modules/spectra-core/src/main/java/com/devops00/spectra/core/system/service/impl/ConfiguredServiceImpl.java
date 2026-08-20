@@ -34,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 /**
  * 系统配置Service层默认实现
  *
@@ -89,5 +91,17 @@ public class ConfiguredServiceImpl extends BaseServiceImpl<ConfiguredMapper, Con
             entity.setRemarks(remarks);
             this.save(entity);
         }
+    }
+
+    @Override
+    public Optional<String> findValue(String key) {
+        if (StrUtils.isBlank(key)) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(this.getOne(new LambdaQueryWrapper<Configured>()
+                .eq(Configured::getKey, key)))
+                .map(Configured::getValue)
+                .filter(StrUtils::isNotBlank)
+                .map(String::trim);
     }
 }

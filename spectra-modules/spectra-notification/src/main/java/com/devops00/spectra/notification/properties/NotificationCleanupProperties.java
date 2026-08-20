@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.notification.properties;
 
+import com.devops00.spectra.common.config.SystemConfigValueProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -27,12 +29,78 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @param retentionSeconds 终态记录保留敏感载荷的秒数
  */
 @ConfigurationProperties(prefix = "spectra.notification.cleanup")
-public record NotificationCleanupProperties(boolean enabled, long fixedDelayMs, int batchSize,
-                                            long retentionSeconds) {
+public class NotificationCleanupProperties {
 
-    public NotificationCleanupProperties {
-        fixedDelayMs = fixedDelayMs > 0 ? fixedDelayMs : 3_600_000L;
-        batchSize = batchSize > 0 ? Math.min(batchSize, 1_000) : 100;
-        retentionSeconds = retentionSeconds > 0 ? retentionSeconds : 86_400L;
+    private boolean enabled = true;
+
+    private long fixedDelayMs = 3_600_000L;
+
+    private int batchSize = 100;
+
+    private long retentionSeconds = 86_400L;
+
+    private SystemConfigValueProvider systemConfigValueProvider;
+
+    public NotificationCleanupProperties() {
+    }
+
+    public NotificationCleanupProperties(boolean enabled, long fixedDelayMs, int batchSize, long retentionSeconds) {
+        this.enabled = enabled;
+        this.fixedDelayMs = normalizeDelay(fixedDelayMs);
+        this.batchSize = normalizeBatchSize(batchSize);
+        this.retentionSeconds = normalizeRetention(retentionSeconds);
+    }
+
+    @Autowired(required = false)
+    public void setSystemConfigValueProvider(SystemConfigValueProvider systemConfigValueProvider) {
+        this.systemConfigValueProvider = systemConfigValueProvider;
+    }
+
+    public boolean enabled() {
+        return systemValue("notification.cleanup.enabled").map(Boolean::parseBoolean).orElse(enabled);
+    }
+
+    public long fixedDelayMs() {
+        return normalizeDelay(fixedDelayMs);
+    }
+
+    public int batchSize() {
+        return normalizeBatchSize(batchSize);
+    }
+
+    public long retentionSeconds() {
+        return normalizeRetention(retentionSeconds);
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public void setFixedDelayMs(long fixedDelayMs) {
+        this.fixedDelayMs = fixedDelayMs;
+    }
+
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+
+    public void setRetentionSeconds(long retentionSeconds) {
+        this.retentionSeconds = retentionSeconds;
+    }
+
+    private java.util.Optional<String> systemValue(String key) {
+        return systemConfigValueProvider == null ? java.util.Optional.empty() : systemConfigValueProvider.find(key);
+    }
+
+    private static long normalizeDelay(long value) {
+        return value > 0 ? value : 3_600_000L;
+    }
+
+    private static int normalizeBatchSize(int value) {
+        return value > 0 ? Math.min(value, 1_000) : 100;
+    }
+
+    private static long normalizeRetention(long value) {
+        return value > 0 ? value : 86_400L;
     }
 }

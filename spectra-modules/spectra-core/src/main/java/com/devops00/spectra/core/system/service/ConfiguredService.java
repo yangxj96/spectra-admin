@@ -25,6 +25,8 @@ import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 
+import java.util.Optional;
+
 /**
  * 系统配置Service层
  *
@@ -59,4 +61,12 @@ public interface ConfiguredService extends BaseService<Configured> {
      * @param remarks 备注说明
      */
     void upsert(String key, String value, ConfiguredValueType type, String remarks);
+
+    /**
+     * 按配置键读取非空配置值。
+     *
+     * @param key 配置键
+     * @return 配置值
+     */
+    Optional<String> findValue(String key);
 }

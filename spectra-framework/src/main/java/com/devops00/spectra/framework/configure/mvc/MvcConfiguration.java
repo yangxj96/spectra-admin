@@ -18,7 +18,6 @@ package com.devops00.spectra.framework.configure.mvc;
 
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.properties.SystemProperties;
-import com.devops00.spectra.framework.configure.mvc.properties.UserProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
@@ -40,7 +39,7 @@ import java.util.List;
  */
 @Slf4j
 @Configuration
-@EnableConfigurationProperties({SystemProperties.class, UserProperties.class})
+@EnableConfigurationProperties(SystemProperties.class)
 @RequiredArgsConstructor
 public class MvcConfiguration implements WebMvcConfigurer {
 

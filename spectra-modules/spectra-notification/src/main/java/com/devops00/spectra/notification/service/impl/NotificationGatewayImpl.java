@@ -18,6 +18,7 @@ package com.devops00.spectra.notification.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.github.f4b6a3.uuid.UuidCreator;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
@@ -173,6 +174,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
         entity.setExpiresAt(request.expiresAt());
         entity.setPriority(request.priority() == null ? 0 : request.priority());
+        entity.setId(UuidCreator.getTimeOrderedEpoch());
         if (requestMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知请求失败");
         }

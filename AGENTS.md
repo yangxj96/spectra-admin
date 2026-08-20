@@ -76,13 +76,14 @@ spectra-launch       → 应用入口，运行此模块
 
 - `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` - PostgreSQL 连接
 - `REDIS_HOST`, `REDIS_PORT`, `REDIS_DB`, `REDIS_PASSWORD` - Redis 连接
-- `DEFAULT_PASSWORD` - 默认用户密码
 - `SERVER_SSL_ENABLED`, `SSL_*` - SSL 配置（模板默认启用 HTTPS，证书使用 `files/ssl/keystore.p12`）
 - `S3_*` - 启动时保留完整配置，使用上传功能前连接真实 S3/MinIO
 - `AI_KEY`, `AI_BASE_URL`, `AI_MODEL` - 启动时保留完整配置，使用 AI 前连接真实服务
 - `RAG_KEY`, `RAG_BASE_URL`, `RAG_MODEL` - 启动时保留完整配置，使用 RAG 前连接真实服务并准备 pgvector
 
 接口加解密不再读取环境变量；开关和密钥由 `spectra_core.sys_config` 中的 `crypto.*` 配置通过管理 API 动态维护，默认关闭。
+
+通知模块开关、运行时 AES 密钥和敏感载荷清理开关在 DEV_OPS 首次登录后的系统设置引导中写入 `spectra_core.sys_config`；数据库、Redis、SSL、MFA 主密钥和外部 Provider 凭据仍需在启动前配置。
 
 需要运行的服务：PostgreSQL, Redis。
 

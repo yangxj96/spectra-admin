@@ -18,6 +18,8 @@ import com.devops00.spectra.core.security.authentication.mfa.mapper.RecoveryCode
 import com.devops00.spectra.core.security.authentication.mfa.mapper.TotpCredentialMapper;
 import com.devops00.spectra.core.security.authentication.mfa.service.MfaService;
 import com.devops00.spectra.core.security.authentication.mfa.util.TotpSecretCipher;
+import com.devops00.spectra.core.system.constant.SystemConfigKeys;
+import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
@@ -51,18 +53,21 @@ public class MfaServiceImpl implements MfaService {
     private final TotpCredentialMapper credentialMapper;
     private final RecoveryCodeMapper recoveryCodeMapper;
     private final UserMapper userMapper;
+    private final ConfiguredService configuredService;
     private final SecurityProperties properties;
     private final SecurityAuditWriter securityAuditWriter;
     private final Clock clock = Clock.systemUTC();
     private final SecureRandom random = new SecureRandom();
 
     public MfaServiceImpl(MfaEnrollmentMapper enrollmentMapper, TotpCredentialMapper credentialMapper,
-                          RecoveryCodeMapper recoveryCodeMapper, UserMapper userMapper, SecurityProperties properties,
+                          RecoveryCodeMapper recoveryCodeMapper, UserMapper userMapper, ConfiguredService configuredService,
+                          SecurityProperties properties,
                           SecurityAuditWriter securityAuditWriter) {
         this.enrollmentMapper = enrollmentMapper;
         this.credentialMapper = credentialMapper;
         this.recoveryCodeMapper = recoveryCodeMapper;
         this.userMapper = userMapper;
+        this.configuredService = configuredService;
         this.properties = properties;
         this.securityAuditWriter = securityAuditWriter;
     }
@@ -91,8 +96,10 @@ public class MfaServiceImpl implements MfaService {
             throw new IllegalStateException("保存 MFA 密钥失败");
         }
         String account = resolveAccount(userId);
-        String issuer = java.net.URLEncoder.encode(properties.getMfaTotpIssuer(), StandardCharsets.UTF_8);
-        String label = java.net.URLEncoder.encode(properties.getMfaTotpIssuer() + ":" + account, StandardCharsets.UTF_8);
+        String issuerName = configuredService.findValue(SystemConfigKeys.SYSTEM_NAME)
+                .orElse(properties.getMfaTotpIssuer());
+        String issuer = java.net.URLEncoder.encode(issuerName, StandardCharsets.UTF_8);
+        String label = java.net.URLEncoder.encode(issuerName + ":" + account, StandardCharsets.UTF_8);
         String uri = "otpauth://totp/" + label + "?secret="
                 + secret
                 + "&issuer=" + issuer + "&algorithm=SHA1&digits=6&period=30";

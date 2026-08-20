@@ -25,8 +25,6 @@ spectra:
     cors:
       required: ${SPECTRA_CORS_REQUIRED:false}
       origin-patterns: ${SPECTRA_CORS_ORIGIN_ALLOWLIST:https://localhost:5173,https://127.0.0.1:5173,https://localhost:5174,https://127.0.0.1:5174}
-  user:
-    default-password: ${DEFAULT_PASSWORD}
   kaptcha:
     type: math
     verify: false
@@ -53,19 +51,19 @@ spectra:
       max-segment-size: 300
       max-overlap-size: 30
   notification:
-    enabled: ${NOTIFICATION_ENABLED:true}
-    address-encryption-key: ${NOTIFICATION_ADDRESS_ENCRYPTION_KEY:}
-    sensitive-payload-key: ${NOTIFICATION_SENSITIVE_PAYLOAD_KEY:}
-    allowed-link-prefixes: ${NOTIFICATION_ALLOWED_LINK_PREFIXES:/login,/auth/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/}
+    enabled: true
+    address-encryption-key:
+    sensitive-payload-key:
+    allowed-link-prefixes: /login,/auth/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/
     worker:
-      fixed-delay-ms: ${NOTIFICATION_WORKER_FIXED_DELAY_MS:5000}
-      processing-timeout-seconds: ${NOTIFICATION_WORKER_PROCESSING_TIMEOUT_SECONDS:300}
-      retry-base-delay-seconds: ${NOTIFICATION_WORKER_RETRY_BASE_DELAY_SECONDS:5}
+      fixed-delay-ms: 5000
+      processing-timeout-seconds: 300
+      retry-base-delay-seconds: 5
     cleanup:
-      enabled: ${NOTIFICATION_CLEANUP_ENABLED:true}
-      fixed-delay-ms: ${NOTIFICATION_CLEANUP_FIXED_DELAY_MS:3600000}
-      batch-size: ${NOTIFICATION_CLEANUP_BATCH_SIZE:100}
-      retention-seconds: ${NOTIFICATION_CLEANUP_RETENTION_SECONDS:86400}
+      enabled: true
+      fixed-delay-ms: 3600000
+      batch-size: 100
+      retention-seconds: 86400
 
 # ==================== 服务器配置 ====================
 server:

@@ -64,7 +64,9 @@ public class SecurityProperties {
             "/actuator/health",
             "/actuator/info",
             // 获取系统加密配置接口
-            "/system/crypto/config"));
+            "/system/crypto/config",
+            // Web 端启动阶段公开配置聚合接口
+            "/system/bootstrap"));
 
     /**
      * accessToken有效期（秒），默认5分钟
