@@ -18,7 +18,9 @@ package com.devops00.spectra.security.starter.autoconfiguration;
 
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
+import com.devops00.spectra.security.starter.advice.LoginExceptionAdvice;
 import com.devops00.spectra.security.starter.configuration.SecurityConfiguration;
+import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import com.devops00.spectra.security.starter.root.DefaultRootAuthorizationPolicy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -38,7 +40,7 @@ import org.springframework.context.annotation.Import;
 @AutoConfiguration
 @EnableConfigurationProperties(SecurityProperties.class)
 @Import({SecurityConfiguration.class})
-@ComponentScan("com.devops00.spectra.security.starter.web")
+@ComponentScan(basePackageClasses = {LoginExceptionAdvice.class, UserOnlineConverter.class})
 public class SecurityAutoConfiguration {
 
     /**

@@ -43,10 +43,10 @@ public class SecurityProperties {
             // 生成图形验证码
             "/common/kaptcha",
             // 用户登陆
-            "/auth/login",
+            "/security/authentication/login",
             // MFA 二阶段登录与首次 TOTP 登记
-            "/auth/mfa/verify",
-            "/auth/mfa/complete",
+            "/security/authentication/mfa/verify",
+            "/security/authentication/mfa/complete",
             "/security/mfa/setup/totp/enroll",
             "/security/mfa/setup/totp/confirm",
             // 首次系统初始化；接口内部仍要求一次性初始化令牌或 Redis Challenge
@@ -55,11 +55,11 @@ public class SecurityProperties {
             "/system/initialization/mfa/confirm",
             "/system/initialization/complete",
             // 刷新token
-            "/auth/refresh",
+            "/security/authentication/refresh",
             // 发送短信验证码
-            "/auth/sms",
+            "/security/authentication/sms",
             // 发送邮箱验证码
-            "/auth/email",
+            "/security/authentication/email",
             // 健康检查与版本信息；禁止把整个 Actuator 暴露为匿名接口
             "/actuator/health",
             "/actuator/info",

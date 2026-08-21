@@ -310,6 +310,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         if (organizationVersionMapper.update(null, versionUpdate) != 1) {
             throw new DataException("organizationVersion 并发变化，组织变更已拒绝");
         }
+        String currentAccessToken = securityContextAccessor.currentToken();
         for (var userId : prepared.affectedUserIds()) {
             var user = userMapper.selectById(userId);
             if (user == null) {
@@ -318,7 +319,11 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
             var version = user.getSecurityVersion() == null ? 0L : user.getSecurityVersion();
             epochGuard.assertCurrent(userId, version);
             epochGuard.advance(userId, version);
-            sessionRevocationPort.revokeUserSessions(userId);
+            if (Objects.equals(userId, prepared.operatorId())) {
+                sessionRevocationPort.revokeUserSessionsExceptToken(userId, currentAccessToken);
+            } else {
+                sessionRevocationPort.revokeUserSessions(userId);
+            }
         }
         return department.getId();
     }

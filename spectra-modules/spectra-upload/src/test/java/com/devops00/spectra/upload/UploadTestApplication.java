@@ -19,6 +19,7 @@ package com.devops00.spectra.upload;
 import com.devops00.spectra.core.CoreModule;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,7 +42,7 @@ public class UploadTestApplication {
     SecurityContextAccessor securityContextAccessor() {
         return new SecurityContextAccessor() {
             @Override
-            public com.devops00.spectra.security.base.javabean.entity.SecurityUser currentUser() {
+            public SecurityUser currentUser() {
                 return null;
             }
 

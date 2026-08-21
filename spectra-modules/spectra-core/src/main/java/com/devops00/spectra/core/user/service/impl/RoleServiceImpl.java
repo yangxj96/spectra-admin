@@ -14,6 +14,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
@@ -67,9 +69,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         if (Boolean.TRUE.equals(role.getSystemManaged())) {
             throw new BuiltinDataException("系统维护角色不可删除");
         }
-        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.core.security.authorization.entity.RoleAssignment>()
-                .eq(com.devops00.spectra.core.security.authorization.entity.RoleAssignment::getRoleId, id)
-                .eq(com.devops00.spectra.core.security.authorization.entity.RoleAssignment::getState, "ACTIVE")) > 0) {
+        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<RoleAssignment>()
+                .eq(RoleAssignment::getRoleId, id)
+                .eq(RoleAssignment::getState, "ACTIVE")) > 0) {
             throw new DataException("角色仍有有效授权实例，不可停用");
         }
         role.setState("DISABLED");
@@ -105,7 +107,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     }
 
     @Override
-    public IPage<RoleVO> page(com.devops00.spectra.common.base.javabean.from.PageFrom page, RolePageFrom params) {
+    public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         var wrapper = new LambdaQueryWrapper<SecurityRole>()
                 .like(hasText(params.getName()), SecurityRole::getName, params.getName())
                 .eq(params.getState() != null, SecurityRole::getState, Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE")

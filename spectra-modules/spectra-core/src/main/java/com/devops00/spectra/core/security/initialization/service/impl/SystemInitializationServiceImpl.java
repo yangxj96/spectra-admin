@@ -8,7 +8,7 @@
 package com.devops00.spectra.core.security.initialization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.core.security.authentication.mfa.service.MfaService;
+import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;

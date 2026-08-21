@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
+import com.devops00.spectra.core.security.authorization.entity.AuthorizationScope;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
@@ -151,9 +152,9 @@ class AuthorizationAssignmentQueryServiceImplTest {
         return value;
     }
 
-    private static com.devops00.spectra.core.security.authorization.entity.AuthorizationScope scope(
-                                                                                                    UUID id, String mode, String resourceCode) {
-        var value = new com.devops00.spectra.core.security.authorization.entity.AuthorizationScope();
+    private static AuthorizationScope scope(
+                                            UUID id, String mode, String resourceCode) {
+        var value = new AuthorizationScope();
         value.setId(id);
         value.setScopeMode(mode);
         value.setResourceCode(resourceCode);

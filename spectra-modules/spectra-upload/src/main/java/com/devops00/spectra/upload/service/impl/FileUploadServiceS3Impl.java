@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.FileUploadException;
+import com.devops00.spectra.common.event.FileUploadFinishEvent;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadChunk;
@@ -190,7 +191,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         vo.setUrl("/api/file/preview/" + fileInfo.getId());
         vo.setFileId(fileInfo.getId());
 
-        publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
+        publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
         return vo;
     }
 
@@ -302,7 +303,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
             vo.setUrl("/api/file/preview/" + fileInfo.getId());
             vo.setFileId(fileInfo.getId());
 
-            publisher.publishEvent(new com.devops00.spectra.common.event.FileUploadFinishEvent(this, fileInfo.getId()));
+            publisher.publishEvent(new FileUploadFinishEvent(this, fileInfo.getId()));
             return vo;
         }
     }

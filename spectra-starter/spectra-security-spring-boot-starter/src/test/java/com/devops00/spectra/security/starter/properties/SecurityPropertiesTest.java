@@ -34,8 +34,8 @@ class SecurityPropertiesTest {
 
         assertTrue(whitelists.contains("/actuator/health"));
         assertTrue(whitelists.contains("/actuator/info"));
-        assertTrue(whitelists.contains("/auth/mfa/verify"));
-        assertTrue(whitelists.contains("/auth/mfa/complete"));
+        assertTrue(whitelists.contains("/security/authentication/mfa/verify"));
+        assertTrue(whitelists.contains("/security/authentication/mfa/complete"));
         assertTrue(whitelists.contains("/security/mfa/setup/totp/enroll"));
         assertTrue(whitelists.contains("/security/mfa/setup/totp/confirm"));
         assertFalse(whitelists.contains("/actuator/**"));

@@ -18,6 +18,7 @@ package com.devops00.spectra.framework.configure.mvc.advice.response;
 
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.EncryptException;
 import com.devops00.spectra.common.utils.AESUtils;
 import com.devops00.spectra.common.utils.RSAUtils;
 import com.devops00.spectra.common.utils.SHA256Utils;
@@ -192,7 +193,7 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return result;
         } catch (Exception e) {
             log.error("响应加密失败: {}", e.getMessage(), e);
-            throw new com.devops00.spectra.common.exception.EncryptException("响应加密失败", e);
+            throw new EncryptException("响应加密失败", e);
         }
     }
 }

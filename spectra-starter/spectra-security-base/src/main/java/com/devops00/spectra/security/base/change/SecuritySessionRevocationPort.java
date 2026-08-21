@@ -32,4 +32,14 @@ public interface SecuritySessionRevocationPort {
      * 撤销用户全部 Session。
      */
     void revokeUserSessions(UUID userId);
+
+    /**
+     * 撤销用户除当前 Access Token 外的其他 Session。
+     *
+     * <p>用于安全变更接口的当前操作者：其他会话必须失效，但当前请求需要继续完成响应后的页面刷新。
+     * 未提供专用实现时默认退化为撤销全部 Session。</p>
+     */
+    default void revokeUserSessionsExceptToken(UUID userId, String accessToken) {
+        revokeUserSessions(userId);
+    }
 }

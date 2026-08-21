@@ -21,7 +21,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
 import com.devops00.spectra.core.security.authentication.mapper.AuthenticationIdentityMapper;
-import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentifierHash;
+import com.devops00.spectra.core.security.authentication.util.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NullMarked;

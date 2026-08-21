@@ -32,6 +32,7 @@ import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
 import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant;
 import com.devops00.spectra.oa.meeting.javabean.entity.MeetingRecord;
+import com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
@@ -86,8 +87,8 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         var entity = meetingConverter.toEntity(from);
         entity.setInitiatorId(userId.toString());
         entity.setDepartmentId(user.getDepartmentId());
-        entity.setStatus(com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.SCHEDULED);
-        entity.setApprovalStatus(com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.APPROVED);
+        entity.setStatus(MeetingStatus.SCHEDULED);
+        entity.setApprovalStatus(MeetingStatus.APPROVED);
         if (hasConflict(entity, start, end)) {
             throw new DataSaveException("同一地点存在时间重叠的会议");
         }
@@ -211,7 +212,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         }
         var candidates = this.list(new LambdaQueryWrapper<Meeting>().eq(Meeting::getLocation, entity.getLocation())
                 .ne(Meeting::getStatus,
-                        com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus.CANCELLED));
+                        MeetingStatus.CANCELLED));
         return candidates.stream()
                 .anyMatch(item -> item.getStartTime() != null
                         && item.getEndTime() != null

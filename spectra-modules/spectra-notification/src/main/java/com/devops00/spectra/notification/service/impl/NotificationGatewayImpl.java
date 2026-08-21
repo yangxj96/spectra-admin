@@ -297,7 +297,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
     /**
      * 判断用户偏好是否允许向指定渠道投递。
      */
-    private boolean shouldDeliver(com.devops00.spectra.common.notification.NotificationPurpose purpose,
+    private boolean shouldDeliver(NotificationPurpose purpose,
                                   NotificationRecipient recipient,
                                   NotificationChannel channel) {
         if (policy.mandatory(purpose)) {

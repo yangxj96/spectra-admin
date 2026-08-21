@@ -44,6 +44,7 @@ import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
+import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -105,7 +106,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private final AuthorizationScopeMapper authorizationScopeMapper;
     private final ScopeRuleMapper scopeRuleMapper;
     private final UserMapper userMapper;
-    private final com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader snapshotLoader;
+    private final AuthorizationSnapshotLoader snapshotLoader;
     private final GrantBoundaryService grantBoundaryService;
     private final AuthorizationChangeTokenService tokenService;
     private final AuthorizationEpochGuard epochGuard;

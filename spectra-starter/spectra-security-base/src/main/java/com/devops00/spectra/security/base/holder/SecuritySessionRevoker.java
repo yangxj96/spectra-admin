@@ -23,6 +23,11 @@ public interface SecuritySessionRevoker {
     /** 撤销用户的全部会话。 */
     void deleteByUserId(UUID userId);
 
+    /** 撤销用户除指定 Access Token 外的其他会话。 */
+    default void deleteByUserIdExceptToken(UUID userId, String accessToken) {
+        deleteByUserId(userId);
+    }
+
     /** 撤销用户指定客户端的会话。 */
     void deleteByUserIdAndClient(String userId, ClientType clientType);
 }

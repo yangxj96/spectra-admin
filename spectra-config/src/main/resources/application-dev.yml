@@ -54,7 +54,7 @@ spectra:
     enabled: true
     address-encryption-key:
     sensitive-payload-key:
-    allowed-link-prefixes: /login,/auth/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/
+    allowed-link-prefixes: /login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/
     worker:
       fixed-delay-ms: 5000
       processing-timeout-seconds: 300

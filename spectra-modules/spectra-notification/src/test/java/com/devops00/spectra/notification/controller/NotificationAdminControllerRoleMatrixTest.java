@@ -17,6 +17,7 @@
 package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
 import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
@@ -65,7 +66,7 @@ class NotificationAdminControllerRoleMatrixTest {
     void shouldAllowCatalogPermissionsIndependently() throws Exception {
         var controller = new NotificationAdminController(mock(NotificationAdminService.class));
         var query = NotificationAdminController.class.getMethod("pageRequests",
-                com.devops00.spectra.common.base.javabean.from.PageFrom.class, NotificationAdminQueryFrom.class);
+                PageFrom.class, NotificationAdminQueryFrom.class);
         var retry = NotificationAdminController.class.getMethod("retry", java.util.UUID.class);
 
         assertTrue(evaluate(query, controller, authentication("notification:admin:read", "notification:admin:retry")));

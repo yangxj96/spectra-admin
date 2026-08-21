@@ -7,6 +7,7 @@
 package com.devops00.spectra.framework.configure.mybatis.security;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.security.base.authorization.ResourceOperation;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.security.base.authorization.ExecutionContext;
@@ -56,7 +57,7 @@ public class ResourceAuthorizationGuard {
     }
 
     public void assertExportAllowed(ExecutionContext context, Collection<ScopeQuery> queries) {
-        if (context == null || context.operation() != com.devops00.spectra.security.base.authorization.ResourceOperation.EXPORT) {
+        if (context == null || context.operation() != ResourceOperation.EXPORT) {
             throw new DataScopeViolationException("导出操作必须使用 EXPORT Permission");
         }
         assertBatchAllowed(context, queries);

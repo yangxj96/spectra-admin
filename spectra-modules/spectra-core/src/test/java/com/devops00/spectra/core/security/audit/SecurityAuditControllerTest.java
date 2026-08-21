@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.audit;
 
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.security.audit.controller.SecurityAuditController;
 import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,7 @@ class SecurityAuditControllerTest {
 
     @Test
     void readAndExportUseCatalogPermissions() throws NoSuchMethodException {
-        var page = SecurityAuditController.class.getMethod("page", com.devops00.spectra.common.base.javabean.from.PageFrom.class,
+        var page = SecurityAuditController.class.getMethod("page", PageFrom.class,
                 SecurityAuditQueryFrom.class, org.springframework.security.core.Authentication.class);
         var detail = SecurityAuditController.class.getMethod("detail", java.util.UUID.class,
                 org.springframework.security.core.Authentication.class);

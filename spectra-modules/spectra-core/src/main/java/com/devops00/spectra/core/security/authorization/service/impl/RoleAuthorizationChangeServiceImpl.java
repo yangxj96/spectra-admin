@@ -45,6 +45,7 @@ import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
+import com.devops00.spectra.security.base.authorization.ScopeMode;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
 import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
@@ -264,8 +265,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         return added.stream()
                 .sorted()
                 .map(permission -> new AuthorizationGrantRequest(permission, AuthorizationScope.of(
-                        com.devops00.spectra.security.base.authorization.ScopeMode.NONE),
-                        AuthorizationScope.of(com.devops00.spectra.security.base.authorization.ScopeMode.NONE),
+                        ScopeMode.NONE),
+                        AuthorizationScope.of(ScopeMode.NONE),
                         after.authorityLevel()))
                 .toList();
     }

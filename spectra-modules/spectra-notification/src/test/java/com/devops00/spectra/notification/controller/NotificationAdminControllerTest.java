@@ -17,6 +17,8 @@
 package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
 import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,7 +37,7 @@ class NotificationAdminControllerTest {
     void shouldRestrictReadAndWriteOperationsToDifferentRoles() throws NoSuchMethodException {
         var controller = new NotificationAdminController(mock(NotificationAdminService.class));
         var read = NotificationAdminController.class.getMethod("availability",
-                com.devops00.spectra.common.notification.NotificationChannel.class)
+                NotificationChannel.class)
                 .getAnnotation(PreAuthorize.class);
         var retry = NotificationAdminController.class.getMethod("retry", UUID.class)
                 .getAnnotation(PreAuthorize.class);
@@ -52,15 +54,15 @@ class NotificationAdminControllerTest {
     void shouldProtectAllAdminQueriesAndMutations() throws NoSuchMethodException {
         var readExpression = "hasPermission(null, 'notification:admin:read')";
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageRequests", PageFrom.class,
-                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageTasks", PageFrom.class,
-                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageDeliveries", PageFrom.class,
-                com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom.class)
+                NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
         assertEquals("hasPermission(null, 'notification:admin:cancel')", NotificationAdminController.class.getMethod("cancel", UUID.class)

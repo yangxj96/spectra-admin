@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
+import com.devops00.spectra.core.security.authorization.entity.AuthorizationScope;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
@@ -34,6 +35,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleGrantablePerm
 import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.security.base.authorization.ScopeQuery;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -105,9 +107,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         assertThat(snapshot.hasPermission("order:read")).isTrue();
         assertThat(snapshot.hasPermission("user:read")).isFalse();
         assertThat(snapshot.grantablePermissions()).containsExactly("user:read");
-        assertThat(snapshot.canAccess("order:read", new com.devops00.spectra.security.base.authorization.ScopeQuery(
+        assertThat(snapshot.canAccess("order:read", new ScopeQuery(
                 userId, userId, null, Set.of()))).isTrue();
-        assertThat(snapshot.canGrant("user:read", new com.devops00.spectra.security.base.authorization.ScopeQuery(
+        assertThat(snapshot.canGrant("user:read", new ScopeQuery(
                 UUID.randomUUID(), null, departmentId, Set.of(departmentId)))).isTrue();
     }
 
@@ -208,9 +210,9 @@ class JdbcAuthorizationSnapshotLoaderTest {
         return value;
     }
 
-    private static com.devops00.spectra.core.security.authorization.entity.AuthorizationScope scope(
-                                                                                                    UUID id, String mode) {
-        var value = new com.devops00.spectra.core.security.authorization.entity.AuthorizationScope();
+    private static AuthorizationScope scope(
+                                            UUID id, String mode) {
+        var value = new AuthorizationScope();
         value.setId(id);
         value.setScopeMode(mode);
         return value;

@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
+import com.devops00.spectra.core.security.authorization.entity.AuthorizationScope;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
@@ -98,11 +99,11 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
         var scopeIds = accessRows.stream().map(AssignmentPermissionBoundary::getScopeId).collect(Collectors.toSet());
         scopeIds.addAll(grantRows.stream().map(AssignmentGrantBoundary::getScopeId).collect(Collectors.toSet()));
         var scopes = scopeIds.isEmpty()
-                ? Map.<UUID, com.devops00.spectra.core.security.authorization.entity.AuthorizationScope>of()
+                ? Map.<UUID, AuthorizationScope>of()
                 : authorizationScopeMapper.selectBatchIds(scopeIds)
                         .stream()
                         .collect(Collectors.toMap(
-                                com.devops00.spectra.core.security.authorization.entity.AuthorizationScope::getId,
+                                AuthorizationScope::getId,
                                 Function.identity()));
         var rules = scopeIds.isEmpty()
                 ? List.<ScopeRule>of()
@@ -147,7 +148,7 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
                                                  UUID permissionId,
                                                  UUID scopeId,
                                                  Map<UUID, Permission> permissions,
-                                                 Map<UUID, com.devops00.spectra.core.security.authorization.entity.AuthorizationScope> scopes,
+                                                 Map<UUID, AuthorizationScope> scopes,
                                                  Map<UUID, List<ScopeRule>> rulesByScope) {
         var permission = permissions.get(permissionId);
         var scope = scopes.get(scopeId);

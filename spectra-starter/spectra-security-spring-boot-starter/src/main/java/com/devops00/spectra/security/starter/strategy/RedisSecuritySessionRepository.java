@@ -39,7 +39,7 @@ import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
 import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.RefreshTokenRotationStore;
 import com.devops00.spectra.security.base.util.TokenDigestService;
-import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
+import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -281,19 +281,19 @@ public class RedisSecuritySessionRepository
         SecurityRedisExecutor.run("撤销 Access Token", () -> deleteAccessDigest(TokenDigestService.digest(token)));
     }
 
-    private void deleteAccessDigest(String tokenDigest) {
+    private boolean deleteAccessDigest(String tokenDigest) {
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
         Map<Object, Object> session = SecurityRedisExecutor.require("读取安全会话",
                 () -> redis.opsForHash().entries(sessionKey));
         if (session.isEmpty()) {
-            return;
+            return false;
         }
 
         String userId = Objects.toString(session.get("userId"), null);
         String clientType = Objects.toString(session.get("clientType"), null);
         if (userId == null) {
             redis.delete(sessionKey);
-            return;
+            return true;
         }
 
         String ucKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType);
@@ -324,6 +324,7 @@ public class RedisSecuritySessionRepository
             redis.opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId);
             redis.delete(userTokensKey);
         }
+        return true;
     }
 
     @Override
@@ -363,18 +364,66 @@ public class RedisSecuritySessionRepository
 
     @Override
     public void deleteByUserId(UUID userId) {
-        SecurityRedisExecutor.run("按用户撤销会话", () -> deleteByUserIdInternal(userId));
+        SecurityRedisExecutor.run("按用户撤销会话", () -> deleteByUserIdInternal(userId, null));
     }
 
-    private void deleteByUserIdInternal(UUID userId) {
+    @Override
+    public void deleteByUserIdExceptToken(UUID userId, String accessToken) {
+        SecurityRedisExecutor.run("按用户撤销除当前会话外的其他会话",
+                () -> deleteByUserIdInternal(userId, accessToken));
+    }
+
+    private void deleteByUserIdInternal(UUID userId, String accessToken) {
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
         Set<Object> tokens = redis.opsForSet().members(userTokensKey);
         if (tokens == null || tokens.isEmpty()) {
             return;
         }
+        String exceptDigest = StrUtils.isNotBlank(accessToken) ? TokenDigestService.digest(accessToken) : null;
         for (Object t : tokens) {
-            this.deleteAccessDigest(t.toString());
+            String tokenDigest = t.toString();
+            if (!Objects.equals(exceptDigest, tokenDigest)) {
+                boolean activeSessionDeleted = this.deleteAccessDigest(tokenDigest);
+                if (!activeSessionDeleted) {
+                    deleteExpiredAccessSessionState(tokenDigest);
+                    // Access Session 已因 TTL 过期时，deleteAccessDigest 无法再取得 userId；
+                    // 这里仍需从当前用户的 token 索引中移除过期摘要。
+                    redis.opsForSet().remove(userTokensKey, tokenDigest);
+                }
+            }
         }
+        Long remaining = redis.opsForSet().size(userTokensKey);
+        if (remaining == null || remaining == 0) {
+            redis.delete(userTokensKey);
+            redis.opsForSet().remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId.toString());
+        }
+    }
+
+    /**
+     * 清理 Access Session 已过期但 Refresh Token 仍在有效期内的会话链。
+     *
+     * <p>Access Session 与 Refresh Token 使用不同 TTL；批量撤销不能因为前者已过期就放过后者。</p>
+     */
+    private void deleteExpiredAccessSessionState(String accessDigest) {
+        String accessRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(accessDigest);
+        Object refreshDigestObj = redis.opsForValue().get(accessRefreshKey);
+        if (refreshDigestObj == null) {
+            return;
+        }
+
+        String refreshDigest = refreshDigestObj.toString();
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
+        Map<Object, Object> refreshData = SecurityRedisExecutor.require("读取过期会话的 Refresh Token",
+                () -> redis.opsForHash().entries(refreshKey));
+        String familyId = Objects.toString(refreshData.get("familyId"), null);
+        if (familyId != null) {
+            deleteRefreshFamily(familyId);
+            redis.opsForSet().remove(SecurityRedisKey.SESSION_FAMILY.format(familyId), accessDigest);
+        } else {
+            redis.delete(refreshKey);
+            redis.delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
+        }
+        redis.delete(accessRefreshKey);
     }
 
     @Override

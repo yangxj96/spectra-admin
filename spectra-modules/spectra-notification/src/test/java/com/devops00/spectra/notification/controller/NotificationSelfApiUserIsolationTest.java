@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
+import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
 import com.devops00.spectra.notification.service.NotificationInboxService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,7 +66,7 @@ class NotificationSelfApiUserIsolationTest {
         var service = mock(NotificationInboxService.class);
         var controller = new NotificationController(service, security);
         when(security.currentUserId()).thenReturn(USER_A);
-        var page = new Page<com.devops00.spectra.notification.javabean.vo.NotificationInboxVO>();
+        var page = new Page<NotificationInboxVO>();
         var params = new NotificationQueryFrom();
         var batch = new NotificationBatchDeleteFrom();
         batch.setIds(List.of(MESSAGE_ID));
@@ -95,7 +96,7 @@ class NotificationSelfApiUserIsolationTest {
     void shouldSwitchIsolationWhenTheAuthenticatedUserChanges() {
         var service = mock(NotificationInboxService.class);
         var controller = new NotificationController(service, security);
-        var page = new Page<com.devops00.spectra.notification.javabean.vo.NotificationInboxVO>();
+        var page = new Page<NotificationInboxVO>();
         when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_A),
                 org.mockito.ArgumentMatchers.any(NotificationQueryFrom.class))).thenReturn(page);
         when(service.page(org.mockito.ArgumentMatchers.any(PageFrom.class), eq(USER_B),

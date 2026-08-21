@@ -18,6 +18,7 @@ package com.devops00.spectra.notification.service.impl;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
 import com.devops00.spectra.common.notification.*;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
@@ -86,7 +87,7 @@ class NotificationGatewayImplTest {
                 new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
                 directory, protector, List.of());
         var receipt = gateway
-                .enqueue(NotificationRequest.inApp("test:expand", com.devops00.spectra.common.notification.NotificationPurpose.SYSTEM_NOTICE,
+                .enqueue(NotificationRequest.inApp("test:expand", NotificationPurpose.SYSTEM_NOTICE,
                         List.of(first, second), "test", "标题", "正文", "TEST", "1", "TEST", null));
 
         assertEquals(2, receipt.taskCount());
@@ -109,7 +110,7 @@ class NotificationGatewayImplTest {
                 mock(NotificationUserPreferenceMapper.class), new NotificationTemplateRenderer(), new NotificationPolicy(),
                 new NotificationModuleProperties(true, "", "", List.of()), directory, protector(), List.of());
         var receipt = gateway
-                .enqueue(NotificationRequest.inApp("test:replay", com.devops00.spectra.common.notification.NotificationPurpose.SYSTEM_NOTICE,
+                .enqueue(NotificationRequest.inApp("test:replay", NotificationPurpose.SYSTEM_NOTICE,
                         List.of(UUID.randomUUID()), "test", "标题", "正文", "TEST", "2", "TEST", null));
 
         assertTrue(receipt.idempotentReplay());
@@ -226,8 +227,8 @@ class NotificationGatewayImplTest {
         var unknown = NotificationRequest.inApp("test:unknown-link", NotificationPurpose.SYSTEM_NOTICE,
                 List.of(recipientId), "test", "标题", "正文", "TEST", "2", "TEST", "/admin/secrets");
 
-        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class, () -> gateway.enqueue(external));
-        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class, () -> gateway.enqueue(unknown));
+        assertThrows(DataSaveException.class, () -> gateway.enqueue(external));
+        assertThrows(DataSaveException.class, () -> gateway.enqueue(unknown));
     }
 
     @Test

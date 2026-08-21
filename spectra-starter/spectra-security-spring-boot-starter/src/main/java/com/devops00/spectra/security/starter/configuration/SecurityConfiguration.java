@@ -63,7 +63,7 @@ import java.util.List;
 @EnableWebSecurity
 @EnableMethodSecurity
 @RequiredArgsConstructor
-@Import({SecJacksonConfiguration.class, SecRedisConfiguration.class, SecExConfiguration.class, SecuritySessionPortConfiguration.class})
+@Import({SecJacksonConfiguration.class, SecRedisConfiguration.class, SecuritySessionPortConfiguration.class})
 public class SecurityConfiguration {
 
     private final SecurityProperties properties;

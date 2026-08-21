@@ -23,7 +23,7 @@ import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.TokenDigestService;
-import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
+import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -44,6 +44,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -149,5 +150,81 @@ class RedisSecuritySessionRepositoryTest {
 
         verify(hashes).entries(refreshKey);
         verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
+    }
+
+    @Test
+    void shouldPreserveCurrentAccessSessionWhenRevokingOtherUserSessions() {
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        String currentToken = "current-access-token";
+        String currentDigest = TokenDigestService.digest(currentToken);
+        String otherDigest = "other-access-digest";
+        String familyId = "family-id";
+        String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
+        String otherSessionKey = SecurityRedisKey.SESSION.format(otherDigest);
+
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
+        when(sets.members(eq(userTokensKey))).thenReturn(Set.of(currentDigest, otherDigest));
+        when(sets.members(eq(SecurityRedisKey.REFRESH_FAMILY.format(familyId)))).thenReturn(Set.of());
+        when(sets.size(eq(userTokensKey))).thenReturn(1L);
+        when(hashes.entries(eq(otherSessionKey))).thenReturn(Map.of(
+                "userId", userId.toString(),
+                "clientType", "web",
+                "familyId", familyId));
+        when(values.get(anyString())).thenReturn(null);
+
+        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
+                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+
+        repository.deleteByUserIdExceptToken(userId, currentToken);
+
+        verify(redis).delete(otherSessionKey);
+        verify(redis, never()).delete(SecurityRedisKey.SESSION.format(currentDigest));
+        verify(sets).remove(userTokensKey, otherDigest);
+        verify(sets, never()).remove(userTokensKey, currentDigest);
+    }
+
+    @Test
+    void shouldRemoveExpiredSessionDigestFromUserTokenIndex() {
+        UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        String expiredDigest = "expired-access-digest";
+        String refreshDigest = "refresh-digest";
+        String familyId = "family-id";
+        String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
+        String sessionKey = SecurityRedisKey.SESSION.format(expiredDigest);
+        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
+
+        RedisTemplate<String, Object> redis = mock();
+        HashOperations<String, Object, Object> hashes = mock();
+        SetOperations<String, Object> sets = mock();
+        ValueOperations<String, Object> values = mock();
+        when(redis.opsForHash()).thenReturn(hashes);
+        when(redis.opsForSet()).thenReturn(sets);
+        when(redis.opsForValue()).thenReturn(values);
+        when(sets.members(eq(userTokensKey))).thenReturn(Set.of(expiredDigest));
+        when(sets.members(eq(SecurityRedisKey.REFRESH_FAMILY.format(familyId))))
+                .thenReturn(Set.of(refreshDigest));
+        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of());
+        when(hashes.entries(eq(refreshKey))).thenReturn(Map.of("familyId", familyId));
+        when(values.get(eq(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest)))).thenReturn(refreshDigest);
+        when(sets.size(eq(userTokensKey))).thenReturn(0L);
+
+        var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
+                new SecurityProperties(), mock(UserOnlineConverter.class), null, null);
+
+        repository.deleteByUserId(userId);
+
+        verify(sets).remove(userTokensKey, expiredDigest);
+        verify(redis).delete(userTokensKey);
+        verify(sets).remove(SecurityRedisKey.ONLINE_USERS.getPattern(), userId.toString());
+        verify(redis).delete(refreshKey);
+        verify(redis).delete(SecurityRedisKey.REFRESH_CLAIM.format(refreshDigest));
+        verify(redis).delete(SecurityRedisKey.REFRESH_FAMILY.format(familyId));
+        verify(redis).delete(SecurityRedisKey.REFRESH_TOKEN.format(expiredDigest));
     }
 }

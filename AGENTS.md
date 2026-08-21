@@ -45,7 +45,7 @@ $mavenRepo = Join-Path $env:TEMP 'spectra-maven-repository'
 
 IDEA 显示的 `java ... @<系统临时目录>\idea_arg_file... com.devops00.spectra.launch.LaunchApplication` 是 IDEA 对已编译 classpath 的直接启动命令；参数文件位置属于本机临时路径，不得复制进公共启动说明。需要可重复的终端流程时使用上面的 `package` + JAR 方式。
 
-当前 `LaunchApplication` 不需要额外的 `@Import`。安全 starter 的 `SecurityAutoConfiguration` 会扫描 `com.devops00.spectra.security.starter.web`，`UserOnlineConverter` 放在该包范围内即可被其他模块运行时扫描到。
+当前 `LaunchApplication` 不需要额外的 `@Import`。安全 starter 的 `SecurityAutoConfiguration` 会扫描 `LoginExceptionAdvice` 和 `UserOnlineConverter` 所在的技术适配包，业务 Controller 和 Service 由 `spectra-core` 自身扫描。
 
 IDEA 启动命令中的本机 HTTP/HTTPS 代理参数只在访问外部服务时按需添加，不是本地 API 启动的固定参数。
 

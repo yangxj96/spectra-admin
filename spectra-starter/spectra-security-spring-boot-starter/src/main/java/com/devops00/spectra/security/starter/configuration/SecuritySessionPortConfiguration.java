@@ -28,13 +28,15 @@ import com.devops00.spectra.security.base.holder.SecuritySessionReader;
 import com.devops00.spectra.security.base.holder.SecuritySessionRevoker;
 import com.devops00.spectra.security.base.holder.SecurityTokenAccessor;
 import com.devops00.spectra.security.base.holder.SecurityUserLoader;
+import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
+import com.devops00.spectra.security.base.javabean.vo.TokenVO;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.starter.holder.SecuritySessionContextAccessor;
 import com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository;
 import com.devops00.spectra.security.starter.strategy.RedisMfaLoginChallengeRepository;
-import com.devops00.spectra.security.starter.web.javabean.converter.UserOnlineConverter;
+import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.ObjectProvider;
@@ -43,6 +45,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import tools.jackson.databind.ObjectMapper;
+
+import java.util.UUID;
 
 /**
  * Security Session 适配端口配置
@@ -63,7 +67,17 @@ public class SecuritySessionPortConfiguration {
 
     @Bean
     public SecuritySessionRevocationPort securitySessionRevocationPort(SecuritySessionRevoker sessionRevoker) {
-        return sessionRevoker::deleteByUserId;
+        return new SecuritySessionRevocationPort() {
+            @Override
+            public void revokeUserSessions(UUID userId) {
+                sessionRevoker.deleteByUserId(userId);
+            }
+
+            @Override
+            public void revokeUserSessionsExceptToken(UUID userId, String accessToken) {
+                sessionRevoker.deleteByUserIdExceptToken(userId, accessToken);
+            }
+        };
     }
 
     @Bean
@@ -77,8 +91,7 @@ public class SecuritySessionPortConfiguration {
                                                                  SecurityLoginFailureTracker loginFailureTracker) {
         return new SecurityAuthenticationPort() {
             @Override
-            public com.devops00.spectra.security.base.javabean.vo.TokenVO login(
-                                                                                com.devops00.spectra.security.base.javabean.entity.SecurityUser user) {
+            public TokenVO login(SecurityUser user) {
                 return sessionIssuer.createToken(user);
             }
 
@@ -93,7 +106,7 @@ public class SecuritySessionPortConfiguration {
             }
 
             @Override
-            public com.devops00.spectra.security.base.javabean.vo.TokenVO refreshByRefreshToken(String refreshToken) {
+            public TokenVO refreshByRefreshToken(String refreshToken) {
                 return sessionIssuer.refreshByRefreshToken(refreshToken);
             }
 
