@@ -22,6 +22,7 @@ import com.devops00.spectra.core.security.authorization.entity.AssignmentPermiss
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationScope;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.entity.RolePermission;
 import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.AssignmentGrantBoundaryMapper;
@@ -29,6 +30,7 @@ import com.devops00.spectra.core.security.authorization.mapper.AssignmentPermiss
 import com.devops00.spectra.core.security.authorization.mapper.AuthorizationScopeMapper;
 import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
+import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
@@ -50,6 +52,8 @@ import java.util.stream.Collectors;
 public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAssignmentQueryService {
 
     private final RoleAssignmentMapper roleAssignmentMapper;
+
+    private final RolePermissionMapper rolePermissionMapper;
 
     private final SecurityRoleMapper securityRoleMapper;
 
@@ -79,6 +83,10 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
         var roles = securityRoleMapper.selectBatchIds(roleIds)
                 .stream()
                 .collect(Collectors.toMap(SecurityRole::getId, Function.identity()));
+        var rolePermissionCounts = rolePermissionMapper.selectList(
+                        new LambdaQueryWrapper<RolePermission>().in(RolePermission::getRoleId, roleIds))
+                .stream()
+                .collect(Collectors.groupingBy(RolePermission::getRoleId, Collectors.counting()));
         var assignmentIds = assignments.stream().map(RoleAssignment::getId).collect(Collectors.toSet());
         var accessRows = permissionBoundaryMapper.selectList(
                 new LambdaQueryWrapper<AssignmentPermissionBoundary>()
@@ -128,7 +136,9 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
                     role.getRoleKind(),
                     role.getName(),
                     role.getSystemManaged(),
+                    role.getState(),
                     role.getVersion() == null ? 0L : role.getVersion(),
+                    rolePermissionCounts.getOrDefault(assignment.getRoleId(), 0L),
                     assignment.getVersion() == null ? 0L : assignment.getVersion(),
                     assignment.getState(),
                     assignment.getValidFrom(),

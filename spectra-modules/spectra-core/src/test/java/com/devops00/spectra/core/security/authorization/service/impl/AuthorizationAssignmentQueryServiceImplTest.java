@@ -29,6 +29,7 @@ import com.devops00.spectra.core.security.authorization.mapper.AssignmentPermiss
 import com.devops00.spectra.core.security.authorization.mapper.AuthorizationScopeMapper;
 import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
+import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import org.junit.jupiter.api.Test;
@@ -45,6 +46,8 @@ import static org.mockito.Mockito.when;
 class AuthorizationAssignmentQueryServiceImplTest {
 
     private final RoleAssignmentMapper roleAssignmentMapper = mock(RoleAssignmentMapper.class);
+
+    private final RolePermissionMapper rolePermissionMapper = mock(RolePermissionMapper.class);
 
     private final SecurityRoleMapper securityRoleMapper = mock(SecurityRoleMapper.class);
 
@@ -120,6 +123,7 @@ class AuthorizationAssignmentQueryServiceImplTest {
     private AuthorizationAssignmentQueryServiceImpl service() {
         return new AuthorizationAssignmentQueryServiceImpl(
                 roleAssignmentMapper,
+                rolePermissionMapper,
                 securityRoleMapper,
                 permissionBoundaryMapper,
                 grantBoundaryMapper,

@@ -25,7 +25,9 @@ import com.devops00.spectra.common.exception.*;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatusCalculator;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.system.service.DepartmentService;
@@ -186,9 +188,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         fillExecutor.fill(result.getRecords());
 
         // 扩展字段补充
-        result.getRecords().forEach(vo -> {
-            vo.setRoles(targetRoles(vo.getId()));
-        });
+        result.getRecords().forEach(this::fillAuthorization);
         // 响应
         return result;
     }
@@ -201,7 +201,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
         var result = userConverter.toVO(user);
         fillExecutor.fill(List.of(result));
-        result.setRoles(targetRoles(userId));
+        fillAuthorization(result);
         return result;
     }
 
@@ -369,7 +369,17 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     private List<RoleVO> targetRoles(UUID userId) {
-        return authorizationAssignmentQueryService.findByUserId(userId)
+        return targetRoles(authorizationAssignmentQueryService.findByUserId(userId));
+    }
+
+    private void fillAuthorization(UserPageVO vo) {
+        var assignments = authorizationAssignmentQueryService.findByUserId(vo.getId());
+        vo.setRoles(targetRoles(assignments));
+        vo.setAuthorizationStatus(UserAuthorizationStatusCalculator.calculate(assignments));
+    }
+
+    private List<RoleVO> targetRoles(List<AuthorizationAssignmentView> assignments) {
+        return assignments
                 .stream()
                 .filter(assignment -> "ACTIVE".equals(assignment.state()))
                 .collect(java.util.stream.Collectors.toMap(

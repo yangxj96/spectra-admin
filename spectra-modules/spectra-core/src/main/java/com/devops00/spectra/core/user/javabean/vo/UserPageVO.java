@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.javabean.vo;
 
+import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatus;
 import com.devops00.spectra.core.system.service.impl.DepartmentServiceImpl;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.framework.assembler.NameFill;
@@ -66,6 +67,11 @@ public class UserPageVO implements Serializable {
      * 用户状态
      */
     private UserStatus status;
+
+    /**
+     * 当前授权状态。
+     */
+    private UserAuthorizationStatus authorizationStatus;
 
     /**
      * 真实姓名
