@@ -23,6 +23,7 @@ import com.devops00.spectra.core.user.javabean.from.*;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
+import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -59,8 +60,8 @@ public class UserController {
     @ULog("'创建用户'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create')")
-    public void created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
-        bindService.create(params);
+    public UserCreatedVO created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
+        return bindService.create(params);
     }
 
     @ULog("'根据ID更新用户信息'")

@@ -39,6 +39,7 @@ import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
+import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
@@ -111,7 +112,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void create(UserSaveFrom params) {
+    public UserCreatedVO create(UserSaveFrom params) {
         if (params.getStatus() != UserStatus.ACTIVE) {
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
@@ -126,6 +127,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
+        return new UserCreatedVO(entity.getId(), entity.getUsername());
     }
 
     @Override

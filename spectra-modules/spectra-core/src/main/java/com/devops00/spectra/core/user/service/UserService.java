@@ -27,6 +27,7 @@ import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
+import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 
 import java.util.List;
@@ -67,8 +68,9 @@ public interface UserService extends BaseService<User> {
      * 创建用户
      *
      * @param params 请求参数
+     * @return 新创建的用户信息
      */
-    void create(UserSaveFrom params);
+    UserCreatedVO create(UserSaveFrom params);
 
     /**
      * 根据用户ID更新用户

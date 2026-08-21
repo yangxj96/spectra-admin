@@ -52,8 +52,9 @@ class UserControllerTest {
         from.setCity("Kunming");
         from.setDepartmentId(UuidCreator.getTimeOrderedEpoch());
 
-        userService.create(from);
+        var createdUser = userService.create(from);
 
-        Assertions.assertTrue(true, "测试完成");
+        Assertions.assertNotNull(createdUser, "创建用户应返回用户信息");
+        Assertions.assertNotNull(createdUser.getId(), "创建用户应返回用户 ID");
     }
 }
