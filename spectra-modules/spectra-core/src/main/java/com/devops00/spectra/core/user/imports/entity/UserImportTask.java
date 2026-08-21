@@ -84,6 +84,9 @@ public class UserImportTask extends BaseEntity {
     @TableField("applied_rows")
     private int appliedRows;
 
+    @TableField("completed_rows")
+    private int completedRows;
+
     @TableField("assignment_count")
     private int assignmentCount;
 

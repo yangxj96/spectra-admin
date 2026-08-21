@@ -49,6 +49,8 @@ public class UserImportTaskVO {
 
     private int appliedRows;
 
+    private int completedRows;
+
     private int assignmentCount;
 
     private int accessBoundaryCount;

@@ -75,7 +75,7 @@ public class UserImportController {
     @ULog("'应用用户批量导入'")
     @PostMapping(value = "/{id}/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")
-    public void apply(@PathVariable UUID id, @Validated @RequestBody UserImportApplyFrom params) {
-        userImportService.apply(id, params);
+    public UserImportTaskVO apply(@PathVariable UUID id, @Validated @RequestBody UserImportApplyFrom params) {
+        return userImportService.apply(id, params);
     }
 }

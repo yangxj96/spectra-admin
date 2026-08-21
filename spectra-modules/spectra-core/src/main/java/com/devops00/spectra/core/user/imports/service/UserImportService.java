@@ -33,5 +33,5 @@ public interface UserImportService {
 
     List<UserImportRowVO> errors(UUID id);
 
-    void apply(UUID id, UserImportApplyFrom params);
+    UserImportTaskVO apply(UUID id, UserImportApplyFrom params);
 }

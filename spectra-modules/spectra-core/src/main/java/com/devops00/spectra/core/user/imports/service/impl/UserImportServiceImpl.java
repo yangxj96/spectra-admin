@@ -40,6 +40,10 @@ import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.security.concurrent.DelegatingSecurityContextRunnable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +119,9 @@ public class UserImportServiceImpl implements UserImportService {
     private final AuthorizationProfileService profileService;
 
     private final SecurityContextAccessor securityContextAccessor;
+
+    @Qualifier("userImportTaskExecutor")
+    private final TaskExecutor userImportTaskExecutor;
 
     private final SecureRandom secureRandom = new SecureRandom();
 
@@ -240,10 +247,11 @@ public class UserImportServiceImpl implements UserImportService {
     }
 
     @Override
-    public void apply(UUID id, UserImportApplyFrom params) {
+    public UserImportTaskVO apply(UUID id, UserImportApplyFrom params) {
         var task = requireTask(id);
-        if (STATUS_SUCCEEDED.equals(task.getStatus())) {
-            return;
+        if (STATUS_SUCCEEDED.equals(task.getStatus()) || STATUS_PARTIAL_FAILED.equals(task.getStatus())
+                || STATUS_FAILED.equals(task.getStatus()) || STATUS_APPLYING.equals(task.getStatus())) {
+            return toVO(task);
         }
         if (!STATUS_PREVIEWED.equals(task.getStatus())) {
             throw new DataException("当前导入任务不可 Apply: " + task.getStatus());
@@ -288,53 +296,99 @@ public class UserImportServiceImpl implements UserImportService {
                 .isNull(UserImportTask::getPreviewConsumedAt)
                 .set(UserImportTask::getStatus, STATUS_APPLYING)
                 .set(UserImportTask::getPreviewConsumedAt, claimedAt)
-                .set(UserImportTask::getPreviewTokenHash, null);
+                .set(UserImportTask::getPreviewTokenHash, null)
+                .set(UserImportTask::getCompletedRows, task.getErrorRows())
+                .set(UserImportTask::getSkippedRows, 0)
+                .set(UserImportTask::getAppliedRows, 0);
         if (taskMapper.update(null, claim) != 1) {
             throw new DataException("用户导入任务已被其他请求处理");
         }
         task.setStatus(STATUS_APPLYING);
         task.setPreviewConsumedAt(claimedAt);
         task.setPreviewTokenHash(null);
+        task.setCompletedRows(task.getErrorRows());
+        task.setSkippedRows(0);
+        task.setAppliedRows(0);
 
-        var completed = 0;
-        var applied = 0;
-        var skipped = task.getSkippedRows();
-        var failed = 0;
-        for (var row : rows) {
-            if (!STATE_VALID.equals(row.getState())) {
-                continue;
-            }
-            try {
-                var wasAlreadySkipped = row.getUserId() != null;
-                var result = rowProcessor.process(row, task.isSkipExisting(), referenceData.departmentIds(), referenceData.profiles());
-                row.setUserId(result.userId());
-                if (result.skipped()) {
-                    row.setState(STATE_SKIPPED);
-                    if (!wasAlreadySkipped) {
-                        skipped++;
-                    }
-                } else {
-                    row.setState(STATE_APPLIED);
-                    applied++;
-                }
-                rowMapper.updateById(row);
-                completed++;
-            } catch (RuntimeException exception) {
-                row.setState(STATE_ERROR);
-                row.setErrors(Map.of("apply", safeMessage(exception)));
-                rowMapper.updateById(row);
-                failed++;
-            }
+        var operatorId = currentOperatorId();
+        var securityContext = SecurityContextHolder.getContext();
+        try {
+            userImportTaskExecutor.execute(new DelegatingSecurityContextRunnable(
+                    () -> processApply(task.getId(), operatorId), securityContext));
+        } catch (RuntimeException exception) {
+            markApplyFailed(task.getId(), operatorId, exception);
+            throw new DataException("无法启动用户导入任务: " + safeMessage(exception));
         }
-        task.setAppliedRows(applied);
-        task.setSkippedRows(skipped);
-        task.setErrorRows(task.getErrorRows() + failed);
-        task.setStatus(failed == 0 && task.getErrorRows() == 0
-                ? STATUS_SUCCEEDED
-                : completed == 0 ? STATUS_FAILED : STATUS_PARTIAL_FAILED);
-        taskMapper.updateById(task);
-        log.info("用户批量导入完成: taskId={}, status={}, applied={}, skipped={}, failed={}", task.getId(), task.getStatus(),
-                applied, skipped, failed);
+        return toVO(task);
+    }
+
+    private void processApply(UUID taskId, UUID operatorId) {
+        try {
+            var task = findTask(taskId, operatorId);
+            if (task == null) {
+                return;
+            }
+            var rows = rowMapper.selectList(new LambdaQueryWrapper<UserImportRow>()
+                    .eq(UserImportRow::getTaskId, taskId)
+                    .orderByAsc(UserImportRow::getRowNumber));
+            var referenceData = loadReferenceData();
+            var completed = task.getErrorRows();
+            var applied = 0;
+            var skipped = 0;
+            var failed = task.getErrorRows();
+            var processed = 0;
+            for (var row : rows) {
+                if (!STATE_VALID.equals(row.getState())) {
+                    continue;
+                }
+                try {
+                    var result = rowProcessor.process(row, task.isSkipExisting(), referenceData.departmentIds(),
+                            referenceData.profiles());
+                    row.setUserId(result.userId());
+                    if (result.skipped()) {
+                        row.setState(STATE_SKIPPED);
+                        skipped++;
+                    } else {
+                        row.setState(STATE_APPLIED);
+                        applied++;
+                    }
+                    rowMapper.updateById(row);
+                } catch (RuntimeException exception) {
+                    row.setState(STATE_ERROR);
+                    row.setErrors(Map.of("apply", safeMessage(exception)));
+                    rowMapper.updateById(row);
+                    failed++;
+                }
+                completed++;
+                processed++;
+                task.setCompletedRows(completed);
+                task.setAppliedRows(applied);
+                task.setSkippedRows(skipped);
+                task.setErrorRows(failed);
+                taskMapper.updateById(task);
+            }
+            task.setStatus(failed == 0 ? STATUS_SUCCEEDED : processed == 0 ? STATUS_FAILED : STATUS_PARTIAL_FAILED);
+            taskMapper.updateById(task);
+            log.info("用户批量导入完成: taskId={}, status={}, applied={}, skipped={}, failed={}", task.getId(),
+                    task.getStatus(), applied, skipped, failed);
+        } catch (RuntimeException exception) {
+            markApplyFailed(taskId, operatorId, exception);
+        }
+    }
+
+    private void markApplyFailed(UUID taskId, UUID operatorId, RuntimeException exception) {
+        taskMapper.update(null, new LambdaUpdateWrapper<UserImportTask>()
+                .eq(UserImportTask::getId, taskId)
+                .eq(UserImportTask::getOperatorId, operatorId)
+                .eq(UserImportTask::getStatus, STATUS_APPLYING)
+                .set(UserImportTask::getStatus, STATUS_FAILED));
+        log.error("用户批量导入执行失败: taskId={}", taskId, exception);
+    }
+
+    private UserImportTask findTask(UUID taskId, UUID operatorId) {
+        return taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
+                .eq(UserImportTask::getId, taskId)
+                .eq(UserImportTask::getOperatorId, operatorId));
     }
 
     private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
@@ -552,6 +606,7 @@ public class UserImportServiceImpl implements UserImportService {
         result.setErrorRows(task.getErrorRows());
         result.setSkippedRows(task.getSkippedRows());
         result.setAppliedRows(task.getAppliedRows());
+        result.setCompletedRows(task.getCompletedRows());
         result.setAssignmentCount(task.getAssignmentCount());
         result.setAccessBoundaryCount(task.getAccessBoundaryCount());
         result.setGrantBoundaryCount(task.getGrantBoundaryCount());
