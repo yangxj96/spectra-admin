@@ -126,6 +126,13 @@ public class UserController {
         return bindService.page(page, params);
     }
 
+    @ULog("'根据ID获取用户详情'")
+    @GetMapping(value = "/{uid}", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'user:read')")
+    public UserPageVO detail(@PathVariable UUID uid) throws IllegalAccessException {
+        return bindService.detail(uid);
+    }
+
     @ULog("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:read')")

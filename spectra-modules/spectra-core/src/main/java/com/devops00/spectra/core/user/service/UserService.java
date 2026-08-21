@@ -56,6 +56,14 @@ public interface UserService extends BaseService<User> {
     IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException;
 
     /**
+     * 获取管理员用户详情
+     *
+     * @param userId 用户ID
+     * @return 用户详情
+     */
+    UserPageVO detail(UUID userId) throws IllegalAccessException;
+
+    /**
      * 创建用户
      *
      * @param params 请求参数

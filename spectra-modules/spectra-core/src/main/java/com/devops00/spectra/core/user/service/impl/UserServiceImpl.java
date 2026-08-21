@@ -192,6 +192,18 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     }
 
     @Override
+    public UserPageVO detail(UUID userId) throws IllegalAccessException {
+        var user = this.getById(userId);
+        if (user == null) {
+            throw new DataNotExistException("用户不存在");
+        }
+        var result = userConverter.toVO(user);
+        fillExecutor.fill(List.of(result));
+        result.setRoles(targetRoles(userId));
+        return result;
+    }
+
+    @Override
     public List<UserOnlineVO> online(PageFrom page) {
         return securitySessionQueryPort.listOnlineUsers();
     }
