@@ -29,6 +29,7 @@ import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -60,10 +61,11 @@ public class SecurityUserHelper {
         if (loginType == null || identity == null || credential == null || !(user instanceof User u)) {
             throw new LoginException("账号当前不可用");
         }
-        if (!loginType.name().equals(identity.getMethodCode())
-                || !"ACTIVE".equals(identity.getState())
-                || Boolean.TRUE.equals(credential.getMustChange())) {
+        if (!loginType.name().equals(identity.getMethodCode()) || !"ACTIVE".equals(identity.getState())) {
             throw new LoginException("账号当前不可用");
+        }
+        if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(Instant.now())) {
+            throw new LoginException("临时密码已过期，请联系管理员重置密码");
         }
         if (identity.getUserId() == null || !identity.getUserId().equals(u.getId())) {
             throw new LoginException("账号当前不可用");
@@ -77,6 +79,7 @@ public class SecurityUserHelper {
         securityUser.setAccountNonExpired(true);
         securityUser.setAccountNonLocked(true);
         securityUser.setCredentialsNonExpired(true);
+        securityUser.setPasswordChangeRequired(Boolean.TRUE.equals(credential.getMustChange()));
         securityUser.setAuthorities(buildAuthorities(securityUser.getId()));
         return securityUser;
     }

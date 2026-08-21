@@ -72,11 +72,13 @@ public class CryptoController {
 
     /**
      * 获取客户端私钥（需登录）
+     *
+     * <p>客户端私钥用于浏览器端解密响应和签名请求，是加密通信初始化数据，不属于密钥管理操作。</p>
      */
     @ULog("'获取客户端私钥'")
     @Encrypt(response = false)
     @GetMapping(value = "/keypair/client-private", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
+    @PreAuthorize("isAuthenticated()")
     public CryptoClientKeyVO getClientPrivateKey() {
         return new CryptoClientKeyVO(cryptoKeyManager.getClientPrivateKeyBase64());
     }

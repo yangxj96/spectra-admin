@@ -62,6 +62,10 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 SecurityUser user = securityUserLookupPort.findByToken(token);
                 if (user == null) {
                     SecurityContextHolder.clearContext();
+                } else if (user.isPasswordChangeRequired() && !isPasswordChangeRequest(request)) {
+                    SecurityContextHolder.clearContext();
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "请先修改密码");
+                    return;
                 } else {
                     var auth = new UsernamePasswordAuthenticationToken(user, token, user.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(auth);
@@ -75,5 +79,16 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private boolean isPasswordChangeRequest(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        if ("GET".equalsIgnoreCase(request.getMethod())) {
+            return path.endsWith("/menu/current") || path.endsWith("/security/context")
+                    || path.endsWith("/user/profile") || path.endsWith("/system/guide/status")
+                    || path.endsWith("/system/crypto/keypair/client-private");
+        }
+        return ("PUT".equalsIgnoreCase(request.getMethod()) && path.endsWith("/user/password"))
+                || ("POST".equalsIgnoreCase(request.getMethod()) && path.endsWith("/security/authentication/logout"));
     }
 }

@@ -28,6 +28,7 @@ import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
+import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 
 import java.util.List;
@@ -84,7 +85,7 @@ public interface UserService extends BaseService<User> {
      *
      * @param uid 用户ID
      */
-    void passwordResetById(UUID uid);
+    UserPasswordResetVO passwordResetById(UUID uid);
 
     /**
      * 分页获取在线用户

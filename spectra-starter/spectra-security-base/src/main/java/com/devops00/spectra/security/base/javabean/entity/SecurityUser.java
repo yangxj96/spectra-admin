@@ -108,6 +108,11 @@ public class SecurityUser implements UserDetails {
     private boolean credentialsNonExpired = true;
 
     /**
+     * 是否必须先修改密码。
+     */
+    private boolean passwordChangeRequired;
+
+    /**
      * 扩展数据字段。
      */
     @Nullable

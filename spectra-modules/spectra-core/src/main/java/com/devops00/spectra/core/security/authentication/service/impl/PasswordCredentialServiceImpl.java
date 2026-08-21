@@ -60,22 +60,23 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
             }
             return;
         }
-        update(current, passwordHash, mustChange);
+        update(current, passwordHash, mustChange, null);
     }
 
     @Override
     @Transactional
-    public void updatePassword(UUID userId, String passwordHash, boolean mustChange) {
+    public void updatePassword(UUID userId, String passwordHash, boolean mustChange, Instant expiresAt) {
         var credential = getByUserId(userId);
         if (credential == null) {
             throw new DataNotExistException("密码凭证不存在");
         }
-        update(credential, passwordHash, mustChange);
+        update(credential, passwordHash, mustChange, expiresAt);
     }
 
-    private void update(PasswordCredential credential, String passwordHash, boolean mustChange) {
+    private void update(PasswordCredential credential, String passwordHash, boolean mustChange, Instant expiresAt) {
         credential.setPasswordHash(passwordHash);
         credential.setChangedAt(Instant.now());
+        credential.setExpiresAt(expiresAt);
         credential.setMustChange(mustChange);
         credential.setFailedAttempts(0);
         credential.setLockedUntil(null);

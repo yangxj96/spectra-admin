@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.authentication.service;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import org.jspecify.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.UUID;
 
 public interface PasswordCredentialService {
@@ -28,5 +29,5 @@ public interface PasswordCredentialService {
 
     void createOrReplace(UUID userId, String passwordHash, boolean mustChange);
 
-    void updatePassword(UUID userId, String passwordHash, boolean mustChange);
+    void updatePassword(UUID userId, String passwordHash, boolean mustChange, @Nullable Instant expiresAt);
 }

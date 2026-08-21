@@ -697,6 +697,7 @@ public class RedisSecuritySessionRepository
                 .accessToken(token)
                 .refreshToken(refreshToken)
                 .permissions(permissions)
+                .passwordChangeRequired(user.isPasswordChangeRequired())
                 .build();
     }
 

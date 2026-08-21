@@ -24,10 +24,12 @@ import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
+import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -74,8 +76,10 @@ public class UserController {
     @ULog("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:reset-password')")
-    public void passwordResetById(@PathVariable UUID uid) {
-        bindService.passwordResetById(uid);
+    public UserPasswordResetVO passwordResetById(@PathVariable UUID uid, HttpServletResponse response) {
+        response.setHeader("Cache-Control", "no-store");
+        response.setHeader("Pragma", "no-cache");
+        return bindService.passwordResetById(uid);
     }
 
     @ULog("'锁定用户'")

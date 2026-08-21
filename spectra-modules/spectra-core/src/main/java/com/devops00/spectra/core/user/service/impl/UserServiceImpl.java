@@ -42,6 +42,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
+import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
@@ -61,6 +62,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -75,6 +77,8 @@ import java.util.*;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
+
+    private static final Duration TEMPORARY_PASSWORD_VALIDITY = Duration.ofHours(24);
 
     private final UserConverter userConverter;
 
@@ -158,7 +162,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     @Override
     @Transactional
-    public void passwordResetById(UUID uid) {
+    public UserPasswordResetVO passwordResetById(UUID uid) {
         var user = this.getById(uid);
         if (user == null) {
             throw new DataNotExistException("用户不存在");
@@ -167,10 +171,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (credential == null) {
             throw new DataNotExistException("密码凭证不存在");
         }
-        passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
-        appendAudit("PASSWORD_RESET", uid, Map.of(), Map.of("mustChange", true), "管理员重置密码");
+        String temporaryPassword = generateTemporaryPassword();
+        Instant expiresAt = Instant.now().plus(TEMPORARY_PASSWORD_VALIDITY);
+        passwordCredentialService.updatePassword(user.getId(), passwordEncoder.encode(temporaryPassword), true, expiresAt);
+        appendAudit("PASSWORD_RESET", uid, Map.of(),
+                Map.of("mustChange", true, "expiresAt", expiresAt.toString()), "管理员重置密码");
         // 密码凭证变化后，所有设备必须重新认证。
         securitySessionRevocationPort.revokeUserSessions(uid);
+        return new UserPasswordResetVO(temporaryPassword, expiresAt, true);
     }
 
     @Override
@@ -275,7 +283,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         securityPasswordPolicyProvider.current().assertAccepts(params.getNewPassword());
 
         // 6. 加密新密码并更新
-        passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false);
+        passwordCredentialService.updatePassword(userId, passwordEncoder.encode(params.getNewPassword()), false, null);
         appendAudit("PASSWORD_CHANGED", userId, Map.of(), Map.of("mustChange", false), "用户修改密码");
         // 密码变化包括当前设备在内全部 Session 失效。
         securitySessionRevocationPort.revokeUserSessions(userId);
