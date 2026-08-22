@@ -17,9 +17,11 @@
 package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
+import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRoleMenu;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
@@ -80,6 +82,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         if (!Objects.equals("ACTIVE", role.getState())) {
             throw new DataException("停用角色不能配置菜单");
         }
+        ensureEditableRole(role);
 
         var requestedIds = new HashSet<>(from.getMenuIds());
         var targetIds = new HashSet<UUID>();
@@ -127,6 +130,11 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     @Override
     @Transactional
     public void revoke(UUID roleId) {
+        var role = securityRoleMapper.selectById(roleId);
+        if (role == null) {
+            throw new DataNotExistException("角色不存在");
+        }
+        ensureEditableRole(role);
         // 删除角色关联的菜单
         var wrapper = new LambdaQueryWrapper<SecurityRoleMenu>().eq(SecurityRoleMenu::getRoleId, roleId);
         securityRoleMenuMapper.delete(wrapper);
@@ -136,5 +144,11 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
     public List<MenuVO> get(UUID roleId) {
         List<Menu> menus = menuService.getByRelRoleId(roleId);
         return menuConverter.toVOList(menus);
+    }
+
+    private void ensureEditableRole(SecurityRole role) {
+        if (Boolean.TRUE.equals(role.getSystemManaged()) || !Objects.equals("BUSINESS", role.getRoleKind())) {
+            throw new BuiltinDataException("内置角色不可配置菜单");
+        }
     }
 }

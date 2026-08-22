@@ -38,71 +38,93 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRole> implements RoleService {
 
+    private static final String ROLE_CODE_PREFIX = "ROLE_";
+
+    private static final int GENERATED_ROLE_CODE_SUFFIX_LENGTH = 8;
+
     private final RoleAssignmentMapper roleAssignmentMapper;
 
     @Override
     @Transactional
-    public void created(RoleFrom params) {
-        var role = new SecurityRole();
-        role.setCode(hasText(params.getCode()) ? params.getCode() : generatedCode());
-        role.setName(params.getName());
-        role.setState(Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE");
-        role.setRoleKind("BUSINESS");
-        role.setAuthorityLevel(1);
-        role.setSystemManaged(false);
-        role.setRemark(params.getRemark());
-        if (count(new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, role.getCode())) > 0) {
-            throw new DataException("角色编码已存在");
+    public RoleVO save(RoleFrom params) {
+        if (params.getId() == null) {
+            var role = new SecurityRole();
+            var name = normalize(params.getName());
+            ensureNameAvailable(name, null);
+            var codeProvided = hasText(params.getCode());
+            var code = codeProvided ? normalize(params.getCode()) : generatedCode();
+            if (codeProvided && codeExists(code, null)) {
+                throw new DataException("角色编码已存在");
+            }
+            role.setCode(code);
+            role.setName(name);
+            role.setState("ACTIVE");
+            role.setRoleKind("BUSINESS");
+            role.setAuthorityLevel(1);
+            role.setSystemManaged(false);
+            role.setRemark(params.getRemark());
+            if (getBaseMapper().insert(role) != 1) {
+                throw new DataException("创建角色失败");
+            }
+            return toVO(role);
         }
-        if (getBaseMapper().insert(role) != 1) {
-            throw new DataException("创建角色失败");
+
+        var role = getBaseMapper().selectById(params.getId());
+        if (role == null) {
+            throw new DataNotExistException("角色不存在");
+        }
+        ensureNotSystemManaged(role);
+        var code = normalize(params.getCode());
+        if (hasText(code) && !code.equals(role.getCode())) {
+            throw new DataException("角色编码不可修改");
+        }
+        var name = normalize(params.getName());
+        ensureNameAvailable(name, role.getId());
+        role.setName(name);
+        role.setRemark(params.getRemark());
+        if (getBaseMapper().updateById(role) != 1) {
+            throw new DataException("修改角色失败");
+        }
+        return toVO(role);
+    }
+
+    @Override
+    @Transactional
+    public void enable(UUID id) {
+        var role = getRole(id);
+        ensureNotSystemManaged(role);
+        if ("ACTIVE".equals(role.getState())) {
+            return;
+        }
+        role.setState("ACTIVE");
+        if (getBaseMapper().updateById(role) != 1) {
+            throw new DataException("启用角色失败");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void disable(UUID id) {
+        var role = getRole(id);
+        ensureNotSystemManaged(role);
+        if ("DISABLED".equals(role.getState())) {
+            return;
+        }
+        ensureNoActiveAssignments(id, "禁用");
+        role.setState("DISABLED");
+        if (getBaseMapper().updateById(role) != 1) {
+            throw new DataException("禁用角色失败");
         }
     }
 
     @Override
     @Transactional
     public void deleteById(UUID id) {
-        var role = getBaseMapper().selectById(id);
-        if (role == null) {
-            throw new DataNotExistException("角色不存在");
-        }
-        if (Boolean.TRUE.equals(role.getSystemManaged())) {
-            throw new BuiltinDataException("系统维护角色不可删除");
-        }
-        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getRoleId, id)
-                .eq(RoleAssignment::getState, "ACTIVE")) > 0) {
-            throw new DataException("角色仍有有效授权实例，不可停用");
-        }
-        role.setState("DISABLED");
-        if (getBaseMapper().updateById(role) != 1) {
-            throw new DataException("停用角色失败");
-        }
-    }
-
-    @Override
-    @Transactional
-    public void modify(RoleFrom params) {
-        var role = getBaseMapper().selectById(params.getId());
-        if (role == null) {
-            throw new DataNotExistException("角色不存在");
-        }
-        if (Boolean.TRUE.equals(role.getSystemManaged())) {
-            throw new BuiltinDataException("系统维护角色不可修改");
-        }
-        if (hasText(params.getCode())
-                && !params.getCode().equals(role.getCode())
-                && count(new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, params.getCode())) > 0) {
-            throw new DataException("角色编码已存在");
-        }
-        if (hasText(params.getCode())) {
-            role.setCode(params.getCode());
-        }
-        role.setName(params.getName());
-        role.setState(Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE");
-        role.setRemark(params.getRemark());
-        if (getBaseMapper().updateById(role) != 1) {
-            throw new DataException("修改角色失败");
+        var role = getRole(id);
+        ensureNotSystemManaged(role);
+        ensureNoActiveAssignments(id, "删除");
+        if (!removeById(id)) {
+            throw new DataException("删除角色失败");
         }
     }
 
@@ -111,6 +133,10 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         var wrapper = new LambdaQueryWrapper<SecurityRole>()
                 .like(hasText(params.getName()), SecurityRole::getName, params.getName())
                 .eq(params.getState() != null, SecurityRole::getState, Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE")
+                .orderByDesc(true, SecurityRole::getSystemManaged)
+                .orderByDesc(true, SecurityRole::getAuthorityLevel)
+                .orderByAsc(true, SecurityRole::getState)
+                .orderByAsc(true, SecurityRole::getName)
                 .orderByAsc(true, SecurityRole::getId);
         var result = getBaseMapper().selectPage(new Page<>(page.getPageNum(), page.getPageSize()), wrapper);
         return result.convert(this::toVO);
@@ -124,6 +150,12 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
                 .stream()
                 .map(this::toVO)
                 .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public RoleVO detail(UUID id) {
+        return toVO(getRole(id));
     }
 
     @Override
@@ -148,7 +180,56 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     }
 
     private String generatedCode() {
-        return "ROLE_" + UUID.randomUUID().toString().replace("-", "").toUpperCase(Locale.ROOT);
+        String code;
+        do {
+            var suffix = UUID.randomUUID().toString().replace("-", "").substring(0, GENERATED_ROLE_CODE_SUFFIX_LENGTH);
+            code = ROLE_CODE_PREFIX + suffix.toUpperCase(Locale.ROOT);
+        } while (codeExists(code, null));
+        return code;
+    }
+
+    private void ensureNameAvailable(String name, UUID excludedId) {
+        var wrapper = new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getName, name);
+        if (excludedId != null) {
+            wrapper.ne(SecurityRole::getId, excludedId);
+        }
+        if (count(wrapper) > 0) {
+            throw new DataException("角色名称已存在");
+        }
+    }
+
+    private boolean codeExists(String code, UUID excludedId) {
+        var wrapper = new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, code);
+        if (excludedId != null) {
+            wrapper.ne(SecurityRole::getId, excludedId);
+        }
+        return count(wrapper) > 0;
+    }
+
+    private String normalize(String value) {
+        return value == null ? null : value.trim();
+    }
+
+    private SecurityRole getRole(UUID id) {
+        var role = getBaseMapper().selectById(id);
+        if (role == null) {
+            throw new DataNotExistException("角色不存在");
+        }
+        return role;
+    }
+
+    private void ensureNotSystemManaged(SecurityRole role) {
+        if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
+            throw new BuiltinDataException("内置角色不可操作");
+        }
+    }
+
+    private void ensureNoActiveAssignments(UUID roleId, String operation) {
+        if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<RoleAssignment>()
+                .eq(RoleAssignment::getRoleId, roleId)
+                .eq(RoleAssignment::getState, "ACTIVE")) > 0) {
+            throw new DataException("角色仍有有效授权实例，不可" + operation);
+        }
     }
 
     private boolean hasText(String value) {

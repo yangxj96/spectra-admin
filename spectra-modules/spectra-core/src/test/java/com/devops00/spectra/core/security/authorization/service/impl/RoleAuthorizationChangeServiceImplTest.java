@@ -7,11 +7,14 @@
 
 package com.devops00.spectra.core.security.authorization.service.impl;
 
+import com.devops00.spectra.common.exception.BuiltinDataException;
+import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
 import com.devops00.spectra.core.security.authorization.entity.RolePermission;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.javabean.from.RoleAuthorizationChangeFrom;
 import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.RoleGrantablePermissionMapper;
@@ -38,6 +41,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -136,17 +140,72 @@ class RoleAuthorizationChangeServiceImplTest {
     }
 
     @Test
-    void currentShouldRejectMissingOrDisabledTargetRole() {
+    void currentShouldRejectMissingTargetRole() {
         var roleId = UUID.randomUUID();
         when(roleMapper.selectById(roleId)).thenReturn(null);
 
         assertThrows(DataNotExistException.class, () -> service.current(roleId));
     }
 
+    @Test
+    void currentShouldReadDisabledTargetRole() {
+        var roleId = UUID.randomUUID();
+        var role = role(roleId, 3L);
+        role.setState("DISABLED");
+        when(roleMapper.selectById(roleId)).thenReturn(role);
+        when(rolePermissionMapper.selectList(any())).thenReturn(List.of());
+        when(roleGrantablePermissionMapper.selectList(any())).thenReturn(List.of());
+
+        RoleAuthorizationStateVO result = service.current(roleId);
+
+        assertEquals(roleId, result.getRoleId());
+        assertEquals(3L, result.getVersion());
+        assertEquals(1, result.getAuthorityLevel());
+        assertEquals(Set.of(), result.getPermissionCodes());
+        assertEquals(Set.of(), result.getGrantablePermissionCodes());
+    }
+
+    @Test
+    void previewShouldRejectBuiltinRoleAuthorizationChange() {
+        var roleId = UUID.randomUUID();
+        var role = role(roleId, 1L);
+        role.setRoleKind("SYSTEM_ADMIN");
+        role.setSystemManaged(true);
+        when(securityContextAccessor.currentUserId()).thenReturn(UUID.randomUUID());
+        when(roleMapper.selectById(roleId)).thenReturn(role);
+
+        var from = new RoleAuthorizationChangeFrom();
+        from.setExpectedVersion(1L);
+        from.setAuthorityLevel(1);
+        from.setPermissionCodes(Set.of());
+        from.setGrantablePermissionCodes(Set.of());
+
+        assertThrows(BuiltinDataException.class, () -> service.preview(roleId, from));
+    }
+
+    @Test
+    void previewShouldRejectBusinessRoleAuthorityLevelAbove999() {
+        var roleId = UUID.randomUUID();
+        var role = role(roleId, 1L);
+        role.setRoleKind("BUSINESS");
+        role.setSystemManaged(false);
+        when(securityContextAccessor.currentUserId()).thenReturn(UUID.randomUUID());
+        when(roleMapper.selectById(roleId)).thenReturn(role);
+
+        var from = new RoleAuthorizationChangeFrom();
+        from.setExpectedVersion(1L);
+        from.setAuthorityLevel(1000);
+        from.setPermissionCodes(Set.of());
+        from.setGrantablePermissionCodes(Set.of());
+
+        assertThrows(DataException.class, () -> service.preview(roleId, from));
+    }
+
     private static SecurityRole role(UUID id, long version) {
         var role = new SecurityRole();
         role.setId(id);
         role.setState("ACTIVE");
+        role.setRoleKind("BUSINESS");
         role.setAuthorityLevel(1);
         role.setVersion(version);
         return role;

@@ -17,10 +17,11 @@
 package com.devops00.spectra.core.user.javabean.from;
 
 import com.devops00.spectra.common.base.Verify;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,22 +50,20 @@ public class RoleFrom {
     /**
      * 角色名称
      */
-    @NotEmpty(message = "用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @NotBlank(message = "角色名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 120, message = "角色名称不能超过120个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String name;
 
     /**
      * 稳定角色编码；未提供时由后端生成 ROLE_* 编码。
      */
-    @Pattern(regexp = "^$|ROLE_[A-Z0-9_]+", message = "角色编码格式必须为 ROLE_*", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 80, message = "角色编码不能超过80个字符", groups = {Verify.Insert.class, Verify.Update.class})
+    @Pattern(regexp = "^$|ROLE_[A-Z0-9_]+$", message = "角色编码格式必须为 ROLE_*", groups = {Verify.Insert.class, Verify.Update.class})
     private String code;
-
-    /**
-     * 状态
-     */
-    private Boolean state;
 
     /**
      * 备注
      */
+    @Size(max = 500, message = "备注不能超过500个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String remark;
 }

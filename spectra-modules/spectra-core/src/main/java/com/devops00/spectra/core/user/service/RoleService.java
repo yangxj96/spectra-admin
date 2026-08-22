@@ -36,25 +36,33 @@ import java.util.UUID;
 public interface RoleService {
 
     /**
-     * 创建角色
+     * 保存角色基本信息，ID 为空时新增，否则修改。
      *
      * @param params 实体入参
+     * @return 保存后的角色
      */
-    void created(RoleFrom params);
+    RoleVO save(RoleFrom params);
 
     /**
-     * 删除角色
+     * 启用角色。
+     *
+     * @param id 角色ID
+     */
+    void enable(UUID id);
+
+    /**
+     * 禁用角色。
+     *
+     * @param id 角色ID
+     */
+    void disable(UUID id);
+
+    /**
+     * 逻辑删除角色。
      *
      * @param id 角色ID
      */
     void deleteById(UUID id);
-
-    /**
-     * 修改角色
-     *
-     * @param params 实体入参
-     */
-    void modify(RoleFrom params);
 
     /**
      * 分页查询角色信息
@@ -70,6 +78,14 @@ public interface RoleService {
      * @return 角色列表
      */
     List<RoleVO> all();
+
+    /**
+     * 查询角色详情。
+     *
+     * @param id 角色 ID
+     * @return 角色详情
+     */
+    RoleVO detail(UUID id);
 
     /**
      * 获取系统默认角色.

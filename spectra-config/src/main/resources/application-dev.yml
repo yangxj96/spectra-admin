@@ -153,6 +153,9 @@ mybatis-plus:
     banner: false
     db-config:
       id-type: assign_id
+      logic-delete-field: deleted
+      logic-not-delete-value: "null"
+      logic-delete-value: "now()"
 
 # ==================== XSS 防范 ====================
 mica:

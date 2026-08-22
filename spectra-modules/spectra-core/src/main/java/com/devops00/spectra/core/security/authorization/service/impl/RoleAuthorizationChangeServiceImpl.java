@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.domain.RoleAuthorizationState;
@@ -111,8 +112,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     @Override
     public RoleAuthorizationStateVO current(UUID roleId) {
         var role = roleMapper.selectById(roleId);
-        if (role == null || !"ACTIVE".equals(role.getState())) {
-            throw new DataNotExistException("目标 Role 不存在或已停用");
+        if (role == null) {
+            throw new DataNotExistException("目标 Role 不存在");
         }
         var state = currentState(roleId, role);
         var result = new RoleAuthorizationStateVO();
@@ -186,8 +187,11 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         if (role == null || !"ACTIVE".equals(role.getState())) {
             throw new DataNotExistException("目标 Role 不存在或已停用");
         }
-        if ("DEV_OPS".equals(role.getRoleKind())) {
-            throw new DataException("DEV_OPS Role 必须通过 Root Governance 流程变更");
+        if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
+            throw new BuiltinDataException("内置角色不可修改授权");
+        }
+        if (from.getAuthorityLevel() > 999) {
+            throw new DataException("普通角色授权管理等级必须在 1 到 999 之间");
         }
         long expectedVersion = role.getVersion() == null ? 0L : role.getVersion();
         if (expectedVersion != from.getExpectedVersion()) {
@@ -259,7 +263,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         added.removeAll(before.permissions());
         added.addAll(after.grantablePermissions());
         added.removeAll(before.grantablePermissions());
-        if (added.isEmpty() && after.authorityLevel() > before.authorityLevel()) {
+        if (after.authorityLevel() != before.authorityLevel()) {
             added.add("role:authority-level:update");
         }
         return added.stream()

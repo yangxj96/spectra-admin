@@ -7,13 +7,16 @@
 
 package com.devops00.spectra.core.service;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.repository.CrudRepository;
+import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
+import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.service.impl.RoleServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +30,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -57,14 +61,16 @@ class RoleServiceImplTest {
         when(securityRoleMapper.selectCount(any())).thenReturn(0L);
         when(securityRoleMapper.insert(any(SecurityRole.class))).thenReturn(1);
 
-        var from = new RoleFrom(null, "业务管理员", "ROLE_BUSINESS_ADMIN", true, "业务角色");
-        service.created(from);
+        var from = new RoleFrom(null, "业务管理员", "ROLE_BUSINESS_ADMIN", "业务角色");
+        var result = service.save(from);
 
         ArgumentCaptor<SecurityRole> captor = ArgumentCaptor.forClass(SecurityRole.class);
         verify(securityRoleMapper).insert(captor.capture());
         var role = captor.getValue();
         assertEquals("ROLE_BUSINESS_ADMIN", role.getCode());
         assertEquals("业务管理员", role.getName());
+        assertEquals("ROLE_BUSINESS_ADMIN", result.getCode());
+        assertEquals("业务管理员", result.getName());
         assertEquals("ACTIVE", role.getState());
         assertEquals("BUSINESS", role.getRoleKind());
         assertEquals(1, role.getAuthorityLevel());
@@ -74,24 +80,85 @@ class RoleServiceImplTest {
 
     @Test
     void createdShouldRejectDuplicateTargetCode() {
-        when(securityRoleMapper.selectCount(any())).thenReturn(1L);
+        when(securityRoleMapper.selectCount(any())).thenReturn(0L, 1L);
 
-        assertThrows(DataException.class, () -> service.created(new RoleFrom(null, "重复角色", "ROLE_DUPLICATE", true, null)));
+        assertThrows(DataException.class, () -> service.save(new RoleFrom(null, "重复角色", "ROLE_DUPLICATE", null)));
         verify(securityRoleMapper, never()).insert((SecurityRole) any());
     }
 
     @Test
-    void deleteShouldDisableUnassignedTargetRole() {
+    void createdShouldRejectDuplicateTargetName() {
+        when(securityRoleMapper.selectCount(any())).thenReturn(1L);
+
+        assertThrows(DataException.class, () -> service.save(new RoleFrom(null, "重复角色", "ROLE_UNIQUE", null)));
+        verify(securityRoleMapper, never()).insert((SecurityRole) any());
+    }
+
+    @Test
+    void createdShouldGenerateShortCodeWhenCodeIsMissing() {
+        when(securityRoleMapper.selectCount(any())).thenReturn(0L);
+        when(securityRoleMapper.insert(any(SecurityRole.class))).thenReturn(1);
+
+        service.save(new RoleFrom(null, "自动编码角色", null, null));
+
+        ArgumentCaptor<SecurityRole> captor = ArgumentCaptor.forClass(SecurityRole.class);
+        verify(securityRoleMapper).insert(captor.capture());
+        var code = captor.getValue().getCode();
+        assertTrue(code.matches("ROLE_[A-F0-9]{8}"));
+    }
+
+    @Test
+    void disableShouldDisableUnassignedTargetRole() {
         var roleId = UUID.randomUUID();
         var role = targetRole(roleId, "ROLE_BUSINESS", false);
         when(securityRoleMapper.selectById(roleId)).thenReturn(role);
         when(roleAssignmentMapper.selectCount(any())).thenReturn(0L);
         when(securityRoleMapper.updateById(any(SecurityRole.class))).thenReturn(1);
 
-        service.deleteById(roleId);
+        service.disable(roleId);
 
         assertEquals("DISABLED", role.getState());
         verify(securityRoleMapper).updateById(role);
+    }
+
+    @Test
+    void enableShouldEnableDisabledTargetRole() {
+        var roleId = UUID.randomUUID();
+        var role = targetRole(roleId, "ROLE_BUSINESS", false);
+        role.setState("DISABLED");
+        when(securityRoleMapper.selectById(roleId)).thenReturn(role);
+        when(securityRoleMapper.updateById(any(SecurityRole.class))).thenReturn(1);
+
+        service.enable(roleId);
+
+        assertEquals("ACTIVE", role.getState());
+        verify(securityRoleMapper).updateById(role);
+    }
+
+    @Test
+    void detailShouldReadTargetRole() {
+        var roleId = UUID.randomUUID();
+        var role = targetRole(roleId, "ROLE_BUSINESS", false);
+        role.setName("业务管理员");
+        when(securityRoleMapper.selectById(roleId)).thenReturn(role);
+
+        var result = service.detail(roleId);
+
+        assertEquals(roleId, result.getId());
+        assertEquals("业务管理员", result.getName());
+        assertEquals("ROLE_BUSINESS", result.getCode());
+    }
+
+    @Test
+    void deleteShouldSoftDeleteUnassignedTargetRole() {
+        var roleId = UUID.randomUUID();
+        when(securityRoleMapper.selectById(roleId)).thenReturn(targetRole(roleId, "ROLE_BUSINESS", false));
+        when(roleAssignmentMapper.selectCount(any())).thenReturn(0L);
+        when(securityRoleMapper.deleteById(roleId)).thenReturn(1);
+
+        service.deleteById(roleId);
+
+        verify(securityRoleMapper).deleteById(roleId);
     }
 
     @Test
@@ -99,9 +166,60 @@ class RoleServiceImplTest {
         var roleId = UUID.randomUUID();
         when(securityRoleMapper.selectById(roleId)).thenReturn(targetRole(roleId, "ROLE_ROOT", true));
 
-        var from = new RoleFrom(roleId, "Root", "ROLE_ROOT", true, null);
-        assertThrows(BuiltinDataException.class, () -> service.modify(from));
+        var from = new RoleFrom(roleId, "Root", "ROLE_ROOT", null);
+        assertThrows(BuiltinDataException.class, () -> service.save(from));
         verify(securityRoleMapper, never()).updateById((SecurityRole) any());
+    }
+
+    @Test
+    void modifyShouldRejectProtectedRoleKindEvenWhenNotMarkedSystemManaged() {
+        var roleId = UUID.randomUUID();
+        var role = targetRole(roleId, "ROLE_ADMIN_SYSTEM", false);
+        role.setRoleKind("SYSTEM_ADMIN");
+        when(securityRoleMapper.selectById(roleId)).thenReturn(role);
+
+        var from = new RoleFrom(roleId, "系统管理员", "ROLE_ADMIN_SYSTEM", null);
+        assertThrows(BuiltinDataException.class, () -> service.save(from));
+        verify(securityRoleMapper, never()).updateById((SecurityRole) any());
+    }
+
+    @Test
+    void modifyShouldRejectDuplicateTargetName() {
+        var roleId = UUID.randomUUID();
+        when(securityRoleMapper.selectById(roleId)).thenReturn(targetRole(roleId, "ROLE_BUSINESS", false));
+        when(securityRoleMapper.selectCount(any())).thenReturn(1L);
+
+        var from = new RoleFrom(roleId, "重复角色", "ROLE_BUSINESS", null);
+        assertThrows(DataException.class, () -> service.save(from));
+        verify(securityRoleMapper, never()).updateById((SecurityRole) any());
+    }
+
+    @Test
+    void modifyShouldKeepRoleCodeImmutable() {
+        var roleId = UUID.randomUUID();
+        when(securityRoleMapper.selectById(roleId)).thenReturn(targetRole(roleId, "ROLE_BUSINESS", false));
+
+        var from = new RoleFrom(roleId, "业务角色", "ROLE_RENAMED", null);
+        assertThrows(DataException.class, () -> service.save(from));
+        verify(securityRoleMapper, never()).updateById((SecurityRole) any());
+    }
+
+    @Test
+    void pageShouldKeepRequestedPageAndPageSize() {
+        when(securityRoleMapper.selectPage(any(Page.class), any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        var pageFrom = new PageFrom();
+        pageFrom.setPageNum(2L);
+        pageFrom.setPageSize(15L);
+        var result = service.page(pageFrom, new RolePageFrom());
+
+        assertEquals(2L, result.getCurrent());
+        assertEquals(15L, result.getSize());
+
+        ArgumentCaptor<Page<SecurityRole>> pageCaptor = ArgumentCaptor.forClass(Page.class);
+        verify(securityRoleMapper).selectPage(pageCaptor.capture(), any());
+        assertEquals(2L, pageCaptor.getValue().getCurrent());
+        assertEquals(15L, pageCaptor.getValue().getSize());
     }
 
     @Test
@@ -112,6 +230,7 @@ class RoleServiceImplTest {
 
         assertThrows(DataException.class, () -> service.deleteById(roleId));
         verify(securityRoleMapper, never()).updateById((SecurityRole) any());
+        verify(securityRoleMapper, never()).deleteById(roleId);
     }
 
     private static SecurityRole targetRole(UUID id, String code, boolean systemManaged) {
@@ -120,6 +239,7 @@ class RoleServiceImplTest {
         role.setCode(code);
         role.setName(code);
         role.setState("ACTIVE");
+        role.setRoleKind("BUSINESS");
         role.setSystemManaged(systemManaged);
         return role;
     }

@@ -17,16 +17,15 @@
 package com.devops00.spectra.core.user.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.system.javabean.vo.MenuVO;
-import com.devops00.spectra.core.user.javabean.from.RoleFrom;
-import com.devops00.spectra.core.user.javabean.from.RoleMenuFrom;
+import com.devops00.spectra.core.user.javabean.from.RoleEditorSaveFrom;
 import com.devops00.spectra.core.user.javabean.from.RolePageFrom;
 import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
+import com.devops00.spectra.core.user.service.RoleEditorService;
 import com.devops00.spectra.core.user.service.RoleService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.RequiredArgsConstructor;
@@ -53,31 +52,38 @@ public class RoleController {
 
     private final RoleService bindService;
 
+    private final RoleEditorService roleEditorService;
+
     private final RelRoleMenuService relRoleMenuService;
 
-    @ULog("'创建角色'")
-    @PostMapping(version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'role:create')")
-    public void created(@Validated(Verify.Insert.class) @RequestBody RoleFrom params) {
-        bindService.created(params);
+    @ULog("'提交角色编辑'")
+    @PostMapping(value = "/editor", version = "1.0.0")
+    @PreAuthorize("((#p0.id == null and hasPermission(null, 'role:create')) "
+            + "or (#p0.id != null and hasPermission(null, 'role:update'))) "
+            + "and hasPermission(null, 'role:grant') and hasPermission(null, 'role:assign')")
+    public RoleVO saveEditor(@Validated @RequestBody RoleEditorSaveFrom params) {
+        return roleEditorService.save(params);
+    }
+
+    @ULog("'启用角色'")
+    @PutMapping(value = "/{id}/enable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'role:disable')")
+    public void enable(@PathVariable UUID id) {
+        bindService.enable(id);
+    }
+
+    @ULog("'禁用角色'")
+    @PutMapping(value = "/{id}/disable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'role:disable')")
+    public void disable(@PathVariable UUID id) {
+        bindService.disable(id);
     }
 
     @ULog("'删除角色'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'role:disable')")
+    @PreAuthorize("hasPermission(null, 'role:delete')")
     public void deleteById(@PathVariable UUID id) {
-        try {
-            bindService.deleteById(id);
-        } catch (NumberFormatException e) {
-            log.error("ID转换异常", e);
-        }
-    }
-
-    @ULog("'修改角色'")
-    @PutMapping(version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'role:update')")
-    public void modify(@Validated(Verify.Update.class) @RequestBody RoleFrom params) {
-        bindService.modify(params);
+        bindService.deleteById(id);
     }
 
     /* 查询部分 */
@@ -96,6 +102,13 @@ public class RoleController {
         return bindService.all();
     }
 
+    @ULog("'查询角色详情'")
+    @GetMapping(value = "/{id}", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'role:read')")
+    public RoleVO detail(@PathVariable UUID id) {
+        return bindService.detail(id);
+    }
+
     /* 关联处理部分 */
 
     @ULog("'获取角色关联的菜单列表'")
@@ -110,15 +123,4 @@ public class RoleController {
         }
     }
 
-    @ULog("'保存角色关联的菜单列表'")
-    @PutMapping(value = "/{roleId}/menus", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'role:assign')")
-    public void saveRoleRelMenuByRoleId(@PathVariable UUID roleId, @Validated @RequestBody RoleMenuFrom from) {
-        try {
-            relRoleMenuService.grant(roleId, from);
-        } catch (Exception e) {
-            log.error("{}保存角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new DataException("参数转换失败");
-        }
-    }
 }
