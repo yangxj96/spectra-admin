@@ -68,13 +68,30 @@ class UserAuthorizationStatusCalculatorTest {
                 .isEqualTo(UserAuthorizationStatus.PARTIAL);
     }
 
+    @Test
+    void ignoresRevokedHistoricalAssignmentWhenCurrentAssignmentIsComplete() {
+        var active = assignment("ACTIVE", "ACTIVE", 1L, 1, null, null);
+        var revoked = assignment("REVOKED", "ACTIVE", 1L, 1, null, NOW.minusSeconds(1));
+
+        assertThat(UserAuthorizationStatusCalculator.calculate(List.of(active, revoked), NOW))
+                .isEqualTo(UserAuthorizationStatus.ACTIVE);
+    }
+
+    @Test
+    void returnsUnconfiguredWhenAllAssignmentsAreRevoked() {
+        var revoked = assignment("REVOKED", "ACTIVE", 1L, 1, null, NOW.minusSeconds(1));
+
+        assertThat(UserAuthorizationStatusCalculator.calculate(List.of(revoked), NOW))
+                .isEqualTo(UserAuthorizationStatus.UNCONFIGURED);
+    }
+
     private static AuthorizationAssignmentView assignment(
-                                                           String state,
-                                                           String roleState,
-                                                           long rolePermissionCount,
-                                                           int boundaryCount,
-                                                           Instant validFrom,
-                                                           Instant validUntil) {
+                                                          String state,
+                                                          String roleState,
+                                                          long rolePermissionCount,
+                                                          int boundaryCount,
+                                                          Instant validFrom,
+                                                          Instant validUntil) {
         var boundaries = java.util.stream.IntStream.range(0, boundaryCount)
                 .mapToObj(index -> new com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView(
                         "permission:" + index, "NONE", null, List.of()))

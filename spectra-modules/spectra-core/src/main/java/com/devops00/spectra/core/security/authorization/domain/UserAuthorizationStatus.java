@@ -34,6 +34,6 @@ public enum UserAuthorizationStatus {
     /** 至少一个有效 RoleAssignment 已完整生效，且没有失效授权。 */
     ACTIVE,
 
-    /** 存在已撤销、已过期、停用 Role 或部分失效的授权。 */
+    /** 当前仍有已过期、停用 Role 或部分失效的授权。 */
     PARTIAL
 }

@@ -47,7 +47,7 @@ public final class UserAuthorizationStatusCalculator {
      * 使用指定时刻计算用户授权状态，便于边界时间测试。
      *
      * @param assignments 用户的全部授权实例
-     * @param now 当前时刻
+     * @param now         当前时刻
      * @return 授权状态
      */
     static UserAuthorizationStatus calculate(List<AuthorizationAssignmentView> assignments, Instant now) {
@@ -55,11 +55,19 @@ public final class UserAuthorizationStatusCalculator {
             return UserAuthorizationStatus.UNCONFIGURED;
         }
 
+        // REVOKED Assignment 是角色替换或人工移除后保留的历史记录，不代表当前仍有失效权限。
+        var currentAssignments = assignments.stream()
+                .filter(assignment -> !"REVOKED".equals(assignment.state()))
+                .toList();
+        if (currentAssignments.isEmpty()) {
+            return UserAuthorizationStatus.UNCONFIGURED;
+        }
+
         var effectiveCount = 0;
         var completeCount = 0;
         var incompleteCount = 0;
         var invalidCount = 0;
-        for (var assignment : assignments) {
+        for (var assignment : currentAssignments) {
             var assignmentEffective = "ACTIVE".equals(assignment.state())
                     && (assignment.validFrom() == null || !assignment.validFrom().isAfter(now))
                     && (assignment.validUntil() == null || assignment.validUntil().isAfter(now));
