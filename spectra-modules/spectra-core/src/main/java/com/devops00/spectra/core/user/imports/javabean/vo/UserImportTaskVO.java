@@ -18,7 +18,7 @@ package com.devops00.spectra.core.user.imports.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /** 用户导入任务和 Preview 汇总。 */
@@ -35,9 +35,9 @@ public class UserImportTaskVO {
 
     private String status;
 
-    private Instant expiresAt;
+    private LocalDateTime expiresAt;
 
-    private Instant previewExpiresAt;
+    private LocalDateTime previewExpiresAt;
 
     private int totalRows;
 

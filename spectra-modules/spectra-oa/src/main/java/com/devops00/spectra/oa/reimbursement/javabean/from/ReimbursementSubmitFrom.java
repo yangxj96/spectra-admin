@@ -21,7 +21,7 @@ import lombok.Data;
 /**
  * 报销提交参数。
  * <p>
- * approverUsername 为空时使用当前用户，便于本地演示；正式环境应由流程路由配置审批人。
+ * approverEmail 为空时使用当前用户，便于本地演示；正式环境应由流程路由配置审批人。
  *
  * @author yangxj96
  * @version 1.0
@@ -31,7 +31,7 @@ import lombok.Data;
 public class ReimbursementSubmitFrom {
 
     /**
-     * 审批人用户名。
+     * 审批人邮箱。
      */
-    private String approverUsername;
+    private String approverEmail;
 }

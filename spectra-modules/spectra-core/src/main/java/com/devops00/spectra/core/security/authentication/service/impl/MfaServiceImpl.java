@@ -115,9 +115,6 @@ public class MfaServiceImpl implements MfaService {
         }
         String account = user.getEmail();
         if (account == null || account.isBlank()) {
-            account = user.getUsername();
-        }
-        if (account == null || account.isBlank()) {
             throw new IllegalStateException("MFA 登记用户登录账号不存在");
         }
         return account.trim();

@@ -85,7 +85,7 @@ public class UserImportRowProcessor {
             if (skipExisting) {
                 return new ProcessResult(existing.getId(), true);
             }
-            throw new DataException("用户已存在: " + source.getUsername());
+            throw new DataException("用户已存在: " + source.getEmployeeNo());
         }
         var departmentId = departmentIds.get(source.getDepartmentCode());
         if (departmentId == null) {
@@ -96,7 +96,7 @@ public class UserImportRowProcessor {
             throw new DataException("授权方案不存在或已停用: " + source.getAuthorizationProfileCode());
         }
         var user = new UserSaveFrom();
-        user.setUsername(source.getUsername());
+        user.setEmployeeNo(source.getEmployeeNo());
         user.setRealName(source.getRealName());
         user.setPhone(source.getPhone());
         user.setEmail(source.getEmail());
@@ -167,9 +167,9 @@ public class UserImportRowProcessor {
     }
 
     private User findExisting(UserImportRowFrom source) {
-        var byUsername = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, source.getUsername()));
-        if (byUsername != null) {
-            return byUsername;
+        var byEmployeeNo = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmployeeNo, source.getEmployeeNo()));
+        if (byEmployeeNo != null) {
+            return byEmployeeNo;
         }
         var byEmail = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, source.getEmail()));
         if (byEmail != null) {
@@ -180,7 +180,7 @@ public class UserImportRowProcessor {
 
     private UserImportRowFrom toSource(Map<String, Object> values) {
         var source = new UserImportRowFrom();
-        source.setUsername(value(values, "username"));
+        source.setEmployeeNo(value(values, "employee_no"));
         source.setRealName(value(values, "real_name"));
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));

@@ -43,10 +43,10 @@ import java.util.UUID;
 public class User extends BaseEntity {
 
     /**
-     * 显示名称
+     * 工号/员工编号。
      */
-    @TableField(value = "username")
-    private String username;
+    @TableField(value = "employee_no")
+    private String employeeNo;
 
     /**
      * 头像
@@ -61,22 +61,22 @@ public class User extends BaseEntity {
     private UserStatus status;
 
     /**
+     * 最近一次生命周期变更原因。
+     */
+    @TableField(value = "status_reason")
+    private String statusReason;
+
+    /**
+     * 离职时间。
+     */
+    @TableField(value = "departed_at")
+    private Instant departedAt;
+
+    /**
      * 真实姓名
      */
     @TableField(value = "real_name")
     private String realName;
-
-    /**
-     * 性别(0:保密,1-男,2-女)
-     */
-    @TableField(value = "gender")
-    private Short gender;
-
-    /**
-     * 生日
-     */
-    @TableField(value = "birthday")
-    private Instant birthday;
 
     /**
      * 手机号
@@ -89,18 +89,6 @@ public class User extends BaseEntity {
      */
     @TableField(value = "email")
     private String email;
-
-    /**
-     * 国家
-     */
-    @TableField(value = "country")
-    private String country;
-
-    /**
-     * 城市
-     */
-    @TableField(value = "city")
-    private String city;
 
     /**
      * 语言

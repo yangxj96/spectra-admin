@@ -183,7 +183,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         if (!StringUtils.hasText(applicantUsername)) {
             throw new DataSaveException("当前用户缺少流程用户名");
         }
-        var approver = from == null ? null : from.getApproverUsername();
+        var approver = from == null ? null : from.getApproverEmail();
         var variables = new LinkedHashMap<String, Object>();
         variables.put("applicant", applicantUsername);
         variables.put("approver", StringUtils.hasText(approver) ? approver : applicantUsername);

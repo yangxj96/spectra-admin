@@ -59,7 +59,7 @@ class MfaServiceImplTest {
         UUID enrollmentId = UUID.randomUUID();
         User user = new User();
         user.setEmail("devops00.com");
-        user.setUsername("DEV_OPS");
+        user.setEmail("devops00.com");
         when(userMapper.selectById(userId)).thenReturn(user);
         when(configuredService.findValue(SystemConfigKeys.SYSTEM_NAME)).thenReturn(Optional.of("DevOps00"));
         when(enrollmentMapper.insert(any(MfaEnrollment.class))).thenAnswer(invocation -> {

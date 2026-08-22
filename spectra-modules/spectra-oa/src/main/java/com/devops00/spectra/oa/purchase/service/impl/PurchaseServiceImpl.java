@@ -187,7 +187,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
         var variables = new LinkedHashMap<String, Object>();
         variables.put("applicant", username);
-        var approver = from == null ? null : from.getApproverUsername();
+        var approver = from == null ? null : from.getApproverEmail();
         variables.put("approver", StringUtils.hasText(approver) ? approver : username);
         variables.put("applicantId", application.getApplicantId().toString());
         variables.put("amount", entity.getBudgetAmount().doubleValue());

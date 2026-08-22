@@ -26,6 +26,11 @@ public interface SecurityContextAccessor {
     @Nullable
     String currentToken();
 
+    /**
+     * 获取当前请求的有效时区，按用户时区、系统默认时区、UTC 的顺序解析。
+     *
+     * @return 有效时区 ID
+     */
     String currentUserZoneId();
 
     String currentUsername();

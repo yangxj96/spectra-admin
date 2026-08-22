@@ -26,9 +26,9 @@ public class ContactVO {
     private UUID id;
 
     /**
-     * 用户名。
+     * 工号/员工编号。
      */
-    private String username;
+    private String employeeNo;
 
     /**
      * 真实姓名。

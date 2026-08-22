@@ -103,7 +103,7 @@ class UserOnboardingServiceImplTest {
         var userId = UUID.randomUUID();
         var userParams = new UserSaveFrom();
         userParams.setId(userId);
-        userParams.setUsername("编辑用户");
+        userParams.setRealName("编辑用户");
         var authorization = new AuthorizationAssignmentChangeFrom();
         var request = request(userParams, authorization);
         var preview = new AuthorizationChangePreviewVO();
@@ -114,7 +114,7 @@ class UserOnboardingServiceImplTest {
         UserOnboardingVO result = service.submit(request);
 
         assertEquals(userId, result.getId());
-        assertEquals("编辑用户", result.getUsername());
+        assertEquals("编辑用户", result.getRealName());
         verify(userService).modify(userParams);
         verify(userService, never()).create(any());
         verify(assignmentChangeService).apply(eq(userId), any(AuthorizationAssignmentApplyFrom.class));
@@ -129,7 +129,7 @@ class UserOnboardingServiceImplTest {
         var removedRoleId = UUID.randomUUID();
         var userParams = new UserSaveFrom();
         userParams.setId(userId);
-        userParams.setUsername("编辑用户");
+        userParams.setRealName("编辑用户");
         var kept = new AuthorizationAssignmentChangeFrom();
         kept.setAssignmentId(keptAssignmentId);
         kept.setRoleId(keptRoleId);

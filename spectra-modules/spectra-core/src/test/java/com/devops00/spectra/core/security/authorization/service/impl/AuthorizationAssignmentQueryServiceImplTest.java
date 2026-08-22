@@ -120,6 +120,22 @@ class AuthorizationAssignmentQueryServiceImplTest {
                 .isEqualTo(departmentId);
     }
 
+    @Test
+    void ignoresAssignmentsReferencingDeletedRoles() {
+        var userId = UUID.randomUUID();
+        var roleId = UUID.randomUUID();
+        var assignment = new RoleAssignment();
+        assignment.setId(UUID.randomUUID());
+        assignment.setUserId(userId);
+        assignment.setRoleId(roleId);
+        assignment.setState("REVOKED");
+
+        when(roleAssignmentMapper.selectList(any(Wrapper.class))).thenReturn(List.of(assignment));
+        when(securityRoleMapper.selectBatchIds(anyCollection())).thenReturn(List.of());
+
+        assertThat(service().findByUserId(userId)).isEmpty();
+    }
+
     private AuthorizationAssignmentQueryServiceImpl service() {
         return new AuthorizationAssignmentQueryServiceImpl(
                 roleAssignmentMapper,

@@ -51,7 +51,7 @@ public class ContactServiceImpl implements ContactService {
         var wrapper = new LambdaQueryWrapper<User>().eq(User::getStatus, ENABLED);
         if (StringUtils.hasText(keyword)) {
             String value = keyword.trim();
-            wrapper.and(query -> query.like(User::getUsername, value)
+            wrapper.and(query -> query.like(User::getEmployeeNo, value)
                     .or()
                     .like(User::getRealName, value)
                     .or()
@@ -59,7 +59,7 @@ public class ContactServiceImpl implements ContactService {
                     .or()
                     .like(User::getEmail, value));
         }
-        wrapper.orderByAsc(User::getRealName).orderByAsc(User::getUsername);
+        wrapper.orderByAsc(User::getRealName).orderByAsc(User::getEmployeeNo);
         var users = userMapper.selectPage(page.toPage(), wrapper);
         var departmentIds = users.getRecords().stream().map(User::getDepartmentId).filter(Objects::nonNull).distinct().toList();
         Map<UUID, Department> departments = departmentIds.isEmpty()

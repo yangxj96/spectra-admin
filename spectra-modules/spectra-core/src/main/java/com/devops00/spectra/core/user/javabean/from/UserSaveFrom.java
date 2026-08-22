@@ -19,8 +19,10 @@ package com.devops00.spectra.core.user.javabean.from;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -47,13 +49,17 @@ public class UserSaveFrom {
     private UUID id;
 
     /**
-     * 姓名
+     * 工号/员工编号。
      */
-    private String username;
+    @NotBlank(message = "工号不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 64, message = "工号不能超过 64 个字符", groups = {Verify.Insert.class, Verify.Update.class})
+    private String employeeNo;
 
     /**
-     * 真实姓名
+     * 姓名。
      */
+    @NotBlank(message = "姓名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 50, message = "姓名不能超过 50 个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String realName;
 
     /**
@@ -63,36 +69,19 @@ public class UserSaveFrom {
     private UserStatus status;
 
     /**
-     * 性别
-     */
-    private Integer gender;
-
-    /**
-     * 生日
-     */
-    private String birthday;
-
-    /**
      * 手机号码
      */
+    @NotBlank(message = "手机号码不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 40, message = "手机号码不能超过 40 个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String phone;
 
     /**
      * 邮箱
      */
     @Email(message = "邮箱格式不正确", groups = {Verify.Insert.class, Verify.Update.class})
-    @NotNull(message = "邮箱默认为登录账户,不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @NotBlank(message = "邮箱默认为登录账户，不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 100, message = "邮箱不能超过 100 个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String email;
-
-    /**
-     * 国家
-     */
-    private String country;
-
-    /**
-     * 城市
-     */
-    private String city;
 
     /**
      * 语言

@@ -41,7 +41,7 @@ public class UserOnboardingVO implements Serializable {
     private UUID id;
 
     /**
-     * 用户名称。
+     * 用户姓名。
      */
-    private String username;
+    private String realName;
 }

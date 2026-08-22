@@ -18,7 +18,6 @@ package com.devops00.spectra.core.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.*;
@@ -123,9 +122,6 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
         var entity = userConverter.toEntity(params);
-        if (StrUtils.isBlank(entity.getUsername())) {
-            entity.setUsername(IdWorker.get32UUID().substring(0, 6));
-        }
         if (!this.save(entity)) {
             throw new DataSaveException("保存用户信息异常");
         }
@@ -133,7 +129,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
-        return new UserCreatedVO(entity.getId(), entity.getUsername());
+        return new UserCreatedVO(entity.getId(), entity.getRealName());
     }
 
     @Override
@@ -184,7 +180,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
         // 条件构建
-        var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
+        var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getRealName()), User::getRealName, params.getRealName())
+                .like(StrUtils.isNotBlank(params.getEmployeeNo()), User::getEmployeeNo, params.getEmployeeNo())
                 .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
                 .in(params.getDepartmentId() != null, User::getDepartmentId, departmentService.getSelfAndDescendantIds(params.getDepartmentId()))
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
@@ -326,6 +323,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         securityChangeExecutor.execute(event, () -> {
             current.setStatus(target);
+            current.setStatusReason(StrUtils.isBlank(reason) ? null : reason.trim());
+            current.setDepartedAt(target == UserStatus.DEPARTED ? Instant.now() : null);
             current.setSecurityVersion((current.getSecurityVersion() == null ? 0L : current.getSecurityVersion()) + 1L);
             if (this.baseMapper.updateById(current) == 0) {
                 throw new EntityUpdateException("更新用户生命周期状态失败");

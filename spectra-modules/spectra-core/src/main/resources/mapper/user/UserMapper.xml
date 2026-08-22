@@ -23,37 +23,35 @@
                type="com.devops00.spectra.core.user.javabean.entity.User">
         <!--@mbg.generated-->
         <!--@Table spectra_core.sys_user-->
-        <result column="username"      property="username"/>
+        <result column="employee_no"   property="employeeNo"/>
         <result column="avatar"        property="avatar"/>
         <result column="status"        property="status"/>
+        <result column="status_reason" property="statusReason"/>
+        <result column="departed_at"   property="departedAt"/>
         <result column="real_name"     property="realName"/>
-        <result column="gender"        property="gender"/>
-        <result column="birthday"      property="birthday"/>
         <result column="phone"         property="phone"/>
         <result column="email"         property="email"/>
-        <result column="country"       property="country"/>
-        <result column="city"          property="city"/>
         <result column="language"      property="language"/>
         <result column="timezone"      property="timezone"/>
         <result column="primary_department_id" property="departmentId" typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
+        <result column="security_version" property="securityVersion"/>
     </resultMap>
     <!-- @formatter:on -->
 
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        username,
+        employee_no,
         avatar,
         status,
+        status_reason,
+        departed_at,
         real_name,
-        gender,
-        birthday,
         phone,
         email,
-        country,
-        city,
         "language",
         timezone,
         primary_department_id,
+        security_version,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

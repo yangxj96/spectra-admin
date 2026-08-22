@@ -65,10 +65,10 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
     private UserOnboardingVO submitUser(UserSaveFrom params) {
         if (params.getId() == null) {
             UserCreatedVO created = userService.create(params);
-            return new UserOnboardingVO(created.getId(), created.getUsername());
+            return new UserOnboardingVO(created.getId(), created.getRealName());
         }
         userService.modify(params);
-        return new UserOnboardingVO(params.getId(), params.getUsername());
+        return new UserOnboardingVO(params.getId(), params.getRealName());
     }
 
     private void submitAuthorization(UUID userId, AuthorizationAssignmentsChangeFrom params) {

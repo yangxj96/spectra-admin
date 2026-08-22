@@ -19,7 +19,7 @@ import lombok.Data;
 public class LeaveSubmitFrom {
 
     /**
-     * 审批人用户名；未填写时兼容单用户环境并回退到申请人。
+     * 审批人邮箱；未填写时回退到申请人。
      */
-    private String approverUsername;
+    private String approverEmail;
 }

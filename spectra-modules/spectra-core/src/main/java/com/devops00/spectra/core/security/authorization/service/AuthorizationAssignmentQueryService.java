@@ -24,7 +24,8 @@ import java.util.UUID;
 public interface AuthorizationAssignmentQueryService {
 
     /**
-     * 查询用户的全部 RoleAssignment 历史，保留 Access/Grant Boundary 的 Assignment 绑定。
+     * 查询用户的 RoleAssignment 历史，保留 Access/Grant Boundary 的 Assignment 绑定；
+     * 引用已删除角色的历史记录不参与运行时视图。
      */
     List<AuthorizationAssignmentView> findByUserId(UUID userId);
 }

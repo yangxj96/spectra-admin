@@ -36,9 +36,14 @@ import java.util.UUID;
 public class UserPageFrom {
 
     /**
-     * 用户名称
+     * 姓名。
      */
-    private String username;
+    private String realName;
+
+    /**
+     * 工号/员工编号。
+     */
+    private String employeeNo;
 
     /**
      * 邮箱

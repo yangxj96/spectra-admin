@@ -37,6 +37,7 @@ import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;
 import com.devops00.spectra.core.user.imports.service.UserImportService;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -120,6 +121,8 @@ public class UserImportServiceImpl implements UserImportService {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final TimeMapper timeMapper;
+
     @Qualifier("userImportTaskExecutor")
     private final TaskExecutor userImportTaskExecutor;
 
@@ -129,7 +132,7 @@ public class UserImportServiceImpl implements UserImportService {
     @Transactional
     public UserImportTaskVO preview(UserImportPreviewFrom params) {
         var operatorId = currentOperatorId();
-        var rows = params.getRows().stream().map(this::normalize).toList();
+        var rows = normalizeRows(params.getRows(), params.getIdempotencyKey());
         var requestHash = requestHash(params.getFileHash(), params.isSkipExisting(), rows);
         var existing = taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
                 .eq(UserImportTask::getOperatorId, operatorId)
@@ -158,7 +161,6 @@ public class UserImportServiceImpl implements UserImportService {
             throw new DataException("创建用户导入任务失败");
         }
 
-        var usernames = new HashSet<String>();
         var emails = new HashSet<String>();
         var phones = new HashSet<String>();
         var validRows = 0;
@@ -172,10 +174,10 @@ public class UserImportServiceImpl implements UserImportService {
             var row = new UserImportRow();
             row.setTaskId(task.getId());
             row.setRowNumber(index + 1);
-            row.setRowKey((index + 1) + ":" + normalized.source().getUsername());
+            row.setRowKey((index + 1) + ":" + normalized.source().getEmployeeNo());
             row.setRawData(normalized.rawData());
             row.setNormalizedData(normalized.normalizedData());
-            var errors = validate(normalized.source(), referenceData, params.isSkipExisting(), usernames, emails, phones);
+            var errors = validate(normalized.source(), referenceData, params.isSkipExisting(), emails, phones);
             if (errors.isEmpty()) {
                 row.setState(STATE_VALID);
                 validRows++;
@@ -249,8 +251,10 @@ public class UserImportServiceImpl implements UserImportService {
     @Override
     public UserImportTaskVO apply(UUID id, UserImportApplyFrom params) {
         var task = requireTask(id);
-        if (STATUS_SUCCEEDED.equals(task.getStatus()) || STATUS_PARTIAL_FAILED.equals(task.getStatus())
-                || STATUS_FAILED.equals(task.getStatus()) || STATUS_APPLYING.equals(task.getStatus())) {
+        if (STATUS_SUCCEEDED.equals(task.getStatus())
+                || STATUS_PARTIAL_FAILED.equals(task.getStatus())
+                || STATUS_FAILED.equals(task.getStatus())
+                || STATUS_APPLYING.equals(task.getStatus())) {
             return toVO(task);
         }
         if (!STATUS_PREVIEWED.equals(task.getStatus())) {
@@ -271,21 +275,15 @@ public class UserImportServiceImpl implements UserImportService {
         var rows = rowMapper.selectList(new LambdaQueryWrapper<UserImportRow>()
                 .eq(UserImportRow::getTaskId, task.getId())
                 .orderByAsc(UserImportRow::getRowNumber));
+        var normalizedRows = normalizeRows(rows.stream()
+                .map(UserImportRow::getNormalizedData)
+                .map(this::toSource)
+                .toList(), task.getIdempotencyKey());
         var referenceData = loadReferenceData();
-        if (!task.getProfileVersionHash()
-                .equals(profileVersionHash(rows.stream()
-                        .map(UserImportRow::getNormalizedData)
-                        .map(this::toSource)
-                        .map(this::normalize)
-                        .toList(), referenceData.profiles()))) {
+        if (!task.getProfileVersionHash().equals(profileVersionHash(normalizedRows, referenceData.profiles()))) {
             throw new DataException("授权方案版本已变化，请重新生成导入 Preview");
         }
-        if (!task.getRequestHash()
-                .equals(requestHash(task.getFileHash(), task.isSkipExisting(), rows.stream()
-                        .map(UserImportRow::getNormalizedData)
-                        .map(this::toSource)
-                        .map(this::normalize)
-                        .toList()))) {
+        if (!task.getRequestHash().equals(requestHash(task.getFileHash(), task.isSkipExisting(), normalizedRows))) {
             throw new DataException("导入请求已变化，请重新生成 Preview");
         }
         var claimedAt = Instant.now();
@@ -392,13 +390,8 @@ public class UserImportServiceImpl implements UserImportService {
     }
 
     private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
-                                  Set<String> usernames, Set<String> emails, Set<String> phones) {
+                                  Set<String> emails, Set<String> phones) {
         var errors = new ArrayList<String>();
-        if (blank(source.getUsername())) {
-            errors.add("用户名不能为空");
-        } else if (!usernames.add(source.getUsername().toLowerCase(Locale.ROOT))) {
-            errors.add("用户名在导入文件中重复");
-        }
         if (blank(source.getRealName())) {
             errors.add("真实姓名不能为空");
         }
@@ -431,7 +424,7 @@ public class UserImportServiceImpl implements UserImportService {
         }
         var existing = findExisting(source);
         if (existing != null && !skipExisting) {
-            errors.add("用户名、邮箱或手机号码已存在");
+            errors.add("邮箱或手机号码已存在");
         }
         return errors;
     }
@@ -492,17 +485,37 @@ public class UserImportServiceImpl implements UserImportService {
         taskMapper.updateById(task);
     }
 
-    private NormalizedRow normalize(UserImportRowFrom source) {
-        var raw = toMap(source);
-        var normalized = new LinkedHashMap<String, Object>();
-        raw.forEach((key, value) -> normalized.put(key, value == null ? "" : trim(String.valueOf(value))));
+    private List<NormalizedRow> normalizeRows(List<UserImportRowFrom> sources, String generationSeed) {
+        var result = new ArrayList<NormalizedRow>(sources.size());
+        for (int index = 0; index < sources.size(); index++) {
+            result.add(normalize(sources.get(index), generationSeed, index));
+        }
+        return result;
+    }
+
+    private NormalizedRow normalize(UserImportRowFrom source, String generationSeed, int rowIndex) {
+        var sourceValues = toMap(source);
+        var raw = new LinkedHashMap<>(sourceValues);
+        raw.remove("employee_no");
+        Map<String, Object> normalized = new LinkedHashMap<>();
+        for (var entry : sourceValues.entrySet()) {
+            normalized.put(entry.getKey(), entry.getValue() == null ? "" : trim(String.valueOf(entry.getValue())));
+        }
         var normalizedSource = toSource(normalized);
+        if (blank(normalizedSource.getEmployeeNo())) {
+            normalizedSource.setEmployeeNo(generateEmployeeNo(generationSeed, rowIndex));
+        }
+        normalized = toMap(normalizedSource);
         return new NormalizedRow(normalizedSource, raw, normalized);
+    }
+
+    private String generateEmployeeNo(String generationSeed, int rowIndex) {
+        return "EMP-" + sha256(trim(generationSeed) + '\u001f' + rowIndex).substring(0, 32).toUpperCase(Locale.ROOT);
     }
 
     private Map<String, Object> toMap(UserImportRowFrom source) {
         var result = new LinkedHashMap<String, Object>();
-        result.put("username", source.getUsername());
+        result.put("employee_no", source.getEmployeeNo());
         result.put("real_name", source.getRealName());
         result.put("phone", source.getPhone());
         result.put("email", source.getEmail());
@@ -515,7 +528,7 @@ public class UserImportServiceImpl implements UserImportService {
 
     private UserImportRowFrom toSource(Map<String, Object> values) {
         var source = new UserImportRowFrom();
-        source.setUsername(value(values, "username"));
+        source.setEmployeeNo(value(values, "employee_no"));
         source.setRealName(value(values, "real_name"));
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));
@@ -577,9 +590,9 @@ public class UserImportServiceImpl implements UserImportService {
     }
 
     private User findExisting(UserImportRowFrom source) {
-        var byUsername = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getUsername, source.getUsername()));
-        if (byUsername != null) {
-            return byUsername;
+        var byEmployeeNo = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmployeeNo, source.getEmployeeNo()));
+        if (byEmployeeNo != null) {
+            return byEmployeeNo;
         }
         var byEmail = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, source.getEmail()));
         if (byEmail != null) {
@@ -599,8 +612,8 @@ public class UserImportServiceImpl implements UserImportService {
         result.setFileHash(task.getFileHash());
         result.setSkipExisting(task.isSkipExisting());
         result.setStatus(task.getStatus());
-        result.setExpiresAt(task.getExpiresAt());
-        result.setPreviewExpiresAt(task.getPreviewExpiresAt());
+        result.setExpiresAt(timeMapper.toLocalDateTime(task.getExpiresAt()));
+        result.setPreviewExpiresAt(timeMapper.toLocalDateTime(task.getPreviewExpiresAt()));
         result.setTotalRows(task.getTotalRows());
         result.setValidRows(task.getValidRows());
         result.setErrorRows(task.getErrorRows());

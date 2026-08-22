@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.security.starter.configuration;
 
+import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.security.base.change.SecurityAuthenticationPort;
 import com.devops00.spectra.security.base.change.SecuritySessionQueryPort;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
@@ -61,8 +62,9 @@ public class SecuritySessionPortConfiguration {
 
     @Bean
     public SecurityContextAccessor securityContextAccessor(SecuritySessionReader sessionReader,
-                                                           SecurityTokenAccessor tokenAccessor) {
-        return new SecuritySessionContextAccessor(sessionReader, tokenAccessor);
+                                                           SecurityTokenAccessor tokenAccessor,
+                                                           ObjectProvider<SystemConfigValueProvider> systemConfigValueProvider) {
+        return new SecuritySessionContextAccessor(sessionReader, tokenAccessor, systemConfigValueProvider);
     }
 
     @Bean

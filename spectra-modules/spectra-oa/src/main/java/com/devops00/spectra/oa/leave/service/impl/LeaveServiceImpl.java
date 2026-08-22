@@ -185,7 +185,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         if (!StringUtils.hasText(applicant)) {
             throw new DataSaveException("当前用户缺少流程用户名");
         }
-        var approver = from == null ? null : from.getApproverUsername();
+        var approver = from == null ? null : from.getApproverEmail();
         var variables = new java.util.LinkedHashMap<String, Object>();
         variables.put("applicant", applicant);
         variables.put("approver", StringUtils.hasText(approver) ? approver : applicant);

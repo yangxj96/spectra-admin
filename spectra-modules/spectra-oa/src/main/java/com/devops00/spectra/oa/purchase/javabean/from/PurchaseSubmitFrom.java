@@ -29,7 +29,7 @@ import lombok.Data;
 public class PurchaseSubmitFrom {
 
     /**
-     * 审批人用户名。
+     * 审批人邮箱。
      */
-    private String approverUsername;
+    private String approverEmail;
 }

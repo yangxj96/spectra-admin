@@ -47,9 +47,10 @@ class UserControllerTest {
         // 最小化新建用户
         UserSaveFrom from = new UserSaveFrom();
         from.setStatus(UserStatus.DISABLED);
+        from.setEmployeeNo("ADMIN");
+        from.setRealName("系统管理员");
+        from.setPhone("13800000000");
         from.setEmail("admin@devops00.com");
-        from.setCountry("China");
-        from.setCity("Kunming");
         from.setDepartmentId(UuidCreator.getTimeOrderedEpoch());
 
         var createdUser = userService.create(from);

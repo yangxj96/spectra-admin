@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,9 +48,9 @@ public class UserProfileVO implements Serializable {
     private UUID id;
 
     /**
-     * 用户名
+     * 工号/员工编号。
      */
-    private String username;
+    private String employeeNo;
 
     /**
      * 真实姓名
@@ -68,14 +68,9 @@ public class UserProfileVO implements Serializable {
     private UserStatus status;
 
     /**
-     * 性别
+     * 离职时间。
      */
-    private Short gender;
-
-    /**
-     * 生日
-     */
-    private LocalDate birthday;
+    private Instant departedAt;
 
     /**
      * 手机号
@@ -86,16 +81,6 @@ public class UserProfileVO implements Serializable {
      * 邮箱
      */
     private String email;
-
-    /**
-     * 国家
-     */
-    private String country;
-
-    /**
-     * 城市
-     */
-    private String city;
 
     /**
      * 语言

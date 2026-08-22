@@ -29,6 +29,7 @@ import com.devops00.spectra.core.user.imports.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
 import com.devops00.spectra.core.user.imports.mapper.UserImportTaskMapper;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,7 @@ import org.springframework.core.task.TaskExecutor;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.UUID;
@@ -83,6 +85,9 @@ class UserImportServiceImplTest {
     private SecurityContextAccessor securityContextAccessor;
 
     @Mock
+    private TimeMapper timeMapper;
+
+    @Mock
     private TaskExecutor taskExecutor;
 
     @InjectMocks
@@ -98,6 +103,7 @@ class UserImportServiceImplTest {
         TableInfoHelper.initTableInfo(assistant, UserImportTask.class);
         TableInfoHelper.initTableInfo(assistant, UserImportRow.class);
         when(securityContextAccessor.currentUserId()).thenReturn(OPERATOR_ID);
+        when(timeMapper.toLocalDateTime(any(Instant.class))).thenReturn(LocalDateTime.of(2026, 8, 22, 22, 55, 16));
         when(departmentService.list()).thenReturn(List.of());
         when(dictService.listDictDataByGroupCode(any())).thenReturn(List.of());
         when(profileService.all()).thenReturn(List.of());
@@ -135,7 +141,7 @@ class UserImportServiceImplTest {
         task.setTotalRows(1);
         task.setErrorRows(1);
         task.setProfileVersionHash(sha256("profile|MISSING"));
-        task.setRequestHash(sha256("file-hash\u001ffalse\u001e\u001fzhangsan\u001f张三\u001f13800138000"
+        task.setRequestHash(sha256("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001f13800138000"
                 + "\u001fzhangsan@example.com\u001fdept\u001fzh-CN\u001fAsia/Shanghai\u001fprofile"));
         when(taskMapper.selectOne(any())).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));
@@ -168,7 +174,7 @@ class UserImportServiceImplTest {
 
     private UserImportRow errorRow() {
         var normalized = new LinkedHashMap<String, Object>();
-        normalized.put("username", "zhangsan");
+        normalized.put("employee_no", "EMP-001");
         normalized.put("real_name", "张三");
         normalized.put("phone", "13800138000");
         normalized.put("email", "zhangsan@example.com");

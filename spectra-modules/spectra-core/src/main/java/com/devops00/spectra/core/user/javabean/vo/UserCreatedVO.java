@@ -41,7 +41,7 @@ public class UserCreatedVO implements Serializable {
     private UUID id;
 
     /**
-     * 新创建的用户名
+     * 新创建的用户姓名。
      */
-    private String username;
+    private String realName;
 }

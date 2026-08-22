@@ -187,6 +187,7 @@ class RelRoleMenuServiceImplTest {
         var role = new SecurityRole();
         role.setId(id);
         role.setState("ACTIVE");
+        role.setRoleKind("BUSINESS");
         return role;
     }
 

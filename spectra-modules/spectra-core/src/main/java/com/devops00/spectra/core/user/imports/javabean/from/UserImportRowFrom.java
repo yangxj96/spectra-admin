@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.imports.javabean.from;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,9 +26,12 @@ import lombok.Data;
 @Data
 public class UserImportRowFrom {
 
-    @NotBlank(message = "用户名不能为空")
-    @Size(max = 80, message = "用户名不能超过 80 个字符")
-    private String username;
+    /**
+     * 工号由批量导入服务生成，不属于 Excel 或 Preview 请求字段；保留在内部结构中供 Apply 使用。
+     */
+    @JsonIgnore
+    @Size(max = 64, message = "工号不能超过 64 个字符")
+    private String employeeNo;
 
     @NotBlank(message = "真实姓名不能为空")
     @Size(max = 120, message = "真实姓名不能超过 120 个字符")

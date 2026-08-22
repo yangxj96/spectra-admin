@@ -27,7 +27,7 @@ import lombok.ToString;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -54,9 +54,9 @@ public class UserPageVO implements Serializable {
     private UUID id;
 
     /**
-     * 姓名
+     * 工号/员工编号。
      */
-    private String username;
+    private String employeeNo;
 
     /**
      * 头像
@@ -69,6 +69,16 @@ public class UserPageVO implements Serializable {
     private UserStatus status;
 
     /**
+     * 最近一次生命周期变更原因。
+     */
+    private String statusReason;
+
+    /**
+     * 离职时间。
+     */
+    private Instant departedAt;
+
+    /**
      * 当前授权状态。
      */
     private UserAuthorizationStatus authorizationStatus;
@@ -79,16 +89,6 @@ public class UserPageVO implements Serializable {
     private String realName;
 
     /**
-     * 性别
-     */
-    private Short gender;
-
-    /**
-     * 生日
-     */
-    private LocalDate birthday;
-
-    /**
      * 手机号
      */
     private String phone;
@@ -97,16 +97,6 @@ public class UserPageVO implements Serializable {
      * 邮箱
      */
     private String email;
-
-    /**
-     * 国家
-     */
-    private String country;
-
-    /**
-     * 城市
-     */
-    private String city;
 
     /**
      * 语言

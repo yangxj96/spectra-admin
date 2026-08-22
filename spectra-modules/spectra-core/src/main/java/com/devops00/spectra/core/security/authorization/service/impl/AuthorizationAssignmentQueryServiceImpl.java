@@ -37,6 +37,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAssignmentQueryService {
 
     private final RoleAssignmentMapper roleAssignmentMapper;
@@ -83,11 +85,30 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
         var roles = securityRoleMapper.selectBatchIds(roleIds)
                 .stream()
                 .collect(Collectors.toMap(SecurityRole::getId, Function.identity()));
+        var validAssignments = assignments.stream()
+                .filter(assignment -> {
+                    var role = roles.get(assignment.getRoleId());
+                    if (role == null || role.getCode() == null) {
+                        log.warn(
+                                "忽略引用已删除角色的 RoleAssignment: assignmentId={}, userId={}, roleId={}",
+                                assignment.getId(),
+                                assignment.getUserId(),
+                                assignment.getRoleId());
+                        return false;
+                    }
+                    return true;
+                })
+                .toList();
+        if (validAssignments.isEmpty()) {
+            return List.of();
+        }
+
+        roleIds = validAssignments.stream().map(RoleAssignment::getRoleId).collect(Collectors.toSet());
         var rolePermissionCounts = rolePermissionMapper.selectList(
-                        new LambdaQueryWrapper<RolePermission>().in(RolePermission::getRoleId, roleIds))
+                new LambdaQueryWrapper<RolePermission>().in(RolePermission::getRoleId, roleIds))
                 .stream()
                 .collect(Collectors.groupingBy(RolePermission::getRoleId, Collectors.counting()));
-        var assignmentIds = assignments.stream().map(RoleAssignment::getId).collect(Collectors.toSet());
+        var assignmentIds = validAssignments.stream().map(RoleAssignment::getId).collect(Collectors.toSet());
         var accessRows = permissionBoundaryMapper.selectList(
                 new LambdaQueryWrapper<AssignmentPermissionBoundary>()
                         .in(AssignmentPermissionBoundary::getAssignmentId, assignmentIds));
@@ -123,11 +144,8 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
         var grantByAssignment = grantRows.stream()
                 .collect(Collectors.groupingBy(AssignmentGrantBoundary::getAssignmentId));
 
-        return assignments.stream().map(assignment -> {
+        return validAssignments.stream().map(assignment -> {
             var role = roles.get(assignment.getRoleId());
-            if (role == null || role.getCode() == null) {
-                throw new IllegalStateException("RoleAssignment 引用了不存在的 Role: " + assignment.getRoleId());
-            }
             return new AuthorizationAssignmentView(
                     assignment.getId(),
                     assignment.getUserId(),
