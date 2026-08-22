@@ -179,8 +179,6 @@
                         </includes>
                         <eclipse>
                             <file>${spotless.eclipse.formatterPath}</file>
-                            <!-- 将 Equo/Solstice P2 缓存放在 -Dmaven.repo.local 指定的 Maven 本地仓库。 -->
-                            <cacheDirectory>${maven.repo.local}/dev/equo/p2-data</cacheDirectory>
                         </eclipse>
                         <trimTrailingWhitespace/>
                     </java>
