@@ -23,9 +23,10 @@ import com.devops00.spectra.core.user.javabean.from.*;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
-import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
+import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.user.service.UserOnboardingService;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
@@ -52,25 +53,29 @@ public class UserController {
 
     private final UserService bindService;
 
+    private final UserOnboardingService onboardingService;
+
     private final SecurityContextAccessor securityContextAccessor;
 
-    public UserController(UserService bindService, SecurityContextAccessor securityContextAccessor) {
+    public UserController(UserService bindService, UserOnboardingService onboardingService,
+                          SecurityContextAccessor securityContextAccessor) {
         this.bindService = bindService;
+        this.onboardingService = onboardingService;
         this.securityContextAccessor = securityContextAccessor;
     }
 
-    @ULog("'创建用户'")
-    @PostMapping(version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'user:create')")
-    public UserCreatedVO created(@Validated(Verify.Insert.class) @RequestBody UserSaveFrom params) {
-        return bindService.create(params);
+    @ULog("'提交新增用户及角色授权'")
+    @PostMapping(value = "/onboarding", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")
+    public UserOnboardingVO onboarding(@Validated(Verify.Insert.class) @RequestBody UserOnboardingFrom params) {
+        return onboardingService.submit(params);
     }
 
-    @ULog("'根据ID更新用户信息'")
-    @PutMapping(version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'user:update')")
-    public void modify(@Validated(Verify.Update.class) @RequestBody UserSaveFrom params) {
-        bindService.modify(params);
+    @ULog("'提交用户信息及角色授权变更'")
+    @PutMapping(value = "/onboarding", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'user:update') and hasPermission(null, 'role:assign')")
+    public UserOnboardingVO modifyOnboarding(@Validated(Verify.Update.class) @RequestBody UserOnboardingFrom params) {
+        return onboardingService.submit(params);
     }
 
     @ULog("'重置用户密码'")

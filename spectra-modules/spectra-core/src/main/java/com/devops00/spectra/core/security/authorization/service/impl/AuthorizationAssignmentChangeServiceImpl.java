@@ -30,6 +30,7 @@ import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentRemovalFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationBoundaryFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationScopeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
@@ -165,6 +166,68 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
             UUID persistedAssignmentId = persist(prepared, targetUserId);
             recordAssignmentEvents(prepared, targetUserId, persistedAssignmentId);
             epochGuard.advance(targetUserId, prepared.targetSecurityVersion());
+            sessionRevocationPort.revokeUserSessions(targetUserId);
+            return Boolean.TRUE;
+        });
+    }
+
+    @Override
+    @Transactional
+    public void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from) {
+        if (targetUserId == null
+                || from == null
+                || from.getAssignmentId() == null
+                || from.getExpectedVersion() == null) {
+            throw new DataException("角色授权移除参数不能为空");
+        }
+        var target = userMapper.selectById(targetUserId);
+        if (target == null) {
+            throw new DataNotExistException("目标用户不存在");
+        }
+        if (target.getStatus() == null || !"ACTIVE".equals(target.getStatus().getCode())) {
+            throw new DataException("只有 ACTIVE 用户可以移除授权 Assignment");
+        }
+        var assignment = roleAssignmentMapper.selectById(from.getAssignmentId());
+        if (assignment == null || !targetUserId.equals(assignment.getUserId())) {
+            throw new DataNotExistException("待移除的角色授权不存在");
+        }
+        if (!"ACTIVE".equals(assignment.getState())) {
+            throw new DataException("待移除的角色授权已经不是生效状态");
+        }
+        long assignmentVersion = assignment.getVersion() == null ? 0L : assignment.getVersion();
+        if (assignmentVersion != from.getExpectedVersion()) {
+            throw new DataException("角色授权版本已变化，请刷新后重试");
+        }
+        long targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
+        epochGuard.assertCurrent(targetUserId, targetSecurityVersion);
+        var operatorId = currentOperatorId();
+        var approvalGate = approvalGateProvider.getIfAvailable();
+        if (approvalGate != null) {
+            approvalGate.assertAllowed("ROLE_ASSIGNMENT_REVOKE",
+                    requestHash(assignment.getId(), assignment.getRoleId(), from.getExpectedVersion(),
+                            targetSecurityVersion, List.of()));
+        }
+
+        var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
+                targetUserId, null, null, null,
+                Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
+                Map.of("state", "REVOKED"), "移除用户角色授权", null, AuditResult.STARTED, null);
+        securityChangeExecutor.execute(event, () -> {
+            var update = new LambdaUpdateWrapper<RoleAssignment>()
+                    .eq(RoleAssignment::getId, assignment.getId())
+                    .eq(RoleAssignment::getUserId, targetUserId)
+                    .eq(RoleAssignment::getState, "ACTIVE")
+                    .eq(RoleAssignment::getVersion, from.getExpectedVersion())
+                    .set(RoleAssignment::getState, "REVOKED")
+                    .set(RoleAssignment::getValidUntil, Instant.now())
+                    .set(RoleAssignment::getVersion, from.getExpectedVersion() + 1L);
+            if (roleAssignmentMapper.update(null, update) != 1) {
+                throw new DataException("移除角色授权失败，授权版本可能已变化");
+            }
+            appendAudit("ROLE_ASSIGNMENT_REVOKED", operatorId, targetUserId,
+                    Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
+                    Map.of("state", "REVOKED"), "移除用户角色授权");
+            epochGuard.advance(targetUserId, targetSecurityVersion);
             sessionRevocationPort.revokeUserSessions(targetUserId);
             return Boolean.TRUE;
         });

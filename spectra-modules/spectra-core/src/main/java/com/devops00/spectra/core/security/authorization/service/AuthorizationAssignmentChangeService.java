@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authorization.service;
 
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
+import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentRemovalFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
 
 import java.util.UUID;
@@ -40,4 +41,12 @@ public interface AuthorizationAssignmentChangeService {
      * 校验 Preview token 并原子应用 RoleAssignment 与其 Boundary。
      */
     void apply(UUID targetUserId, AuthorizationAssignmentApplyFrom from);
+
+    /**
+     * 撤销目标用户的一个活动 RoleAssignment。
+     *
+     * @param targetUserId 目标用户
+     * @param from         撤销请求
+     */
+    void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from);
 }
