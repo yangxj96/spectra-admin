@@ -77,7 +77,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AuthorizationProfileServiceImpl extends BaseServiceImpl<AuthorizationProfileMapper, AuthorizationProfile>
-        implements AuthorizationProfileService {
+        implements
+            AuthorizationProfileService {
 
     private final AuthorizationProfileAssignmentMapper assignmentMapper;
 
@@ -145,6 +146,28 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
 
     @Override
     @Transactional
+    public void enable(UUID id) {
+        var profile = getById(id);
+        if (profile == null) {
+            throw new DataNotExistException("授权方案不存在");
+        }
+        if ("ACTIVE".equals(profile.getState())) {
+            return;
+        }
+        var currentVersion = profile.getVersion() == null ? 0L : profile.getVersion();
+        var update = new LambdaUpdateWrapper<AuthorizationProfile>()
+                .eq(AuthorizationProfile::getId, id)
+                .eq(AuthorizationProfile::getVersion, currentVersion)
+                .set(AuthorizationProfile::getState, "ACTIVE")
+                .set(AuthorizationProfile::getVersion, currentVersion + 1L);
+        if (!update(update)) {
+            throw new DataException("授权方案版本并发变化，启用已拒绝");
+        }
+        log.info("启用授权方案成功: id={}", id);
+    }
+
+    @Override
+    @Transactional
     public void disable(UUID id) {
         var profile = getById(id);
         if (profile == null) {
@@ -163,6 +186,28 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
             throw new DataException("授权方案版本并发变化，停用已拒绝");
         }
         log.info("停用授权方案成功: id={}", id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID id) {
+        var profile = getById(id);
+        if (profile == null) {
+            throw new DataNotExistException("授权方案不存在");
+        }
+        var assignments = assignmentMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
+                .eq(AuthorizationProfileAssignment::getProfileId, id));
+        if (!assignments.isEmpty()) {
+            var assignmentIds = assignments.stream().map(AuthorizationProfileAssignment::getId).toList();
+            boundaryMapper.delete(new LambdaQueryWrapper<AuthorizationProfileBoundary>()
+                    .in(AuthorizationProfileBoundary::getProfileAssignmentId, assignmentIds));
+            assignmentMapper.delete(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
+                    .in(AuthorizationProfileAssignment::getId, assignmentIds));
+        }
+        if (!removeById(id)) {
+            throw new DataException("删除授权方案失败");
+        }
+        log.info("删除授权方案成功: id={}, code={}", id, profile.getCode());
     }
 
     @Override
@@ -217,18 +262,18 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
             throw new DataException("授权方案至少需要一个 Permission Boundary: " + role.getCode());
         }
         var rolePermissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
-                        .eq(RolePermission::getRoleId, role.getId()))
+                .eq(RolePermission::getRoleId, role.getId()))
                 .stream()
                 .map(RolePermission::getPermissionId)
                 .collect(Collectors.toSet());
         var grantablePermissionIds = roleGrantablePermissionMapper.selectList(
-                        new LambdaQueryWrapper<RoleGrantablePermission>().eq(RoleGrantablePermission::getRoleId, role.getId()))
+                new LambdaQueryWrapper<RoleGrantablePermission>().eq(RoleGrantablePermission::getRoleId, role.getId()))
                 .stream()
                 .map(RoleGrantablePermission::getPermissionId)
                 .collect(Collectors.toSet());
         var codes = boundaries.stream().map(item -> item.getPermission().trim()).toList();
         var permissions = permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
-                        .in(Permission::getCode, codes))
+                .in(Permission::getCode, codes))
                 .stream()
                 .collect(Collectors.toMap(Permission::getCode, item -> item));
         var seen = new HashSet<String>();
@@ -352,7 +397,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         result.setState(profile.getState());
         result.setVersion(profile.getVersion() == null ? 0L : profile.getVersion());
         result.setAssignments(assignmentMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
-                        .eq(AuthorizationProfileAssignment::getProfileId, profile.getId()))
+                .eq(AuthorizationProfileAssignment::getProfileId, profile.getId()))
                 .stream()
                 .map(this::toAssignmentVO)
                 .toList());
@@ -364,7 +409,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         result.setRoleCode(assignment.getRoleCode());
         result.setRoleVersion(assignment.getRoleVersion());
         result.setBoundaries(boundaryMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileBoundary>()
-                        .eq(AuthorizationProfileBoundary::getProfileAssignmentId, assignment.getId()))
+                .eq(AuthorizationProfileBoundary::getProfileAssignmentId, assignment.getId()))
                 .stream()
                 .map(this::toBoundaryVO)
                 .toList());

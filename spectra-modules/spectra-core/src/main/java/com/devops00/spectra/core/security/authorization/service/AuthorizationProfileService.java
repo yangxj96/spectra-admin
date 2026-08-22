@@ -49,11 +49,25 @@ public interface AuthorizationProfileService extends BaseService<AuthorizationPr
     void modify(UUID id, AuthorizationProfileSaveFrom params);
 
     /**
+     * 启用授权方案。
+     *
+     * @param id 方案 ID
+     */
+    void enable(UUID id);
+
+    /**
      * 停用授权方案。
      *
      * @param id 方案 ID
      */
     void disable(UUID id);
+
+    /**
+     * 删除授权方案。
+     *
+     * @param id 方案 ID
+     */
+    void deleteById(UUID id);
 
     /**
      * 查询可见授权方案。

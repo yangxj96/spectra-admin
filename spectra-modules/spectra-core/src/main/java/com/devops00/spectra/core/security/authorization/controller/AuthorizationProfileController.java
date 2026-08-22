@@ -81,10 +81,24 @@ public class AuthorizationProfileController {
         profileService.modify(id, params);
     }
 
+    @ULog("'启用授权方案'")
+    @PutMapping(value = "/{id}/enable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'role:grant')")
+    public void enable(@PathVariable UUID id) {
+        profileService.enable(id);
+    }
+
     @ULog("'停用授权方案'")
-    @DeleteMapping(value = "/{id}", version = "1.0.0")
+    @PutMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void disable(@PathVariable UUID id) {
         profileService.disable(id);
+    }
+
+    @ULog("'删除授权方案'")
+    @DeleteMapping(value = "/{id}", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'role:grant')")
+    public void deleteById(@PathVariable UUID id) {
+        profileService.deleteById(id);
     }
 }
