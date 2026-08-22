@@ -16,9 +16,7 @@
 
 package com.devops00.spectra.core.system.service;
 
-import com.devops00.spectra.core.system.javabean.vo.CPUInfoVO;
-import com.devops00.spectra.core.system.javabean.vo.JVMInfoVO;
-import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
+import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 
 /**
  * 服务器信息监控
@@ -30,23 +28,9 @@ import com.devops00.spectra.core.system.javabean.vo.RAMInfoVO;
 public interface ServiceMonitorService {
 
     /**
-     * 获取服务器CPU信息
+     * 获取服务监控总览。
      *
-     * @return 服务器CPU信息
+     * @return 服务监控总览
      */
-    CPUInfoVO getCPUInfo();
-
-    /**
-     * 获取服务器内存信息
-     *
-     * @return 服务器内存信息
-     */
-    RAMInfoVO getRAMInfo();
-
-    /**
-     * 获取JVM信息
-     *
-     * @return JVM信息
-     */
-    JVMInfoVO getJVMInfo();
+    ServiceMonitorOverviewVO getOverview();
 }
