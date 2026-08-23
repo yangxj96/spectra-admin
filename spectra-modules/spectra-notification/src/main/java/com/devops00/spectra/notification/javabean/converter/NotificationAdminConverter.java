@@ -74,6 +74,7 @@ public interface NotificationAdminConverter {
     @Mapping(target = "providerCode", source = "provider")
     @Mapping(target = "status", source = "resultStatus")
     @Mapping(target = "responseSummary", source = "responseSummary", qualifiedByName = "maskSummary")
+    @Mapping(target = "errorMessage", source = "errorMessageSanitized", qualifiedByName = "maskText")
     @Mapping(target = "sentAt", source = "completedAt")
     NotificationDeliveryAdminVO toDeliveryVO(NotificationDeliveryEntity source);
 

@@ -208,6 +208,22 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
+     * 查询通知投递记录的脱敏详情摘要。
+     */
+    @Override
+    public NotificationDeliveryAdminVO getDelivery(UUID deliveryId) {
+        var entity = deliveryMapper.selectById(deliveryId);
+        if (entity == null) {
+            throw new DataNotExistException("通知投递记录不存在");
+        }
+        var task = taskMapper.selectById(entity.getNotificationTaskId());
+        if (task != null) {
+            entity.setChannel(task.getChannel());
+        }
+        return converter.toDeliveryVO(entity);
+    }
+
+    /**
      * 统计任务状态和渠道；渠道参数为空时统计全部渠道。
      */
     private long countTasks(Set<String> statuses, String channel) {
@@ -364,20 +380,10 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
         var range = resolveQueryRange(params);
-        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>().orderByDesc(NotificationDeliveryEntity::getCreatedAt);
-        if (range.from() != null) {
-            wrapper.ge(NotificationDeliveryEntity::getCreatedAt, range.from())
-                    .lt(NotificationDeliveryEntity::getCreatedAt, range.to());
-        }
-        if (params != null) {
-            if (params.getTaskId() != null) {
-                wrapper.eq(NotificationDeliveryEntity::getNotificationTaskId, params.getTaskId());
-            }
-            if (StringUtils.hasText(params.getStatus())) {
-                wrapper.eq(NotificationDeliveryEntity::getResultStatus, params.getStatus());
-            }
-        }
-        return converter.toDeliveryPage(deliveryMapper.selectPage(page.toPage(), wrapper));
+        return converter.toDeliveryPage(deliveryMapper.selectAdminPage(page.toPage(), range.from(), range.to(),
+                params == null ? null : params.getRequestId(), params == null ? null : params.getTaskId(),
+                params == null ? null : params.getRecipientUserId(), params == null ? null : params.getStatus(),
+                params == null ? null : params.getChannel()));
     }
 
     /**

@@ -40,6 +40,10 @@ public class NotificationDeliveryAdminVO {
      */
     private UUID taskId;
     /**
+     * 所属任务的投递渠道。
+     */
+    private String channel;
+    /**
      * 投递时锁定的模板版本 ID。
      */
     private UUID templateId;
@@ -67,6 +71,14 @@ public class NotificationDeliveryAdminVO {
      * 已脱敏的供应商响应摘要。
      */
     private String responseSummary;
+    /**
+     * 脱敏投递错误码。
+     */
+    private String errorCode;
+    /**
+     * 脱敏投递错误信息。
+     */
+    private String errorMessage;
     /**
      * 成功发送时间。
      */

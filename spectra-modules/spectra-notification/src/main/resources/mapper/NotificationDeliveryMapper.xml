@@ -40,6 +40,12 @@
         <result column="duration_ms"              property="durationMs"/>
         <result column="response_summary"         property="responseSummary" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
     </resultMap>
+
+    <resultMap id="AdminResultMap"
+               extends="BaseResultMap"
+               type="com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity">
+        <result column="channel" property="channel"/>
+    </resultMap>
     <!-- @formatter:on -->
 
     <resultMap id="OverviewTrendMap"
@@ -93,6 +99,35 @@
            AND created_at &lt; #{to}
          GROUP BY date_trunc('hour', created_at)
          ORDER BY bucket_at ASC
+    </select>
+
+    <select id="selectAdminPage" resultMap="AdminResultMap">
+        SELECT d.*,
+               t.channel AS channel
+          FROM spectra_notification.ntf_delivery d
+          JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
+         WHERE d.deleted IS NULL
+           AND t.deleted IS NULL
+        <if test="from != null">
+           AND d.created_at &gt;= #{from}
+           AND d.created_at &lt; #{to}
+        </if>
+        <if test="requestId != null">
+           AND t.notification_request_id = #{requestId}
+        </if>
+        <if test="taskId != null">
+           AND d.notification_task_id = #{taskId}
+        </if>
+        <if test="recipientUserId != null">
+           AND t.receiver_user_id = #{recipientUserId}
+        </if>
+        <if test="status != null and status != ''">
+           AND d.result_status = #{status}
+        </if>
+        <if test="channel != null and channel != ''">
+           AND t.channel = #{channel}
+        </if>
+         ORDER BY d.created_at DESC
     </select>
 
     <select id="selectRecentErrors" resultMap="OverviewErrorMap">

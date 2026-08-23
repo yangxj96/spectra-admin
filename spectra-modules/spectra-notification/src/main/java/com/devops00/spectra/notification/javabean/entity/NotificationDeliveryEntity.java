@@ -48,6 +48,11 @@ public class NotificationDeliveryEntity extends BaseEntity {
     @TableField("notification_task_id")
     private UUID notificationTaskId;
     /**
+     * 所属任务的投递渠道；仅用于管理端联表查询，不落库。
+     */
+    @TableField(exist = false)
+    private String channel;
+    /**
      * 投递时锁定的模板版本 ID。
      */
     @TableField("template_id")

@@ -63,6 +63,9 @@ class NotificationAdminControllerTest {
         assertEquals(readExpression, NotificationAdminController.class.getMethod("getTask", UUID.class)
                 .getAnnotation(PreAuthorize.class)
                 .value());
+        assertEquals(readExpression, NotificationAdminController.class.getMethod("getDelivery", UUID.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageRequests", PageFrom.class,
                 NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)

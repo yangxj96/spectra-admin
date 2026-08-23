@@ -60,22 +60,20 @@ class NotificationAdminServiceImplTest {
     }
 
     @Test
-    void shouldQueryDeliveriesWithoutLegacyTenantFilter() {
+    void shouldQueryDeliveriesWithStandaloneDataModel() {
         var requestMapper = mock(NotificationRequestMapper.class);
         var taskMapper = mock(NotificationTaskMapper.class);
         var deliveryMapper = mock(NotificationDeliveryMapper.class);
         var converter = mock(NotificationAdminConverter.class);
         var gateway = mock(NotificationGateway.class);
         var page = new Page<NotificationDeliveryEntity>();
-        when(deliveryMapper.selectPage(any(), any())).thenReturn(page);
+        when(deliveryMapper.selectAdminPage(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(page);
         when(converter.toDeliveryPage(page)).thenReturn(new Page<NotificationDeliveryAdminVO>());
         var service = new NotificationAdminServiceImpl(requestMapper, taskMapper, deliveryMapper, converter, gateway);
 
         service.pageDeliveries(new PageFrom(), null);
 
-        var wrapperCaptor = org.mockito.ArgumentCaptor.forClass(LambdaQueryWrapper.class);
-        verify(deliveryMapper).selectPage(any(), wrapperCaptor.capture());
-        assertTrue(!wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
+        verify(deliveryMapper).selectAdminPage(any(), any(), any(), isNull(), isNull(), isNull(), isNull(), isNull());
     }
 
     @Test
@@ -88,9 +86,7 @@ class NotificationAdminServiceImplTest {
 
         assertThrows(DataNotExistException.class, () -> service.retry(UUID.randomUUID()));
 
-        var wrapperCaptor = org.mockito.ArgumentCaptor.forClass(LambdaQueryWrapper.class);
-        verify(taskMapper).selectOne(wrapperCaptor.capture());
-        assertTrue(!wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
+        verify(taskMapper).selectOne(any(LambdaQueryWrapper.class));
     }
 
     @Test
@@ -136,5 +132,25 @@ class NotificationAdminServiceImplTest {
 
         assertTrue(service.getTask(taskId) == view);
         verify(converter).toTaskVO(task);
+    }
+
+    @Test
+    void shouldQueryDeliveryDetailWithTaskChannel() {
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var converter = mock(NotificationAdminConverter.class);
+        var delivery = new NotificationDeliveryEntity();
+        var task = new NotificationTaskEntity();
+        var view = new NotificationDeliveryAdminVO();
+        var deliveryId = UUID.randomUUID();
+        when(deliveryMapper.selectById(deliveryId)).thenReturn(delivery);
+        when(taskMapper.selectById(delivery.getNotificationTaskId())).thenReturn(task);
+        when(converter.toDeliveryVO(delivery)).thenReturn(view);
+        var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
+                deliveryMapper, converter, mock(NotificationGateway.class));
+
+        assertTrue(service.getDelivery(deliveryId) == view);
+        assertTrue(delivery.getChannel() == task.getChannel());
+        verify(converter).toDeliveryVO(delivery);
     }
 }

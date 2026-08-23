@@ -54,6 +54,11 @@ public interface NotificationAdminService {
     NotificationTaskAdminVO getTask(UUID taskId);
 
     /**
+     * 查询通知投递记录详情摘要。
+     */
+    NotificationDeliveryAdminVO getDelivery(UUID deliveryId);
+
+    /**
      * 查询通知渠道是否已配置并可投递。
      */
     NotificationChannelAvailability availability(NotificationChannel channel);

@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * 在真实 PostgreSQL 上验证通知表的事务、唯一约束和 Worker 领取语义。
  *
  * <p>测试只在显式设置 {@code SPECTRA_NOTIFICATION_POSTGRES_TEST=true} 时启用，连接信息从
- * {@code DB_URL}、{@code DB_USERNAME} 和 {@code DB_PASSWORD} 读取。每个测试使用随机租户并在结束时清理，
+ * {@code DB_URL}、{@code DB_USERNAME} 和 {@code DB_PASSWORD} 读取。每个测试使用随机测试数据并在结束时清理，
  * 不依赖本机已有业务数据。</p>
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_NOTIFICATION_POSTGRES_TEST", matches = "true")

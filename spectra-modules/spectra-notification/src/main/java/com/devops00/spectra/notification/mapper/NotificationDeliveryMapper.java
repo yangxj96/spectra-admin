@@ -18,6 +18,7 @@ package com.devops00.spectra.notification.mapper;
 
 import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.vo.NotificationOverviewErrorVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationOverviewTrendVO;
@@ -26,6 +27,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 通知投递 Mapper。
@@ -36,6 +38,19 @@ import java.util.List;
  */
 @Mapper
 public interface NotificationDeliveryMapper extends BaseMapper<NotificationDeliveryEntity> {
+
+    /**
+     * 分页查询投递记录并联表补充任务渠道；查询结果只包含管理端允许展示的字段。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    Page<NotificationDeliveryEntity> selectAdminPage(Page<NotificationDeliveryEntity> page,
+                                                     @Param("from") Instant from,
+                                                     @Param("to") Instant to,
+                                                     @Param("requestId") UUID requestId,
+                                                     @Param("taskId") UUID taskId,
+                                                     @Param("recipientUserId") UUID recipientUserId,
+                                                     @Param("status") String status,
+                                                     @Param("channel") String channel);
 
     /**
      * 查询时间窗口内按小时聚合的投递趋势；聚合 SQL 不返回正文、地址或供应商响应。
