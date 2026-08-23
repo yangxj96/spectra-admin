@@ -19,11 +19,10 @@ package com.devops00.spectra.core.system.service.impl;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -72,12 +71,11 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private final RedisConnectionFactory redisConnectionFactory;
     private final TimeMapper timeMapper;
     private final Environment environment;
-    private final SystemInfo systemInfo = new SystemInfo();
+    private final OperatingSystemMXBean operatingSystem = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
     private final Deque<Sample> history = new ArrayDeque<>(HISTORY_LIMIT);
     private final Object sampleLock = new Object();
 
     private volatile Sample latestSample;
-    private long[] previousCpuTicks;
     private long previousRequestCount = -1L;
     private long previousErrorCount = -1L;
     private long previousRequestNanos = -1L;
@@ -126,15 +124,11 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     private Sample collectSample() {
         var now = Instant.now();
-        var processor = systemInfo.getHardware().getProcessor();
-        var memory = systemInfo.getHardware().getMemory();
-        var currentCpuTicks = processor.getSystemCpuLoadTicks();
-        var cpuUsage = previousCpuTicks == null
-                ? 0D
-                : percentage(processor.getSystemCpuLoadBetweenTicks(previousCpuTicks, currentCpuTicks));
-        previousCpuTicks = currentCpuTicks;
-        var totalMemory = memory.getTotal();
-        var availableMemory = memory.getAvailable();
+        var cpuLoad = operatingSystem.getCpuLoad();
+        var cpuUsage = cpuLoad < 0D ? 0D : percentage(cpuLoad);
+        var logicalCores = operatingSystem.getAvailableProcessors();
+        var totalMemory = operatingSystem.getTotalMemorySize();
+        var availableMemory = operatingSystem.getFreeMemorySize();
         var usedMemory = Math.max(totalMemory - availableMemory, 0L);
         var systemMemoryUsage = ratioAsPercentage(usedMemory, totalMemory);
 
@@ -147,7 +141,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var status = resolveStatus(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics, dependencies);
         var runtime = ManagementFactory.getRuntimeMXBean();
 
-        return new Sample(now, cpuUsage, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
+        return new Sample(now, cpuUsage, logicalCores, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
                 heapUsage.used(), heapUsage.max(), heapUsage.usage(), nonHeapUsage.getUsed(), threadBean.getThreadCount(),
                 threadBean.getPeakThreadCount(), collectGcCount(), requestMetrics.qps(), requestMetrics.errorRate(),
                 requestMetrics.p95ResponseMs(), requestMetrics.available(), dependencies, status,
@@ -247,6 +241,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
         var summary = ServiceMonitorOverviewVO.Summary.builder()
                 .cpuUsage(sample.cpuUsage())
+                .cpuLogicalCores(sample.cpuLogicalCores())
                 .systemMemoryUsage(sample.systemMemoryUsage())
                 .systemMemoryTotalBytes(sample.totalMemory())
                 .systemMemoryUsedBytes(sample.usedMemory())
@@ -358,7 +353,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
-    private record Sample(Instant collectedAt, double cpuUsage, double systemMemoryUsage, long totalMemory,
+    private record Sample(Instant collectedAt, double cpuUsage, int cpuLogicalCores, double systemMemoryUsage,
+                          long totalMemory,
                           long usedMemory, long availableMemory, long jvmHeapUsed, long jvmHeapMax, double jvmHeapUsage,
                           long jvmNonHeapUsed, int liveThreadCount, int peakThreadCount, long gcCount, double qps, double errorRate,
                           double p95ResponseMs, boolean requestMetricsAvailable, List<ServiceMonitorOverviewVO.Dependency> dependencies,

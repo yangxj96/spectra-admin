@@ -81,6 +81,9 @@ public class ServiceMonitorOverviewVO {
         /** CPU 使用率，单位为百分比。 */
         private double cpuUsage;
 
+        /** CPU 逻辑核心数。 */
+        private int cpuLogicalCores;
+
         /** 系统内存使用率，单位为百分比。 */
         private double systemMemoryUsage;
 

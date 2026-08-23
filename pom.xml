@@ -40,7 +40,6 @@
         <apache.tika.version>3.2.3</apache.tika.version>
         <kaptcha.version>2.3.3</kaptcha.version>
         <bitwalker.version>1.21</bitwalker.version>
-        <oshi.version>6.9.1</oshi.version>
         <jetcache.version>2.7.8</jetcache.version>
         <bcprov.version>1.84</bcprov.version>
         <ip2region.version>3.2.1</ip2region.version>
@@ -104,12 +103,6 @@
                 <groupId>eu.bitwalker</groupId>
                 <artifactId>UserAgentUtils</artifactId>
                 <version>${bitwalker.version}</version>
-            </dependency>
-            <!-- 获取系统信息 -->
-            <dependency>
-                <groupId>com.github.oshi</groupId>
-                <artifactId>oshi-core-java25</artifactId>
-                <version>${oshi.version}</version>
             </dependency>
             <!-- 加密补充包 -->
             <dependency>
