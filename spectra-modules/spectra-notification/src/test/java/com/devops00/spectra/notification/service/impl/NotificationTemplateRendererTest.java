@@ -68,6 +68,14 @@ class NotificationTemplateRendererTest {
     }
 
     @Test
+    void shouldRejectContentTemplateThatOnlyContainsOneVariable() {
+        var schema = Map.<String, Object>of("properties", Map.of("content", Map.of("type", "string")));
+
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(schema, "通知", "{{content}}"));
+        renderer.validateDefinition(schema, "通知 {{content}}", "正文：{{content}}");
+    }
+
+    @Test
     void shouldEnforceSensitiveParameterDeclaration() {
         var schema = Map.<String, Object>of("properties", Map.of(
                 "code", Map.of("type", "string", "sensitive", true),

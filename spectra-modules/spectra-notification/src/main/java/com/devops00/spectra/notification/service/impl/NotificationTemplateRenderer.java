@@ -149,9 +149,16 @@ public class NotificationTemplateRenderer {
             unused.removeAll(referenced);
             throw new DataSaveException("模板变量声明与正文不一致: 缺少=" + missing + ", 多余=" + unused);
         }
+        if (templates != null && templates.length > 1 && isOnlyVariable(templates[1])) {
+            throw new DataSaveException("模板正文不能只有一个占位符，请补充通知语义");
+        }
         for (var template : templates == null ? new String[0] : templates) {
             validateHtml(template);
         }
+    }
+
+    private boolean isOnlyVariable(String template) {
+        return template != null && template.trim().matches("\\{\\{\\s*[A-Za-z0-9_.-]+\\s*}}");
     }
 
     /**
