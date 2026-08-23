@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.authorization.domain;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -46,6 +47,14 @@ class UserAuthorizationStatusCalculatorTest {
     @Test
     void returnsActiveWhenEffectiveAssignmentHasAllPermissionBoundaries() {
         var assignment = assignment("ACTIVE", "ACTIVE", 2L, 2, null, null);
+
+        assertThat(UserAuthorizationStatusCalculator.calculate(List.of(assignment), NOW))
+                .isEqualTo(UserAuthorizationStatus.ACTIVE);
+    }
+
+    @Test
+    void returnsActiveWhenEffectiveRootAssignmentHasNoPermissionBoundaries() {
+        var assignment = assignment(RootAuthorizationPolicy.ROOT_ROLE, "ACTIVE", "ACTIVE", 7L, 0, null, null);
 
         assertThat(UserAuthorizationStatusCalculator.calculate(List.of(assignment), NOW))
                 .isEqualTo(UserAuthorizationStatus.ACTIVE);
@@ -92,6 +101,17 @@ class UserAuthorizationStatusCalculatorTest {
                                                           int boundaryCount,
                                                           Instant validFrom,
                                                           Instant validUntil) {
+        return assignment("ROLE_TEST", state, roleState, rolePermissionCount, boundaryCount, validFrom, validUntil);
+    }
+
+    private static AuthorizationAssignmentView assignment(
+                                                          String roleCode,
+                                                          String state,
+                                                          String roleState,
+                                                          long rolePermissionCount,
+                                                          int boundaryCount,
+                                                          Instant validFrom,
+                                                          Instant validUntil) {
         var boundaries = java.util.stream.IntStream.range(0, boundaryCount)
                 .mapToObj(index -> new com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView(
                         "permission:" + index, "NONE", null, List.of()))
@@ -100,7 +120,7 @@ class UserAuthorizationStatusCalculatorTest {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                "ROLE_TEST",
+                roleCode,
                 "BUSINESS",
                 "测试角色",
                 false,

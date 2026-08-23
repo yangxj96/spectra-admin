@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.authorization.domain;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
+import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 
 import java.time.Instant;
 import java.util.List;
@@ -84,7 +85,8 @@ public final class UserAuthorizationStatusCalculator {
             var configuredBoundaryCount = assignment.accessBoundaries() == null
                     ? 0
                     : assignment.accessBoundaries().size();
-            if (requiredPermissionCount == 0 || configuredBoundaryCount >= requiredPermissionCount) {
+            var rootRole = RootAuthorizationPolicy.ROOT_ROLE.equals(assignment.roleCode());
+            if (rootRole || requiredPermissionCount == 0 || configuredBoundaryCount >= requiredPermissionCount) {
                 completeCount++;
             } else {
                 incompleteCount++;
