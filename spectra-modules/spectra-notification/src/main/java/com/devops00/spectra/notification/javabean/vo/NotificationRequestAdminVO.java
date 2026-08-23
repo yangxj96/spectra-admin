@@ -60,6 +60,10 @@ public class NotificationRequestAdminVO {
      * 来源模块。
      */
     private String sourceModule;
+    /** 展开后的接收人数。 */
+    private Integer recipientCount;
+    /** 展开后的投递任务数。 */
+    private Integer taskCount;
     /**
      * 请求状态。
      */

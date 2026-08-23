@@ -18,6 +18,7 @@ package com.devops00.spectra.notification.javabean.from;
 
 import lombok.Data;
 
+import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -29,6 +30,11 @@ import java.util.UUID;
  */
 @Data
 public class NotificationAdminQueryFrom {
+
+    /** 查询开始时间；管理查询最多允许 31 天。 */
+    private Instant startTime;
+    /** 查询结束时间；未传时使用当前时间。 */
+    private Instant endTime;
 
     /**
      * 逻辑通知请求 ID。

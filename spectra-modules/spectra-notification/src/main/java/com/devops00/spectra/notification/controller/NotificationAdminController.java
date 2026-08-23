@@ -64,6 +64,16 @@ public class NotificationAdminController {
     }
 
     /**
+     * 查询逻辑通知请求详情摘要。
+     */
+    @ULog("'查询通知请求详情'")
+    @GetMapping(value = "/requests/{id}", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
+    public NotificationRequestAdminVO getRequest(@PathVariable UUID id) {
+        return service.getRequest(id);
+    }
+
+    /**
      * 查询渠道健康状态；仅返回是否可用及脱敏原因。
      */
     @ULog("'查询通知渠道状态'")

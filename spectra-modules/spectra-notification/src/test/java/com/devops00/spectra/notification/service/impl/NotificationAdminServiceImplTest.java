@@ -28,6 +28,7 @@ import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEnt
 import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
@@ -103,5 +104,21 @@ class NotificationAdminServiceImplTest {
         assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
                 () -> service.overview(new NotificationOverviewFrom(169)));
         verifyNoInteractions(requestMapper, taskMapper, deliveryMapper);
+    }
+
+    @Test
+    void shouldQueryRequestDetailWithoutSensitivePayload() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var entity = new com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity();
+        var view = new NotificationRequestAdminVO();
+        var requestId = UUID.randomUUID();
+        when(requestMapper.selectById(requestId)).thenReturn(entity);
+        var converter = mock(NotificationAdminConverter.class);
+        when(converter.toRequestVO(entity)).thenReturn(view);
+        var service = new NotificationAdminServiceImpl(requestMapper, mock(NotificationTaskMapper.class),
+                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class));
+
+        assertTrue(service.getRequest(requestId) == view);
+        verify(converter).toRequestVO(entity);
     }
 }

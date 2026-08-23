@@ -44,6 +44,11 @@ public interface NotificationAdminService {
     NotificationOverviewVO overview(NotificationOverviewFrom from);
 
     /**
+     * 查询逻辑通知请求详情摘要。
+     */
+    NotificationRequestAdminVO getRequest(UUID requestId);
+
+    /**
      * 查询通知渠道是否已配置并可投递。
      */
     NotificationChannelAvailability availability(NotificationChannel channel);
