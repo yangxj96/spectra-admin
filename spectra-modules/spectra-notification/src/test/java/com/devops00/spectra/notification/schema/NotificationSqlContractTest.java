@@ -61,7 +61,7 @@ class NotificationSqlContractTest {
         assertTrue(schema.contains("attempt_no"));
         assertTrue(schema.contains("is_read"));
         var tableColumns = tableColumns(schema);
-        assertEquals(150, tableColumns.size());
+        assertEquals(151, tableColumns.size());
         assertEquals(tableColumns, commentedColumns(schema));
     }
 

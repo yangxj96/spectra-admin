@@ -314,6 +314,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
             throw new DataSaveException("受控发送模板版本已不可用");
         }
         if (template != null) {
+            templateRenderer.validateParameterSecurity(template.getParameterSchema(), request.parameters(),
+                    request.sensitiveParameters());
             templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());
             return new RenderedContent(template.getId(), template.getVersionNo(), template.getVersionDigest(),

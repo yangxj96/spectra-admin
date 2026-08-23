@@ -36,6 +36,8 @@ public class NotificationTemplateVO {
 
     private String templateGroupCode;
 
+    private String templateName;
+
     private String channel;
 
     private String purpose;

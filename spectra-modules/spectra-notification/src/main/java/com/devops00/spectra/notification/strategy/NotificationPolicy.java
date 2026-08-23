@@ -66,6 +66,9 @@ public class NotificationPolicy {
         var channels = requested == null || requested.isEmpty()
                 ? List.of(NotificationChannel.IN_APP)
                 : requested.stream().distinct().toList();
+        if (channels.stream().anyMatch(channel -> !templateChannels(purpose).contains(channel))) {
+            throw new DataSaveException("通知用途与投递渠道不匹配");
+        }
         if (purpose == NotificationPurpose.SECURITY_ALERT && !channels.contains(NotificationChannel.IN_APP)) {
             throw new DataSaveException("安全告警必须包含站内信渠道");
         }
@@ -139,6 +142,8 @@ public class NotificationPolicy {
         for (var purpose : VERIFICATION_CODE_PURPOSES) {
             matrix.put(purpose, externalChannels);
         }
+        matrix.put(NotificationPurpose.BIND_PHONE_CODE, Set.of(NotificationChannel.SMS));
+        matrix.put(NotificationPurpose.BIND_EMAIL_CODE, Set.of(NotificationChannel.EMAIL));
         return Map.copyOf(matrix);
     }
 }

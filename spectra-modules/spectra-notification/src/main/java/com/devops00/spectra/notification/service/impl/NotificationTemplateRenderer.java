@@ -98,6 +98,36 @@ public class NotificationTemplateRenderer {
     }
 
     /**
+     * 校验模板声明的敏感参数是否按敏感参数通道传入。
+     *
+     * @param parameterSchema     模板参数 JSON Schema
+     * @param parameters          普通参数
+     * @param sensitiveParameters 敏感参数
+     */
+    public void validateParameterSecurity(Map<String, Object> parameterSchema,
+                                          Map<String, ?> parameters,
+                                          Map<String, ?> sensitiveParameters) {
+        var sensitiveVariables = sensitiveVariables(parameterSchema);
+        var ordinary = parameters == null ? Map.<String, Object>of() : parameters;
+        var sensitive = sensitiveParameters == null ? Map.<String, Object>of() : sensitiveParameters;
+        for (var name : ordinary.keySet()) {
+            if (sensitiveVariables.contains(name)) {
+                throw new DataSaveException("模板敏感参数不能作为普通参数传入: " + name);
+            }
+        }
+        for (var name : sensitive.keySet()) {
+            if (!sensitiveVariables.contains(name)) {
+                throw new DataSaveException("请求敏感参数未声明为模板敏感参数: " + name);
+            }
+        }
+        for (var name : sensitiveVariables) {
+            if (!sensitive.containsKey(name) || sensitive.get(name) == null) {
+                throw new DataSaveException("模板缺少敏感参数: " + name);
+            }
+        }
+    }
+
+    /**
      * 校验模板定义与 JSON Schema 声明的变量完全一致。
      *
      * @param parameterSchema 模板参数 JSON Schema
@@ -153,21 +183,54 @@ public class NotificationTemplateRenderer {
      * 从标准 JSON Schema 的 properties 节点提取变量名称。
      */
     private Set<String> declaredVariables(Map<String, Object> parameterSchema) {
+        var propertyMap = propertyDefinitions(parameterSchema);
+        var declared = new LinkedHashSet<String>();
+        for (var entry : propertyMap.entrySet()) {
+            var key = entry.getKey();
+            if (!(key instanceof String name) || !name.matches("[A-Za-z0-9_.-]+")) {
+                throw new DataSaveException("模板参数名称不合法");
+            }
+            validateParameterDefinition(name, entry.getValue());
+            declared.add(name);
+        }
+        return declared;
+    }
+
+    /**
+     * 提取模板参数定义中的敏感字段。
+     */
+    private Set<String> sensitiveVariables(Map<String, Object> parameterSchema) {
+        declaredVariables(parameterSchema);
+        var sensitive = new LinkedHashSet<String>();
+        for (var entry : propertyDefinitions(parameterSchema).entrySet()) {
+            var name = String.valueOf(entry.getKey());
+            validateParameterDefinition(name, entry.getValue());
+            if (Boolean.TRUE.equals(((Map<?, ?>) entry.getValue()).get("sensitive"))) {
+                sensitive.add(name);
+            }
+        }
+        return sensitive;
+    }
+
+    private Map<?, ?> propertyDefinitions(Map<String, Object> parameterSchema) {
         if (parameterSchema == null || parameterSchema.isEmpty()) {
-            return Set.of();
+            return Map.of();
         }
         var properties = parameterSchema.get("properties");
         if (!(properties instanceof Map<?, ?> propertyMap)) {
             throw new DataSaveException("模板参数 schema 必须包含 properties 对象");
         }
-        var declared = new LinkedHashSet<String>();
-        for (var key : propertyMap.keySet()) {
-            if (!(key instanceof String name) || !name.matches("[A-Za-z0-9_.-]+")) {
-                throw new DataSaveException("模板参数名称不合法");
-            }
-            declared.add(name);
+        return propertyMap;
+    }
+
+    private void validateParameterDefinition(String name, Object definition) {
+        if (!(definition instanceof Map<?, ?> property)) {
+            throw new DataSaveException("模板参数定义不合法: " + name);
         }
-        return declared;
+        var sensitive = property.get("sensitive");
+        if (sensitive != null && !(sensitive instanceof Boolean)) {
+            throw new DataSaveException("模板参数敏感标识不合法: " + name);
+        }
     }
 
     /**

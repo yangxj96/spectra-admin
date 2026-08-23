@@ -68,6 +68,29 @@ class NotificationTemplateRendererTest {
     }
 
     @Test
+    void shouldEnforceSensitiveParameterDeclaration() {
+        var schema = Map.<String, Object>of("properties", Map.of(
+                "code", Map.of("type", "string", "sensitive", true),
+                "name", Map.of("type", "string")));
+
+        renderer.validateParameterSecurity(schema, Map.of("name", "Ada"), Map.of("code", "123456"));
+        assertThrows(DataSaveException.class,
+                () -> renderer.validateParameterSecurity(schema, Map.of("name", "Ada", "code", "123456"), Map.of()));
+        assertThrows(DataSaveException.class,
+                () -> renderer.validateParameterSecurity(schema, Map.of("name", "Ada"), Map.of("token", "secret")));
+        assertThrows(DataSaveException.class,
+                () -> renderer.validateParameterSecurity(schema, Map.of("name", "Ada"), Map.of()));
+    }
+
+    @Test
+    void shouldValidateSensitiveFlagType() {
+        var schema = Map.<String, Object>of("properties", Map.of(
+                "code", Map.of("type", "string", "sensitive", "true")));
+
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(schema, "验证码 {{code}}"));
+    }
+
+    @Test
     void shouldRejectIllegalPlaceholders() {
         assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{bad name}}"));
         assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{name"));

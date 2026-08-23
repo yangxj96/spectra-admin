@@ -54,6 +54,12 @@ public class NotificationTemplateSaveFrom {
     private String templateGroupCode;
 
     /**
+     * 模板名称。
+     */
+    @NotBlank(message = "模板名称不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    private String templateName;
+
+    /**
      * 投递渠道。
      */
     @NotNull(message = "通知渠道不能为空", groups = {Verify.Insert.class, Verify.Update.class})

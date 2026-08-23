@@ -46,6 +46,11 @@ public class NotificationTemplateEntity extends BaseEntity {
     @TableField("template_group_code")
     private String templateGroupCode;
     /**
+     * 模板名称。
+     */
+    @TableField("template_name")
+    private String templateName;
+    /**
      * 适用渠道。
      */
     @TableField("channel")

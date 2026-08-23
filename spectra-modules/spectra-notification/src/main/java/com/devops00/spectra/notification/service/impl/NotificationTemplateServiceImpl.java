@@ -42,6 +42,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -108,6 +109,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         var purpose = validateContent(params);
         var entity = new NotificationTemplateEntity();
         entity.setTemplateGroupCode(normalize(params.getTemplateGroupCode()));
+        entity.setTemplateName(normalize(params.getTemplateName()));
         entity.setChannel(params.getChannel().name());
         entity.setPurpose(purpose.name());
         entity.setVersionNo(nextVersionNo(entity.getTemplateGroupCode(), entity.getChannel()));
@@ -144,6 +146,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             throw new DataSaveException("草稿的模板组和渠道不可修改，请创建新的模板版本");
         }
         entity.setPurpose(purpose.name());
+        entity.setTemplateName(normalize(params.getTemplateName()));
         copyContent(params, entity);
         if (mapper.updateById(entity) != 1) {
             throw new DataSaveException("修改通知模板失败");
@@ -234,6 +237,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     private NotificationTemplateEntity copyToDraft(NotificationTemplateEntity source) {
         var draft = new NotificationTemplateEntity();
         draft.setTemplateGroupCode(source.getTemplateGroupCode());
+        draft.setTemplateName(source.getTemplateName());
         draft.setChannel(source.getChannel());
         draft.setPurpose(source.getPurpose());
         draft.setVersionNo(nextVersionNo(source.getTemplateGroupCode(), source.getChannel()));
@@ -263,7 +267,15 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         var purposeValue = policy.parsePurpose(purpose);
         policy.validateTemplateChannel(purposeValue, channel);
         renderer.validateDefinition(schema, title, content, html);
-        renderer.validateAll(params.getParameters(), title, content, html);
+        renderer.validateParameterSecurity(schema, params.getParameters(), params.getSensitiveParameters());
+        var parameters = new HashMap<String, Object>();
+        if (params.getParameters() != null) {
+            parameters.putAll(params.getParameters());
+        }
+        if (params.getSensitiveParameters() != null) {
+            parameters.putAll(params.getSensitiveParameters());
+        }
+        renderer.validateAll(parameters, title, content, html);
 
         var result = new NotificationTemplatePreviewVO();
         result.setTemplateId(template == null ? null : template.getId());
@@ -271,9 +283,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         result.setChannel(channel.name());
         result.setPurpose(purposeValue.name());
         result.setVersionNo(template == null ? null : template.getVersionNo());
-        result.setTitle(renderer.render(title, params.getParameters()));
-        result.setContent(renderer.render(content, params.getParameters()));
-        result.setHtml(renderer.render(html, params.getParameters()));
+        result.setTitle(renderer.render(title, parameters));
+        result.setContent(renderer.render(content, parameters));
+        result.setHtml(renderer.render(html, parameters));
         result.setPreviewedAt(Instant.now());
         return result;
     }
@@ -282,8 +294,10 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         if (params.getChannel() == null) {
             throw new DataSaveException("通知渠道不能为空");
         }
-        if (!StringUtils.hasText(params.getTemplateGroupCode()) || !StringUtils.hasText(params.getPurpose())) {
-            throw new DataSaveException("模板组编码和通知用途不能为空");
+        if (!StringUtils.hasText(params.getTemplateGroupCode())
+                || !StringUtils.hasText(params.getTemplateName())
+                || !StringUtils.hasText(params.getPurpose())) {
+            throw new DataSaveException("模板名称、模板组编码和通知用途不能为空");
         }
         if (!StringUtils.hasText(params.getContentTemplate())) {
             throw new DataSaveException("正文模板不能为空");

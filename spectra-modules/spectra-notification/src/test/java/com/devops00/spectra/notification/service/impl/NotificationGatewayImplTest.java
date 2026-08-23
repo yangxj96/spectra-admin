@@ -157,6 +157,40 @@ class NotificationGatewayImplTest {
     }
 
     @Test
+    void shouldRejectSensitiveTemplateParameterPassedAsOrdinary() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var directory = mock(NotificationRecipientDirectory.class);
+        var recipientId = UUID.randomUUID();
+        var template = new NotificationTemplateEntity();
+        template.setTemplateGroupCode("security.login-code");
+        template.setChannel(NotificationChannel.IN_APP.name());
+        template.setPurpose(NotificationPurpose.SYSTEM_NOTICE.name());
+        template.setState("PUBLISHED");
+        template.setVersionNo(1);
+        template.setContentTemplate("验证码 {{code}}");
+        template.setParameterSchema(java.util.Map.of("properties", java.util.Map.of(
+                "code", java.util.Map.of("type", "string", "sensitive", true))));
+        when(requestMapper.selectOne(any())).thenReturn(null);
+        when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
+        when(taskMapper.selectCount(any())).thenReturn(0L);
+        when(templateMapper.selectOne(any())).thenReturn(template);
+        when(directory.resolve(any())).thenReturn(List.of(
+                new NotificationRecipient(recipientId, null, null, true, true, null)));
+
+        var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
+        var request = new NotificationRequest(null, "test:sensitive-template", NotificationPurpose.SYSTEM_NOTICE,
+                List.of(NotificationChannel.IN_APP), List.of(recipientId), List.of(), "security.login-code",
+                java.util.Map.of("code", "123456"), java.util.Map.of(), "SECURITY", "login", "SECURITY", null,
+                null, null, 0, null);
+
+        assertThrows(DataSaveException.class, () -> gateway.enqueue(request));
+        verify(taskMapper, never()).insert(any(NotificationTaskEntity.class));
+    }
+
+    @Test
     void shouldSkipOptionalChannelWhenUserDisabledIt() {
         var requestMapper = mock(NotificationRequestMapper.class);
         var taskMapper = mock(NotificationTaskMapper.class);

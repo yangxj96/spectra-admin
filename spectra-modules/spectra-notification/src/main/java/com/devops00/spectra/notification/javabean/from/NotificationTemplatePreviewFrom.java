@@ -77,4 +77,9 @@ public class NotificationTemplatePreviewFrom {
      */
     @NotNull(message = "预览参数不能为空")
     private Map<String, Object> parameters;
+
+    /**
+     * 仅用于预览的敏感示例参数，不会写入数据库。
+     */
+    private Map<String, Object> sensitiveParameters;
 }

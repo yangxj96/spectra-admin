@@ -60,9 +60,26 @@ class NotificationPolicyTest {
         policy.validateTemplateChannel(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.SMS);
         policy.validateTemplateChannel(NotificationPurpose.SECURITY_ALERT, NotificationChannel.EMAIL);
         policy.validateTemplateChannel(NotificationPurpose.LOGIN_CODE, NotificationChannel.SMS);
+        policy.validateTemplateChannel(NotificationPurpose.BIND_PHONE_CODE, NotificationChannel.SMS);
+        policy.validateTemplateChannel(NotificationPurpose.BIND_EMAIL_CODE, NotificationChannel.EMAIL);
         assertThrows(DataSaveException.class,
                 () -> policy.validateTemplateChannel(NotificationPurpose.LOGIN_CODE, NotificationChannel.IN_APP));
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateChannel(NotificationPurpose.BIND_PHONE_CODE, NotificationChannel.EMAIL));
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateChannel(NotificationPurpose.BIND_EMAIL_CODE, NotificationChannel.SMS));
         assertEquals(NotificationPurpose.OA_NOTICE, policy.parsePurpose(" oa_notice "));
         assertThrows(DataSaveException.class, () -> policy.parsePurpose("UNKNOWN_PURPOSE"));
+    }
+
+    @Test
+    void shouldRejectChannelsNotSupportedByPurpose() {
+        assertThrows(DataSaveException.class,
+                () -> policy.resolve(NotificationPurpose.BIND_PHONE_CODE, List.of(NotificationChannel.EMAIL)));
+        assertThrows(DataSaveException.class,
+                () -> policy.resolve(NotificationPurpose.BIND_EMAIL_CODE, List.of(NotificationChannel.SMS)));
+        assertEquals(List.of(NotificationChannel.SMS, NotificationChannel.EMAIL),
+                policy.resolve(NotificationPurpose.LOGIN_CODE,
+                        List.of(NotificationChannel.SMS, NotificationChannel.EMAIL)));
     }
 }
