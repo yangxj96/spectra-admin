@@ -80,6 +80,37 @@ public class NotificationPayloadProtector {
     }
 
     /**
+     * 保护 Provider Secret；Secret 只允许以密文形式进入运行时配置存储。
+     */
+    public String protectSecret(String secret) {
+        if (secret == null || secret.isBlank()) {
+            throw new DataSaveException("Provider Secret 不能为空");
+        }
+        return protect(secret, properties.sensitivePayloadKey(), "Provider Secret");
+    }
+
+    /**
+     * 解密 Provider Secret；解密失败时直接阻断渠道使用。
+     */
+    public String unprotectSecret(String ciphertext) {
+        if (ciphertext == null || ciphertext.isBlank()) {
+            throw new DataSaveException("Provider Secret 未配置");
+        }
+        try {
+            var parts = ciphertext.split(":", 3);
+            if (parts.length != 3 || !VERSION.equals(parts[0])) {
+                throw new DataSaveException("Provider Secret 密文格式不正确");
+            }
+            var keyBytes = decodeKey(properties.sensitivePayloadKey(), "Provider Secret");
+            return AESUtils.decrypt(parts[2], new SecretKeySpec(keyBytes, "AES"), AESUtils.hexToIv(parts[1]));
+        } catch (DataSaveException | EncryptException exception) {
+            throw exception;
+        } catch (Exception exception) {
+            throw new EncryptException("Provider Secret 解密失败", exception);
+        }
+    }
+
+    /**
      * 使用配置密钥对文本执行 AES-GCM 加密。
      */
     private String protect(String plainText, String encodedKey, String name) {
