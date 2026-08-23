@@ -53,4 +53,16 @@ class NotificationPolicyTest {
         assertEquals(List.of(NotificationChannel.SMS),
                 policy.resolve(NotificationPurpose.LOGIN_CODE, List.of(NotificationChannel.SMS)));
     }
+
+    @Test
+    void shouldEnforceTemplatePurposeChannelMatrix() {
+        policy.validateTemplateChannel(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.IN_APP);
+        policy.validateTemplateChannel(NotificationPurpose.SYSTEM_NOTICE, NotificationChannel.SMS);
+        policy.validateTemplateChannel(NotificationPurpose.SECURITY_ALERT, NotificationChannel.EMAIL);
+        policy.validateTemplateChannel(NotificationPurpose.LOGIN_CODE, NotificationChannel.SMS);
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateChannel(NotificationPurpose.LOGIN_CODE, NotificationChannel.IN_APP));
+        assertEquals(NotificationPurpose.OA_NOTICE, policy.parsePurpose(" oa_notice "));
+        assertThrows(DataSaveException.class, () -> policy.parsePurpose("UNKNOWN_PURPOSE"));
+    }
 }

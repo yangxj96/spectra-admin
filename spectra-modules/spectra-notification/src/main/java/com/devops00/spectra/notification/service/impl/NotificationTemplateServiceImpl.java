@@ -22,6 +22,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.notification.javabean.converter.NotificationTemplateConverter;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplateActionFrom;
@@ -32,6 +34,7 @@ import com.devops00.spectra.notification.javabean.vo.NotificationTemplatePreview
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateVO;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.service.NotificationTemplateService;
+import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -73,6 +76,8 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     private final NotificationTemplateRenderer renderer;
 
+    private final NotificationPolicy policy;
+
     @Override
     public IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params) {
         var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
@@ -100,11 +105,11 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     @Override
     @Transactional
     public NotificationTemplateVO create(NotificationTemplateSaveFrom params) {
-        validateContent(params);
+        var purpose = validateContent(params);
         var entity = new NotificationTemplateEntity();
         entity.setTemplateGroupCode(normalize(params.getTemplateGroupCode()));
         entity.setChannel(params.getChannel().name());
-        entity.setPurpose(normalize(params.getPurpose()));
+        entity.setPurpose(purpose.name());
         entity.setVersionNo(nextVersionNo(entity.getTemplateGroupCode(), entity.getChannel()));
         entity.setState(DRAFT);
         copyContent(params, entity);
@@ -133,12 +138,12 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         var entity = getTemplate(params.getId());
         ensureState(entity, DRAFT, "只有草稿模板可以编辑");
         ensureVersion(entity, params.getVersion());
-        validateContent(params);
+        var purpose = validateContent(params);
         if (!Objects.equals(entity.getTemplateGroupCode(), normalize(params.getTemplateGroupCode()))
                 || !Objects.equals(entity.getChannel(), params.getChannel().name())) {
             throw new DataSaveException("草稿的模板组和渠道不可修改，请创建新的模板版本");
         }
-        entity.setPurpose(normalize(params.getPurpose()));
+        entity.setPurpose(purpose.name());
         copyContent(params, entity);
         if (mapper.updateById(entity) != 1) {
             throw new DataSaveException("修改通知模板失败");
@@ -246,7 +251,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     public NotificationTemplatePreviewVO preview(NotificationTemplatePreviewFrom params) {
         var template = params.getTemplateId() == null ? null : getTemplate(params.getTemplateId());
         var groupCode = template == null ? null : template.getTemplateGroupCode();
-        var channel = template == null ? params.getChannel() == null ? null : params.getChannel().name() : template.getChannel();
+        var channel = template == null ? params.getChannel() : parseChannel(template.getChannel());
         var purpose = template == null ? normalize(params.getPurpose()) : template.getPurpose();
         var title = template == null ? params.getTitleTemplate() : template.getTitleTemplate();
         var content = template == null ? params.getContentTemplate() : template.getContentTemplate();
@@ -255,14 +260,16 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         if (!StringUtils.hasText(content)) {
             throw new DataSaveException("正文模板不能为空");
         }
+        var purposeValue = policy.parsePurpose(purpose);
+        policy.validateTemplateChannel(purposeValue, channel);
         renderer.validateDefinition(schema, title, content, html);
         renderer.validateAll(params.getParameters(), title, content, html);
 
         var result = new NotificationTemplatePreviewVO();
         result.setTemplateId(template == null ? null : template.getId());
         result.setTemplateGroupCode(groupCode);
-        result.setChannel(channel);
-        result.setPurpose(purpose);
+        result.setChannel(channel.name());
+        result.setPurpose(purposeValue.name());
         result.setVersionNo(template == null ? null : template.getVersionNo());
         result.setTitle(renderer.render(title, params.getParameters()));
         result.setContent(renderer.render(content, params.getParameters()));
@@ -271,7 +278,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return result;
     }
 
-    private void validateContent(NotificationTemplateSaveFrom params) {
+    private NotificationPurpose validateContent(NotificationTemplateSaveFrom params) {
         if (params.getChannel() == null) {
             throw new DataSaveException("通知渠道不能为空");
         }
@@ -281,11 +288,26 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         if (!StringUtils.hasText(params.getContentTemplate())) {
             throw new DataSaveException("正文模板不能为空");
         }
+        var purpose = policy.parsePurpose(params.getPurpose());
+        policy.validateTemplateChannel(purpose, params.getChannel());
         renderer.validateDefinition(params.getParameterSchema(), params.getTitleTemplate(), params.getContentTemplate(), params.getHtmlTemplate());
+        return purpose;
     }
 
     private void validateDefinition(NotificationTemplateEntity entity) {
+        policy.validateTemplateChannel(policy.parsePurpose(entity.getPurpose()), parseChannel(entity.getChannel()));
         renderer.validateDefinition(entity.getParameterSchema(), entity.getTitleTemplate(), entity.getContentTemplate(), entity.getHtmlTemplate());
+    }
+
+    private NotificationChannel parseChannel(String value) {
+        if (!StringUtils.hasText(value)) {
+            throw new DataSaveException("通知渠道不能为空");
+        }
+        try {
+            return NotificationChannel.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException exception) {
+            throw new DataSaveException("通知渠道不合法");
+        }
     }
 
     private void copyContent(NotificationTemplateSaveFrom params, NotificationTemplateEntity entity) {
