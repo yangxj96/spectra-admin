@@ -92,6 +92,32 @@ public class NotificationTemplateRenderer {
     }
 
     /**
+     * 校验模板定义与 JSON Schema 声明的变量完全一致。
+     *
+     * @param parameterSchema 模板参数 JSON Schema
+     * @param templates       标题、正文等模板
+     */
+    public void validateDefinition(Map<String, Object> parameterSchema, String... templates) {
+        var referenced = new LinkedHashSet<String>();
+        if (templates != null) {
+            for (var template : templates) {
+                collectVariables(template, referenced);
+            }
+        }
+        var declared = declaredVariables(parameterSchema);
+        if (!declared.equals(referenced)) {
+            var missing = new LinkedHashSet<>(referenced);
+            missing.removeAll(declared);
+            var unused = new LinkedHashSet<>(declared);
+            unused.removeAll(referenced);
+            throw new DataSaveException("模板变量声明与正文不一致: 缺少=" + missing + ", 多余=" + unused);
+        }
+        for (var template : templates == null ? new String[0] : templates) {
+            validateHtml(template);
+        }
+    }
+
+    /**
      * 校验没有持久化模板时的标题和正文回退值；回退值允许业务参数直接作为正文快照。
      */
     public void validateFallback(String template, Map<String, ?> variables) {
@@ -114,6 +140,27 @@ public class NotificationTemplateRenderer {
         while (matcher.find()) {
             referenced.add(matcher.group(1));
         }
+    }
+
+    /**
+     * 从标准 JSON Schema 的 properties 节点提取变量名称。
+     */
+    private Set<String> declaredVariables(Map<String, Object> parameterSchema) {
+        if (parameterSchema == null || parameterSchema.isEmpty()) {
+            return Set.of();
+        }
+        var properties = parameterSchema.get("properties");
+        if (!(properties instanceof Map<?, ?> propertyMap)) {
+            throw new DataSaveException("模板参数 schema 必须包含 properties 对象");
+        }
+        var declared = new LinkedHashSet<String>();
+        for (var key : propertyMap.keySet()) {
+            if (!(key instanceof String name) || !name.matches("[A-Za-z0-9_.-]+")) {
+                throw new DataSaveException("模板参数名称不合法");
+            }
+            declared.add(name);
+        }
+        return declared;
     }
 
     /**

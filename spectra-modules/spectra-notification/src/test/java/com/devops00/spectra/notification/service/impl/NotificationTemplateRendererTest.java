@@ -55,4 +55,13 @@ class NotificationTemplateRendererTest {
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<img src=x onerror=alert(1) />"));
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<a href=\"javascript:alert(1)\">x</a>"));
     }
+
+    @Test
+    void shouldRequireSchemaPropertiesToMatchTemplateVariables() {
+        var schema = Map.<String, Object>of("properties", Map.of("name", Map.of("type", "string")));
+
+        renderer.validateDefinition(schema, "你好 {{name}}", "正文 {{name}}");
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(schema, "正文 {{missing}}"));
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{name}}"));
+    }
 }

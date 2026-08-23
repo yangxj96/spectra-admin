@@ -86,8 +86,8 @@ public class NotificationTemplateEntity extends BaseEntity {
     @TableField("provider_template_code")
     private String providerTemplateCode;
     /**
-     * 是否启用。
+     * 模板生命周期状态：DRAFT、PUBLISHED、DISABLED 或 ARCHIVED。
      */
-    @TableField("enabled")
-    private Boolean enabled;
+    @TableField("state")
+    private String state;
 }

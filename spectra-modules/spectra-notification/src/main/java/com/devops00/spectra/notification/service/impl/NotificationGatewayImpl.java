@@ -272,7 +272,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var template = templateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
                 .eq(NotificationTemplateEntity::getChannel, channel.name())
-                .eq(NotificationTemplateEntity::getEnabled, true)
+                .eq(NotificationTemplateEntity::getState, "PUBLISHED")
                 .isNull(NotificationTemplateEntity::getDeleted)
                 .orderByDesc(NotificationTemplateEntity::getVersionNo)
                 .last("LIMIT 1"));
