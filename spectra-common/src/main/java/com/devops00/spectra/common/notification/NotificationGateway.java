@@ -16,6 +16,9 @@
 
 package com.devops00.spectra.common.notification;
 
+import java.util.Map;
+import java.util.UUID;
+
 /**
  * 业务模块使用的统一通知入口，隔离具体渠道、模板、重试和持久化实现。
  *
@@ -40,4 +43,13 @@ public interface NotificationGateway {
      * @return 逻辑请求 ID、状态、任务数与幂等重放标记
      */
     NotificationReceipt enqueue(NotificationRequest request);
+
+    /**
+     * 使用受控发送 Preview 锁定的模板版本入队；普通业务调用继续使用按用途和渠道选择的默认版本。
+     *
+     * @param request            不可变通知请求
+     * @param templateVersionIds 渠道到已发布模板版本 ID 的锁定映射
+     * @return 入队回执
+     */
+    NotificationReceipt enqueue(NotificationRequest request, Map<NotificationChannel, UUID> templateVersionIds);
 }

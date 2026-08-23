@@ -17,6 +17,7 @@
 package com.devops00.spectra.notification.service;
 
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
+import com.devops00.spectra.notification.mapper.NotificationSendPreviewMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.properties.NotificationCleanupProperties;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,16 @@ public class NotificationCleanupService {
     private final NotificationCleanupProperties properties;
 
     /**
+     * 短时 Preview 快照 Mapper；精简测试运行时可以不注册。
+     */
+    private NotificationSendPreviewMapper previewMapper;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setPreviewMapper(NotificationSendPreviewMapper previewMapper) {
+        this.previewMapper = previewMapper;
+    }
+
+    /**
      * 定时执行清理；关闭时保持完全无副作用。
      */
     @Scheduled(fixedDelayString = "${spectra.notification.cleanup.fixed-delay-ms:3600000}")
@@ -59,6 +70,9 @@ public class NotificationCleanupService {
         var cutoff = now.minusSeconds(properties.retentionSeconds());
         var requestCount = requestMapper.clearSensitivePayloads(now, cutoff, properties.batchSize());
         var taskCount = taskMapper.clearSensitivePayloads(now, cutoff, properties.batchSize());
+        if (previewMapper != null) {
+            previewMapper.deleteExpired(now, now.minusSeconds(3600));
+        }
         return new NotificationCleanupResult(requestCount, taskCount);
     }
 

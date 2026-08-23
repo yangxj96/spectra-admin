@@ -140,11 +140,28 @@ public class NotificationGatewayImpl implements NotificationGateway {
     @Override
     @Transactional
     public NotificationReceipt enqueue(NotificationRequest request) {
+        return enqueue(request, Map.of());
+    }
+
+    /**
+     * 使用受控发送锁定的模板版本入队。
+     */
+    @Override
+    @Transactional
+    public NotificationReceipt enqueue(NotificationRequest request,
+                                       Map<NotificationChannel, UUID> templateVersionIds) {
         if (!properties.enabled()) {
             throw new DataSaveException("通知模块未启用");
         }
         validate(request);
         var channels = policy.resolve(request.purpose(), request.channels());
+        var lockedTemplateVersions = templateVersionIds == null
+                ? Map.<NotificationChannel, UUID>of()
+                : Map.copyOf(templateVersionIds);
+        if (!lockedTemplateVersions.isEmpty()
+                && channels.stream().anyMatch(channel -> !lockedTemplateVersions.containsKey(channel))) {
+            throw new DataSaveException("受控发送模板版本未覆盖全部渠道");
+        }
         var recipients = recipientDirectory.resolve(request.recipientUserIds());
         var existing = requestMapper.selectOne(new LambdaQueryWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getIdempotencyKey, request.idempotencyKey()));
@@ -202,7 +219,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
                     log.warn("通知收件人缺少已验证渠道地址: userId={}, channel={}", recipient.userId(), channel);
                     continue;
                 }
-                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now, templateSnapshot);
+                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now, templateSnapshot,
+                        lockedTemplateVersions);
             }
         }
         for (var directAddress : request.directAddresses()) {
@@ -210,7 +228,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 continue;
             }
             taskCount += createTask(request, requestId, null, directAddress.channel(), directAddress.address(), now,
-                    templateSnapshot);
+                    templateSnapshot, lockedTemplateVersions);
         }
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, requestId)
@@ -224,7 +242,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
      */
     private int createTask(NotificationRequest request, UUID requestId, UUID recipientUserId,
                            NotificationChannel channel, String address, Instant now,
-                           Map<String, Object> templateSnapshot) {
+                           Map<String, Object> templateSnapshot,
+                           Map<NotificationChannel, UUID> templateVersionIds) {
         var recipientKeyHash = recipientKeyHash(recipientUserId, channel, address);
         if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getNotificationRequestId, requestId)
@@ -234,7 +253,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         }
         var renderParameters = new HashMap<String, Object>(request.parameters());
         renderParameters.putAll(request.sensitiveParameters());
-        var rendered = render(request, channel, renderParameters);
+        var rendered = render(request, channel, renderParameters, templateVersionIds);
         recordTemplateSnapshot(templateSnapshot, channel, rendered);
         var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
         var task = new NotificationTaskEntity();
@@ -275,15 +294,25 @@ public class NotificationGatewayImpl implements NotificationGateway {
      * 优先使用渠道模板渲染内容，没有模板时回退到请求参数。
      */
     private RenderedContent render(NotificationRequest request, NotificationChannel channel,
-                                   Map<String, Object> parameters) {
-        var template = templateMapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
-                .eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
+                                   Map<String, Object> parameters,
+                                   Map<NotificationChannel, UUID> templateVersionIds) {
+        var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getChannel, channel.name())
                 .eq(NotificationTemplateEntity::getPurpose, request.purpose().name())
                 .eq(NotificationTemplateEntity::getState, "PUBLISHED")
-                .isNull(NotificationTemplateEntity::getDeleted)
-                .orderByDesc(NotificationTemplateEntity::getVersionNo)
-                .last("LIMIT 1"));
+                .isNull(NotificationTemplateEntity::getDeleted);
+        var lockedTemplateId = templateVersionIds.get(channel);
+        if (lockedTemplateId != null) {
+            query.eq(NotificationTemplateEntity::getId, lockedTemplateId);
+        } else {
+            query.eq(NotificationTemplateEntity::getTemplateGroupCode, request.templateGroupCode())
+                    .orderByDesc(NotificationTemplateEntity::getVersionNo)
+                    .last("LIMIT 1");
+        }
+        var template = templateMapper.selectOne(query);
+        if (lockedTemplateId != null && template == null) {
+            throw new DataSaveException("受控发送模板版本已不可用");
+        }
         if (template != null) {
             templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());

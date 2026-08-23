@@ -26,7 +26,7 @@ import java.util.UUID;
  * 实现模块不得接受任务状态、Provider Bean 名或重试字段。
  *
  * @param requestId           调用方生成的外部请求 ID；为空时由通知模块生成
- * @param idempotencyKey      业务幂等键，同一租户内重复提交时返回原请求结果
+ * @param idempotencyKey      业务幂等键，同一业务幂等键重复提交时返回原请求结果
  * @param purpose             通知用途，决定渠道策略、模板和用户偏好规则
  * @param channels            显式请求的投递渠道；空集合由通知策略选择默认渠道
  * @param recipientUserIds    系统用户 ID 列表，由收件人目录解析为可用地址
