@@ -20,10 +20,11 @@ import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationDirectAddress;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.security.authentication.service.VerificationCodeService;
 import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
@@ -37,7 +38,6 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -52,14 +52,14 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
     private final RedisTemplate<String, Object> redisTemplate;
     private final SecurityProperties securityProperties;
 
-    public VerificationCodeServiceImpl(NotificationGateway notificationGateway,
+    public VerificationCodeServiceImpl(NotificationService notificationService,
                                        @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
                                        SecurityProperties securityProperties) {
-        this.notificationGateway = notificationGateway;
+        this.notificationService = notificationService;
         this.redisTemplate = redisTemplate;
         this.securityProperties = securityProperties;
     }
@@ -67,33 +67,29 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     @Override
     public void sendSmsCode(String phone) {
         sendCode(phone, NotificationChannel.SMS, RedisCacheKey.LOGIN_SMS_CODE, NotificationPurpose.LOGIN_CODE,
-                "security.login-code.sms", "登录验证码");
+                NotificationTemplateCode.SECURITY_LOGIN_CODE);
     }
 
     @Override
     public void sendEmailCode(String email) {
         sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.LOGIN_EMAIL_CODE, NotificationPurpose.LOGIN_CODE,
-                "security.login-code.email", "登录验证码");
+                NotificationTemplateCode.SECURITY_LOGIN_CODE);
     }
 
     @Override
     public void sendBindingSmsCode(String phone) {
         sendCode(phone, NotificationChannel.SMS, RedisCacheKey.BIND_PHONE_CODE,
-                NotificationPurpose.BIND_PHONE_CODE, "security.bind-phone-code.sms", "绑定手机号验证码");
+                NotificationPurpose.BIND_PHONE_CODE, NotificationTemplateCode.SECURITY_BIND_PHONE_CODE);
     }
 
     @Override
     public void sendBindingEmailCode(String email) {
         sendCode(email, NotificationChannel.EMAIL, RedisCacheKey.BIND_EMAIL_CODE,
-                NotificationPurpose.BIND_EMAIL_CODE, "security.bind-email-code.email", "绑定邮箱验证码");
+                NotificationPurpose.BIND_EMAIL_CODE, NotificationTemplateCode.SECURITY_BIND_EMAIL_CODE);
     }
 
     private void sendCode(String address, NotificationChannel channel, String redisPrefix,
-                          NotificationPurpose purpose, String templateCode, String title) {
-        var availability = notificationGateway.availability(channel);
-        if (!availability.available()) {
-            throw new SpectraException("验证码通知渠道暂不可用: " + availability.reason());
-        }
+                          NotificationPurpose purpose, String templateCode) {
         var redisKey = redisPrefix + address;
         requireHmacKey();
         var code = generateCode();
@@ -108,14 +104,17 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
             var purposeKey = purpose == NotificationPurpose.LOGIN_CODE
                     ? "login-code"
                     : purpose.name().toLowerCase().replace('_', '-');
-            var request = new NotificationRequest(null,
+            var now = Instant.now();
+            NotificationReceipt receipt = notificationService.send(NotificationSendRequest.direct(
                     "security:" + purposeKey + ":" + channel.name() + ":" + address + ":" + requestWindow,
-                    purpose, List.of(channel), List.of(), List.of(new NotificationDirectAddress(channel, address)),
-                    templateCode, Map.of("title", title, "content", "您的验证码为 {{code}}，请在有效期内完成操作。"),
-                    Map.of("code", code), "SECURITY", channel.name() + ":" + address + ":" + requestWindow,
-                    "SECURITY", null, Instant.now(),
-                    Instant.now().plusSeconds(securityProperties.getVerificationCodeExpire()), 100, null);
-            NotificationReceipt receipt = notificationGateway.enqueue(request);
+                    purpose, List.of(new NotificationDirectAddress(channel, address)), templateCode)
+                    .sensitiveParameter("code", code)
+                    .businessReference("SECURITY", channel.name() + ":" + address + ":" + requestWindow)
+                    .sourceModule("SECURITY")
+                    .scheduledAt(now)
+                    .expiresAt(now.plusSeconds(securityProperties.getVerificationCodeExpire()))
+                    .priority(100)
+                    .build());
             if (receipt.taskCount() == 0) {
                 throw new SpectraException("验证码通知未生成投递任务");
             }

@@ -20,9 +20,10 @@ import com.devops00.spectra.ai.configuration.rag.utils.SpectraDocumentParser;
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
@@ -41,6 +42,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 文件上传完成监听
@@ -64,7 +66,7 @@ public class FileUploadFinishListener {
 
     private final AiRAGProperties properties;
 
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
 
     @Async
     @EventListener
@@ -120,20 +122,17 @@ public class FileUploadFinishListener {
         if (fileInfo.getCreatedBy() == null) {
             return;
         }
-        var title = success ? "知识库索引完成" : "知识库索引失败";
-        var content = success
-                ? "文件「" + fileInfo.getOriginalName() + "」已完成知识库索引。"
-                : "文件「" + fileInfo.getOriginalName() + "」知识库索引失败，请稍后重试。";
-        notificationGateway.enqueue(NotificationRequest.inApp(
+        var fileName = Objects.toString(fileInfo.getOriginalName(), "");
+        notificationService.send(NotificationSendRequest.inApp(
                 "ai:rag:index:" + fileInfo.getId() + ":" + (success ? "success" : "failure"),
                 NotificationPurpose.SYSTEM_NOTICE,
                 List.of(fileInfo.getCreatedBy()),
-                "ai.rag.index",
-                title,
-                content,
-                "AI",
-                fileInfo.getId().toString(),
-                "AI",
-                null));
+                NotificationTemplateCode.AI_RAG_INDEX)
+                .parameter("status", success ? "完成" : "失败")
+                .parameter("file_name", fileName)
+                .parameter("message", success ? "已完成知识库索引。" : "知识库索引失败，请稍后重试。")
+                .businessReference("AI", fileInfo.getId().toString())
+                .sourceModule("AI")
+                .build());
     }
 }

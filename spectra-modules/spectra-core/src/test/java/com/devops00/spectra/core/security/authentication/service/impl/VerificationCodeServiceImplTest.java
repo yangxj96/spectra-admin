@@ -18,11 +18,10 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.common.notification.NotificationChannelAvailability;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -48,23 +46,21 @@ class VerificationCodeServiceImplTest {
 
     @Test
     void shouldStoreDigestAndSendSensitiveRequest() throws Exception {
-        var gateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var redisTemplate = mock(RedisTemplate.class);
         var valueOperations = mock(ValueOperations.class);
-        when(gateway.availability(NotificationChannel.SMS))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
-        when(gateway.enqueue(any(NotificationRequest.class)))
+        when(notificationService.send(any(NotificationSendRequest.class)))
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, redisTemplate, properties);
 
         service.sendSmsCode("13800138000");
 
-        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(gateway).enqueue(requestCaptor.capture());
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationSendRequest.class);
+        verify(notificationService).send(requestCaptor.capture());
         var request = requestCaptor.getValue();
         var code = request.sensitiveParameters().get("code").toString();
         assertTrue(code.matches("\\d{6}"));
@@ -76,41 +72,37 @@ class VerificationCodeServiceImplTest {
 
     @Test
     void shouldNotCreateAnotherRequestWhenCodeWindowAlreadyExists() {
-        var gateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var redisTemplate = mock(RedisTemplate.class);
         var valueOperations = mock(ValueOperations.class);
-        when(gateway.availability(NotificationChannel.SMS))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(false);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, redisTemplate, properties);
 
         service.sendSmsCode("13800138000");
 
-        verify(gateway, never()).enqueue(any(NotificationRequest.class));
+        verifyNoInteractions(notificationService);
     }
 
     @Test
     void shouldUseDedicatedPurposeAndKeyForBindingCode() {
-        var gateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var redisTemplate = mock(RedisTemplate.class);
         var valueOperations = mock(ValueOperations.class);
-        when(gateway.availability(NotificationChannel.SMS))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
-        when(gateway.enqueue(any(NotificationRequest.class)))
+        when(notificationService.send(any(NotificationSendRequest.class)))
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, redisTemplate, properties);
 
         service.sendBindingSmsCode("13800138000");
 
-        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(gateway).enqueue(requestCaptor.capture());
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationSendRequest.class);
+        verify(notificationService).send(requestCaptor.capture());
         var request = requestCaptor.getValue();
         var code = request.sensitiveParameters().get("code").toString();
         assertTrue(request.purpose() == NotificationPurpose.BIND_PHONE_CODE);
@@ -122,17 +114,15 @@ class VerificationCodeServiceImplTest {
 
     @Test
     void shouldDeleteDigestWhenGatewayEnqueueFails() {
-        var gateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var redisTemplate = mock(RedisTemplate.class);
         var valueOperations = mock(ValueOperations.class);
-        when(gateway.availability(NotificationChannel.EMAIL))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.EMAIL, true, "AVAILABLE"));
-        when(gateway.enqueue(any(NotificationRequest.class))).thenThrow(new IllegalStateException("mock failure"));
+        when(notificationService.send(any(NotificationSendRequest.class))).thenThrow(new IllegalStateException("mock failure"));
         when(redisTemplate.opsForValue()).thenReturn(valueOperations);
         when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
         var properties = new SecurityProperties();
         properties.setVerificationCodeHmacKey("test-verification-hmac-key");
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, properties);
+        var service = new VerificationCodeServiceImpl(notificationService, redisTemplate, properties);
 
         assertThrows(RuntimeException.class, () -> service.sendEmailCode("user@example.com"));
 
@@ -140,30 +130,14 @@ class VerificationCodeServiceImplTest {
     }
 
     @Test
-    void shouldRejectUnavailableChannelBeforeWritingRedis() {
-        var gateway = mock(NotificationGateway.class);
-        var redisTemplate = mock(RedisTemplate.class);
-        when(gateway.availability(NotificationChannel.SMS))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, false,
-                        "CHANNEL_NOT_CONFIGURED"));
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, new SecurityProperties());
-
-        assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
-
-        verifyNoInteractions(redisTemplate);
-    }
-
-    @Test
     void shouldRejectMissingHmacKeyBeforeWritingRedis() {
-        var gateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var redisTemplate = mock(RedisTemplate.class);
-        when(gateway.availability(NotificationChannel.SMS))
-                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
-        var service = new VerificationCodeServiceImpl(gateway, redisTemplate, new SecurityProperties());
+        var service = new VerificationCodeServiceImpl(notificationService, redisTemplate, new SecurityProperties());
 
         assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
 
         verifyNoInteractions(redisTemplate);
-        verify(gateway, never()).enqueue(any(NotificationRequest.class));
+        verifyNoInteractions(notificationService);
     }
 }

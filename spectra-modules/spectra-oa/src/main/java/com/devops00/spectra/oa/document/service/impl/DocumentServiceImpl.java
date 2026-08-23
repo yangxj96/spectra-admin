@@ -24,9 +24,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.document.javabean.converter.DocumentConverter;
@@ -55,6 +56,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -80,7 +82,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private final DocumentFolderMapper folderMapper;
     private final FileInfoService fileInfoService;
     private final FileUploadFacade fileUploadFacade;
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
     private final UserService userService;
     private final DocumentConverter documentConverter;
     private final SecurityContextAccessor securityContextAccessor;
@@ -351,10 +353,14 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             if (receiverIds.isEmpty()) {
                 return;
             }
-            notificationGateway.enqueue(NotificationRequest.inApp("oa:document:" + document.getId() + ":publish",
-                    NotificationPurpose.OA_NOTICE, receiverIds, "oa.document.published", "文档已发布: " + document.getTitle(),
-                    document.getSummary(), "OA_DOCUMENT", document.getId().toString(), "OA",
-                    "/oa/document?id=" + document.getId()));
+            notificationService.send(NotificationSendRequest.inApp("oa:document:" + document.getId() + ":publish",
+                    NotificationPurpose.OA_NOTICE, receiverIds, NotificationTemplateCode.OA_DOCUMENT_PUBLISHED)
+                    .parameter("document_title", Objects.toString(document.getTitle(), ""))
+                    .parameter("summary", Objects.toString(document.getSummary(), ""))
+                    .businessReference("OA_DOCUMENT", document.getId().toString())
+                    .sourceModule("OA")
+                    .link("/oa/document?id=" + document.getId())
+                    .build());
         } catch (Exception exception) {
             log.warn("文档发布通知发送失败: documentId={}", document.getId(), exception);
         }

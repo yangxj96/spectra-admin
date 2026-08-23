@@ -23,9 +23,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -78,7 +79,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationService applicationService;
     private final ProcessInstanceService processInstanceService;
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
     private final ReimbursementConverter reimbursementConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -393,9 +394,14 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private void sendNotification(Application application, String title, String content) {
-        notificationGateway.enqueue(NotificationRequest.inApp("oa:reimbursement:" + application.getBizId() + ":" + title,
-                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), "oa.application.status", title, content,
-                "OA_REIMBURSEMENT", application.getBizId().toString(), "OA", "/oa/reimbursement/" + application.getBizId()));
+        notificationService.send(NotificationSendRequest.inApp("oa:reimbursement:" + application.getBizId() + ":" + title,
+                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), NotificationTemplateCode.OA_APPLICATION_STATUS)
+                .parameter("title", title)
+                .parameter("content", content)
+                .businessReference("OA_REIMBURSEMENT", application.getBizId().toString())
+                .sourceModule("OA")
+                .link("/oa/reimbursement/" + application.getBizId())
+                .build());
     }
 
     private String mask(String account) {

@@ -18,9 +18,10 @@ package com.devops00.spectra.ai.configuration.rag.listener;
 
 import com.devops00.spectra.ai.properties.AiRAGProperties;
 import com.devops00.spectra.common.event.FileUploadFinishEvent;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
@@ -45,7 +46,7 @@ class FileUploadFinishListenerNotificationTest {
         var fileInfoService = mock(FileInfoService.class);
         var fileUploadFacade = mock(FileUploadFacade.class);
         var properties = new AiRAGProperties();
-        var notificationGateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var fileId = UUID.randomUUID();
         var creatorId = UUID.randomUUID();
         var fileInfo = new FileInfo();
@@ -56,14 +57,16 @@ class FileUploadFinishListenerNotificationTest {
         when(fileUploadFacade.openStream(fileInfo)).thenThrow(new IllegalStateException("mock storage failure"));
 
         var listener = new FileUploadFinishListener(embeddingStore, embeddingModel, fileInfoService, fileUploadFacade,
-                properties, notificationGateway);
+                properties, notificationService);
 
         listener.handleFileUploaded(new FileUploadFinishEvent(this, fileId));
 
-        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(notificationGateway).enqueue(requestCaptor.capture());
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationSendRequest.class);
+        verify(notificationService).send(requestCaptor.capture());
         assertEquals(NotificationPurpose.SYSTEM_NOTICE, requestCaptor.getValue().purpose());
         assertEquals("ai:rag:index:" + fileId + ":failure", requestCaptor.getValue().idempotencyKey());
         assertEquals(creatorId, requestCaptor.getValue().recipientUserIds().getFirst());
+        assertEquals(NotificationTemplateCode.AI_RAG_INDEX, requestCaptor.getValue().templateGroupCode());
+        assertEquals("失败", requestCaptor.getValue().parameters().get("status"));
     }
 }

@@ -48,7 +48,7 @@ class TaskServiceImplNotificationTest {
         var runtimeService = mock(RuntimeService.class);
         var workflowService = mock(WorkflowService.class);
         var taskConverter = mock(TaskConverter.class);
-        var notificationGateway = mock(NotificationGateway.class);
+        var notificationService = mock(NotificationService.class);
         var recipientDirectory = mock(NotificationRecipientDirectory.class);
         var taskQuery = mock(TaskQuery.class);
         var historicProcessQuery = mock(HistoricProcessInstanceQuery.class);
@@ -69,18 +69,20 @@ class TaskServiceImplNotificationTest {
         when(historicProcessQuery.singleResult()).thenReturn(null);
         when(recipientDirectory.resolveByLoginNames(List.of("alice")))
                 .thenReturn(List.of(new NotificationRecipient(userId, null, null, true, true, null)));
-        when(notificationGateway.enqueue(any(NotificationRequest.class)))
+        when(notificationService.send(any(NotificationSendRequest.class)))
                 .thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
 
         var service = new TaskServiceImpl(flowableTaskService, historyService, repositoryService, runtimeService,
-                workflowService, taskConverter, notificationGateway, recipientDirectory);
+                workflowService, taskConverter, notificationService, recipientDirectory);
 
         service.complete("task-1", "同意", "alice");
 
-        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
-        verify(notificationGateway).enqueue(requestCaptor.capture());
+        var requestCaptor = org.mockito.ArgumentCaptor.forClass(NotificationSendRequest.class);
+        verify(notificationService).send(requestCaptor.capture());
         assertEquals(NotificationPurpose.WORKFLOW_RESULT, requestCaptor.getValue().purpose());
         assertEquals("workflow:result:task-1:true", requestCaptor.getValue().idempotencyKey());
+        assertEquals(NotificationTemplateCode.WORKFLOW_TASK_RESULT, requestCaptor.getValue().templateGroupCode());
+        assertEquals("通过", requestCaptor.getValue().parameters().get("result"));
         verify(flowableTaskService).complete(eq("task-1"), anyMap());
     }
 }

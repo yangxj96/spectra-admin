@@ -23,9 +23,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.meeting.javabean.converter.MeetingConverter;
@@ -50,6 +51,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -66,7 +68,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
     private final MeetingConverter meetingConverter;
     private final MeetingParticipantMapper participantMapper;
     private final MeetingRecordMapper recordMapper;
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
     private final UserService userService;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -117,10 +119,15 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             }
         }
         if (!receivers.isEmpty()) {
-            notificationGateway.enqueue(NotificationRequest.inApp("oa:meeting:" + entity.getId(),
-                    NotificationPurpose.OA_REMINDER, receivers.stream().distinct().toList(), "oa.meeting.invitation",
-                    "会议邀请：" + entity.getTitle(), entity.getContent(), "OA_MEETING", entity.getId().toString(), "OA",
-                    "/oa/meeting?id=" + entity.getId()));
+            notificationService.send(NotificationSendRequest.inApp("oa:meeting:" + entity.getId(),
+                    NotificationPurpose.OA_REMINDER, receivers.stream().distinct().toList(),
+                    NotificationTemplateCode.OA_MEETING_INVITATION)
+                    .parameter("meeting_title", Objects.toString(entity.getTitle(), ""))
+                    .parameter("content", Objects.toString(entity.getContent(), ""))
+                    .businessReference("OA_MEETING", entity.getId().toString())
+                    .sourceModule("OA")
+                    .link("/oa/meeting?id=" + entity.getId())
+                    .build());
         }
     }
 

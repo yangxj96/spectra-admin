@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * OA 通知调用方迁移契约测试，防止业务服务回退到 Core 旧通知实现。
+ * OA 通知调用方迁移契约测试，防止业务服务绕过快捷通知服务。
  *
  * @author yangxj96
  * @version 1.0
@@ -44,11 +44,12 @@ class NotificationCallerMigrationContractTest {
             "reimbursement/service/impl/ReimbursementServiceImpl.java");
 
     @Test
-    void shouldKeepEveryOaNotificationCallerOnGatewayWithStableKey() throws Exception {
+    void shouldKeepEveryOaNotificationCallerOnShortcutServiceWithStableKey() throws Exception {
         for (var caller : CALLERS) {
             var source = readSource(caller);
-            assertTrue(source.contains("import com.devops00.spectra.common.notification.NotificationGateway;"), caller);
-            assertTrue(source.contains("notificationGateway.enqueue(NotificationRequest.inApp("), caller);
+            assertTrue(source.contains("import com.devops00.spectra.common.notification.NotificationService;"), caller);
+            assertTrue(source.contains("NotificationSendRequest.inApp("), caller);
+            assertTrue(source.contains("NotificationTemplateCode."), caller);
             assertTrue(source.contains("\"oa:"), caller);
             assertFalse(source.contains("com.devops00.spectra.core.notification"), caller);
         }

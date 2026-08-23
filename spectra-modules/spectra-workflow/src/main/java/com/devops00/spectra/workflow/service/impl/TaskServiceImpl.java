@@ -20,10 +20,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
 import com.devops00.spectra.workflow.service.ApprovalCallback;
@@ -66,7 +67,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
 
     private final TaskConverter taskConverter;
 
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
 
     private final NotificationRecipientDirectory recipientDirectory;
 
@@ -264,19 +265,16 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         if (recipients.isEmpty()) {
             return;
         }
-        var title = approved ? "流程任务已通过" : "流程任务已驳回";
-        var content = approved ? "您处理的流程任务已通过。" : "您处理的流程任务已驳回。";
-        notificationGateway.enqueue(NotificationRequest.inApp(
+        notificationService.send(NotificationSendRequest.inApp(
                 "workflow:result:" + task.getId() + ":" + approved,
                 NotificationPurpose.WORKFLOW_RESULT,
                 recipients,
-                "workflow.task.result",
-                title,
-                content,
-                "WORKFLOW",
-                task.getProcessInstanceId(),
-                "WORKFLOW",
-                "/workflow/tasks/done"));
+                NotificationTemplateCode.WORKFLOW_TASK_RESULT)
+                .parameter("result", approved ? "通过" : "驳回")
+                .businessReference("WORKFLOW", task.getProcessInstanceId())
+                .sourceModule("WORKFLOW")
+                .link("/workflow/tasks/done")
+                .build());
     }
 
     private void notifyNextTasks(String processInstanceId) {
@@ -293,17 +291,16 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
             if (recipients.isEmpty()) {
                 return;
             }
-            notificationGateway.enqueue(NotificationRequest.inApp(
+            notificationService.send(NotificationSendRequest.inApp(
                     "workflow:todo:" + task.getId(),
                     NotificationPurpose.WORKFLOW_TODO,
                     recipients,
-                    "workflow.task.todo",
-                    "新的待办任务",
-                    "您有新的流程待办任务：" + task.getName(),
-                    "WORKFLOW",
-                    processInstanceId,
-                    "WORKFLOW",
-                    "/workflow/tasks/todo"));
+                    NotificationTemplateCode.WORKFLOW_TASK_TODO)
+                    .parameter("task_name", task.getName())
+                    .businessReference("WORKFLOW", processInstanceId)
+                    .sourceModule("WORKFLOW")
+                    .link("/workflow/tasks/todo")
+                    .build());
         });
     }
 }

@@ -9,9 +9,10 @@ package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
@@ -60,11 +61,11 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     private final RoleAssignmentMapper roleAssignmentMapper;
     private final UserMapper userMapper;
     private final TimeMapper timeMapper;
-    private Optional<NotificationGateway> notificationGateway = Optional.empty();
+    private Optional<NotificationService> notificationService = Optional.empty();
 
     @Autowired(required = false)
-    public void setNotificationGateway(NotificationGateway notificationGateway) {
-        this.notificationGateway = Optional.ofNullable(notificationGateway);
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = Optional.ofNullable(notificationService);
     }
 
     @Override
@@ -238,7 +239,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     }
 
     private void notifyOperators(ServiceMonitorAlertEvent event) {
-        if (notificationGateway.isEmpty() || event.getId() == null) {
+        if (notificationService.isEmpty() || event.getId() == null) {
             return;
         }
         var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
@@ -274,13 +275,15 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (recipients.isEmpty()) {
             return;
         }
-        var title = "服务监控告警：" + event.getRuleName();
-        var content = event.getMessage() + "，请在服务监控中查看。";
-        notificationGateway.get()
-                .enqueue(NotificationRequest.inApp(
+        notificationService.get()
+                .send(NotificationSendRequest.inApp(
                         "service-monitor-alert:" + event.getId() + ":" + event.getOccurrenceCount(),
-                        NotificationPurpose.SYSTEM_NOTICE, recipients, "service-monitor-alert", title, content,
-                        "SERVICE_MONITOR_ALERT", event.getId().toString(), "spectra-core", null));
+                        NotificationPurpose.SYSTEM_NOTICE, recipients, NotificationTemplateCode.SYSTEM_SERVICE_MONITOR_ALERT)
+                        .parameter("rule_name", event.getRuleName())
+                        .parameter("message", event.getMessage())
+                        .businessReference("SERVICE_MONITOR_ALERT", event.getId().toString())
+                        .sourceModule("spectra-core")
+                        .build());
     }
 
     @Override

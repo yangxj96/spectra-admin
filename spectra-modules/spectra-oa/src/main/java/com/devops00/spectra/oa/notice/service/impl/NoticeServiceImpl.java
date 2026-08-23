@@ -23,9 +23,10 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
@@ -61,7 +62,7 @@ import java.util.UUID;
 public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> implements NoticeService {
 
     private final NoticeReaderMapper noticeReaderMapper;
-    private final NotificationGateway notificationGateway;
+    private final NotificationService notificationService;
     private final UserService userService;
     private final NoticeConverter noticeConverter;
     private final TimeMapper timeMapper;
@@ -233,10 +234,14 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (receiverIds.isEmpty()) {
             return;
         }
-        notificationGateway.enqueue(NotificationRequest.inApp("oa:notice:" + notice.getId() + ":publish",
-                NotificationPurpose.OA_NOTICE, receiverIds, "oa.notice.published", notice.getTitle(),
-                notice.getSummary() == null ? notice.getContent() : notice.getSummary(), "OA_NOTICE",
-                notice.getId().toString(), "OA", "/oa/notice?id=" + notice.getId()));
+        notificationService.send(NotificationSendRequest.inApp("oa:notice:" + notice.getId() + ":publish",
+                NotificationPurpose.OA_NOTICE, receiverIds, NotificationTemplateCode.OA_NOTICE_PUBLISHED)
+                .parameter("title", notice.getTitle())
+                .parameter("content", notice.getSummary() == null ? notice.getContent() : notice.getSummary())
+                .businessReference("OA_NOTICE", notice.getId().toString())
+                .sourceModule("OA")
+                .link("/oa/notice?id=" + notice.getId())
+                .build());
     }
 
     private void activateDueNotices(List<Notice> notices) {
