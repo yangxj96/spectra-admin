@@ -66,7 +66,9 @@ public class SecurityProperties {
             // 获取系统加密配置接口
             "/system/crypto/config",
             // Web 端启动阶段公开配置聚合接口
-            "/system/bootstrap"));
+            "/system/bootstrap",
+            // 外部 Provider 回执由通知模块使用渠道 Secret HMAC 验签
+            "/notification/provider/callback/**"));
 
     /**
      * accessToken有效期（秒），默认5分钟

@@ -40,6 +40,14 @@ import java.util.UUID;
 public interface NotificationDeliveryMapper extends BaseMapper<NotificationDeliveryEntity> {
 
     /**
+     * 按渠道和供应商消息 ID 查询既有投递；回执只允许更新已创建的 Delivery。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    NotificationDeliveryEntity selectByProviderMessageId(@Param("provider") String provider,
+                                                         @Param("messageId") String messageId,
+                                                         @Param("channel") String channel);
+
+    /**
      * 分页查询投递记录并联表补充任务渠道；查询结果只包含管理端允许展示的字段。
      */
     @InterceptorIgnore(dataPermission = "true")

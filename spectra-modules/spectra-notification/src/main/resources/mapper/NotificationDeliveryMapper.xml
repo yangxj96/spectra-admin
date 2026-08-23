@@ -101,6 +101,20 @@
          ORDER BY bucket_at ASC
     </select>
 
+    <select id="selectByProviderMessageId" resultMap="AdminResultMap">
+        SELECT d.*,
+               t.channel AS channel
+          FROM spectra_notification.ntf_delivery d
+          JOIN spectra_notification.ntf_task t ON t.id = d.notification_task_id
+         WHERE d.deleted IS NULL
+           AND t.deleted IS NULL
+           AND d.provider = #{provider}
+           AND d.provider_message_id = #{messageId}
+           AND t.channel = #{channel}
+         ORDER BY d.created_at DESC
+         LIMIT 1
+    </select>
+
     <select id="selectAdminPage" resultMap="AdminResultMap">
         SELECT d.*,
                t.channel AS channel
