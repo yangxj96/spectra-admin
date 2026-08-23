@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.system.controller;
 
+import com.devops00.spectra.core.system.javabean.from.ServiceMonitorHistoryFrom;
+import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -51,5 +53,18 @@ public class ServiceMonitorController {
     @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public ServiceMonitorOverviewVO getOverview() {
         return bindService.getOverview();
+    }
+
+    /**
+     * 查询服务监控历史趋势。
+     *
+     * @param from 查询条件
+     * @return 历史趋势
+     */
+    @ULog("'查询服务监控历史'")
+    @GetMapping(value = "/history", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'system:monitor:read')")
+    public ServiceMonitorHistoryVO getHistory(ServiceMonitorHistoryFrom from) {
+        return bindService.getHistory(from);
     }
 }

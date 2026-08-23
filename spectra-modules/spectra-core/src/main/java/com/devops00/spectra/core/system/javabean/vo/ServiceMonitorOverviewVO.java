@@ -46,6 +46,12 @@ public class ServiceMonitorOverviewVO {
     /** 状态说明。 */
     private String statusMessage;
 
+    /** 监控数据新鲜度：CURRENT、DELAYED、STALE 或 UNAVAILABLE。 */
+    private String dataFreshness;
+
+    /** 当前快照距离响应时间的秒数。 */
+    private long dataAgeSeconds;
+
     /** 应用名称。 */
     private String serviceName;
 
@@ -68,6 +74,13 @@ public class ServiceMonitorOverviewVO {
     /** 关键依赖状态。 */
     @Builder.Default
     private List<Dependency> dependencies = List.of();
+
+    /** Actuator 健康组件状态。 */
+    @Builder.Default
+    private List<HealthComponent> healthComponents = List.of();
+
+    /** 健康组件聚合检查耗时，单位为毫秒。 */
+    private long healthCheckLatencyMs;
 
     /**
      * 当前指标摘要。
@@ -187,5 +200,27 @@ public class ServiceMonitorOverviewVO {
 
         /** 脱敏后的状态说明。 */
         private String message;
+    }
+
+    /**
+     * 应用健康组件状态。
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HealthComponent {
+
+        /** 组件名称。 */
+        private String name;
+
+        /** 组件状态：UP、DOWN、OUT_OF_SERVICE 或 UNKNOWN。 */
+        private String status;
+
+        /** 脱敏后的状态说明。 */
+        private String message;
+
+        /** 最近一次检查时间。 */
+        private LocalDateTime checkedAt;
     }
 }

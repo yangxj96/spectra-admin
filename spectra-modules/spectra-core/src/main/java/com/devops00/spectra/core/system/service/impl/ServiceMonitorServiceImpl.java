@@ -16,13 +16,22 @@
 
 package com.devops00.spectra.core.system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorHistoryRange;
+import com.devops00.spectra.core.system.javabean.from.ServiceMonitorHistoryFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
+import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
+import com.devops00.spectra.core.system.mapper.ServiceMonitorSampleMapper;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.health.actuate.endpoint.CompositeHealthDescriptor;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -40,6 +49,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.ZoneOffset;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -65,12 +75,18 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private static final double WARNING_JVM_HEAP_USAGE = 75D;
     private static final double WARNING_ERROR_RATE = 1D;
     private static final double WARNING_P95_RESPONSE_MS = 500D;
+    private static final long HISTORY_CLEANUP_INTERVAL_SECONDS = 3600L;
+    private static final int DEFAULT_HISTORY_RETENTION_DAYS = 7;
 
     private final MeterRegistry meterRegistry;
     private final DataSource dataSource;
     private final RedisConnectionFactory redisConnectionFactory;
     private final TimeMapper timeMapper;
     private final Environment environment;
+    private final HealthEndpoint healthEndpoint;
+    private final ServiceMonitorSampleMapper sampleMapper;
+    private final long collectionIntervalSeconds;
+    private final int historyRetentionDays;
     private final OperatingSystemMXBean operatingSystem = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
     private final Deque<Sample> history = new ArrayDeque<>(HISTORY_LIMIT);
     private final Object sampleLock = new Object();
@@ -79,23 +95,33 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private long previousRequestCount = -1L;
     private long previousErrorCount = -1L;
     private long previousRequestNanos = -1L;
+    private volatile Instant lastHistoryCleanupAt;
 
     public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, DataSource dataSource,
-                                     RedisConnectionFactory redisConnectionFactory, TimeMapper timeMapper, Environment environment) {
+                                     RedisConnectionFactory redisConnectionFactory, TimeMapper timeMapper, Environment environment,
+                                     HealthEndpoint healthEndpoint, ServiceMonitorSampleMapper sampleMapper) {
         this.meterRegistry = meterRegistry;
         this.dataSource = dataSource;
         this.redisConnectionFactory = redisConnectionFactory;
         this.timeMapper = timeMapper;
         this.environment = environment;
+        this.healthEndpoint = healthEndpoint;
+        this.sampleMapper = sampleMapper;
+        var intervalMillis = environment.getProperty("spectra.monitor.collection-interval-ms", Long.class, 10000L);
+        this.collectionIntervalSeconds = Math.max(intervalMillis / 1000L, 1L);
+        var retentionDays = environment.getProperty("spectra.monitor.history-retention-days", Integer.class,
+                DEFAULT_HISTORY_RETENTION_DAYS);
+        this.historyRetentionDays = Math.max(retentionDays, 1);
     }
 
     /**
-     * 按固定间隔采集一次监控快照。历史数据只保留在当前实例内存中，避免第一期引入额外的监控存储和数据清理任务。
+     * 按固定间隔采集一次监控快照，并保存单体应用本地历史趋势。
      */
     @Scheduled(fixedDelayString = "${spectra.monitor.collection-interval-ms:10000}", initialDelay = 1000)
     public void collectSnapshot() {
         try {
             var sample = collectSample();
+            persistSample(sample);
             synchronized (sampleLock) {
                 latestSample = sample;
                 history.addLast(sample);
@@ -122,6 +148,30 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
+    @Override
+    public ServiceMonitorHistoryVO getHistory(ServiceMonitorHistoryFrom from) {
+        var range = ServiceMonitorHistoryRange.fromCode(from == null ? null : from.getRange());
+        var to = Instant.now();
+        var start = to.minus(range.getDuration());
+        List<ServiceMonitorSample> samples;
+        try {
+            var query = new LambdaQueryWrapper<ServiceMonitorSample>()
+                    .ge(ServiceMonitorSample::getCollectedAt, start)
+                    .le(ServiceMonitorSample::getCollectedAt, to)
+                    .orderByAsc(ServiceMonitorSample::getCollectedAt);
+            samples = sampleMapper.selectList(query);
+        } catch (RuntimeException exception) {
+            throw new DataException("服务监控历史查询失败");
+        }
+        var points = downsample(samples, range.getMaxPoints()).stream().map(this::toPoint).toList();
+        return ServiceMonitorHistoryVO.builder()
+                .range(range.getCode())
+                .from(toLocalDateTime(start))
+                .to(toLocalDateTime(to))
+                .points(points)
+                .build();
+    }
+
     private Sample collectSample() {
         var now = Instant.now();
         var cpuLoad = operatingSystem.getCpuLoad();
@@ -138,14 +188,54 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var threadBean = ManagementFactory.getThreadMXBean();
         var requestMetrics = collectRequestMetrics();
         var dependencies = List.of(checkDatabase(), checkRedis());
-        var status = resolveStatus(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics, dependencies);
+        var health = collectHealth();
+        var status = resolveStatus(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics, dependencies,
+                health.status());
         var runtime = ManagementFactory.getRuntimeMXBean();
 
         return new Sample(now, cpuUsage, logicalCores, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
                 heapUsage.used(), heapUsage.max(), heapUsage.usage(), nonHeapUsage.getUsed(), threadBean.getThreadCount(),
                 threadBean.getPeakThreadCount(), collectGcCount(), requestMetrics.qps(), requestMetrics.errorRate(),
-                requestMetrics.p95ResponseMs(), requestMetrics.available(), dependencies, status,
+                requestMetrics.p95ResponseMs(), requestMetrics.available(), dependencies, health.components(),
+                health.status(), health.latencyMs(), status,
                 runtime.getUptime() / 1000L);
+    }
+
+    private HealthSnapshot collectHealth() {
+        var start = System.nanoTime();
+        try {
+            var descriptor = healthEndpoint.health();
+            var components = new ArrayList<ServiceMonitorOverviewVO.HealthComponent>();
+            if (descriptor instanceof CompositeHealthDescriptor composite && !composite.getComponents().isEmpty()) {
+                composite.getComponents()
+                        .forEach((name, component) -> components.add(healthComponent(name,
+                                component.getStatus().getCode())));
+            } else {
+                components.add(healthComponent("application", descriptor.getStatus().getCode()));
+            }
+            return new HealthSnapshot(descriptor.getStatus().getCode(), List.copyOf(components), elapsedMillis(start));
+        } catch (RuntimeException exception) {
+            return new HealthSnapshot("UNKNOWN", List.of(healthComponent("application", "UNKNOWN")),
+                    elapsedMillis(start));
+        }
+    }
+
+    private static ServiceMonitorOverviewVO.HealthComponent healthComponent(String name, String status) {
+        var normalizedStatus = status == null || status.isBlank() ? "UNKNOWN" : status;
+        return ServiceMonitorOverviewVO.HealthComponent.builder()
+                .name(name)
+                .status(normalizedStatus)
+                .message(healthMessage(normalizedStatus))
+                .build();
+    }
+
+    private static String healthMessage(String status) {
+        return switch (status) {
+            case "UP" -> "检查正常";
+            case "DOWN" -> "检查未通过";
+            case "OUT_OF_SERVICE" -> "服务不可用";
+            default -> "检查状态未知";
+        };
     }
 
     private RequestMetrics collectRequestMetrics() {
@@ -215,13 +305,20 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     }
 
     private static String resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
-                                        RequestMetrics requestMetrics, List<ServiceMonitorOverviewVO.Dependency> dependencies) {
+                                        RequestMetrics requestMetrics, List<ServiceMonitorOverviewVO.Dependency> dependencies,
+                                        String healthStatus) {
         var downCount = dependencies.stream().filter(item -> "DOWN".equals(item.getStatus())).count();
         if (downCount == dependencies.size()) {
             return "DOWN";
         }
         if (downCount > 0L) {
             return "DEGRADED";
+        }
+        if ("DOWN".equals(healthStatus) || "OUT_OF_SERVICE".equals(healthStatus)) {
+            return "DEGRADED";
+        }
+        if ("UNKNOWN".equals(healthStatus)) {
+            return "WARNING";
         }
         if (cpuUsage >= WARNING_CPU_USAGE
                 || systemMemoryUsage >= WARNING_MEMORY_USAGE
@@ -258,10 +355,14 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .p95ResponseMs(sample.p95ResponseMs())
                 .requestMetricsAvailable(sample.requestMetricsAvailable())
                 .build();
+        var freshness = freshness(sample.collectedAt());
+        var status = effectiveStatus(sample.status(), freshness.code());
         return ServiceMonitorOverviewVO.builder()
                 .collectedAt(toLocalDateTime(sample.collectedAt()))
-                .status(sample.status())
-                .statusMessage(statusMessage(sample.status()))
+                .status(status)
+                .statusMessage(statusMessage(status, freshness.code()))
+                .dataFreshness(freshness.code())
+                .dataAgeSeconds(freshness.ageSeconds())
                 .serviceName(environment.getProperty("spring.application.name", "spectra-admin"))
                 .hostName(getHostName())
                 .osName(System.getProperty("os.name", "Unknown"))
@@ -269,6 +370,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .summary(summary)
                 .history(historyPoints)
                 .dependencies(sample.dependencies())
+                .healthComponents(toHealthComponents(sample))
+                .healthCheckLatencyMs(sample.healthCheckLatencyMs())
                 .build();
     }
 
@@ -286,12 +389,41 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    private ServiceMonitorOverviewVO.Point toPoint(ServiceMonitorSample sample) {
+        return ServiceMonitorOverviewVO.Point.builder()
+                .collectedAt(toLocalDateTime(sample.getCollectedAt()))
+                .cpuUsage(sample.getCpuUsage())
+                .systemMemoryUsage(sample.getSystemMemoryUsage())
+                .jvmHeapUsage(sample.getJvmHeapUsage())
+                .liveThreadCount(sample.getLiveThreadCount())
+                .gcCount(sample.getGcCount())
+                .qps(sample.getQps())
+                .errorRate(sample.getErrorRate())
+                .p95ResponseMs(sample.getP95ResponseMs())
+                .build();
+    }
+
+    private List<ServiceMonitorOverviewVO.HealthComponent> toHealthComponents(Sample sample) {
+        var checkedAt = toLocalDateTime(sample.collectedAt());
+        return sample.healthComponents()
+                .stream()
+                .map(item -> ServiceMonitorOverviewVO.HealthComponent.builder()
+                        .name(item.getName())
+                        .status(item.getStatus())
+                        .message(item.getMessage())
+                        .checkedAt(checkedAt)
+                        .build())
+                .toList();
+    }
+
     private ServiceMonitorOverviewVO emptyOverview() {
         var summary = ServiceMonitorOverviewVO.Summary.builder().build();
         return ServiceMonitorOverviewVO.builder()
                 .collectedAt(toLocalDateTime(Instant.now()))
                 .status("DOWN")
                 .statusMessage("监控数据暂不可用")
+                .dataFreshness("UNAVAILABLE")
+                .dataAgeSeconds(0L)
                 .serviceName(environment.getProperty("spring.application.name", "spectra-admin"))
                 .hostName(getHostName())
                 .osName(System.getProperty("os.name", "Unknown"))
@@ -299,12 +431,84 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    private void persistSample(Sample sample) {
+        try {
+            sampleMapper.insert(toEntity(sample));
+        } catch (RuntimeException exception) {
+            log.warn("服务监控历史保存失败，保留当前监控快照", exception);
+        }
+        var now = sample.collectedAt();
+        if (lastHistoryCleanupAt != null
+                && Duration.between(lastHistoryCleanupAt, now).getSeconds() < HISTORY_CLEANUP_INTERVAL_SECONDS) {
+            return;
+        }
+        try {
+            var cutoff = now.minus(Duration.ofDays(historyRetentionDays));
+            sampleMapper.delete(new LambdaQueryWrapper<ServiceMonitorSample>()
+                    .lt(ServiceMonitorSample::getCollectedAt, cutoff));
+            lastHistoryCleanupAt = now;
+        } catch (RuntimeException exception) {
+            log.warn("服务监控历史清理失败", exception);
+        }
+    }
+
+    private static ServiceMonitorSample toEntity(Sample sample) {
+        var entity = new ServiceMonitorSample();
+        entity.setCollectedAt(sample.collectedAt());
+        entity.setCpuUsage(sample.cpuUsage());
+        entity.setCpuLogicalCores(sample.cpuLogicalCores());
+        entity.setSystemMemoryUsage(sample.systemMemoryUsage());
+        entity.setSystemMemoryTotalBytes(sample.totalMemory());
+        entity.setSystemMemoryUsedBytes(sample.usedMemory());
+        entity.setSystemMemoryAvailableBytes(sample.availableMemory());
+        entity.setJvmHeapUsage(sample.jvmHeapUsage());
+        entity.setJvmHeapUsedBytes(sample.jvmHeapUsed());
+        entity.setJvmHeapMaxBytes(sample.jvmHeapMax());
+        entity.setJvmNonHeapUsedBytes(sample.jvmNonHeapUsed());
+        entity.setLiveThreadCount(sample.liveThreadCount());
+        entity.setPeakThreadCount(sample.peakThreadCount());
+        entity.setGcCount(sample.gcCount());
+        entity.setQps(sample.qps());
+        entity.setErrorRate(sample.errorRate());
+        entity.setP95ResponseMs(sample.p95ResponseMs());
+        entity.setRequestMetricsAvailable(sample.requestMetricsAvailable());
+        entity.setStatus(sample.status());
+        return entity;
+    }
+
+    private Freshness freshness(Instant collectedAt) {
+        var ageSeconds = Math.max(Duration.between(collectedAt, Instant.now()).getSeconds(), 0L);
+        if (ageSeconds <= collectionIntervalSeconds * 2L) {
+            return new Freshness("CURRENT", ageSeconds);
+        }
+        if (ageSeconds <= collectionIntervalSeconds * 6L) {
+            return new Freshness("DELAYED", ageSeconds);
+        }
+        return new Freshness("STALE", ageSeconds);
+    }
+
+    private static String effectiveStatus(String status, String freshness) {
+        if ("STALE".equals(freshness) && !"DOWN".equals(status)) {
+            return "DEGRADED";
+        }
+        if ("DELAYED".equals(freshness) && "HEALTHY".equals(status)) {
+            return "WARNING";
+        }
+        return status;
+    }
+
     private LocalDateTime toLocalDateTime(Instant instant) {
         var value = timeMapper.toLocalDateTime(instant);
         return value == null ? LocalDateTime.ofInstant(instant, ZoneOffset.UTC) : value;
     }
 
-    private static String statusMessage(String status) {
+    private static String statusMessage(String status, String freshness) {
+        if ("STALE".equals(freshness)) {
+            return "监控数据已过期，当前状态仅供参考";
+        }
+        if ("DELAYED".equals(freshness) && "WARNING".equals(status)) {
+            return "监控数据采集延迟";
+        }
         return switch (status) {
             case "HEALTHY" -> "服务运行正常";
             case "WARNING" -> "服务存在需要关注的指标";
@@ -343,6 +547,22 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return Math.max(0D, Math.min(ratio * 100D, 100D));
     }
 
+    private static long elapsedMillis(long start) {
+        return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+    }
+
+    private static <T> List<T> downsample(List<T> values, int maxPoints) {
+        if (values.size() <= maxPoints) {
+            return values;
+        }
+        var result = new ArrayList<T>(maxPoints);
+        for (var index = 0; index < maxPoints; index++) {
+            var sourceIndex = (int) Math.round(index * (values.size() - 1D) / (maxPoints - 1D));
+            result.add(values.get(sourceIndex));
+        }
+        return result;
+    }
+
     private record MemorySnapshot(long used, long max, double usage) {
     }
 
@@ -353,11 +573,19 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
+    private record HealthSnapshot(String status, List<ServiceMonitorOverviewVO.HealthComponent> components,
+                                  long latencyMs) {
+    }
+
+    private record Freshness(String code, long ageSeconds) {
+    }
+
     private record Sample(Instant collectedAt, double cpuUsage, int cpuLogicalCores, double systemMemoryUsage,
                           long totalMemory,
                           long usedMemory, long availableMemory, long jvmHeapUsed, long jvmHeapMax, double jvmHeapUsage,
                           long jvmNonHeapUsed, int liveThreadCount, int peakThreadCount, long gcCount, double qps, double errorRate,
                           double p95ResponseMs, boolean requestMetricsAvailable, List<ServiceMonitorOverviewVO.Dependency> dependencies,
-                          String status, long uptimeSeconds) {
+                          List<ServiceMonitorOverviewVO.HealthComponent> healthComponents, String healthStatus,
+                          long healthCheckLatencyMs, String status, long uptimeSeconds) {
     }
 }

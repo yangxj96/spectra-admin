@@ -17,6 +17,8 @@
 package com.devops00.spectra.core.system.service;
 
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
+import com.devops00.spectra.core.system.javabean.from.ServiceMonitorHistoryFrom;
+import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
 
 /**
  * 服务器信息监控
@@ -33,4 +35,12 @@ public interface ServiceMonitorService {
      * @return 服务监控总览
      */
     ServiceMonitorOverviewVO getOverview();
+
+    /**
+     * 查询服务监控历史趋势。
+     *
+     * @param from 查询条件
+     * @return 历史趋势
+     */
+    ServiceMonitorHistoryVO getHistory(ServiceMonitorHistoryFrom from);
 }
