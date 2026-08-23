@@ -34,6 +34,7 @@
         <result column="initiator_user_id"               property="initiatorUserId"/>
         <result column="source_department_id"            property="sourceDepartmentId"/>
         <result column="parameters"                      property="parameters" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="template_snapshot"                property="templateSnapshot" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
         <result column="sensitive_parameters_ciphertext" property="sensitiveParametersCiphertext"/>
         <result column="encryption_key_id"               property="encryptionKeyId"/>
         <result column="status"                          property="status"/>
@@ -59,6 +60,7 @@
         initiator_user_id,
         source_department_id,
         parameters,
+        template_snapshot,
         sensitive_parameters_ciphertext,
         encryption_key_id,
         status,

@@ -30,7 +30,10 @@ import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEnt
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewTrendVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
@@ -44,9 +47,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 通知管理端 Service 实现；不返回请求参数、敏感载荷或原始地址。
@@ -59,6 +67,21 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class NotificationAdminServiceImpl implements NotificationAdminService {
+
+    /** 默认统计窗口。 */
+    private static final int DEFAULT_OVERVIEW_HOURS = 24;
+    /** 管理概览允许的最大统计窗口。 */
+    private static final int MAX_OVERVIEW_HOURS = 7 * 24;
+    /** 最近错误最多返回的条数。 */
+    private static final int RECENT_ERROR_LIMIT = 10;
+    /** 当前排队中的任务状态。 */
+    private static final Set<String> QUEUED_STATUSES = Set.of("PENDING", "RETRYING");
+    /** 当前失败任务状态。 */
+    private static final Set<String> FAILED_TASK_STATUSES = Set.of("FAILED", "BLOCKED");
+    /** 成功投递结果。 */
+    private static final Set<String> SUCCESS_DELIVERY_STATUSES = Set.of("ACCEPTED", "SENT");
+    /** 失败投递结果。 */
+    private static final Set<String> FAILED_DELIVERY_STATUSES = Set.of("FAILED", "BLOCKED");
 
     /**
      * 允许人工重新排队的终态。
@@ -91,11 +114,133 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     private final NotificationGateway notificationGateway;
 
     /**
+     * 查询通知运行概览。
+     */
+    @Override
+    public NotificationOverviewVO overview(NotificationOverviewFrom from) {
+        var hours = resolveOverviewHours(from);
+        var to = Instant.now();
+        var start = to.minus(hours, ChronoUnit.HOURS);
+        var pendingTaskCount = countTasks(QUEUED_STATUSES, null);
+        var processingTaskCount = countTasks(Set.of("PROCESSING"), null);
+        var oldestPendingTask = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>()
+                .in(NotificationTaskEntity::getStatus, QUEUED_STATUSES)
+                .orderByAsc(NotificationTaskEntity::getScheduledAt)
+                .last("LIMIT 1"));
+        var failedTaskCount = countTasks(FAILED_TASK_STATUSES, null);
+        var unknownTaskCount = countTasks(Set.of("UNKNOWN"), null);
+        var deliveryCount = countDeliveries(null, start, to);
+        var successfulDeliveryCount = countDeliveries(SUCCESS_DELIVERY_STATUSES, start, to);
+        var failedDeliveryCount = countDeliveries(FAILED_DELIVERY_STATUSES, start, to);
+        var unknownDeliveryCount = countDeliveries(Set.of("UNKNOWN"), start, to);
+        var trendRows = deliveryMapper.selectOverviewTrend(start, to);
+        var recentErrorRows = deliveryMapper.selectRecentErrors(start, to, RECENT_ERROR_LIMIT);
+
+        var channels = List.of(NotificationChannel.values())
+                .stream()
+                .map(channel -> NotificationOverviewVO.ChannelSummary.builder()
+                        .availability(availability(channel))
+                        .pendingTaskCount(countTasks(QUEUED_STATUSES, channel.name()))
+                        .failedTaskCount(countTasks(FAILED_TASK_STATUSES, channel.name()))
+                        .unknownTaskCount(countTasks(Set.of("UNKNOWN"), channel.name()))
+                        .build())
+                .toList();
+        var trend = fillTrend(start, to, trendRows);
+        var recentErrors = recentErrorRows == null
+                ? List.<NotificationOverviewVO.ErrorSummary>of()
+                : recentErrorRows.stream()
+                        .map(item -> NotificationOverviewVO.ErrorSummary.builder()
+                                .occurredAt(item.getOccurredAt())
+                                .channel(item.getChannel())
+                                .status(item.getStatus())
+                                .errorCode(item.getErrorCode())
+                                .message(item.getMessage())
+                                .build())
+                        .toList();
+        return NotificationOverviewVO.builder()
+                .generatedAt(to)
+                .rangeHours(hours)
+                .pendingTaskCount(pendingTaskCount)
+                .processingTaskCount(processingTaskCount)
+                .oldestPendingTaskAt(oldestPendingTask == null ? null : oldestPendingTask.getScheduledAt())
+                .failedTaskCount(failedTaskCount)
+                .unknownTaskCount(unknownTaskCount)
+                .deliveryCount(deliveryCount)
+                .successfulDeliveryCount(successfulDeliveryCount)
+                .failedDeliveryCount(failedDeliveryCount)
+                .unknownDeliveryCount(unknownDeliveryCount)
+                .failureRate(deliveryCount == 0L ? 0D : failedDeliveryCount * 100D / deliveryCount)
+                .channels(channels)
+                .trend(trend)
+                .recentErrors(recentErrors)
+                .build();
+    }
+
+    /**
      * 查询渠道健康状态。
      */
     @Override
     public NotificationChannelAvailability availability(NotificationChannel channel) {
         return notificationGateway.availability(channel);
+    }
+
+    /**
+     * 统计任务状态和渠道；渠道参数为空时统计全部渠道。
+     */
+    private long countTasks(Set<String> statuses, String channel) {
+        var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>().in(NotificationTaskEntity::getStatus, statuses);
+        if (StringUtils.hasText(channel)) {
+            wrapper.eq(NotificationTaskEntity::getChannel, channel);
+        }
+        return taskMapper.selectCount(wrapper);
+    }
+
+    /**
+     * 统计时间窗口内的投递结果；状态为空时统计所有结果。
+     */
+    private long countDeliveries(Set<String> statuses, Instant from, Instant to) {
+        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>()
+                .ge(NotificationDeliveryEntity::getCreatedAt, from)
+                .lt(NotificationDeliveryEntity::getCreatedAt, to);
+        if (statuses != null && !statuses.isEmpty()) {
+            wrapper.in(NotificationDeliveryEntity::getResultStatus, statuses);
+        }
+        return deliveryMapper.selectCount(wrapper);
+    }
+
+    /**
+     * 补齐没有投递记录的小时桶，保证前端趋势图时间轴连续。
+     */
+    private List<NotificationOverviewVO.TrendPoint> fillTrend(Instant from, Instant to,
+                                                              List<NotificationOverviewTrendVO> rows) {
+        var byBucket = rows == null
+                ? Map.<Instant, NotificationOverviewTrendVO>of()
+                : rows.stream()
+                        .collect(Collectors.toMap(NotificationOverviewTrendVO::getBucketAt,
+                                Function.identity()));
+        var result = new ArrayList<NotificationOverviewVO.TrendPoint>();
+        for (var bucket = from.truncatedTo(ChronoUnit.HOURS); bucket.isBefore(to); bucket = bucket.plus(1, ChronoUnit.HOURS)) {
+            var row = byBucket.get(bucket);
+            result.add(NotificationOverviewVO.TrendPoint.builder()
+                    .bucketAt(bucket)
+                    .totalCount(row == null ? 0L : row.getTotalCount())
+                    .successCount(row == null ? 0L : row.getSuccessCount())
+                    .failedCount(row == null ? 0L : row.getFailedCount())
+                    .unknownCount(row == null ? 0L : row.getUnknownCount())
+                    .build());
+        }
+        return List.copyOf(result);
+    }
+
+    /**
+     * 解析并限制概览时间窗口。
+     */
+    private int resolveOverviewHours(NotificationOverviewFrom from) {
+        var hours = from == null || from.getHours() == null ? DEFAULT_OVERVIEW_HOURS : from.getHours();
+        if (hours < 1 || hours > MAX_OVERVIEW_HOURS) {
+            throw new DataSaveException("通知运行概览时间范围必须在 1 到 168 小时之间");
+        }
+        return hours;
     }
 
     /**

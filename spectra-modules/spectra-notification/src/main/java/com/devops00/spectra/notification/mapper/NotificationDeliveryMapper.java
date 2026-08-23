@@ -16,9 +16,16 @@
 
 package com.devops00.spectra.notification.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewErrorVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewTrendVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import java.time.Instant;
+import java.util.List;
 
 /**
  * 通知投递 Mapper。
@@ -29,4 +36,19 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface NotificationDeliveryMapper extends BaseMapper<NotificationDeliveryEntity> {
+
+    /**
+     * 查询时间窗口内按小时聚合的投递趋势；聚合 SQL 不返回正文、地址或供应商响应。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    List<NotificationOverviewTrendVO> selectOverviewTrend(@Param("from") Instant from,
+                                                          @Param("to") Instant to);
+
+    /**
+     * 查询时间窗口内最近的脱敏投递错误。
+     */
+    @InterceptorIgnore(dataPermission = "true")
+    List<NotificationOverviewErrorVO> selectRecentErrors(@Param("from") Instant from,
+                                                         @Param("to") Instant to,
+                                                         @Param("limit") int limit);
 }

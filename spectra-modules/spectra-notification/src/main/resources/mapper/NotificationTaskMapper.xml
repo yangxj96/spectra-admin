@@ -30,6 +30,8 @@
         <result column="recipient_masked"                property="recipientMasked"/>
         <result column="recipient_ciphertext"            property="recipientCiphertext"/>
         <result column="template_id"                     property="templateId"/>
+        <result column="template_version_no"             property="templateVersionNo"/>
+        <result column="template_version_digest"         property="templateVersionDigest"/>
         <result column="purpose"                         property="purpose"/>
         <result column="title"                           property="title"/>
         <result column="content"                         property="content"/>
@@ -58,6 +60,8 @@
         recipient_masked,
         recipient_ciphertext,
         template_id,
+        template_version_no,
+        template_version_digest,
         purpose,
         title,
         content,

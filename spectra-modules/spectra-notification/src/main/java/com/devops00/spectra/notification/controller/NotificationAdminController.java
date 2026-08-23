@@ -22,7 +22,9 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO;
 import com.devops00.spectra.notification.service.NotificationAdminService;
@@ -50,6 +52,16 @@ public class NotificationAdminController {
      * 通知管理端服务。
      */
     private final NotificationAdminService service;
+
+    /**
+     * 查询通知运行概览；统计窗口最多允许七天，避免管理查询扫描无限历史数据。
+     */
+    @ULog("'查询通知运行概览'")
+    @GetMapping(value = "/overview", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:admin:read')")
+    public NotificationOverviewVO overview(NotificationOverviewFrom from) {
+        return service.overview(from);
+    }
 
     /**
      * 查询渠道健康状态；仅返回是否可用及脱敏原因。

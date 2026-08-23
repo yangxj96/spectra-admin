@@ -25,6 +25,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.notification.NotificationGateway;
 import com.devops00.spectra.notification.javabean.converter.NotificationAdminConverter;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
+import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
@@ -89,5 +90,18 @@ class NotificationAdminServiceImplTest {
         var wrapperCaptor = org.mockito.ArgumentCaptor.forClass(LambdaQueryWrapper.class);
         verify(taskMapper).selectOne(wrapperCaptor.capture());
         assertTrue(!wrapperCaptor.getValue().getSqlSegment().contains("tenant_id"));
+    }
+
+    @Test
+    void shouldRejectOverviewWindowOutsideSevenDays() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var service = new NotificationAdminServiceImpl(requestMapper, taskMapper, deliveryMapper,
+                mock(NotificationAdminConverter.class), mock(NotificationGateway.class));
+
+        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
+                () -> service.overview(new NotificationOverviewFrom(169)));
+        verifyNoInteractions(requestMapper, taskMapper, deliveryMapper);
     }
 }

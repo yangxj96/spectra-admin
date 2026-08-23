@@ -32,7 +32,8 @@
         <result column="html_template"           property="htmlTemplate"/>
         <result column="parameter_schema"        property="parameterSchema" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
         <result column="provider_template_code" property="providerTemplateCode"/>
-        <result column="enabled"                 property="enabled"/>
+        <result column="state"                   property="state"/>
+        <result column="version_digest"          property="versionDigest"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -47,7 +48,8 @@
         html_template,
         parameter_schema,
         provider_template_code,
-        enabled,
+        state,
+        version_digest,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
 </mapper>

@@ -21,7 +21,9 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO;
 
@@ -35,6 +37,11 @@ import java.util.UUID;
  * @since 2026/8/11
  */
 public interface NotificationAdminService {
+
+    /**
+     * 查询通知运行概览。
+     */
+    NotificationOverviewVO overview(NotificationOverviewFrom from);
 
     /**
      * 查询通知渠道是否已配置并可投递。

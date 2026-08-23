@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.controller;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.service.NotificationAdminService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +54,9 @@ class NotificationAdminControllerTest {
     @Test
     void shouldProtectAllAdminQueriesAndMutations() throws NoSuchMethodException {
         var readExpression = "hasPermission(null, 'notification:admin:read')";
+        assertEquals(readExpression, NotificationAdminController.class.getMethod("overview", NotificationOverviewFrom.class)
+                .getAnnotation(PreAuthorize.class)
+                .value());
         assertEquals(readExpression, NotificationAdminController.class.getMethod("pageRequests", PageFrom.class,
                 NotificationAdminQueryFrom.class)
                 .getAnnotation(PreAuthorize.class)
