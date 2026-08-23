@@ -200,6 +200,14 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     }
 
     /**
+     * 查询通知投递任务的脱敏详情摘要。
+     */
+    @Override
+    public NotificationTaskAdminVO getTask(UUID taskId) {
+        return converter.toTaskVO(getTaskEntity(taskId));
+    }
+
+    /**
      * 统计任务状态和渠道；渠道参数为空时统计全部渠道。
      */
     private long countTasks(Set<String> statuses, String channel) {
@@ -378,7 +386,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     @Transactional
     public void retry(UUID taskId) {
-        var task = getTask(taskId);
+        var task = getTaskEntity(taskId);
         if (!RETRYABLE_STATUSES.contains(task.getStatus())) {
             throw new DataSaveException("当前通知任务不可重试");
         }
@@ -409,7 +417,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     @Transactional
     public void cancel(UUID taskId) {
-        var task = getTask(taskId);
+        var task = getTaskEntity(taskId);
         if (!CANCELLABLE_STATUSES.contains(task.getStatus())) {
             throw new DataSaveException("当前通知任务不可取消");
         }
@@ -428,7 +436,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     /**
      * 查询指定通知任务。
      */
-    private NotificationTaskEntity getTask(UUID taskId) {
+    private NotificationTaskEntity getTaskEntity(UUID taskId) {
         var task = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>().eq(NotificationTaskEntity::getId, taskId));
         if (task == null) {
             throw new DataNotExistException("通知任务不存在");

@@ -121,4 +121,20 @@ class NotificationAdminServiceImplTest {
         assertTrue(service.getRequest(requestId) == view);
         verify(converter).toRequestVO(entity);
     }
+
+    @Test
+    void shouldQueryTaskDetailThroughTheSanitizedConverter() {
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var converter = mock(NotificationAdminConverter.class);
+        var task = new NotificationTaskEntity();
+        var view = new com.devops00.spectra.notification.javabean.vo.NotificationTaskAdminVO();
+        var taskId = UUID.randomUUID();
+        when(taskMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(task);
+        when(converter.toTaskVO(task)).thenReturn(view);
+        var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
+                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class));
+
+        assertTrue(service.getTask(taskId) == view);
+        verify(converter).toTaskVO(task);
+    }
 }
