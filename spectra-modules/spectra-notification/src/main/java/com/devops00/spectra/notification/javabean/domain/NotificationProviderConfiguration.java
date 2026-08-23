@@ -23,31 +23,31 @@ import java.time.Instant;
 /**
  * Provider 运行时配置；其中 Secret 只在内存中短暂存在，不得转换为管理端 VO。
  *
- * @param channel             通知渠道
- * @param providerType        Provider 类型
- * @param enabled             是否启用
- * @param endpoint            Provider 端点
- * @param timeoutMs           请求超时毫秒数
+ * @param channel            通知渠道
+ * @param providerType       Provider 类型
+ * @param enabled            是否启用
+ * @param endpoint           Provider 端点
+ * @param timeoutMs          请求超时毫秒数
  * @param rateLimitPerSecond 每秒发送上限
- * @param maxAttempts         最大投递尝试次数
- * @param templateCode        外部渠道模板编码
- * @param secret              已解密的 Secret，仅供 Provider 发送时使用
- * @param secretKeyId         Secret 标识
- * @param updatedAt           配置更新时间
+ * @param maxAttempts        最大投递尝试次数
+ * @param templateCode       外部渠道模板编码
+ * @param secret             已解密的 Secret，仅供 Provider 发送时使用
+ * @param secretKeyId        Secret 标识
+ * @param updatedAt          配置更新时间
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/23
  */
 public record NotificationProviderConfiguration(
-        NotificationChannel channel,
-        String providerType,
-        boolean enabled,
-        String endpoint,
-        int timeoutMs,
-        int rateLimitPerSecond,
-        int maxAttempts,
-        String templateCode,
-        String secret,
-        String secretKeyId,
-        Instant updatedAt) {
+                                                NotificationChannel channel,
+                                                String providerType,
+                                                boolean enabled,
+                                                String endpoint,
+                                                int timeoutMs,
+                                                int rateLimitPerSecond,
+                                                int maxAttempts,
+                                                String templateCode,
+                                                String secret,
+                                                String secretKeyId,
+                                                Instant updatedAt) {
 }

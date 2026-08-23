@@ -16,39 +16,32 @@
 
 package com.devops00.spectra.notification.service;
 
-import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
-import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
-import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
-
-import java.util.List;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
+import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 
 /**
- * 通知 Provider 配置管理服务。
+ * 外部通知 Provider SPI；Gateway、Worker 不感知供应商 SDK 或 HTTP 细节。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/23
  */
-public interface NotificationProviderAdminService {
+public interface NotificationProvider {
 
     /**
-     * 查询所有渠道的脱敏配置。
+     * Provider 类型编码。
      */
-    List<NotificationProviderVO> list();
+    String code();
 
     /**
-     * 查询指定渠道的脱敏配置。
+     * 执行健康检查；不得返回明文响应或凭据。
      */
-    NotificationProviderVO get(NotificationChannel channel);
+    NotificationProviderHealth health(NotificationProviderConfiguration configuration);
 
     /**
-     * 读取 Provider 运行时配置；Secret 仅供 Provider 内部使用。
+     * 发送一个已经由通知域渲染并保护地址的任务。
      */
-    NotificationProviderConfiguration resolve(NotificationChannel channel);
-
-    /**
-     * 保存指定渠道配置。
-     */
-    NotificationProviderVO modify(NotificationChannel channel, NotificationProviderSaveFrom params);
+    ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration);
 }

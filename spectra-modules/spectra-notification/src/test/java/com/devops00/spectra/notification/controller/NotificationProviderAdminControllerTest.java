@@ -36,11 +36,13 @@ class NotificationProviderAdminControllerTest {
 
         assertEquals("hasPermission(null, 'notification:provider:read')",
                 NotificationProviderAdminController.class.getMethod("list")
-                        .getAnnotation(PreAuthorize.class).value());
+                        .getAnnotation(PreAuthorize.class)
+                        .value());
         assertEquals("hasPermission(null, 'notification:provider:configure')",
                 NotificationProviderAdminController.class.getMethod("modify", NotificationChannel.class,
-                                NotificationProviderSaveFrom.class)
-                        .getAnnotation(PreAuthorize.class).value());
+                        NotificationProviderSaveFrom.class)
+                        .getAnnotation(PreAuthorize.class)
+                        .value());
         assertEquals(NotificationProviderAdminController.class, controller.getClass());
     }
 }

@@ -52,8 +52,7 @@ class NotificationProviderAdminServiceImplTest {
     @BeforeEach
     void setUp() {
         var provider = mock(SystemConfigValueProvider.class);
-        when(provider.find(ArgumentMatchers.anyString())).thenAnswer(invocation ->
-                Optional.ofNullable(values.get(invocation.getArgument(0))));
+        when(provider.find(ArgumentMatchers.anyString())).thenAnswer(invocation -> Optional.ofNullable(values.get(invocation.getArgument(0))));
         var writer = mock(SystemConfigValueWriter.class);
         doAnswer(invocation -> {
             var key = invocation.getArgument(0, String.class);
@@ -64,8 +63,9 @@ class NotificationProviderAdminServiceImplTest {
                 values.put(key, value);
             }
             return null;
-        }).when(writer).upsert(ArgumentMatchers.anyString(), ArgumentMatchers.any(), ArgumentMatchers.any(),
-                ArgumentMatchers.anyString());
+        }).when(writer)
+                .upsert(ArgumentMatchers.anyString(), ArgumentMatchers.any(), ArgumentMatchers.any(),
+                        ArgumentMatchers.anyString());
         var key = java.util.Base64.getEncoder().encodeToString(new byte[32]);
         var protector = new NotificationPayloadProtector(
                 new NotificationModuleProperties(true, key, key, java.util.List.of()), new ObjectMapper());

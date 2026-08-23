@@ -23,6 +23,7 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfigDocument;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
@@ -131,15 +132,15 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         }
         var document = readDocument(channel);
         var secretCiphertext = valueProvider.find(secretKey(channel)).orElse(null);
-        var secretConfigured = document.secretKeyId() != null && !document.secretKeyId().isBlank()
-                && secretCiphertext != null && !secretCiphertext.isBlank();
-        var state = resolveState(document, secretConfigured);
+        var secretConfigured = hasSecret(document, secretCiphertext);
+        var secretUsable = secretConfigured && canDecrypt(secretCiphertext);
+        var state = resolveState(document, secretUsable);
         return NotificationProviderVO.builder()
                 .channel(channel.name())
                 .providerType(document.providerType())
                 .state(state)
                 .enabled(document.enabled())
-                .reason(resolveReason(document, secretConfigured, state))
+                .reason(resolveReason(document, secretConfigured, secretUsable, state))
                 .endpoint(document.endpoint())
                 .timeoutMs(document.timeoutMs())
                 .rateLimitPerSecond(document.rateLimitPerSecond())
@@ -149,6 +150,33 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 .secretKeyId(document.secretKeyId())
                 .updatedAt(document.updatedAt())
                 .build();
+    }
+
+    /**
+     * 解析 Provider 运行时配置；密钥不可解密时返回空 Secret 以触发 fail-closed。
+     */
+    @Override
+    public NotificationProviderConfiguration resolve(NotificationChannel channel) {
+        if (channel == null) {
+            throw new DataSaveException("通知渠道不能为空");
+        }
+        if (channel == NotificationChannel.IN_APP) {
+            return new NotificationProviderConfiguration(channel, "IN_APP", true, "", 0, 0, 1,
+                    null, null, null, null);
+        }
+        var document = readDocument(channel);
+        var ciphertext = valueProvider.find(secretKey(channel)).orElse(null);
+        String secret = null;
+        if (hasSecret(document, ciphertext)) {
+            try {
+                secret = payloadProtector.unprotectSecret(ciphertext);
+            } catch (RuntimeException ignored) {
+                // Secret 不可解密时必须以空值返回，让 Provider 明确阻断发送。
+            }
+        }
+        return new NotificationProviderConfiguration(channel, document.providerType(), document.enabled(),
+                document.endpoint(), document.timeoutMs(), document.rateLimitPerSecond(), document.maxAttempts(),
+                document.templateCode(), secret, document.secretKeyId(), document.updatedAt());
     }
 
     /**
@@ -218,12 +246,13 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     /**
      * 判断配置状态；没有健康检查结果时不报告 HEALTHY。
      */
-    private String resolveState(NotificationProviderConfigDocument document, boolean secretConfigured) {
+    private String resolveState(NotificationProviderConfigDocument document, boolean secretUsable) {
         if (document.providerType() == null || document.providerType().isBlank()) {
             return "NOT_CONFIGURED";
         }
-        if ("INVALID".equals(document.providerType()) || ("HTTP_JSON".equals(document.providerType())
-                && (!isHttpEndpoint(document.endpoint()) || !secretConfigured))) {
+        if ("INVALID".equals(document.providerType())
+                || ("HTTP_JSON".equals(document.providerType())
+                        && (!isHttpEndpoint(document.endpoint()) || !secretUsable))) {
             return "BLOCKED";
         }
         if (!document.enabled()) {
@@ -235,10 +264,14 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     /**
      * 生成脱敏状态原因。
      */
-    private String resolveReason(NotificationProviderConfigDocument document, boolean secretConfigured, String state) {
+    private String resolveReason(NotificationProviderConfigDocument document, boolean secretConfigured,
+                                 boolean secretUsable, String state) {
         if ("BLOCKED".equals(state)) {
             if (!secretConfigured && "HTTP_JSON".equals(document.providerType())) {
                 return "SECRET_NOT_CONFIGURED";
+            }
+            if (!secretUsable && "HTTP_JSON".equals(document.providerType())) {
+                return "SECRET_UNAVAILABLE";
             }
             return "CONFIG_INVALID";
         }
@@ -249,6 +282,22 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             return "HEALTH_CHECK_REQUIRED";
         }
         return state;
+    }
+
+    private boolean hasSecret(NotificationProviderConfigDocument document, String ciphertext) {
+        return document.secretKeyId() != null
+                && !document.secretKeyId().isBlank()
+                && ciphertext != null
+                && !ciphertext.isBlank();
+    }
+
+    private boolean canDecrypt(String ciphertext) {
+        try {
+            payloadProtector.unprotectSecret(ciphertext);
+            return true;
+        } catch (RuntimeException exception) {
+            return false;
+        }
     }
 
     /**
