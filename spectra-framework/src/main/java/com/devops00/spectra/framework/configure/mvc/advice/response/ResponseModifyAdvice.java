@@ -28,6 +28,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.ResourceHttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -63,6 +64,11 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
 
         // 忽略 ByteArrayHttpMessageConverter（避免干扰文件下载等二进制响应）
         if (converterType.isAssignableFrom(ByteArrayHttpMessageConverter.class)) {
+            return false;
+        }
+
+        // 忽略 ResourceHttpMessageConverter（避免把文件下载响应包装成统一业务响应）
+        if (converterType.isAssignableFrom(ResourceHttpMessageConverter.class)) {
             return false;
         }
 

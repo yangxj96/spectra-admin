@@ -39,6 +39,13 @@
     </properties>
 
     <dependencies>
+        <!-- 告警事件通过统一通知网关发送站内消息。 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-notification</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!-- === 工具 === -->
         <!-- ip 转区域 -->
         <dependency>

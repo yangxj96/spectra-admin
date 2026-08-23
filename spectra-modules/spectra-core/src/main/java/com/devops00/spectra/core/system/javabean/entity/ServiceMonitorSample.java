@@ -108,6 +108,14 @@ public class ServiceMonitorSample extends BaseEntity {
     @TableField("request_metrics_available")
     private boolean requestMetricsAvailable;
 
+    /** PostgreSQL 连接状态。 */
+    @TableField("database_status")
+    private String databaseStatus;
+
+    /** Redis 连接状态。 */
+    @TableField("redis_status")
+    private String redisStatus;
+
     /** 采样时的服务状态。 */
     private String status;
 }

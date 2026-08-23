@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.config.annotation.ApiVersionConfigurer;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -74,6 +75,7 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .allowedMethods(spectraProperties.getCors().getMethods().toArray(new String[0]))
                 // 允许的头部信息
                 .allowedHeaders(spectraProperties.getCors().getHeaders().toArray(new String[0]))
+                .exposedHeaders(HttpHeaders.CONTENT_DISPOSITION)
                 // 是否支持凭证
                 .allowCredentials(Boolean.TRUE.equals(spectraProperties.getCors().getCredentials()))
                 // 预检后缓存策略时长

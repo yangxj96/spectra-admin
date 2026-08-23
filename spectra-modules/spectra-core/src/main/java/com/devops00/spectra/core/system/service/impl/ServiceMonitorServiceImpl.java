@@ -24,6 +24,7 @@ import com.devops00.spectra.core.system.javabean.from.ServiceMonitorHistoryFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
 import com.devops00.spectra.core.system.mapper.ServiceMonitorSampleMapper;
+import com.devops00.spectra.core.system.service.ServiceMonitorAlertService;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.sun.management.OperatingSystemMXBean;
@@ -85,6 +86,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private final Environment environment;
     private final HealthEndpoint healthEndpoint;
     private final ServiceMonitorSampleMapper sampleMapper;
+    private final ServiceMonitorAlertService alertService;
     private final long collectionIntervalSeconds;
     private final int historyRetentionDays;
     private final OperatingSystemMXBean operatingSystem = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
@@ -99,7 +101,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, DataSource dataSource,
                                      RedisConnectionFactory redisConnectionFactory, TimeMapper timeMapper, Environment environment,
-                                     HealthEndpoint healthEndpoint, ServiceMonitorSampleMapper sampleMapper) {
+                                     HealthEndpoint healthEndpoint, ServiceMonitorSampleMapper sampleMapper,
+                                     ServiceMonitorAlertService alertService) {
         this.meterRegistry = meterRegistry;
         this.dataSource = dataSource;
         this.redisConnectionFactory = redisConnectionFactory;
@@ -107,6 +110,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         this.environment = environment;
         this.healthEndpoint = healthEndpoint;
         this.sampleMapper = sampleMapper;
+        this.alertService = alertService;
         var intervalMillis = environment.getProperty("spectra.monitor.collection-interval-ms", Long.class, 10000L);
         this.collectionIntervalSeconds = Math.max(intervalMillis / 1000L, 1L);
         var retentionDays = environment.getProperty("spectra.monitor.history-retention-days", Integer.class,
@@ -121,7 +125,12 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     public void collectSnapshot() {
         try {
             var sample = collectSample();
-            persistSample(sample);
+            var persisted = persistSample(sample);
+            try {
+                alertService.evaluate(persisted);
+            } catch (RuntimeException exception) {
+                log.warn("服务监控告警评估失败，保留当前监控快照", exception);
+            }
             synchronized (sampleLock) {
                 latestSample = sample;
                 history.addLast(sample);
@@ -193,11 +202,22 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 health.status());
         var runtime = ManagementFactory.getRuntimeMXBean();
 
+        var databaseStatus = dependencies.stream()
+                .filter(item -> "PostgreSQL".equals(item.getName()))
+                .map(ServiceMonitorOverviewVO.Dependency::getStatus)
+                .findFirst()
+                .orElse("UNKNOWN");
+        var redisStatus = dependencies.stream()
+                .filter(item -> "Redis".equals(item.getName()))
+                .map(ServiceMonitorOverviewVO.Dependency::getStatus)
+                .findFirst()
+                .orElse("UNKNOWN");
         return new Sample(now, cpuUsage, logicalCores, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
                 heapUsage.used(), heapUsage.max(), heapUsage.usage(), nonHeapUsage.getUsed(), threadBean.getThreadCount(),
                 threadBean.getPeakThreadCount(), collectGcCount(), requestMetrics.qps(), requestMetrics.errorRate(),
                 requestMetrics.p95ResponseMs(), requestMetrics.available(), dependencies, health.components(),
                 health.status(), health.latencyMs(), status,
+                databaseStatus, redisStatus,
                 runtime.getUptime() / 1000L);
     }
 
@@ -431,16 +451,17 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
-    private void persistSample(Sample sample) {
+    private ServiceMonitorSample persistSample(Sample sample) {
+        var entity = toEntity(sample);
         try {
-            sampleMapper.insert(toEntity(sample));
+            sampleMapper.insert(entity);
         } catch (RuntimeException exception) {
             log.warn("服务监控历史保存失败，保留当前监控快照", exception);
         }
         var now = sample.collectedAt();
         if (lastHistoryCleanupAt != null
                 && Duration.between(lastHistoryCleanupAt, now).getSeconds() < HISTORY_CLEANUP_INTERVAL_SECONDS) {
-            return;
+            return entity;
         }
         try {
             var cutoff = now.minus(Duration.ofDays(historyRetentionDays));
@@ -450,6 +471,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         } catch (RuntimeException exception) {
             log.warn("服务监控历史清理失败", exception);
         }
+        return entity;
     }
 
     private static ServiceMonitorSample toEntity(Sample sample) {
@@ -472,6 +494,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         entity.setErrorRate(sample.errorRate());
         entity.setP95ResponseMs(sample.p95ResponseMs());
         entity.setRequestMetricsAvailable(sample.requestMetricsAvailable());
+        entity.setDatabaseStatus(sample.databaseStatus());
+        entity.setRedisStatus(sample.redisStatus());
         entity.setStatus(sample.status());
         return entity;
     }
@@ -586,6 +610,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                           long jvmNonHeapUsed, int liveThreadCount, int peakThreadCount, long gcCount, double qps, double errorRate,
                           double p95ResponseMs, boolean requestMetricsAvailable, List<ServiceMonitorOverviewVO.Dependency> dependencies,
                           List<ServiceMonitorOverviewVO.HealthComponent> healthComponents, String healthStatus,
-                          long healthCheckLatencyMs, String status, long uptimeSeconds) {
+                          long healthCheckLatencyMs, String status, String databaseStatus, String redisStatus,
+                          long uptimeSeconds) {
     }
 }
