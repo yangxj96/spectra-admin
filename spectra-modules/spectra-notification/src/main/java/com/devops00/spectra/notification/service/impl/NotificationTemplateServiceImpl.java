@@ -260,12 +260,14 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         var title = template == null ? params.getTitleTemplate() : template.getTitleTemplate();
         var content = template == null ? params.getContentTemplate() : template.getContentTemplate();
         var html = template == null ? params.getHtmlTemplate() : template.getHtmlTemplate();
+        var providerTemplateCode = template == null ? null : template.getProviderTemplateCode();
         var schema = template == null ? params.getParameterSchema() : template.getParameterSchema();
         if (!StringUtils.hasText(content)) {
             throw new DataSaveException("正文模板不能为空");
         }
         var purposeValue = policy.parsePurpose(purpose);
         policy.validateTemplateChannel(purposeValue, channel);
+        policy.validateTemplateFields(channel, title, html, providerTemplateCode);
         renderer.validateDefinition(schema, title, content, html);
         renderer.validateParameterSecurity(schema, params.getParameters(), params.getSensitiveParameters());
         var parameters = new HashMap<String, Object>();
@@ -304,12 +306,17 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         }
         var purpose = policy.parsePurpose(params.getPurpose());
         policy.validateTemplateChannel(purpose, params.getChannel());
+        policy.validateTemplateFields(params.getChannel(), params.getTitleTemplate(), params.getHtmlTemplate(),
+                params.getProviderTemplateCode());
         renderer.validateDefinition(params.getParameterSchema(), params.getTitleTemplate(), params.getContentTemplate(), params.getHtmlTemplate());
         return purpose;
     }
 
     private void validateDefinition(NotificationTemplateEntity entity) {
-        policy.validateTemplateChannel(policy.parsePurpose(entity.getPurpose()), parseChannel(entity.getChannel()));
+        var channel = parseChannel(entity.getChannel());
+        policy.validateTemplateChannel(policy.parsePurpose(entity.getPurpose()), channel);
+        policy.validateTemplateFields(channel, entity.getTitleTemplate(), entity.getHtmlTemplate(),
+                entity.getProviderTemplateCode());
         renderer.validateDefinition(entity.getParameterSchema(), entity.getTitleTemplate(), entity.getContentTemplate(), entity.getHtmlTemplate());
     }
 

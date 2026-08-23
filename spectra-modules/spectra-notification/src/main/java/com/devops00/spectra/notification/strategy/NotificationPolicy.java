@@ -106,6 +106,30 @@ public class NotificationPolicy {
     }
 
     /**
+     * 校验通知模板字段与投递渠道是否匹配。
+     *
+     * @param channel              投递渠道
+     * @param titleTemplate        标题或邮件主题模板
+     * @param htmlTemplate         邮件 HTML 模板
+     * @param providerTemplateCode 供应商模板编码
+     */
+    public void validateTemplateFields(NotificationChannel channel,
+                                       String titleTemplate,
+                                       String htmlTemplate,
+                                       String providerTemplateCode) {
+        if (channel == null) {
+            throw new DataSaveException("通知渠道不能为空");
+        }
+        if (channel == NotificationChannel.SMS) {
+            rejectTemplateField(titleTemplate, "短信模板不支持标题模板");
+            rejectTemplateField(htmlTemplate, "短信模板不支持 HTML 模板");
+        } else if (channel == NotificationChannel.IN_APP) {
+            rejectTemplateField(htmlTemplate, "站内信模板不支持 HTML 模板");
+            rejectTemplateField(providerTemplateCode, "站内信模板不支持供应商模板编码");
+        }
+    }
+
+    /**
      * 返回指定用途允许配置的模板渠道。
      */
     public Set<NotificationChannel> templateChannels(NotificationPurpose purpose) {
@@ -145,5 +169,11 @@ public class NotificationPolicy {
         matrix.put(NotificationPurpose.BIND_PHONE_CODE, Set.of(NotificationChannel.SMS));
         matrix.put(NotificationPurpose.BIND_EMAIL_CODE, Set.of(NotificationChannel.EMAIL));
         return Map.copyOf(matrix);
+    }
+
+    private void rejectTemplateField(String value, String message) {
+        if (value != null && !value.isBlank()) {
+            throw new DataSaveException(message);
+        }
     }
 }

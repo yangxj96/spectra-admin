@@ -82,4 +82,19 @@ class NotificationPolicyTest {
                 policy.resolve(NotificationPurpose.LOGIN_CODE,
                         List.of(NotificationChannel.SMS, NotificationChannel.EMAIL)));
     }
+
+    @Test
+    void shouldEnforceChannelSpecificTemplateFields() {
+        policy.validateTemplateFields(NotificationChannel.IN_APP, "站内标题", null, null);
+        policy.validateTemplateFields(NotificationChannel.SMS, null, null, "sms-template-code");
+        policy.validateTemplateFields(NotificationChannel.EMAIL, "邮件主题", "<p>邮件正文</p>", "email-template-code");
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateFields(NotificationChannel.SMS, "短信标题", null, null));
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateFields(NotificationChannel.SMS, null, "<p>短信正文</p>", null));
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateFields(NotificationChannel.IN_APP, "站内标题", null, "provider-code"));
+        assertThrows(DataSaveException.class,
+                () -> policy.validateTemplateFields(NotificationChannel.IN_APP, "站内标题", "<p>站内正文</p>", null));
+    }
 }
