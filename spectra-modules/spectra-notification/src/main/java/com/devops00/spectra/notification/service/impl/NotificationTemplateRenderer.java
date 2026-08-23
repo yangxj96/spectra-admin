@@ -42,6 +42,11 @@ public class NotificationTemplateRenderer {
     private static final Pattern VARIABLE = Pattern.compile("\\{\\{\\s*([A-Za-z0-9_.-]+)\\s*}}");
 
     /**
+     * 清除合法占位符后，用于识别残留的非法双大括号。
+     */
+    private static final Pattern INVALID_VARIABLE = Pattern.compile("\\{\\{|}}", Pattern.DOTALL);
+
+    /**
      * 渲染模板，不执行表达式。
      */
     public String render(String template, Map<String, ?> variables) {
@@ -75,6 +80,7 @@ public class NotificationTemplateRenderer {
         Set<String> referenced = new LinkedHashSet<>();
         if (templates != null) {
             for (var template : templates) {
+                validatePlaceholders(template);
                 collectVariables(template, referenced);
             }
         }
@@ -101,6 +107,7 @@ public class NotificationTemplateRenderer {
         var referenced = new LinkedHashSet<String>();
         if (templates != null) {
             for (var template : templates) {
+                validatePlaceholders(template);
                 collectVariables(template, referenced);
             }
         }
@@ -171,8 +178,23 @@ public class NotificationTemplateRenderer {
             return;
         }
         var unsafe = html.toLowerCase(java.util.Locale.ROOT);
-        if (unsafe.contains("<script") || unsafe.contains("javascript:") || unsafe.matches("(?s).*\\bon[a-z]+\\s*=.*")) {
+        if (unsafe.contains("<script")
+                || unsafe.matches("(?s).*\\bon[a-z]+\\s*=.*")
+                || unsafe.matches("(?s).*\\b(?:javascript|vbscript|data|file):.*")) {
             throw new DataSaveException("邮件模板包含不安全 HTML");
+        }
+    }
+
+    /**
+     * 拒绝看起来像占位符但不符合安全变量语法的双大括号。
+     */
+    private void validatePlaceholders(String template) {
+        if (!StringUtils.hasText(template)) {
+            return;
+        }
+        var remainder = VARIABLE.matcher(template).replaceAll("");
+        if (INVALID_VARIABLE.matcher(remainder).find()) {
+            throw new DataSaveException("通知模板包含非法占位符");
         }
     }
 }

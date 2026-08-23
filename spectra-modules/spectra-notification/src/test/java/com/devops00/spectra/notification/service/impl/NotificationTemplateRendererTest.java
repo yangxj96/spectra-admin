@@ -54,6 +54,8 @@ class NotificationTemplateRendererTest {
     void shouldRejectUnsafeHtml() {
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<img src=x onerror=alert(1) />"));
         assertThrows(DataSaveException.class, () -> renderer.validateHtml("<a href=\"javascript:alert(1)\">x</a>"));
+        assertThrows(DataSaveException.class, () -> renderer.validateHtml("<img src=\"data:image/png;base64,abc\" />"));
+        assertThrows(DataSaveException.class, () -> renderer.validateHtml("<a href=\"file:///tmp/a\">x</a>"));
     }
 
     @Test
@@ -63,5 +65,11 @@ class NotificationTemplateRendererTest {
         renderer.validateDefinition(schema, "你好 {{name}}", "正文 {{name}}");
         assertThrows(DataSaveException.class, () -> renderer.validateDefinition(schema, "正文 {{missing}}"));
         assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{name}}"));
+    }
+
+    @Test
+    void shouldRejectIllegalPlaceholders() {
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{bad name}}"));
+        assertThrows(DataSaveException.class, () -> renderer.validateDefinition(Map.of(), "正文 {{name"));
     }
 }
