@@ -73,6 +73,13 @@ public class NotificationTemplateAdminController {
         return service.create(params);
     }
 
+    @ULog("'复制通知模板草稿'")
+    @PostMapping(value = "/{id}/copy", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:template:write')")
+    public NotificationTemplateVO copy(@PathVariable UUID id) {
+        return service.copy(id);
+    }
+
     @ULog("'修改通知模板草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")

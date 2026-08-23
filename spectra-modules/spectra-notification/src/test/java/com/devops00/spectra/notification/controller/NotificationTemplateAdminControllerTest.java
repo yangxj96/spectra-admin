@@ -44,6 +44,7 @@ class NotificationTemplateAdminControllerTest {
                 PageFrom.class, NotificationTemplatePageFrom.class));
         assertEquals("hasPermission(null, 'notification:template:write')", annotation("create",
                 NotificationTemplateSaveFrom.class));
+        assertEquals("hasPermission(null, 'notification:template:write')", annotation("copy", UUID.class));
         assertEquals("hasPermission(null, 'notification:template:publish')", annotation("publish",
                 UUID.class, NotificationTemplateActionFrom.class));
         assertEquals("hasPermission(null, 'notification:template:read')", annotation("preview",

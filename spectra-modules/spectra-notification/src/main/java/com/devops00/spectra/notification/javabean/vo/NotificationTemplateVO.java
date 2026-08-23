@@ -44,6 +44,8 @@ public class NotificationTemplateVO {
 
     private String state;
 
+    private String versionDigest;
+
     private String titleTemplate;
 
     private String contentTemplate;

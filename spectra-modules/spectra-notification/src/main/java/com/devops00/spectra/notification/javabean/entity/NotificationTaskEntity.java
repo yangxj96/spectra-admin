@@ -78,6 +78,16 @@ public class NotificationTaskEntity extends BaseEntity {
     @TableField("template_id")
     private UUID templateId;
     /**
+     * 锁定的模板业务版本号。
+     */
+    @TableField("template_version_no")
+    private Integer templateVersionNo;
+    /**
+     * 锁定的模板内容摘要。
+     */
+    @TableField("template_version_digest")
+    private String templateVersionDigest;
+    /**
      * 通知用途。
      */
     @TableField("purpose")

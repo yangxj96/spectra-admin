@@ -63,7 +63,7 @@ class NotificationSqlContractTest {
         var targetSchema = schema.substring(0, schema.indexOf("-- 历史数据迁移"));
         assertFalse(targetSchema.contains("tenant_id"), "通知模块目标 schema 不应恢复已移除的 tenant_id");
         var tableColumns = tableColumns(schema);
-        assertEquals(125, tableColumns.size());
+        assertEquals(134, tableColumns.size());
         assertEquals(tableColumns, commentedColumns(schema));
     }
 

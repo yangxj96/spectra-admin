@@ -98,6 +98,11 @@ public class NotificationRequestEntity extends BaseEntity {
     @TableField(value = "parameters", typeHandler = PgJsonbTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
     private Map<String, Object> parameters;
     /**
+     * 各渠道实际选中的模板版本元数据，不保存渲染正文或敏感参数。
+     */
+    @TableField(value = "template_snapshot", typeHandler = PgJsonbTypeHandler.class, updateStrategy = FieldStrategy.ALWAYS)
+    private Map<String, Object> templateSnapshot;
+    /**
      * 敏感参数密文。
      */
     @TableField("sensitive_parameters_ciphertext")

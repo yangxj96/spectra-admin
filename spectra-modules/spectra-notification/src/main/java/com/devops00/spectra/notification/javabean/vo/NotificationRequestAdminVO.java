@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.javabean.vo;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -47,6 +48,10 @@ public class NotificationRequestAdminVO {
      * 模板编码。
      */
     private String templateCode;
+    /**
+     * 各渠道实际使用的模板版本摘要元数据。
+     */
+    private Map<String, Object> templateSnapshot;
     /**
      * 通知用途。
      */

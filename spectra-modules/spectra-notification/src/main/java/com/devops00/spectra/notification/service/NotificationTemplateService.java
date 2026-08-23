@@ -43,6 +43,8 @@ public interface NotificationTemplateService {
 
     NotificationTemplateVO create(NotificationTemplateSaveFrom params);
 
+    NotificationTemplateVO copy(UUID id);
+
     NotificationTemplateVO update(NotificationTemplateSaveFrom params);
 
     void publish(UUID id, NotificationTemplateActionFrom params);

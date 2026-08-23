@@ -48,6 +48,31 @@ public class NotificationDeliveryEntity extends BaseEntity {
     @TableField("notification_task_id")
     private UUID notificationTaskId;
     /**
+     * 投递时锁定的模板版本 ID。
+     */
+    @TableField("template_id")
+    private UUID templateId;
+    /**
+     * 投递时锁定的模板业务版本号。
+     */
+    @TableField("template_version_no")
+    private Integer templateVersionNo;
+    /**
+     * 投递时锁定的模板内容摘要。
+     */
+    @TableField("template_version_digest")
+    private String templateVersionDigest;
+    /**
+     * 投递时使用的渲染标题快照；敏感通知只保存脱敏占位标题。
+     */
+    @TableField("rendered_title")
+    private String renderedTitle;
+    /**
+     * 投递时使用的渲染正文快照；敏感通知只保存脱敏占位正文。
+     */
+    @TableField("rendered_content")
+    private String renderedContent;
+    /**
      * 当前任务尝试序号。
      */
     @TableField("attempt_no")

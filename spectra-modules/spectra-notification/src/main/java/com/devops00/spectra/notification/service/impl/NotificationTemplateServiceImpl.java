@@ -117,6 +117,18 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
 
     @Override
     @Transactional
+    public NotificationTemplateVO copy(UUID id) {
+        var source = getTemplate(id);
+        var draft = copyToDraft(source);
+        if (mapper.insert(draft) != 1) {
+            throw new DataSaveException("复制通知模板失败");
+        }
+        log.info("已复制通知模板草稿: sourceId={}, draftId={}", id, draft.getId());
+        return converter.toVO(draft);
+    }
+
+    @Override
+    @Transactional
     public NotificationTemplateVO update(NotificationTemplateSaveFrom params) {
         var entity = getTemplate(params.getId());
         ensureState(entity, DRAFT, "只有草稿模板可以编辑");
@@ -150,6 +162,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
                 .set(NotificationTemplateEntity::getState, DISABLED)
                 .set(NotificationTemplateEntity::getUpdatedAt, Instant.now()));
         entity.setState(PUBLISHED);
+        entity.setVersionDigest(NotificationTemplateDigest.calculate(entity));
         if (mapper.updateById(entity) != 1) {
             throw new DataSaveException("发布通知模板失败");
         }
@@ -205,6 +218,15 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         if (DRAFT.equals(source.getState())) {
             throw new DataSaveException("草稿模板不能回滚");
         }
+        var draft = copyToDraft(source);
+        if (mapper.insert(draft) != 1) {
+            throw new DataSaveException("创建回滚草稿失败");
+        }
+        log.info("已从通知模板历史版本创建回滚草稿: sourceId={}, draftId={}", id, draft.getId());
+        return converter.toVO(draft);
+    }
+
+    private NotificationTemplateEntity copyToDraft(NotificationTemplateEntity source) {
         var draft = new NotificationTemplateEntity();
         draft.setTemplateGroupCode(source.getTemplateGroupCode());
         draft.setChannel(source.getChannel());
@@ -216,11 +238,8 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         draft.setHtmlTemplate(source.getHtmlTemplate());
         draft.setParameterSchema(source.getParameterSchema());
         draft.setProviderTemplateCode(source.getProviderTemplateCode());
-        if (mapper.insert(draft) != 1) {
-            throw new DataSaveException("创建回滚草稿失败");
-        }
-        log.info("已从通知模板历史版本创建回滚草稿: sourceId={}, draftId={}", id, draft.getId());
-        return converter.toVO(draft);
+        draft.setVersionDigest(NotificationTemplateDigest.calculate(draft));
+        return draft;
     }
 
     @Override
@@ -275,6 +294,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         entity.setHtmlTemplate(normalizeNullable(params.getHtmlTemplate()));
         entity.setParameterSchema(params.getParameterSchema() == null ? Map.of() : params.getParameterSchema());
         entity.setProviderTemplateCode(normalizeNullable(params.getProviderTemplateCode()));
+        entity.setVersionDigest(NotificationTemplateDigest.calculate(entity));
     }
 
     private int nextVersionNo(String groupCode, String channel) {

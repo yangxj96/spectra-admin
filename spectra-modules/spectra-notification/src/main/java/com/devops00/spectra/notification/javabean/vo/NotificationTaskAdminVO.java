@@ -40,6 +40,18 @@ public class NotificationTaskAdminVO {
      */
     private UUID requestId;
     /**
+     * 锁定的模板版本 ID。
+     */
+    private UUID templateId;
+    /**
+     * 锁定的模板业务版本号。
+     */
+    private Integer templateVersionNo;
+    /**
+     * 锁定的模板内容摘要。
+     */
+    private String templateVersionDigest;
+    /**
      * 收件用户 ID。
      */
     private UUID recipientUserId;

@@ -187,6 +187,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         }
 
         var taskCount = 0;
+        var templateSnapshot = new LinkedHashMap<String, Object>();
         for (var recipient : recipients) {
             if (!recipient.active()) {
                 log.warn("通知收件人不存在或已禁用: userId={}", recipient.userId());
@@ -201,18 +202,20 @@ public class NotificationGatewayImpl implements NotificationGateway {
                     log.warn("通知收件人缺少已验证渠道地址: userId={}, channel={}", recipient.userId(), channel);
                     continue;
                 }
-                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now);
+                taskCount += createTask(request, requestId, recipient.userId(), channel, address, now, templateSnapshot);
             }
         }
         for (var directAddress : request.directAddresses()) {
             if (!channels.contains(directAddress.channel())) {
                 continue;
             }
-            taskCount += createTask(request, requestId, null, directAddress.channel(), directAddress.address(), now);
+            taskCount += createTask(request, requestId, null, directAddress.channel(), directAddress.address(), now,
+                    templateSnapshot);
         }
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, requestId)
-                .set(NotificationRequestEntity::getTaskCount, taskCount));
+                .set(NotificationRequestEntity::getTaskCount, taskCount)
+                .set(NotificationRequestEntity::getTemplateSnapshot, templateSnapshot));
         return new NotificationReceipt(requestId, "ACCEPTED", taskCount, false);
     }
 
@@ -220,7 +223,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
      * 为单个收件人和渠道创建幂等投递任务。
      */
     private int createTask(NotificationRequest request, UUID requestId, UUID recipientUserId,
-                           NotificationChannel channel, String address, Instant now) {
+                           NotificationChannel channel, String address, Instant now,
+                           Map<String, Object> templateSnapshot) {
         var recipientKeyHash = recipientKeyHash(recipientUserId, channel, address);
         if (taskMapper.selectCount(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getNotificationRequestId, requestId)
@@ -231,6 +235,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var renderParameters = new HashMap<String, Object>(request.parameters());
         renderParameters.putAll(request.sensitiveParameters());
         var rendered = render(request, channel, renderParameters);
+        recordTemplateSnapshot(templateSnapshot, channel, rendered);
         var hasSensitivePayload = !request.sensitiveParameters().isEmpty();
         var task = new NotificationTaskEntity();
         task.setNotificationRequestId(requestId);
@@ -241,6 +246,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
         task.setChannel(channel.name());
         task.setPurpose(request.purpose().name());
         task.setTemplateId(rendered.templateId());
+        task.setTemplateVersionNo(rendered.versionNo());
+        task.setTemplateVersionDigest(rendered.versionDigest());
         task.setTitle(hasSensitivePayload ? "安全通知" : rendered.title());
         task.setContent(hasSensitivePayload ? "敏感通知内容已加密" : rendered.content());
         task.setLink(request.link());
@@ -279,7 +286,8 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (template != null) {
             templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());
-            return new RenderedContent(template.getId(), templateRenderer.render(template.getTitleTemplate(), parameters),
+            return new RenderedContent(template.getId(), template.getVersionNo(), template.getVersionDigest(),
+                    templateRenderer.render(template.getTitleTemplate(), parameters),
                     templateRenderer.render(template.getContentTemplate(), parameters));
         }
         var title = String.valueOf(parameters.getOrDefault("title", "通知"));
@@ -291,7 +299,22 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (!StringUtils.hasText(title)) {
             throw new DataSaveException("通知标题不能为空");
         }
-        return new RenderedContent(null, title, content);
+        return new RenderedContent(null, null, null, title, content);
+    }
+
+    /**
+     * 在逻辑请求上记录每个实际渠道使用的模板版本元数据。
+     */
+    private void recordTemplateSnapshot(Map<String, Object> snapshots, NotificationChannel channel,
+                                        RenderedContent rendered) {
+        if (rendered.templateId() == null) {
+            return;
+        }
+        var snapshot = new LinkedHashMap<String, Object>();
+        snapshot.put("template_id", rendered.templateId().toString());
+        snapshot.put("version_no", rendered.versionNo());
+        snapshot.put("version_digest", rendered.versionDigest());
+        snapshots.put(channel.name(), snapshot);
     }
 
     /**
@@ -408,6 +431,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
     /**
      * 渲染后的标题和正文。
      */
-    private record RenderedContent(UUID templateId, String title, String content) {
+    private record RenderedContent(UUID templateId, Integer versionNo, String versionDigest,
+                                   String title, String content) {
     }
 }

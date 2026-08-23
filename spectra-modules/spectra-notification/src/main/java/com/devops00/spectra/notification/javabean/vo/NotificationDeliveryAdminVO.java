@@ -40,6 +40,18 @@ public class NotificationDeliveryAdminVO {
      */
     private UUID taskId;
     /**
+     * 投递时锁定的模板版本 ID。
+     */
+    private UUID templateId;
+    /**
+     * 投递时锁定的模板业务版本号。
+     */
+    private Integer templateVersionNo;
+    /**
+     * 投递时锁定的模板内容摘要。
+     */
+    private String templateVersionDigest;
+    /**
      * 渠道供应商编码。
      */
     private String providerCode;

@@ -90,4 +90,9 @@ public class NotificationTemplateEntity extends BaseEntity {
      */
     @TableField("state")
     private String state;
+    /**
+     * 模板内容不可变摘要，使用 SHA-256 十六进制编码。
+     */
+    @TableField("version_digest")
+    private String versionDigest;
 }

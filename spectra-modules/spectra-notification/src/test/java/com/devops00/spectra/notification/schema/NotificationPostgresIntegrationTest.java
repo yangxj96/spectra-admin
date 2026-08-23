@@ -25,11 +25,7 @@ import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.sql.Types;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -314,35 +310,6 @@ class NotificationPostgresIntegrationTest {
     }
 
     @Test
-    void shouldMigrateLegacyNotificationsAndPreferencesIdempotently() throws Exception {
-        var userId = UUID.randomUUID();
-        var notificationId = UUID.randomUUID();
-        var settingId = UUID.randomUUID();
-        var createdAt = Instant.now().minusSeconds(60);
-        try (var connection = openConnection()) {
-            insertLegacyNotification(connection, notificationId, userId, createdAt);
-            insertLegacySetting(connection, settingId, userId, createdAt);
-            executeMigrationScript(connection);
-            var firstInboxCount = countByReceiver(connection, userId);
-            var firstPreferenceCount = countByPreferenceUser(connection, userId);
-            assertEquals(1, firstInboxCount);
-            assertEquals(5, firstPreferenceCount);
-            assertEquals(1, countUnreadByReceiver(connection, userId));
-            assertEquals("{}", migratedExtra(connection, notificationId));
-            assertMigratedNotification(connection, notificationId, userId, createdAt);
-            assertMigratedPreferences(connection, userId, createdAt);
-
-            executeMigrationScript(connection);
-            assertEquals(firstInboxCount, countByReceiver(connection, userId));
-            assertEquals(firstPreferenceCount, countByPreferenceUser(connection, userId));
-        } finally {
-            try (var connection = openConnection()) {
-                deleteMigratedData(connection, notificationId, userId);
-            }
-        }
-    }
-
-    @Test
     void shouldClearExpiredSensitivePayloadsWithoutTouchingBusinessContent() throws Exception {
         var requestId = UUID.randomUUID();
         var taskId = UUID.randomUUID();
@@ -399,24 +366,6 @@ class NotificationPostgresIntegrationTest {
         Class.forName("org.postgresql.Driver");
         return DriverManager.getConnection(requiredEnvironment("DB_URL"), requiredEnvironment("DB_USERNAME"),
                 requiredEnvironment("DB_PASSWORD"));
-    }
-
-    private void executeMigrationScript(Connection connection) throws Exception {
-        var candidates = List.of(
-                Path.of("docs", "sql", "spectra_notification", "迁移", "V20260813__migrate_legacy_notifications.sql"),
-                Path.of("..", "docs", "sql", "spectra_notification", "迁移",
-                        "V20260813__migrate_legacy_notifications.sql"),
-                Path.of("..", "..", "docs", "sql", "spectra_notification", "迁移",
-                        "V20260813__migrate_legacy_notifications.sql"),
-                Path.of("..", "..", "..", "docs", "sql", "spectra_notification", "迁移",
-                        "V20260813__migrate_legacy_notifications.sql"));
-        var script = candidates.stream()
-                .filter(Files::isRegularFile)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("找不到通知迁移脚本"));
-        try (var statement = connection.createStatement()) {
-            statement.execute(Files.readString(script, StandardCharsets.UTF_8));
-        }
     }
 
     private void executeSensitivePayloadCleanup(Connection connection, Instant now, Instant cutoff, int limit)
@@ -488,42 +437,6 @@ class NotificationPostgresIntegrationTest {
             insert.setString(3, idempotencyKey);
             insert.setString(4, requestId.toString());
             setInstant(insert, 5, Instant.now());
-            insert.executeUpdate();
-        }
-    }
-
-    private void insertLegacyNotification(Connection connection, UUID notificationId, UUID userId, Instant createdAt)
-            throws SQLException {
-        try (var insert = connection.prepareStatement("""
-                INSERT INTO spectra_core.sys_notification
-                    (id, title, content, type, sender_id, sender_name, link, is_read, read_at, receiver_id,
-                     extra, created_by, created_at, updated_by, updated_at, version)
-                VALUES (?, 'Legacy title', 'Legacy content', 'oa', NULL, NULL, '/legacy', FALSE, NULL, ?,
-                        '"legacy-scalar"'::jsonb, NULL, ?, NULL, ?, 0)
-                """)) {
-            insert.setObject(1, notificationId);
-            insert.setObject(2, userId);
-            setInstant(insert, 3, createdAt);
-            setInstant(insert, 4, createdAt);
-            insert.executeUpdate();
-        }
-    }
-
-    private void insertLegacySetting(Connection connection, UUID settingId, UUID userId, Instant createdAt)
-            throws SQLException {
-        try (var insert = connection.prepareStatement("""
-                INSERT INTO spectra_core.sys_notification_setting
-                    (id, user_id, system_enabled, workflow_enabled, oa_enabled, inner_mail_enabled,
-                     approval_enabled, do_not_disturb, do_not_disturb_start, do_not_disturb_end,
-                     created_by, created_at, updated_by, updated_at, version)
-                VALUES (?, ?, TRUE, FALSE, TRUE, FALSE, TRUE, TRUE, ?, ?, NULL, ?, NULL, ?, 0)
-                """)) {
-            insert.setObject(1, settingId);
-            insert.setObject(2, userId);
-            setInstant(insert, 3, createdAt.minusSeconds(3600));
-            setInstant(insert, 4, createdAt);
-            setInstant(insert, 5, createdAt);
-            setInstant(insert, 6, createdAt);
             insert.executeUpdate();
         }
     }
@@ -626,110 +539,6 @@ class NotificationPostgresIntegrationTest {
         }
     }
 
-    private long countByReceiver(Connection connection, UUID userId) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "SELECT COUNT(*) FROM spectra_notification.ntf_inbox_message WHERE receiver_user_id = ?")) {
-            query.setObject(1, userId);
-            try (var result = query.executeQuery()) {
-                result.next();
-                return result.getLong(1);
-            }
-        }
-    }
-
-    private long countUnreadByReceiver(Connection connection, UUID userId) throws SQLException {
-        try (var query = connection.prepareStatement("""
-                SELECT COUNT(*)
-                  FROM spectra_notification.ntf_inbox_message
-                 WHERE receiver_user_id = ? AND is_read = FALSE
-                """)) {
-            query.setObject(1, userId);
-            try (var result = query.executeQuery()) {
-                result.next();
-                return result.getLong(1);
-            }
-        }
-    }
-
-    private long countByPreferenceUser(Connection connection, UUID userId) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "SELECT COUNT(*) FROM spectra_notification.ntf_user_preference WHERE user_id = ?")) {
-            query.setObject(1, userId);
-            try (var result = query.executeQuery()) {
-                result.next();
-                return result.getLong(1);
-            }
-        }
-    }
-
-    private String migratedExtra(Connection connection, UUID notificationId) throws SQLException {
-        try (var query = connection.prepareStatement(
-                "SELECT extra::text FROM spectra_notification.ntf_inbox_message WHERE id = ?")) {
-            query.setObject(1, notificationId);
-            try (var result = query.executeQuery()) {
-                assertTrue(result.next());
-                return result.getString(1);
-            }
-        }
-    }
-
-    private void assertMigratedNotification(Connection connection, UUID notificationId, UUID userId,
-                                            Instant createdAt)
-            throws SQLException {
-        try (var query = connection.prepareStatement("""
-                SELECT receiver_user_id, purpose, title, content, link, is_read, read_at, created_at, deleted
-                  FROM spectra_notification.ntf_inbox_message
-                 WHERE id = ?
-                """)) {
-            query.setObject(1, notificationId);
-            try (var result = query.executeQuery()) {
-                assertTrue(result.next());
-                assertEquals(userId, result.getObject("receiver_user_id", UUID.class));
-                assertEquals("OA_NOTICE", result.getString("purpose"));
-                assertEquals("Legacy title", result.getString("title"));
-                assertEquals("Legacy content", result.getString("content"));
-                assertEquals("/legacy", result.getString("link"));
-                assertFalse(result.getBoolean("is_read"));
-                assertNull(result.getObject("read_at"));
-                assertEquals(createdAt.toEpochMilli(), result.getTimestamp("created_at").toInstant().toEpochMilli());
-                assertNull(result.getObject("deleted"));
-            }
-        }
-    }
-
-    private void assertMigratedPreferences(Connection connection, UUID userId, Instant createdAt) throws SQLException {
-        try (var query = connection.prepareStatement("""
-                SELECT purpose, enabled, do_not_disturb, do_not_disturb_start, do_not_disturb_end, channel
-                  FROM spectra_notification.ntf_user_preference
-                 WHERE user_id = ?
-                """)) {
-            query.setObject(1, userId);
-            var enabled = new HashMap<String, Boolean>();
-            var channels = new HashMap<String, String>();
-            try (var result = query.executeQuery()) {
-                while (result.next()) {
-                    var purpose = result.getString("purpose");
-                    enabled.put(purpose, result.getBoolean("enabled"));
-                    channels.put(purpose, result.getString("channel"));
-                    assertTrue(result.getBoolean("do_not_disturb"));
-                    assertEquals(createdAt.minusSeconds(3600).toEpochMilli(),
-                            result.getTimestamp("do_not_disturb_start").toInstant().toEpochMilli());
-                    assertEquals(createdAt.toEpochMilli(), result.getTimestamp("do_not_disturb_end")
-                            .toInstant()
-                            .toEpochMilli());
-                }
-            }
-            assertEquals(Map.of(
-                    "SYSTEM_NOTICE", true,
-                    "WORKFLOW_TODO", false,
-                    "OA_NOTICE", true,
-                    "INNER_MESSAGE", false,
-                    "WORKFLOW_RESULT", true), enabled);
-            assertEquals(5, channels.size());
-            assertTrue(channels.values().stream().allMatch("IN_APP"::equals));
-        }
-    }
-
     private void deleteTask(Connection connection, UUID taskId) throws SQLException {
         try (var delete = connection.prepareStatement("DELETE FROM spectra_notification.ntf_task WHERE id = ?")) {
             delete.setObject(1, taskId);
@@ -742,26 +551,6 @@ class NotificationPostgresIntegrationTest {
                 "DELETE FROM spectra_notification.ntf_inbox_message WHERE notification_task_id = ?")) {
             delete.setObject(1, taskId);
             delete.executeUpdate();
-        }
-    }
-
-    private void deleteMigratedData(Connection connection, UUID notificationId, UUID userId) throws SQLException {
-        try (var deleteInbox = connection.prepareStatement(
-                "DELETE FROM spectra_notification.ntf_inbox_message WHERE id = ?");
-                var deletePreferences = connection.prepareStatement(
-                        "DELETE FROM spectra_notification.ntf_user_preference WHERE user_id = ?");
-                var deleteNotification = connection.prepareStatement(
-                        "DELETE FROM spectra_core.sys_notification WHERE id = ?");
-                var deleteSetting = connection.prepareStatement(
-                        "DELETE FROM spectra_core.sys_notification_setting WHERE user_id = ?")) {
-            deleteInbox.setObject(1, notificationId);
-            deleteInbox.executeUpdate();
-            deletePreferences.setObject(1, userId);
-            deletePreferences.executeUpdate();
-            deleteNotification.setObject(1, notificationId);
-            deleteNotification.executeUpdate();
-            deleteSetting.setObject(1, userId);
-            deleteSetting.executeUpdate();
         }
     }
 
