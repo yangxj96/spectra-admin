@@ -29,7 +29,6 @@ import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.observability.NotificationMetrics;
 import com.devops00.spectra.notification.service.NotificationSender;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -49,7 +48,6 @@ import java.util.UUID;
  * @version 1.0
  * @since 2026/8/11
  */
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationTaskWorker {
@@ -179,28 +177,28 @@ public class NotificationTaskWorker {
                 metrics.recordTask(task.getChannel(), result.status(), task.getPurpose());
             }
         } catch (RuntimeException exception) {
-            var safeMessage = sanitizeProviderSummary(exception.getMessage());
-            finishFailure(task, safeMessage == null ? "PROVIDER_FAILURE" : safeMessage);
+            finish(task, new ChannelSendResult("UNKNOWN", "NONE", null, "PROVIDER_FAILURE"));
             if (metrics != null) {
-                metrics.recordRetry(task.getChannel(), "PROVIDER_FAILURE");
+                metrics.recordTask(task.getChannel(), "UNKNOWN", task.getPurpose());
             }
         }
         refreshRequestStatus(task.getNotificationRequestId());
     }
 
     /**
-     * 记录渠道结果并将任务更新为对应终态。
+     * 记录渠道结果；只有明确的限流结果允许按任务最大尝试次数退避重试。
      */
     private void finish(NotificationTaskEntity task, ChannelSendResult result) {
         var delivery = new NotificationDeliveryEntity();
         var completedAt = Instant.now();
+        var attemptCount = (task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1;
         delivery.setNotificationTaskId(task.getId());
         delivery.setTemplateId(task.getTemplateId());
         delivery.setTemplateVersionNo(task.getTemplateVersionNo());
         delivery.setTemplateVersionDigest(task.getTemplateVersionDigest());
         delivery.setRenderedTitle(task.getTitle());
         delivery.setRenderedContent(task.getContent());
-        delivery.setAttemptNo((task.getAttemptCount() == null ? 0 : task.getAttemptCount()) + 1);
+        delivery.setAttemptNo(attemptCount);
         delivery.setProvider(result.providerCode());
         delivery.setProviderMessageId(result.providerMessageId());
         delivery.setStartedAt(completedAt);
@@ -213,33 +211,28 @@ public class NotificationTaskWorker {
         if (deliveryMapper.insert(delivery) != 1) {
             throw new DataSaveException("记录通知投递结果失败");
         }
-        taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getId, task.getId())
-                .eq(NotificationTaskEntity::getStatus, "PROCESSING")
-                .set(NotificationTaskEntity::getStatus, result.status())
-                .set(NotificationTaskEntity::getLockedBy, null)
-                .set(NotificationTaskEntity::getLockedAt, null));
-    }
-
-    /**
-     * 记录渠道异常，并按重试次数决定下次处理时间或失败终态。
-     */
-    private void finishFailure(NotificationTaskEntity task, String message) {
-        var attemptCount = task.getAttemptCount() == null ? 1 : task.getAttemptCount() + 1;
-        var terminal = attemptCount >= MAX_RETRY_COUNT;
-        var status = terminal ? "FAILED" : "RETRYING";
+        var retryable = isRetryable(result, attemptCount, task.getMaxAttempts());
         var nextAttempt = Instant.now().plusSeconds(retryDelaySeconds(attemptCount));
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
                 .eq(NotificationTaskEntity::getStatus, "PROCESSING")
                 .set(NotificationTaskEntity::getAttemptCount, attemptCount)
-                .set(NotificationTaskEntity::getLastErrorCode, message)
-                .set(NotificationTaskEntity::getStatus, status)
-                .set(NotificationTaskEntity::getScheduledAt, nextAttempt)
-                .set(NotificationTaskEntity::getNextRetryAt, nextAttempt)
+                .set(NotificationTaskEntity::getLastErrorCode, "SENT".equals(result.status()) ? null : safeSummary)
+                .set(NotificationTaskEntity::getStatus, retryable ? "RETRYING" : result.status())
+                .set(NotificationTaskEntity::getScheduledAt, retryable ? nextAttempt : task.getScheduledAt())
+                .set(NotificationTaskEntity::getNextRetryAt, retryable ? nextAttempt : task.getNextRetryAt())
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
-        log.warn("通知任务处理失败: taskId={}, attemptCount={}, status={}", task.getId(), attemptCount, status);
+    }
+
+    /**
+     * 仅对供应商明确返回的限流结果执行自动重试；UNKNOWN 不做无条件重试。
+     */
+    private boolean isRetryable(ChannelSendResult result, int attemptCount, Integer maxAttempts) {
+        var allowedAttempts = maxAttempts == null || maxAttempts < 1 ? MAX_RETRY_COUNT : maxAttempts;
+        return "FAILED".equals(result.status())
+                && "PROVIDER_RATE_LIMITED".equals(result.summary())
+                && attemptCount < allowedAttempts;
     }
 
     /**

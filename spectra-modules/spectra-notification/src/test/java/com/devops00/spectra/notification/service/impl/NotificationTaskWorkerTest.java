@@ -107,12 +107,44 @@ class NotificationTaskWorkerTest {
     }
 
     @Test
-    void shouldRetrySenderFailureWithoutCreatingDelivery() {
+    void shouldRecordUnknownProviderFailureWithoutRetry() {
         var taskMapper = mock(NotificationTaskMapper.class);
         var deliveryMapper = mock(NotificationDeliveryMapper.class);
         var requestMapper = mock(NotificationRequestMapper.class);
         var sender = mock(NotificationSender.class);
         var task = task("PENDING", Instant.now().minusSeconds(1), Instant.now().plusSeconds(60));
+        var unknown = task("UNKNOWN", task.getScheduledAt(), task.getExpiresAt());
+        unknown.setId(task.getId());
+        unknown.setNotificationRequestId(task.getNotificationRequestId());
+        unknown.setAttemptCount(1);
+        when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
+        when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(unknown));
+        when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+        when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
+        when(sender.channel()).thenReturn(NotificationChannel.SMS);
+        when(sender.send(task)).thenThrow(new IllegalStateException("provider unavailable"));
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+
+        assertEquals(1, worker.processPending(50));
+
+        var deliveryCaptor = org.mockito.ArgumentCaptor.forClass(NotificationDeliveryEntity.class);
+        verify(deliveryMapper).insert(deliveryCaptor.capture());
+        assertEquals("UNKNOWN", deliveryCaptor.getValue().getResultStatus());
+        var updateCaptor = org.mockito.ArgumentCaptor.forClass(LambdaUpdateWrapper.class);
+        verify(taskMapper, org.mockito.Mockito.times(3)).update(isNull(), updateCaptor.capture());
+        var resultUpdate = updateCaptor.getAllValues().get(2).getParamNameValuePairs();
+        assertTrue(resultUpdate.containsValue("UNKNOWN"));
+        assertTrue(resultUpdate.containsValue(1));
+    }
+
+    @Test
+    void shouldRetryOnlyExplicitRateLimitedResult() {
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var sender = mock(NotificationSender.class);
+        var task = task("PENDING", Instant.now().minusSeconds(1), Instant.now().plusSeconds(60));
+        task.setMaxAttempts(3);
         var retrying = task("RETRYING", task.getScheduledAt(), task.getExpiresAt());
         retrying.setId(task.getId());
         retrying.setNotificationRequestId(task.getNotificationRequestId());
@@ -120,18 +152,22 @@ class NotificationTaskWorkerTest {
         when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
         when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(retrying));
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+        when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
         when(sender.channel()).thenReturn(NotificationChannel.SMS);
-        when(sender.send(task)).thenThrow(new IllegalStateException("provider unavailable"));
+        when(sender.send(task)).thenReturn(new ChannelSendResult("FAILED", "RATE_LIMITED", null,
+                "PROVIDER_RATE_LIMITED"));
         var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
 
         assertEquals(1, worker.processPending(50));
 
-        verify(deliveryMapper, never()).insert(any(NotificationDeliveryEntity.class));
+        var deliveryCaptor = org.mockito.ArgumentCaptor.forClass(NotificationDeliveryEntity.class);
+        verify(deliveryMapper).insert(deliveryCaptor.capture());
+        assertEquals("FAILED", deliveryCaptor.getValue().getResultStatus());
         var updateCaptor = org.mockito.ArgumentCaptor.forClass(LambdaUpdateWrapper.class);
         verify(taskMapper, org.mockito.Mockito.times(3)).update(isNull(), updateCaptor.capture());
-        var failureUpdate = updateCaptor.getAllValues().get(2).getParamNameValuePairs();
-        assertTrue(failureUpdate.containsValue("RETRYING"));
-        assertTrue(failureUpdate.containsValue(1));
+        var resultUpdate = updateCaptor.getAllValues().get(2).getParamNameValuePairs();
+        assertTrue(resultUpdate.containsValue("RETRYING"));
+        assertTrue(resultUpdate.containsValue(1));
     }
 
     @Test
