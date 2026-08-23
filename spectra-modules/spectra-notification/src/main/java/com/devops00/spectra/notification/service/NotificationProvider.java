@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.notification.service;
 
+import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
@@ -34,6 +35,13 @@ public interface NotificationProvider {
      * Provider 类型编码。
      */
     String code();
+
+    /**
+     * 判断当前 Provider 是否支持指定渠道。
+     */
+    default boolean supports(NotificationChannel channel) {
+        return channel != null;
+    }
 
     /**
      * 执行健康检查；不得返回明文响应或凭据。

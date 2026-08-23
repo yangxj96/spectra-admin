@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.controller;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
+import com.devops00.spectra.notification.service.NotificationProviderRuntime;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -32,10 +33,15 @@ class NotificationProviderAdminControllerTest {
 
     @Test
     void shouldSeparateProviderReadAndConfigurePermissions() throws NoSuchMethodException {
-        var controller = new NotificationProviderAdminController(mock(NotificationProviderAdminService.class));
+        var controller = new NotificationProviderAdminController(mock(NotificationProviderAdminService.class),
+                mock(NotificationProviderRuntime.class));
 
         assertEquals("hasPermission(null, 'notification:provider:read')",
                 NotificationProviderAdminController.class.getMethod("list")
+                        .getAnnotation(PreAuthorize.class)
+                        .value());
+        assertEquals("hasPermission(null, 'notification:provider:configure')",
+                NotificationProviderAdminController.class.getMethod("health", NotificationChannel.class)
                         .getAnnotation(PreAuthorize.class)
                         .value());
         assertEquals("hasPermission(null, 'notification:provider:configure')",

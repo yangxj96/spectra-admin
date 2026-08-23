@@ -20,7 +20,6 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.service.NotificationSender;
-import org.springframework.stereotype.Component;
 
 /**
  * 短信占位 Sender；未接入真实供应商时明确返回未配置。
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Component;
  * @version 1.0
  * @since 2026/8/11
  */
-@Component
 public class PlaceholderSmsSender implements NotificationSender {
 
     /**

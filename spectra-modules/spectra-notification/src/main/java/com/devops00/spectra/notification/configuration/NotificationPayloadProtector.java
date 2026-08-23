@@ -66,6 +66,13 @@ public class NotificationPayloadProtector {
     }
 
     /**
+     * 解密外部渠道地址；解密失败时直接阻断当前投递。
+     */
+    public String unprotectAddress(String ciphertext) {
+        return unprotect(ciphertext, properties.addressEncryptionKey(), "通知地址");
+    }
+
+    /**
      * 保护敏感参数对象。
      */
     public String protectParameters(Map<String, Object> parameters) {
@@ -93,20 +100,27 @@ public class NotificationPayloadProtector {
      * 解密 Provider Secret；解密失败时直接阻断渠道使用。
      */
     public String unprotectSecret(String ciphertext) {
+        return unprotect(ciphertext, properties.sensitivePayloadKey(), "Provider Secret");
+    }
+
+    /**
+     * 使用指定配置密钥解密载荷。
+     */
+    private String unprotect(String ciphertext, String encodedKey, String name) {
         if (ciphertext == null || ciphertext.isBlank()) {
-            throw new DataSaveException("Provider Secret 未配置");
+            throw new DataSaveException(name + "未配置");
         }
         try {
             var parts = ciphertext.split(":", 3);
             if (parts.length != 3 || !VERSION.equals(parts[0])) {
-                throw new DataSaveException("Provider Secret 密文格式不正确");
+                throw new DataSaveException(name + "密文格式不正确");
             }
-            var keyBytes = decodeKey(properties.sensitivePayloadKey(), "Provider Secret");
+            var keyBytes = decodeKey(encodedKey, name);
             return AESUtils.decrypt(parts[2], new SecretKeySpec(keyBytes, "AES"), AESUtils.hexToIv(parts[1]));
         } catch (DataSaveException | EncryptException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new EncryptException("Provider Secret 解密失败", exception);
+            throw new EncryptException(name + "解密失败", exception);
         }
     }
 

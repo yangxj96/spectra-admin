@@ -81,6 +81,14 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
     }
 
     /**
+     * 通用 JSON Provider 支持短信和邮件两个外部渠道。
+     */
+    @Override
+    public boolean supports(NotificationChannel channel) {
+        return channel == NotificationChannel.SMS || channel == NotificationChannel.EMAIL;
+    }
+
+    /**
      * 通过 GET 端点检查供应商是否可达；HTTP 4xx/5xx 均视为不健康。
      */
     @Override

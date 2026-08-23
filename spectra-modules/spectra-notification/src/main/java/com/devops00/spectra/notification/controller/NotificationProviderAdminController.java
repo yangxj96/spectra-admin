@@ -18,9 +18,11 @@ package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
+import com.devops00.spectra.notification.service.NotificationProviderRuntime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -46,6 +48,11 @@ public class NotificationProviderAdminController {
      * Provider 配置服务。
      */
     private final NotificationProviderAdminService service;
+
+    /**
+     * Provider 运行时协调器。
+     */
+    private final NotificationProviderRuntime runtime;
 
     /**
      * 查询所有通知渠道 Provider 配置。
@@ -76,5 +83,15 @@ public class NotificationProviderAdminController {
     public NotificationProviderVO modify(@PathVariable NotificationChannel channel,
                                          @Validated @RequestBody NotificationProviderSaveFrom params) {
         return service.modify(channel, params);
+    }
+
+    /**
+     * 执行指定渠道健康检查；不返回任何供应商原始响应。
+     */
+    @ULog("'检查通知 Provider 健康状态'")
+    @PostMapping(value = "/{channel}/health", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
+    public NotificationProviderHealth health(@PathVariable NotificationChannel channel) {
+        return runtime.check(channel);
     }
 }

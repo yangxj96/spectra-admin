@@ -19,46 +19,50 @@ package com.devops00.spectra.notification.service.impl;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
+import com.devops00.spectra.notification.service.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.NotificationSender;
 
 /**
- * 邮件占位 Sender；未接入真实供应商时明确返回未配置。
+ * SMS/EMAIL Sender 的公共适配层；只依赖 Provider Runtime，不依赖具体供应商。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/8/23
  */
-public class PlaceholderEmailSender implements NotificationSender {
+public abstract class AbstractExternalNotificationSender implements NotificationSender {
 
     /**
-     * 返回邮件渠道标识。
+     * Provider Runtime。
      */
+    private final NotificationProviderRuntime runtime;
+
+    /**
+     * 当前外部渠道。
+     */
+    private final NotificationChannel channel;
+
+    protected AbstractExternalNotificationSender(NotificationProviderRuntime runtime, NotificationChannel channel) {
+        this.runtime = runtime;
+        this.channel = channel;
+    }
+
     @Override
     public NotificationChannel channel() {
-        return NotificationChannel.EMAIL;
+        return channel;
     }
 
-    /**
-     * 邮件供应商尚未配置。
-     */
     @Override
     public boolean available() {
-        return false;
+        return runtime.available(channel);
     }
 
-    /**
-     * 返回邮件渠道未配置原因。
-     */
     @Override
     public String unavailableReason() {
-        return "EMAIL_CHANNEL_NOT_CONFIGURED";
+        return runtime.unavailableReason(channel);
     }
 
-    /**
-     * 明确阻断投递，不伪造邮件发送成功。
-     */
     @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
-        return new ChannelSendResult("BLOCKED", "EMAIL_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
+        return runtime.send(channel, task);
     }
 }
