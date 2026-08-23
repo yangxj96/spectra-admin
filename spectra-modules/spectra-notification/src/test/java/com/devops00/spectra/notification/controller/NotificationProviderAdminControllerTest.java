@@ -18,8 +18,10 @@ package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import com.devops00.spectra.notification.service.NotificationProviderRuntime;
+import com.devops00.spectra.notification.service.NotificationProviderTestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
@@ -34,7 +36,7 @@ class NotificationProviderAdminControllerTest {
     @Test
     void shouldSeparateProviderReadAndConfigurePermissions() throws NoSuchMethodException {
         var controller = new NotificationProviderAdminController(mock(NotificationProviderAdminService.class),
-                mock(NotificationProviderRuntime.class));
+                mock(NotificationProviderRuntime.class), mock(NotificationProviderTestService.class));
 
         assertEquals("hasPermission(null, 'notification:provider:read')",
                 NotificationProviderAdminController.class.getMethod("list")
@@ -47,6 +49,11 @@ class NotificationProviderAdminControllerTest {
         assertEquals("hasPermission(null, 'notification:provider:configure')",
                 NotificationProviderAdminController.class.getMethod("modify", NotificationChannel.class,
                         NotificationProviderSaveFrom.class)
+                        .getAnnotation(PreAuthorize.class)
+                        .value());
+        assertEquals("hasPermission(null, 'notification:provider:configure')",
+                NotificationProviderAdminController.class.getMethod("test", NotificationChannel.class,
+                        NotificationProviderTestFrom.class)
                         .getAnnotation(PreAuthorize.class)
                         .value());
         assertEquals(NotificationProviderAdminController.class, controller.getClass());

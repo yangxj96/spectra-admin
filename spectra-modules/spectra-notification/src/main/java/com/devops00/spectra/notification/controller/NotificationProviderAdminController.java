@@ -20,9 +20,12 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
+import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationProviderTestVO;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import com.devops00.spectra.notification.service.NotificationProviderRuntime;
+import com.devops00.spectra.notification.service.NotificationProviderTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -53,6 +56,11 @@ public class NotificationProviderAdminController {
      * Provider 运行时协调器。
      */
     private final NotificationProviderRuntime runtime;
+
+    /**
+     * Provider 测试发送服务。
+     */
+    private final NotificationProviderTestService testService;
 
     /**
      * 查询所有通知渠道 Provider 配置。
@@ -93,5 +101,16 @@ public class NotificationProviderAdminController {
     @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
     public NotificationProviderHealth health(@PathVariable NotificationChannel channel) {
         return runtime.check(channel);
+    }
+
+    /**
+     * 向明确指定的测试地址发送一次测试消息；不写入业务 Request/Task/Delivery。
+     */
+    @ULog("'测试通知 Provider 发送'")
+    @PostMapping(value = "/{channel}/test", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
+    public NotificationProviderTestVO test(@PathVariable NotificationChannel channel,
+                                           @Validated @RequestBody NotificationProviderTestFrom params) {
+        return testService.send(channel, params);
     }
 }
