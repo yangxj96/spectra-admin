@@ -28,7 +28,7 @@ template_values AS (
     FROM base_templates base
     CROSS JOIN (VALUES ('IN_APP'), ('SMS'), ('EMAIL')) channel(channel)
 ),
-prepared AS (
+prepared_base AS (
     SELECT gen_random_uuid() AS id,
            template_group_code,
            channel,
@@ -39,7 +39,21 @@ prepared AS (
            NULL::text AS html_template,
            parameter_schema,
            NULL::varchar(200) AS provider_template_code,
-           'PUBLISHED' AS state,
+           'PUBLISHED' AS state
+    FROM template_values
+),
+prepared AS (
+    SELECT id,
+           template_group_code,
+           channel,
+           purpose,
+           version_no,
+           title_template,
+           content_template,
+           html_template,
+           parameter_schema,
+           provider_template_code,
+           state,
            encode(
                digest(
                    concat_ws(chr(31),
@@ -54,7 +68,7 @@ prepared AS (
                        coalesce(provider_template_code, '<NULL>')),
                    'sha256'),
                'hex') AS version_digest
-    FROM template_values
+    FROM prepared_base
 )
 INSERT INTO spectra_notification.ntf_template (
     id, template_group_code, channel, purpose, version_no, title_template, content_template, html_template,
