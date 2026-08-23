@@ -262,6 +262,12 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      * 解析管理分页时间范围；未传条件时默认查询最近 31 天。
      */
     private QueryRange resolveQueryRange(NotificationAdminQueryFrom params) {
+        if (params != null
+                && (params.getRequestId() != null || params.getTaskId() != null)
+                && params.getStartTime() == null
+                && params.getEndTime() == null) {
+            return new QueryRange(null, null);
+        }
         var to = params != null && params.getEndTime() != null ? params.getEndTime() : Instant.now();
         var from = params != null && params.getStartTime() != null
                 ? params.getStartTime()
@@ -282,10 +288,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
         var range = resolveQueryRange(params);
-        var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>()
-                .ge(NotificationRequestEntity::getCreatedAt, range.from())
-                .lt(NotificationRequestEntity::getCreatedAt, range.to())
-                .orderByDesc(NotificationRequestEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationRequestEntity>().orderByDesc(NotificationRequestEntity::getCreatedAt);
+        if (range.from() != null) {
+            wrapper.ge(NotificationRequestEntity::getCreatedAt, range.from())
+                    .lt(NotificationRequestEntity::getCreatedAt, range.to());
+        }
         if (params != null) {
             if (StringUtils.hasText(params.getStatus())) {
                 wrapper.eq(NotificationRequestEntity::getStatus, params.getStatus());
@@ -315,10 +322,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
         var range = resolveQueryRange(params);
-        var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>()
-                .ge(NotificationTaskEntity::getCreatedAt, range.from())
-                .lt(NotificationTaskEntity::getCreatedAt, range.to())
-                .orderByDesc(NotificationTaskEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationTaskEntity>().orderByDesc(NotificationTaskEntity::getCreatedAt);
+        if (range.from() != null) {
+            wrapper.ge(NotificationTaskEntity::getCreatedAt, range.from())
+                    .lt(NotificationTaskEntity::getCreatedAt, range.to());
+        }
         if (params != null) {
             if (params.getRequestId() != null) {
                 wrapper.eq(NotificationTaskEntity::getNotificationRequestId, params.getRequestId());
@@ -348,10 +356,11 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     @Override
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
         var range = resolveQueryRange(params);
-        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>()
-                .ge(NotificationDeliveryEntity::getCreatedAt, range.from())
-                .lt(NotificationDeliveryEntity::getCreatedAt, range.to())
-                .orderByDesc(NotificationDeliveryEntity::getCreatedAt);
+        var wrapper = new LambdaQueryWrapper<NotificationDeliveryEntity>().orderByDesc(NotificationDeliveryEntity::getCreatedAt);
+        if (range.from() != null) {
+            wrapper.ge(NotificationDeliveryEntity::getCreatedAt, range.from())
+                    .lt(NotificationDeliveryEntity::getCreatedAt, range.to());
+        }
         if (params != null) {
             if (params.getTaskId() != null) {
                 wrapper.eq(NotificationDeliveryEntity::getNotificationTaskId, params.getTaskId());
