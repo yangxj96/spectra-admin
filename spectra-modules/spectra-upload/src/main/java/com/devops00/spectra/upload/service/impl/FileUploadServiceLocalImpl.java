@@ -191,7 +191,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
 
         // 把task表对应的记录结果修改下
         FileUploadTask task = taskService.findByUploadId(from.getUploadId());
-        task.setStatus("DON");
+        task.setStatus("DONE");
         taskService.updateById(task);
 
         FileUploadVO vo = new FileUploadVO();
