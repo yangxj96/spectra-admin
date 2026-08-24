@@ -139,8 +139,8 @@ class UserImportServiceImplTest {
         var task = task("file-hash", false, List.of(row));
         task.setTotalRows(1);
         task.setErrorRows(1);
-        task.setProfileVersionHash(sha256("profile|MISSING"));
-        task.setRequestHash(sha256("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001f13800138000"
+        task.setProfileVersionHash(SHA256Utils.hash("profile|MISSING"));
+        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f13800138000"
                 + "\u001fzhangsan@example.com\u001fdept\u001fzh-CN\u001fAsia/Shanghai\u001fprofile"));
         when(taskMapper.selectOne(any())).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));
@@ -162,12 +162,12 @@ class UserImportServiceImplTest {
         task.setStatus("PREVIEWED");
         task.setExpiresAt(Instant.now().plusSeconds(60));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(60));
-        task.setPreviewTokenHash(sha256("preview-token"));
+        task.setPreviewTokenHash(SHA256Utils.hash("preview-token"));
         task.setTotalRows(rows.size());
         task.setValidRows(rows.size());
         task.setErrorRows(0);
-        task.setProfileVersionHash(sha256(""));
-        task.setRequestHash(sha256(fileHash + "\u001f" + skipExisting));
+        task.setProfileVersionHash(SHA256Utils.hash(""));
+        task.setRequestHash(SHA256Utils.hash(fileHash + "\u001f" + skipExisting));
         return task;
     }
 
@@ -193,7 +193,4 @@ class UserImportServiceImplTest {
         return request;
     }
 
-    private static String sha256(String value) {
-        return SHA256Utils.hash(value);
-    }
 }

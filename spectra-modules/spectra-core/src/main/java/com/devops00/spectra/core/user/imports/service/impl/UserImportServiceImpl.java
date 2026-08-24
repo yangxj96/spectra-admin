@@ -218,7 +218,7 @@ public class UserImportServiceImpl implements UserImportService {
         task.setAccessBoundaryCount(accessBoundaryCount);
         task.setGrantBoundaryCount(grantBoundaryCount);
         var token = issuePreviewToken();
-        task.setPreviewTokenHash(sha256(token));
+        task.setPreviewTokenHash(SHA256Utils.hash(token));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
         if (taskMapper.updateById(task) != 1) {
             throw new DataException("更新用户导入 Preview 状态失败");
@@ -269,7 +269,7 @@ public class UserImportServiceImpl implements UserImportService {
         if (task.getPreviewExpiresAt() == null
                 || now.isAfter(task.getPreviewExpiresAt())
                 || task.getPreviewConsumedAt() != null
-                || !MessageDigest.isEqual(sha256(params.getPreviewToken()).getBytes(StandardCharsets.UTF_8),
+                || !MessageDigest.isEqual(SHA256Utils.hash(params.getPreviewToken()).getBytes(StandardCharsets.UTF_8),
                         task.getPreviewTokenHash().getBytes(StandardCharsets.UTF_8))) {
             throw new DataException("用户导入 Preview token 无效或已过期");
         }
@@ -472,7 +472,7 @@ public class UserImportServiceImpl implements UserImportService {
             throw new DataException("用户导入任务已过期，请使用新的幂等键");
         }
         var token = issuePreviewToken();
-        task.setPreviewTokenHash(sha256(token));
+        task.setPreviewTokenHash(SHA256Utils.hash(token));
         task.setPreviewExpiresAt(Instant.now().plusSeconds(10 * 60));
         task.setPreviewConsumedAt(null);
         taskMapper.updateById(task);
@@ -511,7 +511,7 @@ public class UserImportServiceImpl implements UserImportService {
     }
 
     private String generateEmployeeNo(String generationSeed, int rowIndex) {
-        return "EMP-" + sha256(trim(generationSeed) + '\u001f' + rowIndex).substring(0, 32).toUpperCase(Locale.ROOT);
+        return "EMP-" + SHA256Utils.hash(trim(generationSeed) + '\u001f' + rowIndex).substring(0, 32).toUpperCase(Locale.ROOT);
     }
 
     private Map<String, Object> toMap(UserImportRowFrom source) {
@@ -554,7 +554,7 @@ public class UserImportServiceImpl implements UserImportService {
             canonical.append('\u001e');
             toMap(row.source()).values().forEach(value -> canonical.append('\u001f').append(value == null ? "" : value));
         }
-        return sha256(canonical.toString());
+        return SHA256Utils.hash(canonical.toString());
     }
 
     private String profileVersionHash(List<NormalizedRow> rows, Map<String, AuthorizationProfileVO> profiles) {
@@ -571,17 +571,13 @@ public class UserImportServiceImpl implements UserImportService {
                     .collect(Collectors.joining(","));
             return code + "|" + profile.getState() + "|" + profile.getVersion() + "|" + assignments;
         }).collect(Collectors.joining("\u001f"));
-        return sha256(canonical);
+        return SHA256Utils.hash(canonical);
     }
 
     private String issuePreviewToken() {
         var bytes = new byte[32];
         secureRandom.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
-
-    private String sha256(String value) {
-        return SHA256Utils.hash(value);
     }
 
     private User findExisting(UserImportRowFrom source) {

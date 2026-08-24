@@ -158,11 +158,12 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
             var host = endpoint.getHost();
             var canonicalHeaders = "content-type:application/json; charset=utf-8\n" + "host:" + host + "\n";
             var signedHeaders = "content-type;host";
-            var canonicalRequest = "POST\n/\n\n" + canonicalHeaders + "\n" + signedHeaders + "\n" + sha256(body);
+            var canonicalRequest = "POST\n/\n\n" + canonicalHeaders + "\n" + signedHeaders + "\n"
+                    + SHA256Utils.hash(body);
             var date = UTC_SECOND.format(Instant.ofEpochSecond(timestamp)).substring(0, 10);
             var credentialScope = date + "/" + SERVICE + "/tc3_request";
             var stringToSign = "TC3-HMAC-SHA256\n" + timestamp + "\n" + credentialScope + "\n"
-                    + sha256(canonicalRequest);
+                    + SHA256Utils.hash(canonicalRequest);
             var secretDate = hmac(("TC3" + configuration.secret()).getBytes(StandardCharsets.UTF_8), date);
             var secretService = hmac(secretDate, SERVICE);
             var secretSigning = hmac(secretService, "tc3_request");
@@ -250,10 +251,6 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
 
     private HttpClient client(NotificationProviderConfiguration configuration) {
         return HttpClient.newBuilder().connectTimeout(Duration.ofMillis(configuration.timeoutMs())).build();
-    }
-
-    private String sha256(String value) {
-        return SHA256Utils.hash(value);
     }
 
     private byte[] hmac(byte[] key, String value) {
