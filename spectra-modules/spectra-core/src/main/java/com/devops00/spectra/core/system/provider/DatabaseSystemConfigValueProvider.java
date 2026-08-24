@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.system.service.impl;
+package com.devops00.spectra.core.system.provider;
 
 import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.core.system.service.ConfiguredService;

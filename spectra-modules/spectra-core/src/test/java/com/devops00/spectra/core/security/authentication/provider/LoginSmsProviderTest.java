@@ -14,12 +14,13 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.security.authentication.service.impl;
+package com.devops00.spectra.core.security.authentication.provider;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.authentication.service.impl.SecurityUserHelper;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
