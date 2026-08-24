@@ -120,7 +120,8 @@ class NotificationProviderCallbackServiceTest {
 
     private NotificationProviderConfiguration configuration() {
         return new NotificationProviderConfiguration(NotificationChannel.SMS, "HTTP_JSON", true,
-                "https://provider.example/send", 5_000, 10, 3, null, "callback-secret", "sms-key", null);
+                "https://provider.example/send", 0, null, null, null, null, null, null, false, false,
+                5_000, 10, 3, null, null, "callback-secret", "sms-key", null);
     }
 
     private String signature(String body, String secret) throws Exception {

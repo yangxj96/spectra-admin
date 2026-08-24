@@ -57,8 +57,9 @@ class HttpJsonNotificationProviderTest {
             var protector = new NotificationPayloadProtector(properties, new ObjectMapper());
             var provider = new HttpJsonNotificationProvider(protector, new ObjectMapper());
             var configuration = new NotificationProviderConfiguration(null, "HTTP_JSON", true,
-                    "http://127.0.0.1:" + server.getAddress().getPort() + "/provider", 2_000, 10, 3,
-                    "template-1", "test-secret", "sms-key", null);
+                    "http://127.0.0.1:" + server.getAddress().getPort() + "/provider", 0, null, null, null, null,
+                    null, null, false, false, 2_000, 10, 3, "template-1", null, "test-secret", "sms-key",
+                    null);
             var task = new NotificationTaskEntity();
             task.setId(UUID.randomUUID());
             task.setChannel("SMS");

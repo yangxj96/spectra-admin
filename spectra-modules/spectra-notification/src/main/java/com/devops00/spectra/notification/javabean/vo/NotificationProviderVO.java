@@ -57,10 +57,35 @@ public class NotificationProviderVO {
      */
     private String reason;
 
-    /**
-     * 非敏感端点。
-     */
+    /** 非敏感端点或 SMTP 主机。 */
     private String endpoint;
+
+    /** Provider 端口。 */
+    private int port;
+
+    /** 云服务地域。 */
+    private String region;
+
+    /** AccessKey ID、SecretId 或 SMTP 用户名。 */
+    private String credentialId;
+
+    /** 腾讯云短信 SDK AppID。 */
+    private String appId;
+
+    /** 短信签名或邮件发件人名称。 */
+    private String signName;
+
+    /** 邮件发件地址。 */
+    private String senderAddress;
+
+    /** 邮件发件人显示名称。 */
+    private String senderName;
+
+    /** 是否启用隐式 SSL。 */
+    private boolean sslEnabled;
+
+    /** 是否启用 STARTTLS。 */
+    private boolean starttlsEnabled;
 
     /**
      * 请求超时毫秒数。
@@ -81,6 +106,11 @@ public class NotificationProviderVO {
      * 外部模板编码。
      */
     private String templateCode;
+
+    /**
+     * 外部模板参数顺序。
+     */
+    private String templateParameterOrder;
 
     /**
      * 是否已配置 Secret。

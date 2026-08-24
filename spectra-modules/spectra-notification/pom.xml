@@ -30,6 +30,14 @@
 
     <description>统一通知领域实现模块</description>
 
+    <dependencies>
+        <!-- SMTP 邮件 Provider -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+    </dependencies>
+
     <properties>
         <java.version>25</java.version>
         <maven.compiler.source>25</maven.compiler.source>

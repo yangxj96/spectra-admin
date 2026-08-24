@@ -33,7 +33,7 @@ import lombok.Data;
 public class NotificationProviderSaveFrom {
 
     /**
-     * Provider 类型；当前契约支持 HTTP_JSON 和 MOCK。
+     * Provider 类型；支持阿里云短信、腾讯云短信、SMTP、HTTP_JSON 和 MOCK。
      */
     @NotBlank(message = "Provider 类型不能为空")
     @Size(max = 32, message = "Provider 类型长度不能超过 32 个字符")
@@ -45,10 +45,63 @@ public class NotificationProviderSaveFrom {
     private boolean enabled;
 
     /**
-     * Provider HTTP 端点；MOCK 类型可以为空。
+     * Provider 端点或 SMTP 主机；MOCK 类型可以为空。
      */
     @Size(max = 500, message = "Provider 端点长度不能超过 500 个字符")
     private String endpoint;
+
+    /**
+     * Provider 端口；云服务通常不需要填写，SMTP 常用 465 或 587。
+     */
+    @Min(value = 0, message = "Provider 端口不能小于 0")
+    @Max(value = 65_535, message = "Provider 端口不能超过 65535")
+    private int port;
+
+    /**
+     * 云服务地域，例如 cn-hangzhou 或 ap-guangzhou。
+     */
+    @Size(max = 64, message = "Provider 地域长度不能超过 64 个字符")
+    private String region;
+
+    /**
+     * AccessKey ID、SecretId 或 SMTP 用户名；非敏感字段。
+     */
+    @Size(max = 200, message = "Provider 凭据标识长度不能超过 200 个字符")
+    private String credentialId;
+
+    /**
+     * 腾讯云短信 SDK AppID。
+     */
+    @Size(max = 64, message = "短信 SDK AppID 长度不能超过 64 个字符")
+    private String appId;
+
+    /**
+     * 已审核的短信签名或邮件发件人名称。
+     */
+    @Size(max = 200, message = "签名或发件人名称长度不能超过 200 个字符")
+    private String signName;
+
+    /**
+     * 邮件 From 地址。
+     */
+    @Size(max = 320, message = "邮件发件地址长度不能超过 320 个字符")
+    private String senderAddress;
+
+    /**
+     * 邮件 From 显示名称。
+     */
+    @Size(max = 200, message = "邮件发件人名称长度不能超过 200 个字符")
+    private String senderName;
+
+    /**
+     * 是否使用隐式 SSL；SMTP 465 常用。
+     */
+    private boolean sslEnabled;
+
+    /**
+     * 是否使用 STARTTLS；SMTP 587 常用。
+     */
+    private boolean starttlsEnabled;
 
     /**
      * 请求超时毫秒数。
@@ -76,6 +129,12 @@ public class NotificationProviderSaveFrom {
      */
     @Size(max = 100, message = "供应商模板编码长度不能超过 100 个字符")
     private String templateCode;
+
+    /**
+     * 腾讯云模板参数顺序，逗号分隔；例如 code,userName。
+     */
+    @Size(max = 500, message = "模板参数顺序长度不能超过 500 个字符")
+    private String templateParameterOrder;
 
     /**
      * 新 Secret；不回显旧值。

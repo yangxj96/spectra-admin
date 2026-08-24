@@ -233,7 +233,10 @@ public class NotificationGatewayImpl implements NotificationGateway {
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, requestId)
                 .set(NotificationRequestEntity::getTaskCount, taskCount)
-                .set(NotificationRequestEntity::getTemplateSnapshot, templateSnapshot));
+                .set(
+                        NotificationRequestEntity::getTemplateSnapshot,
+                        templateSnapshot,
+                        "typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"));
         return new NotificationReceipt(requestId, "ACCEPTED", taskCount, false);
     }
 
@@ -270,10 +273,20 @@ public class NotificationGatewayImpl implements NotificationGateway {
         task.setTitle(hasSensitivePayload ? "安全通知" : rendered.title());
         task.setContent(hasSensitivePayload ? "敏感通知内容已加密" : rendered.content());
         task.setLink(request.link());
-        task.setExtra(request.parameters());
-        task.setSensitiveParametersCiphertext(hasSensitivePayload
-                ? payloadProtector.protectParameters(Map.of("title", rendered.title(), "content", rendered.content()))
-                : null);
+        var taskParameters = new LinkedHashMap<String, Object>(request.parameters());
+        if (rendered.providerTemplateCode() != null && !rendered.providerTemplateCode().isBlank()) {
+            taskParameters.put("__provider_template_code", rendered.providerTemplateCode());
+        }
+        task.setExtra(taskParameters);
+        if (hasSensitivePayload) {
+            var protectedPayload = new LinkedHashMap<String, Object>();
+            protectedPayload.put("title", rendered.title());
+            protectedPayload.put("content", rendered.content());
+            protectedPayload.put("parameters", request.sensitiveParameters());
+            task.setSensitiveParametersCiphertext(payloadProtector.protectParameters(protectedPayload));
+        } else {
+            task.setSensitiveParametersCiphertext(null);
+        }
         task.setPriority(request.priority() == null ? 0 : request.priority());
         task.setAttemptCount(0);
         task.setMaxAttempts(3);
@@ -319,6 +332,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
             templateRenderer.validateAll(parameters, template.getTitleTemplate(), template.getContentTemplate());
             templateRenderer.validateHtml(template.getHtmlTemplate());
             return new RenderedContent(template.getId(), template.getVersionNo(), template.getVersionDigest(),
+                    template.getProviderTemplateCode(),
                     templateRenderer.render(template.getTitleTemplate(), parameters),
                     templateRenderer.render(template.getContentTemplate(), parameters));
         }
@@ -331,7 +345,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         if (!StringUtils.hasText(title)) {
             throw new DataSaveException("通知标题不能为空");
         }
-        return new RenderedContent(null, null, null, title, content);
+        return new RenderedContent(null, null, null, null, title, content);
     }
 
     /**
@@ -346,6 +360,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         snapshot.put("template_id", rendered.templateId().toString());
         snapshot.put("version_no", rendered.versionNo());
         snapshot.put("version_digest", rendered.versionDigest());
+        snapshot.put("provider_template_code", rendered.providerTemplateCode());
         snapshots.put(channel.name(), snapshot);
     }
 
@@ -464,6 +479,6 @@ public class NotificationGatewayImpl implements NotificationGateway {
      * 渲染后的标题和正文。
      */
     private record RenderedContent(UUID templateId, Integer versionNo, String versionDigest,
-                                   String title, String content) {
+                                   String providerTemplateCode, String title, String content) {
     }
 }

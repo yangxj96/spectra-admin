@@ -1,0 +1,138 @@
+/*
+ *  Copyright 2018-2026 yangxj96
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+package com.devops00.spectra.notification.service.impl;
+
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
+import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
+import com.devops00.spectra.notification.service.NotificationProvider;
+import jakarta.mail.Message;
+import jakarta.mail.Session;
+import jakarta.mail.Transport;
+import jakarta.mail.internet.InternetAddress;
+import jakarta.mail.internet.MimeMessage;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Properties;
+import java.util.UUID;
+
+/**
+ * SMTP 邮件 Provider；支持 465 隐式 SSL 和 587 STARTTLS 两种常见部署方式。
+ */
+@Component
+@RequiredArgsConstructor
+public class SmtpEmailNotificationProvider implements NotificationProvider {
+
+    private static final String CODE = "SMTP";
+
+    private final NotificationPayloadProtector payloadProtector;
+
+    @Override
+    public String code() {
+        return CODE;
+    }
+
+    @Override
+    public boolean supports(NotificationChannel channel) {
+        return channel == NotificationChannel.EMAIL;
+    }
+
+    @Override
+    public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
+        var checkedAt = Instant.now();
+        if (!usable(configuration)) {
+            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+        }
+        try {
+            var session = session(configuration);
+            try (var transport = session.getTransport("smtp")) {
+                transport.connect(configuration.endpoint(), configuration.port(), configuration.credentialId(),
+                        configuration.secret());
+            }
+            return new NotificationProviderHealth("HEALTHY", "HEALTH_CHECK_OK", checkedAt);
+        } catch (Exception exception) {
+            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_UNAVAILABLE", checkedAt);
+        }
+    }
+
+    @Override
+    public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
+        if (!usable(configuration)) {
+            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+        }
+        final String recipient;
+        try {
+            recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
+        } catch (RuntimeException exception) {
+            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+        }
+        try {
+            var messageContent = NotificationTaskMessage.resolve(task, payloadProtector);
+            var message = new MimeMessage(session(configuration));
+            var senderName = configuration.senderName();
+            var from = senderName == null || senderName.isBlank()
+                    ? new InternetAddress(configuration.senderAddress())
+                    : new InternetAddress(configuration.senderAddress(), senderName, StandardCharsets.UTF_8.name());
+            message.setFrom(from);
+            message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipient));
+            message.setSubject(messageContent.title(), StandardCharsets.UTF_8.name());
+            message.setText(messageContent.content(), StandardCharsets.UTF_8.name());
+            Transport.send(message, configuration.credentialId(), configuration.secret());
+            return new ChannelSendResult("SENT", CODE, "smtp-" + UUID.randomUUID(), "PROVIDER_ACCEPTED");
+        } catch (jakarta.mail.MessagingException | java.io.UnsupportedEncodingException exception) {
+            return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", null, "PROVIDER_REJECTED");
+        } catch (RuntimeException exception) {
+            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
+        }
+    }
+
+    private Session session(NotificationProviderConfiguration configuration) {
+        var properties = new Properties();
+        properties.put("mail.smtp.host", configuration.endpoint());
+        properties.put("mail.smtp.port", String.valueOf(configuration.port()));
+        properties.put("mail.smtp.auth", "true");
+        properties.put("mail.smtp.connectiontimeout", String.valueOf(configuration.timeoutMs()));
+        properties.put("mail.smtp.timeout", String.valueOf(configuration.timeoutMs()));
+        properties.put("mail.smtp.writetimeout", String.valueOf(configuration.timeoutMs()));
+        properties.put("mail.smtp.ssl.enable", String.valueOf(configuration.sslEnabled()));
+        properties.put("mail.smtp.starttls.enable", String.valueOf(configuration.starttlsEnabled()));
+        properties.put("mail.smtp.starttls.required", String.valueOf(configuration.starttlsEnabled()));
+        return Session.getInstance(properties);
+    }
+
+    private boolean usable(NotificationProviderConfiguration configuration) {
+        return configuration != null
+                && configuration.enabled()
+                && CODE.equals(configuration.providerType())
+                && configuration.endpoint() != null
+                && !configuration.endpoint().isBlank()
+                && configuration.port() > 0
+                && configuration.credentialId() != null
+                && !configuration.credentialId().isBlank()
+                && configuration.senderAddress() != null
+                && !configuration.senderAddress().isBlank()
+                && configuration.secret() != null
+                && !configuration.secret().isBlank()
+                && configuration.timeoutMs() >= 100;
+    }
+}

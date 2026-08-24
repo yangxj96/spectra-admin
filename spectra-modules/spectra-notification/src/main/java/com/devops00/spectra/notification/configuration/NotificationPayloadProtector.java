@@ -27,6 +27,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -83,6 +84,32 @@ public class NotificationPayloadProtector {
             return protect(objectMapper.writeValueAsString(parameters), properties.sensitivePayloadKey(), "通知敏感载荷");
         } catch (JacksonException exception) {
             throw new EncryptException("通知敏感载荷序列化失败", exception);
+        }
+    }
+
+    /**
+     * 解密 Provider 投递所需的敏感参数；失败时由调用方转换为明确的阻断结果。
+     *
+     * @param ciphertext 敏感参数密文
+     * @return 敏感参数
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, Object> unprotectParameters(String ciphertext) {
+        var plainText = unprotect(ciphertext, properties.sensitivePayloadKey(), "通知敏感载荷");
+        try {
+            var value = objectMapper.readValue(plainText, Map.class);
+            if (!(value instanceof Map<?, ?> map)) {
+                throw new DataSaveException("通知敏感载荷格式不正确");
+            }
+            var result = new LinkedHashMap<String, Object>();
+            map.forEach((key, item) -> {
+                if (key != null) {
+                    result.put(String.valueOf(key), item);
+                }
+            });
+            return result;
+        } catch (JacksonException exception) {
+            throw new EncryptException("通知敏感载荷解析失败", exception);
         }
     }
 

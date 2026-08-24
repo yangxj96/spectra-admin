@@ -17,7 +17,15 @@
 package com.devops00.spectra.notification.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
+import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import tools.jackson.databind.ObjectMapper;
+
+import java.time.Instant;
+import java.util.Base64;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -25,25 +33,34 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * SMS/EMAIL Provider 测试替身示例。
+ * 内置 SMS/EMAIL Mock Provider 测试。
  */
 class MockProviderTest {
 
     @Test
-    void shouldReturnDeterministicAcceptedResultsWithoutExternalCalls() {
+    void shouldUseNormalProviderGateAndPrintOnlyAtFinalSendPoint() {
+        var key = Base64.getEncoder().encodeToString(new byte[32]);
+        var protector = new NotificationPayloadProtector(
+                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
+        var provider = new MockNotificationProvider(protector);
         var task = new NotificationTaskEntity();
         task.setId(UUID.randomUUID());
+        task.setChannel("SMS");
+        task.setRecipientCiphertext(protector.protectAddress("13800138000"));
+        task.setRecipientMasked("138****0000");
+        task.setTitle("测试标题");
+        task.setContent("测试正文");
 
-        var sms = new MockSmsSender().send(task);
-        var email = new MockEmailSender().send(task);
+        var configuration = new NotificationProviderConfiguration(NotificationChannel.SMS, "MOCK", true, "", 0,
+                null, null, null, null, null, null, false, false, 2_000, 10, 3, null, null, null, null,
+                Instant.now());
 
-        assertEquals(NotificationChannel.SMS, new MockSmsSender().channel());
-        assertEquals(NotificationChannel.EMAIL, new MockEmailSender().channel());
-        assertEquals("SENT", sms.status());
-        assertEquals("MOCK_SMS", sms.providerCode());
-        assertEquals("mock-sms-" + task.getId(), sms.providerMessageId());
-        assertEquals("SENT", email.status());
-        assertEquals("MOCK_EMAIL", email.providerCode());
-        assertEquals("mock-email-" + task.getId(), email.providerMessageId());
+        assertEquals("SMS", NotificationChannel.SMS.name());
+        assertEquals("HEALTHY", provider.health(configuration).state());
+        var result = provider.send(task, configuration);
+        assertEquals("SENT", result.status());
+        assertEquals("MOCK", result.providerCode());
+        assertEquals("mock-" + task.getId(), result.providerMessageId());
+        assertEquals("MOCK_ACCEPTED", result.summary());
     }
 }

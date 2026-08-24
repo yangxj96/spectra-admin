@@ -23,17 +23,27 @@ import java.time.Instant;
 /**
  * Provider 运行时配置；其中 Secret 只在内存中短暂存在，不得转换为管理端 VO。
  *
- * @param channel            通知渠道
- * @param providerType       Provider 类型
- * @param enabled            是否启用
- * @param endpoint           Provider 端点
- * @param timeoutMs          请求超时毫秒数
- * @param rateLimitPerSecond 每秒发送上限
- * @param maxAttempts        最大投递尝试次数
- * @param templateCode       外部渠道模板编码
- * @param secret             已解密的 Secret，仅供 Provider 发送时使用
- * @param secretKeyId        Secret 标识
- * @param updatedAt          配置更新时间
+ * @param channel                通知渠道
+ * @param providerType           Provider 类型
+ * @param enabled                是否启用
+ * @param endpoint               Provider 端点或 SMTP 主机
+ * @param port                   Provider 端口
+ * @param region                 云服务地域
+ * @param credentialId           云服务 AccessKey ID/SecretId 或 SMTP 用户名
+ * @param appId                  腾讯云短信 SDK AppID
+ * @param signName               短信签名或邮件发件人名称
+ * @param senderAddress          邮件发件地址
+ * @param senderName             邮件发件人显示名称
+ * @param sslEnabled             是否启用隐式 SSL
+ * @param starttlsEnabled        是否启用 STARTTLS
+ * @param timeoutMs              请求超时毫秒数
+ * @param rateLimitPerSecond     每秒发送上限
+ * @param maxAttempts            最大投递尝试次数
+ * @param templateCode           外部渠道模板编码
+ * @param templateParameterOrder 外部模板参数顺序，逗号分隔
+ * @param secret                 已解密的 Secret，仅供 Provider 发送时使用
+ * @param secretKeyId            Secret 标识
+ * @param updatedAt              配置更新时间
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/23
@@ -43,10 +53,20 @@ public record NotificationProviderConfiguration(
                                                 String providerType,
                                                 boolean enabled,
                                                 String endpoint,
+                                                int port,
+                                                String region,
+                                                String credentialId,
+                                                String appId,
+                                                String signName,
+                                                String senderAddress,
+                                                String senderName,
+                                                boolean sslEnabled,
+                                                boolean starttlsEnabled,
                                                 int timeoutMs,
                                                 int rateLimitPerSecond,
                                                 int maxAttempts,
                                                 String templateCode,
+                                                String templateParameterOrder,
                                                 String secret,
                                                 String secretKeyId,
                                                 Instant updatedAt) {

@@ -61,8 +61,10 @@ class NotificationProviderRuntimeTest {
         var configurationService = mock(NotificationProviderAdminService.class);
         var first = configuration();
         var second = new NotificationProviderConfiguration(NotificationChannel.SMS, "HTTP_JSON", true,
-                first.endpoint(), first.timeoutMs(), first.rateLimitPerSecond(), first.maxAttempts(),
-                first.templateCode(), first.secret(), first.secretKeyId(), first.updatedAt().plusSeconds(1));
+                first.endpoint(), first.port(), first.region(), first.credentialId(), first.appId(), first.signName(),
+                first.senderAddress(), first.senderName(), first.sslEnabled(), first.starttlsEnabled(),
+                first.timeoutMs(), first.rateLimitPerSecond(), first.maxAttempts(), first.templateCode(),
+                first.templateParameterOrder(), first.secret(), first.secretKeyId(), first.updatedAt().plusSeconds(1));
         when(configurationService.resolve(NotificationChannel.SMS)).thenReturn(first, second);
         var runtime = new NotificationProviderRuntime(configurationService, List.of(new TestProvider()),
                 new NotificationModuleProperties(true, "", "", List.of()));
@@ -76,7 +78,8 @@ class NotificationProviderRuntimeTest {
         var configurationService = mock(NotificationProviderAdminService.class);
         when(configurationService.resolve(NotificationChannel.EMAIL)).thenReturn(
                 new NotificationProviderConfiguration(NotificationChannel.EMAIL, "UNKNOWN", true, "https://example.test",
-                        2_000, 10, 3, null, "secret", "key", Instant.now()));
+                        0, null, null, null, null, null, null, false, false,
+                        2_000, 10, 3, null, null, "secret", "key", Instant.now()));
         var runtime = new NotificationProviderRuntime(configurationService, List.of(),
                 new NotificationModuleProperties(true, "", "", List.of()));
 
@@ -88,7 +91,8 @@ class NotificationProviderRuntimeTest {
 
     private NotificationProviderConfiguration configuration() {
         return new NotificationProviderConfiguration(NotificationChannel.SMS, "HTTP_JSON", true,
-                "https://example.test/provider", 2_000, 10, 3, "template-1", "secret", "key-1", Instant.now());
+                "https://example.test/provider", 0, null, null, null, null, null, null, false, false,
+                2_000, 10, 3, "template-1", null, "secret", "key-1", Instant.now());
     }
 
     private static final class TestProvider implements NotificationProvider {

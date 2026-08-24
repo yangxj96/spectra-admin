@@ -58,6 +58,8 @@ class NotificationProviderAdminServiceImplTest {
             var key = invocation.getArgument(0, String.class);
             var value = invocation.getArgument(1, String.class);
             if (value == null) {
+                throw new AssertionError("系统配置不允许写入 null 值");
+            } else if (value.isBlank()) {
                 values.remove(key);
             } else {
                 values.put(key, value);
@@ -101,6 +103,103 @@ class NotificationProviderAdminServiceImplTest {
         assertFalse(values.get("notification.provider.sms.secret").contains("test-secret-value"));
         assertFalse(values.get("notification.provider.sms").contains("test-secret-value"));
         assertFalse(result.toString().contains("test-secret-value"));
+    }
+
+    @Test
+    void shouldSaveAliyunSmsConfigurationWithProviderDefaults() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("ALIYUN_SMS");
+        params.setEnabled(true);
+        params.setCredentialId("LTAI_TEST");
+        params.setSignName("Spectra");
+        params.setTemplateCode("SMS_123456");
+        params.setSecret("aliyun-secret");
+
+        var result = service.modify(NotificationChannel.SMS, params);
+
+        assertEquals("ALIYUN_SMS", result.getProviderType());
+        assertEquals("dysmsapi.aliyuncs.com", result.getEndpoint());
+        assertEquals("cn-hangzhou", result.getRegion());
+        assertEquals("LTAI_TEST", result.getCredentialId());
+        assertEquals("UNHEALTHY", result.getState());
+        assertTrue(result.isSecretConfigured());
+    }
+
+    @Test
+    void shouldSaveMockProviderWithoutThirdPartySecret() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("MOCK");
+        params.setEnabled(true);
+
+        var result = service.modify(NotificationChannel.EMAIL, params);
+
+        assertEquals("MOCK", result.getProviderType());
+        assertEquals("", result.getEndpoint());
+        assertEquals(0, result.getPort());
+        assertEquals(0, result.getTimeoutMs());
+        assertEquals(0, result.getRateLimitPerSecond());
+        assertEquals(1, result.getMaxAttempts());
+        assertEquals("UNHEALTHY", result.getState());
+        assertEquals("HEALTH_CHECK_REQUIRED", result.getReason());
+        assertFalse(result.isSecretConfigured());
+    }
+
+    @Test
+    void shouldResolveSavedMockProviderForRuntime() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("MOCK");
+        params.setEnabled(true);
+        service.modify(NotificationChannel.SMS, params);
+
+        var configuration = service.resolve(NotificationChannel.SMS);
+
+        assertEquals("MOCK", configuration.providerType());
+        assertTrue(configuration.enabled());
+        assertEquals(NotificationChannel.SMS, configuration.channel());
+    }
+
+    @Test
+    void shouldDiscardOldSecretWhenProviderTypeChanges() {
+        var first = new NotificationProviderSaveFrom();
+        first.setProviderType("HTTP_JSON");
+        first.setEndpoint("https://provider.example.test/send");
+        first.setSecret("old-secret");
+        service.modify(NotificationChannel.SMS, first);
+
+        var second = new NotificationProviderSaveFrom();
+        second.setProviderType("MOCK");
+        second.setEnabled(true);
+        var result = service.modify(NotificationChannel.SMS, second);
+
+        assertEquals("MOCK", result.getProviderType());
+        assertFalse(result.isSecretConfigured());
+        assertFalse(values.containsKey("notification.provider.sms.secret"));
+    }
+
+    @Test
+    void shouldRejectBothSmtpSecurityModes() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("SMTP");
+        params.setEndpoint("smtp.example.com");
+        params.setCredentialId("mailer@example.com");
+        params.setSenderAddress("no-reply@example.com");
+        params.setSslEnabled(true);
+        params.setStarttlsEnabled(true);
+
+        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
+                () -> service.modify(NotificationChannel.EMAIL, params));
+    }
+
+    @Test
+    void shouldRejectSmtpWithoutSenderAddress() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("SMTP");
+        params.setEndpoint("smtp.example.com");
+        params.setCredentialId("mailer@example.com");
+        params.setSecret("smtp-secret");
+
+        assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
+                () -> service.modify(NotificationChannel.EMAIL, params));
     }
 
     @Test
