@@ -25,6 +25,7 @@ package com.devops00.spectra.notification.javabean.domain;
  */
 public enum NotificationPreviewStatus {
     PREVIEWED,
+    APPLYING,
     APPLIED,
     EXPIRED
 }

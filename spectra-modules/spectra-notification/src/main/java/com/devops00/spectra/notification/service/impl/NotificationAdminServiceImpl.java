@@ -432,7 +432,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 .eq(NotificationRequestEntity::getId, task.getNotificationRequestId())
                 .notIn(NotificationRequestEntity::getStatus,
                         List.of(NotificationRequestStatus.CANCELLED.name(), NotificationRequestStatus.EXPIRED.name()))
-                .set(NotificationRequestEntity::getStatus, "DISPATCHING")
+                .set(NotificationRequestEntity::getStatus, NotificationRequestStatus.DISPATCHING.name())
                 .set(NotificationRequestEntity::getUpdatedAt, Instant.now()));
         log.info("已重新排队通知任务: taskId={}", taskId);
     }

@@ -193,7 +193,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 .eq(NotificationSendPreviewEntity::getStatus, NotificationPreviewStatus.PREVIEWED.name())
                 .isNull(NotificationSendPreviewEntity::getConsumedAt)
                 .gt(NotificationSendPreviewEntity::getExpiresAt, now)
-                .set(NotificationSendPreviewEntity::getStatus, "APPLYING")
+                .set(NotificationSendPreviewEntity::getStatus, NotificationPreviewStatus.APPLYING.name())
                 .set(NotificationSendPreviewEntity::getConsumedAt, now)) != 1) {
             throw new DataException("通知发送 Preview 已被其他请求消费");
         }
