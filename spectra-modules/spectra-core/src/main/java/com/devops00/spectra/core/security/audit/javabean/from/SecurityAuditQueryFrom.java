@@ -19,7 +19,6 @@ package com.devops00.spectra.core.security.audit.javabean.from;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import lombok.Data;
 
-import java.time.Instant;
 import java.util.UUID;
 
 /**
@@ -36,7 +35,7 @@ public class SecurityAuditQueryFrom {
 
     private AuditResult result;
 
-    private Instant from;
+    private String from;
 
-    private Instant to;
+    private String to;
 }

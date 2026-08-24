@@ -14,12 +14,12 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.sender.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 
 /**
  * 短信占位 Sender；未接入真实供应商时明确返回未配置。
@@ -59,6 +59,6 @@ public class PlaceholderSmsSender implements NotificationSender {
      */
     @Override
     public ChannelSendResult send(NotificationTaskEntity task) {
-        return new ChannelSendResult("BLOCKED", "SMS_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
+        return ChannelSendResult.blocked("SMS_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
     }
 }

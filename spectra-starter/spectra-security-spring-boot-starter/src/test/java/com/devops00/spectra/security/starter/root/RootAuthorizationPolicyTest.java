@@ -21,6 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -33,9 +35,9 @@ class RootAuthorizationPolicyTest {
     void shouldRecognizeOnlyConfiguredDevOpsRoleAsRoot() {
         var policy = new DefaultRootAuthorizationPolicy();
         var root = UsernamePasswordAuthenticationToken.authenticated("root", "N/A",
-                java.util.List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
+                List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
         var administrator = UsernamePasswordAuthenticationToken.authenticated("admin", "N/A",
-                java.util.List.of(new SimpleGrantedAuthority("ROLE_ADMIN_SYSTEM")));
+                List.of(new SimpleGrantedAuthority("ROLE_ADMIN_SYSTEM")));
 
         assertTrue(policy.isRoot(root));
         assertFalse(policy.isRoot(administrator));

@@ -21,6 +21,7 @@ import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Role 授权状态的纯影响分析器。
@@ -60,7 +61,7 @@ public class RoleChangeImpactAnalyzer {
                 levelChanged, expands, affectedAssignmentCount, affectedUserCount);
     }
 
-    private static <T> HashSet<T> difference(java.util.Set<T> left, java.util.Set<T> right) {
+    private static <T> HashSet<T> difference(Set<T> left, Set<T> right) {
         var result = new HashSet<>(left);
         result.removeAll(right);
         return result;

@@ -21,12 +21,32 @@ import java.time.Instant;
 /**
  * Provider 健康检查结果；状态必须使用通知渠道统一状态。
  *
- * @param state     `HEALTHY`、`UNHEALTHY` 或 `BLOCKED`
+ * @param state     Provider 健康状态
  * @param reason    脱敏状态原因
  * @param checkedAt 检查时间
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/23
  */
-public record NotificationProviderHealth(String state, String reason, Instant checkedAt) {
+public record NotificationProviderHealth(NotificationProviderHealthState state, String reason, Instant checkedAt) {
+
+    public static NotificationProviderHealth healthy(String reason, Instant checkedAt) {
+        return new NotificationProviderHealth(NotificationProviderHealthState.HEALTHY, reason, checkedAt);
+    }
+
+    public static NotificationProviderHealth unhealthy(String reason, Instant checkedAt) {
+        return new NotificationProviderHealth(NotificationProviderHealthState.UNHEALTHY, reason, checkedAt);
+    }
+
+    public static NotificationProviderHealth notConfigured(String reason, Instant checkedAt) {
+        return new NotificationProviderHealth(NotificationProviderHealthState.NOT_CONFIGURED, reason, checkedAt);
+    }
+
+    public static NotificationProviderHealth disabled(String reason, Instant checkedAt) {
+        return new NotificationProviderHealth(NotificationProviderHealthState.DISABLED, reason, checkedAt);
+    }
+
+    public static NotificationProviderHealth blocked(String reason, Instant checkedAt) {
+        return new NotificationProviderHealth(NotificationProviderHealthState.BLOCKED, reason, checkedAt);
+    }
 }

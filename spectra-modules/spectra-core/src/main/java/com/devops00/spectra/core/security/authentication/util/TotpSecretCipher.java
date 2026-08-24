@@ -13,6 +13,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -67,8 +68,8 @@ public final class TotpSecretCipher {
             throw new IllegalStateException("MFA 密钥版本不受支持或密文无效");
         }
         try {
-            byte[] iv = java.util.Arrays.copyOf(encrypted, IV_BYTES);
-            byte[] ciphertext = java.util.Arrays.copyOfRange(encrypted, IV_BYTES, encrypted.length);
+            byte[] iv = Arrays.copyOf(encrypted, IV_BYTES);
+            byte[] ciphertext = Arrays.copyOfRange(encrypted, IV_BYTES, encrypted.length);
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, "AES"), new GCMParameterSpec(TAG_BITS, iv));
             return new String(cipher.doFinal(ciphertext), StandardCharsets.UTF_8);

@@ -22,12 +22,15 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
+import java.util.Base64;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -68,10 +71,11 @@ class NotificationProviderAdminServiceImplTest {
         }).when(writer)
                 .upsert(ArgumentMatchers.anyString(), ArgumentMatchers.any(), ArgumentMatchers.any(),
                         ArgumentMatchers.anyString());
-        var key = java.util.Base64.getEncoder().encodeToString(new byte[32]);
+        var key = Base64.getEncoder().encodeToString(new byte[32]);
         var protector = new NotificationPayloadProtector(
-                new NotificationModuleProperties(true, key, key, java.util.List.of()), new ObjectMapper());
-        service = new NotificationProviderAdminServiceImpl(provider, protector, new ObjectMapper());
+                new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
+        service = new NotificationProviderAdminServiceImpl(
+                provider, protector, new ObjectMapper(), NotificationTestTimeMapper.create());
         service.setValueWriter(writer);
     }
 

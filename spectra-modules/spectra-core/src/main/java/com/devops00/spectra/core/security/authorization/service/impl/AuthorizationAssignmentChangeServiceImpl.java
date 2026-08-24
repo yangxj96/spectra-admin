@@ -47,6 +47,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
@@ -120,6 +121,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final TimeMapper timeMapper;
+
     @Override
     public AuthorizationChangePreviewVO preview(UUID targetUserId, AuthorizationAssignmentChangeFrom from) {
         var prepared = prepare(targetUserId, from, from.getAssignmentId());
@@ -131,7 +134,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         result.setTargetUserId(targetUserId);
         result.setAssignmentId(prepared.assignmentId());
         result.setExpectedVersion(from.getExpectedVersion());
-        result.setExpiresAt(expiresAt);
+        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
         result.setAffectedAssignmentCount(1);
         result.setAffectedUserCount(1);
         appendAudit("AUTHORIZATION_IMPACT_PREVIEWED", prepared.operatorId(), targetUserId,

@@ -55,6 +55,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -201,7 +202,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             throw new DataSaveException("文档必须先上传一个版本");
         }
         document.setStatus(STATUS_PUBLISHED);
-        document.setPublishedAt(java.time.Instant.now());
+        document.setPublishedAt(Instant.now());
         if (!updateById(document)) {
             throw new DataSaveException("发布文档失败");
         }
@@ -317,8 +318,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
                 || user.getDepartmentId() == null
                 || (!VISIBILITY_PUBLIC.equals(entity.getVisibility())
                         && !(VISIBILITY_DEPARTMENT.equals(entity.getVisibility())
-                                && java.util.Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
-                        && !java.util.Objects.equals(entity.getOwnerId(), user.getId()))) {
+                                && Objects.equals(entity.getDepartmentId(), user.getDepartmentId()))
+                        && !Objects.equals(entity.getOwnerId(), user.getId()))) {
             throw new DataNotExistException("文档不存在或无权访问");
         }
         return entity;
@@ -327,7 +328,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     private Document requireOwner(UUID id) {
         var entity = require(id);
         var user = securityContextAccessor.currentUser();
-        if (user == null || !java.util.Objects.equals(entity.getOwnerId(), user.getId())) {
+        if (user == null || !Objects.equals(entity.getOwnerId(), user.getId())) {
             throw new DataNotExistException("文档不存在或无权操作");
         }
         return entity;

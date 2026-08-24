@@ -32,6 +32,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * 会议主接口
  *
@@ -73,7 +75,7 @@ public class MeetingController {
     @ULog("'响应会议邀请'")
     @PostMapping(value = "/{id}/response", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
-    public void respond(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingResponseFrom from) {
+    public void respond(@PathVariable UUID id, @Validated @RequestBody MeetingResponseFrom from) {
         bindService.respond(id, from);
     }
 
@@ -83,7 +85,7 @@ public class MeetingController {
     @ULog("'会议签到'")
     @PostMapping(value = "/{id}/check-in", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
-    public void checkIn(@PathVariable java.util.UUID id) {
+    public void checkIn(@PathVariable UUID id) {
         bindService.checkIn(id);
     }
 
@@ -93,7 +95,7 @@ public class MeetingController {
     @ULog("'保存会议纪要'")
     @PostMapping(value = "/{id}/record", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
-    public void saveRecord(@PathVariable java.util.UUID id, @Validated @RequestBody MeetingRecordFrom from) {
+    public void saveRecord(@PathVariable UUID id, @Validated @RequestBody MeetingRecordFrom from) {
         bindService.saveRecord(id, from);
     }
 }

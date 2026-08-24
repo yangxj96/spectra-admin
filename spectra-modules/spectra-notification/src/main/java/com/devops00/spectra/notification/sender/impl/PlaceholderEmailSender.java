@@ -14,42 +14,51 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service;
+package com.devops00.spectra.notification.sender.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
+import com.devops00.spectra.notification.sender.NotificationSender;
 
 /**
- * 单一通知渠道的发送端口。
+ * 邮件占位 Sender；未接入真实供应商时明确返回未配置。
  *
  * @author yangxj96
  * @version 1.0
  * @since 2026/8/11
  */
-public interface NotificationSender {
+public class PlaceholderEmailSender implements NotificationSender {
 
     /**
-     * 当前 Sender 支持的渠道。
+     * 返回邮件渠道标识。
      */
-    NotificationChannel channel();
-
-    /**
-     * 当前 Sender 是否已配置为可用。
-     */
-    default boolean available() {
-        return true;
+    @Override
+    public NotificationChannel channel() {
+        return NotificationChannel.EMAIL;
     }
 
     /**
-     * 不可用时返回脱敏原因。
+     * 邮件供应商尚未配置。
      */
-    default String unavailableReason() {
-        return "CHANNEL_NOT_CONFIGURED";
+    @Override
+    public boolean available() {
+        return false;
     }
 
     /**
-     * 执行一次投递；不得记录明文敏感载荷。
+     * 返回邮件渠道未配置原因。
      */
-    ChannelSendResult send(NotificationTaskEntity task);
+    @Override
+    public String unavailableReason() {
+        return "EMAIL_CHANNEL_NOT_CONFIGURED";
+    }
+
+    /**
+     * 明确阻断投递，不伪造邮件发送成功。
+     */
+    @Override
+    public ChannelSendResult send(NotificationTaskEntity task) {
+        return ChannelSendResult.blocked("EMAIL_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
+    }
 }

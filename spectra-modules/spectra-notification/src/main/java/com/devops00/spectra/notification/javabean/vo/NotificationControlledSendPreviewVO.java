@@ -19,7 +19,7 @@ package com.devops00.spectra.notification.javabean.vo;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -28,7 +28,7 @@ import java.util.UUID;
  * 受控发送 Preview 结果；不包含完整用户清单、地址或敏感参数。
  */
 public record NotificationControlledSendPreviewVO(UUID previewId, String previewToken, String requestHash,
-                                                  Instant expiresAt, int candidateUserCount, int eligibleTaskCount,
+                                                  LocalDateTime expiresAt, int candidateUserCount, int eligibleTaskCount,
                                                   int skippedTaskCount, Map<String, Integer> skippedCounts,
                                                   Map<NotificationChannel, NotificationChannelAvailability> channelAvailability,
                                                   Map<NotificationChannel, NotificationControlledSendTemplateVO> templates,

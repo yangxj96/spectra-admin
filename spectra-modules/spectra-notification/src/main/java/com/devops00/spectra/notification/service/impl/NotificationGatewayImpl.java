@@ -21,7 +21,11 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.*;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.NotificationRequestStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTemplateState;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
@@ -32,7 +36,8 @@ import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.observability.NotificationMetrics;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
+import com.devops00.spectra.notification.utils.NotificationMaskingUtils;
 import com.devops00.spectra.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.*;
 
@@ -185,7 +188,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setSourceDepartmentId(request.sourceDepartmentId());
         entity.setParameters(request.parameters());
         entity.setSensitiveParametersCiphertext(payloadProtector.protectParameters(request.sensitiveParameters()));
-        entity.setStatus("ACCEPTED");
+        entity.setStatus(NotificationRequestStatus.ACCEPTED.name());
         entity.setRecipientCount(recipients.size() + request.directAddresses().size());
         entity.setTaskCount(0);
         entity.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
@@ -200,7 +203,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
             throw new DataSaveException("通知请求主键生成失败");
         }
         if (metrics != null) {
-            metrics.recordRequest(request.purpose().name(), "ACCEPTED");
+            metrics.recordRequest(request.purpose().name(), NotificationRequestStatus.ACCEPTED.name());
         }
 
         var taskCount = 0;
@@ -237,7 +240,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
                         NotificationRequestEntity::getTemplateSnapshot,
                         templateSnapshot,
                         "typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"));
-        return new NotificationReceipt(requestId, "ACCEPTED", taskCount, false);
+        return new NotificationReceipt(requestId, NotificationRequestStatus.ACCEPTED.name(), taskCount, false);
     }
 
     /**
@@ -263,7 +266,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         task.setNotificationRequestId(requestId);
         task.setReceiverUserId(recipientUserId);
         task.setRecipientKeyHash(recipientKeyHash);
-        task.setRecipientMasked(maskAddress(address));
+        task.setRecipientMasked(NotificationMaskingUtils.maskAddress(address));
         task.setRecipientCiphertext(address == null ? null : payloadProtector.protectAddress(address));
         task.setChannel(channel.name());
         task.setPurpose(request.purpose().name());
@@ -293,12 +296,12 @@ public class NotificationGatewayImpl implements NotificationGateway {
         task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
         task.setNextRetryAt(task.getScheduledAt());
         task.setExpiresAt(request.expiresAt());
-        task.setStatus("PENDING");
+        task.setStatus(NotificationTaskStatus.PENDING.name());
         if (taskMapper.insert(task) != 1) {
             throw new DataSaveException("创建通知任务失败");
         }
         if (metrics != null) {
-            metrics.recordTask(channel.name(), "PENDING", request.purpose().name());
+            metrics.recordTask(channel.name(), NotificationTaskStatus.PENDING.name(), request.purpose().name());
         }
         return 1;
     }
@@ -312,7 +315,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getChannel, channel.name())
                 .eq(NotificationTemplateEntity::getPurpose, request.purpose().name())
-                .eq(NotificationTemplateEntity::getState, "PUBLISHED")
+                .eq(NotificationTemplateEntity::getState, NotificationTemplateState.PUBLISHED.name())
                 .isNull(NotificationTemplateEntity::getDeleted);
         var lockedTemplateId = templateVersionIds.get(channel);
         if (lockedTemplateId != null) {
@@ -400,7 +403,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
                 || !StringUtils.hasText(request.templateGroupCode())) {
             throw new DataSaveException("通知请求参数不完整");
         }
-        if (request.recipientUserIds().stream().anyMatch(java.util.Objects::isNull)) {
+        if (request.recipientUserIds().stream().anyMatch(Objects::isNull)) {
             throw new DataSaveException("通知收件人无效");
         }
         for (var directAddress : request.directAddresses()) {
@@ -451,28 +454,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
      */
     private String recipientKeyHash(UUID recipientUserId, NotificationChannel channel, String address) {
         var key = recipientUserId == null ? channel.name() + ":" + address : recipientUserId.toString();
-        try {
-            return HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256")
-                            .digest(key.getBytes(StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("通知接收人键生成失败", exception);
-        }
-    }
-
-    /**
-     * 仅保存可用于运维定位的脱敏地址。
-     */
-    private String maskAddress(String address) {
-        if (!StringUtils.hasText(address)) {
-            return null;
-        }
-        var value = address.trim();
-        var at = value.indexOf('@');
-        if (at > 1) {
-            return value.charAt(0) + "***" + value.substring(at);
-        }
-        return value.length() > 4 ? value.substring(0, 3) + "****" + value.substring(value.length() - 2) : "***";
+        return SHA256Utils.hash(key);
     }
 
     /**

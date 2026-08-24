@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
+import java.util.Locale;
 
 /**
  * 认证身份标识摘要。摘要输入先 trim 并使用小写，避免同一邮箱产生多条身份。
@@ -34,7 +35,7 @@ public final class AuthenticationIdentifierHash {
             throw new IllegalArgumentException("认证身份标识不能为空");
         }
         try {
-            var normalized = identifier.trim().toLowerCase(java.util.Locale.ROOT);
+            var normalized = identifier.trim().toLowerCase(Locale.ROOT);
             var hash = MessageDigest.getInstance("SHA-256").digest(normalized.getBytes(StandardCharsets.UTF_8));
             return HexFormat.of().formatHex(hash);
         } catch (NoSuchAlgorithmException exception) {

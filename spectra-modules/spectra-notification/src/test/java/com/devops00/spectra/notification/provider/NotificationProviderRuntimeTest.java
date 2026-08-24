@@ -14,14 +14,17 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service;
+package com.devops00.spectra.notification.provider;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -50,9 +53,9 @@ class NotificationProviderRuntimeTest {
         assertFalse(runtime.available(NotificationChannel.SMS));
         assertEquals("HEALTH_CHECK_REQUIRED", runtime.unavailableReason(NotificationChannel.SMS));
 
-        assertEquals("HEALTHY", runtime.check(NotificationChannel.SMS).state());
+        assertEquals(NotificationProviderHealthState.HEALTHY, runtime.check(NotificationChannel.SMS).state());
         assertTrue(runtime.available(NotificationChannel.SMS));
-        assertEquals("SENT", runtime.send(NotificationChannel.SMS, new NotificationTaskEntity()).status());
+        assertEquals(ChannelSendStatus.SENT, runtime.send(NotificationChannel.SMS, new NotificationTaskEntity()).status());
         assertTrue(provider.sendCalled);
     }
 
@@ -85,7 +88,7 @@ class NotificationProviderRuntimeTest {
 
         var health = runtime.check(NotificationChannel.EMAIL);
 
-        assertEquals("BLOCKED", health.state());
+        assertEquals(NotificationProviderHealthState.BLOCKED, health.state());
         assertEquals("PROVIDER_NOT_REGISTERED", health.reason());
     }
 
@@ -111,13 +114,13 @@ class NotificationProviderRuntimeTest {
 
         @Override
         public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
-            return new NotificationProviderHealth("HEALTHY", "TEST_OK", Instant.now());
+            return NotificationProviderHealth.healthy("TEST_OK", Instant.now());
         }
 
         @Override
         public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
             sendCalled = true;
-            return new ChannelSendResult("SENT", "HTTP_JSON", "message-1", "TEST_SENT");
+            return ChannelSendResult.sent("HTTP_JSON", "message-1", "TEST_SENT");
         }
     }
 }

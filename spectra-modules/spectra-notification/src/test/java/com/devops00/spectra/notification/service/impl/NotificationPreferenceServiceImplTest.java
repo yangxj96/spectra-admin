@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.UUID;
 
@@ -85,11 +86,11 @@ class NotificationPreferenceServiceImplTest {
     void shouldPersistDoNotDisturbWindow() {
         when(mapper.selectOne(any())).thenReturn(null);
         when(mapper.insert(any(NotificationUserPreferenceEntity.class))).thenReturn(1);
-        var start = java.time.LocalDate.of(2026, 8, 13)
+        var start = LocalDate.of(2026, 8, 13)
                 .atTime(22, 0)
                 .atZone(ZoneId.of("Asia/Shanghai"))
                 .toInstant();
-        var end = java.time.LocalDate.of(2026, 8, 14)
+        var end = LocalDate.of(2026, 8, 14)
                 .atTime(8, 0)
                 .atZone(ZoneId.of("Asia/Shanghai"))
                 .toInstant();

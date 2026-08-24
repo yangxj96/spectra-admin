@@ -58,6 +58,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.UUID;
 
 /**
  * 文件上传服务-本地上传
@@ -450,7 +451,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
      *
      * @param url 地址
      */
-    private FileUploadVO buildUploadVO(String url, java.util.UUID fileId) {
+    private FileUploadVO buildUploadVO(String url, UUID fileId) {
         FileUploadVO vo = new FileUploadVO();
         vo.setUrl(url);
         vo.setFileId(fileId);

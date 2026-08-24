@@ -27,5 +27,21 @@ package com.devops00.spectra.notification.javabean.domain;
  * @version 1.0
  * @since 2026/8/11
  */
-public record ChannelSendResult(String status, String providerCode, String providerMessageId, String summary) {
+public record ChannelSendResult(ChannelSendStatus status, String providerCode, String providerMessageId, String summary) {
+
+    public static ChannelSendResult sent(String providerCode, String providerMessageId, String summary) {
+        return new ChannelSendResult(ChannelSendStatus.SENT, providerCode, providerMessageId, summary);
+    }
+
+    public static ChannelSendResult failed(String providerCode, String providerMessageId, String summary) {
+        return new ChannelSendResult(ChannelSendStatus.FAILED, providerCode, providerMessageId, summary);
+    }
+
+    public static ChannelSendResult blocked(String providerCode, String providerMessageId, String summary) {
+        return new ChannelSendResult(ChannelSendStatus.BLOCKED, providerCode, providerMessageId, summary);
+    }
+
+    public static ChannelSendResult unknown(String providerCode, String providerMessageId, String summary) {
+        return new ChannelSendResult(ChannelSendStatus.UNKNOWN, providerCode, providerMessageId, summary);
+    }
 }

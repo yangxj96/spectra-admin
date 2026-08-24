@@ -19,6 +19,8 @@ package com.devops00.spectra.oa.application.javabean.from;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.UUID;
+
 /**
  * OA 申请类型保存参数。
  *
@@ -44,7 +46,7 @@ public class ApplicationTypeSaveFrom {
     /**
      * 表单定义 ID。
      */
-    private java.util.UUID formDefinitionId;
+    private UUID formDefinitionId;
 
     /**
      * 流程定义 Key。

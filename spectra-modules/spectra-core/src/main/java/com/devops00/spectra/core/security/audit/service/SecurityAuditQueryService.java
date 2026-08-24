@@ -23,6 +23,7 @@ import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditRetentionVO;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditVO;
 import com.devops00.spectra.core.security.audit.observability.SecurityAuditMetrics;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.AuditVisibilityPolicy;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -40,6 +41,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -76,6 +78,8 @@ public class SecurityAuditQueryService {
     private final SecurityAuditWriter securityAuditWriter;
 
     private final SecurityAuditMetrics metrics;
+
+    private final TimeMapper timeMapper;
 
     /**
      * 分页查询审计事件。
@@ -233,13 +237,13 @@ public class SecurityAuditQueryService {
             conditions.add("result = ?");
             arguments.add(safeQuery.getResult().name());
         }
-        if (safeQuery.getFrom() != null) {
+        if (safeQuery.getFrom() != null && !safeQuery.getFrom().isBlank()) {
             conditions.add("occurred_at >= ?");
-            arguments.add(safeQuery.getFrom());
+            arguments.add(timeMapper.toInstant(safeQuery.getFrom()));
         }
-        if (safeQuery.getTo() != null) {
+        if (safeQuery.getTo() != null && !safeQuery.getTo().isBlank()) {
             conditions.add("occurred_at < ?");
-            arguments.add(safeQuery.getTo());
+            arguments.add(timeMapper.toInstant(safeQuery.getTo()));
         }
         String where = conditions.isEmpty() ? "" : " WHERE " + String.join(" AND ", conditions);
         return new QueryPlan(where, arguments);
@@ -257,7 +261,7 @@ public class SecurityAuditQueryService {
                 parseSnapshot(resultSet.getString("before_snapshot")),
                 parseSnapshot(resultSet.getString("after_snapshot")),
                 resultSet.getString("reason"),
-                toInstant(resultSet.getTimestamp("occurred_at")),
+                timeMapper.toLocalDateTime(toInstant(resultSet.getTimestamp("occurred_at"))),
                 AuditResult.valueOf(resultSet.getString("result")),
                 resultSet.getString("correlation_id"));
     }
@@ -269,7 +273,7 @@ public class SecurityAuditQueryService {
         }
         try {
             Map<?, ?> parsed = objectMapper.readValue(json, Map.class);
-            var normalized = new java.util.LinkedHashMap<String, Object>();
+            var normalized = new LinkedHashMap<String, Object>();
             parsed.forEach((key, value) -> normalized.put(String.valueOf(key), value));
             return SecurityAuditSnapshotSanitizer.sanitize(normalized);
         } catch (Exception ignored) {
@@ -279,7 +283,8 @@ public class SecurityAuditQueryService {
 
     private SecurityAuditEvent toEvent(SecurityAuditVO value) {
         return new SecurityAuditEvent(value.eventId(), value.eventType(), value.operatorId(), value.targetId(), value.client(),
-                value.ip(), value.userAgent(), value.before(), value.after(), value.reason(), value.occurredAt(), value.result(),
+                value.ip(), value.userAgent(), value.before(), value.after(), value.reason(), timeMapper.toInstant(value.occurredAt()),
+                value.result(),
                 value.correlationId());
     }
 

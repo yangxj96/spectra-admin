@@ -21,7 +21,9 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.impl.NotificationProviderTestServiceImpl;
+import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -41,7 +43,7 @@ class NotificationProviderTestServiceTest {
     void shouldRequireExplicitConfirmationBeforeSending() {
         var runtime = mock(NotificationProviderRuntime.class);
         var protector = mock(NotificationPayloadProtector.class);
-        var service = new NotificationProviderTestServiceImpl(runtime, protector);
+        var service = new NotificationProviderTestServiceImpl(runtime, protector, NotificationTestTimeMapper.create());
         var params = params();
         params.setConfirmation("SEND");
 
@@ -55,9 +57,9 @@ class NotificationProviderTestServiceTest {
         var runtime = mock(NotificationProviderRuntime.class);
         var protector = mock(NotificationPayloadProtector.class);
         when(protector.protectAddress("+8613800138000")).thenReturn("v1:iv:ciphertext");
-        when(runtime.send(any(), any())).thenReturn(new ChannelSendResult("SENT", "HTTP_JSON", "message-1",
+        when(runtime.send(any(), any())).thenReturn(ChannelSendResult.sent("HTTP_JSON", "message-1",
                 "PROVIDER_ACCEPTED"));
-        var service = new NotificationProviderTestServiceImpl(runtime, protector);
+        var service = new NotificationProviderTestServiceImpl(runtime, protector, NotificationTestTimeMapper.create());
 
         var result = service.send(NotificationChannel.SMS, params());
 
@@ -70,7 +72,7 @@ class NotificationProviderTestServiceTest {
     @Test
     void shouldRejectInAppTestSending() {
         var service = new NotificationProviderTestServiceImpl(mock(NotificationProviderRuntime.class),
-                mock(NotificationPayloadProtector.class));
+                mock(NotificationPayloadProtector.class), NotificationTestTimeMapper.create());
 
         assertThrows(DataSaveException.class, () -> service.send(NotificationChannel.IN_APP, params()));
     }

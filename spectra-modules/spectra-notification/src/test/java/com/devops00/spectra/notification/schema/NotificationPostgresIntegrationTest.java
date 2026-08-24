@@ -26,6 +26,8 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -300,7 +302,7 @@ class NotificationPostgresIntegrationTest {
                            AND indexname IN ('UK_NTF_REQUEST_IDEMPOTENCY', 'UK_NTF_TASK_RECIPIENT_CHANNEL',
                                'IDX_NTF_TASK_PENDING', 'IDX_NTF_INBOX_RECEIVER_UNREAD')
                         """)) {
-            var indexes = new java.util.HashSet<String>();
+            var indexes = new HashSet<String>();
             while (result.next()) {
                 indexes.add(result.getString(1));
             }
@@ -505,7 +507,7 @@ class NotificationPostgresIntegrationTest {
             setInstant(query, 2, now);
             setInstant(query, 3, now);
             try (var result = query.executeQuery()) {
-                var ids = new java.util.ArrayList<UUID>();
+                var ids = new ArrayList<UUID>();
                 while (result.next()) {
                     ids.add(result.getObject(1, UUID.class));
                 }

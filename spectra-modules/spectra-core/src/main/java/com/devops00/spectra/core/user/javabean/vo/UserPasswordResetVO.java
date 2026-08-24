@@ -21,7 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * 管理员重置用户密码后的临时凭证响应。
@@ -45,7 +45,7 @@ public class UserPasswordResetVO implements Serializable {
     /**
      * 临时密码过期时间。
      */
-    private Instant expiresAt;
+    private LocalDateTime expiresAt;
 
     /**
      * 用户登录后是否必须修改密码。

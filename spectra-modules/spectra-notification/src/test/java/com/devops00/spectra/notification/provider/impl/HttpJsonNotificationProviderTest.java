@@ -14,10 +14,12 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.sun.net.httpserver.HttpServer;
@@ -67,10 +69,10 @@ class HttpJsonNotificationProviderTest {
             task.setTitle("通知标题");
             task.setContent("通知正文");
 
-            assertEquals("HEALTHY", provider.health(configuration).state());
+            assertEquals(NotificationProviderHealthState.HEALTHY, provider.health(configuration).state());
             var result = provider.send(task, configuration);
 
-            assertEquals("SENT", result.status());
+            assertEquals(ChannelSendStatus.SENT, result.status());
             assertEquals("message-1", result.providerMessageId());
             assertTrue(requestBody.get().contains("13800138000"));
             assertTrue(requestBody.get().contains("template-1"));

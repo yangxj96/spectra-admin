@@ -18,7 +18,7 @@ package com.devops00.spectra.notification.health;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;

@@ -14,23 +14,21 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
-
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
-import org.springframework.stereotype.Component;
+package com.devops00.spectra.notification.javabean.domain;
 
 /**
- * 邮件渠道 Sender；供应商选择和发送细节由 Provider Runtime 管理。
+ * 通知请求聚合状态。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/8/24
  */
-@Component
-public class EmailNotificationSender extends AbstractExternalNotificationSender {
-
-    public EmailNotificationSender(NotificationProviderRuntime runtime) {
-        super(runtime, NotificationChannel.EMAIL);
-    }
+public enum NotificationRequestStatus {
+    ACCEPTED,
+    DISPATCHING,
+    SUCCEEDED,
+    PARTIAL,
+    FAILED,
+    CANCELLED,
+    EXPIRED
 }

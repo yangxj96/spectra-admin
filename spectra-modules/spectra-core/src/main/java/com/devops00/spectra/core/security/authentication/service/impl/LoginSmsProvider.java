@@ -37,6 +37,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 短信验证码登录
  *
@@ -95,7 +97,7 @@ public class LoginSmsProvider extends SmsAuthenticationProvider {
             var attempts = SecurityRedisExecutor.require("记录短信验证码失败次数",
                     () -> redisTemplate.opsForValue().increment(attemptsKey));
             if (attempts == 1L) {
-                redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), java.util.concurrent.TimeUnit.SECONDS);
+                redisTemplate.expire(attemptsKey, securityProperties.getVerificationCodeExpire(), TimeUnit.SECONDS);
             }
             if (attempts > securityProperties.getVerificationCodeMaxAttempts()) {
                 throw new KaptchaNotMatchException("验证码尝试次数过多");

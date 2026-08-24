@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -256,7 +257,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
     }
 
     private void notifyWorkflowResult(org.flowable.task.api.Task task, String operator, boolean approved) {
-        var recipients = recipientDirectory.resolveByLoginNames(java.util.List.of(operator))
+        var recipients = recipientDirectory.resolveByLoginNames(List.of(operator))
                 .stream()
                 .filter(item -> item.active() && item.userId() != null)
                 .map(item -> item.userId())
@@ -282,7 +283,7 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
             if (!StringUtils.hasText(task.getAssignee())) {
                 return;
             }
-            var recipients = recipientDirectory.resolveByLoginNames(java.util.List.of(task.getAssignee()))
+            var recipients = recipientDirectory.resolveByLoginNames(List.of(task.getAssignee()))
                     .stream()
                     .filter(item -> item.active() && item.userId() != null)
                     .map(item -> item.userId())

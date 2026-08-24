@@ -25,8 +25,10 @@ import org.springframework.stereotype.Repository;
 import tools.jackson.databind.ObjectMapper;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.UUID;
 
 /**
  * PostgreSQL Security Audit 追加写入器。
@@ -97,7 +99,7 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
         }
     }
 
-    private static void setUuid(PreparedStatement statement, int index, java.util.UUID value) throws java.sql.SQLException {
+    private static void setUuid(PreparedStatement statement, int index, UUID value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.OTHER);
         } else {

@@ -18,7 +18,7 @@ package com.devops00.spectra.notification.health;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.health.contributor.Status;
@@ -56,7 +56,7 @@ class NotificationHealthIndicatorTest {
         var sender = mock(NotificationSender.class);
         when(sender.channel()).thenReturn(channel);
         when(sender.available()).thenReturn(available);
-        when(sender.send(org.mockito.ArgumentMatchers.any())).thenReturn(new ChannelSendResult("SENT", "TEST", null,
+        when(sender.send(org.mockito.ArgumentMatchers.any())).thenReturn(ChannelSendResult.sent("TEST", null,
                 "ok"));
         return sender;
     }

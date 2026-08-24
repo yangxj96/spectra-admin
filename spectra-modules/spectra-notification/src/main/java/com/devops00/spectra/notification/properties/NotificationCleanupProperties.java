@@ -20,6 +20,8 @@ import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.Optional;
+
 /**
  * 通知敏感载荷清理策略。
  *
@@ -88,8 +90,8 @@ public class NotificationCleanupProperties {
         this.retentionSeconds = retentionSeconds;
     }
 
-    private java.util.Optional<String> systemValue(String key) {
-        return systemConfigValueProvider == null ? java.util.Optional.empty() : systemConfigValueProvider.find(key);
+    private Optional<String> systemValue(String key) {
+        return systemConfigValueProvider == null ? Optional.empty() : systemConfigValueProvider.find(key);
     }
 
     private static long normalizeDelay(long value) {

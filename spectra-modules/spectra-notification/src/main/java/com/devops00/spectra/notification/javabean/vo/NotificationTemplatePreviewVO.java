@@ -18,7 +18,7 @@ package com.devops00.spectra.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -47,5 +47,5 @@ public class NotificationTemplatePreviewVO {
 
     private String html;
 
-    private Instant previewedAt;
+    private LocalDateTime previewedAt;
 }

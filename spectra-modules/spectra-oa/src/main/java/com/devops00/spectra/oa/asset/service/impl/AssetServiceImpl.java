@@ -34,9 +34,11 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * 资产管理业务服务实现。
@@ -274,8 +276,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
         var itemMap = purchaseItemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, purchase.getId()))
                 .stream()
-                .collect(java.util.stream.Collectors.toMap(PurchaseItem::getId, item -> item));
-        var result = new java.util.ArrayList<AssetVO>();
+                .collect(Collectors.toMap(PurchaseItem::getId, item -> item));
+        var result = new ArrayList<AssetVO>();
         var receiptItems = receiptItemMapper
                 .selectList(new LambdaQueryWrapper<PurchaseReceiptItem>().eq(PurchaseReceiptItem::getReceiptId, receipt.getId()));
         for (var receiptItem : receiptItems) {

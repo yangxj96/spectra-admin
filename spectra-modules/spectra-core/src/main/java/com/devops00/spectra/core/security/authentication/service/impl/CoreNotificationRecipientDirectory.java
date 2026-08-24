@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -56,7 +57,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
             return List.of();
         }
         return userIds.stream()
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .distinct()
                 .map(this::resolveOne)
                 .toList();
@@ -71,9 +72,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .filter(this::hasText)
                 .distinct()
                 .map(userService::getByEmail)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .map(User::getId)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .flatMap(userId -> resolve(List.of(userId)).stream())
                 .toList();
     }
@@ -105,7 +106,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 && !currentUserId.equals(recipientUserId)) {
             return false;
         }
-        if (snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId, null, java.util.Set.of()))) {
+        if (snapshot.canAccess("user:read", new ScopeQuery(currentUserId, recipientUserId, null, Set.of()))) {
             return true;
         }
         var recipient = userService.getById(recipientUserId);

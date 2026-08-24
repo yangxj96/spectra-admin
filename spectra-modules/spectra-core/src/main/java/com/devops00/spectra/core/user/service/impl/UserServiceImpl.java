@@ -45,6 +45,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
@@ -64,6 +65,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 用户service层-实现
@@ -106,6 +108,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final SecuritySessionRevocationPort securitySessionRevocationPort;
 
     private final SecurityPasswordPolicyProvider securityPasswordPolicyProvider;
+
+    private final TimeMapper timeMapper;
 
     @Override
     public User getByEmail(String email) {
@@ -174,7 +178,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 Map.of("mustChange", true, "expiresAt", expiresAt.toString()), "管理员重置密码");
         // 密码凭证变化后，所有设备必须重新认证。
         securitySessionRevocationPort.revokeUserSessions(uid);
-        return new UserPasswordResetVO(temporaryPassword, expiresAt, true);
+        return new UserPasswordResetVO(temporaryPassword, timeMapper.toLocalDateTime(expiresAt), true);
     }
 
     @Override
@@ -382,18 +386,19 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private void fillAuthorization(UserPageVO vo) {
         var assignments = authorizationAssignmentQueryService.findByUserId(vo.getId());
         vo.setRoles(targetRoles(assignments));
-        vo.setAuthorizationStatus(UserAuthorizationStatusCalculator.calculate(assignments));
+        vo.setAuthorizationStatus(UserAuthorizationStatusCalculator.calculate(
+                assignments, timeMapper.toLocalDateTime(Instant.now())));
     }
 
     private List<RoleVO> targetRoles(List<AuthorizationAssignmentView> assignments) {
         return assignments
                 .stream()
                 .filter(assignment -> "ACTIVE".equals(assignment.state()))
-                .collect(java.util.stream.Collectors.toMap(
+                .collect(Collectors.toMap(
                         assignment -> assignment.roleId(),
                         assignment -> assignment,
                         (first, ignored) -> first,
-                        java.util.LinkedHashMap::new))
+                        LinkedHashMap::new))
                 .values()
                 .stream()
                 .map(assignment -> {

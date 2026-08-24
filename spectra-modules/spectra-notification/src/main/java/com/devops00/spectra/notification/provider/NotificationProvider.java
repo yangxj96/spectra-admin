@@ -14,51 +14,42 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationSender;
 
 /**
- * 邮件占位 Sender；未接入真实供应商时明确返回未配置。
+ * 外部通知 Provider SPI；Gateway、Worker 不感知供应商 SDK 或 HTTP 细节。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/11
+ * @since 2026/8/23
  */
-public class PlaceholderEmailSender implements NotificationSender {
+public interface NotificationProvider {
 
     /**
-     * 返回邮件渠道标识。
+     * Provider 类型编码。
      */
-    @Override
-    public NotificationChannel channel() {
-        return NotificationChannel.EMAIL;
+    String code();
+
+    /**
+     * 判断当前 Provider 是否支持指定渠道。
+     */
+    default boolean supports(NotificationChannel channel) {
+        return channel != null;
     }
 
     /**
-     * 邮件供应商尚未配置。
+     * 执行健康检查；不得返回明文响应或凭据。
      */
-    @Override
-    public boolean available() {
-        return false;
-    }
+    NotificationProviderHealth health(NotificationProviderConfiguration configuration);
 
     /**
-     * 返回邮件渠道未配置原因。
+     * 发送一个已经由通知域渲染并保护地址的任务。
      */
-    @Override
-    public String unavailableReason() {
-        return "EMAIL_CHANNEL_NOT_CONFIGURED";
-    }
-
-    /**
-     * 明确阻断投递，不伪造邮件发送成功。
-     */
-    @Override
-    public ChannelSendResult send(NotificationTaskEntity task) {
-        return new ChannelSendResult("BLOCKED", "EMAIL_PLACEHOLDER", null, "CHANNEL_NOT_CONFIGURED");
-    }
+    ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration);
 }

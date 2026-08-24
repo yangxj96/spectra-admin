@@ -59,6 +59,8 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.*;
+import java.time.format.DateTimeParseException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -187,7 +189,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             throw new DataSaveException("当前用户缺少流程用户名");
         }
         var approver = from == null ? null : from.getApproverEmail();
-        var variables = new java.util.LinkedHashMap<String, Object>();
+        var variables = new LinkedHashMap<String, Object>();
         variables.put("applicant", applicant);
         variables.put("approver", StringUtils.hasText(approver) ? approver : applicant);
         variables.put("applicantId", application.getApplicantId().toString());
@@ -302,7 +304,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
                 throw new DataSaveException("请假时长必须大于 0 小时");
             }
             return new ParsedLeave(from.getLeaveTypeCode(), start, end, hours);
-        } catch (java.time.format.DateTimeParseException exception) {
+        } catch (DateTimeParseException exception) {
             throw new DataSaveException("请使用 ISO-8601 时间格式");
         }
     }

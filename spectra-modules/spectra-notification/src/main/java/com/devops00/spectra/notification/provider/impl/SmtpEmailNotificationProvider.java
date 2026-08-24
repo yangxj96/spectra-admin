@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
@@ -22,8 +22,10 @@ import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationTaskMessage;
 import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
 import jakarta.mail.Session;
 import jakarta.mail.Transport;
 import jakarta.mail.internet.InternetAddress;
@@ -31,6 +33,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Properties;
@@ -61,7 +64,7 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
     public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
         var checkedAt = Instant.now();
         if (!usable(configuration)) {
-            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+            return NotificationProviderHealth.blocked("PROVIDER_CONFIGURATION_INVALID", checkedAt);
         }
         try {
             var session = session(configuration);
@@ -69,22 +72,22 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
                 transport.connect(configuration.endpoint(), configuration.port(), configuration.credentialId(),
                         configuration.secret());
             }
-            return new NotificationProviderHealth("HEALTHY", "HEALTH_CHECK_OK", checkedAt);
+            return NotificationProviderHealth.healthy("HEALTH_CHECK_OK", checkedAt);
         } catch (Exception exception) {
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_UNAVAILABLE", checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_UNAVAILABLE", checkedAt);
         }
     }
 
     @Override
     public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
         if (!usable(configuration)) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+            return ChannelSendResult.blocked(CODE, null, "PROVIDER_CONFIGURATION_INVALID");
         }
         final String recipient;
         try {
             recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+            return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         try {
             var messageContent = NotificationTaskMessage.resolve(task, payloadProtector);
@@ -98,11 +101,11 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
             message.setSubject(messageContent.title(), StandardCharsets.UTF_8.name());
             message.setText(messageContent.content(), StandardCharsets.UTF_8.name());
             Transport.send(message, configuration.credentialId(), configuration.secret());
-            return new ChannelSendResult("SENT", CODE, "smtp-" + UUID.randomUUID(), "PROVIDER_ACCEPTED");
-        } catch (jakarta.mail.MessagingException | java.io.UnsupportedEncodingException exception) {
-            return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", null, "PROVIDER_REJECTED");
+            return ChannelSendResult.sent(CODE, "smtp-" + UUID.randomUUID(), "PROVIDER_ACCEPTED");
+        } catch (MessagingException | UnsupportedEncodingException exception) {
+            return ChannelSendResult.failed("PROVIDER_REJECTED", null, "PROVIDER_REJECTED");
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
         }
     }
 

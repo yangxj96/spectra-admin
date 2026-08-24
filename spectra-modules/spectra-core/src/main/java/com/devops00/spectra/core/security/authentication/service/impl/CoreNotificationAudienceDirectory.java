@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -96,7 +97,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
         if (roleIds == null || roleIds.isEmpty()) {
             return;
         }
-        var requestedRoleIds = roleIds.stream().filter(java.util.Objects::nonNull).distinct().toList();
+        var requestedRoleIds = roleIds.stream().filter(Objects::nonNull).distinct().toList();
         if (requestedRoleIds.isEmpty()) {
             return;
         }
@@ -118,7 +119,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
                 .stream()
                 .filter(assignment -> isValid(assignment, now))
                 .map(RoleAssignment::getUserId)
-                .filter(java.util.Objects::nonNull)
+                .filter(Objects::nonNull)
                 .forEach(userIds::add);
     }
 
@@ -129,7 +130,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
 
     private void addNonNull(Set<UUID> target, Collection<UUID> values) {
         if (values != null) {
-            values.stream().filter(java.util.Objects::nonNull).forEach(target::add);
+            values.stream().filter(Objects::nonNull).forEach(target::add);
         }
     }
 }

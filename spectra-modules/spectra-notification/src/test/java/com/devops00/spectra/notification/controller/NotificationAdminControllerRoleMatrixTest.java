@@ -32,7 +32,9 @@ import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.Method;
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -67,7 +69,7 @@ class NotificationAdminControllerRoleMatrixTest {
         var controller = new NotificationAdminController(mock(NotificationAdminService.class));
         var query = NotificationAdminController.class.getMethod("pageRequests",
                 PageFrom.class, NotificationAdminQueryFrom.class);
-        var retry = NotificationAdminController.class.getMethod("retry", java.util.UUID.class);
+        var retry = NotificationAdminController.class.getMethod("retry", UUID.class);
 
         assertTrue(evaluate(query, controller, authentication("notification:admin:read", "notification:admin:retry")));
         assertTrue(evaluate(retry, controller, authentication("notification:admin:retry")));
@@ -79,7 +81,7 @@ class NotificationAdminControllerRoleMatrixTest {
     void shouldDenyAllAdminOperationsToOrdinaryUsers() throws Exception {
         var controller = new NotificationAdminController(mock(NotificationAdminService.class));
         var channel = NotificationAdminController.class.getMethod("availability", NotificationChannel.class);
-        var cancel = NotificationAdminController.class.getMethod("cancel", java.util.UUID.class);
+        var cancel = NotificationAdminController.class.getMethod("cancel", UUID.class);
 
         var ordinary = authentication("user:read");
         assertFalse(evaluate(channel, controller, ordinary));
@@ -98,6 +100,6 @@ class NotificationAdminControllerRoleMatrixTest {
 
     private Authentication authentication(String... authorities) {
         return new UsernamePasswordAuthenticationToken("test-user",
-                "test-token", java.util.Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList());
+                "test-token", Arrays.stream(authorities).map(SimpleGrantedAuthority::new).toList());
     }
 }

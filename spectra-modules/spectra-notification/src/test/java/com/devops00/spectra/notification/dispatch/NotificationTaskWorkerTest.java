@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.dispatch;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -28,7 +28,7 @@ import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.ObjectTypeHandler;
@@ -73,7 +73,7 @@ class NotificationTaskWorkerTest {
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
         when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
         when(sender.channel()).thenReturn(NotificationChannel.SMS);
-        when(sender.send(task)).thenReturn(new ChannelSendResult("SENT", "MOCK_SMS", "provider-1", "accepted"));
+        when(sender.send(task)).thenReturn(ChannelSendResult.sent("MOCK_SMS", "provider-1", "accepted"));
         var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
 
         assertEquals(1, worker.processPending(50));
@@ -154,7 +154,7 @@ class NotificationTaskWorkerTest {
         when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
         when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
         when(sender.channel()).thenReturn(NotificationChannel.SMS);
-        when(sender.send(task)).thenReturn(new ChannelSendResult("FAILED", "RATE_LIMITED", null,
+        when(sender.send(task)).thenReturn(ChannelSendResult.failed("RATE_LIMITED", null,
                 "PROVIDER_RATE_LIMITED"));
         var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
 
@@ -192,7 +192,8 @@ class NotificationTaskWorkerTest {
     private NotificationTaskWorker worker(NotificationTaskMapper taskMapper,
                                           NotificationDeliveryMapper deliveryMapper, NotificationRequestMapper requestMapper,
                                           List<NotificationSender> senders) {
-        var worker = new NotificationTaskWorker(taskMapper, deliveryMapper, requestMapper, senders);
+        var worker = new NotificationTaskWorker(taskMapper, deliveryMapper,
+                new NotificationRequestStatusUpdater(taskMapper, requestMapper), senders);
         setField(worker, "processingTimeoutSeconds", 300L);
         setField(worker, "retryBaseDelaySeconds", 1L);
         return worker;

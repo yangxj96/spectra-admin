@@ -14,42 +14,42 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service;
+package com.devops00.spectra.notification.sender;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
-import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
-import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 
 /**
- * 外部通知 Provider SPI；Gateway、Worker 不感知供应商 SDK 或 HTTP 细节。
+ * 单一通知渠道的发送端口。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/8/11
  */
-public interface NotificationProvider {
+public interface NotificationSender {
 
     /**
-     * Provider 类型编码。
+     * 当前 Sender 支持的渠道。
      */
-    String code();
+    NotificationChannel channel();
 
     /**
-     * 判断当前 Provider 是否支持指定渠道。
+     * 当前 Sender 是否已配置为可用。
      */
-    default boolean supports(NotificationChannel channel) {
-        return channel != null;
+    default boolean available() {
+        return true;
     }
 
     /**
-     * 执行健康检查；不得返回明文响应或凭据。
+     * 不可用时返回脱敏原因。
      */
-    NotificationProviderHealth health(NotificationProviderConfiguration configuration);
+    default String unavailableReason() {
+        return "CHANNEL_NOT_CONFIGURED";
+    }
 
     /**
-     * 发送一个已经由通知域渲染并保护地址的任务。
+     * 执行一次投递；不得记录明文敏感载荷。
      */
-    ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration);
+    ChannelSendResult send(NotificationTaskEntity task);
 }

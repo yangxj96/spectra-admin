@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider;
 
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
@@ -25,12 +25,12 @@ import java.util.Map;
 /**
  * Provider 使用的已渲染消息视图；敏感参数只在调用 Provider 的短暂内存中解密。
  */
-final class NotificationTaskMessage {
+public final class NotificationTaskMessage {
 
     private NotificationTaskMessage() {
     }
 
-    static Message resolve(NotificationTaskEntity task, NotificationPayloadProtector protector) {
+    public static Message resolve(NotificationTaskEntity task, NotificationPayloadProtector protector) {
         var parameters = new LinkedHashMap<String, Object>();
         String providerTemplateCode = null;
         if (task.getExtra() != null) {
@@ -63,6 +63,6 @@ final class NotificationTaskMessage {
         return new Message(title, content, Map.copyOf(parameters), providerTemplateCode);
     }
 
-    record Message(String title, String content, Map<String, Object> parameters, String providerTemplateCode) {
+    public record Message(String title, String content, Map<String, Object> parameters, String providerTemplateCode) {
     }
 }

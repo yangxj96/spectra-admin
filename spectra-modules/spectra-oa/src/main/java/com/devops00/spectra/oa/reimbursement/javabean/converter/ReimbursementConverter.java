@@ -32,6 +32,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
+import java.util.UUID;
+
 /**
  * 报销 MapStruct 转换器。
  *
@@ -81,7 +83,7 @@ public interface ReimbursementConverter {
      * 将文件 ID 转换为文件预览地址。
      */
     @Named("toPreviewUrl")
-    default String toPreviewUrl(java.util.UUID fileId) {
+    default String toPreviewUrl(UUID fileId) {
         return fileId == null ? null : "/api/file/upload/preview/" + fileId;
     }
 }

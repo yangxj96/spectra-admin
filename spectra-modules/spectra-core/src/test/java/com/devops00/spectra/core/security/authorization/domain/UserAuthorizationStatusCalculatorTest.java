@@ -17,18 +17,20 @@
 package com.devops00.spectra.core.security.authorization.domain;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
+import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class UserAuthorizationStatusCalculatorTest {
 
-    private static final Instant NOW = Instant.parse("2026-08-21T00:00:00Z");
+    private static final LocalDateTime NOW = LocalDateTime.parse("2026-08-21T00:00:00");
 
     @Test
     void returnsUnconfiguredWhenUserHasNoAssignments() {
@@ -99,8 +101,8 @@ class UserAuthorizationStatusCalculatorTest {
                                                           String roleState,
                                                           long rolePermissionCount,
                                                           int boundaryCount,
-                                                          Instant validFrom,
-                                                          Instant validUntil) {
+                                                          LocalDateTime validFrom,
+                                                          LocalDateTime validUntil) {
         return assignment("ROLE_TEST", state, roleState, rolePermissionCount, boundaryCount, validFrom, validUntil);
     }
 
@@ -110,10 +112,10 @@ class UserAuthorizationStatusCalculatorTest {
                                                           String roleState,
                                                           long rolePermissionCount,
                                                           int boundaryCount,
-                                                          Instant validFrom,
-                                                          Instant validUntil) {
-        var boundaries = java.util.stream.IntStream.range(0, boundaryCount)
-                .mapToObj(index -> new com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView(
+                                                          LocalDateTime validFrom,
+                                                          LocalDateTime validUntil) {
+        var boundaries = IntStream.range(0, boundaryCount)
+                .mapToObj(index -> new AuthorizationBoundaryView(
                         "permission:" + index, "NONE", null, List.of()))
                 .toList();
         return new AuthorizationAssignmentView(

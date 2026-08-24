@@ -14,14 +14,16 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service;
+package com.devops00.spectra.notification.provider;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -67,27 +69,23 @@ public class NotificationProviderRuntime {
     public NotificationProviderHealth check(NotificationChannel channel) {
         var checkedAt = Instant.now();
         if (!properties.enabled()) {
-            return cache(channel, null, new NotificationProviderHealth("BLOCKED", "MODULE_DISABLED", checkedAt));
+            return cache(channel, null, NotificationProviderHealth.blocked("MODULE_DISABLED", checkedAt));
         }
         var configuration = configurationService.resolve(channel);
         if (configuration.providerType() == null || configuration.providerType().isBlank()) {
-            return cache(channel, configuration, new NotificationProviderHealth("NOT_CONFIGURED", "PROVIDER_NOT_CONFIGURED",
-                    checkedAt));
+            return cache(channel, configuration, NotificationProviderHealth.notConfigured("PROVIDER_NOT_CONFIGURED", checkedAt));
         }
         if (!configuration.enabled()) {
-            return cache(channel, configuration, new NotificationProviderHealth("DISABLED", "DISABLED_BY_CONFIGURATION",
-                    checkedAt));
+            return cache(channel, configuration, NotificationProviderHealth.disabled("DISABLED_BY_CONFIGURATION", checkedAt));
         }
         var provider = findProvider(channel, configuration.providerType());
         if (provider == null) {
-            return cache(channel, configuration, new NotificationProviderHealth("BLOCKED", "PROVIDER_NOT_REGISTERED",
-                    checkedAt));
+            return cache(channel, configuration, NotificationProviderHealth.blocked("PROVIDER_NOT_REGISTERED", checkedAt));
         }
         try {
             return cache(channel, configuration, provider.health(configuration));
         } catch (RuntimeException exception) {
-            return cache(channel, configuration, new NotificationProviderHealth("UNHEALTHY",
-                    "PROVIDER_HEALTH_CHECK_FAILED", checkedAt));
+            return cache(channel, configuration, NotificationProviderHealth.unhealthy("PROVIDER_HEALTH_CHECK_FAILED", checkedAt));
         }
     }
 
@@ -101,19 +99,19 @@ public class NotificationProviderRuntime {
             return cached.health();
         }
         if (configuration.providerType() == null || configuration.providerType().isBlank()) {
-            return new NotificationProviderHealth("NOT_CONFIGURED", "PROVIDER_NOT_CONFIGURED", Instant.now());
+            return NotificationProviderHealth.notConfigured("PROVIDER_NOT_CONFIGURED", Instant.now());
         }
         if (!configuration.enabled()) {
-            return new NotificationProviderHealth("DISABLED", "DISABLED_BY_CONFIGURATION", Instant.now());
+            return NotificationProviderHealth.disabled("DISABLED_BY_CONFIGURATION", Instant.now());
         }
-        return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_REQUIRED", Instant.now());
+        return NotificationProviderHealth.unhealthy("HEALTH_CHECK_REQUIRED", Instant.now());
     }
 
     /**
      * 判断指定外部渠道是否已经通过最近一次健康检查。
      */
     public boolean available(NotificationChannel channel) {
-        return "HEALTHY".equals(snapshot(channel).state());
+        return snapshot(channel).state() == NotificationProviderHealthState.HEALTHY;
     }
 
     /**
@@ -121,7 +119,7 @@ public class NotificationProviderRuntime {
      */
     public String unavailableReason(NotificationChannel channel) {
         var health = snapshot(channel);
-        return "HEALTHY".equals(health.state()) ? "AVAILABLE" : health.reason();
+        return health.state() == NotificationProviderHealthState.HEALTHY ? "AVAILABLE" : health.reason();
     }
 
     /**
@@ -130,17 +128,17 @@ public class NotificationProviderRuntime {
     public ChannelSendResult send(NotificationChannel channel, NotificationTaskEntity task) {
         var configuration = configurationService.resolve(channel);
         var health = snapshot(channel);
-        if (!"HEALTHY".equals(health.state())) {
-            return new ChannelSendResult("BLOCKED", providerCode(configuration), null, health.reason());
+        if (health.state() != NotificationProviderHealthState.HEALTHY) {
+            return ChannelSendResult.blocked(providerCode(configuration), null, health.reason());
         }
         var provider = findProvider(channel, configuration.providerType());
         if (provider == null) {
-            return new ChannelSendResult("BLOCKED", providerCode(configuration), null, "PROVIDER_NOT_REGISTERED");
+            return ChannelSendResult.blocked(providerCode(configuration), null, "PROVIDER_NOT_REGISTERED");
         }
         try {
             return provider.send(task, configuration);
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("UNKNOWN", providerCode(configuration), null, "PROVIDER_FAILURE");
+            return ChannelSendResult.unknown(providerCode(configuration), null, "PROVIDER_FAILURE");
         }
     }
 

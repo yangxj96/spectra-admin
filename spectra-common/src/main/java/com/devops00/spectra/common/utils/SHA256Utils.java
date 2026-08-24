@@ -17,9 +17,15 @@
 package com.devops00.spectra.common.utils;
 
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.HexFormat;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * SHA256摘要工具
@@ -28,26 +34,38 @@ import java.util.Base64;
  * @version 1.0
  * @since 2026/6/4 16:07
  */
-public class SHA256Utils {
+public final class SHA256Utils {
+
+    private static final String SHA_256 = "SHA-256";
+
+    private static final String HMAC_SHA_256 = "HmacSHA256";
+
+    private SHA256Utils() {
+    }
 
     /**
      * SHA-256摘要
      */
-    public static String hash(String input) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hashBytes = digest.digest(input.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hashBytes);
+    public static String hash(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance(SHA_256);
+            return HexFormat.of().formatHex(digest.digest(input.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException("JDK 不支持 SHA-256 摘要算法", exception);
+        }
     }
 
     /**
      * HMAC-SHA256
      */
-    public static String hmac(String input, String key) throws Exception {
-        javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA256");
-        javax.crypto.spec.SecretKeySpec secretKey = new javax.crypto.spec.SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        mac.init(secretKey);
-        byte[] hmacBytes = mac.doFinal(input.getBytes(StandardCharsets.UTF_8));
-        return Base64.getEncoder().encodeToString(hmacBytes);
+    public static String hmac(String input, String key) {
+        try {
+            Mac mac = Mac.getInstance(HMAC_SHA_256);
+            mac.init(new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), HMAC_SHA_256));
+            return Base64.getEncoder().encodeToString(mac.doFinal(input.getBytes(StandardCharsets.UTF_8)));
+        } catch (GeneralSecurityException exception) {
+            throw new IllegalStateException("JDK 不支持 HMAC-SHA256 摘要算法", exception);
+        }
     }
 
     /**
@@ -57,12 +75,5 @@ public class SHA256Utils {
         byte[] nonce = new byte[16];
         new SecureRandom().nextBytes(nonce);
         return Base64.getEncoder().encodeToString(nonce);
-    }
-
-    /**
-     * 字节数组转Hex
-     */
-    private static String bytesToHex(byte[] bytes) {
-        return AESUtils.getIvHex(bytes);
     }
 }

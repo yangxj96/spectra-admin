@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /** 目标认证身份响应；不返回原始标识，只返回摘要对应的元数据。 */
@@ -42,7 +42,7 @@ public class AuthenticationIdentityVO implements Serializable {
 
     private String state;
 
-    private Instant verifiedAt;
+    private LocalDateTime verifiedAt;
 
     private Boolean current;
 }

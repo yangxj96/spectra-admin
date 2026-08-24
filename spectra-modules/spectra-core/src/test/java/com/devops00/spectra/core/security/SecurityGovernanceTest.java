@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -87,7 +88,7 @@ class SecurityGovernanceTest {
 
     private static SecurityAuditEvent event() {
         return new SecurityAuditEvent(UUID.randomUUID(), "DEV_OPS_TEST", null, null, "WEB", "127.0.0.1", null,
-                java.util.Map.of(), java.util.Map.of(), "test", null, AuditResult.STARTED, "corr");
+                Map.of(), Map.of(), "test", null, AuditResult.STARTED, "corr");
     }
 
     private static final class RecordingAuditWriter implements SecurityAuditWriter {

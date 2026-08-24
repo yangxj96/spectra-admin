@@ -13,6 +13,7 @@ import com.devops00.spectra.core.security.authentication.mapper.AuthenticationId
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -59,7 +60,7 @@ class AuthenticationIdentityServiceImplTest {
         var userId = UUID.randomUUID();
         var identity = new AuthenticationIdentity();
         identity.setUserId(userId);
-        when(mapper.selectList(any())).thenReturn(java.util.List.of(identity));
+        when(mapper.selectList(any())).thenReturn(List.of(identity));
         var service = new AuthenticationIdentityServiceImpl(mapper);
 
         assertEquals(1, service.listByUserId(userId).size());

@@ -29,6 +29,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.Map;
+
 /**
  * 通知管理视图转换器；地址和错误信息始终经过脱敏。
  *
@@ -110,7 +112,7 @@ public interface NotificationAdminConverter {
      * 将结构化供应商响应摘要转换为脱敏文本。
      */
     @Named("maskSummary")
-    default String maskSummary(java.util.Map<String, Object> value) {
+    default String maskSummary(Map<String, Object> value) {
         return value == null ? null : maskText(value.toString());
     }
 }

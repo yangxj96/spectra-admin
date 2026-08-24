@@ -31,7 +31,11 @@ import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationSendPreviewEntity;
+import com.devops00.spectra.notification.javabean.domain.NotificationPreviewStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTemplateState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationControlledSendApplyFrom;
@@ -45,6 +49,7 @@ import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.service.NotificationControlledSendService;
+import com.devops00.spectra.notification.utils.NotificationMaskingUtils;
 import com.devops00.spectra.notification.strategy.NotificationDoNotDisturbPolicy;
 import com.devops00.spectra.notification.strategy.NotificationPolicy;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -65,6 +70,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -110,6 +116,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private final ObjectMapper objectMapper;
 
+    private final TimeMapper timeMapper;
+
     @Override
     @Transactional
     public NotificationControlledSendPreviewVO preview(NotificationControlledSendFrom params) {
@@ -126,12 +134,12 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         entity.setResolutionHash(evaluation.resolutionHash());
         entity.setRequestSnapshot(snapshot(params));
         entity.setExpiresAt(now.plusSeconds(PREVIEW_MINUTES * 60L));
-        entity.setStatus("PREVIEWED");
+        entity.setStatus(NotificationPreviewStatus.PREVIEWED.name());
         if (previewMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知发送 Preview 失败");
         }
         return new NotificationControlledSendPreviewVO(entity.getId(), token, entity.getRequestHash(),
-                entity.getExpiresAt(), evaluation.candidateUserCount(), evaluation.eligibleTaskCount(),
+                timeMapper.toLocalDateTime(entity.getExpiresAt()), evaluation.candidateUserCount(), evaluation.eligibleTaskCount(),
                 evaluation.skippedTaskCount(), evaluation.skippedCounts(), evaluation.channelAvailability(),
                 prepared.templates(), evaluation.samples());
     }
@@ -145,15 +153,17 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             throw new DataNotExistException("通知发送 Preview 不存在");
         }
         verifyToken(entity, params);
-        if ("APPLIED".equals(entity.getStatus()) && entity.getAppliedRequestId() != null) {
+        if (NotificationPreviewStatus.APPLIED.name().equals(entity.getStatus())
+                && entity.getAppliedRequestId() != null) {
             var taskCount = Math.toIntExact(
                     taskMapper.selectCount(new LambdaQueryWrapper<com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity>()
                             .eq(com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity::getNotificationRequestId,
                                     entity.getAppliedRequestId())));
-            return new NotificationControlledSendApplyVO(entity.getAppliedRequestId(), "APPLIED", taskCount, true);
+            return new NotificationControlledSendApplyVO(
+                    entity.getAppliedRequestId(), NotificationPreviewStatus.APPLIED.name(), taskCount, true);
         }
         var now = Instant.now();
-        if (!"PREVIEWED".equals(entity.getStatus())
+        if (!NotificationPreviewStatus.PREVIEWED.name().equals(entity.getStatus())
                 || entity.getExpiresAt() == null
                 || !now.isBefore(entity.getExpiresAt())) {
             markExpired(entity);
@@ -180,7 +190,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         if (previewMapper.update(null, new LambdaUpdateWrapper<NotificationSendPreviewEntity>()
                 .eq(NotificationSendPreviewEntity::getId, entity.getId())
                 .eq(NotificationSendPreviewEntity::getOperatorUserId, operatorId)
-                .eq(NotificationSendPreviewEntity::getStatus, "PREVIEWED")
+                .eq(NotificationSendPreviewEntity::getStatus, NotificationPreviewStatus.PREVIEWED.name())
                 .isNull(NotificationSendPreviewEntity::getConsumedAt)
                 .gt(NotificationSendPreviewEntity::getExpiresAt, now)
                 .set(NotificationSendPreviewEntity::getStatus, "APPLYING")
@@ -193,7 +203,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 request.getParameters(), Map.of(), request.getBusinessType(), request.getBusinessId(),
                 "NOTIFICATION_ADMIN", null, null, null, 0, request.getLink());
         NotificationReceipt receipt = notificationGateway.enqueue(gatewayRequest, request.getTemplateVersionIds());
-        entity.setStatus("APPLIED");
+        entity.setStatus(NotificationPreviewStatus.APPLIED.name());
         entity.setAppliedRequestId(receipt.requestId());
         if (previewMapper.updateById(entity) != 1) {
             throw new DataSaveException("保存通知发送 Apply 结果失败");
@@ -210,7 +220,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             var templateId = params.getTemplateVersionIds().get(channel);
             var template = templateMapper.selectById(templateId);
             if (template == null
-                    || !"PUBLISHED".equals(template.getState())
+                    || !NotificationTemplateState.PUBLISHED.name().equals(template.getState())
                     || !channel.name().equals(template.getChannel())
                     || !params.getPurpose().name().equals(template.getPurpose())) {
                 throw new DataException("模板版本已不存在、未发布或与用途渠道不匹配");
@@ -271,7 +281,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                     eligible++;
                     if (samples.size() < MAX_SAMPLE_COUNT) {
                         samples.add(new NotificationControlledSendSampleVO(channel.name(),
-                                maskAddress(channel == NotificationChannel.IN_APP
+                                NotificationMaskingUtils.maskAddressOrPlaceholder(channel == NotificationChannel.IN_APP
                                         ? "站内消息"
                                         : recipient.addressFor(channel))));
                     }
@@ -394,7 +404,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     }
 
     private List<String> ids(List<UUID> values) {
-        return values == null ? List.of() : values.stream().filter(java.util.Objects::nonNull).map(UUID::toString).toList();
+        return values == null ? List.of() : values.stream().filter(Objects::nonNull).map(UUID::toString).toList();
     }
 
     private NotificationControlledSendFrom readSnapshot(Map<String, Object> snapshot) {
@@ -415,8 +425,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     }
 
     private void markExpired(NotificationSendPreviewEntity entity) {
-        if (!"EXPIRED".equals(entity.getStatus())) {
-            entity.setStatus("EXPIRED");
+        if (!NotificationPreviewStatus.EXPIRED.name().equals(entity.getStatus())) {
+            entity.setStatus(NotificationPreviewStatus.EXPIRED.name());
             previewMapper.updateById(entity);
         }
     }
@@ -428,29 +438,11 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
     }
 
     private String hash(String value) {
-        try {
-            return java.util.HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256")
-                            .digest(value.getBytes(StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("通知摘要算法不可用", exception);
-        }
+        return SHA256Utils.hash(value);
     }
 
     private String hash(List<String> values) {
         return hash(String.join("|", values));
-    }
-
-    private String maskAddress(String address) {
-        if (!StringUtils.hasText(address)) {
-            return "***";
-        }
-        var value = address.trim();
-        var at = value.indexOf('@');
-        if (at > 1) {
-            return value.charAt(0) + "***" + value.substring(at);
-        }
-        return value.length() > 4 ? value.substring(0, 3) + "****" + value.substring(value.length() - 2) : "***";
     }
 
     private record PreparedRequest(String templateGroupCode,

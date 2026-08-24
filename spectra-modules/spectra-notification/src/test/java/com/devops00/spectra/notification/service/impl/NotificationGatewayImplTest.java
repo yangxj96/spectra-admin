@@ -40,6 +40,7 @@ import tools.jackson.databind.ObjectMapper;
 
 import java.util.Base64;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.time.Instant;
 
@@ -141,8 +142,8 @@ class NotificationGatewayImplTest {
                 directory, protectorWithKey(), List.of());
         var request = new NotificationRequest(null, "test:sensitive", NotificationPurpose.SYSTEM_NOTICE,
                 List.of(NotificationChannel.IN_APP), List.of(recipientId), List.of(), "login",
-                java.util.Map.of("title", "登录通知", "content", "验证码 {{code}}"),
-                java.util.Map.of("code", "123456"), "SECURITY", "login", "SECURITY", null, null, null, 0, "/login");
+                Map.of("title", "登录通知", "content", "验证码 {{code}}"),
+                Map.of("code", "123456"), "SECURITY", "login", "SECURITY", null, null, null, 0, "/login");
 
         var receipt = gateway.enqueue(request);
 
@@ -171,8 +172,8 @@ class NotificationGatewayImplTest {
         template.setState("PUBLISHED");
         template.setVersionNo(1);
         template.setContentTemplate("验证码 {{code}}");
-        template.setParameterSchema(java.util.Map.of("properties", java.util.Map.of(
-                "code", java.util.Map.of("type", "string", "sensitive", true))));
+        template.setParameterSchema(Map.of("properties", Map.of(
+                "code", Map.of("type", "string", "sensitive", true))));
         when(requestMapper.selectOne(any())).thenReturn(null);
         when(requestMapper.insert(any(NotificationRequestEntity.class))).thenReturn(1);
         when(taskMapper.selectCount(any())).thenReturn(0L);
@@ -183,7 +184,7 @@ class NotificationGatewayImplTest {
         var gateway = gateway(requestMapper, taskMapper, templateMapper, preferenceMapper, directory);
         var request = new NotificationRequest(null, "test:sensitive-template", NotificationPurpose.SYSTEM_NOTICE,
                 List.of(NotificationChannel.IN_APP), List.of(recipientId), List.of(), "security.login-code",
-                java.util.Map.of("code", "123456"), java.util.Map.of(), "SECURITY", "login", "SECURITY", null,
+                Map.of("code", "123456"), Map.of(), "SECURITY", "login", "SECURITY", null,
                 null, null, 0, null);
 
         assertThrows(DataSaveException.class, () -> gateway.enqueue(request));
@@ -339,7 +340,7 @@ class NotificationGatewayImplTest {
     private NotificationRequest request(NotificationPurpose purpose, NotificationChannel channel, UUID recipientId,
                                         String idempotencyKey) {
         return new NotificationRequest(null, idempotencyKey, purpose, List.of(channel), List.of(recipientId),
-                List.of(), "test", java.util.Map.of("title", "通知", "content", "正文"), java.util.Map.of(),
+                List.of(), "test", Map.of("title", "通知", "content", "正文"), Map.of(),
                 "SYSTEM", idempotencyKey, "SYSTEM", null, null, null, 0, null);
     }
 

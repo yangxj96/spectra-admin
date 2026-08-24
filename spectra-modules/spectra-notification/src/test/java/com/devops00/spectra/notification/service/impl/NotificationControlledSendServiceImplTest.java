@@ -26,6 +26,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.notification.javabean.entity.NotificationSendPreviewEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
@@ -37,6 +38,7 @@ import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
 import com.devops00.spectra.notification.mapper.NotificationUserPreferenceMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
+import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
@@ -45,6 +47,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.ObjectMapper;
 
+import java.time.ZoneOffset;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -112,7 +116,7 @@ class NotificationControlledSendServiceImplTest {
         preview.setPreviewTokenHash(hash(result.previewToken()));
         preview.setResolutionHash(hash(List.of(RECIPIENT_ID + ":SMS:null")));
         preview.setRequestSnapshot(snapshot(request));
-        preview.setExpiresAt(result.expiresAt());
+        preview.setExpiresAt(result.expiresAt().toInstant(ZoneOffset.UTC));
         preview.setStatus("PREVIEWED");
 
         var apply = new NotificationControlledSendApplyFrom();
@@ -138,7 +142,7 @@ class NotificationControlledSendServiceImplTest {
                                                           SecurityContextAccessor security) {
         return new NotificationControlledSendServiceImpl(previewMapper, taskMapper, templateMapper, preferenceMapper,
                 gateway, audienceDirectory, recipientDirectory, new com.devops00.spectra.notification.strategy.NotificationPolicy(),
-                new NotificationTemplateRenderer(), security, new ObjectMapper());
+                new NotificationTemplateRenderer(), security, new ObjectMapper(), NotificationTestTimeMapper.create());
     }
 
     private NotificationControlledSendFrom request() {
@@ -179,7 +183,7 @@ class NotificationControlledSendServiceImplTest {
     }
 
     private Map<String, Object> snapshot(NotificationControlledSendFrom request) {
-        return new java.util.LinkedHashMap<>(Map.of(
+        return new LinkedHashMap<>(Map.of(
                 "idempotencyKey", request.getIdempotencyKey(),
                 "purpose", request.getPurpose().name(),
                 "channels", List.of(NotificationChannel.SMS.name()),
@@ -189,13 +193,7 @@ class NotificationControlledSendServiceImplTest {
     }
 
     private String hash(String value) {
-        try {
-            return java.util.HexFormat.of()
-                    .formatHex(java.security.MessageDigest.getInstance("SHA-256")
-                            .digest(value.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException(exception);
-        }
+        return SHA256Utils.hash(value);
     }
 
     private String hash(List<String> values) {

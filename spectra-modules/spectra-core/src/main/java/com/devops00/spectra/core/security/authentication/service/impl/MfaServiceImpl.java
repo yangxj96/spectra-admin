@@ -31,6 +31,7 @@ import com.devops00.spectra.security.base.security.mfa.TotpCodeService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.Clock;
@@ -38,6 +39,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -98,8 +100,8 @@ public class MfaServiceImpl implements MfaService {
         String account = resolveAccount(userId);
         String issuerName = configuredService.findValue(SystemConfigKeys.SYSTEM_NAME)
                 .orElse(properties.getMfaTotpIssuer());
-        String issuer = java.net.URLEncoder.encode(issuerName, StandardCharsets.UTF_8);
-        String label = java.net.URLEncoder.encode(issuerName + ":" + account, StandardCharsets.UTF_8);
+        String issuer = URLEncoder.encode(issuerName, StandardCharsets.UTF_8);
+        String label = URLEncoder.encode(issuerName + ":" + account, StandardCharsets.UTF_8);
         String uri = "otpauth://totp/" + label + "?secret="
                 + secret
                 + "&issuer=" + issuer + "&algorithm=SHA1&digits=6&period=30";
@@ -297,7 +299,7 @@ public class MfaServiceImpl implements MfaService {
     private String generateRecoveryCode() {
         byte[] bytes = new byte[8];
         random.nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).toUpperCase(java.util.Locale.ROOT);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes).toUpperCase(Locale.ROOT);
     }
 
     private record DecryptedSecret(TotpCredential credential, String secret, TotpSecretCipher cipher) {

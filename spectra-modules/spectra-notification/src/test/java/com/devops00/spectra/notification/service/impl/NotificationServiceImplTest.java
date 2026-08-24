@@ -29,6 +29,7 @@ import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,7 +86,7 @@ class NotificationServiceImplTest {
 
         var captor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
         verify(gateway).enqueue(captor.capture());
-        assertEquals(java.util.Map.of(), captor.getValue().parameters());
+        assertEquals(Map.of(), captor.getValue().parameters());
     }
 
     @Test
@@ -99,14 +100,14 @@ class NotificationServiceImplTest {
         var userId = UUID.randomUUID();
 
         service.sendInApp("test:in-app", NotificationPurpose.SYSTEM_NOTICE, List.of(userId),
-                NotificationTemplateCode.SYSTEM_NOTICE, java.util.Map.of());
+                NotificationTemplateCode.SYSTEM_NOTICE, Map.of());
         service.sendSms("test:sms", NotificationPurpose.SYSTEM_NOTICE, List.of(userId),
-                NotificationTemplateCode.SYSTEM_NOTICE, java.util.Map.of());
+                NotificationTemplateCode.SYSTEM_NOTICE, Map.of());
         service.sendEmail("test:email", NotificationPurpose.SYSTEM_NOTICE, List.of(userId),
-                NotificationTemplateCode.SYSTEM_NOTICE, java.util.Map.of());
+                NotificationTemplateCode.SYSTEM_NOTICE, Map.of());
         service.sendToUsers("test:multi", NotificationPurpose.SYSTEM_NOTICE, List.of(userId),
                 List.of(NotificationChannel.IN_APP, NotificationChannel.SMS, NotificationChannel.EMAIL),
-                NotificationTemplateCode.SYSTEM_NOTICE, java.util.Map.of());
+                NotificationTemplateCode.SYSTEM_NOTICE, Map.of());
 
         var captor = org.mockito.ArgumentCaptor.forClass(NotificationRequest.class);
         verify(gateway, org.mockito.Mockito.times(4)).enqueue(captor.capture());

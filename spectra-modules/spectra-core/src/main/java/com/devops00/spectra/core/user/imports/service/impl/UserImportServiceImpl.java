@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -580,13 +581,7 @@ public class UserImportServiceImpl implements UserImportService {
     }
 
     private String sha256(String value) {
-        try {
-            return java.util.HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256")
-                            .digest(value.getBytes(StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 不可用", exception);
-        }
+        return SHA256Utils.hash(value);
     }
 
     private User findExisting(UserImportRowFrom source) {

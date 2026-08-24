@@ -20,7 +20,7 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.NotificationProviderTestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;

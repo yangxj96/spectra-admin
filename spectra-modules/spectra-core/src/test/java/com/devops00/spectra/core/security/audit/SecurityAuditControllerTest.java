@@ -21,6 +21,9 @@ import com.devops00.spectra.core.security.audit.controller.SecurityAuditControll
 import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -29,11 +32,11 @@ class SecurityAuditControllerTest {
     @Test
     void readAndExportUseCatalogPermissions() throws NoSuchMethodException {
         var page = SecurityAuditController.class.getMethod("page", PageFrom.class,
-                SecurityAuditQueryFrom.class, org.springframework.security.core.Authentication.class);
-        var detail = SecurityAuditController.class.getMethod("detail", java.util.UUID.class,
-                org.springframework.security.core.Authentication.class);
+                SecurityAuditQueryFrom.class, Authentication.class);
+        var detail = SecurityAuditController.class.getMethod("detail", UUID.class,
+                Authentication.class);
         var export = SecurityAuditController.class.getMethod("export", SecurityAuditQueryFrom.class,
-                org.springframework.security.core.Authentication.class);
+                Authentication.class);
 
         assertEquals("hasPermission(null, 'audit:read')", page.getAnnotation(PreAuthorize.class).value());
         assertEquals("hasPermission(null, 'audit:read')", detail.getAnnotation(PreAuthorize.class).value());

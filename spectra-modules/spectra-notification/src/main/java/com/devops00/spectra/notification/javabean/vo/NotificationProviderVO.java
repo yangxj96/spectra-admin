@@ -19,7 +19,7 @@ package com.devops00.spectra.notification.javabean.vo;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * Provider 配置脱敏视图。
@@ -125,5 +125,5 @@ public class NotificationProviderVO {
     /**
      * 配置更新时间。
      */
-    private Instant updatedAt;
+    private LocalDateTime updatedAt;
 }

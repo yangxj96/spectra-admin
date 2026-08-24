@@ -24,7 +24,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationProviderTestF
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderTestVO;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.NotificationProviderTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

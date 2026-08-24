@@ -19,12 +19,14 @@ package com.devops00.spectra.notification.service.impl;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
+import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderTestVO;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.NotificationProviderTestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -52,6 +54,9 @@ public class NotificationProviderTestServiceImpl implements NotificationProvider
      */
     private final NotificationPayloadProtector payloadProtector;
 
+    /** 用户时区时间转换器。 */
+    private final TimeMapper timeMapper;
+
     /**
      * 执行一次 Provider 测试发送。
      */
@@ -64,15 +69,15 @@ public class NotificationProviderTestServiceImpl implements NotificationProvider
         task.setRecipientCiphertext(payloadProtector.protectAddress(params.getRecipientAddress().trim()));
         task.setTitle(params.getTitle().trim());
         task.setContent(params.getContent().trim());
-        task.setStatus("TEST");
+        task.setStatus(NotificationTaskStatus.TEST.name());
         var result = runtime.send(channel, task);
         return NotificationProviderTestVO.builder()
                 .channel(channel.name())
                 .providerCode(result.providerCode())
-                .status(result.status())
+                .status(result.status().name())
                 .providerMessageId(result.providerMessageId())
                 .summary(result.summary())
-                .testedAt(Instant.now())
+                .testedAt(timeMapper.toLocalDateTime(Instant.now()))
                 .build();
     }
 

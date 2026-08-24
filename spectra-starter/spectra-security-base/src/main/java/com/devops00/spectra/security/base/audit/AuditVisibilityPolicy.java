@@ -19,6 +19,7 @@ package com.devops00.spectra.security.base.audit;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -83,7 +84,7 @@ public interface AuditVisibilityPolicy {
         if (eventType == null) {
             return true;
         }
-        String normalized = eventType.toUpperCase(java.util.Locale.ROOT);
+        String normalized = eventType.toUpperCase(Locale.ROOT);
         return normalized.contains("ROOT")
                 || normalized.contains("BREAK_GLASS")
                 || normalized.contains("SECURITY")

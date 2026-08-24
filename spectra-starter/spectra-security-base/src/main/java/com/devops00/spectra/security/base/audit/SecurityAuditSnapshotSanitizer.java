@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.security.base.audit;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -77,10 +78,10 @@ public final class SecurityAuditSnapshotSanitizer {
             return Collections.unmodifiableList(collection.stream().map(SecurityAuditSnapshotSanitizer::sanitizeValue).toList());
         }
         if (value != null && value.getClass().isArray()) {
-            int length = java.lang.reflect.Array.getLength(value);
+            int length = Array.getLength(value);
             var values = new ArrayList<>(length);
             for (int index = 0; index < length; index++) {
-                values.add(sanitizeValue(java.lang.reflect.Array.get(value, index)));
+                values.add(sanitizeValue(Array.get(value, index)));
             }
             return Collections.unmodifiableList(new ArrayList<>(values));
         }

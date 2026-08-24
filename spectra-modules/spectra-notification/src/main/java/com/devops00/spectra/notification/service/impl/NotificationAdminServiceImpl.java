@@ -25,7 +25,11 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.converter.NotificationAdminConverter;
+import com.devops00.spectra.notification.javabean.domain.NotificationDeliveryStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationRequestStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
@@ -78,22 +82,32 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     /** 管理分页查询允许的最大时间窗口。 */
     private static final Duration MAX_QUERY_RANGE = Duration.ofDays(31);
     /** 当前排队中的任务状态。 */
-    private static final Set<String> QUEUED_STATUSES = Set.of("PENDING", "RETRYING");
+    private static final Set<String> QUEUED_STATUSES = Set.of(
+            NotificationTaskStatus.PENDING.name(), NotificationTaskStatus.RETRYING.name());
     /** 当前失败任务状态。 */
-    private static final Set<String> FAILED_TASK_STATUSES = Set.of("FAILED", "BLOCKED");
+    private static final Set<String> FAILED_TASK_STATUSES = Set.of(
+            NotificationTaskStatus.FAILED.name(), NotificationTaskStatus.BLOCKED.name());
     /** 成功投递结果。 */
-    private static final Set<String> SUCCESS_DELIVERY_STATUSES = Set.of("ACCEPTED", "SENT");
+    private static final Set<String> SUCCESS_DELIVERY_STATUSES = Set.of(
+            NotificationDeliveryStatus.ACCEPTED.name(), NotificationDeliveryStatus.SENT.name());
     /** 失败投递结果。 */
-    private static final Set<String> FAILED_DELIVERY_STATUSES = Set.of("FAILED", "BLOCKED");
+    private static final Set<String> FAILED_DELIVERY_STATUSES = Set.of(
+            NotificationDeliveryStatus.FAILED.name(), NotificationDeliveryStatus.BLOCKED.name());
 
     /**
      * 允许人工重新排队的终态。
      */
-    private static final Set<String> RETRYABLE_STATUSES = Set.of("FAILED", "BLOCKED", "UNKNOWN");
+    private static final Set<String> RETRYABLE_STATUSES = Set.of(
+            NotificationTaskStatus.FAILED.name(),
+            NotificationTaskStatus.BLOCKED.name(),
+            NotificationTaskStatus.UNKNOWN.name());
     /**
      * 允许取消的处理中状态。
      */
-    private static final Set<String> CANCELLABLE_STATUSES = Set.of("PENDING", "RETRYING", "PROCESSING");
+    private static final Set<String> CANCELLABLE_STATUSES = Set.of(
+            NotificationTaskStatus.PENDING.name(),
+            NotificationTaskStatus.RETRYING.name(),
+            NotificationTaskStatus.PROCESSING.name());
 
     /**
      * 通知请求 Mapper。
@@ -116,6 +130,9 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
      */
     private final NotificationGateway notificationGateway;
 
+    /** 用户时区时间转换器。 */
+    private final TimeMapper timeMapper;
+
     /**
      * 查询通知运行概览。
      */
@@ -125,17 +142,17 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         var to = Instant.now();
         var start = to.minus(hours, ChronoUnit.HOURS);
         var pendingTaskCount = countTasks(QUEUED_STATUSES, null);
-        var processingTaskCount = countTasks(Set.of("PROCESSING"), null);
+        var processingTaskCount = countTasks(Set.of(NotificationTaskStatus.PROCESSING.name()), null);
         var oldestPendingTask = taskMapper.selectOne(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .in(NotificationTaskEntity::getStatus, QUEUED_STATUSES)
                 .orderByAsc(NotificationTaskEntity::getScheduledAt)
                 .last("LIMIT 1"));
         var failedTaskCount = countTasks(FAILED_TASK_STATUSES, null);
-        var unknownTaskCount = countTasks(Set.of("UNKNOWN"), null);
+        var unknownTaskCount = countTasks(Set.of(NotificationTaskStatus.UNKNOWN.name()), null);
         var deliveryCount = countDeliveries(null, start, to);
         var successfulDeliveryCount = countDeliveries(SUCCESS_DELIVERY_STATUSES, start, to);
         var failedDeliveryCount = countDeliveries(FAILED_DELIVERY_STATUSES, start, to);
-        var unknownDeliveryCount = countDeliveries(Set.of("UNKNOWN"), start, to);
+        var unknownDeliveryCount = countDeliveries(Set.of(NotificationDeliveryStatus.UNKNOWN.name()), start, to);
         var trendRows = deliveryMapper.selectOverviewTrend(start, to);
         var recentErrorRows = deliveryMapper.selectRecentErrors(start, to, RECENT_ERROR_LIMIT);
 
@@ -145,7 +162,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                         .availability(availability(channel))
                         .pendingTaskCount(countTasks(QUEUED_STATUSES, channel.name()))
                         .failedTaskCount(countTasks(FAILED_TASK_STATUSES, channel.name()))
-                        .unknownTaskCount(countTasks(Set.of("UNKNOWN"), channel.name()))
+                        .unknownTaskCount(countTasks(Set.of(NotificationTaskStatus.UNKNOWN.name()), channel.name()))
                         .build())
                 .toList();
         var trend = fillTrend(start, to, trendRows);
@@ -161,11 +178,13 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                                 .build())
                         .toList();
         return NotificationOverviewVO.builder()
-                .generatedAt(to)
+                .generatedAt(timeMapper.toLocalDateTime(to))
                 .rangeHours(hours)
                 .pendingTaskCount(pendingTaskCount)
                 .processingTaskCount(processingTaskCount)
-                .oldestPendingTaskAt(oldestPendingTask == null ? null : oldestPendingTask.getScheduledAt())
+                .oldestPendingTaskAt(oldestPendingTask == null
+                        ? null
+                        : timeMapper.toLocalDateTime(oldestPendingTask.getScheduledAt()))
                 .failedTaskCount(failedTaskCount)
                 .unknownTaskCount(unknownTaskCount)
                 .deliveryCount(deliveryCount)
@@ -261,7 +280,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         for (var bucket = from.truncatedTo(ChronoUnit.HOURS); bucket.isBefore(to); bucket = bucket.plus(1, ChronoUnit.HOURS)) {
             var row = byBucket.get(bucket);
             result.add(NotificationOverviewVO.TrendPoint.builder()
-                    .bucketAt(bucket)
+                    .bucketAt(timeMapper.toLocalDateTime(bucket))
                     .totalCount(row == null ? 0L : row.getTotalCount())
                     .successCount(row == null ? 0L : row.getSuccessCount())
                     .failedCount(row == null ? 0L : row.getFailedCount())
@@ -288,13 +307,13 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     private QueryRange resolveQueryRange(NotificationAdminQueryFrom params) {
         if (params != null
                 && (params.getRequestId() != null || params.getTaskId() != null)
-                && params.getStartTime() == null
-                && params.getEndTime() == null) {
+                && !StringUtils.hasText(params.getStartTime())
+                && !StringUtils.hasText(params.getEndTime())) {
             return new QueryRange(null, null);
         }
-        var to = params != null && params.getEndTime() != null ? params.getEndTime() : Instant.now();
-        var from = params != null && params.getStartTime() != null
-                ? params.getStartTime()
+        var to = params != null && StringUtils.hasText(params.getEndTime()) ? timeMapper.toInstant(params.getEndTime()) : Instant.now();
+        var from = params != null && StringUtils.hasText(params.getStartTime())
+                ? timeMapper.toInstant(params.getStartTime())
                 : to.minus(MAX_QUERY_RANGE);
         if (!from.isBefore(to) || Duration.between(from, to).compareTo(MAX_QUERY_RANGE) > 0) {
             throw new DataSaveException("通知管理查询时间范围必须在 31 天以内");
@@ -399,7 +418,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         var updated = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, taskId)
                 .in(NotificationTaskEntity::getStatus, RETRYABLE_STATUSES)
-                .set(NotificationTaskEntity::getStatus, "RETRYING")
+                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.RETRYING.name())
                 .set(NotificationTaskEntity::getAttemptCount, 0)
                 .set(NotificationTaskEntity::getLastErrorCode, null)
                 .set(NotificationTaskEntity::getScheduledAt, Instant.now())
@@ -411,7 +430,8 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         }
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, task.getNotificationRequestId())
-                .notIn(NotificationRequestEntity::getStatus, List.of("CANCELLED", "EXPIRED"))
+                .notIn(NotificationRequestEntity::getStatus,
+                        List.of(NotificationRequestStatus.CANCELLED.name(), NotificationRequestStatus.EXPIRED.name()))
                 .set(NotificationRequestEntity::getStatus, "DISPATCHING")
                 .set(NotificationRequestEntity::getUpdatedAt, Instant.now()));
         log.info("已重新排队通知任务: taskId={}", taskId);
@@ -430,7 +450,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
         var updated = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, taskId)
                 .in(NotificationTaskEntity::getStatus, CANCELLABLE_STATUSES)
-                .set(NotificationTaskEntity::getStatus, "CANCELLED")
+                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.CANCELLED.name())
                 .set(NotificationTaskEntity::getUpdatedAt, Instant.now()));
         if (updated != 1) {
             throw new DataSaveException("取消通知任务失败");
@@ -456,10 +476,12 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
     private void updateRequestAfterCancel(UUID requestId) {
         var tasks = taskMapper.selectList(new LambdaQueryWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getNotificationRequestId, requestId));
-        var status = tasks.stream().allMatch(task -> "CANCELLED".equals(task.getStatus())) ? "CANCELLED" : "DISPATCHING";
+        var status = tasks.stream().allMatch(task -> NotificationTaskStatus.CANCELLED.name().equals(task.getStatus()))
+                ? NotificationRequestStatus.CANCELLED.name()
+                : NotificationRequestStatus.DISPATCHING.name();
         requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
                 .eq(NotificationRequestEntity::getId, requestId)
-                .notIn(NotificationRequestEntity::getStatus, List.of("EXPIRED"))
+                .notIn(NotificationRequestEntity::getStatus, List.of(NotificationRequestStatus.EXPIRED.name()))
                 .set(NotificationRequestEntity::getStatus, status)
                 .set(NotificationRequestEntity::getUpdatedAt, Instant.now()));
     }

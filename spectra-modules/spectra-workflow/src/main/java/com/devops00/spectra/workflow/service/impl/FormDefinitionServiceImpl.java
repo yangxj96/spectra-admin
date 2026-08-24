@@ -99,7 +99,7 @@ public class FormDefinitionServiceImpl extends BaseServiceImpl<FormDefinitionMap
         var entity = new FormDefinition();
         entity.setName(from.getName());
         // 编码自动生成：UUID前8位大写
-        entity.setCode(java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase());
+        entity.setCode(UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase());
         entity.setDescription(from.getDescription());
         entity.setCurrentVersion(1);
         entity.setActive(true);

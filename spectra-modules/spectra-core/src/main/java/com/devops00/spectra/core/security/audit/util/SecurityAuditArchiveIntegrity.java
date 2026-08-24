@@ -7,8 +7,10 @@
 
 package com.devops00.spectra.core.security.audit.util;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HexFormat;
+import java.util.Locale;
 
 /** 归档对象的完整性摘要和恢复校验。 */
 public final class SecurityAuditArchiveIntegrity {
@@ -28,11 +30,11 @@ public final class SecurityAuditArchiveIntegrity {
     }
 
     public static void verify(byte[] content, String expectedSha256) {
-        if (!MessageDigest.isEqual(sha256(content).getBytes(java.nio.charset.StandardCharsets.US_ASCII),
+        if (!MessageDigest.isEqual(sha256(content).getBytes(StandardCharsets.US_ASCII),
                 expectedSha256 == null
                         ? new byte[0]
-                        : expectedSha256.toLowerCase(java.util.Locale.ROOT)
-                                .getBytes(java.nio.charset.StandardCharsets.US_ASCII))) {
+                        : expectedSha256.toLowerCase(Locale.ROOT)
+                                .getBytes(StandardCharsets.US_ASCII))) {
             throw new IllegalStateException("安全审计归档完整性校验失败");
         }
     }

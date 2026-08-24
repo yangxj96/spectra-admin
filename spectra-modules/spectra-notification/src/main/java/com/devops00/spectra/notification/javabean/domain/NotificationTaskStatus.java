@@ -14,23 +14,24 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
-
-import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
-import org.springframework.stereotype.Component;
+package com.devops00.spectra.notification.javabean.domain;
 
 /**
- * 短信渠道 Sender；供应商选择和发送细节由 Provider Runtime 管理。
+ * 通知任务生命周期状态。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/8/24
  */
-@Component
-public class SmsNotificationSender extends AbstractExternalNotificationSender {
-
-    public SmsNotificationSender(NotificationProviderRuntime runtime) {
-        super(runtime, NotificationChannel.SMS);
-    }
+public enum NotificationTaskStatus {
+    PENDING,
+    RETRYING,
+    PROCESSING,
+    SENT,
+    FAILED,
+    BLOCKED,
+    UNKNOWN,
+    EXPIRED,
+    CANCELLED,
+    TEST
 }

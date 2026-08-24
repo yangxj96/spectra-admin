@@ -40,8 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.task.TaskExecutor;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -195,12 +194,6 @@ class UserImportServiceImplTest {
     }
 
     private static String sha256(String value) {
-        try {
-            return java.util.HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256")
-                            .digest(value.getBytes(StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 不可用", exception);
-        }
+        return SHA256Utils.hash(value);
     }
 }

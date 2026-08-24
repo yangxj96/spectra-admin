@@ -50,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -97,7 +98,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (!this.save(entity)) {
             throw new DataSaveException("保存会议失败");
         }
-        var receivers = new java.util.ArrayList<UUID>();
+        var receivers = new ArrayList<UUID>();
         addParticipant(entity, userId, "host", user.getDepartmentId(), "accepted");
         receivers.add(userId);
         if (from.getParticipants() != null) {

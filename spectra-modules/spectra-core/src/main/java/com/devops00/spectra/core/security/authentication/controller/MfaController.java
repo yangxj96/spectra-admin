@@ -66,7 +66,7 @@ public class MfaController {
     @PreAuthorize("permitAll()")
     public MfaEnrollmentResult beginSetupTotpEnrollment(@Valid @RequestBody MfaSetupChallengeFrom from,
                                                         HttpServletRequest request) {
-        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.challengeId(), request);
+        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.getChallengeId(), request);
         return mfaService.beginTotpEnrollment(challenge.userId());
     }
 
@@ -74,7 +74,7 @@ public class MfaController {
     @PreAuthorize("isAuthenticated()")
     public List<String> confirmTotpEnrollment(@Valid @RequestBody MfaConfirmFrom from) {
         return mfaService.confirmTotpEnrollment(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor),
-                from.enrollmentId(), from.code());
+                from.getEnrollmentId(), from.getCode());
     }
 
     @ULog(value = "'确认首次 MFA 登记'", type = SysLogType.SAFETY)
@@ -83,9 +83,9 @@ public class MfaController {
     @PreAuthorize("permitAll()")
     public List<String> confirmSetupTotpEnrollment(@Valid @RequestBody MfaSetupConfirmFrom from,
                                                    HttpServletRequest request) {
-        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.challengeId(), request);
-        List<String> recoveryCodes = mfaService.confirmTotpEnrollment(challenge.userId(), from.enrollmentId(), from.code());
-        if (!MfaChallengeUtils.requireChallengePort(mfaChallengePort).markEnrollmentCompleted(from.challengeId())) {
+        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.getChallengeId(), request);
+        List<String> recoveryCodes = mfaService.confirmTotpEnrollment(challenge.userId(), from.getEnrollmentId(), from.getCode());
+        if (!MfaChallengeUtils.requireChallengePort(mfaChallengePort).markEnrollmentCompleted(from.getChallengeId())) {
             throw new IllegalStateException("MFA 挑战状态更新失败");
         }
         return recoveryCodes;
@@ -96,7 +96,7 @@ public class MfaController {
     @PreAuthorize("isAuthenticated()")
     public void verifyRecoveryCode(@Valid @RequestBody MfaRecoveryCodeFrom from) {
         if (!mfaService.consumeRecoveryCode(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor),
-                from.code())) {
+                from.getCode())) {
             throw new IllegalArgumentException("Recovery Code 无效或已使用");
         }
     }

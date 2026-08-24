@@ -19,7 +19,7 @@ package com.devops00.spectra.core.security.authorization.domain;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -41,7 +41,7 @@ public final class UserAuthorizationStatusCalculator {
      * @return 授权状态
      */
     public static UserAuthorizationStatus calculate(List<AuthorizationAssignmentView> assignments) {
-        return calculate(assignments, Instant.now());
+        return calculate(assignments, LocalDateTime.now());
     }
 
     /**
@@ -51,7 +51,8 @@ public final class UserAuthorizationStatusCalculator {
      * @param now         当前时刻
      * @return 授权状态
      */
-    static UserAuthorizationStatus calculate(List<AuthorizationAssignmentView> assignments, Instant now) {
+    public static UserAuthorizationStatus calculate(
+                                                    List<AuthorizationAssignmentView> assignments, LocalDateTime now) {
         if (assignments == null || assignments.isEmpty()) {
             return UserAuthorizationStatus.UNCONFIGURED;
         }

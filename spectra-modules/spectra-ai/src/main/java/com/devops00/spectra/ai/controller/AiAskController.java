@@ -70,7 +70,7 @@ public class AiAskController {
         }
         AiMemoryId memoryId = new AiMemoryId(conversationId.toString(), securityContextAccessor.currentToken());
 
-        String streamId = "chatcmpl-" + java.util.UUID.randomUUID().toString().replace("-", "");
+        String streamId = "chatcmpl-" + UUID.randomUUID().toString().replace("-", "");
         final String convId = conversationId.toString();
         return Flux.create(sink -> {
             assistant.stream(memoryId, from.getMessage())

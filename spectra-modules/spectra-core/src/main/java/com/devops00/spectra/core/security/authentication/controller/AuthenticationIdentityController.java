@@ -20,6 +20,7 @@ import com.devops00.spectra.core.security.authentication.javabean.from.BindEmail
 import com.devops00.spectra.core.security.authentication.javabean.from.BindPhoneFrom;
 import com.devops00.spectra.core.security.authentication.javabean.vo.AuthenticationIdentityVO;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.log.base.annotation.ULog;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
@@ -48,6 +49,8 @@ public class AuthenticationIdentityController {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final TimeMapper timeMapper;
+
     @ULog("'获取认证身份列表'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:read')")
@@ -59,7 +62,7 @@ public class AuthenticationIdentityController {
             vo.setMethodCode(identity.getMethodCode());
             vo.setProviderCode(identity.getProviderCode());
             vo.setState(identity.getState());
-            vo.setVerifiedAt(identity.getVerifiedAt());
+            vo.setVerifiedAt(timeMapper.toLocalDateTime(identity.getVerifiedAt()));
             vo.setCurrent(false);
             return vo;
         }).toList();

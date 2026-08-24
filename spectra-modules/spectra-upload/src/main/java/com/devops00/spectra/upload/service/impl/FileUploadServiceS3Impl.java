@@ -55,6 +55,8 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -364,7 +366,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
         }
         HttpServletResponse response = attributes.getResponse();
 
-        String encodedFilename = java.net.URLEncoder.encode(file.getOriginalName(), java.nio.charset.StandardCharsets.UTF_8).replaceAll("\\+", "%20");
+        String encodedFilename = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
         GetObjectRequest getObjectRequest = GetObjectRequest.builder()
                 .bucket(s3Properties.getBucket())

@@ -14,12 +14,13 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.sender.impl;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.notification.javabean.entity.NotificationInboxEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.mapper.NotificationInboxMapper;
@@ -62,8 +63,8 @@ class NotificationSenderTest {
 
         assertEquals(NotificationChannel.SMS, sms.channel());
         assertEquals(NotificationChannel.EMAIL, email.channel());
-        assertEquals("BLOCKED", sms.send(task).status());
-        assertEquals("BLOCKED", email.send(task).status());
+        assertEquals(ChannelSendStatus.BLOCKED, sms.send(task).status());
+        assertEquals(ChannelSendStatus.BLOCKED, email.send(task).status());
         assertEquals("CHANNEL_NOT_CONFIGURED", sms.send(task).summary());
         assertEquals("CHANNEL_NOT_CONFIGURED", email.send(task).summary());
         assertEquals("SMS_CHANNEL_NOT_CONFIGURED", sms.unavailableReason());
@@ -82,8 +83,8 @@ class NotificationSenderTest {
         var firstResult = sender.send(task);
         var secondResult = sender.send(task);
 
-        assertEquals("SENT", firstResult.status());
-        assertEquals("SENT", secondResult.status());
+        assertEquals(ChannelSendStatus.SENT, firstResult.status());
+        assertEquals(ChannelSendStatus.SENT, secondResult.status());
         assertEquals("IN_APP", secondResult.providerCode());
         verify(mapper).insert(any(NotificationInboxEntity.class));
     }

@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.notification.dispatch.NotificationRequestStatusUpdater;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
@@ -42,6 +43,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -57,7 +59,7 @@ class NotificationProviderCallbackServiceTest {
     static void registerMybatisLambdaMetadata() {
         var configuration = new MybatisConfiguration();
         configuration.getTypeHandlerRegistry()
-                .register(java.util.UUID.class, JdbcType.OTHER,
+                .register(UUID.class, JdbcType.OTHER,
                         ObjectTypeHandler.class);
         var assistant = new MapperBuilderAssistant(configuration, "notification-callback-test");
         TableInfoHelper.initTableInfo(assistant, NotificationTaskEntity.class);
@@ -90,7 +92,8 @@ class NotificationProviderCallbackServiceTest {
         when(taskMapper.update(any(), any())).thenReturn(1);
         when(requestMapper.update(any(), any())).thenReturn(1);
 
-        var service = new NotificationProviderCallbackServiceImpl(deliveryMapper, taskMapper, requestMapper,
+        var service = new NotificationProviderCallbackServiceImpl(deliveryMapper, taskMapper,
+                new NotificationRequestStatusUpdater(taskMapper, requestMapper),
                 providerAdminService, new ObjectMapper());
         var body = "{\"messageId\":\"message-1\",\"status\":\"DELIVERED\"}";
         var signature = signature(body, configuration.secret());
@@ -109,8 +112,10 @@ class NotificationProviderCallbackServiceTest {
     void shouldRejectInvalidCallbackSignature() {
         var providerAdminService = mock(NotificationProviderAdminService.class);
         when(providerAdminService.resolve(NotificationChannel.EMAIL)).thenReturn(configuration());
-        var service = new NotificationProviderCallbackServiceImpl(mock(NotificationDeliveryMapper.class),
-                mock(NotificationTaskMapper.class), mock(NotificationRequestMapper.class), providerAdminService,
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var service = new NotificationProviderCallbackServiceImpl(mock(NotificationDeliveryMapper.class), taskMapper,
+                new NotificationRequestStatusUpdater(taskMapper, requestMapper), providerAdminService,
                 new ObjectMapper());
 
         assertThrows(DataSaveException.class,

@@ -37,6 +37,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -202,8 +204,8 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         return policies.getFirst();
     }
 
-    private static SecuritySessionPolicyVO mapSessionPolicy(java.sql.ResultSet resultSet, int ignored)
-            throws java.sql.SQLException {
+    private static SecuritySessionPolicyVO mapSessionPolicy(ResultSet resultSet, int ignored)
+            throws SQLException {
         return new SecuritySessionPolicyVO(
                 resultSet.getObject("client_id", UUID.class),
                 resultSet.getString("client_code"),

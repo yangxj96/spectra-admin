@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.LinkedHashSet;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -247,7 +248,7 @@ public class NotificationTemplateRenderer {
         if (!StringUtils.hasText(html)) {
             return;
         }
-        var unsafe = html.toLowerCase(java.util.Locale.ROOT);
+        var unsafe = html.toLowerCase(Locale.ROOT);
         if (unsafe.contains("<script")
                 || unsafe.matches("(?s).*\\bon[a-z]+\\s*=.*")
                 || unsafe.matches("(?s).*\\b(?:javascript|vbscript|data|file):.*")) {

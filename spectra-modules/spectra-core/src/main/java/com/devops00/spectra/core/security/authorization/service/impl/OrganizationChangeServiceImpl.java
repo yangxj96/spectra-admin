@@ -38,6 +38,7 @@ import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.system.mapper.OrganizationVersionMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
@@ -104,6 +105,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final TimeMapper timeMapper;
+
     @Override
     public long currentOrganizationVersion() {
         return readCurrentOrganizationVersion();
@@ -130,7 +133,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         result.setPreviewToken(tokenService.issue(token));
         result.setExpectedOrganizationVersion(prepared.impact().beforeVersion());
         result.setAfterOrganizationVersion(prepared.impact().afterVersion());
-        result.setExpiresAt(expiresAt);
+        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());

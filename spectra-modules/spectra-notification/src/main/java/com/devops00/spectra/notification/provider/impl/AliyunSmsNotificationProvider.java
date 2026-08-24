@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
@@ -22,7 +22,8 @@ import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationTaskMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -81,7 +82,7 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
     public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
         var checkedAt = Instant.now();
         if (!usable(configuration)) {
-            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+            return NotificationProviderHealth.blocked("PROVIDER_CONFIGURATION_INVALID", checkedAt);
         }
         var parameters = new LinkedHashMap<String, String>();
         parameters.put("PhoneNumber", "13800138000");
@@ -90,25 +91,25 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         parameters.put("CurrentPage", "1");
         var response = request(configuration, ACTION_HEALTH, parameters);
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_HTTP_" + response.statusCode(), checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_HTTP_" + response.statusCode(), checkedAt);
         }
         var body = readJson(response.body());
         var resultCode = String.valueOf(body.getOrDefault("Code", ""));
         return "OK".equalsIgnoreCase(resultCode)
-                ? new NotificationProviderHealth("HEALTHY", "HEALTH_CHECK_OK", checkedAt)
-                : new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_PROVIDER_REJECTED", checkedAt);
+                ? NotificationProviderHealth.healthy("HEALTH_CHECK_OK", checkedAt)
+                : NotificationProviderHealth.unhealthy("HEALTH_CHECK_PROVIDER_REJECTED", checkedAt);
     }
 
     @Override
     public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
         if (!usable(configuration)) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+            return ChannelSendResult.blocked(CODE, null, "PROVIDER_CONFIGURATION_INVALID");
         }
         final String recipient;
         try {
             recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+            return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         try {
             var message = NotificationTaskMessage.resolve(task, payloadProtector);
@@ -121,20 +122,20 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
             parameters.put("TemplateParam", objectMapper.writeValueAsString(stringParameters(message.parameters())));
             var response = request(configuration, ACTION_SEND, parameters);
             if (response.statusCode() == 429) {
-                return new ChannelSendResult("FAILED", "RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
+                return ChannelSendResult.failed("RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
             }
             if (response.statusCode() >= 500) {
-                return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_SERVER_ERROR");
+                return ChannelSendResult.unknown(CODE, null, "PROVIDER_SERVER_ERROR");
             }
             var body = readJson(response.body());
             var resultCode = String.valueOf(body.getOrDefault("Code", ""));
             if (!"OK".equalsIgnoreCase(resultCode)) {
-                return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", text(body.get("BizId")),
+                return ChannelSendResult.failed("PROVIDER_REJECTED", text(body.get("BizId")),
                         "PROVIDER_REJECTED");
             }
-            return new ChannelSendResult("SENT", CODE, text(body.get("BizId")), "PROVIDER_ACCEPTED");
+            return ChannelSendResult.sent(CODE, text(body.get("BizId")), "PROVIDER_ACCEPTED");
         } catch (Exception exception) {
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
         }
     }
 

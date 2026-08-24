@@ -17,6 +17,7 @@
 package com.devops00.spectra.common.notification;
 
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -82,7 +83,7 @@ public record NotificationRequest(UUID requestId, String idempotencyKey, Notific
     public static NotificationRequest inApp(String idempotencyKey, NotificationPurpose purpose,
                                             List<UUID> recipientUserIds, String templateGroupCode, String title, String content,
                                             String businessType, String businessId, String sourceModule, String link) {
-        var parameters = new java.util.HashMap<String, Object>();
+        var parameters = new HashMap<String, Object>();
         parameters.put("title", title == null ? "通知" : title);
         parameters.put("content", content == null ? "" : content);
         return new NotificationRequest(null, idempotencyKey, purpose, List.of(NotificationChannel.IN_APP),

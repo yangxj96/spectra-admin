@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.notification.strategy;
 
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 
@@ -76,7 +77,7 @@ public final class NotificationDoNotDisturbPolicy {
         }
         try {
             return ZoneId.of(timezone);
-        } catch (java.time.DateTimeException exception) {
+        } catch (DateTimeException exception) {
             return DEFAULT_ZONE;
         }
     }

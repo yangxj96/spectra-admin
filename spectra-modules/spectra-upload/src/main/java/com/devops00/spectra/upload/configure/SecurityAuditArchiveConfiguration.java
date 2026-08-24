@@ -23,6 +23,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 
 /** S3-compatible Object Lock 安全审计归档后端。 */
 @Configuration
@@ -71,7 +72,7 @@ public class SecurityAuditArchiveConfiguration {
                     .bucket(properties.getArchiveBucket())
                     .key(key)
                     .contentType("application/octet-stream")
-                    .metadata(java.util.Map.of("sha256", digest, "retention-until", retainUntil.toString()))
+                    .metadata(Map.of("sha256", digest, "retention-until", retainUntil.toString()))
                     .objectLockMode(ObjectLockMode.COMPLIANCE)
                     .objectLockRetainUntilDate(retainUntil)
                     .build(), RequestBody.fromBytes(content));

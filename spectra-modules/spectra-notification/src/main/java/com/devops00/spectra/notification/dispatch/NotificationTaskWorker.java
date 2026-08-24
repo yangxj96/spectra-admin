@@ -14,20 +14,19 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.dispatch;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
-import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
-import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.observability.NotificationMetrics;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +38,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * PostgreSQL Outbox 任务 Worker；支持并发领取、租约恢复和指数退避。
@@ -74,9 +72,9 @@ public class NotificationTaskWorker {
      */
     private final NotificationDeliveryMapper deliveryMapper;
     /**
-     * 通知请求 Mapper。
+     * 逻辑请求状态汇总器。
      */
-    private final NotificationRequestMapper requestMapper;
+    private final NotificationRequestStatusUpdater requestStatusUpdater;
     /**
      * 已注册的渠道发送端。
      */
@@ -131,9 +129,9 @@ public class NotificationTaskWorker {
     private void recoverExpiredLeases(Instant now) {
         var leaseDeadline = now.minusSeconds(Math.max(1L, processingTimeoutSeconds));
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getStatus, "PROCESSING")
+                .eq(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
                 .lt(NotificationTaskEntity::getLockedAt, leaseDeadline)
-                .set(NotificationTaskEntity::getStatus, "RETRYING")
+                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.RETRYING.name())
                 .set(NotificationTaskEntity::getScheduledAt, now)
                 .set(NotificationTaskEntity::getNextRetryAt, now)
                 .set(NotificationTaskEntity::getLastErrorCode, "WORKER_LEASE_EXPIRED")
@@ -148,14 +146,15 @@ public class NotificationTaskWorker {
         var now = Instant.now();
         if (isExpired(task, now)) {
             markExpired(task, now);
-            refreshRequestStatus(task.getNotificationRequestId());
+            requestStatusUpdater.refresh(task.getNotificationRequestId());
             return;
         }
         var claimed = taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
-                .in(NotificationTaskEntity::getStatus, List.of("PENDING", "RETRYING"))
+                .in(NotificationTaskEntity::getStatus,
+                        List.of(NotificationTaskStatus.PENDING.name(), NotificationTaskStatus.RETRYING.name()))
                 .le(NotificationTaskEntity::getScheduledAt, now)
-                .set(NotificationTaskEntity::getStatus, "PROCESSING")
+                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
                 .set(NotificationTaskEntity::getLockedBy, WORKER_ID)
                 .set(NotificationTaskEntity::getLockedAt, now));
         if (claimed != 1) {
@@ -166,23 +165,23 @@ public class NotificationTaskWorker {
                 .findFirst()
                 .orElse(null);
         if (sender == null) {
-            finish(task, new ChannelSendResult("BLOCKED", "NONE", null, "CHANNEL_NOT_CONFIGURED"));
-            refreshRequestStatus(task.getNotificationRequestId());
+            finish(task, ChannelSendResult.blocked("NONE", null, "CHANNEL_NOT_CONFIGURED"));
+            requestStatusUpdater.refresh(task.getNotificationRequestId());
             return;
         }
         try {
             var result = sender.send(task);
             finish(task, result);
             if (metrics != null) {
-                metrics.recordTask(task.getChannel(), result.status(), task.getPurpose());
+                metrics.recordTask(task.getChannel(), result.status().name(), task.getPurpose());
             }
         } catch (RuntimeException exception) {
-            finish(task, new ChannelSendResult("UNKNOWN", "NONE", null, "PROVIDER_FAILURE"));
+            finish(task, ChannelSendResult.unknown("NONE", null, "PROVIDER_FAILURE"));
             if (metrics != null) {
-                metrics.recordTask(task.getChannel(), "UNKNOWN", task.getPurpose());
+                metrics.recordTask(task.getChannel(), NotificationTaskStatus.UNKNOWN.name(), task.getPurpose());
             }
         }
-        refreshRequestStatus(task.getNotificationRequestId());
+        requestStatusUpdater.refresh(task.getNotificationRequestId());
     }
 
     /**
@@ -203,9 +202,9 @@ public class NotificationTaskWorker {
         delivery.setProviderMessageId(result.providerMessageId());
         delivery.setStartedAt(completedAt);
         delivery.setCompletedAt(completedAt);
-        delivery.setResultStatus(result.status());
+        delivery.setResultStatus(result.status().name());
         var safeSummary = sanitizeProviderSummary(result.summary());
-        delivery.setErrorCode("SENT".equals(result.status()) ? null : safeSummary);
+        delivery.setErrorCode(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
         delivery.setErrorMessageSanitized(safeSummary);
         delivery.setResponseSummary(safeSummary == null ? Map.of() : Map.of("summary", safeSummary));
         if (deliveryMapper.insert(delivery) != 1) {
@@ -215,10 +214,11 @@ public class NotificationTaskWorker {
         var nextAttempt = Instant.now().plusSeconds(retryDelaySeconds(attemptCount));
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
-                .eq(NotificationTaskEntity::getStatus, "PROCESSING")
+                .eq(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
                 .set(NotificationTaskEntity::getAttemptCount, attemptCount)
-                .set(NotificationTaskEntity::getLastErrorCode, "SENT".equals(result.status()) ? null : safeSummary)
-                .set(NotificationTaskEntity::getStatus, retryable ? "RETRYING" : result.status())
+                .set(NotificationTaskEntity::getLastErrorCode, result.status() == ChannelSendStatus.SENT ? null : safeSummary)
+                .set(NotificationTaskEntity::getStatus,
+                        retryable ? NotificationTaskStatus.RETRYING.name() : result.status().name())
                 .set(NotificationTaskEntity::getScheduledAt, retryable ? nextAttempt : task.getScheduledAt())
                 .set(NotificationTaskEntity::getNextRetryAt, retryable ? nextAttempt : task.getNextRetryAt())
                 .set(NotificationTaskEntity::getLockedBy, null)
@@ -230,7 +230,7 @@ public class NotificationTaskWorker {
      */
     private boolean isRetryable(ChannelSendResult result, int attemptCount, Integer maxAttempts) {
         var allowedAttempts = maxAttempts == null || maxAttempts < 1 ? MAX_RETRY_COUNT : maxAttempts;
-        return "FAILED".equals(result.status())
+        return result.status() == ChannelSendStatus.FAILED
                 && "PROVIDER_RATE_LIMITED".equals(result.summary())
                 && attemptCount < allowedAttempts;
     }
@@ -271,47 +271,11 @@ public class NotificationTaskWorker {
     private void markExpired(NotificationTaskEntity task, Instant now) {
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
-                .in(NotificationTaskEntity::getStatus, List.of("PENDING", "RETRYING"))
-                .set(NotificationTaskEntity::getStatus, "EXPIRED")
+                .in(NotificationTaskEntity::getStatus,
+                        List.of(NotificationTaskStatus.PENDING.name(), NotificationTaskStatus.RETRYING.name()))
+                .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.EXPIRED.name())
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
     }
 
-    /**
-     * 根据任务汇总状态刷新逻辑请求状态。
-     */
-    private void refreshRequestStatus(UUID requestId) {
-        if (requestId == null) {
-            return;
-        }
-        var tasks = taskMapper.selectList(new LambdaQueryWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getNotificationRequestId, requestId));
-        if (tasks.isEmpty()) {
-            return;
-        }
-        var hasOpen = tasks.stream()
-                .anyMatch(task -> List.of("PENDING", "RETRYING", "PROCESSING")
-                        .contains(task.getStatus()));
-        var sentCount = tasks.stream().filter(task -> "SENT".equals(task.getStatus())).count();
-        var terminalCount = tasks.stream()
-                .filter(task -> List.of("SENT", "FAILED", "BLOCKED", "UNKNOWN", "EXPIRED", "CANCELLED")
-                        .contains(task.getStatus()))
-                .count();
-        var status = hasOpen
-                ? "DISPATCHING"
-                : sentCount == tasks.size()
-                        ? "SUCCEEDED"
-                        : sentCount > 0
-                                ? "PARTIAL"
-                                : tasks.stream().allMatch(task -> "CANCELLED".equals(task.getStatus()))
-                                        ? "CANCELLED"
-                                        : tasks.stream().allMatch(task -> "EXPIRED".equals(task.getStatus()))
-                                                ? "EXPIRED"
-                                                : terminalCount == tasks.size() ? "FAILED" : "DISPATCHING";
-        requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getId, requestId)
-                .notIn(NotificationRequestEntity::getStatus, List.of("CANCELLED", "EXPIRED"))
-                .set(NotificationRequestEntity::getStatus, status)
-                .set(NotificationRequestEntity::getUpdatedAt, Instant.now()));
-    }
 }

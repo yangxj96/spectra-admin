@@ -21,6 +21,7 @@ import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.TestingAuthenticationToken;
 
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -74,6 +75,6 @@ class DefaultAuditVisibilityPolicyTest {
 
     private static SecurityAuditEvent event(String type, UUID operatorId, UUID targetId) {
         return new SecurityAuditEvent(UUID.randomUUID(), type, operatorId, targetId, "WEB", "127.0.0.1", "test",
-                java.util.Map.of("safe", "value"), java.util.Map.of(), null, null, AuditResult.SUCCEEDED, "correlation");
+                Map.of("safe", "value"), Map.of(), null, null, AuditResult.SUCCEEDED, "correlation");
     }
 }

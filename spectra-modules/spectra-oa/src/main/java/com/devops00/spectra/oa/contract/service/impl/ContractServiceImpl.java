@@ -52,6 +52,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -490,8 +491,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         }
     }
 
-    private java.math.BigDecimal normalizeAmount(java.math.BigDecimal amount) {
-        return amount == null ? java.math.BigDecimal.ZERO.setScale(2) : amount.setScale(2, RoundingMode.HALF_UP);
+    private BigDecimal normalizeAmount(BigDecimal amount) {
+        return amount == null ? BigDecimal.ZERO.setScale(2) : amount.setScale(2, RoundingMode.HALF_UP);
     }
 
     private String normalizeVisibility(String value) {

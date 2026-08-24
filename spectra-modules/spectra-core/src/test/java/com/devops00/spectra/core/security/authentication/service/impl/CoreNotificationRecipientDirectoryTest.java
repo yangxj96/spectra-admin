@@ -32,6 +32,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -94,7 +96,7 @@ class CoreNotificationRecipientDirectoryTest {
         recipient.setId(RECIPIENT_USER);
         recipient.setDepartmentId(OTHER_DEPARTMENT);
         when(userService.getById(RECIPIENT_USER)).thenReturn(recipient);
-        allowScope(new AuthorizationScope(ScopeMode.RULES, java.util.Set.of(CURRENT_DEPARTMENT), false));
+        allowScope(new AuthorizationScope(ScopeMode.RULES, Set.of(CURRENT_DEPARTMENT), false));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -122,7 +124,7 @@ class CoreNotificationRecipientDirectoryTest {
 
     @Test
     void shouldHonorCustomDepartmentScope() {
-        allowScope(new AuthorizationScope(ScopeMode.RULES, java.util.Set.of(CURRENT_DEPARTMENT), false));
+        allowScope(new AuthorizationScope(ScopeMode.RULES, Set.of(CURRENT_DEPARTMENT), false));
 
         var result = directory().resolve(List.of(RECIPIENT_USER));
 
@@ -136,7 +138,7 @@ class CoreNotificationRecipientDirectoryTest {
     private void allowScope(AuthorizationScope scope) {
         when(authorizationSnapshotProvider.load(CURRENT_USER)).thenReturn(AuthorizationSnapshot.of(List.of(
                 new AuthorizationAssignment(UUID.randomUUID(), "ROLE_TEST", 1,
-                        java.util.Map.of("user:read", new PermissionBoundary("user:read", scope)), java.util.Map.of()))));
+                        Map.of("user:read", new PermissionBoundary("user:read", scope)), Map.of()))));
         when(departmentService.getById(CURRENT_DEPARTMENT)).thenReturn(null);
     }
 }

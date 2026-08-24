@@ -16,19 +16,21 @@
 
 package com.devops00.spectra.notification.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationCallbackStatus;
+import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
+import com.devops00.spectra.notification.dispatch.NotificationRequestStatusUpdater;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
-import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderCallbackFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderCallbackVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
-import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import com.devops00.spectra.notification.service.NotificationProviderCallbackService;
@@ -75,9 +77,9 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
     private final NotificationTaskMapper taskMapper;
 
     /**
-     * 通知请求 Mapper。
+     * 逻辑请求状态汇总器。
      */
-    private final NotificationRequestMapper requestMapper;
+    private final NotificationRequestStatusUpdater requestStatusUpdater;
 
     /**
      * Provider 配置读取服务。
@@ -115,30 +117,31 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
             summary.putAll(delivery.getResponseSummary());
         }
         if (eventDigest.equals(summary.get("callback_event_digest"))) {
-            return new NotificationProviderCallbackVO("DUPLICATE", delivery.getResultStatus());
+            return new NotificationProviderCallbackVO(
+                    NotificationCallbackStatus.DUPLICATE.name(), delivery.getResultStatus());
         }
 
         var receivedAt = Instant.now();
         var errorCode = safeErrorCode(callback.getErrorCode());
         summary.put("callback_event_digest", eventDigest);
-        summary.put("callback_status", resultStatus);
+        summary.put("callback_status", resultStatus.name());
         summary.put("callback_received_at", receivedAt.toString());
         if (errorCode != null) {
             summary.put("callback_error_code", errorCode);
         } else {
             summary.remove("callback_error_code");
         }
-        delivery.setResultStatus(resultStatus);
+        delivery.setResultStatus(resultStatus.name());
         delivery.setCompletedAt(receivedAt);
-        delivery.setErrorCode("FAILED".equals(resultStatus) ? errorCode : null);
-        delivery.setErrorMessageSanitized("FAILED".equals(resultStatus) ? errorCode : null);
+        delivery.setErrorCode(resultStatus == ChannelSendStatus.FAILED ? errorCode : null);
+        delivery.setErrorMessageSanitized(resultStatus == ChannelSendStatus.FAILED ? errorCode : null);
         delivery.setResponseSummary(summary);
         if (deliveryMapper.updateById(delivery) != 1) {
             throw new DataSaveException("更新 Provider 回执失败");
         }
 
         updateTask(delivery, resultStatus, errorCode);
-        return new NotificationProviderCallbackVO("APPLIED", resultStatus);
+        return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
     }
 
     private NotificationProviderCallbackFrom parse(String body) {
@@ -198,12 +201,12 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         return normalized;
     }
 
-    private String normalizeStatus(String value) {
+    private ChannelSendStatus normalizeStatus(String value) {
         var normalized = value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
         return switch (normalized) {
-            case "ACCEPTED", "SENT", "DELIVERED" -> "SENT";
-            case "FAILED", "BOUNCED", "REJECTED" -> "FAILED";
-            case "UNKNOWN" -> "UNKNOWN";
+            case "ACCEPTED", "SENT", "DELIVERED" -> ChannelSendStatus.SENT;
+            case "FAILED", "BOUNCED", "REJECTED" -> ChannelSendStatus.FAILED;
+            case "UNKNOWN" -> ChannelSendStatus.UNKNOWN;
             default -> throw new DataSaveException("Provider 回执状态不支持");
         };
     }
@@ -217,62 +220,25 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
     }
 
     private String digest(String body) {
-        try {
-            return HexFormat.of()
-                    .formatHex(MessageDigest.getInstance("SHA-256")
-                            .digest(body.getBytes(StandardCharsets.UTF_8)));
-        } catch (java.security.NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("Provider 回执摘要生成失败", exception);
-        }
+        return SHA256Utils.hash(body);
     }
 
-    private void updateTask(NotificationDeliveryEntity delivery, String resultStatus, String errorCode) {
+    private void updateTask(NotificationDeliveryEntity delivery, ChannelSendStatus resultStatus, String errorCode) {
         var task = taskMapper.selectById(delivery.getNotificationTaskId());
-        if (task == null || java.util.List.of("CANCELLED", "EXPIRED").contains(task.getStatus())) {
+        if (task == null
+                || List.of(NotificationTaskStatus.CANCELLED.name(), NotificationTaskStatus.EXPIRED.name())
+                        .contains(task.getStatus())) {
             return;
         }
         taskMapper.update(null, new LambdaUpdateWrapper<NotificationTaskEntity>()
                 .eq(NotificationTaskEntity::getId, task.getId())
-                .notIn(NotificationTaskEntity::getStatus, List.of("CANCELLED", "EXPIRED"))
-                .set(NotificationTaskEntity::getStatus, resultStatus)
-                .set(NotificationTaskEntity::getLastErrorCode, "SENT".equals(resultStatus) ? null : errorCode)
+                .notIn(NotificationTaskEntity::getStatus,
+                        List.of(NotificationTaskStatus.CANCELLED.name(), NotificationTaskStatus.EXPIRED.name()))
+                .set(NotificationTaskEntity::getStatus, resultStatus.name())
+                .set(NotificationTaskEntity::getLastErrorCode,
+                        resultStatus == ChannelSendStatus.SENT ? null : errorCode)
                 .set(NotificationTaskEntity::getLockedBy, null)
                 .set(NotificationTaskEntity::getLockedAt, null));
-        refreshRequestStatus(task.getNotificationRequestId());
-    }
-
-    private void refreshRequestStatus(java.util.UUID requestId) {
-        if (requestId == null) {
-            return;
-        }
-        var tasks = taskMapper.selectList(new LambdaQueryWrapper<NotificationTaskEntity>()
-                .eq(NotificationTaskEntity::getNotificationRequestId, requestId));
-        if (tasks.isEmpty()) {
-            return;
-        }
-        var hasOpen = tasks.stream()
-                .anyMatch(task -> List.of("PENDING", "RETRYING", "PROCESSING")
-                        .contains(task.getStatus()));
-        var sentCount = tasks.stream().filter(task -> "SENT".equals(task.getStatus())).count();
-        var terminalCount = tasks.stream()
-                .filter(task -> List.of("SENT", "FAILED", "BLOCKED", "UNKNOWN", "EXPIRED", "CANCELLED")
-                        .contains(task.getStatus()))
-                .count();
-        var status = hasOpen
-                ? "DISPATCHING"
-                : sentCount == tasks.size()
-                        ? "SUCCEEDED"
-                        : sentCount > 0
-                                ? "PARTIAL"
-                                : tasks.stream().allMatch(task -> "CANCELLED".equals(task.getStatus()))
-                                        ? "CANCELLED"
-                                        : tasks.stream().allMatch(task -> "EXPIRED".equals(task.getStatus()))
-                                                ? "EXPIRED"
-                                                : terminalCount == tasks.size() ? "FAILED" : "DISPATCHING";
-        requestMapper.update(null, new LambdaUpdateWrapper<NotificationRequestEntity>()
-                .eq(NotificationRequestEntity::getId, requestId)
-                .notIn(NotificationRequestEntity::getStatus, List.of("CANCELLED", "EXPIRED"))
-                .set(NotificationRequestEntity::getStatus, status)
-                .set(NotificationRequestEntity::getUpdatedAt, Instant.now()));
+        requestStatusUpdater.refresh(task.getNotificationRequestId());
     }
 }

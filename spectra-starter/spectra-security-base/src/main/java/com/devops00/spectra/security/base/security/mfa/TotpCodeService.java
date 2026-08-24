@@ -9,10 +9,14 @@ package com.devops00.spectra.security.base.security.mfa;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Locale;
 
 /** RFC 6238 TOTP 实现，默认 30 秒窗口、6 位数字和 SHA-1。 */
 public final class TotpCodeService {
@@ -52,9 +56,9 @@ public final class TotpCodeService {
         }
         long counter = instant.getEpochSecond() / PERIOD_SECONDS;
         for (long offset = -window; offset <= window; offset++) {
-            if (java.security.MessageDigest.isEqual(code(encodedSecret, counter + offset)
-                    .getBytes(java.nio.charset.StandardCharsets.US_ASCII),
-                    candidate.getBytes(java.nio.charset.StandardCharsets.US_ASCII))) {
+            if (MessageDigest.isEqual(code(encodedSecret, counter + offset)
+                    .getBytes(StandardCharsets.US_ASCII),
+                    candidate.getBytes(StandardCharsets.US_ASCII))) {
                 return true;
             }
         }
@@ -113,8 +117,8 @@ public final class TotpCodeService {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("TOTP密钥不能为空");
         }
-        String normalized = value.replace("=", "").replace(" ", "").toUpperCase(java.util.Locale.ROOT);
-        java.io.ByteArrayOutputStream output = new java.io.ByteArrayOutputStream();
+        String normalized = value.replace("=", "").replace(" ", "").toUpperCase(Locale.ROOT);
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
         int buffer = 0;
         int bits = 0;
         for (char current : normalized.toCharArray()) {

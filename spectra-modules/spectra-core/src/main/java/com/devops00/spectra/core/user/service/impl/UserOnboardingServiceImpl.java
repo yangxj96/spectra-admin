@@ -33,8 +33,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.UUID;
 import java.util.HashSet;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 用户资料和多角色授权连续提交服务实现。
@@ -74,7 +77,7 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
     private void submitAuthorization(UUID userId, AuthorizationAssignmentsChangeFrom params) {
         validateAssignments(userId, params);
         for (var removal : params.getRemovedAssignments() == null
-                ? java.util.List.<AuthorizationAssignmentRemovalFrom>of()
+                ? List.<AuthorizationAssignmentRemovalFrom>of()
                 : params.getRemovedAssignments()) {
             assignmentChangeService.revoke(userId, removal);
         }
@@ -104,7 +107,7 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 .toList();
         var activeAssignmentIds = activeAssignments.stream()
                 .map(assignment -> assignment.assignmentId())
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
         var requestedAssignmentIds = new HashSet<UUID>();
         var requestedRoleIds = new HashSet<UUID>();
         for (var assignment : params.getAssignments()) {
@@ -126,7 +129,7 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 }
             }
         }
-        if (!java.util.Collections.disjoint(requestedAssignmentIds, removedIds)) {
+        if (!Collections.disjoint(requestedAssignmentIds, removedIds)) {
             throw new com.devops00.spectra.common.exception.DataException("角色授权不能同时保留和移除");
         }
         var reconciledIds = new HashSet<>(requestedAssignmentIds);

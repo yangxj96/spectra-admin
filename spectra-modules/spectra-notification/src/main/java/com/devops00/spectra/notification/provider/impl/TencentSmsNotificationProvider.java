@@ -14,15 +14,17 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationTaskMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -35,7 +37,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneOffset;
@@ -77,31 +78,31 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
     public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
         var checkedAt = Instant.now();
         if (!usable(configuration)) {
-            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+            return NotificationProviderHealth.blocked("PROVIDER_CONFIGURATION_INVALID", checkedAt);
         }
         var response = request(configuration, "DescribeSmsTemplateList", Map.of("Limit", 1, "Offset", 0));
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_HTTP_" + response.statusCode(), checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_HTTP_" + response.statusCode(), checkedAt);
         }
         var body = readJson(response.body());
         if (!(body.get("Response") instanceof Map<?, ?>)) {
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_INVALID_RESPONSE", checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_INVALID_RESPONSE", checkedAt);
         }
         return body.containsKey("Error")
-                ? new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_PROVIDER_REJECTED", checkedAt)
-                : new NotificationProviderHealth("HEALTHY", "HEALTH_CHECK_OK", checkedAt);
+                ? NotificationProviderHealth.unhealthy("HEALTH_CHECK_PROVIDER_REJECTED", checkedAt)
+                : NotificationProviderHealth.healthy("HEALTH_CHECK_OK", checkedAt);
     }
 
     @Override
     public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
         if (!usable(configuration)) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+            return ChannelSendResult.blocked(CODE, null, "PROVIDER_CONFIGURATION_INVALID");
         }
         final String recipient;
         try {
             recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+            return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         try {
             var message = NotificationTaskMessage.resolve(task, payloadProtector);
@@ -116,35 +117,35 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
             payload.put("PhoneNumberSet", List.of(recipient));
             var response = request(configuration, "SendSms", payload);
             if (response.statusCode() == 429) {
-                return new ChannelSendResult("FAILED", "RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
+                return ChannelSendResult.failed("RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
             }
             if (response.statusCode() >= 500) {
-                return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_SERVER_ERROR");
+                return ChannelSendResult.unknown(CODE, null, "PROVIDER_SERVER_ERROR");
             }
             var body = readJson(response.body());
             var responseBody = nestedResponse(body);
             var error = responseBody.get("Error");
             if (error != null) {
-                return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", text(responseBody.get("RequestId")),
+                return ChannelSendResult.failed("PROVIDER_REJECTED", text(responseBody.get("RequestId")),
                         "PROVIDER_REJECTED");
             }
             var sendStatusSet = responseBody.get("SendStatusSet");
             if (!(sendStatusSet instanceof List<?> statuses) || statuses.isEmpty()) {
-                return new ChannelSendResult("UNKNOWN", CODE, text(responseBody.get("RequestId")),
+                return ChannelSendResult.unknown(CODE, text(responseBody.get("RequestId")),
                         "PROVIDER_INVALID_RESPONSE");
             }
             var messageId = firstMessageId(sendStatusSet);
             if (statuses.getFirst() instanceof Map<?, ?> status
                     && !"Ok".equalsIgnoreCase(String.valueOf(status.get("Code")))) {
-                return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", messageId, "PROVIDER_REJECTED");
+                return ChannelSendResult.failed("PROVIDER_REJECTED", messageId, "PROVIDER_REJECTED");
             }
             if (!(statuses.getFirst() instanceof Map<?, ?>)) {
-                return new ChannelSendResult("UNKNOWN", CODE, text(responseBody.get("RequestId")),
+                return ChannelSendResult.unknown(CODE, text(responseBody.get("RequestId")),
                         "PROVIDER_INVALID_RESPONSE");
             }
-            return new ChannelSendResult("SENT", CODE, messageId, "PROVIDER_ACCEPTED");
+            return ChannelSendResult.sent(CODE, messageId, "PROVIDER_ACCEPTED");
         } catch (Exception exception) {
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
         }
     }
 
@@ -252,11 +253,7 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
     }
 
     private String sha256(String value) {
-        try {
-            return hex(MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8)));
-        } catch (Exception exception) {
-            throw new IllegalStateException("Tencent SMS hash failed", exception);
-        }
+        return SHA256Utils.hash(value);
     }
 
     private byte[] hmac(byte[] key, String value) {

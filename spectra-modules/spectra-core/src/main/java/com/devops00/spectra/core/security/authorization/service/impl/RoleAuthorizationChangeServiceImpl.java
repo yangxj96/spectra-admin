@@ -41,6 +41,7 @@ import com.devops00.spectra.core.security.authorization.service.GrantBoundarySer
 import com.devops00.spectra.core.security.authorization.service.RoleAuthorizationChangeService;
 import com.devops00.spectra.core.security.authorization.service.RoleChangeImpactAnalyzer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
@@ -109,6 +110,8 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final TimeMapper timeMapper;
+
     @Override
     public RoleAuthorizationStateVO current(UUID roleId) {
         var role = roleMapper.selectById(roleId);
@@ -135,7 +138,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         result.setRoleId(roleId);
         result.setPreviewToken(tokenService.issue(token));
         result.setExpectedVersion(prepared.expectedVersion());
-        result.setExpiresAt(expiresAt);
+        result.setExpiresAt(timeMapper.toLocalDateTime(expiresAt));
         result.setAffectedAssignmentCount(prepared.impact().affectedAssignmentCount());
         result.setAffectedUserCount(prepared.impact().affectedUserCount());
         result.setExpandsEffectiveAuthority(prepared.impact().expandsEffectiveAuthority());

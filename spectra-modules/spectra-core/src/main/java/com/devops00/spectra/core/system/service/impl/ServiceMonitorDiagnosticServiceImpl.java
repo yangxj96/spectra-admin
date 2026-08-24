@@ -45,9 +45,11 @@ import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.function.ToLongFunction;
 
 import com.sun.management.HotSpotDiagnosticMXBean;
 
@@ -102,7 +104,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     @Override
     public ServiceMonitorRuntimeDiagnosticVO getRuntimeDiagnostic() {
         return ServiceMonitorRuntimeDiagnosticVO.builder()
-                .generatedAt(toLocalDateTime(Instant.now()))
+                .generatedAt(timeMapper.toLocalDateTime(Instant.now()))
                 .memoryPools(memoryPools())
                 .garbageCollectors(garbageCollectors())
                 .threadStates(threadStates())
@@ -127,7 +129,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
-    private static long value(MemoryUsage usage, java.util.function.ToLongFunction<MemoryUsage> mapper) {
+    private static long value(MemoryUsage usage, ToLongFunction<MemoryUsage> mapper) {
         return usage == null ? 0L : Math.max(mapper.applyAsLong(usage), 0L);
     }
 
@@ -148,7 +150,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     }
 
     private List<ServiceMonitorRuntimeDiagnosticVO.ThreadStateCount> threadStates() {
-        var counts = new java.util.EnumMap<Thread.State, Long>(Thread.State.class);
+        var counts = new EnumMap<Thread.State, Long>(Thread.State.class);
         for (var state : Thread.State.values())
             counts.put(state, 0L);
         var bean = ManagementFactory.getThreadMXBean();
@@ -432,15 +434,11 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .displayName(task.getDisplayName())
                 .fileSize(task.getFileSize())
                 .errorMessage(task.getErrorMessage())
-                .requestedAt(toLocalDateTime(task.getRequestedAt()))
-                .startedAt(toLocalDateTime(task.getStartedAt()))
-                .completedAt(toLocalDateTime(task.getCompletedAt()))
-                .expiresAt(toLocalDateTime(task.getExpiresAt()))
+                .requestedAt(timeMapper.toLocalDateTime(task.getRequestedAt()))
+                .startedAt(timeMapper.toLocalDateTime(task.getStartedAt()))
+                .completedAt(timeMapper.toLocalDateTime(task.getCompletedAt()))
+                .expiresAt(timeMapper.toLocalDateTime(task.getExpiresAt()))
                 .build();
-    }
-
-    private java.time.LocalDateTime toLocalDateTime(Instant instant) {
-        return instant == null ? null : timeMapper.toLocalDateTime(instant);
     }
 
     private static long elapsedMillis(long start) {

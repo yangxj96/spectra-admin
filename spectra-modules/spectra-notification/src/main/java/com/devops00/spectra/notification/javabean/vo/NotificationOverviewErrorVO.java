@@ -18,7 +18,7 @@ package com.devops00.spectra.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * 通知运行概览中的脱敏错误摘要。
@@ -31,7 +31,7 @@ import java.time.Instant;
 public class NotificationOverviewErrorVO {
 
     /** 错误发生时间。 */
-    private Instant occurredAt;
+    private LocalDateTime occurredAt;
     /** 通知渠道。 */
     private String channel;
     /** 投递结果状态。 */

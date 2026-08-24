@@ -32,6 +32,8 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMap
 import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
+import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -145,7 +147,14 @@ class AuthorizationAssignmentQueryServiceImplTest {
                 grantBoundaryMapper,
                 permissionMapper,
                 authorizationScopeMapper,
-                scopeRuleMapper);
+                scopeRuleMapper,
+                timeMapper());
+    }
+
+    private TimeMapper timeMapper() {
+        var accessor = mock(SecurityContextAccessor.class);
+        when(accessor.currentUserZoneId()).thenReturn("UTC");
+        return new TimeMapper(accessor);
     }
 
     private static Permission permission(UUID id, String code) {

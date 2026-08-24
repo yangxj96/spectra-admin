@@ -417,7 +417,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .cooldownSeconds(rule.getCooldownSeconds())
                 .remark(rule.getRemark())
                 .version(rule.getVersion())
-                .updatedAt(toLocalDateTime(rule.getUpdatedAt()))
+                .updatedAt(timeMapper.toLocalDateTime(rule.getUpdatedAt()))
                 .build();
     }
 
@@ -434,16 +434,12 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .thresholdValue(event.getThresholdValue())
                 .expectedValue(event.getExpectedValue())
                 .message(event.getMessage())
-                .firstOccurredAt(toLocalDateTime(event.getFirstOccurredAt()))
-                .lastOccurredAt(toLocalDateTime(event.getLastOccurredAt()))
-                .recoveredAt(toLocalDateTime(event.getRecoveredAt()))
+                .firstOccurredAt(timeMapper.toLocalDateTime(event.getFirstOccurredAt()))
+                .lastOccurredAt(timeMapper.toLocalDateTime(event.getLastOccurredAt()))
+                .recoveredAt(timeMapper.toLocalDateTime(event.getRecoveredAt()))
                 .occurrenceCount(event.getOccurrenceCount())
-                .lastNotifiedAt(toLocalDateTime(event.getLastNotifiedAt()))
+                .lastNotifiedAt(timeMapper.toLocalDateTime(event.getLastNotifiedAt()))
                 .build();
-    }
-
-    private java.time.LocalDateTime toLocalDateTime(Instant instant) {
-        return instant == null ? null : timeMapper.toLocalDateTime(instant);
     }
 
     private record Observation(boolean violated, String currentValue, String thresholdValue,

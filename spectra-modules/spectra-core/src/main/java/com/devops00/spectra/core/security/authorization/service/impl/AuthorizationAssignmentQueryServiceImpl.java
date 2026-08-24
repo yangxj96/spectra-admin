@@ -36,6 +36,7 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationBoundaryView;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -68,6 +69,8 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
     private final AuthorizationScopeMapper authorizationScopeMapper;
 
     private final ScopeRuleMapper scopeRuleMapper;
+
+    private final TimeMapper timeMapper;
 
     @Override
     @Transactional(readOnly = true)
@@ -159,8 +162,8 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
                     rolePermissionCounts.getOrDefault(assignment.getRoleId(), 0L),
                     assignment.getVersion() == null ? 0L : assignment.getVersion(),
                     assignment.getState(),
-                    assignment.getValidFrom(),
-                    assignment.getValidUntil(),
+                    timeMapper.toLocalDateTime(assignment.getValidFrom()),
+                    timeMapper.toLocalDateTime(assignment.getValidUntil()),
                     accessByAssignment.getOrDefault(assignment.getId(), List.of())
                             .stream()
                             .map(row -> toBoundary(row.getPermissionId(), row.getScopeId(), permissions, scopes, rulesByScope))

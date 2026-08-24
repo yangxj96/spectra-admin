@@ -58,17 +58,17 @@ public interface ApplicationService {
     /**
      * 创建申请类型。
      */
-    java.util.UUID createdType(ApplicationTypeSaveFrom from);
+    UUID createdType(ApplicationTypeSaveFrom from);
 
     /**
      * 修改申请类型。
      */
-    void modifyType(java.util.UUID id, ApplicationTypeSaveFrom from);
+    void modifyType(UUID id, ApplicationTypeSaveFrom from);
 
     /**
      * 删除申请类型。
      */
-    void deleteType(java.util.UUID id);
+    void deleteType(UUID id);
 
     /**
      * 创建业务申请草稿。

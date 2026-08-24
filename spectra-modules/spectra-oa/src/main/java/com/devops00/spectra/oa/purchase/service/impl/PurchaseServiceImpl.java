@@ -59,6 +59,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 采购申请业务闭环服务实现。
@@ -266,7 +267,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
             throw new DataSaveException("收货人不能为空");
         }
         var purchaseItems = itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, id));
-        var itemMap = purchaseItems.stream().collect(java.util.stream.Collectors.toMap(PurchaseItem::getId, item -> item));
+        var itemMap = purchaseItems.stream().collect(Collectors.toMap(PurchaseItem::getId, item -> item));
         var receiptItems = new LinkedHashMap<UUID, PurchaseReceiptItemFrom>();
         from.getItems().forEach(item -> {
             if (receiptItems.put(item.getPurchaseItemId(), item) != null) {

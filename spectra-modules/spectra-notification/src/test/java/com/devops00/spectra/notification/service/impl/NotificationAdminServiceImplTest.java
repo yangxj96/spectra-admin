@@ -32,6 +32,7 @@ import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
+import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.ObjectTypeHandler;
@@ -69,7 +70,8 @@ class NotificationAdminServiceImplTest {
         var page = new Page<NotificationDeliveryEntity>();
         when(deliveryMapper.selectAdminPage(any(), any(), any(), any(), any(), any(), any(), any())).thenReturn(page);
         when(converter.toDeliveryPage(page)).thenReturn(new Page<NotificationDeliveryAdminVO>());
-        var service = new NotificationAdminServiceImpl(requestMapper, taskMapper, deliveryMapper, converter, gateway);
+        var service = new NotificationAdminServiceImpl(
+                requestMapper, taskMapper, deliveryMapper, converter, gateway, NotificationTestTimeMapper.create());
 
         service.pageDeliveries(new PageFrom(), null);
 
@@ -82,7 +84,7 @@ class NotificationAdminServiceImplTest {
         when(taskMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
                 mock(NotificationDeliveryMapper.class), mock(NotificationAdminConverter.class),
-                mock(NotificationGateway.class));
+                mock(NotificationGateway.class), NotificationTestTimeMapper.create());
 
         assertThrows(DataNotExistException.class, () -> service.retry(UUID.randomUUID()));
 
@@ -95,7 +97,7 @@ class NotificationAdminServiceImplTest {
         var taskMapper = mock(NotificationTaskMapper.class);
         var deliveryMapper = mock(NotificationDeliveryMapper.class);
         var service = new NotificationAdminServiceImpl(requestMapper, taskMapper, deliveryMapper,
-                mock(NotificationAdminConverter.class), mock(NotificationGateway.class));
+                mock(NotificationAdminConverter.class), mock(NotificationGateway.class), NotificationTestTimeMapper.create());
 
         assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
                 () -> service.overview(new NotificationOverviewFrom(169)));
@@ -112,7 +114,8 @@ class NotificationAdminServiceImplTest {
         var converter = mock(NotificationAdminConverter.class);
         when(converter.toRequestVO(entity)).thenReturn(view);
         var service = new NotificationAdminServiceImpl(requestMapper, mock(NotificationTaskMapper.class),
-                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class));
+                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class),
+                NotificationTestTimeMapper.create());
 
         assertTrue(service.getRequest(requestId) == view);
         verify(converter).toRequestVO(entity);
@@ -128,7 +131,8 @@ class NotificationAdminServiceImplTest {
         when(taskMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(task);
         when(converter.toTaskVO(task)).thenReturn(view);
         var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
-                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class));
+                mock(NotificationDeliveryMapper.class), converter, mock(NotificationGateway.class),
+                NotificationTestTimeMapper.create());
 
         assertTrue(service.getTask(taskId) == view);
         verify(converter).toTaskVO(task);
@@ -147,7 +151,7 @@ class NotificationAdminServiceImplTest {
         when(taskMapper.selectById(delivery.getNotificationTaskId())).thenReturn(task);
         when(converter.toDeliveryVO(delivery)).thenReturn(view);
         var service = new NotificationAdminServiceImpl(mock(NotificationRequestMapper.class), taskMapper,
-                deliveryMapper, converter, mock(NotificationGateway.class));
+                deliveryMapper, converter, mock(NotificationGateway.class), NotificationTestTimeMapper.create());
 
         assertTrue(service.getDelivery(deliveryId) == view);
         assertTrue(delivery.getChannel() == task.getChannel());

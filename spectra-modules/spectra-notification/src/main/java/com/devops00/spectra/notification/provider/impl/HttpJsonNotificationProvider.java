@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.utils.StrUtils;
@@ -23,7 +23,7 @@ import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
@@ -95,21 +95,21 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
     public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
         var checkedAt = Instant.now();
         if (!isUsable(configuration)) {
-            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+            return NotificationProviderHealth.blocked("PROVIDER_CONFIGURATION_INVALID", checkedAt);
         }
         try {
             var request = authorizedRequest(configuration)
                     .GET()
                     .build();
             var response = client(configuration).send(request, HttpResponse.BodyHandlers.discarding());
-            var state = response.statusCode() >= 200 && response.statusCode() < 400 ? "HEALTHY" : "UNHEALTHY";
-            var reason = "HEALTHY".equals(state) ? "HEALTH_CHECK_OK" : "HEALTH_CHECK_HTTP_" + response.statusCode();
-            return new NotificationProviderHealth(state, reason, checkedAt);
+            var healthy = response.statusCode() >= 200 && response.statusCode() < 400;
+            var reason = healthy ? "HEALTH_CHECK_OK" : "HEALTH_CHECK_HTTP_" + response.statusCode();
+            return healthy ? NotificationProviderHealth.healthy(reason, checkedAt) : NotificationProviderHealth.unhealthy(reason, checkedAt);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_INTERRUPTED", checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_INTERRUPTED", checkedAt);
         } catch (IOException | RuntimeException exception) {
-            return new NotificationProviderHealth("UNHEALTHY", "HEALTH_CHECK_UNAVAILABLE", checkedAt);
+            return NotificationProviderHealth.unhealthy("HEALTH_CHECK_UNAVAILABLE", checkedAt);
         }
     }
 
@@ -119,13 +119,13 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
     @Override
     public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
         if (!isUsable(configuration)) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+            return ChannelSendResult.blocked(CODE, null, "PROVIDER_CONFIGURATION_INVALID");
         }
         final String recipient;
         try {
             recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+            return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         var body = new LinkedHashMap<String, Object>();
         body.put("channel", task.getChannel());
@@ -143,9 +143,9 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
             return mapResponse(response.statusCode(), response.body());
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_INTERRUPTED");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_REQUEST_INTERRUPTED");
         } catch (IOException | RuntimeException exception) {
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_REQUEST_UNAVAILABLE");
         }
     }
 
@@ -154,23 +154,23 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
      */
     private ChannelSendResult mapResponse(int statusCode, String responseBody) {
         if (statusCode == 429) {
-            return new ChannelSendResult("FAILED", "RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
+            return ChannelSendResult.failed("RATE_LIMITED", null, "PROVIDER_RATE_LIMITED");
         }
         if (statusCode >= 500) {
-            return new ChannelSendResult("UNKNOWN", CODE, null, "PROVIDER_SERVER_ERROR");
+            return ChannelSendResult.unknown(CODE, null, "PROVIDER_SERVER_ERROR");
         }
         if (statusCode < 200 || statusCode >= 300) {
-            return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", null, "PROVIDER_HTTP_REJECTED");
+            return ChannelSendResult.failed("PROVIDER_REJECTED", null, "PROVIDER_HTTP_REJECTED");
         }
         var response = readResponse(responseBody);
         var status = response.get("status") == null ? "SENT" : String.valueOf(response.get("status")).toUpperCase();
         if (!Map.of("SENT", true, "ACCEPTED", true).containsKey(status)) {
             if ("UNKNOWN".equals(status)) {
-                return new ChannelSendResult("UNKNOWN", CODE, messageId(response), "PROVIDER_UNKNOWN_RESULT");
+                return ChannelSendResult.unknown(CODE, messageId(response), "PROVIDER_UNKNOWN_RESULT");
             }
-            return new ChannelSendResult("FAILED", "PROVIDER_REJECTED", messageId(response), "PROVIDER_REJECTED");
+            return ChannelSendResult.failed("PROVIDER_REJECTED", messageId(response), "PROVIDER_REJECTED");
         }
-        return new ChannelSendResult("SENT", CODE, messageId(response), "PROVIDER_ACCEPTED");
+        return ChannelSendResult.sent(CODE, messageId(response), "PROVIDER_ACCEPTED");
     }
 
     /**

@@ -14,11 +14,13 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import tools.jackson.databind.ObjectMapper;
@@ -56,9 +58,9 @@ class MockProviderTest {
                 Instant.now());
 
         assertEquals("SMS", NotificationChannel.SMS.name());
-        assertEquals("HEALTHY", provider.health(configuration).state());
+        assertEquals(NotificationProviderHealthState.HEALTHY, provider.health(configuration).state());
         var result = provider.send(task, configuration);
-        assertEquals("SENT", result.status());
+        assertEquals(ChannelSendStatus.SENT, result.status());
         assertEquals("MOCK", result.providerCode());
         assertEquals("mock-" + task.getId(), result.providerMessageId());
         assertEquals("MOCK_ACCEPTED", result.summary());

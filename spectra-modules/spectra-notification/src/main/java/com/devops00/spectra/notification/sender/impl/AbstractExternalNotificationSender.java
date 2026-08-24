@@ -14,13 +14,13 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.sender.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProviderRuntime;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
+import com.devops00.spectra.notification.sender.NotificationSender;
 
 /**
  * SMS/EMAIL Sender 的公共适配层；只依赖 Provider Runtime，不依赖具体供应商。

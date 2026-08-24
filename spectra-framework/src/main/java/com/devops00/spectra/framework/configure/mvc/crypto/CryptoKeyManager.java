@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 加解密密钥管理器
@@ -169,14 +170,14 @@ public class CryptoKeyManager {
     /**
      * 从 sys_config 读取单个配置值
      */
-    private java.util.Optional<String> getConfigValue(String key) {
+    private Optional<String> getConfigValue(String key) {
         try {
             List<String> results = jdbcTemplate.queryForList("SELECT value FROM spectra_core.sys_config WHERE key = ? AND deleted IS NULL",
                     String.class, key);
-            return results.isEmpty() ? java.util.Optional.empty() : java.util.Optional.of(results.getFirst());
+            return results.isEmpty() ? Optional.empty() : Optional.of(results.getFirst());
         } catch (Exception e) {
             log.warn(LogPrefix.WEB.f("读取配置失败: {}"), key, e);
-            return java.util.Optional.empty();
+            return Optional.empty();
         }
     }
 }

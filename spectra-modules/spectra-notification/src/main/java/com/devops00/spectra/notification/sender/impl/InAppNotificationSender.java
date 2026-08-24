@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.sender.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
@@ -23,7 +23,7 @@ import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationInboxEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.mapper.NotificationInboxMapper;
-import com.devops00.spectra.notification.service.NotificationSender;
+import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -75,6 +75,6 @@ public class InAppNotificationSender implements NotificationSender {
                 throw new DataSaveException("写入站内信失败");
             }
         }
-        return new ChannelSendResult("SENT", "IN_APP", null, "站内信已写入收件箱");
+        return ChannelSendResult.sent("IN_APP", null, "站内信已写入收件箱");
     }
 }

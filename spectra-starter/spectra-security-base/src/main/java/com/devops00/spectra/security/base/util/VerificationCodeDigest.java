@@ -20,6 +20,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
 import java.util.HexFormat;
 
 /**
@@ -68,7 +69,7 @@ public final class VerificationCodeDigest {
         if (expected == null) {
             return false;
         }
-        return java.security.MessageDigest.isEqual(
+        return MessageDigest.isEqual(
                 digest(code, key).getBytes(StandardCharsets.US_ASCII),
                 expected.getBytes(StandardCharsets.US_ASCII));
     }

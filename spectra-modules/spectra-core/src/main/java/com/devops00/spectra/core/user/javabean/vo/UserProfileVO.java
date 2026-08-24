@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,7 +70,7 @@ public class UserProfileVO implements Serializable {
     /**
      * 离职时间。
      */
-    private Instant departedAt;
+    private LocalDateTime departedAt;
 
     /**
      * 手机号

@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.notification.service.impl;
+package com.devops00.spectra.notification.provider.impl;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
@@ -22,7 +22,8 @@ import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
-import com.devops00.spectra.notification.service.NotificationProvider;
+import com.devops00.spectra.notification.provider.NotificationProvider;
+import com.devops00.spectra.notification.utils.NotificationMaskingUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -64,44 +65,30 @@ public class MockNotificationProvider implements NotificationProvider {
     public NotificationProviderHealth health(NotificationProviderConfiguration configuration) {
         var checkedAt = Instant.now();
         if (configuration == null || !configuration.enabled() || !CODE.equals(configuration.providerType())) {
-            return new NotificationProviderHealth("BLOCKED", "PROVIDER_CONFIGURATION_INVALID", checkedAt);
+            return NotificationProviderHealth.blocked("PROVIDER_CONFIGURATION_INVALID", checkedAt);
         }
-        return new NotificationProviderHealth("HEALTHY", "MOCK_PROVIDER_READY", checkedAt);
+        return NotificationProviderHealth.healthy("MOCK_PROVIDER_READY", checkedAt);
     }
 
     @Override
     public ChannelSendResult send(NotificationTaskEntity task, NotificationProviderConfiguration configuration) {
         if (configuration == null || !configuration.enabled() || !CODE.equals(configuration.providerType())) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "PROVIDER_CONFIGURATION_INVALID");
+            return ChannelSendResult.blocked(CODE, null, "PROVIDER_CONFIGURATION_INVALID");
         }
         final String recipient;
         try {
             recipient = payloadProtector.unprotectAddress(task.getRecipientCiphertext());
         } catch (RuntimeException exception) {
-            return new ChannelSendResult("BLOCKED", CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
+            return ChannelSendResult.blocked(CODE, null, "RECIPIENT_ADDRESS_UNAVAILABLE");
         }
         var taskId = task.getId() == null ? "none" : task.getId().toString();
         var recipientMasked = task.getRecipientMasked();
         if (recipientMasked == null || recipientMasked.isBlank()) {
-            recipientMasked = mask(recipient);
+            recipientMasked = NotificationMaskingUtils.maskAddressOrPlaceholder(recipient);
         }
         log.info("通知模拟发送: channel={}, taskId={}, recipient={}, title={}, content={}",
                 task.getChannel(), taskId, recipientMasked, task.getTitle(), task.getContent());
-        return new ChannelSendResult("SENT", CODE, "mock-" + taskId, "MOCK_ACCEPTED");
+        return ChannelSendResult.sent(CODE, "mock-" + taskId, "MOCK_ACCEPTED");
     }
 
-    private String mask(String address) {
-        if (address == null || address.isBlank()) {
-            return "***";
-        }
-        var at = address.indexOf('@');
-        if (at > 0) {
-            var prefixLength = Math.min(2, at);
-            return address.substring(0, prefixLength) + "***" + address.substring(at);
-        }
-        if (address.length() <= 7) {
-            return "***";
-        }
-        return address.substring(0, 3) + "****" + address.substring(address.length() - 4);
-    }
 }

@@ -44,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -189,11 +190,11 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return buildCurrentTree(menuIds, menus);
     }
 
-    private List<MenuTreeVO> buildCurrentTree(java.util.Set<UUID> menuIds) {
+    private List<MenuTreeVO> buildCurrentTree(Set<UUID> menuIds) {
         return buildCurrentTree(menuIds, loadActiveMenus());
     }
 
-    private List<MenuTreeVO> buildCurrentTree(java.util.Set<UUID> menuIds, List<Menu> menus) {
+    private List<MenuTreeVO> buildCurrentTree(Set<UUID> menuIds, List<Menu> menus) {
         if (CollUtils.isEmpty(menus)) {
             return Collections.emptyList();
         }

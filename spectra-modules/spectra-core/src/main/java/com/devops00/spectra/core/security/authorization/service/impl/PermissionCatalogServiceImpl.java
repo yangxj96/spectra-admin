@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -93,7 +94,7 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
         if (value == null || value.isBlank()) {
             return List.of();
         }
-        return java.util.Arrays.stream(value.split(","))
+        return Arrays.stream(value.split(","))
                 .map(String::trim)
                 .filter(mode -> !mode.isBlank())
                 .map(mode -> mode.toUpperCase(Locale.ROOT))

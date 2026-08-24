@@ -21,9 +21,11 @@ import com.devops00.spectra.common.config.SystemConfigValueWriter;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfigDocument;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
@@ -110,6 +112,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
      */
     private final ObjectMapper objectMapper;
 
+    /** 用户时区时间转换器。 */
+    private final TimeMapper timeMapper;
+
     /**
      * 公共运行时配置写入端口；精简测试上下文可以不提供。
      */
@@ -140,7 +145,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             return NotificationProviderVO.builder()
                     .channel(channel.name())
                     .providerType("IN_APP")
-                    .state("HEALTHY")
+                    .state(NotificationProviderHealthState.HEALTHY.name())
                     .enabled(true)
                     .reason("IN_APP_READY")
                     .timeoutMs(0)
@@ -157,7 +162,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         return NotificationProviderVO.builder()
                 .channel(channel.name())
                 .providerType(document.providerType())
-                .state(state)
+                .state(state.name())
                 .enabled(document.enabled())
                 .reason(resolveReason(document, secretConfigured, secretUsable, state))
                 .endpoint(document.endpoint())
@@ -177,7 +182,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 .templateParameterOrder(document.templateParameterOrder())
                 .secretConfigured(secretConfigured)
                 .secretKeyId(document.secretKeyId())
-                .updatedAt(document.updatedAt())
+                .updatedAt(timeMapper.toLocalDateTime(document.updatedAt()))
                 .build();
     }
 
@@ -336,28 +341,29 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     /**
      * 判断配置状态；没有健康检查结果时不报告 HEALTHY。
      */
-    private String resolveState(NotificationProviderConfigDocument document, boolean secretUsable) {
+    private NotificationProviderHealthState resolveState(
+                                                         NotificationProviderConfigDocument document, boolean secretUsable) {
         if (document.providerType() == null || document.providerType().isBlank()) {
-            return "NOT_CONFIGURED";
+            return NotificationProviderHealthState.NOT_CONFIGURED;
         }
         if ("INVALID".equals(document.providerType())
                 || !SUPPORTED_PROVIDER_TYPES.contains(document.providerType())
                 || !isConfigurationComplete(document)
                 || (requiresSecret(document.providerType()) && !secretUsable)) {
-            return "BLOCKED";
+            return NotificationProviderHealthState.BLOCKED;
         }
         if (!document.enabled()) {
-            return "DISABLED";
+            return NotificationProviderHealthState.DISABLED;
         }
-        return "UNHEALTHY";
+        return NotificationProviderHealthState.UNHEALTHY;
     }
 
     /**
      * 生成脱敏状态原因。
      */
     private String resolveReason(NotificationProviderConfigDocument document, boolean secretConfigured,
-                                 boolean secretUsable, String state) {
-        if ("BLOCKED".equals(state)) {
+                                 boolean secretUsable, NotificationProviderHealthState state) {
+        if (state == NotificationProviderHealthState.BLOCKED) {
             if (!secretConfigured && requiresSecret(document.providerType())) {
                 return "SECRET_NOT_CONFIGURED";
             }
@@ -366,13 +372,13 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             }
             return "CONFIG_INVALID";
         }
-        if ("DISABLED".equals(state)) {
+        if (state == NotificationProviderHealthState.DISABLED) {
             return "DISABLED_BY_CONFIGURATION";
         }
-        if ("UNHEALTHY".equals(state)) {
+        if (state == NotificationProviderHealthState.UNHEALTHY) {
             return "HEALTH_CHECK_REQUIRED";
         }
-        return state;
+        return state.name();
     }
 
     private boolean hasSecret(NotificationProviderConfigDocument document, String ciphertext) {

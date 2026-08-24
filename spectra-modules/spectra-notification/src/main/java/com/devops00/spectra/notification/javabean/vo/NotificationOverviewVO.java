@@ -22,7 +22,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ import java.util.List;
 public class NotificationOverviewVO {
 
     /** 数据生成时间。 */
-    private Instant generatedAt;
+    private LocalDateTime generatedAt;
     /** 统计窗口，单位为小时。 */
     private int rangeHours;
     /** 当前待处理任务数：PENDING 和 RETRYING。 */
@@ -47,7 +47,7 @@ public class NotificationOverviewVO {
     /** 当前正在处理任务数。 */
     private long processingTaskCount;
     /** 最早待处理任务的计划时间。 */
-    private Instant oldestPendingTaskAt;
+    private LocalDateTime oldestPendingTaskAt;
     /** 当前失败或阻断任务数。 */
     private long failedTaskCount;
     /** 当前 UNKNOWN 任务数。 */
@@ -101,7 +101,7 @@ public class NotificationOverviewVO {
     public static class TrendPoint {
 
         /** 小时桶起始时间。 */
-        private Instant bucketAt;
+        private LocalDateTime bucketAt;
         /** 投递尝试数。 */
         private long totalCount;
         /** 接受或发送成功数。 */
@@ -122,7 +122,7 @@ public class NotificationOverviewVO {
     public static class ErrorSummary {
 
         /** 错误发生时间。 */
-        private Instant occurredAt;
+        private LocalDateTime occurredAt;
         /** 通知渠道。 */
         private String channel;
         /** 投递结果状态。 */

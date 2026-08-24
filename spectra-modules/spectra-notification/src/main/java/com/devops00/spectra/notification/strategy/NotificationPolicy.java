@@ -21,6 +21,7 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import org.springframework.stereotype.Component;
 
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -159,7 +160,7 @@ public class NotificationPolicy {
     private static Map<NotificationPurpose, Set<NotificationChannel>> buildTemplateChannels() {
         var allChannels = Set.of(NotificationChannel.IN_APP, NotificationChannel.SMS, NotificationChannel.EMAIL);
         var externalChannels = Set.of(NotificationChannel.SMS, NotificationChannel.EMAIL);
-        var matrix = new java.util.EnumMap<NotificationPurpose, Set<NotificationChannel>>(NotificationPurpose.class);
+        var matrix = new EnumMap<NotificationPurpose, Set<NotificationChannel>>(NotificationPurpose.class);
         for (var purpose : NotificationPurpose.values()) {
             matrix.put(purpose, allChannels);
         }

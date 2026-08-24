@@ -24,6 +24,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.util.UUID;
+
 /**
  * 单元测试使用
  *
@@ -47,7 +49,7 @@ public class UploadTestApplication {
             }
 
             @Override
-            public java.util.UUID currentUserId() {
+            public UUID currentUserId() {
                 return null;
             }
 

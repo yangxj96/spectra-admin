@@ -24,7 +24,9 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.converter.NotificationTemplateConverter;
+import com.devops00.spectra.notification.javabean.domain.NotificationTemplateState;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplateActionFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplatePageFrom;
@@ -44,6 +46,7 @@ import org.springframework.util.StringUtils;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -61,13 +64,13 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class NotificationTemplateServiceImpl implements NotificationTemplateService {
 
-    private static final String DRAFT = "DRAFT";
+    private static final String DRAFT = NotificationTemplateState.DRAFT.name();
 
-    private static final String PUBLISHED = "PUBLISHED";
+    private static final String PUBLISHED = NotificationTemplateState.PUBLISHED.name();
 
-    private static final String DISABLED = "DISABLED";
+    private static final String DISABLED = NotificationTemplateState.DISABLED.name();
 
-    private static final String ARCHIVED = "ARCHIVED";
+    private static final String ARCHIVED = NotificationTemplateState.ARCHIVED.name();
 
     private static final Set<String> STATES = Set.of(DRAFT, PUBLISHED, DISABLED, ARCHIVED);
 
@@ -78,6 +81,8 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
     private final NotificationTemplateRenderer renderer;
 
     private final NotificationPolicy policy;
+
+    private final TimeMapper timeMapper;
 
     @Override
     public IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params) {
@@ -288,7 +293,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         result.setTitle(renderer.render(title, parameters));
         result.setContent(renderer.render(content, parameters));
         result.setHtml(renderer.render(html, parameters));
-        result.setPreviewedAt(Instant.now());
+        result.setPreviewedAt(timeMapper.toLocalDateTime(Instant.now()));
         return result;
     }
 
@@ -325,7 +330,7 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             throw new DataSaveException("通知渠道不能为空");
         }
         try {
-            return NotificationChannel.valueOf(value.trim().toUpperCase(java.util.Locale.ROOT));
+            return NotificationChannel.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException exception) {
             throw new DataSaveException("通知渠道不合法");
         }

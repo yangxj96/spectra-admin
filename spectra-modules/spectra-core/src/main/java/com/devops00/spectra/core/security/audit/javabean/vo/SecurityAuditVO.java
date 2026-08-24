@@ -18,7 +18,7 @@ package com.devops00.spectra.core.security.audit.javabean.vo;
 
 import com.devops00.spectra.security.base.audit.AuditResult;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,7 +35,7 @@ public record SecurityAuditVO(UUID eventId,
                               Map<String, Object> before,
                               Map<String, Object> after,
                               String reason,
-                              Instant occurredAt,
+                              LocalDateTime occurredAt,
                               AuditResult result,
                               String correlationId) {
 }
