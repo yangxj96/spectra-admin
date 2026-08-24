@@ -19,7 +19,10 @@ package com.devops00.spectra.core.system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDependencyStatus;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorFreshness;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorHistoryRange;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorHealthStatus;
 import com.devops00.spectra.core.system.javabean.from.ServiceMonitorHistoryFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorOverviewVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorHistoryVO;
@@ -49,9 +52,8 @@ import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.Duration;
-import java.time.ZoneOffset;
+import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -206,12 +208,12 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .filter(item -> "PostgreSQL".equals(item.getName()))
                 .map(ServiceMonitorOverviewVO.Dependency::getStatus)
                 .findFirst()
-                .orElse("UNKNOWN");
+                .orElse(ServiceMonitorDependencyStatus.UNKNOWN.name());
         var redisStatus = dependencies.stream()
                 .filter(item -> "Redis".equals(item.getName()))
                 .map(ServiceMonitorOverviewVO.Dependency::getStatus)
                 .findFirst()
-                .orElse("UNKNOWN");
+                .orElse(ServiceMonitorDependencyStatus.UNKNOWN.name());
         return new Sample(now, cpuUsage, logicalCores, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
                 heapUsage.used(), heapUsage.max(), heapUsage.usage(), nonHeapUsage.getUsed(), threadBean.getThreadCount(),
                 threadBean.getPeakThreadCount(), collectGcCount(), requestMetrics.qps(), requestMetrics.errorRate(),
@@ -318,36 +320,39 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                                                                   String message) {
         return ServiceMonitorOverviewVO.Dependency.builder()
                 .name(name)
-                .status(available ? "UP" : "DOWN")
+                .status((available ? ServiceMonitorDependencyStatus.UP : ServiceMonitorDependencyStatus.DOWN).name())
                 .latencyMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
                 .message(message)
                 .build();
     }
 
-    private static String resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
-                                        RequestMetrics requestMetrics, List<ServiceMonitorOverviewVO.Dependency> dependencies,
-                                        String healthStatus) {
-        var downCount = dependencies.stream().filter(item -> "DOWN".equals(item.getStatus())).count();
+    private static ServiceMonitorHealthStatus resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
+                                                            RequestMetrics requestMetrics,
+                                                            List<ServiceMonitorOverviewVO.Dependency> dependencies,
+                                                            String healthStatus) {
+        var downCount = dependencies.stream()
+                .filter(item -> ServiceMonitorDependencyStatus.DOWN.name().equals(item.getStatus()))
+                .count();
         if (downCount == dependencies.size()) {
-            return "DOWN";
+            return ServiceMonitorHealthStatus.DOWN;
         }
         if (downCount > 0L) {
-            return "DEGRADED";
+            return ServiceMonitorHealthStatus.DEGRADED;
         }
         if ("DOWN".equals(healthStatus) || "OUT_OF_SERVICE".equals(healthStatus)) {
-            return "DEGRADED";
+            return ServiceMonitorHealthStatus.DEGRADED;
         }
         if ("UNKNOWN".equals(healthStatus)) {
-            return "WARNING";
+            return ServiceMonitorHealthStatus.WARNING;
         }
         if (cpuUsage >= WARNING_CPU_USAGE
                 || systemMemoryUsage >= WARNING_MEMORY_USAGE
                 || jvmHeapUsage >= WARNING_JVM_HEAP_USAGE
                 || requestMetrics.errorRate() >= WARNING_ERROR_RATE
                 || requestMetrics.p95ResponseMs() >= WARNING_P95_RESPONSE_MS) {
-            return "WARNING";
+            return ServiceMonitorHealthStatus.WARNING;
         }
-        return "HEALTHY";
+        return ServiceMonitorHealthStatus.HEALTHY;
     }
 
     private ServiceMonitorOverviewVO toOverview(Sample sample, List<Sample> samples) {
@@ -376,12 +381,12 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .requestMetricsAvailable(sample.requestMetricsAvailable())
                 .build();
         var freshness = freshness(sample.collectedAt());
-        var status = effectiveStatus(sample.status(), freshness.code());
+        var status = effectiveStatus(sample.status(), freshness.status());
         return ServiceMonitorOverviewVO.builder()
                 .collectedAt(toLocalDateTime(sample.collectedAt()))
-                .status(status)
-                .statusMessage(statusMessage(status, freshness.code()))
-                .dataFreshness(freshness.code())
+                .status(status.name())
+                .statusMessage(statusMessage(status, freshness.status()))
+                .dataFreshness(freshness.status().name())
                 .dataAgeSeconds(freshness.ageSeconds())
                 .serviceName(environment.getProperty("spring.application.name", "spectra-admin"))
                 .hostName(getHostName())
@@ -440,9 +445,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var summary = ServiceMonitorOverviewVO.Summary.builder().build();
         return ServiceMonitorOverviewVO.builder()
                 .collectedAt(toLocalDateTime(Instant.now()))
-                .status("DOWN")
+                .status(ServiceMonitorHealthStatus.DOWN.name())
                 .statusMessage("监控数据暂不可用")
-                .dataFreshness("UNAVAILABLE")
+                .dataFreshness(ServiceMonitorFreshness.UNAVAILABLE.name())
                 .dataAgeSeconds(0L)
                 .serviceName(environment.getProperty("spring.application.name", "spectra-admin"))
                 .hostName(getHostName())
@@ -496,49 +501,48 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         entity.setRequestMetricsAvailable(sample.requestMetricsAvailable());
         entity.setDatabaseStatus(sample.databaseStatus());
         entity.setRedisStatus(sample.redisStatus());
-        entity.setStatus(sample.status());
+        entity.setStatus(sample.status().name());
         return entity;
     }
 
     private Freshness freshness(Instant collectedAt) {
         var ageSeconds = Math.max(Duration.between(collectedAt, Instant.now()).getSeconds(), 0L);
         if (ageSeconds <= collectionIntervalSeconds * 2L) {
-            return new Freshness("CURRENT", ageSeconds);
+            return new Freshness(ServiceMonitorFreshness.CURRENT, ageSeconds);
         }
         if (ageSeconds <= collectionIntervalSeconds * 6L) {
-            return new Freshness("DELAYED", ageSeconds);
+            return new Freshness(ServiceMonitorFreshness.DELAYED, ageSeconds);
         }
-        return new Freshness("STALE", ageSeconds);
+        return new Freshness(ServiceMonitorFreshness.STALE, ageSeconds);
     }
 
-    private static String effectiveStatus(String status, String freshness) {
-        if ("STALE".equals(freshness) && !"DOWN".equals(status)) {
-            return "DEGRADED";
+    private static ServiceMonitorHealthStatus effectiveStatus(ServiceMonitorHealthStatus status,
+                                                              ServiceMonitorFreshness freshness) {
+        if (freshness == ServiceMonitorFreshness.STALE && status != ServiceMonitorHealthStatus.DOWN) {
+            return ServiceMonitorHealthStatus.DEGRADED;
         }
-        if ("DELAYED".equals(freshness) && "HEALTHY".equals(status)) {
-            return "WARNING";
+        if (freshness == ServiceMonitorFreshness.DELAYED && status == ServiceMonitorHealthStatus.HEALTHY) {
+            return ServiceMonitorHealthStatus.WARNING;
         }
         return status;
     }
 
     private LocalDateTime toLocalDateTime(Instant instant) {
-        var value = timeMapper.toLocalDateTime(instant);
-        return value == null ? LocalDateTime.ofInstant(instant, ZoneOffset.UTC) : value;
+        return timeMapper.toLocalDateTime(instant);
     }
 
-    private static String statusMessage(String status, String freshness) {
-        if ("STALE".equals(freshness)) {
+    private static String statusMessage(ServiceMonitorHealthStatus status, ServiceMonitorFreshness freshness) {
+        if (freshness == ServiceMonitorFreshness.STALE) {
             return "监控数据已过期，当前状态仅供参考";
         }
-        if ("DELAYED".equals(freshness) && "WARNING".equals(status)) {
+        if (freshness == ServiceMonitorFreshness.DELAYED && status == ServiceMonitorHealthStatus.WARNING) {
             return "监控数据采集延迟";
         }
         return switch (status) {
-            case "HEALTHY" -> "服务运行正常";
-            case "WARNING" -> "服务存在需要关注的指标";
-            case "DEGRADED" -> "部分关键依赖不可用";
-            case "DOWN" -> "关键依赖均不可用";
-            default -> "监控数据暂不可用";
+            case HEALTHY -> "服务运行正常";
+            case WARNING -> "服务存在需要关注的指标";
+            case DEGRADED -> "部分关键依赖不可用";
+            case DOWN -> "关键依赖均不可用";
         };
     }
 
@@ -601,7 +605,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                                   long latencyMs) {
     }
 
-    private record Freshness(String code, long ageSeconds) {
+    private record Freshness(ServiceMonitorFreshness status, long ageSeconds) {
     }
 
     private record Sample(Instant collectedAt, double cpuUsage, int cpuLogicalCores, double systemMemoryUsage,
@@ -610,7 +614,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                           long jvmNonHeapUsed, int liveThreadCount, int peakThreadCount, long gcCount, double qps, double errorRate,
                           double p95ResponseMs, boolean requestMetricsAvailable, List<ServiceMonitorOverviewVO.Dependency> dependencies,
                           List<ServiceMonitorOverviewVO.HealthComponent> healthComponents, String healthStatus,
-                          long healthCheckLatencyMs, String status, String databaseStatus, String redisStatus,
+                          long healthCheckLatencyMs, ServiceMonitorHealthStatus status, String databaseStatus, String redisStatus,
                           long uptimeSeconds) {
     }
 }

@@ -140,7 +140,7 @@ class UserImportServiceImplTest {
         task.setTotalRows(1);
         task.setErrorRows(1);
         task.setProfileVersionHash(SHA256Utils.hash("profile|MISSING"));
-        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f13800138000"
+        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001f13800138000"
                 + "\u001fzhangsan@example.com\u001fdept\u001fzh-CN\u001fAsia/Shanghai\u001fprofile"));
         when(taskMapper.selectOne(any())).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));

@@ -19,6 +19,7 @@ package com.devops00.spectra.upload.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import lombok.*;
 
@@ -77,7 +78,7 @@ public class FileInfo extends BaseEntity {
      * 文件状态(ACTIVE/DELETED)
      */
     @TableField(value = "status")
-    private String status;
+    private FileInfoStatus status;
 
     /**
      * 引用计数(用于秒传共享文件)

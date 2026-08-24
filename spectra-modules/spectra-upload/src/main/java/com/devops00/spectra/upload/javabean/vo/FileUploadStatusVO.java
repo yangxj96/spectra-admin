@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.upload.javabean.vo;
 
+import com.devops00.spectra.upload.javabean.constant.UploadTaskStatus;
 import lombok.Data;
 
 import java.util.List;
@@ -35,7 +36,7 @@ public class FileUploadStatusVO {
      * <p>
      * INIT → UPLOADING → DONE → EXPIRED
      */
-    private String status;
+    private UploadTaskStatus status;
 
     /**
      * 已上传分片

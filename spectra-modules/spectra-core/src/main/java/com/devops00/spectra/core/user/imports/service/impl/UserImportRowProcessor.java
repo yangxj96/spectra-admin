@@ -19,6 +19,7 @@ package com.devops00.spectra.core.user.imports.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationBoundaryFrom;
@@ -92,7 +93,7 @@ public class UserImportRowProcessor {
             throw new DataException("部门不存在: " + source.getDepartmentCode());
         }
         var profile = profiles.get(source.getAuthorizationProfileCode());
-        if (profile == null || !"ACTIVE".equals(profile.getState())) {
+        if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             throw new DataException("授权方案不存在或已停用: " + source.getAuthorizationProfileCode());
         }
         var user = new UserSaveFrom();
@@ -113,7 +114,7 @@ public class UserImportRowProcessor {
         for (var assignment : profile.getAssignments()) {
             var role = roleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                     .eq(SecurityRole::getCode, assignment.getRoleCode()));
-            if (role == null || !"ACTIVE".equals(role.getState())) {
+            if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
                 throw new DataException("Role 不存在或已停用: " + assignment.getRoleCode());
             }
             if (!Long.valueOf(role.getVersion() == null ? 0L : role.getVersion()).equals(assignment.getRoleVersion())) {

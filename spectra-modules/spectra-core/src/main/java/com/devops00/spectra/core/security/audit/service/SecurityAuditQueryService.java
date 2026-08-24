@@ -312,7 +312,7 @@ public class SecurityAuditQueryService {
     }
 
     private void recordOperation(Authentication viewer, String eventType, String operation) {
-        metrics.recordQuery(operation, "SUCCEEDED");
+        metrics.recordQuery(operation, AuditResult.SUCCEEDED.name());
         var operatorId = visibilityPolicy.viewerId(viewer);
         securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, null, null, null,
                 Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED, null));

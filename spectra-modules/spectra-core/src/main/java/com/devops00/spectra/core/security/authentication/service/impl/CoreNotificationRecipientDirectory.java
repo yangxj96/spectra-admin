@@ -29,6 +29,7 @@ import com.devops00.spectra.security.base.authorization.ScopeQuery;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -69,7 +70,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
             return List.of();
         }
         return loginNames.stream()
-                .filter(this::hasText)
+                .filter(StringUtils::hasText)
                 .distinct()
                 .map(userService::getByEmail)
                 .filter(Objects::nonNull)
@@ -87,7 +88,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         var active = user != null && UserStatus.ACTIVE.equals(user.getStatus());
         var phone = user == null ? null : user.getPhone();
         var email = user == null ? null : user.getEmail();
-        var verified = active && (hasText(phone) || hasText(email));
+        var verified = active && (StringUtils.hasText(phone) || StringUtils.hasText(email));
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }
 
@@ -127,7 +128,4 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         return lineage;
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
-    }
 }

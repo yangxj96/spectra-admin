@@ -23,10 +23,6 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationSendRequest;
-import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -36,7 +32,9 @@ import com.devops00.spectra.oa.application.mapper.ApplicationAttachmentMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
+import com.devops00.spectra.oa.application.support.OaApplicationWorkflowSupport;
 import com.devops00.spectra.oa.reimbursement.javabean.converter.ReimbursementConverter;
+import com.devops00.spectra.oa.reimbursement.javabean.constant.ReimbursementPaymentStatus;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem;
 import com.devops00.spectra.oa.reimbursement.javabean.from.*;
@@ -70,8 +68,6 @@ import java.util.*;
 public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMapper, Reimbursement> implements ReimbursementService {
 
     private static final String TYPE_CODE = "reimbursement";
-    private static final String PAYMENT_PENDING = "PENDING";
-    private static final String PAYMENT_PAID = "PAID";
 
     private final ReimbursementItemMapper itemMapper;
     private final ApplicationAttachmentMapper attachmentMapper;
@@ -79,7 +75,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationService applicationService;
     private final ProcessInstanceService processInstanceService;
-    private final NotificationService notificationService;
+    private final OaApplicationWorkflowSupport workflowSupport;
     private final ReimbursementConverter reimbursementConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -142,7 +138,7 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         entity.setDepartmentId(application.getDepartmentId());
         entity.setTotalAmount(from.getTotalAmount().setScale(2, RoundingMode.HALF_UP));
         entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
-        entity.setPaymentStatus(PAYMENT_PENDING);
+        entity.setPaymentStatus(ReimbursementPaymentStatus.PENDING.getValue());
         if (!this.save(entity)) {
             throw new DataSaveException("保存报销单失败");
         }
@@ -199,18 +195,18 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     @Transactional
     public void withdraw(UUID id) {
         var entity = require(id);
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "报销单不存在或无权操作");
         applicationService.withdraw(application.getId());
-        terminateProcess(application);
+        workflowSupport.terminateProcess(application, "OA 报销申请已撤回或取消");
     }
 
     @Override
     @Transactional
     public void cancel(UUID id) {
         var entity = require(id);
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "报销单不存在或无权操作");
         applicationService.cancel(application.getId());
-        terminateProcess(application);
+        workflowSupport.terminateProcess(application, "OA 报销申请已撤回或取消");
     }
 
     @Override
@@ -221,47 +217,47 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         if (!ApplicationStatus.APPROVED.name().equals(application.getStatus())) {
             throw new DataSaveException("只有审批通过的报销单可以登记付款");
         }
-        if (!PAYMENT_PENDING.equals(entity.getPaymentStatus())) {
+        if (!ReimbursementPaymentStatus.PENDING.getValue().equals(entity.getPaymentStatus())) {
             throw new DataSaveException("当前付款状态不允许登记");
         }
-        entity.setPaymentStatus(PAYMENT_PAID);
+        entity.setPaymentStatus(ReimbursementPaymentStatus.PAID.getValue());
         entity.setPaymentAt(Instant.now());
         entity.setPaymentRemark(from == null ? null : from.getPaymentRemark());
         if (!this.updateById(entity)) {
             throw new DataSaveException("登记报销付款失败");
         }
-        sendNotification(application, "报销已付款", "您的报销申请已完成付款");
+        workflowSupport.sendNotification(application, "reimbursement", "报销已付款", "您的报销申请已完成付款");
     }
 
     @Override
     @Transactional
     public void onApproved(String businessKey, Map<String, Object> variables) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
         var entity = require(application.getBizId());
         applicationService.updateStatus(application.getId(), ApplicationStatus.APPROVED.name(), null);
-        entity.setPaymentStatus(PAYMENT_PENDING);
+        entity.setPaymentStatus(ReimbursementPaymentStatus.PENDING.getValue());
         this.updateById(entity);
-        sendNotification(application, "报销申请已通过", "您的报销申请已审批通过，等待付款");
+        workflowSupport.sendNotification(application, "reimbursement", "报销申请已通过", "您的报销申请已审批通过，等待付款");
     }
 
     @Override
     @Transactional
     public void onRejected(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
         applicationService.updateStatus(application.getId(), ApplicationStatus.REJECTED.name(), reason);
-        sendNotification(application, "报销申请已驳回", StringUtils.hasText(reason) ? reason : "报销申请未通过审批");
+        workflowSupport.sendNotification(application, "reimbursement", "报销申请已驳回", StringUtils.hasText(reason) ? reason : "报销申请未通过审批");
     }
 
     @Override
     @Transactional
     public void onTerminated(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             applicationService.updateStatus(application.getId(), ApplicationStatus.CANCELLED.name(), reason);
         }
@@ -364,44 +360,11 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     }
 
     private Application requireEditableApplication(Reimbursement entity) {
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "报销单不存在或无权操作");
         if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
             throw new DataSaveException("当前状态不允许修改或提交报销单");
         }
         return application;
-    }
-
-    private Application requireApplicantApplication(Reimbursement entity) {
-        var application = applicationService.require(entity.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
-            throw new DataNotExistException("报销单不存在或无权操作");
-        }
-        return application;
-    }
-
-    private Application requireApplication(String businessKey) {
-        try {
-            return applicationService.require(UUID.fromString(businessKey));
-        } catch (IllegalArgumentException exception) {
-            throw new DataNotExistException("审批业务KEY无效: " + businessKey);
-        }
-    }
-
-    private void terminateProcess(Application application) {
-        if (StringUtils.hasText(application.getProcessInstanceId())) {
-            processInstanceService.terminate(application.getProcessInstanceId(), "OA 报销申请已撤回或取消");
-        }
-    }
-
-    private void sendNotification(Application application, String title, String content) {
-        notificationService.send(NotificationSendRequest.inApp("oa:reimbursement:" + application.getBizId() + ":" + title,
-                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), NotificationTemplateCode.OA_APPLICATION_STATUS)
-                .parameter("title", title)
-                .parameter("content", content)
-                .businessReference("OA_REIMBURSEMENT", application.getBizId().toString())
-                .sourceModule("OA")
-                .link("/oa/reimbursement/" + application.getBizId())
-                .build());
     }
 
     private String mask(String account) {

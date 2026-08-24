@@ -23,6 +23,7 @@ import com.devops00.spectra.core.security.authorization.javabean.from.Authorizat
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationChangePreviewVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
@@ -103,7 +104,7 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         }
         var activeAssignments = assignmentQueryService.findByUserId(userId)
                 .stream()
-                .filter(assignment -> "ACTIVE".equals(assignment.state()))
+                .filter(assignment -> SecurityAuthorizationState.ACTIVE.name().equals(assignment.state()))
                 .toList();
         var activeAssignmentIds = activeAssignments.stream()
                 .map(assignment -> assignment.assignmentId())

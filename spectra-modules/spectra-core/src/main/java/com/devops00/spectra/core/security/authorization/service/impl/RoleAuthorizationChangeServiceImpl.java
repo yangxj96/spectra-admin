@@ -23,6 +23,7 @@ import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.domain.RoleAuthorizationState;
 import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
@@ -187,7 +188,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
         var operatorId = currentOperatorId();
         var role = roleMapper.selectById(roleId);
-        if (role == null || !"ACTIVE".equals(role.getState())) {
+        if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
             throw new DataNotExistException("目标 Role 不存在或已停用");
         }
         if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
@@ -252,7 +253,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private void validatePermissionCodes(Set<String> codes) {
         var rows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes));
         var active = rows.stream()
-                .filter(permission -> "ACTIVE".equals(permission.getState()))
+                .filter(permission -> SecurityAuthorizationState.ACTIVE.name().equals(permission.getState()))
                 .map(Permission::getCode)
                 .collect(Collectors.toSet());
         if (active.size() != codes.size() || !active.containsAll(codes)) {
@@ -281,7 +282,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
     private List<RoleAssignment> activeAssignments(UUID roleId) {
         return roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getRoleId, roleId)
-                .eq(RoleAssignment::getState, "ACTIVE"));
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()));
     }
 
     private Set<UUID> affectedUserIds(UUID roleId) {

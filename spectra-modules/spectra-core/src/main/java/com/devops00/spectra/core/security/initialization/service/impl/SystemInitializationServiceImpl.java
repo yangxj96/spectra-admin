@@ -13,6 +13,7 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
@@ -157,7 +158,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         }
         SecurityRole role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, DEV_OPS_ROLE)
-                .eq(SecurityRole::getState, "ACTIVE")
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name())
                 .last("LIMIT 1"));
         if (role == null) {
             throw new IllegalStateException("ROLE_DEV_OPS 种子不存在");
@@ -170,13 +171,13 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         RoleAssignment assignment = roleAssignmentMapper.selectOne(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getUserId, user.getId())
                 .eq(RoleAssignment::getRoleId, role.getId())
-                .eq(RoleAssignment::getState, "ACTIVE")
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
                 .last("LIMIT 1"));
         if (assignment == null) {
             assignment = new RoleAssignment();
             assignment.setUserId(user.getId());
             assignment.setRoleId(role.getId());
-            assignment.setState("ACTIVE");
+            assignment.setState(SecurityAuthorizationState.ACTIVE.name());
             assignment.setVersion(0L);
             if (roleAssignmentMapper.insert(assignment) != 1) {
                 throw new IllegalStateException("创建 DEV_OPS 角色分配失败");

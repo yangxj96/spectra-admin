@@ -23,10 +23,6 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationSendRequest;
-import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -34,6 +30,7 @@ import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
+import com.devops00.spectra.oa.application.support.OaApplicationWorkflowSupport;
 import com.devops00.spectra.oa.leave.javabean.converter.LeaveConverter;
 import com.devops00.spectra.oa.leave.javabean.entity.AttendanceRecord;
 import com.devops00.spectra.oa.leave.javabean.entity.LeaveApplication;
@@ -63,7 +60,6 @@ import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -89,7 +85,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     private final ApplicationMapper applicationMapper;
     private final ApplicationService applicationService;
     private final ProcessInstanceService processInstanceService;
-    private final NotificationService notificationService;
+    private final OaApplicationWorkflowSupport workflowSupport;
     private final LeaveConverter leaveConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
@@ -120,7 +116,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void update(UUID id, LeaveCreateFrom from) {
         var detail = requireDetail(id);
-        var application = requireApplicantApplication(detail);
+        var application = workflowSupport.requireApplicantApplication(detail.getApplicationId(), "请假申请不存在或无权操作");
         if (!(ApplicationStatus.DRAFT.name().equals(application.getStatus()) || ApplicationStatus.REJECTED.name().equals(application.getStatus()))) {
             throw new DataSaveException("当前状态不允许修改请假申请");
         }
@@ -175,7 +171,7 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void submit(UUID id, LeaveSubmitFrom from) {
         var detail = requireDetail(id);
-        var application = requireApplicantApplication(detail);
+        var application = workflowSupport.requireApplicantApplication(detail.getApplicationId(), "请假申请不存在或无权操作");
         applicationService.submit(application.getId());
         reserveBalance(application.getApplicantId(), detail);
         var type = applicationTypeMapper.selectOne(
@@ -203,28 +199,28 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
     @Transactional
     public void withdraw(UUID id) {
         var detail = requireDetail(id);
-        var application = requireApplicantApplication(detail);
+        var application = workflowSupport.requireApplicantApplication(detail.getApplicationId(), "请假申请不存在或无权操作");
         releaseReservedBalance(application.getApplicantId(), detail);
         applicationService.withdraw(application.getId());
-        terminateProcess(application);
+        workflowSupport.terminateProcess(application, "OA 申请已撤回或取消");
     }
 
     @Override
     @Transactional
     public void cancel(UUID id) {
         var detail = requireDetail(id);
-        var application = requireApplicantApplication(detail);
+        var application = workflowSupport.requireApplicantApplication(detail.getApplicationId(), "请假申请不存在或无权操作");
         if (ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             releaseReservedBalance(application.getApplicantId(), detail);
         }
         applicationService.cancel(application.getId());
-        terminateProcess(application);
+        workflowSupport.terminateProcess(application, "OA 申请已撤回或取消");
     }
 
     @Override
     @Transactional
     public void onApproved(String businessKey, Map<String, Object> variables) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
@@ -232,26 +228,26 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         applicationService.updateStatus(application.getId(), ApplicationStatus.APPROVED.name(), null);
         approveBalance(application.getApplicantId(), detail);
         createAttendanceRecords(application, detail);
-        sendNotification(application, "请假申请已通过", "您的请假申请已审批通过");
+        workflowSupport.sendNotification(application, "leave", "请假申请已通过", "您的请假申请已审批通过");
     }
 
     @Override
     @Transactional
     public void onRejected(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
         var detail = requireDetail(application.getBizId());
         applicationService.updateStatus(application.getId(), ApplicationStatus.REJECTED.name(), reason);
         releaseReservedBalance(application.getApplicantId(), detail);
-        sendNotification(application, "请假申请已驳回", StringUtils.hasText(reason) ? reason : "请假申请未通过审批");
+        workflowSupport.sendNotification(application, "leave", "请假申请已驳回", StringUtils.hasText(reason) ? reason : "请假申请未通过审批");
     }
 
     @Override
     @Transactional
     public void onTerminated(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
@@ -266,22 +262,6 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             throw new DataNotExistException("请假申请不存在: " + id);
         }
         return detail;
-    }
-
-    private Application requireApplicantApplication(LeaveApplication detail) {
-        var application = applicationService.require(detail.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
-            throw new DataNotExistException("请假申请不存在或无权操作");
-        }
-        return application;
-    }
-
-    private Application requireApplication(String businessKey) {
-        try {
-            return applicationService.require(UUID.fromString(businessKey));
-        } catch (IllegalArgumentException exception) {
-            throw new DataNotExistException("审批业务KEY无效: " + businessKey);
-        }
     }
 
     private LeaveType requireLeaveType(String code) {
@@ -407,23 +387,6 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             }
             date = date.plusDays(1);
         }
-    }
-
-    private void terminateProcess(Application application) {
-        if (StringUtils.hasText(application.getProcessInstanceId())) {
-            processInstanceService.terminate(application.getProcessInstanceId(), "OA 申请已撤回或取消");
-        }
-    }
-
-    private void sendNotification(Application application, String title, String content) {
-        notificationService.send(NotificationSendRequest.inApp("oa:leave:" + application.getBizId() + ":" + title,
-                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), NotificationTemplateCode.OA_APPLICATION_STATUS)
-                .parameter("title", title)
-                .parameter("content", content)
-                .businessReference("OA_LEAVE", application.getBizId().toString())
-                .sourceModule("OA")
-                .link("/oa/leave/" + application.getBizId())
-                .build());
     }
 
     /**

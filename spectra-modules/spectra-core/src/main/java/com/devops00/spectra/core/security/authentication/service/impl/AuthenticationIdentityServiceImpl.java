@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.mapper.AuthenticationIdentityMapper;
 import com.devops00.spectra.core.security.authentication.util.AuthenticationIdentifierHash;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
@@ -45,9 +46,9 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
 
     private static final String PROVIDER_LOCAL = "LOCAL";
 
-    private static final String STATE_ACTIVE = "ACTIVE";
+    private static final String STATE_ACTIVE = AuthenticationIdentityState.ACTIVE.name();
 
-    private static final String STATE_REVOKED = "REVOKED";
+    private static final String STATE_REVOKED = AuthenticationIdentityState.REVOKED.name();
 
     private final AuthenticationIdentityMapper mapper;
 

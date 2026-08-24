@@ -1,5 +1,6 @@
 package com.devops00.spectra.oa.supply.javabean.from;
 
+import com.devops00.spectra.oa.supply.javabean.constant.SupplyItemStatus;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -61,7 +62,7 @@ public class SupplySaveFrom {
     /**
      * 状态。
      */
-    private String status = "ACTIVE";
+    private String status = SupplyItemStatus.ACTIVE.getValue();
 
     /**
      * 供应商。

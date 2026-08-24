@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
@@ -60,8 +61,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoader {
 
-    private static final String ACTIVE = "ACTIVE";
-
     private final RoleAssignmentMapper roleAssignmentMapper;
 
     private final SecurityRoleMapper securityRoleMapper;
@@ -89,7 +88,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         var now = Instant.now();
         var assignmentQuery = new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getUserId, userId)
-                .eq(RoleAssignment::getState, ACTIVE);
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name());
         var assignments = roleAssignmentMapper.selectList(assignmentQuery)
                 .stream()
                 .filter(assignment -> assignment.getValidFrom() == null
@@ -106,7 +105,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                 .collect(Collectors.toSet());
         var roleRows = securityRoleMapper.selectBatchIds(roleIds);
         var roles = roleRows.stream()
-                .filter(role -> ACTIVE.equals(role.getState()) && role.getCode() != null)
+                .filter(role -> SecurityAuthorizationState.ACTIVE.name().equals(role.getState()) && role.getCode() != null)
                 .collect(Collectors.toMap(SecurityRole::getId, Function.identity()));
         var rolePermissions = loadRolePermissions(roleIds);
         var roleGrantablePermissions = loadRoleGrantablePermissions(roleIds);
@@ -128,7 +127,7 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                 ? List.<Permission>of()
                 : permissionMapper.selectBatchIds(permissionIds);
         var permissions = permissionRows.stream()
-                .filter(permission -> ACTIVE.equals(permission.getState())
+                .filter(permission -> SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())
                         && permission.getCode() != null)
                 .collect(Collectors.toMap(Permission::getId, Function.identity()));
 

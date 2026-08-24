@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -233,16 +234,16 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             throw new DataSaveException("不支持的 Provider 类型");
         }
         var endpoint = normalize(params.getEndpoint());
-        if ("ALIYUN_SMS".equals(providerType) && !hasText(endpoint)) {
+        if ("ALIYUN_SMS".equals(providerType) && !StringUtils.hasText(endpoint)) {
             endpoint = ALIYUN_SMS_ENDPOINT;
-        } else if ("TENCENT_SMS".equals(providerType) && !hasText(endpoint)) {
+        } else if ("TENCENT_SMS".equals(providerType) && !StringUtils.hasText(endpoint)) {
             endpoint = TENCENT_SMS_ENDPOINT;
         }
         var port = normalizePort(providerType, params.getPort(), params.isSslEnabled());
         var region = normalize(params.getRegion());
-        if ("ALIYUN_SMS".equals(providerType) && !hasText(region)) {
+        if ("ALIYUN_SMS".equals(providerType) && !StringUtils.hasText(region)) {
             region = ALIYUN_SMS_REGION;
-        } else if ("TENCENT_SMS".equals(providerType) && !hasText(region)) {
+        } else if ("TENCENT_SMS".equals(providerType) && !StringUtils.hasText(region)) {
             region = TENCENT_SMS_REGION;
         }
         var credentialId = normalize(params.getCredentialId());
@@ -284,7 +285,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         var providerTypeChanged = !providerType.equals(current.providerType());
         if (params.isClearSecret() || providerTypeChanged) {
             secretKeyId = null;
-            if (hasText(existingSecretCiphertext)) {
+            if (StringUtils.hasText(existingSecretCiphertext)) {
                 write(secretKey(channel), "", "通知" + channel.name() + " Provider Secret");
             }
         }
@@ -449,17 +450,24 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                                          String signName, String senderAddress, String templateCode) {
         switch (providerType) {
             case "ALIYUN_SMS" -> {
-                if (!hasText(credentialId) || !hasText(signName) || !hasText(templateCode)) {
+                if (!StringUtils.hasText(credentialId)
+                        || !StringUtils.hasText(signName)
+                        || !StringUtils.hasText(templateCode)) {
                     throw new DataSaveException("阿里云短信必须配置 AccessKey ID、短信签名和模板编码");
                 }
             }
             case "TENCENT_SMS" -> {
-                if (!hasText(credentialId) || !hasText(appId) || !hasText(signName) || !hasText(templateCode)) {
+                if (!StringUtils.hasText(credentialId)
+                        || !StringUtils.hasText(appId)
+                        || !StringUtils.hasText(signName)
+                        || !StringUtils.hasText(templateCode)) {
                     throw new DataSaveException("腾讯云短信必须配置 SecretId、SDK AppID、短信签名和模板 ID");
                 }
             }
             case "SMTP" -> {
-                if (!hasText(endpoint) || !hasText(credentialId) || !hasText(senderAddress)) {
+                if (!StringUtils.hasText(endpoint)
+                        || !StringUtils.hasText(credentialId)
+                        || !StringUtils.hasText(senderAddress)) {
                     throw new DataSaveException("SMTP 必须配置主机、用户名和发件地址");
                 }
             }
@@ -477,17 +485,17 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
 
     private boolean isConfigurationComplete(NotificationProviderConfigDocument document) {
         return switch (document.providerType()) {
-            case "ALIYUN_SMS" -> hasText(document.credentialId())
-                    && hasText(document.signName())
-                    && hasText(document.templateCode());
-            case "TENCENT_SMS" -> hasText(document.credentialId())
-                    && hasText(document.appId())
-                    && hasText(document.signName())
-                    && hasText(document.templateCode());
+            case "ALIYUN_SMS" -> StringUtils.hasText(document.credentialId())
+                    && StringUtils.hasText(document.signName())
+                    && StringUtils.hasText(document.templateCode());
+            case "TENCENT_SMS" -> StringUtils.hasText(document.credentialId())
+                    && StringUtils.hasText(document.appId())
+                    && StringUtils.hasText(document.signName())
+                    && StringUtils.hasText(document.templateCode());
             case "SMTP" -> isSmtpEndpoint(document.endpoint())
                     && document.port() > 0
-                    && hasText(document.credentialId())
-                    && hasText(document.senderAddress())
+                    && StringUtils.hasText(document.credentialId())
+                    && StringUtils.hasText(document.senderAddress())
                     && !(document.sslEnabled() && document.starttlsEnabled());
             case "HTTP_JSON" -> isHttpEndpoint(document.endpoint());
             case "MOCK" -> true;
@@ -500,10 +508,6 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     }
 
     private boolean isSmtpEndpoint(String endpoint) {
-        return hasText(endpoint) && !endpoint.contains("/") && !endpoint.contains("\\");
-    }
-
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
+        return StringUtils.hasText(endpoint) && !endpoint.contains("/") && !endpoint.contains("\\");
     }
 }

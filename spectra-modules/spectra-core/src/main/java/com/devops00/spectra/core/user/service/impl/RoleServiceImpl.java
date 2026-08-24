@@ -17,6 +17,7 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
@@ -26,6 +27,7 @@ import com.devops00.spectra.core.user.service.RoleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Locale;
@@ -51,14 +53,14 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
             var role = new SecurityRole();
             var name = normalize(params.getName());
             ensureNameAvailable(name, null);
-            var codeProvided = hasText(params.getCode());
+            var codeProvided = StringUtils.hasText(params.getCode());
             var code = codeProvided ? normalize(params.getCode()) : generatedCode();
             if (codeProvided && codeExists(code, null)) {
                 throw new DataException("角色编码已存在");
             }
             role.setCode(code);
             role.setName(name);
-            role.setState("ACTIVE");
+            role.setState(SecurityAuthorizationState.ACTIVE.name());
             role.setRoleKind("BUSINESS");
             role.setAuthorityLevel(1);
             role.setSystemManaged(false);
@@ -75,7 +77,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         }
         ensureNotSystemManaged(role);
         var code = normalize(params.getCode());
-        if (hasText(code) && !code.equals(role.getCode())) {
+        if (StringUtils.hasText(code) && !code.equals(role.getCode())) {
             throw new DataException("角色编码不可修改");
         }
         var name = normalize(params.getName());
@@ -93,10 +95,10 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     public void enable(UUID id) {
         var role = getRole(id);
         ensureNotSystemManaged(role);
-        if ("ACTIVE".equals(role.getState())) {
+        if (SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
             return;
         }
-        role.setState("ACTIVE");
+        role.setState(SecurityAuthorizationState.ACTIVE.name());
         if (getBaseMapper().updateById(role) != 1) {
             throw new DataException("启用角色失败");
         }
@@ -107,11 +109,11 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     public void disable(UUID id) {
         var role = getRole(id);
         ensureNotSystemManaged(role);
-        if ("DISABLED".equals(role.getState())) {
+        if (SecurityAuthorizationState.DISABLED.name().equals(role.getState())) {
             return;
         }
         ensureNoActiveAssignments(id, "禁用");
-        role.setState("DISABLED");
+        role.setState(SecurityAuthorizationState.DISABLED.name());
         if (getBaseMapper().updateById(role) != 1) {
             throw new DataException("禁用角色失败");
         }
@@ -131,8 +133,11 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     @Override
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
         var wrapper = new LambdaQueryWrapper<SecurityRole>()
-                .like(hasText(params.getName()), SecurityRole::getName, params.getName())
-                .eq(params.getState() != null, SecurityRole::getState, Boolean.FALSE.equals(params.getState()) ? "DISABLED" : "ACTIVE")
+                .like(StringUtils.hasText(params.getName()), SecurityRole::getName, params.getName())
+                .eq(params.getState() != null, SecurityRole::getState,
+                        Boolean.FALSE.equals(params.getState())
+                                ? SecurityAuthorizationState.DISABLED.name()
+                                : SecurityAuthorizationState.ACTIVE.name())
                 .orderByDesc(true, SecurityRole::getSystemManaged)
                 .orderByDesc(true, SecurityRole::getAuthorityLevel)
                 .orderByAsc(true, SecurityRole::getState)
@@ -145,7 +150,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     @Override
     public List<RoleVO> all() {
         return getBaseMapper().selectList(new LambdaQueryWrapper<SecurityRole>()
-                .eq(SecurityRole::getState, "ACTIVE")
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name())
                 .orderByAsc(true, SecurityRole::getId))
                 .stream()
                 .map(this::toVO)
@@ -162,7 +167,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     public SecurityRole getSystemDefaultUserRole() {
         return getBaseMapper().selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, "ROLE_USER")
-                .eq(SecurityRole::getState, "ACTIVE"));
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()));
     }
 
     private RoleVO toVO(SecurityRole role) {
@@ -170,7 +175,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         vo.setId(role.getId());
         vo.setName(role.getName());
         vo.setCode(role.getCode());
-        vo.setState("ACTIVE".equals(role.getState()));
+        vo.setState(SecurityAuthorizationState.ACTIVE.name().equals(role.getState()));
         vo.setBuiltin(Boolean.TRUE.equals(role.getSystemManaged()));
         vo.setRemark(role.getRemark());
         vo.setAuthorityLevel(role.getAuthorityLevel());
@@ -227,12 +232,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     private void ensureNoActiveAssignments(UUID roleId, String operation) {
         if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getRoleId, roleId)
-                .eq(RoleAssignment::getState, "ACTIVE")) > 0) {
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())) > 0) {
             throw new DataException("角色仍有有效授权实例，不可" + operation);
         }
     }
 
-    private boolean hasText(String value) {
-        return value != null && !value.isBlank();
-    }
 }

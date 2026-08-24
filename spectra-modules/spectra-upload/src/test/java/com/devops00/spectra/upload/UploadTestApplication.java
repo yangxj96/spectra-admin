@@ -17,6 +17,10 @@
 package com.devops00.spectra.upload;
 
 import com.devops00.spectra.core.CoreModule;
+import com.devops00.spectra.common.notification.NotificationAudienceDirectory;
+import com.devops00.spectra.common.notification.NotificationRecipient;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
@@ -24,6 +28,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -75,5 +81,39 @@ public class UploadTestApplication {
         return userId -> {
             // 测试应用不连接安全会话存储。
         };
+    }
+
+    /**
+     * 上传模块测试不加载 Core，因此为自动装配的通知模块提供空的 Core 端口实现。
+     */
+    @Bean
+    NotificationRecipientDirectory notificationRecipientDirectory() {
+        return new NotificationRecipientDirectory() {
+            @Override
+            public List<NotificationRecipient> resolve(List<UUID> userIds) {
+                return List.of();
+            }
+
+            @Override
+            public List<NotificationRecipient> resolveByLoginNames(List<String> loginNames) {
+                return List.of();
+            }
+        };
+    }
+
+    /**
+     * 上传模块测试不覆盖受控通知发送，受众展开端口返回空结果即可。
+     */
+    @Bean
+    NotificationAudienceDirectory notificationAudienceDirectory() {
+        return audience -> List.of();
+    }
+
+    /**
+     * 上传模块测试不加载 Core 的数据库配置实现，通知 Provider 配置读取统一视为空值。
+     */
+    @Bean
+    SystemConfigValueProvider systemConfigValueProvider() {
+        return key -> Optional.empty();
     }
 }

@@ -21,6 +21,10 @@ import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertEvent
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorAlertRule;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertMetric;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertEventState;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertOperator;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertSeverity;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDependencyStatus;
 import com.devops00.spectra.core.system.javabean.from.ServiceMonitorAlertRuleFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorAlertEventVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorAlertRuleVO;
@@ -43,6 +47,7 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /** 服务监控告警规则与事件服务实现。 */
@@ -51,8 +56,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertService {
 
-    private static final String ACTIVE = "ACTIVE";
-    private static final String RECOVERED = "RECOVERED";
+    private static final String ACTIVE = ServiceMonitorAlertEventState.ACTIVE.name();
+    private static final String RECOVERED = ServiceMonitorAlertEventState.RECOVERED.name();
     private static final String ROLE_DEV_OPS = "ROLE_DEV_OPS";
 
     private final ServiceMonitorAlertRuleMapper ruleMapper;
@@ -155,20 +160,21 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     }
 
     private static String normalizeDependencyStatus(String status) {
-        return status == null || status.isBlank() ? "UNKNOWN" : status;
+        return status == null || status.isBlank() ? ServiceMonitorDependencyStatus.UNKNOWN.name() : status;
     }
 
     private static boolean compare(double value, Double threshold, String operator) {
         if (threshold == null) {
             return false;
         }
-        return switch (operator == null ? "GTE" : operator.toUpperCase()) {
-            case "GT" -> value > threshold;
-            case "LTE" -> value <= threshold;
-            case "LT" -> value < threshold;
-            case "EQ" -> value == threshold;
-            case "NE" -> value != threshold;
-            default -> value >= threshold;
+        var parsedOperator = parseOperator(operator, ServiceMonitorAlertOperator.GTE);
+        return switch (parsedOperator == null ? ServiceMonitorAlertOperator.GTE : parsedOperator) {
+            case GT -> value > threshold;
+            case LTE -> value <= threshold;
+            case LT -> value < threshold;
+            case EQ -> value == threshold;
+            case NE -> value != threshold;
+            case GTE -> value >= threshold;
         };
     }
 
@@ -177,8 +183,21 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             return false;
         }
         var same = expected.equalsIgnoreCase(value);
-        var normalizedOperator = operator == null ? "EQ" : operator;
-        return "NE".equalsIgnoreCase(normalizedOperator) ? !same : "EQ".equalsIgnoreCase(normalizedOperator) && same;
+        var parsedOperator = parseOperator(operator, ServiceMonitorAlertOperator.EQ);
+        return parsedOperator == ServiceMonitorAlertOperator.NE
+                ? !same
+                : parsedOperator == ServiceMonitorAlertOperator.EQ && same;
+    }
+
+    private static ServiceMonitorAlertOperator parseOperator(String value, ServiceMonitorAlertOperator defaultValue) {
+        if (value == null || value.isBlank()) {
+            return defaultValue;
+        }
+        try {
+            return ServiceMonitorAlertOperator.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException exception) {
+            return null;
+        }
     }
 
     private static String metricUnit(ServiceMonitorAlertMetric metric) {
@@ -348,8 +367,13 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         var metric = ServiceMonitorAlertMetric.fromCode(metricCode);
         if (metric == null)
             throw new DataException("告警指标无效");
-        var operator = from.getOperatorCode() == null ? "GTE" : from.getOperatorCode().toUpperCase();
-        if (!List.of("GTE", "GT", "LTE", "LT", "EQ", "NE").contains(operator)) {
+        if (from.getSeverity() != null
+                && !Set.of(ServiceMonitorAlertSeverity.WARNING.name(), ServiceMonitorAlertSeverity.CRITICAL.name())
+                        .contains(from.getSeverity().trim().toUpperCase())) {
+            throw new DataException("告警级别无效");
+        }
+        var operator = from.getOperatorCode() == null ? ServiceMonitorAlertOperator.GTE.name() : from.getOperatorCode().toUpperCase();
+        if (!ServiceMonitorAlertOperator.contains(operator)) {
             throw new DataException("告警比较方式无效");
         }
         if (metric.isNumeric() && from.getThresholdValue() == null) {
@@ -359,7 +383,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
             if (from.getExpectedValue() == null) {
                 throw new DataException("状态告警必须设置期望状态");
             }
-            if (!List.of("EQ", "NE").contains(operator)) {
+            if (!Set.of(ServiceMonitorAlertOperator.EQ.name(), ServiceMonitorAlertOperator.NE.name()).contains(operator)) {
                 throw new DataException("状态告警只支持等于或不等于");
             }
         }
@@ -394,8 +418,8 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .isNull(ServiceMonitorAlertEvent::getDeleted));
         return ServiceMonitorAlertSummaryVO.builder()
                 .activeCount(active.size())
-                .warningCount(active.stream().filter(item -> "WARNING".equals(item.getSeverity())).count())
-                .criticalCount(active.stream().filter(item -> "CRITICAL".equals(item.getSeverity())).count())
+                .warningCount(active.stream().filter(item -> ServiceMonitorAlertSeverity.WARNING.name().equals(item.getSeverity())).count())
+                .criticalCount(active.stream().filter(item -> ServiceMonitorAlertSeverity.CRITICAL.name().equals(item.getSeverity())).count())
                 .recoveredTodayCount(recoveredToday)
                 .build();
     }

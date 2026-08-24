@@ -47,12 +47,21 @@ class NotificationCallerMigrationContractTest {
     void shouldKeepEveryOaNotificationCallerOnShortcutServiceWithStableKey() throws Exception {
         for (var caller : CALLERS) {
             var source = readSource(caller);
+            if (source.contains("OaApplicationWorkflowSupport")) {
+                assertTrue(source.contains("workflowSupport.sendNotification("), caller);
+                assertFalse(source.contains("com.devops00.spectra.core.notification"), caller);
+                continue;
+            }
             assertTrue(source.contains("import com.devops00.spectra.common.notification.NotificationService;"), caller);
             assertTrue(source.contains("NotificationSendRequest.inApp("), caller);
             assertTrue(source.contains("NotificationTemplateCode."), caller);
             assertTrue(source.contains("\"oa:"), caller);
             assertFalse(source.contains("com.devops00.spectra.core.notification"), caller);
         }
+        var support = readSource("application/support/OaApplicationWorkflowSupport.java");
+        assertTrue(support.contains("NotificationSendRequest.inApp("));
+        assertTrue(support.contains("\"oa:"));
+        assertTrue(support.contains("businessReference("));
     }
 
     private String readSource(String relativePath) throws Exception {

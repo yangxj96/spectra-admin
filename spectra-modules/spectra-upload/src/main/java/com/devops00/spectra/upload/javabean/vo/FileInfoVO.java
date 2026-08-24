@@ -17,6 +17,7 @@
 package com.devops00.spectra.upload.javabean.vo;
 
 import com.devops00.spectra.upload.javabean.constant.UploadType;
+import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -75,7 +76,7 @@ public class FileInfoVO implements Serializable {
     /**
      * 文件状态
      */
-    private String status;
+    private FileInfoStatus status;
 
     /**
      * 创建时间

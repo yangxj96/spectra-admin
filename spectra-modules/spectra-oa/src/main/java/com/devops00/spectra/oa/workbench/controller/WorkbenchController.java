@@ -26,6 +26,7 @@ import com.devops00.spectra.oa.calendar.service.CalendarService;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
 import com.devops00.spectra.oa.meeting.service.MeetingService;
 import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
+import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import com.devops00.spectra.oa.workbench.javabean.vo.WorkbenchSummaryVO;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -97,7 +98,7 @@ public class WorkbenchController {
             var noticePage = new PageFrom();
             noticePage.setPageSize(20L);
             var noticeParams = new NoticePageFrom();
-            noticeParams.setStatus("PUBLISHED");
+            noticeParams.setStatus(NoticeStatus.PUBLISHED.getValue());
             var notices = noticeService.page(noticePage, noticeParams);
             result.setNotices(notices.getRecords());
             result.setUnreadNoticeCount(notices.getRecords().stream().filter(notice -> !Boolean.TRUE.equals(notice.getRead())).count());

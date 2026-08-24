@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorDiagnosticTask;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDiagnosticType;
+import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDiagnosticTaskStatus;
 import com.devops00.spectra.core.system.javabean.from.ServiceMonitorDiagnosticFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorDiagnosticTaskVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorRuntimeDiagnosticVO;
@@ -58,11 +59,11 @@ import com.sun.management.HotSpotDiagnosticMXBean;
 @Service
 public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagnosticService {
 
-    private static final String PENDING = "PENDING";
-    private static final String RUNNING = "RUNNING";
-    private static final String SUCCEEDED = "SUCCEEDED";
-    private static final String FAILED = "FAILED";
-    private static final String EXPIRED = "EXPIRED";
+    private static final String PENDING = ServiceMonitorDiagnosticTaskStatus.PENDING.name();
+    private static final String RUNNING = ServiceMonitorDiagnosticTaskStatus.RUNNING.name();
+    private static final String SUCCEEDED = ServiceMonitorDiagnosticTaskStatus.SUCCEEDED.name();
+    private static final String FAILED = ServiceMonitorDiagnosticTaskStatus.FAILED.name();
+    private static final String EXPIRED = ServiceMonitorDiagnosticTaskStatus.EXPIRED.name();
 
     private final MeterRegistry meterRegistry;
     private final DataSource dataSource;

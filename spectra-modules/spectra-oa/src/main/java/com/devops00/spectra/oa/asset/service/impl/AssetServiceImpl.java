@@ -9,6 +9,9 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.asset.javabean.converter.AssetConverter;
+import com.devops00.spectra.oa.asset.javabean.constant.AssetOperationStatus;
+import com.devops00.spectra.oa.asset.javabean.constant.AssetOperationType;
+import com.devops00.spectra.oa.asset.javabean.constant.AssetStatus;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetCategory;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetOperation;
@@ -50,18 +53,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implements AssetService {
-
-    private static final String STATUS_DRAFT = "DRAFT";
-    private static final String STATUS_IN_STOCK = "IN_STOCK";
-    private static final String STATUS_IN_USE = "IN_USE";
-    private static final String STATUS_MAINTENANCE = "MAINTENANCE";
-    private static final String STATUS_SCRAPPED = "SCRAPPED";
-    private static final String OP_INBOUND = "INBOUND";
-    private static final String OP_ASSIGN = "ASSIGN";
-    private static final String OP_RETURN = "RETURN";
-    private static final String OP_TRANSFER = "TRANSFER";
-    private static final String OP_MAINTENANCE = "MAINTENANCE";
-    private static final String OP_SCRAP = "SCRAP";
 
     private final AssetCategoryMapper categoryMapper;
     private final AssetOperationMapper operationMapper;
@@ -183,12 +174,12 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     public void assign(UUID id, AssetOperationFrom from) {
         var entity = require(id);
         ensureOperable(entity);
-        if (STATUS_IN_USE.equals(entity.getStatus())
+        if (AssetStatus.IN_USE.getValue().equals(entity.getStatus())
                 && entity.getCustodianId() != null
                 && (from == null || from.getToUserId() == null || !Objects.equals(entity.getCustodianId(), from.getToUserId()))) {
             throw new DataSaveException("资产已被其他人员领用");
         }
-        var operation = operation(entity, OP_ASSIGN, from);
+        var operation = operation(entity, AssetOperationType.ASSIGN.getValue(), from);
         operation.setToDepartmentId(from == null || from.getToDepartmentId() == null ? entity.getDepartmentId() : from.getToDepartmentId());
         var targetUserId = from == null || from.getToUserId() == null ? securityContextAccessor.currentUserId() : from.getToUserId();
         if (targetUserId == null) {
@@ -199,7 +190,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         entity.setDepartmentId(operation.getToDepartmentId());
         entity.setCustodianId(operation.getToUserId());
         entity.setLocation(operation.getToLocation());
-        entity.setStatus(STATUS_IN_USE);
+        entity.setStatus(AssetStatus.IN_USE.getValue());
         saveOperation(entity, operation);
     }
 
@@ -208,8 +199,8 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     public void returnAsset(UUID id, AssetOperationFrom from) {
         var entity = require(id);
         ensureOperable(entity);
-        var operation = operation(entity, OP_RETURN, from);
-        entity.setStatus(STATUS_IN_STOCK);
+        var operation = operation(entity, AssetOperationType.RETURN.getValue(), from);
+        entity.setStatus(AssetStatus.IN_STOCK.getValue());
         entity.setCustodianId(null);
         operation.setToDepartmentId(entity.getDepartmentId());
         operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation()) ? entity.getLocation() : from.getToLocation());
@@ -222,15 +213,15 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     public void transfer(UUID id, AssetOperationFrom from) {
         var entity = require(id);
         ensureOperable(entity);
-        var operation = operation(entity, OP_TRANSFER, from);
+        var operation = operation(entity, AssetOperationType.TRANSFER.getValue(), from);
         operation.setToDepartmentId(from == null || from.getToDepartmentId() == null ? entity.getDepartmentId() : from.getToDepartmentId());
         operation.setToUserId(from == null || from.getToUserId() == null ? entity.getCustodianId() : from.getToUserId());
         operation.setToLocation(from == null || !StringUtils.hasText(from.getToLocation()) ? entity.getLocation() : from.getToLocation());
         entity.setDepartmentId(operation.getToDepartmentId());
         entity.setCustodianId(operation.getToUserId());
         entity.setLocation(operation.getToLocation());
-        if (STATUS_DRAFT.equals(entity.getStatus())) {
-            entity.setStatus(STATUS_IN_STOCK);
+        if (AssetStatus.DRAFT.getValue().equals(entity.getStatus())) {
+            entity.setStatus(AssetStatus.IN_STOCK.getValue());
         }
         saveOperation(entity, operation);
     }
@@ -240,13 +231,15 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     public void maintenance(UUID id, AssetOperationFrom from) {
         var entity = require(id);
         ensureOperable(entity);
-        var operation = operation(entity, OP_MAINTENANCE, from);
+        var operation = operation(entity, AssetOperationType.MAINTENANCE.getValue(), from);
         operation.setMaintenanceContent(from == null ? null : from.getMaintenanceContent());
         operation.setMaintenanceCost(from == null ? null : from.getMaintenanceCost());
-        operation.setStatus(from != null && "COMPLETE".equalsIgnoreCase(from.getStatus()) ? "COMPLETE" : "STARTED");
-        entity.setStatus("COMPLETE".equalsIgnoreCase(operation.getStatus())
-                ? entity.getCustodianId() == null ? STATUS_IN_STOCK : STATUS_IN_USE
-                : STATUS_MAINTENANCE);
+        operation.setStatus(from != null && AssetOperationStatus.COMPLETE.getValue().equalsIgnoreCase(from.getStatus())
+                ? AssetOperationStatus.COMPLETE.getValue()
+                : AssetOperationStatus.STARTED.getValue());
+        entity.setStatus(AssetOperationStatus.COMPLETE.getValue().equalsIgnoreCase(operation.getStatus())
+                ? entity.getCustodianId() == null ? AssetStatus.IN_STOCK.getValue() : AssetStatus.IN_USE.getValue()
+                : AssetStatus.MAINTENANCE.getValue());
         saveOperation(entity, operation);
     }
 
@@ -254,11 +247,11 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     @Transactional
     public void scrap(UUID id, AssetOperationFrom from) {
         var entity = require(id);
-        if (STATUS_SCRAPPED.equals(entity.getStatus())) {
+        if (AssetStatus.SCRAPPED.getValue().equals(entity.getStatus())) {
             throw new DataSaveException("资产已经报废");
         }
-        var operation = operation(entity, OP_SCRAP, from);
-        entity.setStatus(STATUS_SCRAPPED);
+        var operation = operation(entity, AssetOperationType.SCRAP.getValue(), from);
+        entity.setStatus(AssetStatus.SCRAPPED.getValue());
         entity.setCustodianId(null);
         saveOperation(entity, operation);
     }
@@ -299,7 +292,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             entity.setName(purchaseItem.getItemName());
             entity.setSpecification(purchaseItem.getSpecification());
             entity.setAssetType("FIXED");
-            entity.setStatus(STATUS_DRAFT);
+            entity.setStatus(AssetStatus.DRAFT.getValue());
             entity.setQuantity(receiptItem.getQuantity() == null ? BigDecimal.ONE : receiptItem.getQuantity());
             entity.setAcquisitionDate(receipt.getReceivedDate());
             entity.setAcquisitionAmount(purchaseItem.getEstimatedUnitPrice() == null
@@ -325,7 +318,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
             entity.setAssetType("FIXED");
         }
         if (!StringUtils.hasText(entity.getStatus())) {
-            entity.setStatus(STATUS_DRAFT);
+            entity.setStatus(AssetStatus.DRAFT.getValue());
         }
         if (entity.getQuantity() == null) {
             entity.setQuantity(BigDecimal.ONE);
@@ -360,7 +353,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     }
 
     private void ensureOperable(Asset entity) {
-        if (STATUS_SCRAPPED.equals(entity.getStatus())) {
+        if (AssetStatus.SCRAPPED.getValue().equals(entity.getStatus())) {
             throw new DataSaveException("已报废资产不能继续操作");
         }
     }
@@ -374,7 +367,7 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         operation.setFromLocation(entity.getLocation());
         operation.setOperationDate(from == null || from.getOperationDate() == null ? Instant.now() : timeMapper.toInstant(from.getOperationDate()));
         operation.setReason(from == null ? null : from.getReason());
-        operation.setStatus("COMPLETE");
+        operation.setStatus(AssetOperationStatus.COMPLETE.getValue());
         return operation;
     }
 
@@ -387,11 +380,11 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
     private void saveInboundOperation(Asset entity, PurchaseReceipt receipt) {
         var operation = new AssetOperation();
         operation.setAssetId(entity.getId());
-        operation.setOperationType(OP_INBOUND);
+        operation.setOperationType(AssetOperationType.INBOUND.getValue());
         operation.setToDepartmentId(entity.getDepartmentId());
         operation.setOperationDate(receipt.getReceivedDate() == null ? Instant.now() : receipt.getReceivedDate());
         operation.setReason("采购收货单 " + receipt.getReceiptNo());
-        operation.setStatus("COMPLETE");
+        operation.setStatus(AssetOperationStatus.COMPLETE.getValue());
         if (operationMapper.insert(operation) != 1) {
             throw new DataSaveException("保存资产入库记录失败");
         }

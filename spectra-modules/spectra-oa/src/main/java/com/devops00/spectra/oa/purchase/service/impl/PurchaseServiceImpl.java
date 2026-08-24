@@ -23,10 +23,6 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.NotificationPurpose;
-import com.devops00.spectra.common.notification.NotificationSendRequest;
-import com.devops00.spectra.common.notification.NotificationService;
-import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.javabean.entity.Application;
@@ -34,7 +30,10 @@ import com.devops00.spectra.oa.application.javabean.entity.ApplicationType;
 import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
+import com.devops00.spectra.oa.application.support.OaApplicationWorkflowSupport;
 import com.devops00.spectra.oa.purchase.javabean.converter.PurchaseConverter;
+import com.devops00.spectra.oa.purchase.javabean.constant.PurchaseExecutionStatus;
+import com.devops00.spectra.oa.purchase.javabean.constant.PurchaseReceiptStatus;
 import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseItem;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;
@@ -74,13 +73,6 @@ import java.util.stream.Collectors;
 public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchase> implements PurchaseService {
 
     private static final String TYPE_CODE = "purchase";
-    private static final String EXECUTION_NOT_STARTED = "NOT_STARTED";
-    private static final String EXECUTION_ORDERED = "ORDERED";
-    private static final String EXECUTION_PARTIAL_RECEIVED = "PARTIAL_RECEIVED";
-    private static final String EXECUTION_RECEIVED = "RECEIVED";
-    private static final String RECEIPT_PARTIAL = "PARTIAL";
-    private static final String RECEIPT_DIFFERENCE = "DIFFERENCE";
-    private static final String RECEIPT_COMPLETE = "COMPLETE";
 
     private final PurchaseItemMapper itemMapper;
     private final PurchaseReceiptMapper receiptMapper;
@@ -90,7 +82,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     private final ApplicationTypeMapper applicationTypeMapper;
     private final ApplicationService applicationService;
     private final ProcessInstanceService processInstanceService;
-    private final NotificationService notificationService;
+    private final OaApplicationWorkflowSupport workflowSupport;
     private final PurchaseConverter purchaseConverter;
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -143,7 +135,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         var entity = purchaseConverter.toEntity(from);
         entity.setApplicationId(application.getId());
         entity.setDepartmentId(application.getDepartmentId());
-        entity.setExecutionStatus(EXECUTION_NOT_STARTED);
+        entity.setExecutionStatus(PurchaseExecutionStatus.NOT_STARTED.getValue());
         entity.setBudgetAmount(from.getBudgetAmount().setScale(2, RoundingMode.HALF_UP));
         entity.setCurrency(StringUtils.hasText(from.getCurrency()) ? from.getCurrency().toUpperCase() : "CNY");
         if (!this.save(entity)) {
@@ -202,19 +194,19 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     @Transactional
     public void withdraw(UUID id) {
         var entity = require(id);
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "采购申请不存在或无权操作");
         applicationService.withdraw(application.getId());
-        terminateProcess(application);
+        workflowSupport.terminateProcess(application, "OA 采购申请已撤回或取消");
     }
 
     @Override
     @Transactional
     public void cancel(UUID id) {
         var entity = require(id);
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "采购申请不存在或无权操作");
         applicationService.cancel(application.getId());
-        terminateProcess(application);
-        entity.setExecutionStatus("CANCELLED");
+        workflowSupport.terminateProcess(application, "OA 采购申请已撤回或取消");
+        entity.setExecutionStatus(PurchaseExecutionStatus.CANCELLED.getValue());
         this.updateById(entity);
     }
 
@@ -226,7 +218,7 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (!ApplicationStatus.APPROVED.name().equals(application.getStatus())) {
             throw new DataSaveException("只有审批通过的采购申请可以执行");
         }
-        if (EXECUTION_RECEIVED.equals(entity.getExecutionStatus())) {
+        if (PurchaseExecutionStatus.RECEIVED.getValue().equals(entity.getExecutionStatus())) {
             throw new DataSaveException("采购申请已完成收货");
         }
         var currentUserId = securityContextAccessor.currentUserId();
@@ -234,21 +226,26 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (purchaserId == null) {
             throw new DataSaveException("采购执行人不能为空");
         }
-        var status = from == null || !StringUtils.hasText(from.getExecutionStatus()) ? EXECUTION_ORDERED : from.getExecutionStatus();
-        if (!EXECUTION_ORDERED.equals(status) && !EXECUTION_PARTIAL_RECEIVED.equals(status)) {
+        var status = from == null || !StringUtils.hasText(from.getExecutionStatus())
+                ? PurchaseExecutionStatus.ORDERED.getValue()
+                : from.getExecutionStatus();
+        if (!PurchaseExecutionStatus.ORDERED.getValue().equals(status)
+                && !PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue().equals(status)) {
             throw new DataSaveException("采购执行状态不合法");
         }
         entity.setPurchaserId(purchaserId);
         if (StringUtils.hasText(from == null ? null : from.getOrderNo())) {
             entity.setOrderNo(from.getOrderNo());
         }
-        entity.setExecutionStatus(EXECUTION_PARTIAL_RECEIVED.equals(entity.getExecutionStatus()) ? EXECUTION_PARTIAL_RECEIVED : status);
+        entity.setExecutionStatus(PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue().equals(entity.getExecutionStatus())
+                ? PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue()
+                : status);
         entity.setOrderedAt(entity.getOrderedAt() == null ? Instant.now() : entity.getOrderedAt());
         entity.setExecutionRemark(from == null ? null : from.getExecutionRemark());
         if (!this.updateById(entity)) {
             throw new DataSaveException("登记采购执行失败");
         }
-        sendNotification(application, "采购申请已进入执行", "采购申请已审批通过并进入采购执行环节");
+        workflowSupport.sendNotification(application, "purchase", "采购申请已进入执行", "采购申请已审批通过并进入采购执行环节");
     }
 
     @Override
@@ -259,7 +256,8 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         if (!ApplicationStatus.APPROVED.name().equals(application.getStatus())) {
             throw new DataSaveException("只有审批通过的采购申请可以收货");
         }
-        if (EXECUTION_RECEIVED.equals(entity.getExecutionStatus()) || "CANCELLED".equals(entity.getExecutionStatus())) {
+        if (PurchaseExecutionStatus.RECEIVED.getValue().equals(entity.getExecutionStatus())
+                || PurchaseExecutionStatus.CANCELLED.getValue().equals(entity.getExecutionStatus())) {
             throw new DataSaveException("当前采购状态不允许收货");
         }
         var receiverId = from.getReceiverId() == null ? securityContextAccessor.currentUserId() : from.getReceiverId();
@@ -305,7 +303,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         receipt.setReceiptNo(StringUtils.hasText(from.getReceiptNo()) ? from.getReceiptNo() : "GR" + Instant.now().toEpochMilli());
         receipt.setReceivedDate(timeMapper.toInstant(from.getReceivedDate()));
         receipt.setReceiverId(receiverId);
-        receipt.setStatus(hasDifference ? RECEIPT_DIFFERENCE : allReceived ? RECEIPT_COMPLETE : RECEIPT_PARTIAL);
+        receipt.setStatus(hasDifference
+                ? PurchaseReceiptStatus.DIFFERENCE.getValue()
+                : allReceived ? PurchaseReceiptStatus.COMPLETE.getValue() : PurchaseReceiptStatus.PARTIAL.getValue());
         receipt.setRemark(from.getRemark());
         if (receiptMapper.insert(receipt) != 1) {
             throw new DataSaveException("保存采购收货单失败");
@@ -325,47 +325,50 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 throw new DataSaveException("更新采购收货数量失败");
             }
         }
-        entity.setExecutionStatus(allReceived ? EXECUTION_RECEIVED : EXECUTION_PARTIAL_RECEIVED);
+        entity.setExecutionStatus(allReceived
+                ? PurchaseExecutionStatus.RECEIVED.getValue()
+                : PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue());
         if (allReceived) {
             entity.setCompletedAt(Instant.now());
         }
         if (!this.updateById(entity)) {
             throw new DataSaveException("更新采购执行状态失败");
         }
-        sendNotification(application, allReceived ? "采购已全部收货" : "采购已部分收货", allReceived ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
+        workflowSupport.sendNotification(application, "purchase", allReceived ? "采购已全部收货" : "采购已部分收货",
+                allReceived ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
     }
 
     @Override
     @Transactional
     public void onApproved(String businessKey, Map<String, Object> variables) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
         var entity = require(application.getBizId());
         applicationService.updateStatus(application.getId(), ApplicationStatus.APPROVED.name(), null);
-        if (!EXECUTION_NOT_STARTED.equals(entity.getExecutionStatus())) {
-            entity.setExecutionStatus(EXECUTION_NOT_STARTED);
+        if (!PurchaseExecutionStatus.NOT_STARTED.getValue().equals(entity.getExecutionStatus())) {
+            entity.setExecutionStatus(PurchaseExecutionStatus.NOT_STARTED.getValue());
             this.updateById(entity);
         }
-        sendNotification(application, "采购申请已通过", "您的采购申请已审批通过，请安排采购执行");
+        workflowSupport.sendNotification(application, "purchase", "采购申请已通过", "您的采购申请已审批通过，请安排采购执行");
     }
 
     @Override
     @Transactional
     public void onRejected(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (!ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             return;
         }
         applicationService.updateStatus(application.getId(), ApplicationStatus.REJECTED.name(), reason);
-        sendNotification(application, "采购申请已驳回", StringUtils.hasText(reason) ? reason : "采购申请未通过审批");
+        workflowSupport.sendNotification(application, "purchase", "采购申请已驳回", StringUtils.hasText(reason) ? reason : "采购申请未通过审批");
     }
 
     @Override
     @Transactional
     public void onTerminated(String businessKey, String reason) {
-        var application = requireApplication(businessKey);
+        var application = workflowSupport.requireApplication(businessKey);
         if (ApplicationStatus.IN_REVIEW.name().equals(application.getStatus())) {
             applicationService.updateStatus(application.getId(), ApplicationStatus.CANCELLED.name(), reason);
         }
@@ -444,43 +447,11 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     }
 
     private Application requireEditableApplication(Purchase entity) {
-        var application = requireApplicantApplication(entity);
+        var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "采购申请不存在或无权操作");
         if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
             throw new DataSaveException("当前状态不允许修改或提交采购申请");
         }
         return application;
     }
 
-    private Application requireApplicantApplication(Purchase entity) {
-        var application = applicationService.require(entity.getApplicationId());
-        if (!Objects.equals(application.getApplicantId(), securityContextAccessor.currentUserId())) {
-            throw new DataNotExistException("采购申请不存在或无权操作");
-        }
-        return application;
-    }
-
-    private Application requireApplication(String businessKey) {
-        try {
-            return applicationService.require(UUID.fromString(businessKey));
-        } catch (IllegalArgumentException exception) {
-            throw new DataNotExistException("审批业务KEY无效: " + businessKey);
-        }
-    }
-
-    private void terminateProcess(Application application) {
-        if (StringUtils.hasText(application.getProcessInstanceId())) {
-            processInstanceService.terminate(application.getProcessInstanceId(), "OA 采购申请已撤回或取消");
-        }
-    }
-
-    private void sendNotification(Application application, String title, String content) {
-        notificationService.send(NotificationSendRequest.inApp("oa:purchase:" + application.getBizId() + ":" + title,
-                NotificationPurpose.OA_NOTICE, List.of(application.getApplicantId()), NotificationTemplateCode.OA_APPLICATION_STATUS)
-                .parameter("title", title)
-                .parameter("content", content)
-                .businessReference("OA_PURCHASE", application.getBizId().toString())
-                .sourceModule("OA")
-                .link("/oa/purchase/" + application.getBizId())
-                .build());
-    }
 }

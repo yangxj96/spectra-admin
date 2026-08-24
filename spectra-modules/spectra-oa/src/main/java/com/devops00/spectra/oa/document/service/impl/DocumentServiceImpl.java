@@ -31,6 +31,7 @@ import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.oa.document.javabean.converter.DocumentConverter;
+import com.devops00.spectra.oa.document.javabean.constant.DocumentStatus;
 import com.devops00.spectra.oa.document.javabean.entity.Document;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentFolder;
 import com.devops00.spectra.oa.document.javabean.entity.DocumentVersion;
@@ -48,6 +49,7 @@ import com.devops00.spectra.oa.document.service.DocumentService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.service.FileInfoService;
+import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
 import com.devops00.spectra.upload.service.impl.FileUploadFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,9 +74,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Document> implements DocumentService {
 
-    private static final String STATUS_DRAFT = "DRAFT";
-    private static final String STATUS_PUBLISHED = "PUBLISHED";
-    private static final String STATUS_ARCHIVED = "ARCHIVED";
     private static final String VISIBILITY_PUBLIC = "PUBLIC";
     private static final String VISIBILITY_DEPARTMENT = "DEPARTMENT";
     private static final String VISIBILITY_PRIVATE = "PRIVATE";
@@ -132,7 +131,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         var entity = documentConverter.toEntity(from);
         entity.setTitle(from.getTitle().trim());
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
-        entity.setStatus(STATUS_DRAFT);
+        entity.setStatus(DocumentStatus.DRAFT.getValue());
         entity.setOwnerId(user.getId());
         entity.setDepartmentId(user.getDepartmentId());
         if (!save(entity)) {
@@ -158,7 +157,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     public UUID addVersion(UUID id, DocumentVersionFrom from) {
         var document = requireOwner(id);
         FileInfo file = fileInfoService.getById(from.getFileId());
-        if (file == null || !"ACTIVE".equals(file.getStatus())) {
+        if (file == null || !FileInfoStatus.ACTIVE.equals(file.getStatus())) {
             throw new DataNotExistException("文件不存在或已失效");
         }
         var latest = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
@@ -194,14 +193,14 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public void publish(UUID id) {
         var document = requireOwner(id);
-        if (STATUS_ARCHIVED.equals(document.getStatus())) {
+        if (DocumentStatus.ARCHIVED.getValue().equals(document.getStatus())) {
             throw new DataSaveException("已归档文档不能再次发布");
         }
         var current = currentVersion(document.getId());
         if (current == null) {
             throw new DataSaveException("文档必须先上传一个版本");
         }
-        document.setStatus(STATUS_PUBLISHED);
+        document.setStatus(DocumentStatus.PUBLISHED.getValue());
         document.setPublishedAt(Instant.now());
         if (!updateById(document)) {
             throw new DataSaveException("发布文档失败");
@@ -213,10 +212,10 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public void archive(UUID id) {
         var document = requireOwner(id);
-        if (STATUS_ARCHIVED.equals(document.getStatus())) {
+        if (DocumentStatus.ARCHIVED.getValue().equals(document.getStatus())) {
             throw new DataSaveException("文档已经归档");
         }
-        document.setStatus(STATUS_ARCHIVED);
+        document.setStatus(DocumentStatus.ARCHIVED.getValue());
         if (!updateById(document)) {
             throw new DataSaveException("归档文档失败");
         }

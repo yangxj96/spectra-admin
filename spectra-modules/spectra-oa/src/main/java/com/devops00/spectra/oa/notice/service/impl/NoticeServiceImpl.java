@@ -31,6 +31,7 @@ import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.notice.javabean.converter.NoticeConverter;
+import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
 import com.devops00.spectra.oa.notice.javabean.entity.Notice;
 import com.devops00.spectra.oa.notice.javabean.entity.NoticeReader;
 import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
@@ -79,8 +80,8 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         var wrapper = new LambdaQueryWrapper<Notice>();
         wrapper.and(q -> q.eq(Notice::getPublisherId, userId)
                 .or()
-                .eq(Notice::getStatus, "PUBLISHED")
-                .or(w -> w.eq(Notice::getStatus, "SCHEDULED").le(Notice::getPublishAt, Instant.now())));
+                .eq(Notice::getStatus, NoticeStatus.PUBLISHED.getValue())
+                .or(w -> w.eq(Notice::getStatus, NoticeStatus.SCHEDULED.getValue()).le(Notice::getPublishAt, Instant.now())));
         wrapper.and(q -> {
             q.eq(Notice::getTargetType, "ALL");
             if (currentUser.getDepartmentId() != null) {
@@ -125,7 +126,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
             throw new DataSaveException("部门公告必须指定目标部门");
         }
         var notice = noticeConverter.toEntity(from);
-        notice.setStatus("DRAFT");
+        notice.setStatus(NoticeStatus.DRAFT.getValue());
         notice.setTargetType(targetType);
         notice.setDepartmentId(user.getDepartmentId());
         notice.setPublisherId(userId);
@@ -142,16 +143,16 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     public void publish(UUID id) {
         var notice = require(id);
         ensurePublisher(notice);
-        if (!"DRAFT".equals(notice.getStatus()) && !"SCHEDULED".equals(notice.getStatus())) {
+        if (!NoticeStatus.DRAFT.getValue().equals(notice.getStatus()) && !NoticeStatus.SCHEDULED.getValue().equals(notice.getStatus())) {
             throw new DataSaveException("当前公告状态不允许发布");
         }
         var publishAt = notice.getPublishAt() == null ? Instant.now() : notice.getPublishAt();
-        notice.setStatus(publishAt.isAfter(Instant.now()) ? "SCHEDULED" : "PUBLISHED");
+        notice.setStatus(publishAt.isAfter(Instant.now()) ? NoticeStatus.SCHEDULED.getValue() : NoticeStatus.PUBLISHED.getValue());
         notice.setPublishAt(publishAt);
         if (!this.updateById(notice)) {
             throw new DataSaveException("发布公告失败");
         }
-        if ("PUBLISHED".equals(notice.getStatus())) {
+        if (NoticeStatus.PUBLISHED.getValue().equals(notice.getStatus())) {
             sendNotifications(notice);
         }
     }
@@ -161,10 +162,10 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     public void revoke(UUID id) {
         var notice = require(id);
         ensurePublisher(notice);
-        if (!"PUBLISHED".equals(notice.getStatus()) && !"SCHEDULED".equals(notice.getStatus())) {
+        if (!NoticeStatus.PUBLISHED.getValue().equals(notice.getStatus()) && !NoticeStatus.SCHEDULED.getValue().equals(notice.getStatus())) {
             throw new DataSaveException("当前公告状态不允许撤回");
         }
-        notice.setStatus("REVOKED");
+        notice.setStatus(NoticeStatus.REVOKED.getValue());
         if (!this.updateById(notice)) {
             throw new DataSaveException("撤回公告失败");
         }
@@ -206,7 +207,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         if (userId.equals(notice.getPublisherId())) {
             return true;
         }
-        if (!"PUBLISHED".equals(notice.getStatus()) && !"SCHEDULED".equals(notice.getStatus())) {
+        if (!NoticeStatus.PUBLISHED.getValue().equals(notice.getStatus()) && !NoticeStatus.SCHEDULED.getValue().equals(notice.getStatus())) {
             return false;
         }
         if (notice.getPublishAt() != null && notice.getPublishAt().isAfter(Instant.now())) {
@@ -247,9 +248,11 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
     private void activateDueNotices(List<Notice> notices) {
         var now = Instant.now();
         notices.stream()
-                .filter(notice -> "SCHEDULED".equals(notice.getStatus()) && notice.getPublishAt() != null && !notice.getPublishAt().isAfter(now))
+                .filter(notice -> NoticeStatus.SCHEDULED.getValue().equals(notice.getStatus())
+                        && notice.getPublishAt() != null
+                        && !notice.getPublishAt().isAfter(now))
                 .forEach(notice -> {
-                    notice.setStatus("PUBLISHED");
+                    notice.setStatus(NoticeStatus.PUBLISHED.getValue());
                     if (this.updateById(notice)) {
                         sendNotifications(notice);
                     }

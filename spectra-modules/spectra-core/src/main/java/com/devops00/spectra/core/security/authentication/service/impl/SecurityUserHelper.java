@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.core.security.authentication.javabean.converter.AuthConverter;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.javabean.entity.PasswordCredential;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -61,7 +62,8 @@ public class SecurityUserHelper {
         if (loginType == null || identity == null || credential == null || !(user instanceof User u)) {
             throw new LoginException("账号当前不可用");
         }
-        if (!loginType.name().equals(identity.getMethodCode()) || !"ACTIVE".equals(identity.getState())) {
+        if (!loginType.name().equals(identity.getMethodCode())
+                || !AuthenticationIdentityState.ACTIVE.name().equals(identity.getState())) {
             throw new LoginException("账号当前不可用");
         }
         if (credential.getExpiresAt() != null && !credential.getExpiresAt().isAfter(Instant.now())) {

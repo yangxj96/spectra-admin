@@ -22,6 +22,8 @@ import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.FileUploadException;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
+import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
+import com.devops00.spectra.upload.javabean.constant.UploadTaskStatus;
 import com.devops00.spectra.upload.javabean.entity.FileInfo;
 import com.devops00.spectra.upload.javabean.entity.FileUploadChunk;
 import com.devops00.spectra.upload.javabean.entity.FileUploadTask;
@@ -149,7 +151,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         task.setChunkSize(chunkSize);
         task.setTotalChunks(totalChunks);
         task.setStorageType(UploadType.LOCAL);
-        task.setStatus("INIT");
+        task.setStatus(UploadTaskStatus.INIT);
 
         taskService.save(task);
 
@@ -185,13 +187,13 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         fileInfo.setSize(file.getSize());
         fileInfo.setHash(from.getHash());
         fileInfo.setStorageType(UploadType.LOCAL);
-        fileInfo.setStatus("ACTIVE");
+        fileInfo.setStatus(FileInfoStatus.ACTIVE);
 
         infoService.save(fileInfo);
 
         // 把task表对应的记录结果修改下
         FileUploadTask task = taskService.findByUploadId(from.getUploadId());
-        task.setStatus("DONE");
+        task.setStatus(UploadTaskStatus.DONE);
         taskService.updateById(task);
 
         FileUploadVO vo = new FileUploadVO();
@@ -279,11 +281,11 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             fileInfo.setSize(task.getSize());
             fileInfo.setHash(task.getHash());
             fileInfo.setStorageType(UploadType.LOCAL);
-            fileInfo.setStatus("ACTIVE");
+            fileInfo.setStatus(FileInfoStatus.ACTIVE);
 
             infoService.save(fileInfo);
 
-            task.setStatus("DONE");
+            task.setStatus(UploadTaskStatus.DONE);
             task.setFileId(fileInfo.getId());
             taskService.updateById(task);
 

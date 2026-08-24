@@ -20,6 +20,7 @@ import com.devops00.spectra.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;
+import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.security.base.constant.LoginType;
@@ -42,7 +43,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class AuthenticationIdentityBindingServiceImpl implements AuthenticationIdentityBindingService {
 
-    private static final String STATE_ACTIVE = "ACTIVE";
+    private static final String STATE_ACTIVE = AuthenticationIdentityState.ACTIVE.name();
 
     private final @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate;
 

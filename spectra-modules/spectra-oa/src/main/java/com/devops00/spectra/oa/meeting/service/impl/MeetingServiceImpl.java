@@ -34,6 +34,7 @@ import com.devops00.spectra.oa.meeting.javabean.entity.Meeting;
 import com.devops00.spectra.oa.meeting.javabean.entity.MeetingParticipant;
 import com.devops00.spectra.oa.meeting.javabean.entity.MeetingRecord;
 import com.devops00.spectra.oa.meeting.javabean.constant.MeetingStatus;
+import com.devops00.spectra.oa.meeting.javabean.constant.MeetingParticipantStatus;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
@@ -99,7 +100,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
             throw new DataSaveException("保存会议失败");
         }
         var receivers = new ArrayList<UUID>();
-        addParticipant(entity, userId, "host", user.getDepartmentId(), "accepted");
+        addParticipant(entity, userId, "host", user.getDepartmentId(), MeetingParticipantStatus.ACCEPTED.getValue());
         receivers.add(userId);
         if (from.getParticipants() != null) {
             for (var fromParticipant : from.getParticipants()) {
@@ -115,7 +116,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                     continue;
                 }
                 addParticipant(entity, participantId, StringUtils.hasText(fromParticipant.getRole()) ? fromParticipant.getRole() : "attendee",
-                        participant.getDepartmentId(), "pending");
+                        participant.getDepartmentId(), MeetingParticipantStatus.PENDING.getValue());
                 receivers.add(participantId);
             }
         }
@@ -158,7 +159,10 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (participant == null) {
             throw new DataNotExistException("您不是该会议参与人");
         }
-        if (!List.of("accepted", "declined", "pending").contains(from.getStatus())) {
+        if (!List
+                .of(MeetingParticipantStatus.ACCEPTED.getValue(), MeetingParticipantStatus.DECLINED.getValue(),
+                        MeetingParticipantStatus.PENDING.getValue())
+                .contains(from.getStatus())) {
             throw new DataSaveException("会议响应状态不正确");
         }
         participant.setStatus(from.getStatus());
@@ -177,7 +181,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         if (participant == null) {
             throw new DataNotExistException("您不是该会议参与人");
         }
-        participant.setStatus("checked_in");
+        participant.setStatus(MeetingParticipantStatus.CHECKED_IN.getValue());
         participant.setCheckInAt(Instant.now());
         participantMapper.updateById(participant);
     }

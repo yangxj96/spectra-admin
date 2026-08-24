@@ -19,6 +19,7 @@ package com.devops00.spectra.upload.javabean.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
+import com.devops00.spectra.upload.javabean.constant.UploadTaskStatus;
 import com.devops00.spectra.upload.javabean.constant.UploadType;
 import lombok.*;
 
@@ -85,7 +86,7 @@ public class FileUploadTask extends BaseEntity {
      * 上传状态（INIT(初始化)/UPLOADING(上传中)/MERGING(合并中)/DONE(完成)/FAILED(失败)）
      */
     @TableField(value = "status")
-    private String status;
+    private UploadTaskStatus status;
 
     /**
      * S3协议扩展ID

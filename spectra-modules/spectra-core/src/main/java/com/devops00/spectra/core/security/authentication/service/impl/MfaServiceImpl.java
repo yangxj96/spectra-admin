@@ -10,6 +10,7 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.core.security.authentication.javabean.entity.MfaEnrollment;
+import com.devops00.spectra.core.security.authentication.javabean.enums.MfaEnrollmentState;
 import com.devops00.spectra.core.security.authentication.javabean.entity.RecoveryCode;
 import com.devops00.spectra.core.security.authentication.javabean.entity.TotpCredential;
 import com.devops00.spectra.core.security.authentication.javabean.vo.MfaEnrollmentResult;
@@ -48,8 +49,8 @@ import java.util.UUID;
 public class MfaServiceImpl implements MfaService {
 
     private static final String FACTOR_TOTP = "TOTP";
-    private static final String PENDING = "PENDING";
-    private static final String ACTIVE = "ACTIVE";
+    private static final String PENDING = MfaEnrollmentState.PENDING.name();
+    private static final String ACTIVE = MfaEnrollmentState.ACTIVE.name();
 
     private final MfaEnrollmentMapper enrollmentMapper;
     private final TotpCredentialMapper credentialMapper;

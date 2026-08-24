@@ -22,6 +22,7 @@ import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.CollUtils;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRoleMenu;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
@@ -79,7 +80,7 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         if (role == null) {
             throw new DataNotExistException("角色不存在");
         }
-        if (!Objects.equals("ACTIVE", role.getState())) {
+        if (!Objects.equals(SecurityAuthorizationState.ACTIVE.name(), role.getState())) {
             throw new DataException("停用角色不能配置菜单");
         }
         ensureEditableRole(role);

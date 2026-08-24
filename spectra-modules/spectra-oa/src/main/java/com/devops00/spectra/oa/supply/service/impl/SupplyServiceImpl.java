@@ -9,6 +9,9 @@ import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.supply.javabean.converter.SupplyConverter;
+import com.devops00.spectra.oa.supply.javabean.constant.SupplyItemStatus;
+import com.devops00.spectra.oa.supply.javabean.constant.SupplyOperationStatus;
+import com.devops00.spectra.oa.supply.javabean.constant.SupplyOperationType;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
 import com.devops00.spectra.oa.supply.javabean.entity.SupplyOperation;
 import com.devops00.spectra.oa.supply.javabean.from.SupplyOperationFrom;
@@ -39,13 +42,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyItem> implements SupplyService {
-    private static final String STATUS_ACTIVE = "ACTIVE";
-    private static final String STATUS_INACTIVE = "INACTIVE";
-    private static final String OP_INBOUND = "INBOUND";
-    private static final String OP_ISSUE = "ISSUE";
-    private static final String OP_RETURN = "RETURN";
-    private static final String OP_ADJUST = "ADJUST";
-
     private final SupplyOperationMapper operationMapper;
     private final SupplyConverter supplyConverter;
     private final TimeMapper timeMapper;
@@ -113,7 +109,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
     public void inbound(UUID id, SupplyOperationFrom from) {
         var operationFrom = requireFrom(from);
         var quantity = positiveQuantity(operationFrom);
-        change(id, OP_INBOUND, quantity, operationFrom);
+        change(id, SupplyOperationType.INBOUND.getValue(), quantity, operationFrom);
     }
 
     @Override
@@ -124,7 +120,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         if (operationFrom.getUserId() == null) {
             operationFrom.setUserId(securityContextAccessor.currentUserId());
         }
-        change(id, OP_ISSUE, quantity, operationFrom);
+        change(id, SupplyOperationType.ISSUE.getValue(), quantity, operationFrom);
     }
 
     @Override
@@ -135,7 +131,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         if (operationFrom.getUserId() == null) {
             operationFrom.setUserId(securityContextAccessor.currentUserId());
         }
-        change(id, OP_RETURN, quantity, operationFrom);
+        change(id, SupplyOperationType.RETURN.getValue(), quantity, operationFrom);
     }
 
     @Override
@@ -146,12 +142,12 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
             throw new DataSaveException("盘点调整后的库存不能为空且不能小于 0");
         }
         var entity = require(id);
-        change(entity, OP_ADJUST, operationFrom.getTargetStock().subtract(stock(entity)), operationFrom);
+        change(entity, SupplyOperationType.ADJUST.getValue(), operationFrom.getTargetStock().subtract(stock(entity)), operationFrom);
     }
 
     @Override
     public List<SupplyItemVO> lowStock() {
-        return this.list(new LambdaQueryWrapper<SupplyItem>().eq(SupplyItem::getStatus, STATUS_ACTIVE)
+        return this.list(new LambdaQueryWrapper<SupplyItem>().eq(SupplyItem::getStatus, SupplyItemStatus.ACTIVE.getValue())
                 .apply("current_stock <= min_stock")
                 .orderByAsc(SupplyItem::getName)).stream().map(item -> assembleView(item, false)).toList();
     }
@@ -161,7 +157,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
     }
 
     private void change(SupplyItem entity, String type, BigDecimal delta, SupplyOperationFrom from) {
-        if (STATUS_INACTIVE.equals(entity.getStatus())) {
+        if (SupplyItemStatus.INACTIVE.getValue().equals(entity.getStatus())) {
             throw new DataSaveException("停用的办公用品不能变更库存");
         }
         var before = stock(entity);
@@ -184,7 +180,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         operation.setSourcePurchaseId(from.getSourcePurchaseId());
         operation.setSourceReceiptId(from.getSourceReceiptId());
         operation.setSourcePurchaseItemId(from.getSourcePurchaseItemId());
-        operation.setStatus("COMPLETE");
+        operation.setStatus(SupplyOperationStatus.COMPLETE.getValue());
         if (!this.updateById(entity) || operationMapper.insert(operation) != 1) {
             throw new DataSaveException("保存办公用品库存变动失败");
         }
@@ -227,7 +223,7 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
             entity.setUnit("件");
         }
         if (!StringUtils.hasText(entity.getStatus())) {
-            entity.setStatus(STATUS_ACTIVE);
+            entity.setStatus(SupplyItemStatus.ACTIVE.getValue());
         }
     }
 

@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.domain.OrganizationChangeImpact;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeApplyFrom;
@@ -228,7 +229,7 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
 
         var requestedDepartment = requestedDepartment(departmentId, from);
         var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
-                .eq(RoleAssignment::getState, "ACTIVE"));
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()));
         var userIds = assignments.stream().map(RoleAssignment::getUserId).collect(Collectors.toSet());
         var impact = impactAnalyzer.analyze(currentVersion, assignments.size(), userIds.size(), true);
         var operatorId = currentOperatorId();

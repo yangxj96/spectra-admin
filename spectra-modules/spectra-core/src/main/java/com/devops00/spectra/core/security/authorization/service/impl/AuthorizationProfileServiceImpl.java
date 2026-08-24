@@ -22,6 +22,7 @@ import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationProfile;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationProfileAssignment;
 import com.devops00.spectra.core.security.authorization.entity.AuthorizationProfileBoundary;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
@@ -105,7 +106,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         profile.setCode(params.getCode().trim());
         profile.setName(params.getName().trim());
         profile.setDescription(trimToNull(params.getDescription()));
-        profile.setState("ACTIVE");
+        profile.setState(SecurityAuthorizationState.ACTIVE.name());
         if (!save(profile)) {
             throw new DataException("创建授权方案失败");
         }
@@ -151,14 +152,14 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         if (profile == null) {
             throw new DataNotExistException("授权方案不存在");
         }
-        if ("ACTIVE".equals(profile.getState())) {
+        if (SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             return;
         }
         var currentVersion = profile.getVersion() == null ? 0L : profile.getVersion();
         var update = new LambdaUpdateWrapper<AuthorizationProfile>()
                 .eq(AuthorizationProfile::getId, id)
                 .eq(AuthorizationProfile::getVersion, currentVersion)
-                .set(AuthorizationProfile::getState, "ACTIVE")
+                .set(AuthorizationProfile::getState, SecurityAuthorizationState.ACTIVE.name())
                 .set(AuthorizationProfile::getVersion, currentVersion + 1L);
         if (!update(update)) {
             throw new DataException("授权方案版本并发变化，启用已拒绝");
@@ -173,14 +174,14 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         if (profile == null) {
             throw new DataNotExistException("授权方案不存在");
         }
-        if (!"ACTIVE".equals(profile.getState())) {
+        if (!SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             return;
         }
         var currentVersion = profile.getVersion() == null ? 0L : profile.getVersion();
         var update = new LambdaUpdateWrapper<AuthorizationProfile>()
                 .eq(AuthorizationProfile::getId, id)
                 .eq(AuthorizationProfile::getVersion, currentVersion)
-                .set(AuthorizationProfile::getState, "DISABLED")
+                .set(AuthorizationProfile::getState, SecurityAuthorizationState.DISABLED.name())
                 .set(AuthorizationProfile::getVersion, currentVersion + 1L);
         if (!update(update)) {
             throw new DataException("授权方案版本并发变化，停用已拒绝");
@@ -243,7 +244,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
             }
             var role = roleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                     .eq(SecurityRole::getCode, roleCode));
-            if (role == null || !"ACTIVE".equals(role.getState())) {
+            if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
                 throw new DataNotExistException("Role 不存在或已停用: " + roleCode);
             }
             var currentRoleVersion = role.getVersion() == null ? 0L : role.getVersion();
@@ -283,7 +284,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 throw new DataException("授权方案不能重复配置 Permission: " + permissionCode);
             }
             var permission = permissions.get(permissionCode);
-            if (permission == null || !"ACTIVE".equals(permission.getState())) {
+            if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
                 throw new DataNotExistException("Permission 不存在或已停用: " + permissionCode);
             }
             if (!rolePermissionIds.contains(permission.getId())) {

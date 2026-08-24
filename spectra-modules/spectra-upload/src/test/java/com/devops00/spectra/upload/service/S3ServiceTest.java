@@ -19,6 +19,7 @@ package com.devops00.spectra.upload.service;
 import com.devops00.spectra.upload.UploadTestApplication;
 import com.devops00.spectra.upload.properties.S3Properties;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -46,6 +47,7 @@ public class S3ServiceTest {
     private S3Service s3Service;
 
     @Test
+    @EnabledIfEnvironmentVariable(named = "S3_INTEGRATION_TESTS", matches = "true")
     public void testList() {
         List<String> files = s3Service.listAllObjects(s3Properties.getBucket());
         assertNotNull(files);

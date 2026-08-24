@@ -9,6 +9,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.PermissionMapper;
 import com.devops00.spectra.core.security.authorization.service.PermissionCatalogService;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
@@ -38,12 +39,12 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
     @Override
     public List<AuthorityTreeVO> tree() {
         var permissions = permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
-                .eq(Permission::getState, "ACTIVE")
+                .eq(Permission::getState, SecurityAuthorizationState.ACTIVE.name())
                 .orderByAsc(Permission::getResourceCode)
                 .orderByAsc(Permission::getActionCode)
                 .orderByAsc(Permission::getCode))
                 .stream()
-                .filter(permission -> "ACTIVE".equals(permission.getState()))
+                .filter(permission -> SecurityAuthorizationState.ACTIVE.name().equals(permission.getState()))
                 .sorted(Comparator.comparing(this::resourceCode)
                         .thenComparing(permission -> valueOrEmpty(permission.getActionCode()))
                         .thenComparing(permission -> valueOrEmpty(permission.getCode())))

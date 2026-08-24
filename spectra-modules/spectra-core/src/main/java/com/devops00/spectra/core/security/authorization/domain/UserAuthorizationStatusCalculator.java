@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.authorization.domain;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 
 import java.time.LocalDateTime;
@@ -59,7 +60,7 @@ public final class UserAuthorizationStatusCalculator {
 
         // REVOKED Assignment 是角色替换或人工移除后保留的历史记录，不代表当前仍有失效权限。
         var currentAssignments = assignments.stream()
-                .filter(assignment -> !"REVOKED".equals(assignment.state()))
+                .filter(assignment -> !SecurityAuthorizationState.REVOKED.name().equals(assignment.state()))
                 .toList();
         if (currentAssignments.isEmpty()) {
             return UserAuthorizationStatus.UNCONFIGURED;
@@ -70,10 +71,10 @@ public final class UserAuthorizationStatusCalculator {
         var incompleteCount = 0;
         var invalidCount = 0;
         for (var assignment : currentAssignments) {
-            var assignmentEffective = "ACTIVE".equals(assignment.state())
+            var assignmentEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.state())
                     && (assignment.validFrom() == null || !assignment.validFrom().isAfter(now))
                     && (assignment.validUntil() == null || assignment.validUntil().isAfter(now));
-            var roleEffective = "ACTIVE".equals(assignment.roleState());
+            var roleEffective = SecurityAuthorizationState.ACTIVE.name().equals(assignment.roleState());
             if (!assignmentEffective || !roleEffective) {
                 invalidCount++;
                 continue;

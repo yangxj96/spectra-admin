@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.SHA256Utils;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -31,6 +32,8 @@ import com.devops00.spectra.core.user.imports.entity.UserImportTask;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportApplyFrom;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportPreviewFrom;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportRowFrom;
+import com.devops00.spectra.core.user.imports.javabean.enums.UserImportRowState;
+import com.devops00.spectra.core.user.imports.javabean.enums.UserImportTaskStatus;
 import com.devops00.spectra.core.user.imports.javabean.vo.UserImportRowVO;
 import com.devops00.spectra.core.user.imports.javabean.vo.UserImportTaskVO;
 import com.devops00.spectra.core.user.imports.mapper.UserImportRowMapper;
@@ -82,25 +85,27 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserImportServiceImpl implements UserImportService {
 
-    private static final String STATUS_PREVIEWED = "PREVIEWED";
+    private static final String STATUS_PREVIEWED = UserImportTaskStatus.PREVIEWED.name();
 
-    private static final String STATUS_APPLYING = "APPLYING";
+    private static final String STATUS_VALIDATING = UserImportTaskStatus.VALIDATING.name();
 
-    private static final String STATUS_SUCCEEDED = "SUCCEEDED";
+    private static final String STATUS_APPLYING = UserImportTaskStatus.APPLYING.name();
 
-    private static final String STATUS_PARTIAL_FAILED = "PARTIAL_FAILED";
+    private static final String STATUS_SUCCEEDED = UserImportTaskStatus.SUCCEEDED.name();
 
-    private static final String STATUS_FAILED = "FAILED";
+    private static final String STATUS_PARTIAL_FAILED = UserImportTaskStatus.PARTIAL_FAILED.name();
 
-    private static final String STATUS_EXPIRED = "EXPIRED";
+    private static final String STATUS_FAILED = UserImportTaskStatus.FAILED.name();
 
-    private static final String STATE_VALID = "VALID";
+    private static final String STATUS_EXPIRED = UserImportTaskStatus.EXPIRED.name();
 
-    private static final String STATE_ERROR = "ERROR";
+    private static final String STATE_VALID = UserImportRowState.VALID.name();
 
-    private static final String STATE_APPLIED = "APPLIED";
+    private static final String STATE_ERROR = UserImportRowState.ERROR.name();
 
-    private static final String STATE_SKIPPED = "SKIPPED";
+    private static final String STATE_APPLIED = UserImportRowState.APPLIED.name();
+
+    private static final String STATE_SKIPPED = UserImportRowState.SKIPPED.name();
 
     private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9][0-9 .()\\-]{5,38}$");
 
@@ -153,7 +158,7 @@ public class UserImportServiceImpl implements UserImportService {
         task.setFileName(params.getFileName().trim());
         task.setFileHash(params.getFileHash().trim());
         task.setSkipExisting(params.isSkipExisting());
-        task.setStatus("VALIDATING");
+        task.setStatus(STATUS_VALIDATING);
         task.setRequestHash(requestHash);
         task.setProfileVersionHash(profileVersionHash(rows, referenceData.profiles()));
         task.setExpiresAt(Instant.now().plusSeconds(24 * 60 * 60));
@@ -420,7 +425,7 @@ public class UserImportServiceImpl implements UserImportService {
             errors.add("时区不在当前系统字典中");
         }
         var profile = referenceData.profiles().get(source.getAuthorizationProfileCode());
-        if (profile == null || !"ACTIVE".equals(profile.getState())) {
+        if (profile == null || !SecurityAuthorizationState.ACTIVE.name().equals(profile.getState())) {
             errors.add("授权方案不存在或已停用");
         }
         var existing = findExisting(source);

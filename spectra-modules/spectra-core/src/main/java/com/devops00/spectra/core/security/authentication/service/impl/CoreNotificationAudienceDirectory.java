@@ -21,6 +21,7 @@ import com.devops00.spectra.common.notification.NotificationAudience;
 import com.devops00.spectra.common.notification.NotificationAudienceDirectory;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.system.service.DepartmentService;
@@ -104,7 +105,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
         var activeRoleIds = securityRoleMapper.selectList(new LambdaQueryWrapper<SecurityRole>()
                 .select(SecurityRole::getId)
                 .in(SecurityRole::getId, requestedRoleIds)
-                .eq(SecurityRole::getState, "ACTIVE"))
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()))
                 .stream()
                 .map(SecurityRole::getId)
                 .toList();
@@ -115,7 +116,7 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
         roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .select(RoleAssignment::getUserId, RoleAssignment::getValidFrom, RoleAssignment::getValidUntil)
                 .in(RoleAssignment::getRoleId, activeRoleIds)
-                .eq(RoleAssignment::getState, "ACTIVE"))
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()))
                 .stream()
                 .filter(assignment -> isValid(assignment, now))
                 .map(RoleAssignment::getUserId)

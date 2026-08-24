@@ -26,6 +26,7 @@ import com.devops00.spectra.core.security.authentication.service.AuthenticationI
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatusCalculator;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
@@ -367,10 +368,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private void revokeActiveAssignments(UUID userId) {
         var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getUserId, userId)
-                .eq(RoleAssignment::getState, "ACTIVE"));
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()));
         var revokedAt = Instant.now();
         for (var assignment : assignments) {
-            assignment.setState("REVOKED");
+            assignment.setState(SecurityAuthorizationState.REVOKED.name());
             assignment.setValidUntil(revokedAt);
             assignment.setVersion((assignment.getVersion() == null ? 0L : assignment.getVersion()) + 1L);
             if (roleAssignmentMapper.updateById(assignment) != 1) {
@@ -393,7 +394,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private List<RoleVO> targetRoles(List<AuthorizationAssignmentView> assignments) {
         return assignments
                 .stream()
-                .filter(assignment -> "ACTIVE".equals(assignment.state()))
+                .filter(assignment -> SecurityAuthorizationState.ACTIVE.name().equals(assignment.state()))
                 .collect(Collectors.toMap(
                         assignment -> assignment.roleId(),
                         assignment -> assignment,

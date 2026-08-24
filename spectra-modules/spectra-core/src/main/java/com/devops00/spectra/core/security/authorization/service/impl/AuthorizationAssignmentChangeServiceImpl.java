@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentGrantBoundary;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.AssignmentPermissionBoundary;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
@@ -187,14 +188,14 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         if (target == null) {
             throw new DataNotExistException("目标用户不存在");
         }
-        if (target.getStatus() == null || !"ACTIVE".equals(target.getStatus().getCode())) {
+        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
             throw new DataException("只有 ACTIVE 用户可以移除授权 Assignment");
         }
         var assignment = roleAssignmentMapper.selectById(from.getAssignmentId());
         if (assignment == null || !targetUserId.equals(assignment.getUserId())) {
             throw new DataNotExistException("待移除的角色授权不存在");
         }
-        if (!"ACTIVE".equals(assignment.getState())) {
+        if (!SecurityAuthorizationState.ACTIVE.name().equals(assignment.getState())) {
             throw new DataException("待移除的角色授权已经不是生效状态");
         }
         long assignmentVersion = assignment.getVersion() == null ? 0L : assignment.getVersion();
@@ -214,14 +215,14 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
                 targetUserId, null, null, null,
                 Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
-                Map.of("state", "REVOKED"), "移除用户角色授权", null, AuditResult.STARTED, null);
+                Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权", null, AuditResult.STARTED, null);
         securityChangeExecutor.execute(event, () -> {
             var update = new LambdaUpdateWrapper<RoleAssignment>()
                     .eq(RoleAssignment::getId, assignment.getId())
                     .eq(RoleAssignment::getUserId, targetUserId)
-                    .eq(RoleAssignment::getState, "ACTIVE")
+                    .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
                     .eq(RoleAssignment::getVersion, from.getExpectedVersion())
-                    .set(RoleAssignment::getState, "REVOKED")
+                    .set(RoleAssignment::getState, SecurityAuthorizationState.REVOKED.name())
                     .set(RoleAssignment::getValidUntil, Instant.now())
                     .set(RoleAssignment::getVersion, from.getExpectedVersion() + 1L);
             if (roleAssignmentMapper.update(null, update) != 1) {
@@ -229,7 +230,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
             }
             appendAudit("ROLE_ASSIGNMENT_REVOKED", operatorId, targetUserId,
                     Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
-                    Map.of("state", "REVOKED"), "移除用户角色授权");
+                    Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权");
             epochGuard.advance(targetUserId, targetSecurityVersion);
             sessionRevocationPort.revokeUserSessions(targetUserId);
             return Boolean.TRUE;
@@ -245,7 +246,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         if (target == null) {
             throw new DataNotExistException("目标用户不存在");
         }
-        if (target.getStatus() == null || !"ACTIVE".equals(target.getStatus().getCode())) {
+        if (target.getStatus() == null || !SecurityAuthorizationState.ACTIVE.name().equals(target.getStatus().getCode())) {
             throw new DataException("只有 ACTIVE 用户可以建立授权 Assignment");
         }
         var assignment = assignmentId == null ? null : roleAssignmentMapper.selectById(assignmentId);
@@ -279,7 +280,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
             throw new DataException("目标 Role 不能为空");
         }
         var role = securityRoleMapper.selectById(roleId);
-        if (role == null || !"ACTIVE".equals(role.getState())) {
+        if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
             throw new DataNotExistException("目标 Role 不存在或已停用");
         }
         if (role.getAuthorityLevel() == null || role.getAuthorityLevel() <= 0) {
@@ -312,7 +313,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                 throw new DataException("同一 Permission 不能重复提交 Boundary");
             }
             var permission = permissions.get(boundary.getPermission());
-            if (permission == null || !"ACTIVE".equals(permission.getState())) {
+            if (permission == null || !SecurityAuthorizationState.ACTIVE.name().equals(permission.getState())) {
                 throw new DataNotExistException("Permission 不存在或已停用: " + boundary.getPermission());
             }
             if (!rolePermissionIds.contains(permission.getId())) {
@@ -340,7 +341,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         var assignment = prepared.assignment() == null ? new RoleAssignment() : prepared.assignment();
         assignment.setUserId(targetUserId);
         assignment.setRoleId(prepared.role().getId());
-        assignment.setState("ACTIVE");
+        assignment.setState(SecurityAuthorizationState.ACTIVE.name());
         assignment.setValidFrom(assignment.getValidFrom() == null ? Instant.now() : assignment.getValidFrom());
         if (prepared.assignment() == null) {
             assignment.setVersion(prepared.expectedVersion());
@@ -426,7 +427,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private void recordAssignmentEvents(PreparedChange prepared, UUID targetUserId, UUID assignmentId) {
         appendAudit(prepared.assignment() == null ? "ROLE_ASSIGNMENT_CREATED" : "ROLE_ASSIGNMENT_UPDATED",
                 prepared.operatorId(), targetUserId, Map.of("assignmentId", assignmentId.toString()),
-                Map.of("roleId", prepared.role().getId().toString(), "state", "ACTIVE"), null);
+                Map.of("roleId", prepared.role().getId().toString(), "state", SecurityAuthorizationState.ACTIVE.name()), null);
         if (!prepared.requests().isEmpty()) {
             appendAudit("ASSIGNMENT_PERMISSION_BOUNDARY_CHANGED", prepared.operatorId(), targetUserId,
                     Map.of("assignmentId", assignmentId.toString()),

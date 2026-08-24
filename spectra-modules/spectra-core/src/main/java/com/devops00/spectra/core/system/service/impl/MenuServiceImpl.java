@@ -26,6 +26,7 @@ import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.common.utils.TreeBuilder;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRoleMenu;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMenuMapper;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
@@ -169,7 +170,7 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         var roles = securityRoleMapper.selectList(new QueryWrapper<SecurityRole>()
                 .select("id", "code")
                 .in("code", roleCodes)
-                .eq("state", "ACTIVE"));
+                .eq("state", SecurityAuthorizationState.ACTIVE.name()));
         if (CollUtils.isEmpty(roles)) {
             return Collections.emptyList();
         }

@@ -19,6 +19,7 @@ package com.devops00.spectra.ai.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.ai.javabean.entity.AiChatMemory;
 import com.devops00.spectra.ai.javabean.entity.AiConversation;
+import com.devops00.spectra.ai.javabean.enums.AiConversationStatus;
 import com.devops00.spectra.ai.javabean.enums.ChatRole;
 import com.devops00.spectra.ai.javabean.vo.ChatMessageVO;
 import com.devops00.spectra.ai.mapper.AiChatMemoryMapper;
@@ -59,7 +60,7 @@ public class AiConversationServiceImpl
         AiConversation conversation = new AiConversation();
         conversation.setUserId(userId);
         conversation.setTitle(generateTitle(firstMessage));
-        conversation.setStatus("active");
+        conversation.setStatus(AiConversationStatus.ACTIVE.getValue());
         baseMapper.insert(conversation);
         return conversation.getId();
     }
