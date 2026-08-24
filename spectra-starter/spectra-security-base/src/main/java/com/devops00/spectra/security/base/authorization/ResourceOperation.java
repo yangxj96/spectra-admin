@@ -24,6 +24,9 @@ public enum ResourceOperation {
         this.code = code;
     }
 
+    /**
+     * 查询或获取目标数据（{@code code}）。
+     */
     public String code() {
         return code;
     }

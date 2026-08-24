@@ -19,6 +19,8 @@ package com.devops00.spectra.core.security.audit.javabean.vo;
 import com.devops00.spectra.security.base.audit.AuditResult;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -38,4 +40,28 @@ public record SecurityAuditVO(UUID eventId,
                               LocalDateTime occurredAt,
                               AuditResult result,
                               String correlationId) {
+
+    public SecurityAuditVO {
+        before = immutableMap(before);
+        after = immutableMap(after);
+    }
+
+    @Override
+    public Map<String, Object> before() {
+        return immutableMap(before);
+    }
+
+    @Override
+    public Map<String, Object> after() {
+        return immutableMap(after);
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code immutableMap}）。
+     */
+    private static Map<String, Object> immutableMap(Map<String, Object> source) {
+        return source == null || source.isEmpty()
+                ? Map.of()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(source));
+    }
 }

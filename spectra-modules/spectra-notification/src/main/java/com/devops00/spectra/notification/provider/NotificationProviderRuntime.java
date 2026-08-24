@@ -142,6 +142,9 @@ public class NotificationProviderRuntime {
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code findProvider}）。
+     */
     private NotificationProvider findProvider(NotificationChannel channel, String providerType) {
         return providers.stream()
                 .filter(provider -> provider.code().equals(providerType) && provider.supports(channel))
@@ -149,6 +152,9 @@ public class NotificationProviderRuntime {
                 .orElse(null);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code cache}）。
+     */
     private NotificationProviderHealth cache(NotificationChannel channel,
                                              NotificationProviderConfiguration configuration,
                                              NotificationProviderHealth health) {
@@ -156,6 +162,9 @@ public class NotificationProviderRuntime {
         return health;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code providerCode}）。
+     */
     private String providerCode(NotificationProviderConfiguration configuration) {
         return configuration == null || configuration.providerType() == null ? "NONE" : configuration.providerType();
     }

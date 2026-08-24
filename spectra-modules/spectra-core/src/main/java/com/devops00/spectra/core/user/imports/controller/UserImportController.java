@@ -51,6 +51,9 @@ public class UserImportController {
 
     private final UserImportService userImportService;
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     @ULog("'预览用户批量导入'")
     @PostMapping(value = "/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")
@@ -58,6 +61,9 @@ public class UserImportController {
         return userImportService.preview(params);
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'查询用户批量导入任务'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
@@ -65,6 +71,9 @@ public class UserImportController {
         return userImportService.detail(id);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code errors}）。
+     */
     @ULog("'查询用户批量导入错误'")
     @GetMapping(value = "/{id}/errors", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
@@ -72,6 +81,9 @@ public class UserImportController {
         return userImportService.errors(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code apply}）。
+     */
     @ULog("'应用用户批量导入'")
     @PostMapping(value = "/{id}/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")

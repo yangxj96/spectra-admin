@@ -49,6 +49,9 @@ public class ULogListener {
 
     private final ObjectMapper om;
 
+    /**
+     * 执行内部处理逻辑（{@code handleLogEvent}）。
+     */
     @Async
     @EventListener
     public void handleLogEvent(ULogEntity entity) {

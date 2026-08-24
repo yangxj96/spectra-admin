@@ -32,7 +32,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,6 +58,9 @@ public class NotificationTemplateAdminController {
 
     private final NotificationTemplateService service;
 
+    /**
+     * 查询或获取目标数据（{@code page}）。
+     */
     @ULog("'查询通知模板列表'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
@@ -59,6 +68,9 @@ public class NotificationTemplateAdminController {
         return service.page(page, params);
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'查询通知模板详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
@@ -66,6 +78,9 @@ public class NotificationTemplateAdminController {
         return service.detail(id);
     }
 
+    /**
+     * 创建或构建目标数据（{@code create}）。
+     */
     @ULog("'创建通知模板草稿'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
@@ -73,6 +88,9 @@ public class NotificationTemplateAdminController {
         return service.create(params);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code copy}）。
+     */
     @ULog("'复制通知模板草稿'")
     @PostMapping(value = "/{id}/copy", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
@@ -80,6 +98,9 @@ public class NotificationTemplateAdminController {
         return service.copy(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code update}）。
+     */
     @ULog("'修改通知模板草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
@@ -91,6 +112,9 @@ public class NotificationTemplateAdminController {
         return service.update(params);
     }
 
+    /**
+     * 更新或推进目标状态（{@code publish}）。
+     */
     @ULog("'发布通知模板'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:publish')")
@@ -98,6 +122,9 @@ public class NotificationTemplateAdminController {
         service.publish(id, params);
     }
 
+    /**
+     * 更新或推进目标状态（{@code disable}）。
+     */
     @ULog("'停用通知模板'")
     @PostMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
@@ -105,6 +132,9 @@ public class NotificationTemplateAdminController {
         service.disable(id, params);
     }
 
+    /**
+     * 更新或推进目标状态（{@code archive}）。
+     */
     @ULog("'归档通知模板'")
     @PostMapping(value = "/{id}/archive", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
@@ -112,6 +142,9 @@ public class NotificationTemplateAdminController {
         service.archive(id, params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code versions}）。
+     */
     @ULog("'查询通知模板版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
@@ -119,6 +152,9 @@ public class NotificationTemplateAdminController {
         return service.versions(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code rollback}）。
+     */
     @ULog("'回滚通知模板'")
     @PostMapping(value = "/{id}/rollback", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:publish')")
@@ -126,6 +162,9 @@ public class NotificationTemplateAdminController {
         return service.rollback(id);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     @ULog("'预览通知模板'")
     @PostMapping(value = "/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")

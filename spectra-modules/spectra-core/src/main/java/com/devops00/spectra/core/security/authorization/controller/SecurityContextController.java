@@ -34,6 +34,9 @@ public class SecurityContextController {
         this.securityContextAccessor = securityContextAccessor;
     }
 
+    /**
+     * 查询或获取目标数据（{@code current}）。
+     */
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     public AuthorizationContextVO current() {

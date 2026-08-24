@@ -41,6 +41,8 @@ public class AiUserTool implements AiToolMarker {
 
     private final UserService userService;
 
+    private final ToolExecutor toolExecutor;
+
     /**
      * 获取所有用户信息
      *
@@ -48,7 +50,7 @@ public class AiUserTool implements AiToolMarker {
      */
     @Tool("获取所有用户信息")
     public String getAllUsers(@ToolMemoryId AiMemoryId memoryId) {
-        return ToolExecutor.execute(memoryId.token(), _ -> {
+        return toolExecutor.execute(memoryId.token(), _ -> {
             log.debug("{}获取所有用户信息", LogPrefix.AI.p());
             return userService.list();
         });

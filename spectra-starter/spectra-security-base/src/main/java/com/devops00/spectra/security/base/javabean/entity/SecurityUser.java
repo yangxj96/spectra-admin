@@ -27,7 +27,14 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serial;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * 用DTO传输类
@@ -40,6 +47,9 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SecurityUser implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 用户ID
@@ -135,7 +145,19 @@ public class SecurityUser implements UserDetails {
         return StrUtils.isNotBlank(this.getEmail()) ? this.getEmail() : "";
     }
 
+    /**
+     * 更新或推进目标状态（{@code setUsername}）。
+     */
     public void setUsername(String username) {
         this.setEmail(username);
+    }
+
+    /**
+     * 查询或获取目标数据（{@code readObject}）。
+     */
+    @Serial
+    private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+        input.defaultReadObject();
+        extraData = null;
     }
 }

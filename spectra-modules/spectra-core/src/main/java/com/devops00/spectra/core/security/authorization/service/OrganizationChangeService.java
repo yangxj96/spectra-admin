@@ -32,13 +32,28 @@ import java.util.UUID;
  */
 public interface OrganizationChangeService {
 
+    /**
+     * 查询或获取目标数据（{@code currentOrganizationVersion}）。
+     */
     long currentOrganizationVersion();
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from);
 
+    /**
+     * 更新或推进目标状态（{@code apply}）。
+     */
     void apply(UUID departmentId, OrganizationChangeApplyFrom from);
 
+    /**
+     * 处理内部业务逻辑（{@code previewCreate}）。
+     */
     OrganizationChangePreviewVO previewCreate(OrganizationChangeFrom from);
 
+    /**
+     * 更新或推进目标状态（{@code applyCreate}）。
+     */
     void applyCreate(OrganizationCreateApplyFrom from);
 }

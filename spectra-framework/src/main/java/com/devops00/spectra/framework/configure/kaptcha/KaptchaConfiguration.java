@@ -30,7 +30,20 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Properties;
 
-import static com.google.code.kaptcha.Constants.*;
+import static com.google.code.kaptcha.Constants.KAPTCHA_BORDER;
+import static com.google.code.kaptcha.Constants.KAPTCHA_BORDER_COLOR;
+import static com.google.code.kaptcha.Constants.KAPTCHA_IMAGE_HEIGHT;
+import static com.google.code.kaptcha.Constants.KAPTCHA_IMAGE_WIDTH;
+import static com.google.code.kaptcha.Constants.KAPTCHA_NOISE_COLOR;
+import static com.google.code.kaptcha.Constants.KAPTCHA_NOISE_IMPL;
+import static com.google.code.kaptcha.Constants.KAPTCHA_OBSCURIFICATOR_IMPL;
+import static com.google.code.kaptcha.Constants.KAPTCHA_SESSION_CONFIG_KEY;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_CHAR_LENGTH;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_CHAR_SPACE;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_COLOR;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_NAMES;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_FONT_SIZE;
+import static com.google.code.kaptcha.Constants.KAPTCHA_TEXTPRODUCER_IMPL;
 
 /**
  * 验证码配置

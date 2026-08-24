@@ -45,6 +45,9 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
 
     private static final String STATE_ACTIVE = AuthenticationIdentityState.ACTIVE.name();
 
+    /**
+     * 处理内部业务逻辑（{@code Qualifier}）。
+     */
     private final @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate;
 
     private final SecurityProperties securityProperties;
@@ -87,6 +90,9 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
         identityService.revokeByUserIdAndId(userId, identityId);
     }
 
+    /**
+     * 更新或推进目标状态（{@code consumeBindingCode}）。
+     */
     private void consumeBindingCode(String prefix, String address, String code) {
         if (code == null || code.isBlank()) {
             throw new SpectraException("绑定验证码不能为空");

@@ -105,25 +105,35 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
         return SecurityRedisExecutor.execute("读取 MFA Challenge", () -> findInternal(challengeId));
     }
 
+    /**
+     * 查询或获取目标数据（{@code findInternal}）。
+     */
     private MfaLoginChallenge findInternal(String challengeId) {
         Map<Object, Object> values = SecurityRedisExecutor.require("读取 MFA Challenge",
                 () -> redis.opsForHash().entries(key(challengeId)));
         if (values.isEmpty()) {
             return null;
         }
+        String userIdValue = value(values, FIELD_USER_ID);
+        String username = value(values, FIELD_USERNAME);
+        String clientTypeValue = value(values, FIELD_CLIENT_TYPE);
+        String state = value(values, FIELD_STATE);
+        String expiresAtValue = value(values, FIELD_EXPIRES_AT);
+        if (userIdValue == null || username == null || clientTypeValue == null || state == null || expiresAtValue == null) {
+            redis.delete(key(challengeId));
+            return null;
+        }
         try {
-            UUID userId = UUID.fromString(value(values, FIELD_USER_ID));
-            String username = value(values, FIELD_USERNAME);
-            ClientType clientType = ClientType.fromName(value(values, FIELD_CLIENT_TYPE));
-            String state = value(values, FIELD_STATE);
-            long expiresAt = Long.parseLong(value(values, FIELD_EXPIRES_AT));
+            UUID userId = UUID.fromString(userIdValue);
+            ClientType clientType = ClientType.fromName(clientTypeValue);
+            long expiresAt = Long.parseLong(expiresAtValue);
             if (expiresAt <= Instant.now().toEpochMilli()) {
                 redis.delete(key(challengeId));
                 return null;
             }
             return new MfaLoginChallenge(challengeId, userId, username, clientType,
                     STATE_ENROLLMENT_REQUIRED.equals(state), STATE_ENROLLMENT_COMPLETED.equals(state), expiresAt);
-        } catch (IllegalArgumentException | NullPointerException exception) {
+        } catch (IllegalArgumentException exception) {
             redis.delete(key(challengeId));
             return null;
         }
@@ -163,10 +173,16 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
         });
     }
 
+    /**
+     * 处理内部业务逻辑（{@code key}）。
+     */
     private String key(String challengeId) {
         return SecurityRedisKey.MFA_CHALLENGE.format(challengeId);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code value}）。
+     */
     @Nullable
     private String value(Map<Object, Object> values, String field) {
         Object value = values.get(field);

@@ -21,7 +21,6 @@ import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
-import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.NotificationTaskStatus;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
@@ -81,6 +80,9 @@ public class NotificationProviderTestServiceImpl implements NotificationProvider
                 .build();
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private void validate(NotificationChannel channel, NotificationProviderTestFrom params) {
         if (channel == null || channel == NotificationChannel.IN_APP) {
             throw new DataSaveException("仅支持 SMS 或 EMAIL Provider 测试发送");

@@ -209,7 +209,7 @@ public class NotificationInboxServiceImpl implements NotificationInboxService {
         try {
             return timeMapper.toInstant(value);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("消息时间格式不正确");
+            throw new DataSaveException("消息时间格式不正确", exception);
         }
     }
 }

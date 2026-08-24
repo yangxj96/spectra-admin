@@ -22,8 +22,6 @@ import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.UUID;
-
 @Data
 @EqualsAndHashCode(callSuper = true)
 @TableName(value = "sec_permission", schema = "spectra_security")

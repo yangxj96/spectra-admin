@@ -134,7 +134,7 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
             requested = new PasswordPolicy(from.getMinLength(), from.getRequireUppercase(), from.getRequireLowercase(),
                     from.getRequireDigit(), from.getRequireSpecial(), from.getMaxAgeDays());
         } catch (IllegalArgumentException exception) {
-            throw new DataException(exception.getMessage());
+            throw new DataException(exception.getMessage(), exception);
         }
         SecurityPasswordPolicyVO after = new SecurityPasswordPolicyVO("SYSTEM", requested.minLength(),
                 requested.requireUppercase(), requested.requireLowercase(), requested.requireDigit(),
@@ -157,6 +157,9 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         });
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadSessionPolicy}）。
+     */
     private SecuritySessionPolicyVO loadSessionPolicy(UUID clientId, boolean lock) {
         String suffix = lock ? " FOR UPDATE" : "";
         List<SecuritySessionPolicyVO> policies = jdbcTemplate.query("""
@@ -181,6 +184,9 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         return policies.getFirst();
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadPasswordPolicy}）。
+     */
     private SecurityPasswordPolicyVO loadPasswordPolicy(boolean lock) {
         String suffix = lock ? " FOR UPDATE" : "";
         List<SecurityPasswordPolicyVO> policies = jdbcTemplate.query("""
@@ -204,6 +210,9 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         return policies.getFirst();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code mapSessionPolicy}）。
+     */
     private static SecuritySessionPolicyVO mapSessionPolicy(ResultSet resultSet, int ignored)
             throws SQLException {
         return new SecuritySessionPolicyVO(
@@ -220,32 +229,47 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
                 resultSet.getLong("version"));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toSessionPolicy}）。
+     */
     private static SessionPolicy toSessionPolicy(SecuritySessionPolicyFrom from) {
         try {
             return new SessionPolicy(SessionConcurrencyMode.valueOf(from.getConcurrencyMode().trim().toUpperCase(Locale.ROOT)),
                     from.getMaxSessions(), from.getAccessTtlSeconds(), from.getRefreshTtlSeconds(),
                     toLong(from.getAbsoluteTtlSeconds()), toLong(from.getIdleTtlSeconds()));
         } catch (IllegalArgumentException exception) {
-            throw new DataException("会话策略参数无效");
+            throw new DataException("会话策略参数无效", exception);
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toLong}）。
+     */
     private static Long toLong(Integer value) {
         return value == null ? null : value.longValue();
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireVersion}）。
+     */
     private static void requireVersion(Long current, Long expected) {
         if (expected == null || !expected.equals(current)) {
             throw new EntityUpdateException("安全策略版本冲突，请刷新后重试");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code auditEvent}）。
+     */
     private SecurityAuditEvent auditEvent(String type, UUID targetId, Map<String, Object> before,
                                           Map<String, Object> after) {
         return new SecurityAuditEvent(null, type, securityContextAccessor.currentUserId(), targetId, null, null, null,
                 before, after, "安全策略配置变更", null, AuditResult.STARTED, null);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code snapshot}）。
+     */
     private static Map<String, Object> snapshot(SecuritySessionPolicyVO value) {
         var snapshot = new LinkedHashMap<String, Object>();
         snapshot.put("clientId", value.clientId());
@@ -261,6 +285,9 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
         return snapshot;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code snapshot}）。
+     */
     private static Map<String, Object> snapshot(SecurityPasswordPolicyVO value) {
         var snapshot = new LinkedHashMap<String, Object>();
         snapshot.put("policyKey", value.policyKey());

@@ -38,7 +38,13 @@ import com.devops00.spectra.oa.purchase.javabean.entity.Purchase;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseItem;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceipt;
 import com.devops00.spectra.oa.purchase.javabean.entity.PurchaseReceiptItem;
-import com.devops00.spectra.oa.purchase.javabean.from.*;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseExecuteFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseItemFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchasePageFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptItemFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSaveFrom;
+import com.devops00.spectra.oa.purchase.javabean.from.PurchaseSubmitFrom;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseReceiptVO;
 import com.devops00.spectra.oa.purchase.javabean.vo.PurchaseVO;
 import com.devops00.spectra.oa.purchase.mapper.PurchaseItemMapper;
@@ -57,7 +63,10 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -253,6 +262,31 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
     public void receive(UUID id, PurchaseReceiptFrom from) {
         var entity = require(id);
         var application = applicationService.require(entity.getApplicationId());
+        validateReceiptState(entity, application);
+        var receiverId = resolveReceiver(from);
+        var purchaseItems = itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, id));
+        var itemMap = purchaseItems.stream().collect(Collectors.toMap(PurchaseItem::getId, item -> item));
+        var receiptItems = collectReceiptItems(from);
+        var progress = applyReceiptItems(purchaseItems, itemMap, receiptItems);
+        var receipt = createReceipt(id, from, receiverId, progress);
+        saveReceiptItems(receipt, receiptItems, itemMap);
+        entity.setExecutionStatus(progress.allReceived()
+                ? PurchaseExecutionStatus.RECEIVED.getValue()
+                : PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue());
+        if (progress.allReceived()) {
+            entity.setCompletedAt(Instant.now());
+        }
+        if (!this.updateById(entity)) {
+            throw new DataSaveException("更新采购执行状态失败");
+        }
+        workflowSupport.sendNotification(application, "purchase", progress.allReceived() ? "采购已全部收货" : "采购已部分收货",
+                progress.allReceived() ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
+    }
+
+    /**
+     * 校验并确保数据满足当前约束（{@code validateReceiptState}）。
+     */
+    private void validateReceiptState(Purchase entity, Application application) {
         if (!ApplicationStatus.APPROVED.name().equals(application.getStatus())) {
             throw new DataSaveException("只有审批通过的采购申请可以收货");
         }
@@ -260,18 +294,37 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 || PurchaseExecutionStatus.CANCELLED.getValue().equals(entity.getExecutionStatus())) {
             throw new DataSaveException("当前采购状态不允许收货");
         }
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code resolveReceiver}）。
+     */
+    private UUID resolveReceiver(PurchaseReceiptFrom from) {
         var receiverId = from.getReceiverId() == null ? securityContextAccessor.currentUserId() : from.getReceiverId();
         if (receiverId == null) {
             throw new DataSaveException("收货人不能为空");
         }
-        var purchaseItems = itemMapper.selectList(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, id));
-        var itemMap = purchaseItems.stream().collect(Collectors.toMap(PurchaseItem::getId, item -> item));
+        return receiverId;
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code collectReceiptItems}）。
+     */
+    private LinkedHashMap<UUID, PurchaseReceiptItemFrom> collectReceiptItems(PurchaseReceiptFrom from) {
         var receiptItems = new LinkedHashMap<UUID, PurchaseReceiptItemFrom>();
         from.getItems().forEach(item -> {
             if (receiptItems.put(item.getPurchaseItemId(), item) != null) {
                 throw new DataSaveException("同一采购项不能重复登记收货");
             }
         });
+        return receiptItems;
+    }
+
+    /**
+     * 更新或推进目标状态（{@code applyReceiptItems}）。
+     */
+    private ReceiptProgress applyReceiptItems(List<PurchaseItem> purchaseItems, Map<UUID, PurchaseItem> itemMap,
+                                              Map<UUID, PurchaseReceiptItemFrom> receiptItems) {
         var allReceived = true;
         var hasDifference = false;
         for (var entry : receiptItems.entrySet()) {
@@ -285,12 +338,8 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 throw new DataSaveException("收货数量不能超过采购数量: " + purchaseItem.getItemName());
             }
             purchaseItem.setReceivedQuantity(received.add(quantity).setScale(3, RoundingMode.HALF_UP));
-            if (Boolean.FALSE.equals(entry.getValue().getAccepted())) {
-                hasDifference = true;
-            }
-            if (purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) < 0) {
-                allReceived = false;
-            }
+            hasDifference |= Boolean.FALSE.equals(entry.getValue().getAccepted());
+            allReceived &= purchaseItem.getReceivedQuantity().compareTo(purchaseItem.getQuantity()) >= 0;
         }
         for (var purchaseItem : purchaseItems) {
             if (!receiptItems.containsKey(purchaseItem.getId())
@@ -298,18 +347,33 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 allReceived = false;
             }
         }
+        return new ReceiptProgress(allReceived, hasDifference);
+    }
+
+    /**
+     * 创建或构建目标数据（{@code createReceipt}）。
+     */
+    private PurchaseReceipt createReceipt(UUID id, PurchaseReceiptFrom from, UUID receiverId, ReceiptProgress progress) {
         var receipt = new PurchaseReceipt();
         receipt.setPurchaseId(id);
         receipt.setReceiptNo(StringUtils.hasText(from.getReceiptNo()) ? from.getReceiptNo() : "GR" + Instant.now().toEpochMilli());
         receipt.setReceivedDate(timeMapper.toInstant(from.getReceivedDate()));
         receipt.setReceiverId(receiverId);
-        receipt.setStatus(hasDifference
+        receipt.setStatus(progress.hasDifference()
                 ? PurchaseReceiptStatus.DIFFERENCE.getValue()
-                : allReceived ? PurchaseReceiptStatus.COMPLETE.getValue() : PurchaseReceiptStatus.PARTIAL.getValue());
+                : progress.allReceived() ? PurchaseReceiptStatus.COMPLETE.getValue() : PurchaseReceiptStatus.PARTIAL.getValue());
         receipt.setRemark(from.getRemark());
         if (receiptMapper.insert(receipt) != 1) {
             throw new DataSaveException("保存采购收货单失败");
         }
+        return receipt;
+    }
+
+    /**
+     * 更新或推进目标状态（{@code saveReceiptItems}）。
+     */
+    private void saveReceiptItems(PurchaseReceipt receipt, Map<UUID, PurchaseReceiptItemFrom> receiptItems,
+                                  Map<UUID, PurchaseItem> itemMap) {
         for (var entry : receiptItems.entrySet()) {
             var item = entry.getValue();
             var receiptItem = new PurchaseReceiptItem();
@@ -325,17 +389,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
                 throw new DataSaveException("更新采购收货数量失败");
             }
         }
-        entity.setExecutionStatus(allReceived
-                ? PurchaseExecutionStatus.RECEIVED.getValue()
-                : PurchaseExecutionStatus.PARTIAL_RECEIVED.getValue());
-        if (allReceived) {
-            entity.setCompletedAt(Instant.now());
-        }
-        if (!this.updateById(entity)) {
-            throw new DataSaveException("更新采购执行状态失败");
-        }
-        workflowSupport.sendNotification(application, "purchase", allReceived ? "采购已全部收货" : "采购已部分收货",
-                allReceived ? "采购申请的全部明细已完成收货" : "采购申请已登记一批收货记录");
+    }
+
+    private record ReceiptProgress(boolean allReceived, boolean hasDifference) {
     }
 
     @Override
@@ -374,6 +430,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private void validate(PurchaseSaveFrom from) {
         if (from == null || from.getItems() == null || from.getItems().isEmpty()) {
             throw new DataSaveException("采购参数和采购明细不能为空");
@@ -388,6 +447,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code replaceItems}）。
+     */
     private void replaceItems(Purchase entity, List<PurchaseItemFrom> items) {
         itemMapper.delete(new LambdaQueryWrapper<PurchaseItem>().eq(PurchaseItem::getPurchaseId, entity.getId()));
         items.forEach(item -> {
@@ -404,10 +466,16 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         });
     }
 
+    /**
+     * 更新或推进目标状态（{@code updatePurchaseItem}）。
+     */
     private boolean updatePurchaseItem(PurchaseItem item) {
         return itemMapper.updateById(item) == 1;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private PurchaseVO assembleView(Purchase entity) {
         var application = applicationService.require(entity.getApplicationId());
         var vo = purchaseConverter.toVO(entity);
@@ -429,6 +497,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         return vo;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleReceiptView}）。
+     */
     private PurchaseReceiptVO assembleReceiptView(PurchaseReceipt receipt) {
         var vo = purchaseConverter.toReceiptVO(receipt);
         vo.setItems(receiptItemMapper.selectList(new LambdaQueryWrapper<PurchaseReceiptItem>().eq(PurchaseReceiptItem::getReceiptId, receipt.getId()))
@@ -438,6 +509,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         return vo;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Purchase require(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
@@ -446,6 +520,9 @@ public class PurchaseServiceImpl extends BaseServiceImpl<PurchaseMapper, Purchas
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireEditableApplication}）。
+     */
     private Application requireEditableApplication(Purchase entity) {
         var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "采购申请不存在或无权操作");
         if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {

@@ -64,6 +64,9 @@ public final class SecurityAuditSnapshotSanitizer {
         return Collections.unmodifiableMap(new LinkedHashMap<>(sanitized));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sanitizeValue}）。
+     */
     private static Object sanitizeValue(Object value) {
         if (value instanceof Map<?, ?> nested) {
             Map<String, Object> nestedMap = new LinkedHashMap<>();
@@ -88,6 +91,9 @@ public final class SecurityAuditSnapshotSanitizer {
         return value;
     }
 
+    /**
+     * 判断条件是否满足（{@code isSensitiveKey}）。
+     */
     private static boolean isSensitiveKey(String key) {
         String normalized = key.replaceAll("[^A-Za-z0-9]", "").toLowerCase(Locale.ROOT);
         return SENSITIVE_KEYS.contains(normalized) || normalized.endsWith("secret") || normalized.endsWith("token");

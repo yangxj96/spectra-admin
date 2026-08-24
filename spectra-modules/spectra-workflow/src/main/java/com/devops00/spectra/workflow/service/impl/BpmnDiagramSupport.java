@@ -39,6 +39,9 @@ final class BpmnDiagramSupport {
     private BpmnDiagramSupport() {
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureGraphicInfo}）。
+     */
     static void ensureGraphicInfo(BpmnModel model) {
         Process process = model.getMainProcess();
         if (process == null) {
@@ -93,6 +96,9 @@ final class BpmnDiagramSupport {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code calculateDepths}）。
+     */
     private static Map<String, Integer> calculateDepths(List<FlowNode> nodes, Process process) {
         Map<String, Integer> depths = new HashMap<>();
         nodes.forEach(node -> depths.put(node.getId(), 0));

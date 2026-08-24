@@ -59,6 +59,9 @@ public enum RegionLevel implements IEnum<Integer> {
         this.name = name;
     }
 
+    /**
+     * 创建或构建目标数据（{@code of}）。
+     */
     public static RegionLevel of(Integer level) {
         if (level == null) {
             return null;

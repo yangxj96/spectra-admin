@@ -20,7 +20,12 @@ import com.devops00.spectra.common.base.javabean.vo.Tree;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * 通用树结构构建器
@@ -32,6 +37,12 @@ import java.util.*;
  */
 @Slf4j
 public record TreeBuilder<T extends Tree<T>>(@Nullable List<T> dataList) {
+
+    public TreeBuilder {
+        dataList = dataList == null
+                ? null
+                : Collections.unmodifiableList(new ArrayList<>(dataList));
+    }
 
     /**
      * 构建树形结构
@@ -58,12 +69,17 @@ public record TreeBuilder<T extends Tree<T>>(@Nullable List<T> dataList) {
 
             if (parentId == null || parentId.equals(rootPid)) {
                 rootNodes.add(node);
-            } else if (nodeMap.containsKey(parentId)) {
+            } else {
                 T parent = nodeMap.get(parentId);
-                if (parent.getChildren() == null) {
-                    parent.setChildren(new ArrayList<>());
+                if (parent == null) {
+                    continue;
                 }
-                parent.getChildren().add(node);
+                List<T> children = parent.getChildren();
+                if (children == null) {
+                    children = new ArrayList<>();
+                    parent.setChildren(children);
+                }
+                children.add(node);
             }
         }
 

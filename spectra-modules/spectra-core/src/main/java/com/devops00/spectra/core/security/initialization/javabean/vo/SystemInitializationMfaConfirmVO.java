@@ -7,8 +7,19 @@
 
 package com.devops00.spectra.core.security.initialization.javabean.vo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /** MFA 首次确认返回的 Recovery Code。仅返回一次。 */
 public record SystemInitializationMfaConfirmVO(List<String> recoveryCodes) {
+
+    public SystemInitializationMfaConfirmVO {
+        recoveryCodes = recoveryCodes == null ? List.of() : Collections.unmodifiableList(new ArrayList<>(recoveryCodes));
+    }
+
+    @Override
+    public List<String> recoveryCodes() {
+        return Collections.unmodifiableList(new ArrayList<>(recoveryCodes));
+    }
 }

@@ -28,6 +28,9 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public record ULogEventPublisher(ApplicationEventPublisher publisher) {
 
+    /**
+     * 更新或推进目标状态（{@code save}）。
+     */
     public void save(ULogEntity entity) {
         publisher.publishEvent(entity);
     }

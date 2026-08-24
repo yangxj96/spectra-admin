@@ -68,6 +68,9 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
         return userIds.stream().toList();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addDepartmentUsers}）。
+     */
     private void addDepartmentUsers(Set<UUID> userIds, List<UUID> departmentIds) {
         if (departmentIds == null || departmentIds.isEmpty()) {
             return;
@@ -94,6 +97,9 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
                 .forEach(userIds::add);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addRoleUsers}）。
+     */
     private void addRoleUsers(Set<UUID> userIds, List<UUID> roleIds) {
         if (roleIds == null || roleIds.isEmpty()) {
             return;
@@ -124,11 +130,17 @@ public class CoreNotificationAudienceDirectory implements NotificationAudienceDi
                 .forEach(userIds::add);
     }
 
+    /**
+     * 判断条件是否满足（{@code isValid}）。
+     */
     private boolean isValid(RoleAssignment assignment, Instant now) {
         return (assignment.getValidFrom() == null || !now.isBefore(assignment.getValidFrom()))
                 && (assignment.getValidUntil() == null || now.isBefore(assignment.getValidUntil()));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addNonNull}）。
+     */
     private void addNonNull(Set<UUID> target, Collection<UUID> values) {
         if (values != null) {
             values.stream().filter(Objects::nonNull).forEach(target::add);

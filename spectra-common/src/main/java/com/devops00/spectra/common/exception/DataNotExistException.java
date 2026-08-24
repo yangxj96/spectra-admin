@@ -32,4 +32,8 @@ public class DataNotExistException extends DataException {
     public DataNotExistException(String message) {
         super(message);
     }
+
+    public DataNotExistException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

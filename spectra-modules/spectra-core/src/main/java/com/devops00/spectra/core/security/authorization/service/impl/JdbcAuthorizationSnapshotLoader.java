@@ -178,6 +178,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return AuthorizationSnapshot.of(result);
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadRolePermissions}）。
+     */
     private Map<UUID, Set<UUID>> loadRolePermissions(Set<UUID> roleIds) {
         if (roleIds.isEmpty()) {
             return Map.of();
@@ -190,6 +193,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                         Collectors.mapping(RolePermission::getPermissionId, Collectors.toSet())));
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadRoleGrantablePermissions}）。
+     */
     private Map<UUID, Set<UUID>> loadRoleGrantablePermissions(Set<UUID> roleIds) {
         if (roleIds.isEmpty()) {
             return Map.of();
@@ -203,6 +209,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
                         Collectors.mapping(RoleGrantablePermission::getPermissionId, Collectors.toSet())));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toAccessBoundaries}）。
+     */
     private Map<String, PermissionBoundary> toAccessBoundaries(
                                                                List<AssignmentPermissionBoundary> rows,
                                                                Map<UUID, Permission> permissions,
@@ -219,6 +228,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toGrantBoundaries}）。
+     */
     private Map<String, PermissionBoundary> toGrantBoundaries(
                                                               List<AssignmentGrantBoundary> rows,
                                                               Map<UUID, Permission> permissions,
@@ -235,6 +247,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toScope}）。
+     */
     private AuthorizationScope toScope(
                                        Map<UUID, com.devops00.spectra.core.security.authorization.entity.AuthorizationScope> scopes,
                                        List<ScopeRule> rules,
@@ -266,6 +281,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return new AuthorizationScope(mode, departments, includeDescendants);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireRole}）。
+     */
     private SecurityRole requireRole(Map<UUID, SecurityRole> roles, UUID roleId) {
         var role = roles.get(roleId);
         if (role == null) {
@@ -274,6 +292,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return role;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requirePermission}）。
+     */
     private Permission requirePermission(Map<UUID, Permission> permissions, UUID permissionId) {
         var permission = permissions.get(permissionId);
         if (permission == null) {
@@ -282,6 +303,9 @@ public class JdbcAuthorizationSnapshotLoader implements AuthorizationSnapshotLoa
         return permission;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireRolePermission}）。
+     */
     private void requireRolePermission(Set<UUID> rolePermissionIds, UUID permissionId) {
         if (!rolePermissionIds.contains(permissionId)) {
             throw new IllegalStateException("授权边界引用了 Role 未声明的 Permission: " + permissionId);

@@ -36,10 +36,19 @@ import java.util.List;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface FileInfoConverter {
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     FileInfoVO toVO(FileInfo source);
 
+    /**
+     * 转换、解析或规范化数据（{@code toVOList}）。
+     */
     List<FileInfoVO> toVOList(List<FileInfo> source);
 
+    /**
+     * 转换、解析或规范化数据（{@code toVOPage}）。
+     */
     @Mapping(target = "pages", ignore = true)
     Page<FileInfoVO> toVOPage(Page<FileInfo> source);
 }

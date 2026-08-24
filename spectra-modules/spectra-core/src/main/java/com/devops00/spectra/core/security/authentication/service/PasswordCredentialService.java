@@ -24,10 +24,19 @@ import java.util.UUID;
 
 public interface PasswordCredentialService {
 
+    /**
+     * 查询或获取目标数据（{@code getByUserId}）。
+     */
     @Nullable
     PasswordCredential getByUserId(UUID userId);
 
+    /**
+     * 创建或构建目标数据（{@code createOrReplace}）。
+     */
     void createOrReplace(UUID userId, String passwordHash, boolean mustChange);
 
+    /**
+     * 更新或推进目标状态（{@code updatePassword}）。
+     */
     void updatePassword(UUID userId, String passwordHash, boolean mustChange, @Nullable Instant expiresAt);
 }

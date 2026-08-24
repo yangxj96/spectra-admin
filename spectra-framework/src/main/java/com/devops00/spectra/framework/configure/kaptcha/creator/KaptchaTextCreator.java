@@ -18,7 +18,7 @@ package com.devops00.spectra.framework.configure.kaptcha.creator;
 
 import com.google.code.kaptcha.text.impl.DefaultTextCreator;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 /**
  * 验证码文本生成器
@@ -37,14 +37,14 @@ public class KaptchaTextCreator extends DefaultTextCreator {
     /**
      * 随机数种子
      */
-    private static final Random random = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Override
     public String getText() {
 
-        var x = random.nextInt(10);
-        var y = random.nextInt(10);
-        var operands = random.nextInt(3);
+        var x = RANDOM.nextInt(10);
+        var y = RANDOM.nextInt(10);
+        var operands = RANDOM.nextInt(3);
 
         // 使用 switch 表达式（JDK 14+）返回结果
         var result = switch (operands) {

@@ -55,6 +55,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SystemGuideServiceImpl implements SystemGuideService {
 
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final SystemStateMapper stateMapper;
     private final SystemGuideAuthorization guideAuthorization;
     private final ConfiguredService configuredService;
@@ -98,6 +100,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
                 from.getCryptoEnabled(), from.getNotificationEnabled());
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyCopyright}）。
+     */
     private void applyCopyright(boolean enabled, String name, String url) {
         String copyrightName = name == null ? "" : name.trim();
         String copyrightUrl = url == null ? "" : url.trim();
@@ -117,6 +122,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
                 "系统底部版权点击跳转地址");
     }
 
+    /**
+     * 判断条件是否满足（{@code isHttpUrl}）。
+     */
     private boolean isHttpUrl(String value) {
         if (value.isBlank()) {
             return false;
@@ -131,6 +139,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         }
     }
 
+    /**
+     * 创建或构建目标数据（{@code createRootDepartment}）。
+     */
     private Department createRootDepartment(String name, UUID regionId, Short type, UUID userId) {
         String departmentName = name == null ? "" : name.trim();
         if (departmentName.isBlank()) {
@@ -171,6 +182,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         return rootDepartment;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireCurrentUserId}）。
+     */
     private UUID requireCurrentUserId() {
         UUID userId = securityContextAccessor.currentUserId();
         if (userId == null) {
@@ -179,6 +193,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         return userId;
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyCrypto}）。
+     */
     private void applyCrypto(boolean enabled) {
         if (!enabled) {
             configuredService.upsert(SystemConfigKeys.CRYPTO_ENABLED, "false", ConfiguredValueType.BOOL,
@@ -198,6 +215,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyNotification}）。
+     */
     private void applyNotification(boolean enabled) {
         configuredService.upsert(SystemConfigKeys.NOTIFICATION_ENABLED, Boolean.toString(enabled),
                 ConfiguredValueType.BOOL, "系统设置引导中配置的通知模块开关");
@@ -213,16 +233,22 @@ public class SystemGuideServiceImpl implements SystemGuideService {
                 ConfiguredValueType.TEXT, "消息中心允许的站内路由前缀");
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureAesKey}）。
+     */
     private void ensureAesKey(String key, String remarks) {
         var existing = configuredService.findValue(key).orElse(null);
         if (isValidAesKey(existing)) {
             return;
         }
         var bytes = new byte[32];
-        new SecureRandom().nextBytes(bytes);
+        SECURE_RANDOM.nextBytes(bytes);
         configuredService.upsert(key, Base64.getEncoder().encodeToString(bytes), ConfiguredValueType.TEXT, remarks);
     }
 
+    /**
+     * 判断条件是否满足（{@code isValidAesKey}）。
+     */
     private boolean isValidAesKey(String encodedKey) {
         if (encodedKey == null || encodedKey.isBlank()) {
             return false;
@@ -235,6 +261,9 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code saveKeyPair}）。
+     */
     private void saveKeyPair(KeyPair serverPair, KeyPair clientPair) {
         String remarks = "系统设置引导自动生成 RSA 密钥对";
         configuredService.upsert("crypto.server.public-key", RSAUtils.getPublicKeyBase64(serverPair.getPublic()),
@@ -247,18 +276,27 @@ public class SystemGuideServiceImpl implements SystemGuideService {
                 ConfiguredValueType.TEXT, remarks);
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateRsaKeyPair}）。
+     */
     private KeyPair generateRsaKeyPair() {
         try {
             return RSAUtils.generateKeyPair();
         } catch (Exception exception) {
-            throw new DataSaveException("生成接口加解密密钥失败");
+            throw new DataSaveException("生成接口加解密密钥失败", exception);
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadState}）。
+     */
     private SystemState loadState(boolean lock) {
         return loadStateByKey(SystemStateKeys.SYSTEM_GUIDE, lock);
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadStateByKey}）。
+     */
     private SystemState loadStateByKey(String stateKey, boolean lock) {
         SystemState state = lock
                 ? stateMapper.selectForUpdateByStateKey(stateKey)

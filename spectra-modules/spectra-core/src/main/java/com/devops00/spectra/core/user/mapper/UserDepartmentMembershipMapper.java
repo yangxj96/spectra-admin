@@ -29,5 +29,8 @@ public interface UserDepartmentMembershipMapper {
                 (user_id, department_id, membership_type, created_by, updated_by)
             VALUES (#{userId}, #{departmentId}, 'PRIMARY', #{userId}, #{userId})
             """)
+    /**
+     * 处理内部业务逻辑（{@code insertPrimary}）。
+     */
     int insertPrimary(@Param("userId") UUID userId, @Param("departmentId") UUID departmentId);
 }

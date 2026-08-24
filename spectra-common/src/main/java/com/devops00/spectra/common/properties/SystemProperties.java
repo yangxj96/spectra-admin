@@ -108,7 +108,7 @@ public class SystemProperties {
          * 指定运行的头信息
          */
         private List<String> headers = List.of("Accept", "Authorization", "Content-Type", "Api-Version", "X-Client-Type",
-                "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With","X-Spectra-Initialization-Token");
+                "X-CSRF-Token", "X-XSRF-TOKEN", "X-Requested-With", "X-Spectra-Initialization-Token");
 
         /**
          * 是否支持凭证

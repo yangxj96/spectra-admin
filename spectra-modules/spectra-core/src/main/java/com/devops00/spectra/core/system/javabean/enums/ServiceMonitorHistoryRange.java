@@ -48,14 +48,23 @@ public enum ServiceMonitorHistoryRange {
         this.maxPoints = maxPoints;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getCode}）。
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getDuration}）。
+     */
     public Duration getDuration() {
         return duration;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getMaxPoints}）。
+     */
     public int getMaxPoints() {
         return maxPoints;
     }

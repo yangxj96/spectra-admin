@@ -123,6 +123,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return preview(null, from, ChangeType.CREATE);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     private OrganizationChangePreviewVO preview(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
         var prepared = prepare(departmentId, from, changeType);
         var expiresAt = Instant.now().plusSeconds(300);
@@ -158,6 +161,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         execute(prepared);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verifyAndPrepare}）。
+     */
     private PreparedChange verifyAndPrepare(UUID departmentId, OrganizationChangeApplyFrom from,
                                             ChangeType changeType) {
         if (from == null || from.getPreviewToken() == null || from.getPreviewToken().isBlank()) {
@@ -183,6 +189,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return prepared;
     }
 
+    /**
+     * 执行内部处理逻辑（{@code execute}）。
+     */
     private void execute(PreparedChange prepared) {
         UUID operatorId = prepared.operatorId();
         UUID departmentId = prepared.departmentId();
@@ -206,6 +215,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         });
     }
 
+    /**
+     * 创建或构建目标数据（{@code prepare}）。
+     */
     private PreparedChange prepare(UUID departmentId, OrganizationChangeFrom from, ChangeType changeType) {
         if ((changeType == ChangeType.UPDATE && departmentId == null)
                 || from == null
@@ -250,6 +262,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
                 userIds);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateParent}）。
+     */
     private void validateParent(UUID departmentId, UUID newParentId, Department existing) {
         if (Objects.equals(departmentId, newParentId)) {
             throw new DataException("部门不能移动到自身");
@@ -265,6 +280,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestedDepartment}）。
+     */
     private Department requestedDepartment(UUID departmentId, OrganizationChangeFrom from) {
         var department = new Department();
         if (departmentId != null) {
@@ -279,12 +297,18 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return department;
     }
 
+    /**
+     * 查询或获取目标数据（{@code readCurrentOrganizationVersion}）。
+     */
     private long readCurrentOrganizationVersion() {
         var row = organizationVersionMapper.selectOne(new LambdaQueryWrapper<OrganizationVersion>()
                 .eq(OrganizationVersion::getSingletonKey, "SYSTEM"));
         return row == null || row.getOrganizationVersion() == null ? 0L : row.getOrganizationVersion();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code persist}）。
+     */
     private UUID persist(PreparedChange prepared) {
         var department = prepared.requestedDepartment();
         if (prepared.changeType() == ChangeType.CREATE) {
@@ -332,6 +356,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return department.getId();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestHash}）。
+     */
     private String requestHash(UUID departmentId, ChangeType changeType, Department department, long version) {
         String canonical = List.of(changeType.name(), canonicalValue(departmentId), Long.toString(version),
                 canonicalValue(department.getPid()), canonicalValue(department.getName()),
@@ -352,6 +379,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code canonicalValue}）。
+     */
     private String canonicalValue(Object value) {
         if (value == null) {
             return "-";
@@ -360,6 +390,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return text.length() + ":" + text;
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentOperatorId}）。
+     */
     private UUID currentOperatorId() {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
@@ -368,6 +401,9 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
         return operatorId;
     }
 
+    /**
+     * 更新或推进目标状态（{@code appendAudit}）。
+     */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,

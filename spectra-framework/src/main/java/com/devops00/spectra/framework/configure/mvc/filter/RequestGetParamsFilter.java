@@ -32,6 +32,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,16 +79,13 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
 
         public ParamsModifyHttpServletRequestWrapper(HttpServletRequest request, ConcurrentMap<String, String[]> formatted) {
             super(request);
-            this.formatted = formatted;
+            this.formatted = new ConcurrentHashMap<>(copyParameterMap(formatted));
         }
 
         @Override
         public @Nullable String getParameter(String name) {
-            if (formatted.containsKey(name)) {
-                return formatted.get(name)[0];
-            } else {
-                return null;
-            }
+            var values = formatted.get(name);
+            return values == null || values.length == 0 ? null : values[0];
         }
 
         @Override
@@ -97,16 +95,22 @@ public class RequestGetParamsFilter extends OncePerRequestFilter {
 
         @Override
         public String[] getParameterValues(String name) {
-            if (formatted.containsKey(name)) {
-                return formatted.get(name);
-            } else {
-                return new String[]{""};
-            }
+            var values = formatted.get(name);
+            return values == null ? null : values.clone();
         }
 
         @Override
         public Map<String, String[]> getParameterMap() {
-            return formatted;
+            return copyParameterMap(formatted);
+        }
+
+        /**
+         * 转换、解析或规范化数据（{@code copyParameterMap}）。
+         */
+        private static Map<String, String[]> copyParameterMap(Map<String, String[]> source) {
+            var copy = new HashMap<String, String[]>();
+            source.forEach((key, values) -> copy.put(key, values == null ? null : values.clone()));
+            return Collections.unmodifiableMap(copy);
         }
     }
 }

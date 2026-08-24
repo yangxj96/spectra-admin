@@ -27,6 +27,9 @@ import java.util.List;
  */
 public interface S3Service {
 
+    /**
+     * 查询或获取目标数据（{@code listAllObjects}）。
+     */
     List<String> listAllObjects(String bucket);
 
     /**

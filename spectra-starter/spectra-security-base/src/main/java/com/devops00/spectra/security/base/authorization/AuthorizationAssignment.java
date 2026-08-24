@@ -44,6 +44,19 @@ public record AuthorizationAssignment(UUID assignmentId,
         grantBoundaries = immutableByPermission(grantBoundaries);
     }
 
+    @Override
+    public Map<String, PermissionBoundary> accessBoundaries() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(accessBoundaries));
+    }
+
+    @Override
+    public Map<String, PermissionBoundary> grantBoundaries() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(grantBoundaries));
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code immutableByPermission}）。
+     */
     private static Map<String, PermissionBoundary> immutableByPermission(Map<String, PermissionBoundary> source) {
         if (source == null || source.isEmpty()) {
             return Map.of();

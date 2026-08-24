@@ -26,6 +26,9 @@ import java.util.UUID;
  */
 public record AuthorizationScope(ScopeMode mode, Set<UUID> departmentIds, boolean includeDescendants) {
 
+    /**
+     * 创建或构建目标数据（{@code of}）。
+     */
     public static AuthorizationScope of(ScopeMode mode) {
         return new AuthorizationScope(mode, Set.of(), false);
     }
@@ -48,6 +51,14 @@ public record AuthorizationScope(ScopeMode mode, Set<UUID> departmentIds, boolea
         }
     }
 
+    @Override
+    public Set<UUID> departmentIds() {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(departmentIds));
+    }
+
+    /**
+     * 查询或获取目标数据（{@code allows}）。
+     */
     public boolean allows(ScopeQuery query) {
         if (query == null) {
             return false;

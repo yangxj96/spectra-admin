@@ -46,6 +46,9 @@ public class DataScopeExecutor {
         DataScopeContextHolder.withBypass(action);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireSystemOperator}）。
+     */
     private void requireSystemOperator() {
         var user = securityContextAccessor.currentUser();
         if (user == null

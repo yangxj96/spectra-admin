@@ -55,6 +55,9 @@ public interface RegionService extends BaseService<Region> {
      */
     IPage<RegionVO> page(PageFrom page, RegionPageFrom params);
 
+    /**
+     * 查询或获取目标数据（{@code getPath}）。
+     */
     RegionPathVO getPath(UUID id);
 
     /**

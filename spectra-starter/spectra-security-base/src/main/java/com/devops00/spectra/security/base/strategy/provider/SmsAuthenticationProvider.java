@@ -51,8 +51,14 @@ public abstract class SmsAuthenticationProvider implements BasicAuthenticationPr
         return login(phone, code);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code login}）。
+     */
     public abstract Authentication login(String phone, String code) throws AuthenticationException;
 
+    /**
+     * 处理内部业务逻辑（{@code kaptchaValidate}）。
+     */
     public abstract void kaptchaValidate(String phone, String kaptcha);
 
     @Override

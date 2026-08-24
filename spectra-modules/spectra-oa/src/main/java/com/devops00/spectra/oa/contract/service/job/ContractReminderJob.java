@@ -36,6 +36,9 @@ public class ContractReminderJob {
 
     private final ContractService contractService;
 
+    /**
+     * 更新或推进目标状态（{@code sendDueMilestoneReminders}）。
+     */
     @Scheduled(cron = "0 0 1 * * *")
     public void sendDueMilestoneReminders() {
         var sent = contractService.sendDueMilestoneReminders();

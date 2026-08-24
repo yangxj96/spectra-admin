@@ -64,14 +64,23 @@ public class SystemBootstrapServiceImpl implements SystemBootstrapService {
         return new SystemBootstrapVO(system, crypto, initializationService.status());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code value}）。
+     */
     private String value(String key, String fallback) {
         return configuredService.findValue(key).orElse(fallback);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code booleanValue}）。
+     */
     private boolean booleanValue(String key, boolean fallback) {
         return configuredService.findValue(key).map(Boolean::parseBoolean).orElse(fallback);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code copyrightUrl}）。
+     */
     private String copyrightUrl() {
         String value = value(SystemConfigKeys.COPYRIGHT_URL, DEFAULT_COPYRIGHT_URL);
         try {

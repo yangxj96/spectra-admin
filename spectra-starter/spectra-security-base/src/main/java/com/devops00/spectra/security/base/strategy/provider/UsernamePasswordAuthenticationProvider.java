@@ -52,8 +52,14 @@ public abstract class UsernamePasswordAuthenticationProvider implements BasicAut
         return login(username, password);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code login}）。
+     */
     public abstract Authentication login(String username, String password) throws AuthenticationException;
 
+    /**
+     * 处理内部业务逻辑（{@code kaptchaValidate}）。
+     */
     public abstract void kaptchaValidate(String kaptcha);
 
     @Override

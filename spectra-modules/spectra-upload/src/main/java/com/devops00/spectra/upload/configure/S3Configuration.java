@@ -43,6 +43,9 @@ public class S3Configuration {
 
     private final S3Properties properties;
 
+    /**
+     * 处理内部业务逻辑（{@code s3Client}）。
+     */
     @Bean
     public S3Client s3Client() {
 
@@ -55,6 +58,9 @@ public class S3Configuration {
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code s3Presigner}）。
+     */
     @Bean
     public S3Presigner s3Presigner() {
         return S3Presigner.builder()

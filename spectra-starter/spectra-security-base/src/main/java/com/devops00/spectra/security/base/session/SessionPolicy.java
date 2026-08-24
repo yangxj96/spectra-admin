@@ -30,6 +30,9 @@ public record SessionPolicy(SessionConcurrencyMode concurrencyMode, int maxSessi
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code defaults}）。
+     */
     public static SessionPolicy defaults(long accessTtlSeconds, long refreshTtlSeconds) {
         return new SessionPolicy(SessionConcurrencyMode.ALLOW, 5, accessTtlSeconds, refreshTtlSeconds, null, null);
     }

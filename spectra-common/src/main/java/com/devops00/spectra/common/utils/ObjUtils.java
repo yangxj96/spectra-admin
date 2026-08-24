@@ -59,7 +59,7 @@ public final class ObjUtils {
     }
 
     /**
-     * Object → Map<K, V>
+     * Object 转 Map&lt;K, V&gt;
      *
      * @param obj        对象
      * @param keyClass   key类型

@@ -53,12 +53,21 @@ import java.util.TimeZone;
 @EnableConfigurationProperties(JacksonProperties.class)
 public class JacksonConfiguration {
 
-    private final JacksonProperties properties;
+    private final String localDateTimeFormat;
+
+    private final String localDateFormat;
+
+    private final String localTimeFormat;
 
     public JacksonConfiguration(JacksonProperties properties) {
-        this.properties = properties;
+        this.localDateTimeFormat = properties.getLocalDateTimeFormat();
+        this.localDateFormat = properties.getLocalDateFormat();
+        this.localTimeFormat = properties.getLocalTimeFormat();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code jsonMapperBuilderCustomizer}）。
+     */
     @Bean
     public JsonMapperBuilderCustomizer jsonMapperBuilderCustomizer() {
         log.debug(LogPrefix.SERIALIZATION.f("配置JsonMapper"));
@@ -70,20 +79,20 @@ public class JacksonConfiguration {
 
             // 添加自定义序列化器
             javaTimeModule.addSerializer(LocalDateTime.class,
-                    new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-            javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-            javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
+                    new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(localDateTimeFormat)));
+            javaTimeModule.addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(localDateFormat)));
+            javaTimeModule.addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(localTimeFormat)));
 
             // 添加反序列化器
             javaTimeModule.addDeserializer(LocalDateTime.class,
-                    new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateTimeFormat())));
-            javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(properties.getLocalDateFormat())));
-            javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(properties.getLocalTimeFormat())));
+                    new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(localDateTimeFormat)));
+            javaTimeModule.addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(localDateFormat)));
+            javaTimeModule.addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(localTimeFormat)));
 
             // 旧时间的序列化
             // 理论上是非线程安全的,如果用不到传统time类,可以注释掉
             log.debug(LogPrefix.SERIALIZATION.f("传统time进行处理"));
-            var sdf = new SimpleDateFormat(properties.getLocalDateTimeFormat());
+            var sdf = new SimpleDateFormat(localDateTimeFormat);
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             log.debug(LogPrefix.SERIALIZATION.f("NON_NULL,SNAKE_CASE,MixIn"));

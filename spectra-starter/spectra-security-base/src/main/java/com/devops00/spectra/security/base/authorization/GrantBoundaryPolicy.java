@@ -74,6 +74,9 @@ public final class GrantBoundaryPolicy {
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code contains}）。
+     */
     private static boolean contains(PermissionBoundary container, AuthorizationScope requested) {
         return requested != null && ScopeContains.contains(container.scope(), requested);
     }

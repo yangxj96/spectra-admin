@@ -74,7 +74,7 @@ public class OaApplicationWorkflowSupport {
             }
             return applicationService.require(UUID.fromString(businessKey));
         } catch (IllegalArgumentException exception) {
-            throw new DataNotExistException("审批业务KEY无效: " + businessKey);
+            throw new DataNotExistException("审批业务KEY无效: " + businessKey, exception);
         }
     }
 

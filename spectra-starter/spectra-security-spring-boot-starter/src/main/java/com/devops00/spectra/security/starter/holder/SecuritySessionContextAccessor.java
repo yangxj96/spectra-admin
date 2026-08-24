@@ -75,6 +75,9 @@ public class SecuritySessionContextAccessor implements SecurityContextAccessor {
         return UTC_ZONE_ID;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeZoneId}）。
+     */
     private String normalizeZoneId(String value) {
         if (value == null || value.isBlank()) {
             return null;

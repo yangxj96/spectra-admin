@@ -17,12 +17,21 @@ import java.util.UUID;
  */
 public interface SecurityContextAccessor {
 
+    /**
+     * 查询或获取目标数据（{@code currentUser}）。
+     */
     @Nullable
     SecurityUser currentUser();
 
+    /**
+     * 查询或获取目标数据（{@code currentUserId}）。
+     */
     @Nullable
     UUID currentUserId();
 
+    /**
+     * 查询或获取目标数据（{@code currentToken}）。
+     */
     @Nullable
     String currentToken();
 
@@ -33,5 +42,8 @@ public interface SecurityContextAccessor {
      */
     String currentUserZoneId();
 
+    /**
+     * 查询或获取目标数据（{@code currentUsername}）。
+     */
     String currentUsername();
 }

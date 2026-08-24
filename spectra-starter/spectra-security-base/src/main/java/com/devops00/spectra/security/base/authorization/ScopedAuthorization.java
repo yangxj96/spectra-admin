@@ -25,16 +25,25 @@ public record ScopedAuthorization(UUID subjectId, AuthorizationSnapshot snapshot
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code hasPermission}）。
+     */
     public boolean hasPermission(String permission) {
         return snapshot.hasPermission(permission);
     }
 
+    /**
+     * 查询或获取目标数据（{@code allows}）。
+     */
     public boolean allows(ExecutionContext context, ScopeQuery query) {
         return context != null
                 && subjectId.equals(context.subjectId())
                 && snapshot.canAccess(context.permission(), query);
     }
 
+    /**
+     * 查询或获取目标数据（{@code allows}）。
+     */
     public boolean allows(String permission, ScopeQuery query) {
         return permission != null && snapshot.canAccess(permission, query);
     }

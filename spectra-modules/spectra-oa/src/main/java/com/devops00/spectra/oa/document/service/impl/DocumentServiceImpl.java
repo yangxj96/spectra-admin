@@ -248,7 +248,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         entity.setPid(from.getPid());
         entity.setName(from.getName().trim());
         entity.setVisibility(normalizeVisibility(from.getVisibility()));
-        entity.setSort(from.getSort() == null ? 0 : from.getSort());
+        entity.setSort(from.getSort() == null ? Integer.valueOf(0) : from.getSort());
         entity.setDepartmentId(user.getDepartmentId());
         if (folderMapper.insert(entity) != 1) {
             throw new DataSaveException("保存文档目录失败");
@@ -284,6 +284,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireVersion}）。
+     */
     private DocumentVersion requireVersion(UUID id, UUID versionId) {
         var document = requireAccessible(id);
         DocumentVersion version = versionId == null
@@ -296,12 +299,18 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return version;
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentVersion}）。
+     */
     private DocumentVersion currentVersion(UUID id) {
         return versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, id)
                 .eq(DocumentVersion::getCurrentVersion, true)
                 .last("limit 1"));
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Document require(UUID id) {
         var entity = getById(id);
         if (entity == null) {
@@ -310,6 +319,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireAccessible}）。
+     */
     private Document requireAccessible(UUID id) {
         var entity = require(id);
         var user = securityContextAccessor.currentUser();
@@ -324,6 +336,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireOwner}）。
+     */
     private Document requireOwner(UUID id) {
         var entity = require(id);
         var user = securityContextAccessor.currentUser();
@@ -333,6 +348,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return entity;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeVisibility}）。
+     */
     private String normalizeVisibility(String value) {
         var normalized = StringUtils.hasText(value) ? value.trim().toUpperCase() : VISIBILITY_DEPARTMENT;
         if (!List.of(VISIBILITY_PUBLIC, VISIBILITY_DEPARTMENT, VISIBILITY_PRIVATE).contains(normalized)) {
@@ -341,6 +359,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         return normalized;
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendPublishNotification}）。
+     */
     private void sendPublishNotification(Document document) {
         try {
             var wrapper = new LambdaQueryWrapper<User>();

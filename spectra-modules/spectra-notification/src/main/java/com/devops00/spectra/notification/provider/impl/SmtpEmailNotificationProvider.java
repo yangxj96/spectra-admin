@@ -73,7 +73,7 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
                         configuration.secret());
             }
             return NotificationProviderHealth.healthy("HEALTH_CHECK_OK", checkedAt);
-        } catch (Exception exception) {
+        } catch (MessagingException exception) {
             return NotificationProviderHealth.unhealthy("HEALTH_CHECK_UNAVAILABLE", checkedAt);
         }
     }
@@ -109,6 +109,9 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code session}）。
+     */
     private Session session(NotificationProviderConfiguration configuration) {
         var properties = new Properties();
         properties.put("mail.smtp.host", configuration.endpoint());
@@ -123,6 +126,9 @@ public class SmtpEmailNotificationProvider implements NotificationProvider {
         return Session.getInstance(properties);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code usable}）。
+     */
     private boolean usable(NotificationProviderConfiguration configuration) {
         return configuration != null
                 && configuration.enabled()

@@ -23,6 +23,9 @@ import java.util.UUID;
 
 public interface AuthorizationSnapshotLoader extends AuthorizationSnapshotProvider {
 
+    /**
+     * 查询或获取目标数据（{@code load}）。
+     */
     @Override
     AuthorizationSnapshot load(UUID userId);
 }

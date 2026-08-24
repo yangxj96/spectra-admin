@@ -239,6 +239,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return converter.toVO(draft);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code copyToDraft}）。
+     */
     private NotificationTemplateEntity copyToDraft(NotificationTemplateEntity source) {
         var draft = new NotificationTemplateEntity();
         draft.setTemplateGroupCode(source.getTemplateGroupCode());
@@ -297,6 +300,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return result;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateContent}）。
+     */
     private NotificationPurpose validateContent(NotificationTemplateSaveFrom params) {
         if (params.getChannel() == null) {
             throw new DataSaveException("通知渠道不能为空");
@@ -317,6 +323,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return purpose;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateDefinition}）。
+     */
     private void validateDefinition(NotificationTemplateEntity entity) {
         var channel = parseChannel(entity.getChannel());
         policy.validateTemplateChannel(policy.parsePurpose(entity.getPurpose()), channel);
@@ -325,6 +334,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         renderer.validateDefinition(entity.getParameterSchema(), entity.getTitleTemplate(), entity.getContentTemplate(), entity.getHtmlTemplate());
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseChannel}）。
+     */
     private NotificationChannel parseChannel(String value) {
         if (!StringUtils.hasText(value)) {
             throw new DataSaveException("通知渠道不能为空");
@@ -332,10 +344,13 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         try {
             return NotificationChannel.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException exception) {
-            throw new DataSaveException("通知渠道不合法");
+            throw new DataSaveException("通知渠道不合法", exception);
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code copyContent}）。
+     */
     private void copyContent(NotificationTemplateSaveFrom params, NotificationTemplateEntity entity) {
         entity.setTitleTemplate(normalizeNullable(params.getTitleTemplate()));
         entity.setContentTemplate(params.getContentTemplate().trim());
@@ -345,6 +360,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         entity.setVersionDigest(NotificationTemplateDigest.calculate(entity));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code nextVersionNo}）。
+     */
     private int nextVersionNo(String groupCode, String channel) {
         return mapper.selectList(new LambdaQueryWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, groupCode)
@@ -356,6 +374,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
                 .orElse(0) + 1;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getTemplate}）。
+     */
     private NotificationTemplateEntity getTemplate(UUID id) {
         if (id == null) {
             throw new DataNotExistException("通知模板不存在");
@@ -369,26 +390,41 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         return entity;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureVersion}）。
+     */
     private void ensureVersion(NotificationTemplateEntity entity, Long version) {
         if (!Objects.equals(entity.getVersion(), version)) {
             throw new DataSaveException("通知模板已被其他人修改，请刷新后重试");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureState}）。
+     */
     private void ensureState(NotificationTemplateEntity entity, String expected, String message) {
         ensureState(entity, Set.of(expected), message);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureState}）。
+     */
     private void ensureState(NotificationTemplateEntity entity, Set<String> expected, String message) {
         if (!expected.contains(entity.getState())) {
             throw new DataSaveException(message);
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private String normalize(String value) {
         return value == null ? null : value.trim();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeNullable}）。
+     */
     private String normalizeNullable(String value) {
         var normalized = normalize(value);
         return StringUtils.hasText(normalized) ? normalized : null;

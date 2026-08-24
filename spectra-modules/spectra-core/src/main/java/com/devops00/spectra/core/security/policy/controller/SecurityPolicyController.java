@@ -46,6 +46,9 @@ public class SecurityPolicyController {
 
     private final SecurityPolicyService policyService;
 
+    /**
+     * 查询或获取目标数据（{@code sessionPolicies}）。
+     */
     @ULog("'查询会话策略'")
     @GetMapping(value = "/session", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
@@ -53,6 +56,9 @@ public class SecurityPolicyController {
         return policyService.sessionPolicies();
     }
 
+    /**
+     * 更新或推进目标状态（{@code modifySessionPolicy}）。
+     */
     @ULog("'修改会话策略'")
     @PutMapping(value = "/session/{clientId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
@@ -61,6 +67,9 @@ public class SecurityPolicyController {
         return policyService.modifySessionPolicy(clientId, from);
     }
 
+    /**
+     * 查询或获取目标数据（{@code passwordPolicy}）。
+     */
     @ULog("'查询密码策略'")
     @GetMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
@@ -68,6 +77,9 @@ public class SecurityPolicyController {
         return policyService.passwordPolicy();
     }
 
+    /**
+     * 更新或推进目标状态（{@code modifyPasswordPolicy}）。
+     */
     @ULog("'修改密码策略'")
     @PutMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")

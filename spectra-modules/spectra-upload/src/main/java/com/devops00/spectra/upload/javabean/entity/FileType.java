@@ -22,6 +22,7 @@ import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.upload.javabean.domain.MagicRule;
 import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -37,6 +38,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "file_type", schema = "spectra_upload", autoResultMap = true)
 public class FileType extends BaseEntity {
 

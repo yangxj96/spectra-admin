@@ -111,6 +111,9 @@ public class MfaServiceImpl implements MfaService {
         return new MfaEnrollmentResult(enrollment.getId(), uri, secret);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolveAccount}）。
+     */
     private String resolveAccount(UUID userId) {
         User user = userMapper.selectById(userId);
         if (user == null) {
@@ -215,6 +218,9 @@ public class MfaServiceImpl implements MfaService {
         return List.copyOf(recoveryCodes);
     }
 
+    /**
+     * 创建或构建目标数据（{@code createRecoveryCodes}）。
+     */
     private List<String> createRecoveryCodes(UUID enrollmentId) {
         List<String> recoveryCodes = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -236,12 +242,18 @@ public class MfaServiceImpl implements MfaService {
         return findActiveEnrollment(userId) != null;
     }
 
+    /**
+     * 更新或推进目标状态（{@code appendAudit}）。
+     */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, targetId, targetId,
                 null, null, null, before, after, reason, null, auditResult(eventType), null));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code auditResult}）。
+     */
     private AuditResult auditResult(String eventType) {
         return switch (eventType) {
             case "AUTH_CHALLENGE_FAILED", "MFA_RECOVERY_CODE_REPLAYED" -> AuditResult.FAILED;
@@ -249,6 +261,9 @@ public class MfaServiceImpl implements MfaService {
         };
     }
 
+    /**
+     * 查询或获取目标数据（{@code findActiveEnrollment}）。
+     */
     private MfaEnrollment findActiveEnrollment(UUID userId) {
         return enrollmentMapper.selectOne(new LambdaQueryWrapper<MfaEnrollment>()
                 .eq(MfaEnrollment::getUserId, userId)
@@ -257,6 +272,9 @@ public class MfaServiceImpl implements MfaService {
                 .last("LIMIT 1"));
     }
 
+    /**
+     * 查询或获取目标数据（{@code findEnrollment}）。
+     */
     private MfaEnrollment findEnrollment(UUID userId, UUID enrollmentId, String state) {
         MfaEnrollment enrollment = enrollmentMapper.selectOne(new LambdaQueryWrapper<MfaEnrollment>()
                 .eq(MfaEnrollment::getId, enrollmentId)
@@ -269,6 +287,9 @@ public class MfaServiceImpl implements MfaService {
         return enrollment;
     }
 
+    /**
+     * 执行加密或解密处理（{@code decryptSecret}）。
+     */
     private DecryptedSecret decryptSecret(MfaEnrollment enrollment) {
         TotpCredential credential = credentialMapper.selectOne(new LambdaQueryWrapper<TotpCredential>()
                 .eq(TotpCredential::getEnrollmentId, enrollment.getId()));
@@ -279,6 +300,9 @@ public class MfaServiceImpl implements MfaService {
         return new DecryptedSecret(credential, cipher.decrypt(credential.getKeyVersion(), credential.getEncryptedSecret()), cipher);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code migrateSecretIfRequired}）。
+     */
     private void migrateSecretIfRequired(MfaEnrollment enrollment, DecryptedSecret decrypted) {
         if (decrypted.cipher().isCurrentVersion(decrypted.credential().getKeyVersion())) {
             return;
@@ -297,6 +321,9 @@ public class MfaServiceImpl implements MfaService {
         }
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateRecoveryCode}）。
+     */
     private String generateRecoveryCode() {
         byte[] bytes = new byte[8];
         random.nextBytes(bytes);

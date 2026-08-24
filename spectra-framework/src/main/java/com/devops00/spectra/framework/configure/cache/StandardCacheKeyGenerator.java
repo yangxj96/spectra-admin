@@ -49,6 +49,9 @@ public class StandardCacheKeyGenerator implements KeyGenerator {
         return methodName + ":" + argsHash;
     }
 
+    /**
+     * 计算缓存参数的稳定哈希值（{@code hashParams}）。
+     */
     private String hashParams(@Nullable Object[] params) {
 
         if (params == null || params.length == 0) {
@@ -68,6 +71,9 @@ public class StandardCacheKeyGenerator implements KeyGenerator {
         }
     }
 
+    /**
+     * 将缓存参数规范化为稳定字符串（{@code stableString}）。
+     */
     private String stableString(@Nullable Object param) {
         return switch (param) {
             case null -> "null";

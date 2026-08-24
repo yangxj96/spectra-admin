@@ -42,6 +42,9 @@ public enum ChatRole {
      */
     SYSTEM;
 
+    /**
+     * 转换、解析或规范化数据（{@code toValue}）。
+     */
     @JsonValue
     public String toValue() {
         return name().toLowerCase();

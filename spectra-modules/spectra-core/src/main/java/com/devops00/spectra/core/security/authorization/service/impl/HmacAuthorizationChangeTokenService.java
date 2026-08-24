@@ -22,9 +22,9 @@ import com.devops00.spectra.security.base.properties.SecurityProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.ObjectProvider;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Clock;
@@ -108,20 +108,32 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireSecret}）。
+     */
     private void requireSecret() {
         if (secret.length < 32) {
             throw new IllegalStateException("未配置满足长度要求的授权变更 token HMAC 密钥");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code uuidText}）。
+     */
     private static String uuidText(UUID value) {
         return value == null ? "-" : value.toString();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseUuid}）。
+     */
     private static UUID parseUuid(String value) {
         return "-".equals(value) ? null : UUID.fromString(value);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sign}）。
+     */
     private byte[] sign(String payload) {
         try {
             var mac = Mac.getInstance(HMAC_ALGORITHM);
@@ -132,18 +144,30 @@ public class HmacAuthorizationChangeTokenService implements AuthorizationChangeT
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code encode}）。
+     */
     private static String encode(String value) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(value.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code encode}）。
+     */
     private static String encode(byte[] value) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(value);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code decode}）。
+     */
     private static String decode(String value) {
         return new String(decodeBytes(value), StandardCharsets.UTF_8);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code decodeBytes}）。
+     */
     private static byte[] decodeBytes(String value) {
         try {
             return Base64.getUrlDecoder().decode(value);

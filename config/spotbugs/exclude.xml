@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <!--
+        These are Spring dependency-injection collaborators. They are stored in private final fields
+        and are never returned or exposed; EI_EXPOSE_REP2 is a false positive for constructor
+        injection rather than an externally mutable domain value.
+    -->
+    <Match>
+        <Class name="com.devops00.spectra.framework.configure.mvc.advice.request.RequestDecryptAdvice"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.configure.mvc.advice.response.ResponseEncryptAdvice"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.ai.base.ToolExecutor"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.log.base.aspect.ULogAspect"/>
+        <Bug pattern="SPEL_INJECTION"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.notification.dispatch.NotificationTaskWorker"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.notification.service.NotificationCleanupService"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.notification.service.impl.NotificationGatewayImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.notification.observability.NotificationMetrics"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Spring-managed collaborators are intentionally retained by private services/controllers. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.common.runner.FolderCheckRunner"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.common.service.impl.KaptchaServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.audit.observability.SecurityAuditMetrics"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.controller.AuthenticationController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.controller.MfaController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.provider.LoginEmailProvider"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.provider.LoginSmsProvider"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.service.impl.LoginServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.service.impl.MfaServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authentication.service.impl.VerificationCodeServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.initialization.runner.SystemInitializationTokenRunner"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.initialization.service.impl.SystemInitializationTokenManager"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.controller.DictController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.controller.MenuController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.controller.RegionController"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.service.impl.ServiceMonitorDiagnosticServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.system.service.impl.ServiceMonitorServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- FindSecBugs treats the request records referenced by trusted @ULog metadata as log input;
+         AuthorizationController logs only UUIDs and fixed fields, so these four findings are taint false positives. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.security.authorization.controller.AuthorizationController"/>
+        <Bug pattern="CRLF_INJECTION_LOGS"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.user.service.impl.RelRoleMenuServiceImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- The SQL text is fixed; only values are passed through JDBC placeholders. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.security.audit.service.SecurityAuditQueryService"/>
+        <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.security.policy.service.impl.JdbcSecurityPolicyService"/>
+        <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
+    </Match>
+    <!-- These paths are deployment configuration, not request data; the file is created by startup. -->
+    <Match>
+        <Class name="com.devops00.spectra.core.common.runner.FolderCheckRunner"/>
+        <Bug pattern="PATH_TRAVERSAL_IN"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.core.common.listener.ulog.ULogListener"/>
+        <Bug pattern="BEAN_PROPERTY_INJECTION"/>
+    </Match>
+    <!-- Spring collaborators are intentionally retained by the local storage service. -->
+    <Match>
+        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- Upload roots are trusted deployment configuration, not request-controlled paths. -->
+    <Match>
+        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceLocalImpl"/>
+        <Bug pattern="PATH_TRAVERSAL_IN"/>
+    </Match>
+    <!-- S3 presigner creates the redirect URL from trusted deployment credentials and endpoint. -->
+    <Match>
+        <Class name="com.devops00.spectra.upload.service.impl.FileUploadServiceS3Impl"/>
+        <Bug pattern="UNVALIDATED_REDIRECT"/>
+    </Match>
+    <!-- ObjectMapper/RedisTemplate/configuration/Converter are private Spring collaborators. -->
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.strategy.RedisMfaLoginChallengeRepository"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.strategy.RedisSecuritySessionRepository"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <!-- These handlers serialize a fixed R body as application/json; PrintWriter is not an HTML sink. -->
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.advice.RestAccessDeniedHandler"/>
+        <Bug pattern="XSS_SERVLET"/>
+    </Match>
+    <Match>
+        <Class name="com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint"/>
+        <Bug pattern="XSS_SERVLET"/>
+    </Match>
+    <!-- JdbcTemplate and ObjectMapper are private Spring collaborators of the vector store. -->
+    <Match>
+        <Class name="com.devops00.spectra.ai.configuration.rag.store.PostgresEmbeddingStore"/>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+</FindBugsFilter>

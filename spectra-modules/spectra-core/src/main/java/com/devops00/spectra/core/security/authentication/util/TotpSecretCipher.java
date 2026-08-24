@@ -11,6 +11,7 @@ import com.devops00.spectra.security.base.properties.SecurityProperties;
 import javax.crypto.Cipher;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Arrays;
@@ -49,6 +50,9 @@ public final class TotpSecretCipher {
         }
     }
 
+    /**
+     * 执行加密或解密处理（{@code encrypt}）。
+     */
     public EncryptedSecret encrypt(String secret) {
         try {
             byte[] iv = new byte[IV_BYTES];
@@ -62,6 +66,9 @@ public final class TotpSecretCipher {
         }
     }
 
+    /**
+     * 执行加密或解密处理（{@code decrypt}）。
+     */
     public String decrypt(String keyVersion, byte[] encrypted) {
         byte[] key = keys.get(keyVersion);
         if (key == null || encrypted == null || encrypted.length <= IV_BYTES) {
@@ -88,6 +95,9 @@ public final class TotpSecretCipher {
         return encrypt(decrypt(keyVersion, encrypted));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code keyBytes}）。
+     */
     private static byte[] keyBytes(String value, String label) {
         if (value == null || value.getBytes(StandardCharsets.UTF_8).length != 32) {
             throw new IllegalStateException("MFA " + label + "加密密钥必须通过部署密钥管理配置为 32 字节");
@@ -95,6 +105,9 @@ public final class TotpSecretCipher {
         return value.getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireVersion}）。
+     */
     private static String requireVersion(String value, String label) {
         if (isBlank(value) || value.length() > 64 || value.chars().anyMatch(character -> character < 0x21 || character > 0x7e)) {
             throw new IllegalStateException("MFA " + label + "密钥版本必须为 1-64 位可打印非空字符串");
@@ -102,11 +115,32 @@ public final class TotpSecretCipher {
         return value;
     }
 
+    /**
+     * 判断条件是否满足（{@code isBlank}）。
+     */
     private static boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
 
     public record EncryptedSecret(String keyVersion, byte[] iv, byte[] ciphertext) {
+        public EncryptedSecret {
+            iv = iv == null ? new byte[0] : iv.clone();
+            ciphertext = ciphertext == null ? new byte[0] : ciphertext.clone();
+        }
+
+        @Override
+        public byte[] iv() {
+            return iv.clone();
+        }
+
+        @Override
+        public byte[] ciphertext() {
+            return ciphertext.clone();
+        }
+
+        /**
+         * 转换、解析或规范化数据（{@code combined}）。
+         */
         public byte[] combined() {
             byte[] result = new byte[iv.length + ciphertext.length];
             System.arraycopy(iv, 0, result, 0, iv.length);
@@ -114,6 +148,9 @@ public final class TotpSecretCipher {
             return result;
         }
 
+        /**
+         * 转换、解析或规范化数据（{@code encoded}）。
+         */
         public String encoded() {
             return Base64.getEncoder().encodeToString(combined());
         }

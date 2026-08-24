@@ -90,7 +90,7 @@ public class NotificationPreferenceServiceImpl implements NotificationPreference
             NotificationPurpose.valueOf(normalizedPurpose);
             NotificationChannel.valueOf(normalizedChannel);
         } catch (IllegalArgumentException exception) {
-            throw new DataSaveException("通知用途或渠道不合法");
+            throw new DataSaveException("通知用途或渠道不合法", exception);
         }
         if (MANDATORY_PURPOSES.contains(normalizedPurpose)) {
             enabled = true;

@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.constant.RedisCacheKey;
-import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;

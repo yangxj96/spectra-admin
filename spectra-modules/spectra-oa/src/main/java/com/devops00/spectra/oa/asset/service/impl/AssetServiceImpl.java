@@ -15,7 +15,11 @@ import com.devops00.spectra.oa.asset.javabean.constant.AssetStatus;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetCategory;
 import com.devops00.spectra.oa.asset.javabean.entity.AssetOperation;
-import com.devops00.spectra.oa.asset.javabean.from.*;
+import com.devops00.spectra.oa.asset.javabean.from.AssetCategorySaveFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetOperationFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPageFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPurchaseDraftFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetSaveFrom;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
 import com.devops00.spectra.oa.asset.mapper.AssetCategoryMapper;
@@ -313,6 +317,9 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         return result;
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyDefaults}）。
+     */
     private void applyDefaults(Asset entity) {
         if (!StringUtils.hasText(entity.getAssetType())) {
             entity.setAssetType("FIXED");
@@ -331,6 +338,9 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateAssetNo}）。
+     */
     private void validateAssetNo(String assetNo, UUID id) {
         if (!StringUtils.hasText(assetNo)) {
             return;
@@ -344,6 +354,9 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Asset require(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
@@ -352,12 +365,18 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         return entity;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureOperable}）。
+     */
     private void ensureOperable(Asset entity) {
         if (AssetStatus.SCRAPPED.getValue().equals(entity.getStatus())) {
             throw new DataSaveException("已报废资产不能继续操作");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code operation}）。
+     */
     private AssetOperation operation(Asset entity, String type, AssetOperationFrom from) {
         var operation = new AssetOperation();
         operation.setAssetId(entity.getId());
@@ -371,12 +390,18 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         return operation;
     }
 
+    /**
+     * 更新或推进目标状态（{@code saveOperation}）。
+     */
     private void saveOperation(Asset entity, AssetOperation operation) {
         if (!this.updateById(entity) || operationMapper.insert(operation) != 1) {
             throw new DataSaveException("保存资产生命周期操作失败");
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code saveInboundOperation}）。
+     */
     private void saveInboundOperation(Asset entity, PurchaseReceipt receipt) {
         var operation = new AssetOperation();
         operation.setAssetId(entity.getId());
@@ -390,6 +415,9 @@ public class AssetServiceImpl extends BaseServiceImpl<AssetMapper, Asset> implem
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private AssetVO assembleView(Asset entity) {
         var vo = assetConverter.toVO(entity);
         if (entity.getCategoryId() != null) {

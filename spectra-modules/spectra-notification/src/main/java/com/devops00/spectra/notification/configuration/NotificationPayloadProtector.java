@@ -24,8 +24,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
-
 import javax.crypto.spec.SecretKeySpec;
+
 import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -97,8 +97,8 @@ public class NotificationPayloadProtector {
     public Map<String, Object> unprotectParameters(String ciphertext) {
         var plainText = unprotect(ciphertext, properties.sensitivePayloadKey(), "通知敏感载荷");
         try {
-            var value = objectMapper.readValue(plainText, Map.class);
-            if (!(value instanceof Map<?, ?> map)) {
+            Map<?, ?> map = objectMapper.readValue(plainText, Map.class);
+            if (map == null) {
                 throw new DataSaveException("通知敏感载荷格式不正确");
             }
             var result = new LinkedHashMap<String, Object>();
@@ -181,7 +181,7 @@ public class NotificationPayloadProtector {
         try {
             keyBytes = Base64.getDecoder().decode(encodedKey);
         } catch (IllegalArgumentException exception) {
-            throw new DataSaveException(name + "加密密钥格式不正确");
+            throw new DataSaveException(name + "加密密钥格式不正确", exception);
         }
         if (keyBytes.length != 16 && keyBytes.length != 24 && keyBytes.length != 32) {
             throw new DataSaveException(name + "加密密钥长度不正确");

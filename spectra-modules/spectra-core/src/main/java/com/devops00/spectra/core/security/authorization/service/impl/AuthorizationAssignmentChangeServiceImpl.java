@@ -55,7 +55,6 @@ import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
-import com.devops00.spectra.security.base.authorization.ScopeMode;
 import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
 import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
@@ -237,6 +236,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         });
     }
 
+    /**
+     * 创建或构建目标数据（{@code prepare}）。
+     */
     private PreparedChange prepare(UUID targetUserId, AuthorizationAssignmentChangeFrom from, UUID assignmentId) {
         if (targetUserId == null || from == null || from.getExpectedVersion() == null) {
             throw new DataException("授权变更参数不能为空");
@@ -275,6 +277,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                 from.getExpectedVersion(), targetSecurityVersion, requestHash);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireActiveRole}）。
+     */
     private SecurityRole requireActiveRole(UUID roleId) {
         if (roleId == null) {
             throw new DataException("目标 Role 不能为空");
@@ -289,6 +294,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         return role;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toGrantRequests}）。
+     */
     private List<AuthorizationGrantRequest> toGrantRequests(SecurityRole role, List<AuthorizationBoundaryFrom> boundaries) {
         if (boundaries == null || boundaries.isEmpty()) {
             throw new DataException("授权 Boundary 不能为空");
@@ -328,6 +336,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         return List.copyOf(result);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toDomainScope}）。
+     */
     private AuthorizationScope toDomainScope(AuthorizationScopeFrom source) {
         if (source == null || source.getMode() == null) {
             throw new DataException("Scope 参数不能为空");
@@ -337,6 +348,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                 : Set.copyOf(source.getDepartmentIds()), source.isIncludeDescendants());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code persist}）。
+     */
     private UUID persist(PreparedChange prepared, UUID targetUserId) {
         var assignment = prepared.assignment() == null ? new RoleAssignment() : prepared.assignment();
         assignment.setUserId(targetUserId);
@@ -400,6 +414,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         return persistedAssignmentId;
     }
 
+    /**
+     * 更新或推进目标状态（{@code saveScope}）。
+     */
     private UUID saveScope(String permission, AuthorizationScope scope) {
         var entity = new com.devops00.spectra.core.security.authorization.entity.AuthorizationScope();
         entity.setScopeMode(scope.mode().name());
@@ -416,6 +433,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         return entity.getId();
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentOperatorId}）。
+     */
     private UUID currentOperatorId() {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
@@ -424,6 +444,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         return operatorId;
     }
 
+    /**
+     * 更新或推进目标状态（{@code recordAssignmentEvents}）。
+     */
     private void recordAssignmentEvents(PreparedChange prepared, UUID targetUserId, UUID assignmentId) {
         appendAudit(prepared.assignment() == null ? "ROLE_ASSIGNMENT_CREATED" : "ROLE_ASSIGNMENT_UPDATED",
                 prepared.operatorId(), targetUserId, Map.of("assignmentId", assignmentId.toString()),
@@ -444,12 +467,18 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code appendAudit}）。
+     */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
                 before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestHash}）。
+     */
     private String requestHash(UUID assignmentId,
                                UUID roleId,
                                long expectedVersion,
@@ -485,6 +514,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code scopeText}）。
+     */
     private String scopeText(AuthorizationScope scope) {
         if (scope == null) {
             return "-";

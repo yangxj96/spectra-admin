@@ -17,7 +17,11 @@
 package com.devops00.spectra.security.base.javabean.vo;
 
 import com.devops00.spectra.security.base.constant.LoginType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import tools.jackson.databind.annotation.JsonSerialize;
 import tools.jackson.databind.ser.std.ToStringSerializer;
 

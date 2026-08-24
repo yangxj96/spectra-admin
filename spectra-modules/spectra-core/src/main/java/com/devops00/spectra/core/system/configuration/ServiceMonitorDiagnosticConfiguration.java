@@ -11,6 +11,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration(proxyBeanMethods = false)
 public class ServiceMonitorDiagnosticConfiguration {
 
+    /**
+     * 处理内部业务逻辑（{@code serviceMonitorDiagnosticTaskExecutor}）。
+     */
     @Bean(name = "serviceMonitorDiagnosticTaskExecutor")
     public TaskExecutor serviceMonitorDiagnosticTaskExecutor() {
         var executor = new ThreadPoolTaskExecutor();

@@ -53,7 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -232,6 +231,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return toVO(profile);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private void validate(AuthorizationProfileSaveFrom params) {
         if (params == null || params.getAssignments() == null || params.getAssignments().isEmpty()) {
             throw new DataException("授权方案至少需要一个 Role");
@@ -258,6 +260,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateBoundaries}）。
+     */
     private void validateBoundaries(SecurityRole role, List<AuthorizationProfileBoundaryFrom> boundaries) {
         if (boundaries == null || boundaries.isEmpty()) {
             throw new DataException("授权方案至少需要一个 Permission Boundary: " + role.getCode());
@@ -300,6 +305,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateScope}）。
+     */
     private void validateScope(AuthorizationProfileScopeFrom scope, Permission permission, String label) {
         if (scope == null || scope.getMode() == null) {
             throw new DataException(label + "不能为空: " + permission.getCode());
@@ -324,6 +332,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseAllowedModes}）。
+     */
     private Set<ScopeMode> parseAllowedModes(String value) {
         if (value == null || value.isBlank()) {
             return Set.of(ScopeMode.NONE);
@@ -336,6 +347,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 .collect(Collectors.toSet());
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeDepartmentCodes}）。
+     */
     private List<String> normalizeDepartmentCodes(List<String> departmentCodes) {
         if (departmentCodes == null) {
             return List.of();
@@ -347,6 +361,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 .toList();
     }
 
+    /**
+     * 更新或推进目标状态（{@code replaceAssignments}）。
+     */
     private void replaceAssignments(UUID profileId, List<AuthorizationProfileAssignmentFrom> sources) {
         var oldAssignments = assignmentMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
                 .eq(AuthorizationProfileAssignment::getProfileId, profileId));
@@ -378,6 +395,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toScopeMap}）。
+     */
     private Map<String, Object> toScopeMap(AuthorizationProfileScopeFrom source) {
         var result = new LinkedHashMap<String, Object>();
         result.put("mode", source.getMode().name());
@@ -389,6 +409,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     private AuthorizationProfileVO toVO(AuthorizationProfile profile) {
         var result = new AuthorizationProfileVO();
         result.setId(profile.getId());
@@ -396,7 +419,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         result.setName(profile.getName());
         result.setDescription(profile.getDescription());
         result.setState(profile.getState());
-        result.setVersion(profile.getVersion() == null ? 0L : profile.getVersion());
+        result.setVersion(profile.getVersion() == null ? Long.valueOf(0L) : profile.getVersion());
         result.setAssignments(assignmentMapper.selectList(new LambdaQueryWrapper<AuthorizationProfileAssignment>()
                 .eq(AuthorizationProfileAssignment::getProfileId, profile.getId()))
                 .stream()
@@ -405,6 +428,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toAssignmentVO}）。
+     */
     private AuthorizationProfileAssignmentVO toAssignmentVO(AuthorizationProfileAssignment assignment) {
         var result = new AuthorizationProfileAssignmentVO();
         result.setRoleCode(assignment.getRoleCode());
@@ -417,6 +443,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toBoundaryVO}）。
+     */
     private AuthorizationProfileBoundaryVO toBoundaryVO(AuthorizationProfileBoundary boundary) {
         var result = new AuthorizationProfileBoundaryVO();
         result.setPermission(boundary.getPermissionCode());
@@ -425,6 +454,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toScopeVO}）。
+     */
     private AuthorizationProfileScopeVO toScopeVO(Map<String, Object> source) {
         if (source == null) {
             return null;
@@ -433,7 +465,7 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         try {
             result.setMode(ScopeMode.valueOf(String.valueOf(source.get("mode"))));
         } catch (IllegalArgumentException exception) {
-            throw new DataException("授权方案 Scope 模式无效");
+            throw new DataException("授权方案 Scope 模式无效", exception);
         }
         result.setResourceCode(source.get("resource_code") == null ? null : String.valueOf(source.get("resource_code")));
         var departmentCodes = source.get("department_codes");
@@ -444,6 +476,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
         return result;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code trimToNull}）。
+     */
     private String trimToNull(String value) {
         return value == null || value.isBlank() ? null : value.trim();
     }

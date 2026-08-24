@@ -54,6 +54,9 @@ public class FileStorageHealthIndicator implements HealthIndicator {
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code isWritableDirectory}）。
+     */
     private static boolean isWritableDirectory(Path path) {
         return Files.isDirectory(path) && Files.isWritable(path);
     }

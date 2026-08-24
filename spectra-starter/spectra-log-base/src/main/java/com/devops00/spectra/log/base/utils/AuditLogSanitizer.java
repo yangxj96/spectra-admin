@@ -17,7 +17,12 @@
 package com.devops00.spectra.log.base.utils;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
@@ -109,6 +114,9 @@ public final class AuditLogSanitizer {
         return sanitized;
     }
 
+    /**
+     * 判断条件是否满足（{@code isSensitiveKey}）。
+     */
     private static boolean isSensitiveKey(String key) {
         String normalized = key.replaceAll("[-_.]", "").toLowerCase(Locale.ROOT);
         return SENSITIVE_KEYS.contains(normalized)
@@ -119,6 +127,9 @@ public final class AuditLogSanitizer {
                 || normalized.endsWith("privatekey");
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sanitizeText}）。
+     */
     private static String sanitizeText(String text) {
         String sanitized = URL_SECRET.matcher(text).replaceAll("$1" + REDACTED_VALUE);
         return BEARER_TOKEN.matcher(sanitized).replaceAll("$1" + REDACTED_VALUE);

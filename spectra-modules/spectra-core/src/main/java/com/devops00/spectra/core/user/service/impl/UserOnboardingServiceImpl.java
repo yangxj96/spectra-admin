@@ -66,6 +66,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         return user;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code submitUser}）。
+     */
     private UserOnboardingVO submitUser(UserSaveFrom params) {
         if (params.getId() == null) {
             UserCreatedVO created = userService.create(params);
@@ -75,6 +78,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         return new UserOnboardingVO(params.getId(), params.getRealName());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code submitAuthorization}）。
+     */
     private void submitAuthorization(UUID userId, AuthorizationAssignmentsChangeFrom params) {
         validateAssignments(userId, params);
         for (var removal : params.getRemovedAssignments() == null
@@ -87,6 +93,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyAssignment}）。
+     */
     private void applyAssignment(UUID userId, AuthorizationAssignmentChangeFrom params) {
         AuthorizationChangePreviewVO preview = assignmentChangeService.preview(userId, params);
         var apply = new AuthorizationAssignmentApplyFrom();
@@ -98,6 +107,9 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
         assignmentChangeService.apply(userId, apply);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateAssignments}）。
+     */
     private void validateAssignments(UUID userId, AuthorizationAssignmentsChangeFrom params) {
         if (params == null || params.getAssignments() == null || params.getAssignments().isEmpty()) {
             throw new com.devops00.spectra.common.exception.DataException("至少保留一个角色授权");

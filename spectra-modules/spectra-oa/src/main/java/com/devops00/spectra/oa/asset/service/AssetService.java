@@ -4,7 +4,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.oa.asset.javabean.entity.Asset;
-import com.devops00.spectra.oa.asset.javabean.from.*;
+import com.devops00.spectra.oa.asset.javabean.from.AssetCategorySaveFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetOperationFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPageFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetPurchaseDraftFrom;
+import com.devops00.spectra.oa.asset.javabean.from.AssetSaveFrom;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetCategoryVO;
 import com.devops00.spectra.oa.asset.javabean.vo.AssetVO;
 

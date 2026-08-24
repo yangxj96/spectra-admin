@@ -58,6 +58,9 @@ public interface DepartmentMapper extends BaseMapper<Department> {
             SELECT ancestor_id, descendant_id, depth
             FROM department_tree
             """)
+    /**
+     * 处理内部业务逻辑（{@code rebuildClosure}）。
+     */
     int rebuildClosure();
 
     /**

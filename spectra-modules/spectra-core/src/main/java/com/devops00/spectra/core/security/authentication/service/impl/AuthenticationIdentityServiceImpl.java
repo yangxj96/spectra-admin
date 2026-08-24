@@ -174,6 +174,9 @@ public class AuthenticationIdentityServiceImpl implements AuthenticationIdentity
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code findByUserId}）。
+     */
     private @Nullable AuthenticationIdentity findByUserId(UUID userId) {
         List<AuthenticationIdentity> identities = mapper.selectList(new LambdaQueryWrapper<AuthenticationIdentity>()
                 .eq(AuthenticationIdentity::getUserId, userId)

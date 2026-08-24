@@ -27,11 +27,23 @@ import java.util.UUID;
 /** 用户批量导入应用服务。 */
 public interface UserImportService {
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     UserImportTaskVO preview(UserImportPreviewFrom params);
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     UserImportTaskVO detail(UUID id);
 
+    /**
+     * 处理内部业务逻辑（{@code errors}）。
+     */
     List<UserImportRowVO> errors(UUID id);
 
+    /**
+     * 更新或推进目标状态（{@code apply}）。
+     */
     UserImportTaskVO apply(UUID id, UserImportApplyFrom params);
 }

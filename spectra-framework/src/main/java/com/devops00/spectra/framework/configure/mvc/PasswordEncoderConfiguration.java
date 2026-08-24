@@ -34,6 +34,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class PasswordEncoderConfiguration {
 
+    /**
+     * 处理内部业务逻辑（{@code passwordEncoder}）。
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         log.debug(LogPrefix.WEB.f("配置PasswordEncoder"));

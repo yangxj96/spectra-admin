@@ -60,6 +60,9 @@ public class AiAskController {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    /**
+     * 处理内部业务逻辑（{@code stream}）。
+     */
     @ULog("'AI对话流式问答'")
     @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE, version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'ai:create')")
@@ -100,6 +103,9 @@ public class AiAskController {
         });
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildOpenAIDelta}）。
+     */
     private OpenAIStreamVO buildOpenAIDelta(String id, String content, String finishReason, String conversationId) {
         OpenAIStreamVO vo = new OpenAIStreamVO();
         vo.setId(id);
@@ -120,7 +126,7 @@ public class AiAskController {
         choice.setDelta(delta);
 
         if (finishReason != null) {
-            choice.setFinish_reason(finishReason);
+            choice.setFinishReason(finishReason);
         }
 
         choices.add(choice);

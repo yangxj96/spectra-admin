@@ -64,6 +64,9 @@ public class PostgresChatMemoryStore implements ChatMemoryStore {
         mapper.deleteById(key);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code extractKey}）。
+     */
     private String extractKey(Object memoryId) {
         if (memoryId instanceof AiMemoryId ami) {
             return ami.conversationId();

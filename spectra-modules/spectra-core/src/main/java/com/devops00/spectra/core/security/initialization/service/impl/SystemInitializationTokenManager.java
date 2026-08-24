@@ -99,6 +99,9 @@ public class SystemInitializationTokenManager {
                 () -> redisTemplate.delete(tokenKey()));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code digest}）。
+     */
     static String digest(String token) {
         try {
             return HexFormat.of()
@@ -109,12 +112,18 @@ public class SystemInitializationTokenManager {
         }
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateToken}）。
+     */
     private String generateToken() {
         byte[] bytes = new byte[TOKEN_BYTES];
         SECURE_RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code tokenKey}）。
+     */
     private String tokenKey() {
         return SecurityRedisKey.INITIALIZATION_TOKEN.getPattern();
     }

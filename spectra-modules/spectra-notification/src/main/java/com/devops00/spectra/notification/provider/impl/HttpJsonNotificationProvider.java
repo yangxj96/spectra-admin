@@ -182,18 +182,24 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
             return Map.of();
         }
         try {
-            var value = objectMapper.readValue(responseBody, Map.class);
-            return value instanceof Map<?, ?> map ? (Map<String, Object>) map : Map.of();
+            Map<?, ?> map = objectMapper.readValue(responseBody, Map.class);
+            return map == null ? Map.of() : (Map<String, Object>) map;
         } catch (RuntimeException exception) {
             return Map.of();
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code messageId}）。
+     */
     private String messageId(Map<String, Object> response) {
         var value = response.get(MESSAGE_ID);
         return value == null ? null : String.valueOf(value).substring(0, Math.min(200, String.valueOf(value).length()));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code authorizedRequest}）。
+     */
     private HttpRequest.Builder authorizedRequest(NotificationProviderConfiguration configuration) {
         var builder = HttpRequest.newBuilder(URI.create(configuration.endpoint()))
                 .timeout(Duration.ofMillis(configuration.timeoutMs()));
@@ -203,12 +209,18 @@ public class HttpJsonNotificationProvider implements NotificationProvider {
         return builder;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code client}）。
+     */
     private HttpClient client(NotificationProviderConfiguration configuration) {
         return HttpClient.newBuilder()
                 .connectTimeout(Duration.ofMillis(configuration.timeoutMs()))
                 .build();
     }
 
+    /**
+     * 判断条件是否满足（{@code isUsable}）。
+     */
     private boolean isUsable(NotificationProviderConfiguration configuration) {
         return configuration != null
                 && configuration.enabled()

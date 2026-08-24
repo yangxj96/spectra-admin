@@ -51,6 +51,9 @@ public class AuthenticationIdentityController {
 
     private final TimeMapper timeMapper;
 
+    /**
+     * 查询或获取目标数据（{@code list}）。
+     */
     @ULog("'获取认证身份列表'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:read')")
@@ -68,6 +71,9 @@ public class AuthenticationIdentityController {
         }).toList();
     }
 
+    /**
+     * 更新或推进目标状态（{@code bindPhone}）。
+     */
     @ULog("'绑定手机号认证身份'")
     @PostMapping(value = "/phone", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
@@ -75,6 +81,9 @@ public class AuthenticationIdentityController {
         bindingService.bindPhone(securityContextAccessor.currentUserId(), params.getPhone(), params.getCode());
     }
 
+    /**
+     * 更新或推进目标状态（{@code bindEmail}）。
+     */
     @ULog("'绑定邮箱认证身份'")
     @PostMapping(value = "/email", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
@@ -82,6 +91,9 @@ public class AuthenticationIdentityController {
         bindingService.bindEmail(securityContextAccessor.currentUserId(), params.getEmail(), params.getCode());
     }
 
+    /**
+     * 更新或推进目标状态（{@code unbind}）。
+     */
     @ULog("'撤销认证身份'")
     @DeleteMapping(value = "/{identityId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")

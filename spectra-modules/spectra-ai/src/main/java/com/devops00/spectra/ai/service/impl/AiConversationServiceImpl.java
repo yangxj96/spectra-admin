@@ -27,7 +27,11 @@ import com.devops00.spectra.ai.mapper.AiConversationMapper;
 import com.devops00.spectra.ai.service.AiConversationService;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import dev.langchain4j.data.message.*;
+import dev.langchain4j.data.message.AiMessage;
+import dev.langchain4j.data.message.ChatMessage;
+import dev.langchain4j.data.message.ChatMessageDeserializer;
+import dev.langchain4j.data.message.SystemMessage;
+import dev.langchain4j.data.message.UserMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -110,6 +114,9 @@ public class AiConversationServiceImpl
         return result;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getOwnedConversation}）。
+     */
     private AiConversation getOwnedConversation(UUID conversationId, UUID userId) {
         AiConversation conversation = baseMapper.selectById(conversationId);
         if (conversation == null || !conversation.getUserId().equals(userId)) {
@@ -118,6 +125,9 @@ public class AiConversationServiceImpl
         return conversation;
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateTitle}）。
+     */
     private String generateTitle(String message) {
         if (message == null || message.isBlank()) {
             return "新对话";

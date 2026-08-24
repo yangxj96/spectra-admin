@@ -311,10 +311,10 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 && !StringUtils.hasText(params.getEndTime())) {
             return new QueryRange(null, null);
         }
-        var to = params != null && StringUtils.hasText(params.getEndTime()) ? timeMapper.toInstant(params.getEndTime()) : Instant.now();
-        var from = params != null && StringUtils.hasText(params.getStartTime())
-                ? timeMapper.toInstant(params.getStartTime())
-                : to.minus(MAX_QUERY_RANGE);
+        var parsedTo = params != null && StringUtils.hasText(params.getEndTime()) ? timeMapper.toInstant(params.getEndTime()) : null;
+        var to = parsedTo == null ? Instant.now() : parsedTo;
+        var parsedFrom = params != null && StringUtils.hasText(params.getStartTime()) ? timeMapper.toInstant(params.getStartTime()) : null;
+        var from = parsedFrom == null ? to.minus(MAX_QUERY_RANGE) : parsedFrom;
         if (!from.isBefore(to) || Duration.between(from, to).compareTo(MAX_QUERY_RANGE) > 0) {
             throw new DataSaveException("通知管理查询时间范围必须在 31 天以内");
         }

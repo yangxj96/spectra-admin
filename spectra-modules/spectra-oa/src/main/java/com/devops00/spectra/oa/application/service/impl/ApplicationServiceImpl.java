@@ -103,10 +103,12 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
     public Application requireVisible(UUID id) {
         var entity = require(id);
         var user = securityContextAccessor.currentUser();
+        var applicantId = entity.getApplicantId();
+        var departmentId = entity.getDepartmentId();
         if (user != null
                 && user.getId() != null
                 && user.getDepartmentId() != null
-                && (user.getId().equals(entity.getApplicantId()) || user.getDepartmentId().equals(entity.getDepartmentId()))) {
+                && (user.getId().equals(applicantId) || user.getDepartmentId().equals(departmentId))) {
             return entity;
         }
         String username = securityContextAccessor.currentUsername();
@@ -138,8 +140,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         var entity = applicationConverter.toTypeEntity(from);
         entity.setCode(code);
         entity.setName(from.getName().trim());
-        entity.setEnabled(from.getEnabled() == null || from.getEnabled());
-        entity.setSortOrder(from.getSortOrder() == null ? 0 : from.getSortOrder());
+        entity.setEnabled(from.getEnabled() == null ? Boolean.TRUE : from.getEnabled());
+        Integer sortOrder = from.getSortOrder();
+        entity.setSortOrder(sortOrder == null ? Integer.valueOf(0) : sortOrder);
         if (applicationTypeMapper.insert(entity) != 1) {
             throw new DataSaveException("创建申请类型失败");
         }
@@ -159,8 +162,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         applicationConverter.updateTypeEntity(from, entity);
         entity.setCode(code);
         entity.setName(from.getName().trim());
-        entity.setEnabled(from.getEnabled() == null || from.getEnabled());
-        entity.setSortOrder(from.getSortOrder() == null ? 0 : from.getSortOrder());
+        entity.setEnabled(from.getEnabled() == null ? Boolean.TRUE : from.getEnabled());
+        Integer sortOrder = from.getSortOrder();
+        entity.setSortOrder(sortOrder == null ? Integer.valueOf(0) : sortOrder);
         if (applicationTypeMapper.updateById(entity) != 1) {
             throw new DataSaveException("修改申请类型失败");
         }
@@ -303,6 +307,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         return this.count(wrapper);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireType}）。
+     */
     private ApplicationType requireType(UUID id) {
         var entity = applicationTypeMapper.selectById(id);
         if (entity == null) {
@@ -311,6 +318,9 @@ public class ApplicationServiceImpl extends BaseServiceImpl<ApplicationMapper, A
         return entity;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeTypeCode}）。
+     */
     private String normalizeTypeCode(String value) {
         if (!StringUtils.hasText(value)) {
             throw new DataSaveException("申请类型编码不能为空");

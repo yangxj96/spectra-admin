@@ -42,6 +42,9 @@ public class SecJacksonConfiguration {
     @Resource
     private SystemProperties spectraSystemProperties;
 
+    /**
+     * 处理内部业务逻辑（{@code redisObjectMapper}）。
+     */
     @Bean("securityObjectMapper")
     public ObjectMapper redisObjectMapper(ObjectMapper om) {
         log.debug(LogPrefix.SECURITY.f("开始配置Security使用的ObjectMapper"));

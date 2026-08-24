@@ -39,12 +39,18 @@ public class SystemInitializationController {
 
     private final SystemInitializationService initializationService;
 
+    /**
+     * 查询或获取目标数据（{@code status}）。
+     */
     @GetMapping(value = "/status", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public SystemInitializationStatusVO status() {
         return initializationService.status();
     }
 
+    /**
+     * 创建或构建目标数据（{@code start}）。
+     */
     @ULog(value = "'开始系统初始化'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PostMapping(value = "/start", version = "1.0.0")
@@ -55,6 +61,9 @@ public class SystemInitializationController {
         return initializationService.start(from, token);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code confirmMfa}）。
+     */
     @ULog(value = "'确认系统初始化 MFA'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PostMapping(value = "/mfa/confirm", version = "1.0.0")
@@ -64,6 +73,9 @@ public class SystemInitializationController {
         return initializationService.confirmMfa(from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code complete}）。
+     */
     @ULog(value = "'完成系统初始化'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PostMapping(value = "/complete", version = "1.0.0")

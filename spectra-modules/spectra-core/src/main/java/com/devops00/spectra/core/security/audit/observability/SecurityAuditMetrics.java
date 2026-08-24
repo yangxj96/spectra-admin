@@ -35,6 +35,9 @@ public class SecurityAuditMetrics {
         this.registry = registry;
     }
 
+    /**
+     * 更新或推进目标状态（{@code recordQuery}）。
+     */
     public void recordQuery(String operation, String outcome) {
         Counter.builder("security_audit_queries_total")
                 .tags(Tags.of("operation", safeTag(operation), "outcome", safeTag(outcome)))
@@ -42,6 +45,9 @@ public class SecurityAuditMetrics {
                 .increment();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code safeTag}）。
+     */
     private static String safeTag(String value) {
         if (value == null || value.isBlank()) {
             return "UNKNOWN";

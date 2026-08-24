@@ -84,48 +84,90 @@ public final class ScopeSqlPolicy {
         return combined == null ? falsePredicate() : combined;
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildBoundary}）。
+     */
     private static Expression buildBoundary(Table table, DataScope annotation, AuthorizationScope scope, UUID subjectId) {
         if (scope.mode() == ScopeMode.NONE || scope.mode() == ScopeMode.ALL) {
             return null;
         }
 
-        Expression structural = null;
-        if (scope.mode() == ScopeMode.SELF) {
-            if (subjectId != null && !annotation.ownerColumn().isBlank()) {
-                structural = new EqualsTo(new Column(table, annotation.ownerColumn()), new StringValue(subjectId.toString()));
-            }
-        } else if (scope.mode() == ScopeMode.RULES && !annotation.column().isBlank()) {
-            structural = departmentPredicate(table, annotation.column(), scope);
-        }
-
-        Expression relations = null;
-        for (DataScope.Relation relation : annotation.relations()) {
-            Expression relationPredicate = null;
-            if (scope.mode() == ScopeMode.RULES && !relation.departmentColumn().isBlank()) {
-                relationPredicate = relationSubquery(table, relation,
-                        departmentPredicate(new Table(relation.schema(), relation.table()), relation.departmentColumn(), scope));
-            }
-            if (subjectId != null && !relation.userColumn().isBlank()) {
-                Expression userPredicate = relationSubquery(table, relation,
-                        new EqualsTo(new Column(new Table(relation.schema(), relation.table()), relation.userColumn()),
-                                new StringValue(subjectId.toString())));
-                relationPredicate = relationPredicate == null
-                        ? userPredicate
-                        : new AndExpression(relationPredicate, userPredicate);
-            }
-            if (relationPredicate != null) {
-                relations = relations == null
-                        ? relationPredicate
-                        : new OrExpression(relations, relationPredicate);
-            }
-        }
-
-        if (structural == null) {
-            return relations == null ? falsePredicate() : relations;
-        }
-        return relations == null ? structural : new OrExpression(structural, relations);
+        Expression structural = structuralPredicate(table, annotation, scope, subjectId);
+        Expression relations = relationPredicates(table, annotation, scope, subjectId);
+        return combineWithOr(structural, relations);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code structuralPredicate}）。
+     */
+    private static Expression structuralPredicate(Table table, DataScope annotation, AuthorizationScope scope,
+                                                  UUID subjectId) {
+        if (scope.mode() == ScopeMode.SELF && subjectId != null && !annotation.ownerColumn().isBlank()) {
+            return new EqualsTo(new Column(table, annotation.ownerColumn()), new StringValue(subjectId.toString()));
+        }
+        if (scope.mode() == ScopeMode.RULES && !annotation.column().isBlank()) {
+            return departmentPredicate(table, annotation.column(), scope);
+        }
+        return null;
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code relationPredicates}）。
+     */
+    private static Expression relationPredicates(Table table, DataScope annotation, AuthorizationScope scope,
+                                                 UUID subjectId) {
+        Expression relations = null;
+        for (DataScope.Relation relation : annotation.relations()) {
+            relations = combineWithOr(relations, relationPredicate(table, relation, scope, subjectId));
+        }
+        return relations;
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code relationPredicate}）。
+     */
+    private static Expression relationPredicate(Table table, DataScope.Relation relation, AuthorizationScope scope,
+                                                UUID subjectId) {
+        Expression department = null;
+        if (scope.mode() == ScopeMode.RULES && !relation.departmentColumn().isBlank()) {
+            department = relationSubquery(table, relation,
+                    departmentPredicate(new Table(relation.schema(), relation.table()), relation.departmentColumn(), scope));
+        }
+        Expression user = null;
+        if (subjectId != null && !relation.userColumn().isBlank()) {
+            user = relationSubquery(table, relation,
+                    new EqualsTo(new Column(new Table(relation.schema(), relation.table()), relation.userColumn()),
+                            new StringValue(subjectId.toString())));
+        }
+        return combineWithAnd(department, user);
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code combineWithAnd}）。
+     */
+    private static Expression combineWithAnd(Expression left, Expression right) {
+        if (left == null) {
+            return right;
+        }
+        return right == null ? left : new AndExpression(left, right);
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code combineWithOr}）。
+     */
+    private static Expression combineWithOr(Expression left, Expression right) {
+        if (left == null) {
+            return right;
+        }
+        if (right == null) {
+            return left;
+        }
+        return new OrExpression(left, right);
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code departmentPredicate}）。
+     */
     private static Expression departmentPredicate(Table table, String column, AuthorizationScope scope) {
         if (scope.departmentIds().isEmpty()) {
             return falsePredicate();
@@ -150,6 +192,9 @@ public final class ScopeSqlPolicy {
         return new InExpression(left, descendants);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code relationSubquery}）。
+     */
     private static Expression relationSubquery(Table ignored, DataScope.Relation relation, Expression where) {
         Table relationTable = new Table(relation.schema(), relation.table());
         PlainSelect select = new PlainSelect();
@@ -161,10 +206,16 @@ public final class ScopeSqlPolicy {
         return new InExpression(new Column(relation.mainColumn()), subquery);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code falsePredicate}）。
+     */
     private static Expression falsePredicate() {
         return new EqualsTo(new LongValue(1), new LongValue(0));
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code required}）。
+     */
     private static String required(String value, String field) {
         if (value == null || value.isBlank()) {
             throw new IllegalStateException("DataScope 必须显式登记 " + field);

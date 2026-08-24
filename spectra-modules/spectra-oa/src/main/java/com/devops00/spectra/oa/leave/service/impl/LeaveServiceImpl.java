@@ -55,11 +55,16 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.*;
+import java.time.Duration;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -256,6 +261,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         releaseReservedBalance(application.getApplicantId(), detail);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireDetail}）。
+     */
     private LeaveApplication requireDetail(UUID id) {
         var detail = this.getById(id);
         if (detail == null) {
@@ -264,6 +272,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return detail;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireLeaveType}）。
+     */
     private LeaveType requireLeaveType(String code) {
         var type = leaveTypeMapper.selectOne(new LambdaQueryWrapper<LeaveType>().eq(LeaveType::getCode, code).eq(LeaveType::getEnabled, true));
         if (type == null) {
@@ -272,10 +283,13 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return type;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parse}）。
+     */
     private ParsedLeave parse(LeaveCreateFrom from) {
         try {
-            var start = timeMapper.toInstant(from.getStartTime());
-            var end = timeMapper.toInstant(from.getEndTime());
+            var start = Objects.requireNonNull(timeMapper.toInstant(from.getStartTime()), "请假开始时间不能为空");
+            var end = Objects.requireNonNull(timeMapper.toInstant(from.getEndTime()), "请假结束时间不能为空");
             if (!start.isBefore(end)) {
                 throw new DataSaveException("请假开始时间必须早于结束时间");
             }
@@ -285,10 +299,13 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
             }
             return new ParsedLeave(from.getLeaveTypeCode(), start, end, hours);
         } catch (DateTimeParseException exception) {
-            throw new DataSaveException("请使用 ISO-8601 时间格式");
+            throw new DataSaveException("请使用 ISO-8601 时间格式", exception);
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code calculateBusinessHours}）。
+     */
     private BigDecimal calculateBusinessHours(Instant start, Instant end) {
         var zoneId = timeMapper.getUserZoneId();
         var cursor = start.atZone(zoneId).toLocalDate();
@@ -305,6 +322,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return BigDecimal.valueOf(minutes).divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code overlapMinutes}）。
+     */
     private long overlapMinutes(Instant start, Instant end, LocalDate date, LocalTime from, LocalTime to) {
         var zoneId = timeMapper.getUserZoneId();
         var windowStart = ZonedDateTime.of(date, from, zoneId).toInstant();
@@ -314,6 +334,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return right.isAfter(left) ? Duration.between(left, right).toMinutes() : 0;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private LeaveVO assembleView(LeaveApplication detail, Application application) {
         var vo = leaveConverter.toVO(detail);
         vo.setApplicationNo(application.getApplicationNo());
@@ -325,6 +348,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         return vo;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code reserveBalance}）。
+     */
     private void reserveBalance(UUID userId, LeaveApplication detail) {
         var balance = findBalance(userId, detail);
         if (balance == null) {
@@ -340,6 +366,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code releaseReservedBalance}）。
+     */
     private void releaseReservedBalance(UUID userId, LeaveApplication detail) {
         var balance = findBalance(userId, detail);
         if (balance == null) {
@@ -349,6 +378,9 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         leaveBalanceMapper.updateById(balance);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code approveBalance}）。
+     */
     private void approveBalance(UUID userId, LeaveApplication detail) {
         var balance = findBalance(userId, detail);
         if (balance == null) {
@@ -359,12 +391,18 @@ public class LeaveServiceImpl extends BaseServiceImpl<LeaveApplicationMapper, Le
         leaveBalanceMapper.updateById(balance);
     }
 
+    /**
+     * 查询或获取目标数据（{@code findBalance}）。
+     */
     private LeaveBalance findBalance(UUID userId, LeaveApplication detail) {
         return leaveBalanceMapper.selectOne(new LambdaQueryWrapper<LeaveBalance>().eq(LeaveBalance::getUserId, userId)
                 .eq(LeaveBalance::getLeaveTypeCode, detail.getLeaveTypeCode())
                 .eq(LeaveBalance::getYear, detail.getStartTime().atZone(timeMapper.getUserZoneId()).getYear()));
     }
 
+    /**
+     * 创建或构建目标数据（{@code createAttendanceRecords}）。
+     */
     private void createAttendanceRecords(Application application, LeaveApplication detail) {
         var zoneId = timeMapper.getUserZoneId();
         var date = detail.getStartTime().atZone(zoneId).toLocalDate();

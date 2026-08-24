@@ -33,7 +33,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -103,8 +102,13 @@ public class SqlExceptionAdvice {
     @ExceptionHandler(UncategorizedSQLException.class)
     public R<Object> handleUncategorizedSQLException(UncategorizedSQLException e, HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        log.error("{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]", LogPrefix.PERSISTENCE.p(), Objects.requireNonNull(e.getSQLException()).getSQLState(),
-                e.getSQLException().getErrorCode(), e.getSQLException().getMessage(), e);
+        var sqlException = e.getSQLException();
+        if (sqlException == null) {
+            log.error("{}未分类SQL异常: 未提供底层 SQLException", LogPrefix.PERSISTENCE.p(), e);
+            return R.failure("数据库操作异常,请稍后重试");
+        }
+        log.error("{}未分类SQL异常: SQL状态=[{}], 错误码=[{}], 原因=[{}]", LogPrefix.PERSISTENCE.p(), sqlException.getSQLState(),
+                sqlException.getErrorCode(), sqlException.getMessage(), e);
         return R.failure("数据库操作异常,请稍后重试");
     }
 

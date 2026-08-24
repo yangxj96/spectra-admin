@@ -80,6 +80,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 .toList();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolveOne}）。
+     */
     private NotificationRecipient resolveOne(UUID userId) {
         if (!allowedByCurrentUserScope(userId)) {
             return new NotificationRecipient(userId, null, null, false, false, null);
@@ -118,6 +121,9 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
                 recipient.getDepartmentId(), departmentLineage(recipient.getDepartmentId())));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code departmentLineage}）。
+     */
     private Set<UUID> departmentLineage(UUID departmentId) {
         var lineage = new LinkedHashSet<UUID>();
         var current = departmentId;

@@ -17,11 +17,23 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 /** 系统首次初始化流程。 */
 public interface SystemInitializationService {
 
+    /**
+     * 查询或获取目标数据（{@code status}）。
+     */
     SystemInitializationStatusVO status();
 
+    /**
+     * 创建或构建目标数据（{@code start}）。
+     */
     SystemInitializationStartVO start(SystemInitializationStartFrom from, String initializationToken);
 
+    /**
+     * 处理内部业务逻辑（{@code confirmMfa}）。
+     */
     SystemInitializationMfaConfirmVO confirmMfa(SystemInitializationMfaConfirmFrom from);
 
+    /**
+     * 处理内部业务逻辑（{@code complete}）。
+     */
     void complete(SystemInitializationCompleteFrom from);
 }

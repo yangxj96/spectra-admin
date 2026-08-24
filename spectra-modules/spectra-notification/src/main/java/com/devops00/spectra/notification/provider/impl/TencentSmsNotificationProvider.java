@@ -28,9 +28,9 @@ import com.devops00.spectra.notification.provider.NotificationTaskMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -149,6 +149,9 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code request}）。
+     */
     private HttpResponse<String> request(NotificationProviderConfiguration configuration, String action,
                                          Map<String, ?> payload) {
         try {
@@ -190,6 +193,9 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code orderedParameters}）。
+     */
     private List<String> orderedParameters(Map<String, Object> parameters, String parameterOrder) {
         var values = new ArrayList<String>();
         if (parameterOrder != null && !parameterOrder.isBlank()) {
@@ -205,23 +211,29 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         return values;
     }
 
+    /**
+     * 查询或获取目标数据（{@code readJson}）。
+     */
     @SuppressWarnings("unchecked")
     private Map<String, Object> readJson(String body) {
         if (body == null || body.isBlank()) {
             return Map.of();
         }
         try {
-            var value = objectMapper.readValue(body, Map.class);
-            return value instanceof Map<?, ?> map
-                    ? map.entrySet()
+            Map<?, ?> map = objectMapper.readValue(body, Map.class);
+            return map == null
+                    ? Map.of()
+                    : map.entrySet()
                             .stream()
-                            .collect(Collectors.toMap(entry -> String.valueOf(entry.getKey()), Map.Entry::getValue))
-                    : Map.of();
+                            .collect(Collectors.toMap(entry -> String.valueOf(entry.getKey()), Map.Entry::getValue));
         } catch (RuntimeException exception) {
             return Map.of();
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code nestedResponse}）。
+     */
     @SuppressWarnings("unchecked")
     private Map<String, Object> nestedResponse(Map<String, Object> body) {
         return body.get("Response") instanceof Map<?, ?> response
@@ -229,6 +241,9 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
                 : Map.of();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code firstMessageId}）。
+     */
     @SuppressWarnings("unchecked")
     private String firstMessageId(Object sendStatusSet) {
         if (sendStatusSet instanceof List<?> statuses
@@ -239,6 +254,9 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         return null;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code endpoint}）。
+     */
     private URI endpoint(NotificationProviderConfiguration configuration) {
         var endpoint = configuration.endpoint();
         if (endpoint == null || endpoint.isBlank()) {
@@ -249,10 +267,16 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
                 : "https://" + endpoint);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code client}）。
+     */
     private HttpClient client(NotificationProviderConfiguration configuration) {
         return HttpClient.newBuilder().connectTimeout(Duration.ofMillis(configuration.timeoutMs())).build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code hmac}）。
+     */
     private byte[] hmac(byte[] key, String value) {
         try {
             var mac = Mac.getInstance("HmacSHA256");
@@ -263,6 +287,9 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code hex}）。
+     */
     private String hex(byte[] bytes) {
         var result = new StringBuilder(bytes.length * 2);
         for (var item : bytes) {
@@ -271,10 +298,16 @@ public class TencentSmsNotificationProvider implements NotificationProvider {
         return result.toString();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code text}）。
+     */
     private String text(Object value) {
         return value == null ? null : String.valueOf(value);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code usable}）。
+     */
     private boolean usable(NotificationProviderConfiguration configuration) {
         return configuration != null
                 && configuration.enabled()

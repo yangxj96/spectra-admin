@@ -90,7 +90,7 @@ public class NotificationPolicy {
         try {
             return NotificationPurpose.valueOf(value.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException exception) {
-            throw new DataSaveException("通知用途不合法");
+            throw new DataSaveException("通知用途不合法", exception);
         }
     }
 
@@ -157,6 +157,9 @@ public class NotificationPolicy {
         return MANDATORY.contains(purpose);
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildTemplateChannels}）。
+     */
     private static Map<NotificationPurpose, Set<NotificationChannel>> buildTemplateChannels() {
         var allChannels = Set.of(NotificationChannel.IN_APP, NotificationChannel.SMS, NotificationChannel.EMAIL);
         var externalChannels = Set.of(NotificationChannel.SMS, NotificationChannel.EMAIL);
@@ -172,6 +175,9 @@ public class NotificationPolicy {
         return Map.copyOf(matrix);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code rejectTemplateField}）。
+     */
     private void rejectTemplateField(String value, String message) {
         if (value != null && !value.isBlank()) {
             throw new DataSaveException(message);

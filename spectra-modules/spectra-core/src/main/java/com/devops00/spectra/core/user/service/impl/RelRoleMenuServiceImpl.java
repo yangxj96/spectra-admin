@@ -147,6 +147,9 @@ public class RelRoleMenuServiceImpl implements RelRoleMenuService {
         return menuConverter.toVOList(menus);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureEditableRole}）。
+     */
     private void ensureEditableRole(SecurityRole role) {
         if (Boolean.TRUE.equals(role.getSystemManaged()) || !Objects.equals("BUSINESS", role.getRoleKind())) {
             throw new BuiltinDataException("内置角色不可配置菜单");

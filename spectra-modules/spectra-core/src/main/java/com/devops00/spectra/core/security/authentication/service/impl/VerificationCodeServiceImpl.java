@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -88,6 +87,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
                 NotificationPurpose.BIND_EMAIL_CODE, NotificationTemplateCode.SECURITY_BIND_EMAIL_CODE);
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendCode}）。
+     */
     private void sendCode(String address, NotificationChannel channel, String redisPrefix,
                           NotificationPurpose purpose, String templateCode) {
         var redisKey = redisPrefix + address;
@@ -129,6 +131,9 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         }
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateCode}）。
+     */
     private String generateCode() {
         if (securityProperties.getVerificationCodeLength() != 6) {
             throw new SpectraException("验证码长度配置必须为 6 位");
@@ -136,10 +141,16 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
         return "%06d".formatted(RANDOM.nextInt(1_000_000));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code digest}）。
+     */
     private String digest(String code) {
         return VerificationCodeDigest.digest(code, securityProperties.getVerificationCodeHmacKey());
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireHmacKey}）。
+     */
     private void requireHmacKey() {
         if (securityProperties.getVerificationCodeHmacKey() == null
                 || securityProperties.getVerificationCodeHmacKey().isBlank()) {

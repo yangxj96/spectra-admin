@@ -56,6 +56,9 @@ public class SecurityAuditController {
 
     private final SecurityAuditQueryService queryService;
 
+    /**
+     * 查询或获取目标数据（{@code page}）。
+     */
     @ULog("'分页查询安全审计'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")
@@ -63,6 +66,9 @@ public class SecurityAuditController {
         return queryService.page(viewer, page, query);
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'查询安全审计详情'")
     @GetMapping(value = "/{eventId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")
@@ -70,6 +76,9 @@ public class SecurityAuditController {
         return queryService.detail(viewer, eventId);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code export}）。
+     */
     @ULog("'导出安全审计'")
     @GetMapping(value = "/export", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:export')")
@@ -81,6 +90,9 @@ public class SecurityAuditController {
         return ResponseEntity.ok().headers(headers).body(content);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code retention}）。
+     */
     @ULog("'查询安全审计保留策略'")
     @GetMapping(value = "/retention", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'audit:read')")

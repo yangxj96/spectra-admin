@@ -20,6 +20,9 @@ import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,4 +36,40 @@ public record NotificationControlledSendPreviewVO(UUID previewId, String preview
                                                   Map<NotificationChannel, NotificationChannelAvailability> channelAvailability,
                                                   Map<NotificationChannel, NotificationControlledSendTemplateVO> templates,
                                                   List<NotificationControlledSendSampleVO> samples) {
+
+    public NotificationControlledSendPreviewVO {
+        skippedCounts = immutableMap(skippedCounts);
+        channelAvailability = immutableMap(channelAvailability);
+        templates = immutableMap(templates);
+        samples = samples == null ? List.of() : Collections.unmodifiableList(new ArrayList<>(samples));
+    }
+
+    @Override
+    public Map<String, Integer> skippedCounts() {
+        return immutableMap(skippedCounts);
+    }
+
+    @Override
+    public Map<NotificationChannel, NotificationChannelAvailability> channelAvailability() {
+        return immutableMap(channelAvailability);
+    }
+
+    @Override
+    public Map<NotificationChannel, NotificationControlledSendTemplateVO> templates() {
+        return immutableMap(templates);
+    }
+
+    @Override
+    public List<NotificationControlledSendSampleVO> samples() {
+        return Collections.unmodifiableList(new ArrayList<>(samples));
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code immutableMap}）。
+     */
+    private static <K, V> Map<K, V> immutableMap(Map<K, V> source) {
+        return source == null || source.isEmpty()
+                ? Map.of()
+                : Collections.unmodifiableMap(new LinkedHashMap<>(source));
+    }
 }

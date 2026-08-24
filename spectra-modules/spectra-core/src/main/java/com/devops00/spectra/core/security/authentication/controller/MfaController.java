@@ -45,31 +45,40 @@ public class MfaController {
 
     private final SecurityContextAccessor securityContextAccessor;
 
-    private final SecurityMfaChallengePort mfaChallengePort;
+    private final ObjectProvider<SecurityMfaChallengePort> mfaChallengeProvider;
 
     public MfaController(MfaService mfaService, SecurityContextAccessor securityContextAccessor,
                          ObjectProvider<SecurityMfaChallengePort> mfaChallengeProvider) {
         this.mfaService = mfaService;
         this.securityContextAccessor = securityContextAccessor;
-        this.mfaChallengePort = mfaChallengeProvider.getIfAvailable();
+        this.mfaChallengeProvider = mfaChallengeProvider;
     }
 
+    /**
+     * 创建或构建目标数据（{@code beginTotpEnrollment}）。
+     */
     @PostMapping("/totp/enroll")
     @PreAuthorize("isAuthenticated()")
     public MfaEnrollmentResult beginTotpEnrollment() {
         return mfaService.beginTotpEnrollment(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor));
     }
 
+    /**
+     * 创建或构建目标数据（{@code beginSetupTotpEnrollment}）。
+     */
     @ULog(value = "'开始首次 MFA 登记'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PostMapping(value = "/setup/totp/enroll", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public MfaEnrollmentResult beginSetupTotpEnrollment(@Valid @RequestBody MfaSetupChallengeFrom from,
                                                         HttpServletRequest request) {
-        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.getChallengeId(), request);
+        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengeProvider.getIfAvailable(), from.getChallengeId(), request);
         return mfaService.beginTotpEnrollment(challenge.userId());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code confirmTotpEnrollment}）。
+     */
     @PostMapping("/totp/confirm")
     @PreAuthorize("isAuthenticated()")
     public List<String> confirmTotpEnrollment(@Valid @RequestBody MfaConfirmFrom from) {
@@ -77,20 +86,26 @@ public class MfaController {
                 from.getEnrollmentId(), from.getCode());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code confirmSetupTotpEnrollment}）。
+     */
     @ULog(value = "'确认首次 MFA 登记'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PostMapping(value = "/setup/totp/confirm", version = "1.0.0")
     @PreAuthorize("permitAll()")
     public List<String> confirmSetupTotpEnrollment(@Valid @RequestBody MfaSetupConfirmFrom from,
                                                    HttpServletRequest request) {
-        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengePort, from.getChallengeId(), request);
+        MfaLoginChallenge challenge = MfaChallengeUtils.requireSetupChallenge(mfaChallengeProvider.getIfAvailable(), from.getChallengeId(), request);
         List<String> recoveryCodes = mfaService.confirmTotpEnrollment(challenge.userId(), from.getEnrollmentId(), from.getCode());
-        if (!MfaChallengeUtils.requireChallengePort(mfaChallengePort).markEnrollmentCompleted(from.getChallengeId())) {
+        if (!MfaChallengeUtils.requireChallengePort(mfaChallengeProvider.getIfAvailable()).markEnrollmentCompleted(from.getChallengeId())) {
             throw new IllegalStateException("MFA 挑战状态更新失败");
         }
         return recoveryCodes;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verifyRecoveryCode}）。
+     */
     @PostMapping("/recovery/verify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
@@ -101,6 +116,9 @@ public class MfaController {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code rotateRecoveryCodes}）。
+     */
     @PostMapping("/recovery/rotate")
     @PreAuthorize("isAuthenticated()")
     public List<String> rotateRecoveryCodes() {

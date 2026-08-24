@@ -20,7 +20,11 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseServiceImpl;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.common.exception.*;
+import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.common.exception.DataSaveException;
+import com.devops00.spectra.common.exception.EntityUpdateException;
+import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
@@ -65,7 +69,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
+import java.util.Base64;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -79,6 +87,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implements UserService {
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private static final Duration TEMPORARY_PASSWORD_VALIDITY = Duration.ofHours(24);
 
@@ -344,6 +354,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         });
     }
 
+    /**
+     * 处理内部业务逻辑（{@code lifecycleEventType}）。
+     */
     private String lifecycleEventType(UserStatus previous, UserStatus target) {
         if (target == UserStatus.LOCKED) {
             return "ACCOUNT_LOCKED";
@@ -359,12 +372,18 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         };
     }
 
+    /**
+     * 更新或推进目标状态（{@code appendAudit}）。
+     */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
                 null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
     }
 
+    /**
+     * 更新或推进目标状态（{@code revokeActiveAssignments}）。
+     */
     private void revokeActiveAssignments(UUID userId) {
         var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getUserId, userId)
@@ -380,10 +399,16 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code targetRoles}）。
+     */
     private List<RoleVO> targetRoles(UUID userId) {
         return targetRoles(authorizationAssignmentQueryService.findByUserId(userId));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code fillAuthorization}）。
+     */
     private void fillAuthorization(UserPageVO vo) {
         var assignments = authorizationAssignmentQueryService.findByUserId(vo.getId());
         vo.setRoles(targetRoles(assignments));
@@ -391,6 +416,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 assignments, timeMapper.toLocalDateTime(Instant.now())));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code targetRoles}）。
+     */
     private List<RoleVO> targetRoles(List<AuthorizationAssignmentView> assignments) {
         return assignments
                 .stream()
@@ -417,6 +445,9 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 .toList();
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentOperatorId}）。
+     */
     private UUID currentOperatorId() {
         var currentUser = securityContextAccessor.currentUser();
         return currentUser == null ? null : currentUser.getId();
@@ -429,7 +460,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
      */
     private String generateTemporaryPassword() {
         var bytes = new byte[32];
-        new SecureRandom().nextBytes(bytes);
+        SECURE_RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 }

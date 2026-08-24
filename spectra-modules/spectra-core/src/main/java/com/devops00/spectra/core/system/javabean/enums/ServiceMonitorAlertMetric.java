@@ -26,6 +26,9 @@ public enum ServiceMonitorAlertMetric {
         this.numeric = numeric;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code fromCode}）。
+     */
     public static ServiceMonitorAlertMetric fromCode(String code) {
         for (var metric : values()) {
             if (metric.code.equalsIgnoreCase(code)) {

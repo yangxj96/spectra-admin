@@ -20,7 +20,11 @@ import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
-import com.devops00.spectra.common.notification.*;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationRecipient;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
@@ -44,9 +48,16 @@ import java.util.Map;
 import java.util.UUID;
 import java.time.Instant;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Gateway 幂等和多收件人展开测试。

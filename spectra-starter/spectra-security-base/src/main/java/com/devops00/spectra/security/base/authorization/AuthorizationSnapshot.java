@@ -50,10 +50,16 @@ public final class AuthorizationSnapshot {
         this.grantBoundaries = index(this.assignments, false);
     }
 
+    /**
+     * 创建或构建目标数据（{@code of}）。
+     */
     public static AuthorizationSnapshot of(List<AuthorizationAssignment> assignments) {
         return new AuthorizationSnapshot(assignments);
     }
 
+    /**
+     * 查询或获取目标数据（{@code assignments}）。
+     */
     public List<AuthorizationAssignment> assignments() {
         return assignments;
     }
@@ -67,6 +73,9 @@ public final class AuthorizationSnapshot {
         return root;
     }
 
+    /**
+     * 查询或获取目标数据（{@code permissions}）。
+     */
     public Set<String> permissions() {
         if (root) {
             return Set.of("*");
@@ -74,6 +83,9 @@ public final class AuthorizationSnapshot {
         return Collections.unmodifiableSet(new LinkedHashSet<>(accessBoundaries.keySet()));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code grantablePermissions}）。
+     */
     public Set<String> grantablePermissions() {
         if (root) {
             return Set.of("*");
@@ -81,30 +93,51 @@ public final class AuthorizationSnapshot {
         return Collections.unmodifiableSet(new LinkedHashSet<>(grantBoundaries.keySet()));
     }
 
+    /**
+     * 判断条件是否满足（{@code hasPermission}）。
+     */
     public boolean hasPermission(String permission) {
         return permission != null && (root || accessBoundaries.containsKey(permission));
     }
 
+    /**
+     * 判断条件是否满足（{@code canAccess}）。
+     */
     public boolean canAccess(String permission, ScopeQuery query) {
         return permission != null && (root || allows(accessBoundaries.get(permission), query));
     }
 
+    /**
+     * 判断条件是否满足（{@code canGrant}）。
+     */
     public boolean canGrant(String permission, ScopeQuery query) {
         return permission != null && (root || allows(grantBoundaries.get(permission), query));
     }
 
+    /**
+     * 查询或获取目标数据（{@code accessBoundaries}）。
+     */
     public List<PermissionBoundary> accessBoundaries(String permission) {
         return accessBoundaries.getOrDefault(permission, List.of());
     }
 
+    /**
+     * 查询或获取目标数据（{@code grantBoundaries}）。
+     */
     public List<PermissionBoundary> grantBoundaries(String permission) {
         return grantBoundaries.getOrDefault(permission, List.of());
     }
 
+    /**
+     * 查询或获取目标数据（{@code allows}）。
+     */
     private static boolean allows(List<PermissionBoundary> boundaries, ScopeQuery query) {
         return boundaries != null && boundaries.stream().anyMatch(boundary -> boundary.scope().allows(query));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code index}）。
+     */
     private static Map<String, List<PermissionBoundary>> index(List<AuthorizationAssignment> assignments, boolean access) {
         var result = new LinkedHashMap<String, List<PermissionBoundary>>();
         for (AuthorizationAssignment assignment : assignments) {

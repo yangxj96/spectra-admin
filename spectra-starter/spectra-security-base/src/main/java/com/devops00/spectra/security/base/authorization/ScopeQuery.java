@@ -31,4 +31,9 @@ public record ScopeQuery(UUID subjectId, UUID ownerId, UUID departmentId, Set<UU
                 ? Set.of()
                 : Collections.unmodifiableSet(new LinkedHashSet<>(departmentLineage));
     }
+
+    @Override
+    public Set<UUID> departmentLineage() {
+        return Collections.unmodifiableSet(new LinkedHashSet<>(departmentLineage));
+    }
 }

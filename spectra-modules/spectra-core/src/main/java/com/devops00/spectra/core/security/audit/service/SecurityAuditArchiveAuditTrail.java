@@ -45,6 +45,9 @@ public class SecurityAuditArchiveAuditTrail {
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    /**
+     * 更新或推进目标状态（{@code append}）。
+     */
     public void append(String eventType, UUID operatorId, String partitionName, String detail) {
         if (!ARCHIVE_EVENTS.contains(eventType)) {
             throw new IllegalArgumentException("非法的审计归档事件类型");
@@ -56,6 +59,9 @@ public class SecurityAuditArchiveAuditTrail {
                 Map.of(), snapshot, null, null, resultFor(eventType), null));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code resultFor}）。
+     */
     private static AuditResult resultFor(String eventType) {
         return switch (eventType) {
             case "SECURITY_AUDIT_ARCHIVE_STARTED" -> AuditResult.STARTED;

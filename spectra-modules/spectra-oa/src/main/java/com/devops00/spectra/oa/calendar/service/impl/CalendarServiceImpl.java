@@ -152,6 +152,9 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Calendar require(UUID id) {
         var calendar = this.getById(id);
         if (calendar == null) {
@@ -160,12 +163,18 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         return calendar;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureOwner}）。
+     */
     private void ensureOwner(Calendar calendar) {
         if (!Objects.equals(calendar.getOwnerId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("日程不存在或无权访问");
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseTime}）。
+     */
     private Instant parseTime(String value) {
         if (!StringUtils.hasText(value)) {
             throw new DataSaveException("日程时间不能为空");
@@ -173,7 +182,7 @@ public class CalendarServiceImpl extends BaseServiceImpl<CalendarMapper, Calenda
         try {
             return timeMapper.toInstant(value);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("日程时间格式不正确");
+            throw new DataSaveException("日程时间格式不正确", exception);
         }
     }
 }

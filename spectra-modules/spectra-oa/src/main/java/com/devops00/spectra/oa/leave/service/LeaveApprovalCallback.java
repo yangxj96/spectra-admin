@@ -40,6 +40,9 @@ public class LeaveApprovalCallback implements ApprovalCallback {
     private final WorkflowService workflowService;
     private final LeaveService leaveService;
 
+    /**
+     * 执行内部处理逻辑（{@code register}）。
+     */
     @PostConstruct
     public void register() {
         workflowService.registerCallback(PROCESS_DEFINITION_KEY, this);

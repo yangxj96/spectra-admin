@@ -60,10 +60,13 @@ final class NotificationTemplateDigest {
         try {
             return SHA256Utils.hash(canonicalize(payload).toString());
         } catch (Exception exception) {
-            throw new DataSaveException("生成通知模板版本摘要失败");
+            throw new DataSaveException("生成通知模板版本摘要失败", exception);
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code canonicalize}）。
+     */
     private static Object canonicalize(Object value) {
         if (value instanceof Map<?, ?> map) {
             var sorted = new TreeMap<String, Object>();

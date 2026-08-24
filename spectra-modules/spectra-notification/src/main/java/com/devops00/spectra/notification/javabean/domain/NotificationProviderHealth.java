@@ -30,22 +30,37 @@ import java.time.Instant;
  */
 public record NotificationProviderHealth(NotificationProviderHealthState state, String reason, Instant checkedAt) {
 
+    /**
+     * 处理内部业务逻辑（{@code healthy}）。
+     */
     public static NotificationProviderHealth healthy(String reason, Instant checkedAt) {
         return new NotificationProviderHealth(NotificationProviderHealthState.HEALTHY, reason, checkedAt);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code unhealthy}）。
+     */
     public static NotificationProviderHealth unhealthy(String reason, Instant checkedAt) {
         return new NotificationProviderHealth(NotificationProviderHealthState.UNHEALTHY, reason, checkedAt);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code notConfigured}）。
+     */
     public static NotificationProviderHealth notConfigured(String reason, Instant checkedAt) {
         return new NotificationProviderHealth(NotificationProviderHealthState.NOT_CONFIGURED, reason, checkedAt);
     }
 
+    /**
+     * 更新或推进目标状态（{@code disabled}）。
+     */
     public static NotificationProviderHealth disabled(String reason, Instant checkedAt) {
         return new NotificationProviderHealth(NotificationProviderHealthState.DISABLED, reason, checkedAt);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code blocked}）。
+     */
     public static NotificationProviderHealth blocked(String reason, Instant checkedAt) {
         return new NotificationProviderHealth(NotificationProviderHealthState.BLOCKED, reason, checkedAt);
     }

@@ -27,9 +27,9 @@ import com.devops00.spectra.notification.provider.NotificationTaskMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import tools.jackson.databind.ObjectMapper;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -37,7 +37,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -139,6 +138,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code request}）。
+     */
     private HttpResponse<String> request(NotificationProviderConfiguration configuration, String action,
                                          Map<String, String> actionParameters) {
         try {
@@ -164,6 +166,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code commonParameters}）。
+     */
     private Map<String, String> commonParameters(NotificationProviderConfiguration configuration, String action) {
         var parameters = new LinkedHashMap<String, String>();
         parameters.put("AccessKeyId", configuration.credentialId());
@@ -177,6 +182,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         return parameters;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code signature}）。
+     */
     private String signature(Map<String, String> parameters, String secret) {
         var canonicalized = parameters.entrySet()
                 .stream()
@@ -188,6 +196,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         return hmacSha1(secret + "&", stringToSign);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code hmacSha1}）。
+     */
     private String hmacSha1(String key, String value) {
         try {
             var mac = Mac.getInstance("HmacSHA1");
@@ -198,6 +209,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code encode}）。
+     */
     private String encode(String value) {
         return URLEncoder.encode(value == null ? "" : value, StandardCharsets.UTF_8)
                 .replace("+", "%20")
@@ -205,6 +219,9 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
                 .replace("%7E", "~");
     }
 
+    /**
+     * 处理内部业务逻辑（{@code endpoint}）。
+     */
     private URI endpoint(NotificationProviderConfiguration configuration) {
         var endpoint = configuration.endpoint();
         if (endpoint == null || endpoint.isBlank()) {
@@ -215,26 +232,35 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
                 : "https://" + endpoint);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code client}）。
+     */
     private HttpClient client(NotificationProviderConfiguration configuration) {
         return HttpClient.newBuilder().connectTimeout(Duration.ofMillis(configuration.timeoutMs())).build();
     }
 
+    /**
+     * 查询或获取目标数据（{@code readJson}）。
+     */
     private Map<String, Object> readJson(String body) {
         if (body == null || body.isBlank()) {
             return Map.of();
         }
         try {
-            var value = objectMapper.readValue(body, Map.class);
-            return value instanceof Map<?, ?> map
-                    ? map.entrySet()
+            Map<?, ?> map = objectMapper.readValue(body, Map.class);
+            return map == null
+                    ? Map.of()
+                    : map.entrySet()
                             .stream()
-                            .collect(Collectors.toMap(entry -> String.valueOf(entry.getKey()), Map.Entry::getValue))
-                    : Map.of();
+                            .collect(Collectors.toMap(entry -> String.valueOf(entry.getKey()), Map.Entry::getValue));
         } catch (RuntimeException exception) {
             return Map.of();
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code stringParameters}）。
+     */
     private Map<String, String> stringParameters(Map<String, Object> parameters) {
         return parameters.entrySet()
                 .stream()
@@ -243,10 +269,16 @@ public class AliyunSmsNotificationProvider implements NotificationProvider {
                         (first, ignored) -> first, LinkedHashMap::new));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code text}）。
+     */
     private String text(Object value) {
         return value == null ? null : String.valueOf(value);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code usable}）。
+     */
     private boolean usable(NotificationProviderConfiguration configuration) {
         return configuration != null
                 && configuration.enabled()

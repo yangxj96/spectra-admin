@@ -9,6 +9,8 @@ package com.devops00.spectra.framework.configure.mybatis;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import org.springframework.beans.factory.config.BeanDefinition;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
@@ -28,15 +30,25 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2026/8/9
  */
 @Component
+@Slf4j
 public class DataScopeEntityRegistry {
 
     private final Map<String, DataScope> scopes = new ConcurrentHashMap<>();
 
-    public DataScopeEntityRegistry() {
+    /**
+     * 执行内部处理逻辑（{@code initialize}）。
+     */
+    @PostConstruct
+    public void initialize() {
         var scanner = new ClassPathScanningCandidateComponentProvider(false);
         scanner.addIncludeFilter(new AnnotationTypeFilter(DataScope.class));
-        for (BeanDefinition definition : scanner.findCandidateComponents("com.devops00.spectra")) {
-            register(definition.getBeanClassName());
+        try {
+            for (BeanDefinition definition : scanner.findCandidateComponents("com.devops00.spectra")) {
+                register(definition.getBeanClassName());
+            }
+        } catch (RuntimeException exception) {
+            log.error("扫描数据权限实体失败", exception);
+            throw exception;
         }
     }
 
@@ -51,6 +63,9 @@ public class DataScopeEntityRegistry {
         return scope != null ? scope : scopes.get(tableName.replace("\"", ""));
     }
 
+    /**
+     * 执行内部处理逻辑（{@code register}）。
+     */
     private void register(String className) {
         if (className == null) {
             return;

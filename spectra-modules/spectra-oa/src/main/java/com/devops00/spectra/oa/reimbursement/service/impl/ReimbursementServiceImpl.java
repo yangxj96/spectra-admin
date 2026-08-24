@@ -37,7 +37,12 @@ import com.devops00.spectra.oa.reimbursement.javabean.converter.ReimbursementCon
 import com.devops00.spectra.oa.reimbursement.javabean.constant.ReimbursementPaymentStatus;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.Reimbursement;
 import com.devops00.spectra.oa.reimbursement.javabean.entity.ReimbursementItem;
-import com.devops00.spectra.oa.reimbursement.javabean.from.*;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementAttachmentFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementItemFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPageFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPaymentFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSaveFrom;
+import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSubmitFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.vo.ReimbursementVO;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
@@ -53,7 +58,12 @@ import org.springframework.util.StringUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.*;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * 费用报销业务闭环服务实现。
@@ -176,7 +186,8 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("报销流程尚未配置");
         }
         applicationService.submit(application.getId());
-        var applicantUsername = securityContextAccessor.currentUser() == null ? null : securityContextAccessor.currentUser().getUsername();
+        var currentUser = securityContextAccessor.currentUser();
+        var applicantUsername = currentUser == null ? null : currentUser.getUsername();
         if (!StringUtils.hasText(applicantUsername)) {
             throw new DataSaveException("当前用户缺少流程用户名");
         }
@@ -263,12 +274,15 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private void validate(ReimbursementSaveFrom from) {
         if (from == null || from.getItems() == null || from.getItems().isEmpty()) {
             throw new DataSaveException("报销参数和费用明细不能为空");
         }
-        var expenseStart = timeMapper.toInstant(from.getExpenseStart());
-        var expenseEnd = timeMapper.toInstant(from.getExpenseEnd());
+        var expenseStart = Objects.requireNonNull(timeMapper.toInstant(from.getExpenseStart()), "费用开始日期不能为空");
+        var expenseEnd = Objects.requireNonNull(timeMapper.toInstant(from.getExpenseEnd()), "费用结束日期不能为空");
         if (expenseEnd.isBefore(expenseStart)) {
             throw new DataSaveException("费用结束日期不能早于开始日期");
         }
@@ -282,13 +296,16 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
             throw new DataSaveException("报销总额必须等于费用明细合计");
         }
         from.getItems().forEach(item -> {
-            var expenseDate = timeMapper.toInstant(item.getExpenseDate());
+            var expenseDate = Objects.requireNonNull(timeMapper.toInstant(item.getExpenseDate()), "费用日期不能为空");
             if (expenseDate.isBefore(expenseStart) || expenseDate.isAfter(expenseEnd)) {
                 throw new DataSaveException("费用日期必须在报销期间内");
             }
         });
     }
 
+    /**
+     * 更新或推进目标状态（{@code replaceItems}）。
+     */
     private void replaceItems(Reimbursement entity, List<ReimbursementItemFrom> items) {
         itemMapper.delete(new LambdaQueryWrapper<ReimbursementItem>().eq(ReimbursementItem::getReimbursementId, entity.getId()));
         var invoiceNos = items.stream().map(ReimbursementItemFrom::getInvoiceNo).filter(StringUtils::hasText).map(String::trim).toList();
@@ -315,6 +332,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         });
     }
 
+    /**
+     * 更新或推进目标状态（{@code replaceAttachments}）。
+     */
     private void replaceAttachments(UUID applicationId, List<ReimbursementAttachmentFrom> attachments) {
         attachmentMapper.delete(new LambdaQueryWrapper<ApplicationAttachment>().eq(ApplicationAttachment::getApplicationId, applicationId));
         if (attachments == null || attachments.isEmpty()) {
@@ -331,6 +351,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         });
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private ReimbursementVO assembleView(Reimbursement entity) {
         var application = applicationService.require(entity.getApplicationId());
         var vo = reimbursementConverter.toVO(entity);
@@ -351,6 +374,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         return vo;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Reimbursement require(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
@@ -359,6 +385,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireEditableApplication}）。
+     */
     private Application requireEditableApplication(Reimbursement entity) {
         var application = workflowSupport.requireApplicantApplication(entity.getApplicationId(), "报销单不存在或无权操作");
         if (!ApplicationStatus.DRAFT.name().equals(application.getStatus()) && !ApplicationStatus.REJECTED.name().equals(application.getStatus())) {
@@ -367,6 +396,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
         return application;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code mask}）。
+     */
     private String mask(String account) {
         if (!StringUtils.hasText(account)) {
             return null;

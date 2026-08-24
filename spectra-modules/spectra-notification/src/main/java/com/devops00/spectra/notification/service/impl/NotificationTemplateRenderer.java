@@ -158,6 +158,9 @@ public class NotificationTemplateRenderer {
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code isOnlyVariable}）。
+     */
     private boolean isOnlyVariable(String template) {
         return template != null && template.trim().matches("\\{\\{\\s*[A-Za-z0-9_.-]+\\s*}}");
     }
@@ -177,6 +180,9 @@ public class NotificationTemplateRenderer {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code collectVariables}）。
+     */
     private void collectVariables(String template, Set<String> referenced) {
         if (!StringUtils.hasText(template)) {
             return;
@@ -220,6 +226,9 @@ public class NotificationTemplateRenderer {
         return sensitive;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code propertyDefinitions}）。
+     */
     private Map<?, ?> propertyDefinitions(Map<String, Object> parameterSchema) {
         if (parameterSchema == null || parameterSchema.isEmpty()) {
             return Map.of();
@@ -231,6 +240,9 @@ public class NotificationTemplateRenderer {
         return propertyMap;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateParameterDefinition}）。
+     */
     private void validateParameterDefinition(String name, Object definition) {
         if (!(definition instanceof Map<?, ?> property)) {
             throw new DataSaveException("模板参数定义不合法: " + name);

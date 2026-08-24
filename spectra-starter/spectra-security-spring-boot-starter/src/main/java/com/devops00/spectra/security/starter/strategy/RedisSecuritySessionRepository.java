@@ -56,7 +56,16 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Redis 方式存储 Token（简化版：5 个 key 覆盖全部场景）
@@ -119,10 +128,16 @@ public class RedisSecuritySessionRepository
         return SecurityRedisExecutor.execute("签发安全会话", () -> createToken(user, clientType, UUID.randomUUID().toString()));
     }
 
+    /**
+     * 创建或构建目标数据（{@code createToken}）。
+     */
     private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId) {
         return createToken(user, clientType, familyId, isMfaVerified(user));
     }
 
+    /**
+     * 创建或构建目标数据（{@code createToken}）。
+     */
     private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId, boolean mfaVerified) {
         if (properties.isMfaRequiredForDevOps() && isRoot(user) && !mfaVerified) {
             throw new IllegalStateException("DEV_OPS 必须先完成 MFA 验证");
@@ -207,6 +222,9 @@ public class RedisSecuritySessionRepository
         return SecurityRedisExecutor.execute("刷新安全会话", () -> refreshByRefreshTokenInternal(refreshToken));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code refreshByRefreshTokenInternal}）。
+     */
     private TokenVO refreshByRefreshTokenInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             throw new IllegalArgumentException("刷新token不能为空");
@@ -281,6 +299,9 @@ public class RedisSecuritySessionRepository
         SecurityRedisExecutor.run("撤销 Access Token", () -> deleteAccessDigest(TokenDigestService.digest(token)));
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteAccessDigest}）。
+     */
     private boolean deleteAccessDigest(String tokenDigest) {
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
         Map<Object, Object> session = SecurityRedisExecutor.require("读取安全会话",
@@ -332,6 +353,9 @@ public class RedisSecuritySessionRepository
         SecurityRedisExecutor.run("按 Refresh Token 撤销会话", () -> deleteByRefreshTokenInternal(refreshToken));
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteByRefreshTokenInternal}）。
+     */
     private void deleteByRefreshTokenInternal(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
             return;
@@ -373,6 +397,9 @@ public class RedisSecuritySessionRepository
                 () -> deleteByUserIdInternal(userId, accessToken));
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteByUserIdInternal}）。
+     */
     private void deleteByUserIdInternal(UUID userId, String accessToken) {
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
         Set<Object> tokens = redis.opsForSet().members(userTokensKey);
@@ -444,6 +471,9 @@ public class RedisSecuritySessionRepository
         return SecurityRedisExecutor.execute("查询在线用户", this::listOnlineUsersInternal);
     }
 
+    /**
+     * 查询或获取目标数据（{@code listOnlineUsersInternal}）。
+     */
     private List<UserOnlineVO> listOnlineUsersInternal() {
         Set<Object> userIds = redis.opsForSet().members(SecurityRedisKey.ONLINE_USERS.getPattern());
         if (userIds == null || userIds.isEmpty()) {
@@ -498,6 +528,9 @@ public class RedisSecuritySessionRepository
         return SecurityRedisExecutor.execute("读取安全会话主体", () -> getCurrentUserInternal(token));
     }
 
+    /**
+     * 查询或获取目标数据（{@code getCurrentUserInternal}）。
+     */
     private @Nullable SecurityUser getCurrentUserInternal(String token) {
         String tokenDigest = TokenDigestService.digest(token);
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
@@ -570,13 +603,13 @@ public class RedisSecuritySessionRepository
 
         String accessRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(accessDigest);
         Object mappedRefreshDigest = redis.opsForValue().get(accessRefreshKey);
-        if (refreshDigest.equals(Objects.toString(mappedRefreshDigest, null))) {
+        if (secureEquals(refreshDigest, mappedRefreshDigest)) {
             redis.delete(accessRefreshKey);
         }
 
         String userClientKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType);
         Object mappedAccessDigest = redis.opsForValue().get(userClientKey);
-        if (accessDigest.equals(Objects.toString(mappedAccessDigest, null))) {
+        if (secureEquals(accessDigest, mappedAccessDigest)) {
             redis.delete(userClientKey);
         }
         redis.opsForSet().remove(SecurityRedisKey.USER_TOKENS.format(userId), accessDigest);
@@ -615,10 +648,9 @@ public class RedisSecuritySessionRepository
         redis.delete(SecurityRedisKey.SESSION_FAMILY.format(familyId));
     }
 
-    private SessionPolicy sessionPolicy(ClientType clientType) {
-        return sessionPolicy(clientType.getName());
-    }
-
+    /**
+     * 处理内部业务逻辑（{@code sessionPolicy}）。
+     */
     private SessionPolicy sessionPolicy(String clientCode) {
         if (sessionPolicyProvider == null) {
             throw new SecurityPolicyUnavailableException("会话策略 Provider 未配置，拒绝创建或刷新会话", null);
@@ -630,6 +662,9 @@ public class RedisSecuritySessionRepository
         return databasePolicy;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code activeTokenDigests}）。
+     */
     private Set<Object> activeTokenDigests(String userId) {
         Set<Object> tokens = redis.opsForSet().members(SecurityRedisKey.USER_TOKENS.format(userId));
         if (tokens == null || tokens.isEmpty()) {
@@ -647,12 +682,28 @@ public class RedisSecuritySessionRepository
         return active;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code redisHasKey}）。
+     */
     private boolean redisHasKey(String key) {
         return SecurityRedisExecutor.require("检查安全 Redis Key", () -> redis.hasKey(key));
     }
 
+    /**
+     * 判断条件是否满足（{@code isMfaVerified}）。
+     */
     private boolean isMfaVerified(SecurityUser user) {
-        return user.getExtraData() != null && Boolean.TRUE.equals(user.getExtraData().get("mfaVerified"));
+        Map<String, Object> extraData = user.getExtraData();
+        return extraData != null && Boolean.TRUE.equals(extraData.get("mfaVerified"));
+    }
+
+    /**
+     * 处理内部业务逻辑（{@code secureEquals}）。
+     */
+    private static boolean secureEquals(String expected, Object actual) {
+        return actual != null
+                && MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
+                        actual.toString().getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -672,6 +723,9 @@ public class RedisSecuritySessionRepository
         throw new IllegalArgumentException("刷新token认证等级异常，请重新登录");
     }
 
+    /**
+     * 判断条件是否满足（{@code isRoot}）。
+     */
     private boolean isRoot(SecurityUser user) {
         return user.getAuthorities()
                 .stream()
@@ -749,6 +803,9 @@ public class RedisSecuritySessionRepository
         return ClientType.WEB;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolveDeviceId}）。
+     */
     private String resolveDeviceId() {
         HttpServletRequest request = this.getHttpServletRequest();
         if (request == null) {
@@ -758,6 +815,9 @@ public class RedisSecuritySessionRepository
         return deviceId == null || deviceId.isBlank() ? "unknown" : deviceId;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getTokenFromSecurityContext}）。
+     */
     private @Nullable String getTokenFromSecurityContext() {
         var auth = this.getSecurityContextAuthentication();
         if (auth == null)
@@ -766,6 +826,9 @@ public class RedisSecuritySessionRepository
         return cred instanceof String s ? s : null;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getTokenFromHttpRequest}）。
+     */
     private @Nullable String getTokenFromHttpRequest() {
         HttpServletRequest request = this.getHttpServletRequest();
         if (request == null)
@@ -776,6 +839,9 @@ public class RedisSecuritySessionRepository
         return bearer.substring(7);
     }
 
+    /**
+     * 查询或获取目标数据（{@code getUserFromSecurityContext}）。
+     */
     private @Nullable SecurityUser getUserFromSecurityContext() {
         var auth = this.getSecurityContextAuthentication();
         if (auth == null)
@@ -784,10 +850,16 @@ public class RedisSecuritySessionRepository
         return p instanceof SecurityUser su ? su : null;
     }
 
+    /**
+     * 查询或获取目标数据（{@code getSecurityContextAuthentication}）。
+     */
     private @Nullable Authentication getSecurityContextAuthentication() {
         return SecurityContextHolder.getContext().getAuthentication();
     }
 
+    /**
+     * 查询或获取目标数据（{@code getHttpServletRequest}）。
+     */
     private @Nullable HttpServletRequest getHttpServletRequest() {
         RequestAttributes attrs = RequestContextHolder.getRequestAttributes();
         return attrs instanceof ServletRequestAttributes sra ? sra.getRequest() : null;

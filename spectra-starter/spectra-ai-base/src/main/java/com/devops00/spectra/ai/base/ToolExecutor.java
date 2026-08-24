@@ -53,18 +53,18 @@ import java.util.function.Supplier;
 @Component
 public class ToolExecutor {
 
-    private static ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
-    private static SecurityUserLookupPort securityUserLookupPort;
+    private final SecurityUserLookupPort securityUserLookupPort;
 
     /**
-     * 构造函数注入，用于在 Spring 启动时将容器中配好的 ObjectMapper 赋给静态变量。
+     * 构造函数注入项目统一的 ObjectMapper 和安全用户查询端口。
      *
      * @param objectMapper 项目全局 Jackson 映射器
      */
     public ToolExecutor(ObjectMapper objectMapper, SecurityUserLookupPort securityUserLookupPort) {
-        ToolExecutor.objectMapper = objectMapper;
-        ToolExecutor.securityUserLookupPort = securityUserLookupPort;
+        this.objectMapper = objectMapper;
+        this.securityUserLookupPort = securityUserLookupPort;
     }
 
     /**
@@ -77,9 +77,8 @@ public class ToolExecutor {
      * @param <R>           请求参数的强类型泛型（Request DTO）
      * @param <T>           业务返回结果的强类型泛型（Target/Result Object）
      * @return 序列化后的符合项目 Jackson 规范的 JSON 结果字符串（若发生异常则返回错误 JSON 文本）
-     * @throws IllegalStateException 如果工具类未被 Spring 成功注入初始化则抛出
      */
-    public static <R, T> String execute(String token, String jsonParams, Class<R> reqClass, BiFunction<R, String, T> businessLogic) {
+    public <R, T> String execute(String token, String jsonParams, Class<R> reqClass, BiFunction<R, String, T> businessLogic) {
         return executeWithSecurity(token, () -> {
             // 1. 解析入参
             R request = parseParams(jsonParams, reqClass);
@@ -95,9 +94,8 @@ public class ToolExecutor {
      * @param businessLogic 核心业务逻辑函数表达式，入参为 (用户ID)，返回强类型业务结果
      * @param <T>           业务返回结果的强类型泛型（Target/Result Object）
      * @return 序列化后的符合项目 Jackson 规范的 JSON 结果字符串（若发生异常则返回错误 JSON 文本）
-     * @throws IllegalStateException 如果工具类未被 Spring 成功注入初始化则抛出
      */
-    public static <T> String execute(String token, Function<String, T> businessLogic) {
+    public <T> String execute(String token, Function<String, T> businessLogic) {
         return executeWithSecurity(token, () -> businessLogic.apply(token));
     }
 
@@ -110,11 +108,9 @@ public class ToolExecutor {
      * @param <R>           请求参数的强类型泛型（Request DTO）
      * @param <T>           业务返回结果的强类型泛型（Target/Result Object）
      * @return 序列化后的符合项目 Jackson 规范的 JSON 结果字符串（若发生异常则返回错误 JSON 文本）
-     * @throws IllegalStateException 如果工具类未被 Spring 成功注入初始化则抛出
      */
-    public static <R, T> String execute(String jsonParams, Class<R> reqClass, Function<R, T> businessLogic) {
+    public <R, T> String execute(String jsonParams, Class<R> reqClass, Function<R, T> businessLogic) {
         try {
-            checkInitialized();
             R request = parseParams(jsonParams, reqClass);
             T result = businessLogic.apply(request);
             return objectMapper.writeValueAsString(result);
@@ -128,11 +124,9 @@ public class ToolExecutor {
     /**
      * 环绕控制：负责管理带有 Security 权限校验的工具方法执行全生命周期
      */
-    private static <T> String executeWithSecurity(String token, Supplier<T> coreLogic) {
+    private <T> String executeWithSecurity(String token, Supplier<T> coreLogic) {
         boolean contextBound = false;
         try {
-            checkInitialized();
-
             // 注入 Security 上下文
             if (StrUtils.isNotBlank(token)) {
                 SecurityUser user = securityUserLookupPort.findByToken(token);
@@ -160,19 +154,10 @@ public class ToolExecutor {
     /**
      * 统一参数解析与兜底
      */
-    private static <R> R parseParams(String jsonParams, Class<R> reqClass) {
+    private <R> R parseParams(String jsonParams, Class<R> reqClass) {
         return (jsonParams == null || jsonParams.trim().isEmpty())
                 ? objectMapper.readValue("{}", reqClass)
                 : objectMapper.readValue(jsonParams, reqClass);
-    }
-
-    /**
-     * 检查静态映射器是否已由 Spring 完成注入初始化。
-     */
-    private static void checkInitialized() {
-        if (objectMapper == null) {
-            throw new IllegalStateException("ToolExecutor 未初始化，ObjectMapper 为空！");
-        }
     }
 
     /**
@@ -181,7 +166,7 @@ public class ToolExecutor {
      * @param e 捕获的异常对象
      * @return 包装后的包含错误信息的 JSON 字符串
      */
-    private static String buildErrorResponse(Exception e) {
+    private String buildErrorResponse(Exception e) {
         // 打印错误日志，方便本地排查
         log.error("{}构建出错:{}", LogPrefix.AI.p(), e.getMessage(), e);
         return String.format("{\"status\":\"ERROR\",\"message\":\"%s\"}", e.getMessage());

@@ -121,6 +121,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
      */
     private SystemConfigValueWriter valueWriter;
 
+    /**
+     * 更新或推进目标状态（{@code setValueWriter}）。
+     */
     @Autowired(required = false)
     public void setValueWriter(SystemConfigValueWriter valueWriter) {
         this.valueWriter = valueWriter;
@@ -301,7 +304,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         try {
             write(configKey(channel), objectMapper.writeValueAsString(document), "通知" + channel.name() + " Provider 配置");
         } catch (JacksonException exception) {
-            throw new DataSaveException("Provider 配置序列化失败");
+            throw new DataSaveException("Provider 配置序列化失败", exception);
         }
         return get(channel);
     }
@@ -382,6 +385,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         return state.name();
     }
 
+    /**
+     * 判断条件是否满足（{@code hasSecret}）。
+     */
     private boolean hasSecret(NotificationProviderConfigDocument document, String ciphertext) {
         return document.secretKeyId() != null
                 && !document.secretKeyId().isBlank()
@@ -389,6 +395,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 && !ciphertext.isBlank();
     }
 
+    /**
+     * 判断条件是否满足（{@code canDecrypt}）。
+     */
     private boolean canDecrypt(String ciphertext) {
         try {
             payloadProtector.unprotectSecret(ciphertext);
@@ -398,6 +407,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code isHttpEndpoint}）。
+     */
     private boolean isHttpEndpoint(String endpoint) {
         try {
             var uri = URI.create(endpoint);
@@ -408,6 +420,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code write}）。
+     */
     private void write(String key, String value, String remarks) {
         if (valueWriter == null) {
             throw new DataSaveException("系统配置写入服务不可用");
@@ -415,30 +430,51 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         valueWriter.upsert(key, value, ConfiguredValueType.TEXT, remarks);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code configKey}）。
+     */
     private String configKey(NotificationChannel channel) {
         return CONFIG_KEY_PREFIX + channel.name().toLowerCase();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code secretKey}）。
+     */
     private String secretKey(NotificationChannel channel) {
         return configKey(channel) + SECRET_KEY_SUFFIX;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private String normalize(String value) {
         return value == null ? null : value.trim();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeTimeout}）。
+     */
     private int normalizeTimeout(int value) {
         return value >= 100 && value <= 30_000 ? value : DEFAULT_TIMEOUT_MS;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeRate}）。
+     */
     private int normalizeRate(int value) {
         return value > 0 && value <= 10_000 ? value : DEFAULT_RATE_LIMIT;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeAttempts}）。
+     */
     private int normalizeAttempts(int value) {
         return value > 0 && value <= 5 ? value : DEFAULT_MAX_ATTEMPTS;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizePort}）。
+     */
     private int normalizePort(String providerType, int port, boolean sslEnabled) {
         if ("SMTP".equalsIgnoreCase(providerType)) {
             return port > 0 && port <= 65_535 ? port : (sslEnabled ? 465 : DEFAULT_SMTP_PORT);
@@ -446,6 +482,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         return port > 0 && port <= 65_535 ? port : 0;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeProviderFields}）。
+     */
     private void normalizeProviderFields(String providerType, String endpoint, String credentialId, String appId,
                                          String signName, String senderAddress, String templateCode) {
         switch (providerType) {
@@ -483,6 +522,9 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code isConfigurationComplete}）。
+     */
     private boolean isConfigurationComplete(NotificationProviderConfigDocument document) {
         return switch (document.providerType()) {
             case "ALIYUN_SMS" -> StringUtils.hasText(document.credentialId())
@@ -503,10 +545,16 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         };
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requiresSecret}）。
+     */
     private boolean requiresSecret(String providerType) {
         return !"MOCK".equals(providerType) && providerType != null && !providerType.isBlank();
     }
 
+    /**
+     * 判断条件是否满足（{@code isSmtpEndpoint}）。
+     */
     private boolean isSmtpEndpoint(String endpoint) {
         return StringUtils.hasText(endpoint) && !endpoint.contains("/") && !endpoint.contains("\\");
     }

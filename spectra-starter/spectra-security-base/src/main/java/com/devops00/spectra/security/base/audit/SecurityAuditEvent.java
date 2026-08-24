@@ -76,6 +76,16 @@ public record SecurityAuditEvent(UUID eventId,
         after = immutableCopy(SecurityAuditSnapshotSanitizer.sanitize(after));
     }
 
+    @Override
+    public Map<String, Object> before() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(before));
+    }
+
+    @Override
+    public Map<String, Object> after() {
+        return Collections.unmodifiableMap(new LinkedHashMap<>(after));
+    }
+
     /**
      * 创建高风险事务的审计预写入事件。
      */
@@ -91,6 +101,9 @@ public record SecurityAuditEvent(UUID eventId,
                 reason, occurredAt, nextResult, correlationId);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code immutableCopy}）。
+     */
     private static Map<String, Object> immutableCopy(Map<String, Object> source) {
         if (source == null || source.isEmpty()) {
             return Map.of();

@@ -158,9 +158,9 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
                     role.getName(),
                     role.getSystemManaged(),
                     role.getState(),
-                    role.getVersion() == null ? 0L : role.getVersion(),
+                    role.getVersion() == null ? Long.valueOf(0L) : role.getVersion(),
                     rolePermissionCounts.getOrDefault(assignment.getRoleId(), 0L),
-                    assignment.getVersion() == null ? 0L : assignment.getVersion(),
+                    assignment.getVersion() == null ? Long.valueOf(0L) : assignment.getVersion(),
                     assignment.getState(),
                     timeMapper.toLocalDateTime(assignment.getValidFrom()),
                     timeMapper.toLocalDateTime(assignment.getValidUntil()),
@@ -175,6 +175,9 @@ public class AuthorizationAssignmentQueryServiceImpl implements AuthorizationAss
         }).toList();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toBoundary}）。
+     */
     private AuthorizationBoundaryView toBoundary(
                                                  UUID permissionId,
                                                  UUID scopeId,

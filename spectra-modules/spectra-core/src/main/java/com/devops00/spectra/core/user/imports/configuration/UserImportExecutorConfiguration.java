@@ -25,6 +25,9 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration(proxyBeanMethods = false)
 public class UserImportExecutorConfiguration {
 
+    /**
+     * 处理内部业务逻辑（{@code userImportTaskExecutor}）。
+     */
     @Bean(name = "userImportTaskExecutor")
     public TaskExecutor userImportTaskExecutor() {
         var executor = new ThreadPoolTaskExecutor();

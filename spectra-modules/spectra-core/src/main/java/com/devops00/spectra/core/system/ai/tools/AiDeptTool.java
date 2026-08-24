@@ -41,6 +41,8 @@ public class AiDeptTool implements AiToolMarker {
 
     private final DepartmentService departmentService;
 
+    private final ToolExecutor toolExecutor;
+
     /**
      * 获取所有部门信息
      *
@@ -48,7 +50,7 @@ public class AiDeptTool implements AiToolMarker {
      */
     @Tool("获取所有部门信息")
     public String getAllDepartments(@ToolMemoryId AiMemoryId memoryId) {
-        return ToolExecutor.execute(memoryId.token(), _ -> {
+        return toolExecutor.execute(memoryId.token(), _ -> {
             log.debug("{}获取所有部门信息", LogPrefix.AI.p());
             return departmentService.list();
         });

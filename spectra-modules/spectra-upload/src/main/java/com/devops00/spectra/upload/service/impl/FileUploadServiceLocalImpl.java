@@ -40,6 +40,7 @@ import com.devops00.spectra.upload.service.FileUploadChunkService;
 import com.devops00.spectra.upload.service.FileUploadService;
 import com.devops00.spectra.upload.service.FileUploadTaskService;
 import com.github.f4b6a3.uuid.UuidCreator;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
@@ -77,12 +78,12 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     /**
      * 本地文件管理的根文件路径
      */
-    private final Path root;
+    private Path root;
 
     /**
      * 本地文件管理的临时文件路径
      */
-    private final Path temp;
+    private Path temp;
 
     private final FileUploadProperties uploadProperties;
 
@@ -95,22 +96,41 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
     private final ApplicationEventPublisher publisher;
 
     public FileUploadServiceLocalImpl(LocalProperties properties, FileUploadProperties uploadProperties, FileInfoService infoService,
-                                      FileUploadTaskService taskService, FileUploadChunkService chunkService, ApplicationEventPublisher publisher)
-            throws IOException {
+                                      FileUploadTaskService taskService, FileUploadChunkService chunkService, ApplicationEventPublisher publisher) {
         this.uploadProperties = uploadProperties;
         this.infoService = infoService;
         this.taskService = taskService;
         this.chunkService = chunkService;
         this.publisher = publisher;
 
-        log.debug("{}初始化本地存储位置,存储位置:{},临时文件位置:{}", LogPrefix.STORAGE.p(), properties.getUploadDir(), properties.getUploadTempDir());
-        this.root = Paths.get(properties.getUploadDir());
-        if (!Files.exists(root)) {
-            Files.createDirectories(root);
-        }
-        this.temp = Paths.get(properties.getUploadTempDir());
-        if (!Files.exists(temp)) {
-            Files.createDirectories(temp);
+        this.localProperties = properties;
+    }
+
+    private final LocalProperties localProperties;
+
+    /**
+     * 执行内部处理逻辑（{@code initializeStorage}）。
+     */
+    @PostConstruct
+    private void initializeStorage() {
+        log.debug("{}初始化本地存储位置,存储位置:{},临时文件位置:{}", LogPrefix.STORAGE.p(), localProperties.getUploadDir(),
+                localProperties.getUploadTempDir());
+        this.root = initializeDirectory(localProperties.getUploadDir(), "本地存储目录");
+        this.temp = initializeDirectory(localProperties.getUploadTempDir(), "本地临时目录");
+    }
+
+    /**
+     * 执行内部处理逻辑（{@code initializeDirectory}）。
+     */
+    private static Path initializeDirectory(String directory, String description) {
+        Path path = Paths.get(directory);
+        try {
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            return path;
+        } catch (IOException exception) {
+            throw new FileUploadException(description + "初始化失败", exception);
         }
     }
 
@@ -176,7 +196,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             file.transferTo(path);
         } catch (IOException e) {
-            throw new FileUploadException("文件保存失败");
+            throw new FileUploadException("文件保存失败", e);
         }
         // 成功了存入数据库记录且构建响应vo
         String url = "/file/" + filename;
@@ -218,7 +238,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             Files.createDirectories(dir);
         } catch (IOException e) {
-            throw new FileUploadException("创建临时目录失败");
+            throw new FileUploadException("创建临时目录失败", e);
         }
 
         Path chunkPath = dir.resolve(String.valueOf(chunkNumber));
@@ -226,7 +246,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
         try {
             from.getFile().transferTo(chunkPath);
         } catch (IOException e) {
-            throw new FileUploadException("分片文件保存失败");
+            throw new FileUploadException("分片文件保存失败", e);
         }
 
         FileUploadChunk chunk = new FileUploadChunk();
@@ -270,7 +290,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                     Files.copy(chunkPath, out);
                 }
             } catch (IOException e) {
-                throw new FileUploadException("合并失败");
+                throw new FileUploadException("合并失败", e);
             }
 
             String url = "/file/" + filename;
@@ -371,7 +391,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
             return Files.newInputStream(filePath);
         } catch (IOException e) {
             log.error("{} 打开本地文件流失败, filename: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
-            throw new FileUploadException("读取物理文件流异常");
+            throw new FileUploadException("读取物理文件流异常", e);
         }
     }
 
@@ -434,7 +454,7 @@ public class FileUploadServiceLocalImpl implements FileUploadService {
                 Files.createDirectories(parent);
             }
         } catch (IOException e) {
-            throw new FileUploadException("创建文件目录失败");
+            throw new FileUploadException("创建文件目录失败", e);
         }
         return filePath;
     }

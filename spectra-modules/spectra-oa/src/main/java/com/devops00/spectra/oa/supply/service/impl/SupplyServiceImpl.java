@@ -152,10 +152,16 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
                 .orderByAsc(SupplyItem::getName)).stream().map(item -> assembleView(item, false)).toList();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code change}）。
+     */
     private void change(UUID id, String type, BigDecimal delta, SupplyOperationFrom from) {
         change(require(id), type, delta, from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code change}）。
+     */
     private void change(SupplyItem entity, String type, BigDecimal delta, SupplyOperationFrom from) {
         if (SupplyItemStatus.INACTIVE.getValue().equals(entity.getStatus())) {
             throw new DataSaveException("停用的办公用品不能变更库存");
@@ -186,6 +192,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code positiveQuantity}）。
+     */
     private BigDecimal positiveQuantity(SupplyOperationFrom from) {
         if (from.getQuantity() == null || from.getQuantity().signum() <= 0) {
             throw new DataSaveException("库存变动数量必须大于 0");
@@ -193,6 +202,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         return from.getQuantity();
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireFrom}）。
+     */
     private SupplyOperationFrom requireFrom(SupplyOperationFrom from) {
         if (from == null) {
             throw new DataSaveException("库存变动参数不能为空");
@@ -200,6 +212,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         return from;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private SupplyItem require(UUID id) {
         var entity = this.getById(id);
         if (entity == null) {
@@ -208,10 +223,16 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         return entity;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code stock}）。
+     */
     private BigDecimal stock(SupplyItem entity) {
         return entity.getCurrentStock() == null ? BigDecimal.ZERO : entity.getCurrentStock();
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyDefaults}）。
+     */
     private void applyDefaults(SupplyItem entity) {
         if (entity.getCurrentStock() == null) {
             entity.setCurrentStock(BigDecimal.ZERO);
@@ -227,6 +248,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateSku}）。
+     */
     private void validateSku(String sku, UUID id) {
         if (!StringUtils.hasText(sku)) {
             return;
@@ -240,6 +264,9 @@ public class SupplyServiceImpl extends BaseServiceImpl<SupplyItemMapper, SupplyI
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private SupplyItemVO assembleView(SupplyItem entity, boolean withOperations) {
         var vo = supplyConverter.toVO(entity);
         vo.setLowStock(stock(entity).compareTo(entity.getMinStock() == null ? BigDecimal.ZERO : entity.getMinStock()) <= 0);

@@ -82,6 +82,9 @@ public class MvcConfiguration implements WebMvcConfigurer {
                 .maxAge(spectraProperties.getCors().getMaxAge());
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateOrigin}）。
+     */
     private static void validateOrigin(String origin) {
         try {
             URI parsed = URI.create(origin);
@@ -101,6 +104,9 @@ public class MvcConfiguration implements WebMvcConfigurer {
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code isLoopback}）。
+     */
     private static boolean isLoopback(String host) {
         return "localhost".equalsIgnoreCase(host)
                 || "127.0.0.1".equals(host)

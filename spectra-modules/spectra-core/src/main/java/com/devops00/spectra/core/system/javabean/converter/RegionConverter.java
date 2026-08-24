@@ -37,12 +37,24 @@ import java.util.List;
 @Mapper(uses = TimeMapper.class, config = GlobalMapperConfig.class)
 public interface RegionConverter {
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     RegionVO toVO(Region source);
 
+    /**
+     * 转换、解析或规范化数据（{@code toVOList}）。
+     */
     List<RegionVO> toVOList(List<Region> source);
 
+    /**
+     * 转换、解析或规范化数据（{@code toEntity}）。
+     */
     Region toEntity(RegionFrom source);
 
+    /**
+     * 转换、解析或规范化数据（{@code toEntity}）。
+     */
     void toEntity(RegionFrom source, @org.mapstruct.MappingTarget Region target);
 
     /**

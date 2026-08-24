@@ -43,6 +43,9 @@ public class AuthorityController {
         this.permissionCatalogService = permissionCatalogService;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code tree}）。
+     */
     @ULog("'获取 Permission Catalog 树列表'")
     @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'permission:read')")

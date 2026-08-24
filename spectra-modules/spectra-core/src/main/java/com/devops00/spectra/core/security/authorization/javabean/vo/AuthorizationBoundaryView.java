@@ -16,6 +16,8 @@
 
 package com.devops00.spectra.core.security.authorization.javabean.vo;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,15 @@ public record AuthorizationBoundaryView(String permissionCode,
                                         String scopeMode,
                                         String resourceCode,
                                         List<ScopeRuleView> rules) {
+
+    public AuthorizationBoundaryView {
+        rules = rules == null ? List.of() : Collections.unmodifiableList(new ArrayList<>(rules));
+    }
+
+    @Override
+    public List<ScopeRuleView> rules() {
+        return Collections.unmodifiableList(new ArrayList<>(rules));
+    }
 
     public record ScopeRuleView(String ruleType, UUID departmentId, boolean includeDescendants) {
     }

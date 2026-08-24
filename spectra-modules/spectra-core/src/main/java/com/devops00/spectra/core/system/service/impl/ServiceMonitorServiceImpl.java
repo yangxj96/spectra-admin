@@ -41,13 +41,11 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import javax.sql.DataSource;
+
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
-import java.lang.management.ThreadMXBean;
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -172,7 +170,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                     .orderByAsc(ServiceMonitorSample::getCollectedAt);
             samples = sampleMapper.selectList(query);
         } catch (RuntimeException exception) {
-            throw new DataException("服务监控历史查询失败");
+            throw new DataException("服务监控历史查询失败", exception);
         }
         var points = downsample(samples, range.getMaxPoints()).stream().map(this::toPoint).toList();
         return ServiceMonitorHistoryVO.builder()
@@ -183,6 +181,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code collectSample}）。
+     */
     private Sample collectSample() {
         var now = Instant.now();
         var cpuLoad = operatingSystem.getCpuLoad();
@@ -223,25 +224,40 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 runtime.getUptime() / 1000L);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code collectHealth}）。
+     */
     private HealthSnapshot collectHealth() {
         var start = System.nanoTime();
         try {
             var descriptor = healthEndpoint.health();
             var components = new ArrayList<ServiceMonitorOverviewVO.HealthComponent>();
-            if (descriptor instanceof CompositeHealthDescriptor composite && !composite.getComponents().isEmpty()) {
-                composite.getComponents()
-                        .forEach((name, component) -> components.add(healthComponent(name,
-                                component.getStatus().getCode())));
-            } else {
-                components.add(healthComponent("application", descriptor.getStatus().getCode()));
+            var status = descriptor.getStatus();
+            if (status == null) {
+                return new HealthSnapshot("UNKNOWN", List.of(healthComponent("application", "UNKNOWN")), elapsedMillis(start));
             }
-            return new HealthSnapshot(descriptor.getStatus().getCode(), List.copyOf(components), elapsedMillis(start));
+            if (descriptor instanceof CompositeHealthDescriptor composite) {
+                var compositeComponents = composite.getComponents();
+                if (compositeComponents != null && !compositeComponents.isEmpty()) {
+                    compositeComponents
+                            .forEach((name, component) -> components.add(healthComponent(name,
+                                    component.getStatus() == null ? "UNKNOWN" : component.getStatus().getCode())));
+                } else {
+                    components.add(healthComponent("application", status.getCode()));
+                }
+            } else {
+                components.add(healthComponent("application", status.getCode()));
+            }
+            return new HealthSnapshot(status.getCode(), List.copyOf(components), elapsedMillis(start));
         } catch (RuntimeException exception) {
             return new HealthSnapshot("UNKNOWN", List.of(healthComponent("application", "UNKNOWN")),
                     elapsedMillis(start));
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code healthComponent}）。
+     */
     private static ServiceMonitorOverviewVO.HealthComponent healthComponent(String name, String status) {
         var normalizedStatus = status == null || status.isBlank() ? "UNKNOWN" : status;
         return ServiceMonitorOverviewVO.HealthComponent.builder()
@@ -251,6 +267,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code healthMessage}）。
+     */
     private static String healthMessage(String status) {
         return switch (status) {
             case "UP" -> "检查正常";
@@ -260,6 +279,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         };
     }
 
+    /**
+     * 处理内部业务逻辑（{@code collectRequestMetrics}）。
+     */
     private RequestMetrics collectRequestMetrics() {
         Collection<Timer> timers = meterRegistry.find("http.server.requests").timers();
         if (timers.isEmpty()) {
@@ -296,6 +318,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return new RequestMetrics(true, qps, errorRate, p95ResponseMs);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code checkDatabase}）。
+     */
     private ServiceMonitorOverviewVO.Dependency checkDatabase() {
         var start = System.nanoTime();
         try (Connection connection = dataSource.getConnection()) {
@@ -306,6 +331,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code checkRedis}）。
+     */
     private ServiceMonitorOverviewVO.Dependency checkRedis() {
         var start = System.nanoTime();
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
@@ -316,6 +344,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code dependency}）。
+     */
     private static ServiceMonitorOverviewVO.Dependency dependency(String name, boolean available, long start,
                                                                   String message) {
         return ServiceMonitorOverviewVO.Dependency.builder()
@@ -326,6 +357,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolveStatus}）。
+     */
     private static ServiceMonitorHealthStatus resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
                                                             RequestMetrics requestMetrics,
                                                             List<ServiceMonitorOverviewVO.Dependency> dependencies,
@@ -355,6 +389,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return ServiceMonitorHealthStatus.HEALTHY;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toOverview}）。
+     */
     private ServiceMonitorOverviewVO toOverview(Sample sample, List<Sample> samples) {
         var historyPoints = new ArrayList<ServiceMonitorOverviewVO.Point>(samples.size());
         for (var item : samples) {
@@ -400,6 +437,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toPoint}）。
+     */
     private ServiceMonitorOverviewVO.Point toPoint(Sample sample) {
         return ServiceMonitorOverviewVO.Point.builder()
                 .collectedAt(toLocalDateTime(sample.collectedAt()))
@@ -414,6 +454,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toPoint}）。
+     */
     private ServiceMonitorOverviewVO.Point toPoint(ServiceMonitorSample sample) {
         return ServiceMonitorOverviewVO.Point.builder()
                 .collectedAt(toLocalDateTime(sample.getCollectedAt()))
@@ -428,6 +471,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toHealthComponents}）。
+     */
     private List<ServiceMonitorOverviewVO.HealthComponent> toHealthComponents(Sample sample) {
         var checkedAt = toLocalDateTime(sample.collectedAt());
         return sample.healthComponents()
@@ -441,6 +487,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .toList();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code emptyOverview}）。
+     */
     private ServiceMonitorOverviewVO emptyOverview() {
         var summary = ServiceMonitorOverviewVO.Summary.builder().build();
         return ServiceMonitorOverviewVO.builder()
@@ -456,6 +505,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code persistSample}）。
+     */
     private ServiceMonitorSample persistSample(Sample sample) {
         var entity = toEntity(sample);
         try {
@@ -479,6 +531,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return entity;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toEntity}）。
+     */
     private static ServiceMonitorSample toEntity(Sample sample) {
         var entity = new ServiceMonitorSample();
         entity.setCollectedAt(sample.collectedAt());
@@ -516,6 +571,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return new Freshness(ServiceMonitorFreshness.STALE, ageSeconds);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code effectiveStatus}）。
+     */
     private static ServiceMonitorHealthStatus effectiveStatus(ServiceMonitorHealthStatus status,
                                                               ServiceMonitorFreshness freshness) {
         if (freshness == ServiceMonitorFreshness.STALE && status != ServiceMonitorHealthStatus.DOWN) {
@@ -527,10 +585,16 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         return status;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toLocalDateTime}）。
+     */
     private LocalDateTime toLocalDateTime(Instant instant) {
         return timeMapper.toLocalDateTime(instant);
     }
 
+    /**
+     * 查询或获取目标数据（{@code statusMessage}）。
+     */
     private static String statusMessage(ServiceMonitorHealthStatus status, ServiceMonitorFreshness freshness) {
         if (freshness == ServiceMonitorFreshness.STALE) {
             return "监控数据已过期，当前状态仅供参考";
@@ -546,6 +610,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         };
     }
 
+    /**
+     * 查询或获取目标数据（{@code getHostName}）。
+     */
     private static String getHostName() {
         try {
             return InetAddress.getLocalHost().getHostName();
@@ -554,6 +621,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code collectGcCount}）。
+     */
     private static long collectGcCount() {
         return ManagementFactory.getGarbageCollectorMXBeans()
                 .stream()
@@ -562,23 +632,38 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .sum();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeUsage}）。
+     */
     private static MemorySnapshot normalizeUsage(MemoryUsage usage) {
         var max = usage.getMax() > 0L ? usage.getMax() : usage.getCommitted();
         return new MemorySnapshot(usage.getUsed(), max, ratioAsPercentage(usage.getUsed(), max));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ratioAsPercentage}）。
+     */
     private static double ratioAsPercentage(long numerator, long denominator) {
         return denominator <= 0L ? 0D : percentage((double) numerator / denominator);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code percentage}）。
+     */
     private static double percentage(double ratio) {
         return Math.max(0D, Math.min(ratio * 100D, 100D));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code elapsedMillis}）。
+     */
     private static long elapsedMillis(long start) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code downsample}）。
+     */
     private static <T> List<T> downsample(List<T> values, int maxPoints) {
         if (values.size() <= maxPoints) {
             return values;
@@ -596,6 +681,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     private record RequestMetrics(boolean available, double qps, double errorRate, double p95ResponseMs) {
 
+        /**
+         * 处理内部业务逻辑（{@code unavailable}）。
+         */
         private static RequestMetrics unavailable() {
             return new RequestMetrics(false, 0D, 0D, 0D);
         }

@@ -19,7 +19,10 @@ package com.devops00.spectra.core.user.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.core.user.javabean.from.*;
+import com.devops00.spectra.core.user.javabean.from.ChangePasswordFrom;
+import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
+import com.devops00.spectra.core.user.javabean.from.UserPageFrom;
+import com.devops00.spectra.core.user.javabean.from.UserProfileFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.vo.UserPageVO;
 import com.devops00.spectra.core.user.javabean.vo.UserProfileVO;
@@ -34,7 +37,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -64,6 +74,9 @@ public class UserController {
         this.securityContextAccessor = securityContextAccessor;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code onboarding}）。
+     */
     @ULog("'提交新增用户及角色授权'")
     @PostMapping(value = "/onboarding", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")
@@ -71,6 +84,9 @@ public class UserController {
         return onboardingService.submit(params);
     }
 
+    /**
+     * 更新或推进目标状态（{@code modifyOnboarding}）。
+     */
     @ULog("'提交用户信息及角色授权变更'")
     @PutMapping(value = "/onboarding", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:update') and hasPermission(null, 'role:assign')")
@@ -78,6 +94,9 @@ public class UserController {
         return onboardingService.submit(params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code passwordResetById}）。
+     */
     @ULog("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:reset-password')")
@@ -129,6 +148,9 @@ public class UserController {
         bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
+    /**
+     * 查询或获取目标数据（{@code page}）。
+     */
     @ULog("'分页查询用户列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
@@ -136,6 +158,9 @@ public class UserController {
         return bindService.page(page, params);
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'根据ID获取用户详情'")
     @GetMapping(value = "/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
@@ -143,6 +168,9 @@ public class UserController {
         return bindService.detail(uid);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code online}）。
+     */
     @ULog("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:read')")
@@ -150,6 +178,9 @@ public class UserController {
         return bindService.online(page);
     }
 
+    /**
+     * 查询或获取目标数据（{@code getProfile}）。
+     */
     @ULog("'获取当前用户详情'")
     @GetMapping(value = "/profile", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
@@ -158,6 +189,9 @@ public class UserController {
         return bindService.getProfile(userId);
     }
 
+    /**
+     * 更新或推进目标状态（{@code updateProfile}）。
+     */
     @ULog("'更新当前用户信息'")
     @PutMapping(value = "/profile", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
@@ -166,6 +200,9 @@ public class UserController {
         bindService.updateProfile(userId, params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code changePassword}）。
+     */
     @ULog("'修改密码'")
     @PutMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")

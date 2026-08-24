@@ -25,6 +25,9 @@ package com.devops00.spectra.common.constant;
  */
 public interface RedisKey {
 
+    /**
+     * 查询或获取目标数据（{@code getPattern}）。
+     */
     String getPattern();
 
     default String format(Object... args) {

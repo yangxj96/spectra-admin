@@ -28,8 +28,8 @@ import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import javax.sql.DataSource;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
@@ -37,7 +37,6 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryPoolMXBean;
 import java.lang.management.MemoryUsage;
 import java.lang.management.ThreadInfo;
-import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -51,7 +50,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.ToLongFunction;
-
 import com.sun.management.HotSpotDiagnosticMXBean;
 
 /** 服务监控运行时诊断和受控诊断文件服务实现。 */
@@ -115,10 +113,16 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code memoryPools}）。
+     */
     private List<ServiceMonitorRuntimeDiagnosticVO.MemoryPool> memoryPools() {
         return ManagementFactory.getMemoryPoolMXBeans().stream().map(this::toMemoryPool).toList();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toMemoryPool}）。
+     */
     private ServiceMonitorRuntimeDiagnosticVO.MemoryPool toMemoryPool(MemoryPoolMXBean bean) {
         var usage = bean.getUsage();
         return ServiceMonitorRuntimeDiagnosticVO.MemoryPool.builder()
@@ -130,18 +134,30 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code value}）。
+     */
     private static long value(MemoryUsage usage, ToLongFunction<MemoryUsage> mapper) {
         return usage == null ? 0L : Math.max(mapper.applyAsLong(usage), 0L);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code percentage}）。
+     */
     private static double percentage(long used, long max) {
         return max <= 0L ? 0D : Math.min((double) used / max * 100D, 100D);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code garbageCollectors}）。
+     */
     private List<ServiceMonitorRuntimeDiagnosticVO.GarbageCollector> garbageCollectors() {
         return ManagementFactory.getGarbageCollectorMXBeans().stream().map(this::toGarbageCollector).toList();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toGarbageCollector}）。
+     */
     private ServiceMonitorRuntimeDiagnosticVO.GarbageCollector toGarbageCollector(GarbageCollectorMXBean bean) {
         return ServiceMonitorRuntimeDiagnosticVO.GarbageCollector.builder()
                 .name(bean.getName())
@@ -150,6 +166,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code threadStates}）。
+     */
     private List<ServiceMonitorRuntimeDiagnosticVO.ThreadStateCount> threadStates() {
         var counts = new EnumMap<Thread.State, Long>(Thread.State.class);
         for (var state : Thread.State.values())
@@ -169,6 +188,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .toList();
     }
 
+    /**
+     * 执行内部处理逻辑（{@code connectionPool}）。
+     */
     private ServiceMonitorRuntimeDiagnosticVO.ConnectionPool connectionPool() {
         try {
             var pool = invoke(dataSource, "getHikariPoolMXBean");
@@ -194,6 +216,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code invoke}）。
+     */
     private static Object invoke(Object target, String methodName) {
         if (target == null)
             return null;
@@ -205,10 +230,16 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code integer}）。
+     */
     private static Integer integer(Object value) {
         return value instanceof Number number ? number.intValue() : null;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code redisDiagnostic}）。
+     */
     private ServiceMonitorRuntimeDiagnosticVO.RedisDiagnostic redisDiagnostic() {
         var start = System.nanoTime();
         try (RedisConnection connection = redisConnectionFactory.getConnection()) {
@@ -225,6 +256,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code slowEndpoints}）。
+     */
     private List<ServiceMonitorRuntimeDiagnosticVO.SlowEndpoint> slowEndpoints() {
         return meterRegistry.find("http.server.requests")
                 .timers()
@@ -235,6 +269,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .toList();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toSlowEndpoint}）。
+     */
     private ServiceMonitorRuntimeDiagnosticVO.SlowEndpoint toSlowEndpoint(Timer timer) {
         var tags = timer.getId().getTags();
         return ServiceMonitorRuntimeDiagnosticVO.SlowEndpoint.builder()
@@ -246,6 +283,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code tag}）。
+     */
     private static String tag(Iterable<io.micrometer.core.instrument.Tag> tags, String key, String fallback) {
         for (var tag : tags)
             if (key.equals(tag.getKey()))
@@ -276,7 +316,7 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 throw new DataException("诊断目录可用空间不足");
             }
         } catch (IOException exception) {
-            throw new DataException("诊断目录不可用");
+            throw new DataException("诊断目录不可用", exception);
         }
         var now = Instant.now();
         var task = new ServiceMonitorDiagnosticTask();
@@ -294,11 +334,14 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
             task.setErrorMessage("诊断任务未能启动");
             task.setCompletedAt(Instant.now());
             taskMapper.updateById(task);
-            throw new DataException("诊断任务未能启动");
+            throw new DataException("诊断任务未能启动", exception);
         }
         return toVO(task);
     }
 
+    /**
+     * 执行内部处理逻辑（{@code runTask}）。
+     */
     private void runTask(UUID id, ServiceMonitorDiagnosticType type) {
         var task = taskMapper.selectById(id);
         if (task == null)
@@ -330,6 +373,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code writeThreadDump}）。
+     */
     private void writeThreadDump(Path path) throws IOException {
         var bean = ManagementFactory.getThreadMXBean();
         try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE_NEW)) {
@@ -346,6 +392,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code writeHeapDump}）。
+     */
     private void writeHeapDump(Path path) throws IOException {
         var bean = ManagementFactory.getPlatformMXBean(HotSpotDiagnosticMXBean.class);
         if (bean == null)
@@ -396,6 +445,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         return new DiagnosticDownload(path, task.getDisplayName());
     }
 
+    /**
+     * 执行内部处理逻辑（{@code cleanupExpiredTasks}）。
+     */
     @Scheduled(fixedDelayString = "${spectra.monitor.diagnostics.cleanup-interval-ms:3600000}", initialDelay = 60000)
     public void cleanupExpiredTasks() {
         var now = Instant.now();
@@ -408,6 +460,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code safePath}）。
+     */
     private Path safePath(String fileName) {
         if (fileName == null || fileName.isBlank() || fileName.contains("\\") || fileName.contains("/")) {
             throw new DataException("诊断文件路径无效");
@@ -418,6 +473,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         return path;
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteQuietly}）。
+     */
     private void deleteQuietly(Path path) {
         try {
             if (path != null)
@@ -427,6 +485,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     private ServiceMonitorDiagnosticTaskVO toVO(ServiceMonitorDiagnosticTask task) {
         return ServiceMonitorDiagnosticTaskVO.builder()
                 .id(task.getId())
@@ -442,6 +503,9 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
                 .build();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code elapsedMillis}）。
+     */
     private static long elapsedMillis(long start) {
         return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
     }

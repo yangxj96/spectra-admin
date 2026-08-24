@@ -20,7 +20,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.github.f4b6a3.uuid.UuidCreator;
 import com.devops00.spectra.common.exception.DataSaveException;
-import com.devops00.spectra.common.notification.*;
+import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.notification.NotificationChannelAvailability;
+import com.devops00.spectra.common.notification.NotificationGateway;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationReceipt;
+import com.devops00.spectra.common.notification.NotificationRecipient;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.notification.NotificationRequest;
 import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.NotificationRequestStatus;
@@ -48,7 +55,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * 独立通知模块的统一入队实现。
@@ -113,6 +127,9 @@ public class NotificationGatewayImpl implements NotificationGateway {
      */
     private NotificationMetrics metrics;
 
+    /**
+     * 更新或推进目标状态（{@code setMetrics}）。
+     */
     @Autowired(required = false)
     public void setMetrics(NotificationMetrics metrics) {
         this.metrics = metrics;
@@ -193,7 +210,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         entity.setTaskCount(0);
         entity.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
         entity.setExpiresAt(request.expiresAt());
-        entity.setPriority(request.priority() == null ? 0 : request.priority());
+        entity.setPriority(normalizePriority(request.priority()));
         entity.setId(UuidCreator.getTimeOrderedEpoch());
         if (requestMapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知请求失败");
@@ -290,7 +307,7 @@ public class NotificationGatewayImpl implements NotificationGateway {
         } else {
             task.setSensitiveParametersCiphertext(null);
         }
-        task.setPriority(request.priority() == null ? 0 : request.priority());
+        task.setPriority(normalizePriority(request.priority()));
         task.setAttemptCount(0);
         task.setMaxAttempts(3);
         task.setScheduledAt(request.scheduledAt() == null ? now : request.scheduledAt());
@@ -447,6 +464,13 @@ public class NotificationGatewayImpl implements NotificationGateway {
      */
     private String defaultValue(String value, String fallback) {
         return StringUtils.hasText(value) ? value : fallback;
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code normalizePriority}）。
+     */
+    private int normalizePriority(Integer priority) {
+        return priority == null ? 0 : priority;
     }
 
     /**

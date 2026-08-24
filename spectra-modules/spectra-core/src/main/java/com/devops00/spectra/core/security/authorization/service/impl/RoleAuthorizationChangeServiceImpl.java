@@ -122,7 +122,7 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         var state = currentState(roleId, role);
         var result = new RoleAuthorizationStateVO();
         result.setRoleId(roleId);
-        result.setVersion(role.getVersion() == null ? 0L : role.getVersion());
+        result.setVersion(role.getVersion() == null ? Long.valueOf(0L) : role.getVersion());
         result.setAuthorityLevel(state.authorityLevel());
         result.setPermissionCodes(state.permissions());
         result.setGrantablePermissionCodes(state.grantablePermissions());
@@ -177,6 +177,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         });
     }
 
+    /**
+     * 创建或构建目标数据（{@code prepare}）。
+     */
     private PreparedChange prepare(UUID roleId, RoleAuthorizationChangeFrom from) {
         if (roleId == null
                 || from == null
@@ -221,6 +224,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         return new PreparedChange(operatorId, role, expectedVersion, before, after, impact, requestHash);
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentState}）。
+     */
     private RoleAuthorizationState currentState(UUID roleId, SecurityRole role) {
         var permissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
                 .eq(RolePermission::getRoleId, roleId)).stream().map(RolePermission::getPermissionId).collect(Collectors.toSet());
@@ -233,6 +239,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 permissionCodes(permissionIds), permissionCodes(grantableIds));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestedState}）。
+     */
     private RoleAuthorizationState requestedState(RoleAuthorizationChangeFrom from) {
         if (from.getAuthorityLevel() <= 0) {
             throw new DataException("authorityLevel 必须大于 0");
@@ -243,6 +252,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 from.getGrantablePermissionCodes());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code permissionCodes}）。
+     */
     private Set<String> permissionCodes(Set<UUID> ids) {
         if (ids.isEmpty()) {
             return Set.of();
@@ -250,6 +262,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         return permissionMapper.selectBatchIds(ids).stream().map(Permission::getCode).collect(Collectors.toUnmodifiableSet());
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validatePermissionCodes}）。
+     */
     private void validatePermissionCodes(Set<String> codes) {
         var rows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes));
         var active = rows.stream()
@@ -261,6 +276,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestsForAddedCapabilities}）。
+     */
     private List<AuthorizationGrantRequest> requestsForAddedCapabilities(RoleAuthorizationState before,
                                                                          RoleAuthorizationState after) {
         var added = new HashSet<>(after.permissions());
@@ -279,16 +297,25 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 .toList();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code activeAssignments}）。
+     */
     private List<RoleAssignment> activeAssignments(UUID roleId) {
         return roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getRoleId, roleId)
                 .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name()));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code affectedUserIds}）。
+     */
     private Set<UUID> affectedUserIds(UUID roleId) {
         return activeAssignments(roleId).stream().map(RoleAssignment::getUserId).collect(Collectors.toSet());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code persist}）。
+     */
     private void persist(PreparedChange prepared) {
         var role = prepared.role();
         var roleUpdate = new LambdaUpdateWrapper<SecurityRole>().eq(SecurityRole::getId, role.getId())
@@ -317,6 +344,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code permissionIds}）。
+     */
     private Set<UUID> permissionIds(Set<String> codes) {
         if (codes.isEmpty()) {
             return Set.of();
@@ -330,6 +360,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
                 .collect(Collectors.toUnmodifiableSet());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code insertRolePermissions}）。
+     */
     private void insertRolePermissions(UUID roleId, Set<UUID> permissionIds, boolean grantable) {
         for (var permissionId : permissionIds) {
             if (grantable) {
@@ -346,6 +379,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestHash}）。
+     */
     private String requestHash(UUID roleId, long expectedVersion, RoleAuthorizationState state) {
         var canonical = roleId + "|" + expectedVersion + "|" + state.authorityLevel() + "|"
                 + state.permissions().stream().sorted().collect(Collectors.joining(",")) + "|"
@@ -362,6 +398,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentOperatorId}）。
+     */
     private UUID currentOperatorId() {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
@@ -370,6 +409,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         return operatorId;
     }
 
+    /**
+     * 更新或推进目标状态（{@code recordRoleAuthorizationEvents}）。
+     */
     private void recordRoleAuthorizationEvents(PreparedChange prepared, UUID roleId) {
         if (!prepared.before().permissions().equals(prepared.after().permissions())) {
             appendAudit("ROLE_PERMISSION_CHANGED", prepared.operatorId(), roleId,
@@ -388,6 +430,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code appendAudit}）。
+     */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,

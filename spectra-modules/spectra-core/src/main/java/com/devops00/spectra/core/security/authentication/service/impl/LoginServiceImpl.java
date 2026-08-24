@@ -59,12 +59,12 @@ public class LoginServiceImpl implements LoginService {
 
     private final LoginDispatcher loginDispatcher;
     private final SecurityProperties securityProperties;
-    private final SecurityAuditWriter securityAuditWriter;
+    private final ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider;
     private final SecurityAuthenticationPort securityAuthenticationPort;
     private final SecurityContextAccessor securityContextAccessor;
-    private final SecurityMfaChallengePort mfaChallengePort;
-    private final SecurityMfaVerifier mfaVerifier;
-    private final SecurityUserLoader securityUserLoader;
+    private final ObjectProvider<SecurityMfaChallengePort> mfaChallengeProvider;
+    private final ObjectProvider<SecurityMfaVerifier> mfaVerifierProvider;
+    private final ObjectProvider<SecurityUserLoader> securityUserLoaderProvider;
 
     public LoginServiceImpl(LoginDispatcher loginDispatcher, SecurityProperties securityProperties,
                             ObjectProvider<SecurityAuditWriter> securityAuditWriterProvider,
@@ -75,12 +75,12 @@ public class LoginServiceImpl implements LoginService {
                             ObjectProvider<SecurityUserLoader> securityUserLoaderProvider) {
         this.loginDispatcher = loginDispatcher;
         this.securityProperties = securityProperties;
-        this.securityAuditWriter = securityAuditWriterProvider.getIfAvailable();
+        this.securityAuditWriterProvider = securityAuditWriterProvider;
         this.securityAuthenticationPort = securityAuthenticationPort;
         this.securityContextAccessor = securityContextAccessor;
-        this.mfaChallengePort = mfaChallengeProvider.getIfAvailable();
-        this.mfaVerifier = mfaVerifierProvider.getIfAvailable();
-        this.securityUserLoader = securityUserLoaderProvider.getIfAvailable();
+        this.mfaChallengeProvider = mfaChallengeProvider;
+        this.mfaVerifierProvider = mfaVerifierProvider;
+        this.securityUserLoaderProvider = securityUserLoaderProvider;
     }
 
     @Override
@@ -177,6 +177,9 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    /**
+     * 创建或构建目标数据（{@code createMfaChallenge}）。
+     */
     private TokenVO createMfaChallenge(SecurityUser user, ClientType clientType) {
         SecurityMfaVerifier verifier = requireMfaVerifier();
         boolean enrollmentRequired = !verifier.hasActiveTotp(user.getId());
@@ -196,6 +199,9 @@ public class LoginServiceImpl implements LoginService {
                 .build();
     }
 
+    /**
+     * 判断条件是否满足（{@code issueAuthenticatedToken}）。
+     */
     private TokenVO issueAuthenticatedToken(SecurityUser user, ClientType clientType) {
         SecurityContextHolder.getContext()
                 .setAuthentication(
@@ -206,6 +212,9 @@ public class LoginServiceImpl implements LoginService {
         return securityAuthenticationPort.login(user);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requiresDevOpsMfa}）。
+     */
     private boolean requiresDevOpsMfa(SecurityUser user) {
         return securityProperties.isMfaRequiredForDevOps()
                 && user.getAuthorities()
@@ -213,6 +222,9 @@ public class LoginServiceImpl implements LoginService {
                         .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()));
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireChallenge}）。
+     */
     private MfaLoginChallenge requireChallenge(String challengeId) {
         MfaLoginChallenge challenge = requireChallengePort().find(challengeId);
         if (challenge == null) {
@@ -221,21 +233,33 @@ public class LoginServiceImpl implements LoginService {
         return challenge;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireChallengePort}）。
+     */
     private SecurityMfaChallengePort requireChallengePort() {
+        var mfaChallengePort = mfaChallengeProvider.getIfAvailable();
         if (mfaChallengePort == null) {
             throw new IllegalStateException("MFA 挑战存储未配置");
         }
         return mfaChallengePort;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireMfaVerifier}）。
+     */
     private SecurityMfaVerifier requireMfaVerifier() {
+        var mfaVerifier = mfaVerifierProvider.getIfAvailable();
         if (mfaVerifier == null) {
             throw new IllegalStateException("MFA 校验服务未配置");
         }
         return mfaVerifier;
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadUser}）。
+     */
     private SecurityUser loadUser(UUID userId) {
+        var securityUserLoader = securityUserLoaderProvider.getIfAvailable();
         if (securityUserLoader == null) {
             throw new IllegalStateException("安全主体加载器未配置");
         }
@@ -246,6 +270,9 @@ public class LoginServiceImpl implements LoginService {
         return user;
     }
 
+    /**
+     * 更新或推进目标状态（{@code markMfaVerified}）。
+     */
     private void markMfaVerified(SecurityUser user) {
         Map<String, Object> extraData = new HashMap<>();
         extraData.put("mfaVerified", true);
@@ -253,13 +280,20 @@ public class LoginServiceImpl implements LoginService {
         user.setExtraData(extraData);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateChallengeClient}）。
+     */
     private void validateChallengeClient(MfaLoginChallenge challenge, ClientType clientType) {
         if (challenge.clientType() != clientType) {
             throw new LoginException("MFA 挑战客户端不匹配");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code audit}）。
+     */
     private void audit(String eventType, UUID operatorId, ClientType clientType, String reason) {
+        SecurityAuditWriter securityAuditWriter = securityAuditWriterProvider.getIfAvailable();
         if (securityAuditWriter == null) {
             return;
         }

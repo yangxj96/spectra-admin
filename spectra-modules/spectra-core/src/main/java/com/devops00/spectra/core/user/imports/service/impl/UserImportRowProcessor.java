@@ -29,7 +29,6 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.Authorizatio
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
-import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.user.imports.entity.UserImportRow;
 import com.devops00.spectra.core.user.imports.javabean.from.UserImportRowFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -110,6 +109,9 @@ public class UserImportRowProcessor {
         return new ProcessResult(created.getId(), false);
     }
 
+    /**
+     * 更新或推进目标状态（{@code applyProfile}）。
+     */
     private void applyProfile(UUID userId, AuthorizationProfileVO profile, Map<String, UUID> departmentIds) {
         for (var assignment : profile.getAssignments()) {
             var role = roleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
@@ -117,7 +119,8 @@ public class UserImportRowProcessor {
             if (role == null || !SecurityAuthorizationState.ACTIVE.name().equals(role.getState())) {
                 throw new DataException("Role 不存在或已停用: " + assignment.getRoleCode());
             }
-            if (!Long.valueOf(role.getVersion() == null ? 0L : role.getVersion()).equals(assignment.getRoleVersion())) {
+            Long roleVersion = role.getVersion() == null ? Long.valueOf(0L) : role.getVersion();
+            if (!roleVersion.equals(assignment.getRoleVersion())) {
                 throw new DataException("Role version 已变化，请重新生成导入 Preview: " + assignment.getRoleCode());
             }
             var change = new AuthorizationAssignmentChangeFrom();
@@ -138,6 +141,9 @@ public class UserImportRowProcessor {
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toBoundary}）。
+     */
     private AuthorizationBoundaryFrom toBoundary(AuthorizationProfileBoundaryVO source, Map<String, UUID> departmentIds) {
         var result = new AuthorizationBoundaryFrom();
         result.setPermission(source.getPermission());
@@ -146,6 +152,9 @@ public class UserImportRowProcessor {
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toScope}）。
+     */
     private AuthorizationScopeFrom toScope(AuthorizationProfileScopeVO source, Map<String, UUID> departmentIds) {
         if (source == null || source.getMode() == null) {
             throw new DataException("授权方案 Scope 不能为空");
@@ -167,6 +176,9 @@ public class UserImportRowProcessor {
         return result;
     }
 
+    /**
+     * 查询或获取目标数据（{@code findExisting}）。
+     */
     private User findExisting(UserImportRowFrom source) {
         var byEmployeeNo = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmployeeNo, source.getEmployeeNo()));
         if (byEmployeeNo != null) {
@@ -179,6 +191,9 @@ public class UserImportRowProcessor {
         return userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, source.getPhone()));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toSource}）。
+     */
     private UserImportRowFrom toSource(Map<String, Object> values) {
         var source = new UserImportRowFrom();
         source.setEmployeeNo(value(values, "employee_no"));
@@ -192,6 +207,9 @@ public class UserImportRowProcessor {
         return source;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code value}）。
+     */
     private String value(Map<String, Object> values, String key) {
         return values == null || values.get(key) == null ? null : String.valueOf(values.get(key));
     }

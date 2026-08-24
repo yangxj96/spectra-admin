@@ -21,9 +21,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serial;
-import java.io.Serializable;
-
 /**
  * Web 端启动阶段所需的公开配置聚合响应。
  *
@@ -34,10 +31,7 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SystemBootstrapVO implements Serializable {
-
-    @Serial
-    private static final long serialVersionUID = 1L;
+public class SystemBootstrapVO {
 
     /** 系统基础信息。 */
     private SystemPublicConfigVO system;

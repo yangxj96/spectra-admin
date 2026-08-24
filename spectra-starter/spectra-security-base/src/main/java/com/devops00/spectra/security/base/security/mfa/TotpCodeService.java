@@ -9,6 +9,7 @@ package com.devops00.spectra.security.base.security.mfa;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -45,6 +46,9 @@ public final class TotpCodeService {
         return code(encodedSecret, instant.getEpochSecond() / PERIOD_SECONDS);
     }
 
+    /**
+     * 查询或获取目标数据（{@code code}）。
+     */
     public static String code(String encodedSecret, Clock clock) {
         return code(encodedSecret, Instant.now(clock));
     }
@@ -65,10 +69,16 @@ public final class TotpCodeService {
         return false;
     }
 
+    /**
+     * 判断条件是否满足（{@code matches}）。
+     */
     public static boolean matches(String encodedSecret, String candidate, Clock clock, int window) {
         return matches(encodedSecret, candidate, Instant.now(clock), window);
     }
 
+    /**
+     * 查询或获取目标数据（{@code code}）。
+     */
     private static String code(String encodedSecret, long counter) {
         try {
             byte[] secret = base32Decode(encodedSecret);
@@ -84,6 +94,9 @@ public final class TotpCodeService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code hmac}）。
+     */
     private static byte[] hmac(byte[] secret, long counter) {
         try {
             Mac mac = Mac.getInstance(ALGORITHM);
@@ -94,6 +107,9 @@ public final class TotpCodeService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code base32Encode}）。
+     */
     private static String base32Encode(byte[] bytes) {
         final char[] alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".toCharArray();
         StringBuilder result = new StringBuilder((bytes.length * 8 + 4) / 5);
@@ -113,6 +129,9 @@ public final class TotpCodeService {
         return result.toString();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code base32Decode}）。
+     */
     private static byte[] base32Decode(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("TOTP密钥不能为空");

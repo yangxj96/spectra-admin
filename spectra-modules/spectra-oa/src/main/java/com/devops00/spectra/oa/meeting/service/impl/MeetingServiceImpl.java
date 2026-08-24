@@ -208,6 +208,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addParticipant}）。
+     */
     private void addParticipant(Meeting meeting, UUID userId, String role, UUID departmentId, String status) {
         var participant = new MeetingParticipant();
         participant.setMeetingId(meeting.getId().toString());
@@ -218,6 +221,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         participantMapper.insert(participant);
     }
 
+    /**
+     * 判断条件是否满足（{@code hasConflict}）。
+     */
     private boolean hasConflict(Meeting entity, Instant start, Instant end) {
         if (!StringUtils.hasText(entity.getLocation())) {
             return false;
@@ -232,6 +238,9 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
                         && end.isAfter(item.getStartTime()));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parse}）。
+     */
     private Instant parse(String value) {
         if (!StringUtils.hasText(value)) {
             throw new DataSaveException("会议时间不能为空");
@@ -239,7 +248,7 @@ public class MeetingServiceImpl extends BaseServiceImpl<MeetingMapper, Meeting> 
         try {
             return timeMapper.toInstant(value);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("会议时间格式不正确");
+            throw new DataSaveException("会议时间格式不正确", exception);
         }
     }
 }

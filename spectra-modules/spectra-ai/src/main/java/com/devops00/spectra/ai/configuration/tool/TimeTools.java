@@ -45,6 +45,8 @@ public class TimeTools implements AiToolMarker {
 
     private final SecurityContextAccessor securityContextAccessor;
 
+    private final ToolExecutor toolExecutor;
+
     /**
      * 获取当前日期和时间，返回标准的 ISO 8601 格式字符串
      *
@@ -52,7 +54,7 @@ public class TimeTools implements AiToolMarker {
      */
     @Tool("获取当前日期和时间，返回标准的ISO 8601格式字符串")
     public String getCurrentDateTimeISO(@ToolMemoryId AiMemoryId memoryId) {
-        return ToolExecutor.execute(memoryId.token(), _ -> {
+        return toolExecutor.execute(memoryId.token(), _ -> {
             String zoneId = securityContextAccessor.currentUserZoneId();
             log.debug("{}当前用户时区:{}", LogPrefix.AI.p(), zoneId);
             ZonedDateTime now = ZonedDateTime.now(ZoneId.of(zoneId));

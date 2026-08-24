@@ -43,6 +43,9 @@ public record RootPolicy(int minEffectiveDevOpsUsers, int maxDevOpsUsers, long v
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code defaults}）。
+     */
     public static RootPolicy defaults() {
         return new RootPolicy(DEFAULT_MIN_EFFECTIVE_DEV_OPS_USERS, DEFAULT_MAX_DEV_OPS_USERS, 0L);
     }

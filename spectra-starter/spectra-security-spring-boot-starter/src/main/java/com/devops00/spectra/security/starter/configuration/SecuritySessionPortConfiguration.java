@@ -60,6 +60,9 @@ import java.util.UUID;
 @Configuration
 public class SecuritySessionPortConfiguration {
 
+    /**
+     * 处理内部业务逻辑（{@code securityContextAccessor}）。
+     */
     @Bean
     public SecurityContextAccessor securityContextAccessor(SecuritySessionReader sessionReader,
                                                            SecurityTokenAccessor tokenAccessor,
@@ -67,6 +70,9 @@ public class SecuritySessionPortConfiguration {
         return new SecuritySessionContextAccessor(sessionReader, tokenAccessor, systemConfigValueProvider);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code securitySessionRevocationPort}）。
+     */
     @Bean
     public SecuritySessionRevocationPort securitySessionRevocationPort(SecuritySessionRevoker sessionRevoker) {
         return new SecuritySessionRevocationPort() {
@@ -82,11 +88,17 @@ public class SecuritySessionPortConfiguration {
         };
     }
 
+    /**
+     * 处理内部业务逻辑（{@code securitySessionQueryPort}）。
+     */
     @Bean
     public SecuritySessionQueryPort securitySessionQueryPort(SecuritySessionQuery sessionQuery) {
         return sessionQuery::listOnlineUsers;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code securityAuthenticationPort}）。
+     */
     @Bean
     public SecurityAuthenticationPort securityAuthenticationPort(SecuritySessionIssuer sessionIssuer,
                                                                  SecuritySessionRevoker sessionRevoker,
@@ -129,6 +141,9 @@ public class SecuritySessionPortConfiguration {
         };
     }
 
+    /**
+     * 处理内部业务逻辑（{@code securityUserLookupPort}）。
+     */
     @Bean
     public SecurityUserLookupPort securityUserLookupPort(SecuritySessionReader sessionReader) {
         return token -> sessionReader.getCurrentUser(token);
@@ -156,6 +171,9 @@ public class SecuritySessionPortConfiguration {
                 securityUserLoaderProvider.getIfAvailable());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code securityMfaChallengePort}）。
+     */
     @Bean
     @ConditionalOnProperty(prefix = "spectra.security", name = "sec-mode", havingValue = "REDIS", matchIfMissing = true)
     public SecurityMfaChallengePort securityMfaChallengePort(

@@ -24,11 +24,23 @@ import java.util.UUID;
 /** 当前用户认证身份绑定用例。 */
 public interface AuthenticationIdentityBindingService {
 
+    /**
+     * 查询或获取目标数据（{@code listByUserId}）。
+     */
     List<AuthenticationIdentity> listByUserId(UUID userId);
 
+    /**
+     * 更新或推进目标状态（{@code bindPhone}）。
+     */
     void bindPhone(UUID userId, String phone, String code);
 
+    /**
+     * 更新或推进目标状态（{@code bindEmail}）。
+     */
     void bindEmail(UUID userId, String email, String code);
 
+    /**
+     * 更新或推进目标状态（{@code unbind}）。
+     */
     void unbind(UUID userId, UUID identityId);
 }

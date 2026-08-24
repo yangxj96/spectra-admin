@@ -26,7 +26,11 @@ import com.devops00.spectra.log.base.annotation.ULog;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 系统配置控制器
@@ -60,6 +64,9 @@ public class ConfiguredController {
         bindService.modify(params);
     }
 
+    /**
+     * 查询或获取目标数据（{@code page}）。
+     */
     @ULog("'分页查询系统配置'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:config:read')")

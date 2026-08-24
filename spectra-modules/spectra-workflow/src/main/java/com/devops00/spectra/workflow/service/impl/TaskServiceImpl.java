@@ -187,6 +187,9 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         return historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstanceId).taskAssignee(username).count() > 0;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireOwnedTask}）。
+     */
     private org.flowable.task.api.Task requireOwnedTask(String taskId, String operator) {
         if (!StringUtils.hasText(operator)) {
             throw new DataNotExistException("任务不存在或无权处理: " + taskId);
@@ -198,18 +201,27 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         return task;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private TaskVO assembleView(org.flowable.task.api.Task task) {
         var vo = taskConverter.toVO(task);
         enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), false);
         return vo;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private TaskVO assembleView(org.flowable.task.api.history.HistoricTaskInstance task) {
         var vo = taskConverter.fromHistoricTask(task);
         enrich(vo, task.getProcessInstanceId(), task.getProcessDefinitionId(), true);
         return vo;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code enrich}）。
+     */
     private void enrich(TaskVO vo, String processInstanceId, String processDefinitionId, boolean historic) {
         var definition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
         if (definition != null) {
@@ -256,6 +268,9 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code notifyWorkflowResult}）。
+     */
     private void notifyWorkflowResult(org.flowable.task.api.Task task, String operator, boolean approved) {
         var recipients = recipientDirectory.resolveByLoginNames(List.of(operator))
                 .stream()
@@ -278,6 +293,9 @@ public class TaskServiceImpl implements com.devops00.spectra.workflow.service.Ta
                 .build());
     }
 
+    /**
+     * 执行内部处理逻辑（{@code notifyNextTasks}）。
+     */
     private void notifyNextTasks(String processInstanceId) {
         flowableTaskService.createTaskQuery().processInstanceId(processInstanceId).list().forEach(task -> {
             if (!StringUtils.hasText(task.getAssignee())) {

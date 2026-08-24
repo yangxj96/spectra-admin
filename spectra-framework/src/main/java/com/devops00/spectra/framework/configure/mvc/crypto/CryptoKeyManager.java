@@ -76,6 +76,9 @@ public class CryptoKeyManager {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code init}）。
+     */
     @PostConstruct
     public void init() {
         log.info(LogPrefix.WEB.f("初始化密钥管理器，从 sys_config 加载配置"));

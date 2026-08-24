@@ -51,7 +51,17 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.CompletedPart;
+import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
+import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
+import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.UploadPartRequest;
+import software.amazon.awssdk.services.s3.model.UploadPartResponse;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
@@ -169,7 +179,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
             s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
         } catch (IOException e) {
-            throw new FileUploadException("S3单文件上传失败");
+            throw new FileUploadException("S3单文件上传失败", e);
         }
 
         // 保存文件主信息
@@ -228,7 +238,7 @@ public class FileUploadServiceS3Impl implements FileUploadService {
 
             eTag = uploadPartResponse.eTag(); // S3 返回的该分片唯一数字指纹
         } catch (IOException e) {
-            throw new FileUploadException("S3分片传输失败");
+            throw new FileUploadException("S3分片传输失败", e);
         }
 
         // 录入分片明细表（保存关键的 Etag，合并时全靠它）
@@ -315,10 +325,10 @@ public class FileUploadServiceS3Impl implements FileUploadService {
     @Override
     public void preview(FileInfo file) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null || attributes.getResponse() == null) {
+        HttpServletResponse response = attributes == null ? null : attributes.getResponse();
+        if (response == null) {
             throw new DataException("不在 Web 请求上下文中");
         }
-        HttpServletResponse response = attributes.getResponse();
 
         // 302 重定向架构核心：内存计算安全的短效授权链接
         GetObjectRequest getObjectRequest = GetObjectRequest.builder().bucket(s3Properties.getBucket()).key(file.getFilename()).build();
@@ -353,20 +363,20 @@ public class FileUploadServiceS3Impl implements FileUploadService {
             return s3Client.getObject(getObjectRequest);
         } catch (NoSuchKeyException e) {
             log.error("{} S3 中未找到指定文件: {}", LogPrefix.STORAGE.p(), fileInfo.getFilename(), e);
-            throw new DataNotExistException("文件在云存储中不存在");
+            throw new DataNotExistException("文件在云存储中不存在", e);
         } catch (S3Exception e) {
             log.error("{} 调用 S3 获取文件流失败", LogPrefix.STORAGE.p(), e);
-            throw new FileUploadException("远程云存储服务异常");
+            throw new FileUploadException("远程云存储服务异常", e);
         }
     }
 
     @Override
     public void download(FileInfo file) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (attributes == null || attributes.getResponse() == null) {
+        HttpServletResponse response = attributes == null ? null : attributes.getResponse();
+        if (response == null) {
             throw new DataException("不在 Web 请求上下文中");
         }
-        HttpServletResponse response = attributes.getResponse();
 
         String encodedFilename = URLEncoder.encode(file.getOriginalName(), StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 

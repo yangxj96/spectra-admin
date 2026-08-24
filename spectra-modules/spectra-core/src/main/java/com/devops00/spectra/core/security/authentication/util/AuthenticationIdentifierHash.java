@@ -30,6 +30,9 @@ public final class AuthenticationIdentifierHash {
     private AuthenticationIdentifierHash() {
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code digest}）。
+     */
     public static String digest(String identifier) {
         if (identifier == null || identifier.isBlank()) {
             throw new IllegalArgumentException("认证身份标识不能为空");

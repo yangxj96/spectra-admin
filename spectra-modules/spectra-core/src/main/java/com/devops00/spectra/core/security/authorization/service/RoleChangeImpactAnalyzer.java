@@ -61,6 +61,9 @@ public class RoleChangeImpactAnalyzer {
                 levelChanged, expands, affectedAssignmentCount, affectedUserCount);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code difference}）。
+     */
     private static <T> HashSet<T> difference(Set<T> left, Set<T> right) {
         var result = new HashSet<>(left);
         result.removeAll(right);

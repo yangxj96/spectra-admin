@@ -40,6 +40,13 @@
     </properties>
 
     <dependencies>
+        <!-- 全量后端架构规则通过启动模块的完整业务 classpath 执行。 -->
+        <dependency>
+            <groupId>com.tngtech.archunit</groupId>
+            <artifactId>archunit-junit5</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- 目标数据库 schema 由 Flyway V1 起完整管理；不使用 baseline-on-migrate 兼容旧库。 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -112,6 +119,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.plugin.version}</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <annotationProcessorPaths>
@@ -125,6 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven.jar.plugin.version}</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -136,6 +145,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring-boot.maven.plugin.version}</version>
                 <executions>
                     <execution>
                         <goals>

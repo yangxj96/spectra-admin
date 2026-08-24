@@ -68,6 +68,9 @@ public class AuthorizationController {
 
     private final OrganizationChangeService organizationChangeService;
 
+    /**
+     * 查询或获取目标数据（{@code organizationVersion}）。
+     */
     @ULog("'查询组织结构安全版本'")
     @GetMapping(value = "/departments/organization-version", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:read')")
@@ -75,6 +78,9 @@ public class AuthorizationController {
         return organizationChangeService.currentOrganizationVersion();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code departmentCreatePreview}）。
+     */
     @ULog("'预览新增部门影响'")
     @PostMapping(value = "/departments/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
@@ -84,6 +90,9 @@ public class AuthorizationController {
         return organizationChangeService.previewCreate(from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code departmentCreateApply}）。
+     */
     @ULog("'提交新增部门变更'")
     @PostMapping(value = "/departments/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
@@ -92,6 +101,9 @@ public class AuthorizationController {
         organizationChangeService.applyCreate(from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code roleState}）。
+     */
     @ULog("'查询 Role 授权能力'")
     @GetMapping(value = "/roles/{roleId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
@@ -99,44 +111,57 @@ public class AuthorizationController {
         return roleChangeService.current(roleId);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code departmentPreview}）。
+     */
     @ULog("'预览部门编辑与移动影响'")
     @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public OrganizationChangePreviewVO departmentPreview(@PathVariable UUID departmentId,
                                                          @Validated @RequestBody OrganizationChangeFrom from) {
-        log.debug("预览部门编辑与移动影响: departmentId={}, expectedOrganizationVersion={}", departmentId,
-                from.getExpectedOrganizationVersion());
+        log.debug("预览部门编辑与移动影响: departmentId={}", departmentId);
         return organizationChangeService.preview(departmentId, from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code departmentApply}）。
+     */
     @ULog("'提交部门编辑与移动变更'")
     @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public void departmentApply(@PathVariable UUID departmentId,
                                 @Validated @RequestBody OrganizationChangeApplyFrom from) {
-        log.debug("提交部门编辑与移动变更: departmentId={}, expectedOrganizationVersion={}", departmentId,
-                from.getExpectedOrganizationVersion());
+        log.debug("提交部门编辑与移动变更: departmentId={}", departmentId);
         organizationChangeService.apply(departmentId, from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code rolePreview}）。
+     */
     @ULog("'预览 Role 授权能力变更'")
     @PostMapping(value = "/roles/{roleId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public RoleAuthorizationChangePreviewVO rolePreview(@PathVariable UUID roleId,
                                                         @Validated @RequestBody RoleAuthorizationChangeFrom from) {
-        log.debug("预览 Role 授权能力变更: roleId={}, expectedVersion={}", roleId, from.getExpectedVersion());
+        log.debug("预览 Role 授权能力变更: roleId={}", roleId);
         return roleChangeService.preview(roleId, from);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code roleApply}）。
+     */
     @ULog("'提交 Role 授权能力变更'")
     @PostMapping(value = "/roles/{roleId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public void roleApply(@PathVariable UUID roleId,
                           @Validated @RequestBody RoleAuthorizationApplyFrom from) {
-        log.debug("提交 Role 授权能力变更: roleId={}, expectedVersion={}", roleId, from.getExpectedVersion());
+        log.debug("提交 Role 授权能力变更: roleId={}", roleId);
         roleChangeService.apply(roleId, from);
     }
 
+    /**
+     * 查询或获取目标数据（{@code assignments}）。
+     */
     @ULog("'查询用户授权实例'")
     @GetMapping(value = "/users/{userId}/assignments", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
@@ -144,6 +169,9 @@ public class AuthorizationController {
         return queryService.findByUserId(userId);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     @ULog("'预览用户授权实例变更'")
     @PostMapping(value = "/users/{userId}/assignments/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")
@@ -153,6 +181,9 @@ public class AuthorizationController {
         return changeService.preview(userId, from);
     }
 
+    /**
+     * 更新或推进目标状态（{@code apply}）。
+     */
     @ULog("'提交用户授权实例变更'")
     @PostMapping(value = "/users/{userId}/assignments/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")

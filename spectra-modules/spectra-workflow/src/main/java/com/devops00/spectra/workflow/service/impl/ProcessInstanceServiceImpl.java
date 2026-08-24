@@ -75,7 +75,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             return instance.getId();
         } catch (Exception e) {
             // 3. 统一异常
-            throw new DataException("启动流程失败: " + e.getMessage());
+            throw new DataException("启动流程失败: " + e.getMessage(), e);
         }
     }
 
@@ -148,7 +148,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             }
             return diagramStream.readAllBytes();
         } catch (Exception e) {
-            throw new DataException("读取流程图失败: " + e.getMessage());
+            throw new DataException("读取流程图失败: " + e.getMessage(), e);
         }
     }
 }

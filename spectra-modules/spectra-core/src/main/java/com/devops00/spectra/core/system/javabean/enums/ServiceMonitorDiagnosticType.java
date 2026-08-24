@@ -21,6 +21,9 @@ public enum ServiceMonitorDiagnosticType {
         this.suffix = suffix;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code fromCode}）。
+     */
     public static ServiceMonitorDiagnosticType fromCode(String code) {
         for (var type : values()) {
             if (type.code.equalsIgnoreCase(code)) {

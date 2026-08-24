@@ -32,7 +32,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
@@ -61,10 +68,16 @@ public class RoleController {
     @PreAuthorize("((#p0.id == null and hasPermission(null, 'role:create')) "
             + "or (#p0.id != null and hasPermission(null, 'role:update'))) "
             + "and hasPermission(null, 'role:grant') and hasPermission(null, 'role:assign')")
+    /**
+     * 更新或推进目标状态（{@code saveEditor}）。
+     */
     public RoleVO saveEditor(@Validated @RequestBody RoleEditorSaveFrom params) {
         return roleEditorService.save(params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code enable}）。
+     */
     @ULog("'启用角色'")
     @PutMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:disable')")
@@ -72,6 +85,9 @@ public class RoleController {
         bindService.enable(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code disable}）。
+     */
     @ULog("'禁用角色'")
     @PutMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:disable')")
@@ -79,6 +95,9 @@ public class RoleController {
         bindService.disable(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteById}）。
+     */
     @ULog("'删除角色'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:delete')")
@@ -95,6 +114,9 @@ public class RoleController {
         return bindService.page(page, params);
     }
 
+    /**
+     * 查询或获取目标数据（{@code list}）。
+     */
     @ULog("'查询角色列表'")
     @GetMapping(value = "/list", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -102,6 +124,9 @@ public class RoleController {
         return bindService.all();
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'查询角色详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -119,7 +144,7 @@ public class RoleController {
             return relRoleMenuService.get(roleId);
         } catch (Exception e) {
             log.error("{}获取角色关联的菜单列表出现错误,{}", LogPrefix.CORE.p(), e.getMessage(), e);
-            throw new DataException("参数转换失败");
+            throw new DataException("参数转换失败", e);
         }
     }
 

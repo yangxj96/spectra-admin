@@ -71,7 +71,7 @@ public interface AuditVisibilityPolicy {
             return id;
         }
         try {
-            return UUID.fromString(principal.toString());
+            return UUID.fromString(String.valueOf(principal));
         } catch (IllegalArgumentException ignored) {
             return null;
         }
@@ -94,6 +94,9 @@ public interface AuditVisibilityPolicy {
                 || normalized.contains("AUDIT");
     }
 
+    /**
+     * 判断条件是否满足（{@code hasAuthority}）。
+     */
     private static boolean hasAuthority(Authentication viewer, String... expected) {
         if (viewer == null || !viewer.isAuthenticated()) {
             return false;

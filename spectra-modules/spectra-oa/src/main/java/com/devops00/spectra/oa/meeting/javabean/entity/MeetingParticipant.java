@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.annotation.DataScope;
 import com.devops00.spectra.common.base.BaseEntity;
 import lombok.Getter;
+import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -37,6 +38,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode(callSuper = true)
 @TableName(value = "oa_meeting_participant", schema = "spectra_oa")
 @DataScope(readPermission = "oa:meeting:read", writePermission = "oa:meeting:update", column = "department_id", ownerColumn = "user_id")
 public class MeetingParticipant extends BaseEntity {

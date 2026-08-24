@@ -36,7 +36,6 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.javabean.entity.NotificationSendPreviewEntity;
 import com.devops00.spectra.notification.javabean.domain.NotificationPreviewStatus;
 import com.devops00.spectra.notification.javabean.domain.NotificationTemplateState;
-import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.javabean.from.NotificationControlledSendApplyFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationControlledSendFrom;
@@ -212,6 +211,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 receipt.idempotentReplay());
     }
 
+    /**
+     * 创建或构建目标数据（{@code prepare}）。
+     */
     private PreparedRequest prepare(NotificationControlledSendFrom params) {
         validate(params);
         var templates = new EnumMap<NotificationChannel, NotificationControlledSendTemplateVO>(NotificationChannel.class);
@@ -246,6 +248,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         return new PreparedRequest(templateGroupCode, templates, params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code evaluate}）。
+     */
     private Evaluation evaluate(PreparedRequest prepared) {
         var request = prepared.request();
         var candidateUserIds = audienceDirectory.resolve(request.getAudience().toAudience());
@@ -296,6 +301,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                 availability, samples, hash(fingerprints));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code skipReason}）。
+     */
     private String skipReason(NotificationRecipient recipient, NotificationChannel channel,
                               NotificationPurpose purpose, NotificationChannelAvailability availability,
                               NotificationUserPreferenceEntity preference) {
@@ -319,6 +327,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         return null;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private void validate(NotificationControlledSendFrom params) {
         if (params == null
                 || params.getPurpose() == null
@@ -349,15 +360,24 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code size}）。
+     */
     private int size(List<?> values) {
         return values == null ? 0 : values.size();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sensitiveKey}）。
+     */
     private boolean sensitiveKey(String key) {
         var normalized = key == null ? "" : key.toLowerCase(Locale.ROOT);
         return SENSITIVE_KEYS.stream().anyMatch(normalized::contains);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireOperator}）。
+     */
     private UUID requireOperator() {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
@@ -366,14 +386,20 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         return operatorId;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code requestHash}）。
+     */
     private String requestHash(NotificationControlledSendFrom params) {
         try {
             return hash(objectMapper.writeValueAsString(params));
         } catch (RuntimeException exception) {
-            throw new DataSaveException("生成通知发送请求摘要失败");
+            throw new DataSaveException("生成通知发送请求摘要失败", exception);
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code snapshot}）。
+     */
     private Map<String, Object> snapshot(NotificationControlledSendFrom params) {
         var snapshot = new LinkedHashMap<String, Object>();
         snapshot.put("idempotencyKey", params.getIdempotencyKey());
@@ -403,18 +429,27 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         return snapshot;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ids}）。
+     */
     private List<String> ids(List<UUID> values) {
         return values == null ? List.of() : values.stream().filter(Objects::nonNull).map(UUID::toString).toList();
     }
 
+    /**
+     * 查询或获取目标数据（{@code readSnapshot}）。
+     */
     private NotificationControlledSendFrom readSnapshot(Map<String, Object> snapshot) {
         try {
             return objectMapper.readValue(objectMapper.writeValueAsString(snapshot), NotificationControlledSendFrom.class);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("读取通知发送 Preview 快照失败");
+            throw new DataSaveException("读取通知发送 Preview 快照失败", exception);
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verifyToken}）。
+     */
     private void verifyToken(NotificationSendPreviewEntity entity, NotificationControlledSendApplyFrom params) {
         if (!StringUtils.hasText(params.getPreviewToken())
                 || !MessageDigest.isEqual(
@@ -424,6 +459,9 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code markExpired}）。
+     */
     private void markExpired(NotificationSendPreviewEntity entity) {
         if (!NotificationPreviewStatus.EXPIRED.name().equals(entity.getStatus())) {
             entity.setStatus(NotificationPreviewStatus.EXPIRED.name());
@@ -431,16 +469,25 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code token}）。
+     */
     private String token() {
         var bytes = new byte[32];
         RANDOM.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
+    /**
+     * 判断条件是否满足（{@code hash}）。
+     */
     private String hash(String value) {
         return SHA256Utils.hash(value);
     }
 
+    /**
+     * 判断条件是否满足（{@code hash}）。
+     */
     private String hash(List<String> values) {
         return hash(String.join("|", values));
     }

@@ -87,7 +87,7 @@ public class LoginUsernamePasswordProvider extends UsernamePasswordAuthenticatio
 
     @Override
     public void kaptchaValidate(String kaptcha) {
-        if (kaptchaService.isCheck() == Boolean.TRUE) {
+        if (Boolean.TRUE.equals(kaptchaService.isCheck())) {
             if (!kaptchaService.consumeKaptchaCode(kaptcha)) {
                 throw new KaptchaNotMatchException("验证码错误");
             }

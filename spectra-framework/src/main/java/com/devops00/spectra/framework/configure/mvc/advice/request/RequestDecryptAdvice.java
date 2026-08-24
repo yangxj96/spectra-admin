@@ -205,44 +205,76 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         // 从 CryptoKeyManager 获取密钥
         PublicKey clientPublicKey = cryptoKeyManager.getClientPublicKey();
         PrivateKey serverPrivateKey = cryptoKeyManager.getServerPrivateKey();
+        validateKeys(clientPublicKey, serverPrivateKey);
+        verifySignature(node, encryptedData, nonce, timestamp, clientPublicKey);
+        validateTimestamp(timestamp);
+        consumeNonce(nonce);
+
+        return decryptPayload(encryptedKey, serverPrivateKey, encryptedData, ivHex);
+    }
+
+    /**
+     * 校验并确保数据满足当前约束（{@code validateKeys}）。
+     */
+    private static void validateKeys(PublicKey clientPublicKey, PrivateKey serverPrivateKey) {
         if (clientPublicKey == null || serverPrivateKey == null) {
             throw new EncryptException("密钥未就绪，无法解密请求");
         }
+    }
 
-        // 签名验证（如果提供了 signature）
-        if (node.has("signature")) {
-            long t1 = System.currentTimeMillis();
-            String signature = node.get("signature").asString();
-            String signContent = String.format("data=%s&nonce=%s&timestamp=%d", encryptedData, nonce != null ? nonce : "", timestamp);
-            boolean valid = RSAUtils.verify(signContent, signature, clientPublicKey);
-            if (!valid) {
-                throw new EncryptException("请求签名验证失败，数据可能被篡改");
-            }
-            log.debug("{}请求签名验证耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t1);
+    /**
+     * 处理内部业务逻辑（{@code verifySignature}）。
+     */
+    private void verifySignature(JsonNode node, String encryptedData, String nonce, long timestamp,
+                                 PublicKey clientPublicKey)
+            throws Exception {
+        if (!node.has("signature")) {
+            return;
         }
+        long start = System.currentTimeMillis();
+        String signature = node.get("signature").asString();
+        String signContent = String.format("data=%s&nonce=%s&timestamp=%d", encryptedData,
+                nonce != null ? nonce : "", timestamp);
+        if (!RSAUtils.verify(signContent, signature, clientPublicKey)) {
+            throw new EncryptException("请求签名验证失败，数据可能被篡改");
+        }
+        log.debug("{}请求签名验证耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - start);
+    }
 
-        // 防重放：时间窗口校验
+    /**
+     * 校验并确保数据满足当前约束（{@code validateTimestamp}）。
+     */
+    private static void validateTimestamp(long timestamp) {
         long now = System.currentTimeMillis() / 1000;
         if (timestamp > 0 && Math.abs(now - timestamp) > REPLAY_WINDOW_SECONDS) {
             throw new EncryptException("请求已过期（时间戳超出" + REPLAY_WINDOW_SECONDS + "秒窗口）");
         }
+    }
 
-        // 防重放：Nonce 去重（Redis 缓存）
-        if (nonce != null && !nonce.isEmpty()) {
-            String nonceKey = NONCE_PREFIX + nonce;
-            Boolean success = SecurityRedisExecutor.require("记录加密请求 nonce",
-                    () -> redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS)));
-            if (Boolean.FALSE.equals(success)) {
-                throw new EncryptException("重复请求（nonce 已使用）");
-            }
+    /**
+     * 更新或推进目标状态（{@code consumeNonce}）。
+     */
+    private void consumeNonce(String nonce) throws Exception {
+        if (nonce == null || nonce.isEmpty()) {
+            return;
         }
+        String nonceKey = NONCE_PREFIX + nonce;
+        Boolean success = SecurityRedisExecutor.require("记录加密请求 nonce",
+                () -> redisTemplate.opsForValue().setIfAbsent(nonceKey, "1", Duration.ofSeconds(REPLAY_WINDOW_SECONDS)));
+        if (Boolean.FALSE.equals(success)) {
+            throw new EncryptException("重复请求（nonce 已使用）");
+        }
+    }
 
-        // RSA 私钥解密 AES 密钥
+    /**
+     * 执行加密或解密处理（{@code decryptPayload}）。
+     */
+    private String decryptPayload(String encryptedKey, PrivateKey serverPrivateKey, String encryptedData, String ivHex)
+            throws Exception {
         long t2 = System.currentTimeMillis();
         byte[] aesKeyBytes = RSAUtils.decrypt(encryptedKey, serverPrivateKey);
         log.debug("{}RSA解密AES密钥耗时: {}ms", LogPrefix.WEB.p(), System.currentTimeMillis() - t2);
 
-        // AES-GCM 解密业务数据
         long t3 = System.currentTimeMillis();
         byte[] iv = AESUtils.hexToIv(ivHex);
         String decrypted = AESUtils.decrypt(encryptedData, aesKeyBytes, iv);
@@ -260,13 +292,13 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
         private final InputStream body;
 
         DecryptedHttpInputMessage(HttpInputMessage original, byte[] bodyBytes) {
-            this.headers = original.getHeaders();
+            this.headers = HttpHeaders.readOnlyHttpHeaders(original.getHeaders());
             this.body = new ByteArrayInputStream(bodyBytes);
         }
 
         @Override
         public HttpHeaders getHeaders() {
-            return headers;
+            return HttpHeaders.readOnlyHttpHeaders(headers);
         }
 
         @Override

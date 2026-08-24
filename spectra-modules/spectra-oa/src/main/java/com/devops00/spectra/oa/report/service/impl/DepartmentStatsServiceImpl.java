@@ -34,14 +34,24 @@ import com.devops00.spectra.oa.supply.javabean.entity.SupplyItem;
 import com.devops00.spectra.oa.supply.mapper.SupplyItemMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -130,14 +140,20 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
             return output.toByteArray();
         } catch (IOException exception) {
             log.error("导出部门统计失败", exception);
-            throw new DataSaveException("导出部门统计失败");
+            throw new DataSaveException("导出部门统计失败", exception);
         }
     }
 
+    /**
+     * 判断条件是否满足（{@code hasBusinessData}）。
+     */
     private boolean hasBusinessData(DepartmentStatsVO stats) {
         return stats.getAssetCount() > 0 || stats.getSupplySkuCount() > 0 || stats.getReimbursementCount() > 0 || stats.getPurchaseCount() > 0;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code mergeAssetStats}）。
+     */
     private void mergeAssetStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<Asset> wrapper = aggregateWrapper(departmentId);
         wrapper.select("department_id", "COUNT(*) AS asset_count", "COALESCE(SUM(quantity), 0) AS asset_quantity",
@@ -149,6 +165,9 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         }));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code mergeSupplyStats}）。
+     */
     private void mergeSupplyStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<SupplyItem> wrapper = aggregateWrapper(departmentId);
         wrapper.select("department_id", "COUNT(*) AS supply_sku_count", "COALESCE(SUM(current_stock), 0) AS supply_stock",
@@ -160,6 +179,9 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         }));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code mergeReimbursementStats}）。
+     */
     private void mergeReimbursementStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<Reimbursement> wrapper = aggregateWrapper(departmentId);
         wrapper.select("department_id", "COUNT(*) AS reimbursement_count", "COALESCE(SUM(total_amount), 0) AS reimbursement_amount")
@@ -170,6 +192,9 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         }));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code mergePurchaseStats}）。
+     */
     private void mergePurchaseStats(Map<UUID, DepartmentStatsVO> result, UUID departmentId) {
         QueryWrapper<Purchase> wrapper = aggregateWrapper(departmentId);
         wrapper.select("department_id", "COUNT(*) AS purchase_count", "COALESCE(SUM(budget_amount), 0) AS purchase_budget").groupBy("department_id");
@@ -179,6 +204,9 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         }));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code aggregateWrapper}）。
+     */
     private <T> QueryWrapper<T> aggregateWrapper(UUID departmentId) {
         QueryWrapper<T> wrapper = new QueryWrapper<>();
         wrapper.isNotNull("department_id");
@@ -191,6 +219,9 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         return wrapper;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code merge}）。
+     */
     private void merge(Map<UUID, DepartmentStatsVO> result, Map<String, Object> row, Consumer<DepartmentStatsVO> consumer) {
         UUID departmentId = uuid(row.get("department_id"));
         DepartmentStatsVO stats = result.get(departmentId);
@@ -199,10 +230,16 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code uuid}）。
+     */
     private static UUID uuid(Object value) {
         return value instanceof UUID id ? id : value == null ? null : UUID.fromString(value.toString());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code number}）。
+     */
     private static Number number(Map<String, Object> row, String key) {
         Object value = row.get(key);
         if (value == null) {
@@ -216,10 +253,16 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         return value instanceof Number number ? number : new BigDecimal(value.toString());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code decimal}）。
+     */
     private static BigDecimal decimal(Map<String, Object> row, String key) {
         return new BigDecimal(number(row, key).toString());
     }
 
+    /**
+     * 创建或构建目标数据（{@code createHeaderStyle}）。
+     */
     private static CellStyle createHeaderStyle(XSSFWorkbook workbook) {
         Font font = workbook.createFont();
         font.setBold(true);
@@ -228,10 +271,16 @@ public class DepartmentStatsServiceImpl implements DepartmentStatsService {
         return style;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setText}）。
+     */
     private static void setText(Row row, int column, String value) {
         row.createCell(column).setCellValue(value == null ? "" : value);
     }
 
+    /**
+     * 更新或推进目标状态（{@code setNumber}）。
+     */
     private static void setNumber(Row row, int column, Number value) {
         row.createCell(column).setCellValue(value == null ? 0 : value.doubleValue());
     }

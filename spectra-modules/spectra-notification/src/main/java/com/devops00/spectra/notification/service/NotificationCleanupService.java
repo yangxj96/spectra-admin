@@ -45,6 +45,9 @@ public class NotificationCleanupService {
      */
     private NotificationSendPreviewMapper previewMapper;
 
+    /**
+     * 更新或推进目标状态（{@code setPreviewMapper}）。
+     */
     @org.springframework.beans.factory.annotation.Autowired(required = false)
     public void setPreviewMapper(NotificationSendPreviewMapper previewMapper) {
         this.previewMapper = previewMapper;

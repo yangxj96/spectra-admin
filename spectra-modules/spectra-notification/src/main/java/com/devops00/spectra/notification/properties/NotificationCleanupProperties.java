@@ -53,55 +53,94 @@ public class NotificationCleanupProperties {
         this.retentionSeconds = normalizeRetention(retentionSeconds);
     }
 
+    /**
+     * 更新或推进目标状态（{@code setSystemConfigValueProvider}）。
+     */
     @Autowired(required = false)
     public void setSystemConfigValueProvider(SystemConfigValueProvider systemConfigValueProvider) {
         this.systemConfigValueProvider = systemConfigValueProvider;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code enabled}）。
+     */
     public boolean enabled() {
         return systemValue("notification.cleanup.enabled").map(Boolean::parseBoolean).orElse(enabled);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code fixedDelayMs}）。
+     */
     public long fixedDelayMs() {
         return normalizeDelay(fixedDelayMs);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code batchSize}）。
+     */
     public int batchSize() {
         return normalizeBatchSize(batchSize);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code retentionSeconds}）。
+     */
     public long retentionSeconds() {
         return normalizeRetention(retentionSeconds);
     }
 
+    /**
+     * 更新或推进目标状态（{@code setEnabled}）。
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setFixedDelayMs}）。
+     */
     public void setFixedDelayMs(long fixedDelayMs) {
         this.fixedDelayMs = fixedDelayMs;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setBatchSize}）。
+     */
     public void setBatchSize(int batchSize) {
         this.batchSize = batchSize;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setRetentionSeconds}）。
+     */
     public void setRetentionSeconds(long retentionSeconds) {
         this.retentionSeconds = retentionSeconds;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code systemValue}）。
+     */
     private Optional<String> systemValue(String key) {
         return systemConfigValueProvider == null ? Optional.empty() : systemConfigValueProvider.find(key);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeDelay}）。
+     */
     private static long normalizeDelay(long value) {
         return value > 0 ? value : 3_600_000L;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeBatchSize}）。
+     */
     private static int normalizeBatchSize(int value) {
         return value > 0 ? Math.min(value, 1_000) : 100;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeRetention}）。
+     */
     private static long normalizeRetention(long value) {
         return value > 0 ? value : 86_400L;
     }

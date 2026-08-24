@@ -9,7 +9,7 @@ package com.devops00.spectra.security.base.security.mfa;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import java.nio.charset.StandardCharsets;
+
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -26,6 +26,9 @@ public final class RecoveryCodeHasher {
     private RecoveryCodeHasher() {
     }
 
+    /**
+     * 判断条件是否满足（{@code hash}）。
+     */
     public static String hash(String code) {
         if (code == null || code.isBlank()) {
             throw new IllegalArgumentException("Recovery Code不能为空");
@@ -38,6 +41,9 @@ public final class RecoveryCodeHasher {
                 + Base64.getUrlEncoder().withoutPadding().encodeToString(derived);
     }
 
+    /**
+     * 判断条件是否满足（{@code matches}）。
+     */
     public static boolean matches(String code, String encoded) {
         if (code == null || encoded == null) {
             return false;
@@ -56,6 +62,9 @@ public final class RecoveryCodeHasher {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code derive}）。
+     */
     private static byte[] derive(String code, byte[] salt, int iterations) {
         try {
             PBEKeySpec spec = new PBEKeySpec(code.toCharArray(), salt, iterations, HASH_BITS);

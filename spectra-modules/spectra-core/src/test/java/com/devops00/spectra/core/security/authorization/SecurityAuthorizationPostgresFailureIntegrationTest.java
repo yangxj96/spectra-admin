@@ -35,9 +35,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import jakarta.annotation.Resource;
+
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

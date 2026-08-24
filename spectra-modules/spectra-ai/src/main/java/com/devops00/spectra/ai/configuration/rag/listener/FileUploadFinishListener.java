@@ -41,6 +41,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
@@ -68,6 +69,9 @@ public class FileUploadFinishListener {
 
     private final NotificationService notificationService;
 
+    /**
+     * 执行内部处理逻辑（{@code handleFileUploaded}）。
+     */
     @Async
     @EventListener
     public void handleFileUploaded(FileUploadFinishEvent event) {
@@ -112,12 +116,15 @@ public class FileUploadFinishListener {
             }
             log.info("{}恭喜！文件 [{}] 索引已成功灌入 PgVector", LogPrefix.AI.p(), fileInfo.getOriginalName());
             notifyIndexResult(fileInfo, true);
-        } catch (Exception e) {
+        } catch (IOException | RuntimeException e) {
             log.error("{}文件 [{}] RAG 索引构建失败", LogPrefix.AI.p(), fileInfo.getId(), e);
             notifyIndexResult(fileInfo, false);
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code notifyIndexResult}）。
+     */
     private void notifyIndexResult(FileInfo fileInfo, boolean success) {
         if (fileInfo.getCreatedBy() == null) {
             return;

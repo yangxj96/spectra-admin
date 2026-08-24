@@ -93,7 +93,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             return diagramStream.readAllBytes();
         } catch (Exception e) {
-            throw new DataException("读取流程图失败: " + e.getMessage());
+            throw new DataException("读取流程图失败: " + e.getMessage(), e);
         }
     }
 
@@ -121,7 +121,7 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
             }
             return new ProcessDefinitionResourceVO(new String(resource.readAllBytes(), StandardCharsets.UTF_8));
         } catch (IOException e) {
-            throw new DataException("读取流程资源失败: " + e.getMessage());
+            throw new DataException("读取流程资源失败: " + e.getMessage(), e);
         }
     }
 

@@ -38,6 +38,9 @@ public class LaunchApplication {
     private LaunchApplication() {
     }
 
+    /**
+     * 处理内部业务逻辑（{@code main}）。
+     */
     static void main(String[] args) {
         // 强制程序整体使用UTC时区.在展示的时候在格式化为对应时区
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));

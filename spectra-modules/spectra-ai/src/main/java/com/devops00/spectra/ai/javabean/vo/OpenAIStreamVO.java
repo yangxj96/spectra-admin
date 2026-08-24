@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.ai.javabean.vo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
@@ -79,7 +80,8 @@ public class OpenAIStreamVO {
         /**
          * 结束原因，流式传输中通常为 null，最后一条为 "stop"
          */
-        private String finish_reason;
+        @JsonProperty("finish_reason")
+        private String finishReason;
     }
 
     /**

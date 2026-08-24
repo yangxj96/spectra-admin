@@ -21,6 +21,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -39,6 +40,7 @@ public class AESUtils {
     private static final int KEY_SIZE = 256;
     private static final int IV_SIZE = 12; // 12字节推荐
     private static final int TAG_LENGTH = 128; // GCM标签长度
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * 生成随机AES密钥
@@ -54,7 +56,7 @@ public class AESUtils {
      */
     public static byte[] generateIv() {
         byte[] iv = new byte[IV_SIZE];
-        new SecureRandom().nextBytes(iv);
+        SECURE_RANDOM.nextBytes(iv);
         return iv;
     }
 

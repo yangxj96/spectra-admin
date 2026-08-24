@@ -85,6 +85,9 @@ public class NotificationTaskWorker {
      */
     private NotificationMetrics metrics;
 
+    /**
+     * 更新或推进目标状态（{@code setMetrics}）。
+     */
     @Autowired(required = false)
     public void setMetrics(NotificationMetrics metrics) {
         this.metrics = metrics;

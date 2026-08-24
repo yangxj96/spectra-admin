@@ -27,8 +27,6 @@ import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 /**
  * 站内信 Sender；taskId 是天然幂等键。
  *

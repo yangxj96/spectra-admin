@@ -201,6 +201,9 @@ public class SecurityAuditQueryService {
                         resultSet.getLong("version")));
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildPlan}）。
+     */
     private QueryPlan buildPlan(Authentication viewer, SecurityAuditQueryFrom query) {
         var conditions = new ArrayList<String>();
         var arguments = new ArrayList<>();
@@ -249,6 +252,9 @@ public class SecurityAuditQueryService {
         return new QueryPlan(where, arguments);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code mapVisibleRow}）。
+     */
     private SecurityAuditVO mapVisibleRow(ResultSet resultSet, int ignored) throws SQLException {
         return new SecurityAuditVO(
                 resultSet.getObject("event_id", UUID.class),
@@ -266,6 +272,9 @@ public class SecurityAuditQueryService {
                 resultSet.getString("correlation_id"));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseSnapshot}）。
+     */
     @SuppressWarnings("unchecked")
     private Map<String, Object> parseSnapshot(String json) {
         if (json == null || json.isBlank()) {
@@ -281,6 +290,9 @@ public class SecurityAuditQueryService {
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toEvent}）。
+     */
     private SecurityAuditEvent toEvent(SecurityAuditVO value) {
         return new SecurityAuditEvent(value.eventId(), value.eventType(), value.operatorId(), value.targetId(), value.client(),
                 value.ip(), value.userAgent(), value.before(), value.after(), value.reason(), timeMapper.toInstant(value.occurredAt()),
@@ -288,10 +300,16 @@ public class SecurityAuditQueryService {
                 value.correlationId());
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toInstant}）。
+     */
     private static Instant toInstant(Timestamp timestamp) {
         return timestamp == null ? Instant.EPOCH : timestamp.toInstant();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toJson}）。
+     */
     private String toJson(Object value) {
         try {
             return objectMapper.writeValueAsString(value);
@@ -300,17 +318,26 @@ public class SecurityAuditQueryService {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code csvCell}）。
+     */
     private static String csvCell(Object value) {
         String text = value == null ? "" : String.valueOf(value);
         return "\"" + text.replace("\"", "\"\"").replace("\r", " ").replace("\n", " ") + "\"";
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireAuthenticated}）。
+     */
     private static void requireAuthenticated(Authentication viewer) {
         if (viewer == null || !viewer.isAuthenticated()) {
             throw new AccessDeniedException("需要登录后查询安全审计");
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code recordOperation}）。
+     */
     private void recordOperation(Authentication viewer, String eventType, String operation) {
         metrics.recordQuery(operation, AuditResult.SUCCEEDED.name());
         var operatorId = visibilityPolicy.viewerId(viewer);

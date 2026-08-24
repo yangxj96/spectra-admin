@@ -99,6 +99,9 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code setUuid}）。
+     */
     private static void setUuid(PreparedStatement statement, int index, UUID value) throws SQLException {
         if (value == null) {
             statement.setNull(index, Types.OTHER);
@@ -107,6 +110,9 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code unavailable}）。
+     */
     private static SecurityAuditUnavailableException unavailable(String message, Throwable cause) {
         return cause == null ? new SecurityAuditUnavailableException(message) : new SecurityAuditUnavailableException(message, cause);
     }

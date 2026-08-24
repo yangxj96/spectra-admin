@@ -17,6 +17,8 @@
 package com.devops00.spectra.core.security.authorization.javabean.vo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,4 +41,26 @@ public record AuthorizationAssignmentView(UUID assignmentId,
                                           LocalDateTime validUntil,
                                           List<AuthorizationBoundaryView> accessBoundaries,
                                           List<AuthorizationBoundaryView> grantBoundaries) {
+
+    public AuthorizationAssignmentView {
+        accessBoundaries = immutableList(accessBoundaries);
+        grantBoundaries = immutableList(grantBoundaries);
+    }
+
+    @Override
+    public List<AuthorizationBoundaryView> accessBoundaries() {
+        return immutableList(accessBoundaries);
+    }
+
+    @Override
+    public List<AuthorizationBoundaryView> grantBoundaries() {
+        return immutableList(grantBoundaries);
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code immutableList}）。
+     */
+    private static <T> List<T> immutableList(List<T> source) {
+        return source == null ? List.of() : Collections.unmodifiableList(new ArrayList<>(source));
+    }
 }

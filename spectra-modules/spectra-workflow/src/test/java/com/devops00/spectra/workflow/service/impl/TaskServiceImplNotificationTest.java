@@ -16,7 +16,13 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
-import com.devops00.spectra.common.notification.*;
+import com.devops00.spectra.common.notification.NotificationPurpose;
+import com.devops00.spectra.common.notification.NotificationReceipt;
+import com.devops00.spectra.common.notification.NotificationRecipient;
+import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
+import com.devops00.spectra.common.notification.NotificationSendRequest;
+import com.devops00.spectra.common.notification.NotificationService;
+import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.service.WorkflowService;
 import org.flowable.engine.HistoryService;
@@ -32,8 +38,12 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Workflow 审批结果通知和稳定幂等键回归测试。

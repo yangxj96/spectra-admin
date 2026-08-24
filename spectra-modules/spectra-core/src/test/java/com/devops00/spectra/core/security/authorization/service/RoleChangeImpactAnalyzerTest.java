@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.security.authorization.service;
 
 import com.devops00.spectra.core.security.authorization.domain.RoleAuthorizationState;
-import com.devops00.spectra.core.security.authorization.service.RoleChangeImpactAnalyzer;
 import org.junit.jupiter.api.Test;
 
 import java.util.Set;

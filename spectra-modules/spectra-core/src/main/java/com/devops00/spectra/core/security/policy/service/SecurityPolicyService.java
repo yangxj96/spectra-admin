@@ -27,11 +27,23 @@ import java.util.UUID;
 /** 安全策略查询与受审计修改服务。 */
 public interface SecurityPolicyService {
 
+    /**
+     * 查询或获取目标数据（{@code sessionPolicies}）。
+     */
     List<SecuritySessionPolicyVO> sessionPolicies();
 
+    /**
+     * 更新或推进目标状态（{@code modifySessionPolicy}）。
+     */
     SecuritySessionPolicyVO modifySessionPolicy(UUID clientId, SecuritySessionPolicyFrom from);
 
+    /**
+     * 查询或获取目标数据（{@code passwordPolicy}）。
+     */
     SecurityPasswordPolicyVO passwordPolicy();
 
+    /**
+     * 更新或推进目标状态（{@code modifyPasswordPolicy}）。
+     */
     SecurityPasswordPolicyVO modifyPasswordPolicy(SecurityPasswordPolicyFrom from);
 }

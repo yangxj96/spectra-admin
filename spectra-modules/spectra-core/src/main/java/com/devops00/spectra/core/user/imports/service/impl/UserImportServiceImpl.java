@@ -321,11 +321,14 @@ public class UserImportServiceImpl implements UserImportService {
                     () -> processApply(task.getId(), operatorId), securityContext));
         } catch (RuntimeException exception) {
             markApplyFailed(task.getId(), operatorId, exception);
-            throw new DataException("无法启动用户导入任务: " + safeMessage(exception));
+            throw new DataException("无法启动用户导入任务: " + safeMessage(exception), exception);
         }
         return toVO(task);
     }
 
+    /**
+     * 执行内部处理逻辑（{@code processApply}）。
+     */
     private void processApply(UUID taskId, UUID operatorId) {
         try {
             var task = findTask(taskId, operatorId);
@@ -380,6 +383,9 @@ public class UserImportServiceImpl implements UserImportService {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code markApplyFailed}）。
+     */
     private void markApplyFailed(UUID taskId, UUID operatorId, RuntimeException exception) {
         taskMapper.update(null, new LambdaUpdateWrapper<UserImportTask>()
                 .eq(UserImportTask::getId, taskId)
@@ -389,12 +395,18 @@ public class UserImportServiceImpl implements UserImportService {
         log.error("用户批量导入执行失败: taskId={}", taskId, exception);
     }
 
+    /**
+     * 查询或获取目标数据（{@code findTask}）。
+     */
     private UserImportTask findTask(UUID taskId, UUID operatorId) {
         return taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
                 .eq(UserImportTask::getId, taskId)
                 .eq(UserImportTask::getOperatorId, operatorId));
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validate}）。
+     */
     private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
                                   Set<String> emails, Set<String> phones) {
         var errors = new ArrayList<String>();
@@ -435,6 +447,9 @@ public class UserImportServiceImpl implements UserImportService {
         return errors;
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadReferenceData}）。
+     */
     private ReferenceData loadReferenceData() {
         var departmentIds = departmentService.list()
                 .stream()
@@ -458,6 +473,9 @@ public class UserImportServiceImpl implements UserImportService {
         return new ReferenceData(departmentIds, languages, timezones, profiles);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireTask}）。
+     */
     private UserImportTask requireTask(UUID id) {
         var task = taskMapper.selectOne(new LambdaQueryWrapper<UserImportTask>()
                 .eq(UserImportTask::getId, id)
@@ -468,6 +486,9 @@ public class UserImportServiceImpl implements UserImportService {
         return task;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code replayPreview}）。
+     */
     private UserImportTaskVO replayPreview(UserImportTask task) {
         if (!STATUS_PREVIEWED.equals(task.getStatus())) {
             return toVO(task);
@@ -484,6 +505,9 @@ public class UserImportServiceImpl implements UserImportService {
         return toVO(task, token);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code expire}）。
+     */
     private void expire(UserImportTask task) {
         task.setStatus(STATUS_EXPIRED);
         task.setPreviewTokenHash(null);
@@ -491,6 +515,9 @@ public class UserImportServiceImpl implements UserImportService {
         taskMapper.updateById(task);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeRows}）。
+     */
     private List<NormalizedRow> normalizeRows(List<UserImportRowFrom> sources, String generationSeed) {
         var result = new ArrayList<NormalizedRow>(sources.size());
         for (int index = 0; index < sources.size(); index++) {
@@ -499,6 +526,9 @@ public class UserImportServiceImpl implements UserImportService {
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private NormalizedRow normalize(UserImportRowFrom source, String generationSeed, int rowIndex) {
         var sourceValues = toMap(source);
         var raw = new LinkedHashMap<>(sourceValues);
@@ -515,10 +545,16 @@ public class UserImportServiceImpl implements UserImportService {
         return new NormalizedRow(normalizedSource, raw, normalized);
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateEmployeeNo}）。
+     */
     private String generateEmployeeNo(String generationSeed, int rowIndex) {
         return "EMP-" + SHA256Utils.hash(trim(generationSeed) + '\u001f' + rowIndex).substring(0, 32).toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toMap}）。
+     */
     private Map<String, Object> toMap(UserImportRowFrom source) {
         var result = new LinkedHashMap<String, Object>();
         result.put("employee_no", source.getEmployeeNo());
@@ -532,6 +568,9 @@ public class UserImportServiceImpl implements UserImportService {
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toSource}）。
+     */
     private UserImportRowFrom toSource(Map<String, Object> values) {
         var source = new UserImportRowFrom();
         source.setEmployeeNo(value(values, "employee_no"));
@@ -545,14 +584,16 @@ public class UserImportServiceImpl implements UserImportService {
         return source;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code value}）。
+     */
     private String value(Map<String, Object> values, String key) {
         return values == null || values.get(key) == null ? "" : String.valueOf(values.get(key));
     }
 
-    private Map<String, Object> normalizedMap(UserImportRowFrom source) {
-        return toMap(source);
-    }
-
+    /**
+     * 处理内部业务逻辑（{@code requestHash}）。
+     */
     private String requestHash(String fileHash, boolean skipExisting, List<NormalizedRow> rows) {
         var canonical = new StringBuilder(trim(fileHash)).append('\u001f').append(skipExisting);
         for (var row : rows) {
@@ -562,6 +603,9 @@ public class UserImportServiceImpl implements UserImportService {
         return SHA256Utils.hash(canonical.toString());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code profileVersionHash}）。
+     */
     private String profileVersionHash(List<NormalizedRow> rows, Map<String, AuthorizationProfileVO> profiles) {
         var codes = rows.stream().map(row -> row.source().getAuthorizationProfileCode()).distinct().sorted().toList();
         var canonical = codes.stream().map(code -> {
@@ -579,12 +623,18 @@ public class UserImportServiceImpl implements UserImportService {
         return SHA256Utils.hash(canonical);
     }
 
+    /**
+     * 判断条件是否满足（{@code issuePreviewToken}）。
+     */
     private String issuePreviewToken() {
         var bytes = new byte[32];
         secureRandom.nextBytes(bytes);
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
+    /**
+     * 查询或获取目标数据（{@code findExisting}）。
+     */
     private User findExisting(UserImportRowFrom source) {
         var byEmployeeNo = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmployeeNo, source.getEmployeeNo()));
         if (byEmployeeNo != null) {
@@ -597,10 +647,16 @@ public class UserImportServiceImpl implements UserImportService {
         return userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, source.getPhone()));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     private UserImportTaskVO toVO(UserImportTask task) {
         return toVO(task, null);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     private UserImportTaskVO toVO(UserImportTask task, String previewToken) {
         var result = new UserImportTaskVO();
         result.setId(task.getId());
@@ -623,6 +679,9 @@ public class UserImportServiceImpl implements UserImportService {
         return result;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toRowVO}）。
+     */
     private UserImportRowVO toRowVO(UserImportRow row) {
         var result = new UserImportRowVO();
         result.setId(row.getId());
@@ -644,6 +703,9 @@ public class UserImportServiceImpl implements UserImportService {
         return result;
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentOperatorId}）。
+     */
     private UUID currentOperatorId() {
         var operatorId = securityContextAccessor.currentUserId();
         if (operatorId == null) {
@@ -652,14 +714,23 @@ public class UserImportServiceImpl implements UserImportService {
         return operatorId;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code blank}）。
+     */
     private boolean blank(String value) {
         return value == null || value.isBlank();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code trim}）。
+     */
     private String trim(String value) {
         return value == null ? "" : value.trim();
     }
 
+    /**
+     * 处理内部业务逻辑（{@code safeMessage}）。
+     */
     private String safeMessage(RuntimeException exception) {
         var message = exception.getMessage();
         if (message == null || message.isBlank()) {

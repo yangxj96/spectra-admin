@@ -36,14 +36,23 @@ public final class AuthenticationWebUtils {
     private AuthenticationWebUtils() {
     }
 
+    /**
+     * 查询或获取目标数据（{@code clientType}）。
+     */
     public static ClientType clientType(HttpServletRequest request) {
         return ClientType.fromName(request.getHeader("X-Client-Type"));
     }
 
+    /**
+     * 判断条件是否满足（{@code isWebClient}）。
+     */
     public static boolean isWebClient(ClientType clientType) {
         return clientType == ClientType.WEB;
     }
 
+    /**
+     * 执行内部处理逻辑（{@code writeWebToken}）。
+     */
     public static TokenVO writeWebToken(HttpServletResponse response, TokenVO token,
                                         SecurityProperties securityProperties, ClientType clientType) {
         issueWebCookies(response, token.getRefreshToken(), securityProperties, clientType);
@@ -53,6 +62,9 @@ public final class AuthenticationWebUtils {
         return token;
     }
 
+    /**
+     * 判断条件是否满足（{@code issueWebCookies}）。
+     */
     public static void issueWebCookies(HttpServletResponse response, String refreshToken,
                                        SecurityProperties securityProperties, ClientType clientType) {
         if (!isWebClient(clientType) || StrUtils.isBlank(refreshToken)) {
@@ -64,6 +76,9 @@ public final class AuthenticationWebUtils {
                 false, securityProperties.getRefreshCookieSameSite(), securityProperties.getRefreshTokenExpire());
     }
 
+    /**
+     * 更新或推进目标状态（{@code clearWebCookies}）。
+     */
     public static void clearWebCookies(HttpServletResponse response, SecurityProperties securityProperties) {
         addCookie(response, securityProperties, securityProperties.getRefreshCookieName(), "", true,
                 securityProperties.getRefreshCookieSameSite(), 0);
@@ -71,6 +86,9 @@ public final class AuthenticationWebUtils {
                 securityProperties.getRefreshCookieSameSite(), 0);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateCsrf}）。
+     */
     public static void validateCsrf(HttpServletRequest request, SecurityProperties securityProperties) {
         String header = request.getHeader(securityProperties.getCsrfHeaderName());
         String cookie = readCookie(request, securityProperties.getCsrfCookieName());
@@ -82,6 +100,9 @@ public final class AuthenticationWebUtils {
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code readCookie}）。
+     */
     public static String readCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
@@ -95,6 +116,9 @@ public final class AuthenticationWebUtils {
         return null;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addCookie}）。
+     */
     private static void addCookie(HttpServletResponse response, SecurityProperties securityProperties, String name,
                                   String value, boolean httpOnly, String sameSite, long maxAgeSeconds) {
         ResponseCookie cookie = ResponseCookie.from(name, value)

@@ -34,6 +34,9 @@ public class SecurityAuditArchiveConfiguration {
     private final S3Client s3Client;
     private final S3Properties s3Properties;
 
+    /**
+     * 处理内部业务逻辑（{@code securityAuditArchiveBackend}）。
+     */
     @Bean
     public SecurityAuditArchiveBackend securityAuditArchiveBackend() {
         if (s3Properties.getArchiveBucket() == null || s3Properties.getArchiveBucket().isBlank()) {
@@ -94,6 +97,9 @@ public class SecurityAuditArchiveConfiguration {
                     .build()).asByteArray();
         }
 
+        /**
+         * 处理内部业务逻辑（{@code prefix}）。
+         */
         private String prefix() {
             String prefix = properties.getArchivePrefix();
             if (prefix == null || prefix.isBlank()) {
@@ -102,6 +108,9 @@ public class SecurityAuditArchiveConfiguration {
             return prefix.endsWith("/") ? prefix : prefix + "/";
         }
 
+        /**
+         * 处理内部业务逻辑（{@code uri}）。
+         */
         private String uri(String key) {
             return "s3://" + properties.getArchiveBucket() + "/" + key;
         }

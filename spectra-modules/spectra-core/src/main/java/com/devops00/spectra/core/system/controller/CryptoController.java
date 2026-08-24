@@ -112,7 +112,7 @@ public class CryptoController {
             return new CryptoKeyPairVO(serverPublicKey, serverPrivateKey, clientPublicKey, clientPrivateKey);
         } catch (Exception e) {
             log.error("生成RSA密钥对失败: {}", e.getMessage(), e);
-            throw new DataSaveException("密钥生成失败: " + e.getMessage());
+            throw new DataSaveException("密钥生成失败: " + e.getMessage(), e);
         }
     }
 

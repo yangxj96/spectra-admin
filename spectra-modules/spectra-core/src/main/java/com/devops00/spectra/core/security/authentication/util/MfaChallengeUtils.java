@@ -27,6 +27,9 @@ public final class MfaChallengeUtils {
     private MfaChallengeUtils() {
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireChallengePort}）。
+     */
     public static SecurityMfaChallengePort requireChallengePort(SecurityMfaChallengePort challengePort) {
         if (challengePort == null) {
             throw new IllegalStateException("MFA 挑战存储未配置");
@@ -34,6 +37,9 @@ public final class MfaChallengeUtils {
         return challengePort;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireSetupChallenge}）。
+     */
     public static MfaLoginChallenge requireSetupChallenge(SecurityMfaChallengePort challengePort,
                                                           String challengeId, HttpServletRequest request) {
         MfaLoginChallenge challenge = requireChallengePort(challengePort).find(challengeId);
@@ -44,6 +50,9 @@ public final class MfaChallengeUtils {
         return challenge;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateClient}）。
+     */
     public static void validateClient(MfaLoginChallenge challenge, HttpServletRequest request) {
         ClientType actual = ClientType.fromName(request.getHeader("X-Client-Type"));
         if (challenge.clientType() != actual) {

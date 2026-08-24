@@ -24,6 +24,9 @@ import java.util.UUID;
 
 public interface AuthenticationIdentityService {
 
+    /**
+     * 查询或获取目标数据（{@code findPasswordIdentity}）。
+     */
     @Nullable
     AuthenticationIdentity findPasswordIdentity(String identifier);
 
@@ -31,13 +34,22 @@ public interface AuthenticationIdentityService {
     @Nullable
     AuthenticationIdentity findIdentity(String methodCode, String identifier);
 
+    /**
+     * 创建或构建目标数据（{@code createPasswordIdentity}）。
+     */
     AuthenticationIdentity createPasswordIdentity(UUID userId, String identifier);
 
     /** 创建或重新激活非密码认证身份。 */
     AuthenticationIdentity createIdentity(UUID userId, String methodCode, String identifier);
 
+    /**
+     * 更新或推进目标状态（{@code updatePasswordIdentifier}）。
+     */
     void updatePasswordIdentifier(UUID userId, String identifier);
 
+    /**
+     * 更新或推进目标状态（{@code revokeByUserId}）。
+     */
     void revokeByUserId(UUID userId);
 
     /** 撤销指定认证方式的所有身份。 */

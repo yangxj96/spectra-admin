@@ -63,11 +63,19 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
             leaf.setCode(permission.getCode());
             leaf.setAllowedScopeModes(parseScopeModes(permission.getAllowedScopeModes()));
             leaf.setSort(0);
-            group.getChildren().add(leaf);
+            var children = group.getChildren();
+            if (children == null) {
+                children = new ArrayList<>();
+                group.setChildren(children);
+            }
+            children.add(leaf);
         }
         return new ArrayList<>(groups.values());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code resourceNode}）。
+     */
     private AuthorityTreeVO resourceNode(String resourceCode) {
         var node = new AuthorityTreeVO();
         node.setId(UUID.nameUUIDFromBytes(("permission-resource:" + resourceCode).getBytes(StandardCharsets.UTF_8)));
@@ -78,6 +86,9 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
         return node;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code resourceCode}）。
+     */
     private String resourceCode(Permission permission) {
         if (permission.getResourceCode() != null && !permission.getResourceCode().isBlank()) {
             return permission.getResourceCode();
@@ -87,10 +98,16 @@ public class PermissionCatalogServiceImpl implements PermissionCatalogService {
         return separator > 0 ? code.substring(0, separator) : "uncategorized";
     }
 
+    /**
+     * 处理内部业务逻辑（{@code valueOrEmpty}）。
+     */
     private String valueOrEmpty(String value) {
         return value == null ? "" : value;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseScopeModes}）。
+     */
     private List<String> parseScopeModes(String value) {
         if (value == null || value.isBlank()) {
             return List.of();

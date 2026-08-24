@@ -30,6 +30,9 @@ public final class NotificationTaskMessage {
     private NotificationTaskMessage() {
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolve}）。
+     */
     public static Message resolve(NotificationTaskEntity task, NotificationPayloadProtector protector) {
         var parameters = new LinkedHashMap<String, Object>();
         String providerTemplateCode = null;
@@ -64,5 +67,14 @@ public final class NotificationTaskMessage {
     }
 
     public record Message(String title, String content, Map<String, Object> parameters, String providerTemplateCode) {
+
+        public Message {
+            parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
+        }
+
+        @Override
+        public Map<String, Object> parameters() {
+            return Map.copyOf(parameters);
+        }
     }
 }

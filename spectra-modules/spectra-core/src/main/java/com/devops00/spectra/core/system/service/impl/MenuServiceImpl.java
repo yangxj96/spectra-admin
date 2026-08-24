@@ -103,6 +103,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         menuMapper.updateById(menu);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateRouteBinding}）。
+     */
     private void validateRouteBinding(MenuSaveFrom params) {
         if (params.getMenuType() == MenuType.DIRECTORY && StrUtils.isNotBlank(params.getRouteName())) {
             throw new DataException("目录不能配置路由名称");
@@ -112,6 +115,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateTreeStructure}）。
+     */
     private void validateTreeStructure(MenuSaveFrom params) {
         var parentId = params.getPid();
         var visited = new HashSet<UUID>();
@@ -152,6 +158,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return currentFromSecurityModel(userId);
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentFromSecurityModel}）。
+     */
     private List<MenuTreeVO> currentFromSecurityModel(UUID userId) {
         var snapshot = authorizationSnapshotProvider.load(userId);
         if (snapshot.isRoot()) {
@@ -182,6 +191,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return buildCurrentTree(relations.stream().map(SecurityRoleMenu::getMenuId).collect(Collectors.toSet()));
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildAllCurrentTree}）。
+     */
     private List<MenuTreeVO> buildAllCurrentTree() {
         var menus = loadActiveMenus();
         var menuIds = menus.stream()
@@ -191,10 +203,16 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return buildCurrentTree(menuIds, menus);
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildCurrentTree}）。
+     */
     private List<MenuTreeVO> buildCurrentTree(Set<UUID> menuIds) {
         return buildCurrentTree(menuIds, loadActiveMenus());
     }
 
+    /**
+     * 创建或构建目标数据（{@code buildCurrentTree}）。
+     */
     private List<MenuTreeVO> buildCurrentTree(Set<UUID> menuIds, List<Menu> menus) {
         if (CollUtils.isEmpty(menus)) {
             return Collections.emptyList();
@@ -219,6 +237,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         return tree == null ? Collections.emptyList() : tree;
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadActiveMenus}）。
+     */
     private List<Menu> loadActiveMenus() {
         return menuMapper.selectList(new QueryWrapper<Menu>().isNotNull("menu_type").isNull("deleted"));
     }
@@ -245,6 +266,9 @@ public class MenuServiceImpl extends BaseServiceImpl<MenuMapper, Menu> implement
         this.removeById(menu);
     }
 
+    /**
+     * 查询或获取目标数据（{@code getActiveMenu}）。
+     */
     private @Nullable Menu getActiveMenu(UUID id) {
         return menuMapper.selectOne(new QueryWrapper<Menu>().eq("id", id).isNull("deleted"));
     }

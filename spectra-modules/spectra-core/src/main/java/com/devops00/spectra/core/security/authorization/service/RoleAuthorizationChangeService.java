@@ -32,9 +32,18 @@ import java.util.UUID;
  */
 public interface RoleAuthorizationChangeService {
 
+    /**
+     * 查询或获取目标数据（{@code current}）。
+     */
     RoleAuthorizationStateVO current(UUID roleId);
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     RoleAuthorizationChangePreviewVO preview(UUID roleId, RoleAuthorizationChangeFrom from);
 
+    /**
+     * 更新或推进目标状态（{@code apply}）。
+     */
     void apply(UUID roleId, RoleAuthorizationApplyFrom from);
 }

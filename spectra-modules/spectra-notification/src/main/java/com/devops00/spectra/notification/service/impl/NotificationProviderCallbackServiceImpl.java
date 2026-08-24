@@ -39,9 +39,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import tools.jackson.databind.ObjectMapper;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
@@ -116,7 +116,10 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         if (delivery.getResponseSummary() != null) {
             summary.putAll(delivery.getResponseSummary());
         }
-        if (eventDigest.equals(summary.get("callback_event_digest"))) {
+        var previousDigest = summary.get("callback_event_digest");
+        if (previousDigest != null
+                && MessageDigest.isEqual(eventDigest.getBytes(StandardCharsets.US_ASCII),
+                        String.valueOf(previousDigest).getBytes(StandardCharsets.US_ASCII))) {
             return new NotificationProviderCallbackVO(
                     NotificationCallbackStatus.DUPLICATE.name(), delivery.getResultStatus());
         }
@@ -144,6 +147,9 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         return new NotificationProviderCallbackVO(NotificationCallbackStatus.APPLIED.name(), resultStatus.name());
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parse}）。
+     */
     private NotificationProviderCallbackFrom parse(String body) {
         try {
             var callback = objectMapper.readValue(body, NotificationProviderCallbackFrom.class);
@@ -154,13 +160,16 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
             }
             return callback;
         } catch (RuntimeException exception) {
-            if (exception instanceof DataSaveException dataSaveException) {
-                throw dataSaveException;
+            if (exception instanceof DataSaveException) {
+                throw exception;
             }
-            throw new DataSaveException("Provider 回执 JSON 不合法");
+            throw new DataSaveException("Provider 回执 JSON 不合法", exception);
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verifySignature}）。
+     */
     private void verifySignature(String signature, String body, NotificationProviderConfiguration configuration) {
         if (configuration == null
                 || !configuration.enabled()
@@ -189,10 +198,13 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         } catch (DataSaveException exception) {
             throw exception;
         } catch (Exception exception) {
-            throw new DataSaveException("Provider 回执签名校验失败");
+            throw new DataSaveException("Provider 回执签名校验失败", exception);
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeMessageId}）。
+     */
     private String normalizeMessageId(String value) {
         var normalized = value == null ? null : value.trim();
         if (!StringUtils.hasText(normalized) || normalized.length() > 200) {
@@ -201,6 +213,9 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         return normalized;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeStatus}）。
+     */
     private ChannelSendStatus normalizeStatus(String value) {
         var normalized = value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
         return switch (normalized) {
@@ -211,6 +226,9 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         };
     }
 
+    /**
+     * 处理内部业务逻辑（{@code safeErrorCode}）。
+     */
     private String safeErrorCode(String value) {
         if (!StringUtils.hasText(value)) {
             return null;
@@ -219,10 +237,16 @@ public class NotificationProviderCallbackServiceImpl implements NotificationProv
         return normalized.matches("[A-Z0-9_.:-]{1,100}") ? normalized : "PROVIDER_CALLBACK_ERROR";
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code digest}）。
+     */
     private String digest(String body) {
         return SHA256Utils.hash(body);
     }
 
+    /**
+     * 更新或推进目标状态（{@code updateTask}）。
+     */
     private void updateTask(NotificationDeliveryEntity delivery, ChannelSendStatus resultStatus, String errorCode) {
         var task = taskMapper.selectById(delivery.getNotificationTaskId());
         if (task == null

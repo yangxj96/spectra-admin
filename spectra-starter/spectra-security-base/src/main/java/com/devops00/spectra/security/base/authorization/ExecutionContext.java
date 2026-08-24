@@ -33,6 +33,9 @@ public record ExecutionContext(UUID subjectId, String resourceCode, ResourceOper
                 : permission;
     }
 
+    /**
+     * 创建或构建目标数据（{@code of}）。
+     */
     public static ExecutionContext of(UUID subjectId, String resourceCode, ResourceOperation operation) {
         return new ExecutionContext(subjectId, resourceCode, operation, null);
     }

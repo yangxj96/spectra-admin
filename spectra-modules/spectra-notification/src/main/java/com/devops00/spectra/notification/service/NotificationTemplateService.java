@@ -37,25 +37,58 @@ import java.util.UUID;
  */
 public interface NotificationTemplateService {
 
+    /**
+     * 查询或获取目标数据（{@code page}）。
+     */
     IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params);
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     NotificationTemplateVO detail(UUID id);
 
+    /**
+     * 创建或构建目标数据（{@code create}）。
+     */
     NotificationTemplateVO create(NotificationTemplateSaveFrom params);
 
+    /**
+     * 转换、解析或规范化数据（{@code copy}）。
+     */
     NotificationTemplateVO copy(UUID id);
 
+    /**
+     * 更新或推进目标状态（{@code update}）。
+     */
     NotificationTemplateVO update(NotificationTemplateSaveFrom params);
 
+    /**
+     * 更新或推进目标状态（{@code publish}）。
+     */
     void publish(UUID id, NotificationTemplateActionFrom params);
 
+    /**
+     * 更新或推进目标状态（{@code disable}）。
+     */
     void disable(UUID id, NotificationTemplateActionFrom params);
 
+    /**
+     * 更新或推进目标状态（{@code archive}）。
+     */
     void archive(UUID id, NotificationTemplateActionFrom params);
 
+    /**
+     * 处理内部业务逻辑（{@code versions}）。
+     */
     List<NotificationTemplateVO> versions(UUID id);
 
+    /**
+     * 更新或推进目标状态（{@code rollback}）。
+     */
     NotificationTemplateVO rollback(UUID id);
 
+    /**
+     * 处理内部业务逻辑（{@code preview}）。
+     */
     NotificationTemplatePreviewVO preview(NotificationTemplatePreviewFrom params);
 }

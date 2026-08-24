@@ -34,8 +34,8 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.jspecify.annotations.Nullable;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,6 +104,9 @@ public class ULogAspect {
         }
     }
 
+    /**
+     * 执行内部处理逻辑（{@code executeLogSafely}）。
+     */
     private void executeLogSafely(ProceedingJoinPoint point, ULog annotation, @Nullable Exception e, @Nullable Object result, long timeCost,
                                   String preParsedExplain) {
         try {
@@ -185,8 +188,11 @@ public class ULogAspect {
             return "";
         }
 
-        // 💡 性能轻量优化：如果既没有冒号（单引号）、也没有井号、也没有 T(，说明它 100% 是个普通纯文本
-        if (!spelExpression.contains("#") && !spelExpression.contains("T(") && !spelExpression.contains("'")) {
+        // 只允许读取方法参数；禁止静态类型引用 T(...) 和方法调用，避免表达式注入。
+        if (spelExpression.contains("T(")) {
+            return spelExpression;
+        }
+        if (!spelExpression.contains("#") && !spelExpression.contains("'")) {
             return spelExpression;
         }
 
@@ -194,8 +200,8 @@ public class ULogAspect {
             MethodSignature signature = (MethodSignature) point.getSignature();
             Object[] args = point.getArgs();
 
-            // 使用 StandardEvaluationContext，完美承载 T() 静态方法与高级特性
-            EvaluationContext context = new StandardEvaluationContext();
+            // 只开放只读数据绑定，不允许方法调用或类型引用。
+            EvaluationContext context = SimpleEvaluationContext.forReadOnlyDataBinding().build();
 
             // 绑定参数名，支持 #params.username 动态解析
             String[] parameterNames = signature.getParameterNames();
@@ -213,6 +219,9 @@ public class ULogAspect {
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code getHttpResponseStatus}）。
+     */
     private short getHttpResponseStatus(@Nullable HttpServletResponse response) {
         if (response == null) {
             return 500;

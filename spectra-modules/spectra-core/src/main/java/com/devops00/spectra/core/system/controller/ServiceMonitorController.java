@@ -96,6 +96,9 @@ public class ServiceMonitorController {
         return bindService.getHistory(from);
     }
 
+    /**
+     * 查询或获取目标数据（{@code getAlertSummary}）。
+     */
     @ULog("'查询服务监控告警摘要'")
     @GetMapping(value = "/alerts/summary", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
@@ -103,6 +106,9 @@ public class ServiceMonitorController {
         return alertService.getSummary();
     }
 
+    /**
+     * 查询或获取目标数据（{@code listAlertRules}）。
+     */
     @ULog("'查询服务监控告警规则'")
     @GetMapping(value = "/alerts/rules", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
@@ -110,6 +116,9 @@ public class ServiceMonitorController {
         return alertService.listRules();
     }
 
+    /**
+     * 更新或推进目标状态（{@code modifyAlertRule}）。
+     */
     @ULog("'修改服务监控告警规则'")
     @PutMapping(value = "/alerts/rules/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:configure')")
@@ -117,6 +126,9 @@ public class ServiceMonitorController {
         alertService.modifyRule(id, from);
     }
 
+    /**
+     * 查询或获取目标数据（{@code listAlertEvents}）。
+     */
     @ULog("'查询服务监控告警事件'")
     @GetMapping(value = "/alerts/events", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
@@ -125,6 +137,9 @@ public class ServiceMonitorController {
         return alertService.listEvents(activeOnly);
     }
 
+    /**
+     * 查询或获取目标数据（{@code getRuntimeDiagnostic}）。
+     */
     @ULog("'查询服务运行时诊断'")
     @GetMapping(value = "/diagnostics/runtime", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
@@ -132,6 +147,9 @@ public class ServiceMonitorController {
         return diagnosticService.getRuntimeDiagnostic();
     }
 
+    /**
+     * 创建或构建目标数据（{@code createDiagnosticTask}）。
+     */
     @ULog("'创建服务监控诊断任务'")
     @PostMapping(value = "/diagnostics/tasks", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
@@ -140,6 +158,9 @@ public class ServiceMonitorController {
         return diagnosticService.createTask(from);
     }
 
+    /**
+     * 查询或获取目标数据（{@code listDiagnosticTasks}）。
+     */
     @ULog("'查询服务监控诊断任务'")
     @GetMapping(value = "/diagnostics/tasks", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
@@ -147,6 +168,9 @@ public class ServiceMonitorController {
         return diagnosticService.listTasks();
     }
 
+    /**
+     * 查询或获取目标数据（{@code getDiagnosticTask}）。
+     */
     @ULog("'查询服务监控诊断任务状态'")
     @GetMapping(value = "/diagnostics/tasks/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
@@ -154,6 +178,9 @@ public class ServiceMonitorController {
         return diagnosticService.getTask(id);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code downloadDiagnosticTask}）。
+     */
     @Encrypt(response = false)
     @ULog("'下载服务监控诊断文件'")
     @GetMapping(value = "/diagnostics/tasks/{id}/download", version = "1.0.0")

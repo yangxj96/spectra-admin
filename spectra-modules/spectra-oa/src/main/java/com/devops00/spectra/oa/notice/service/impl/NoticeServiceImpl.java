@@ -193,6 +193,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code assembleView}）。
+     */
     private NoticeVO assembleView(Notice notice) {
         var userId = securityContextAccessor.currentUserId();
         if (userId == null) {
@@ -203,6 +206,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         return noticeConverter.toVO(notice, reader);
     }
 
+    /**
+     * 判断条件是否满足（{@code isVisible}）。
+     */
     private boolean isVisible(Notice notice, UUID userId) {
         if (userId.equals(notice.getPublisherId())) {
             return true;
@@ -220,12 +226,18 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         return user != null && notice.getTargetDepartmentId() != null && notice.getTargetDepartmentId().equals(user.getDepartmentId());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensurePublisher}）。
+     */
     private void ensurePublisher(Notice notice) {
         if (!Objects.equals(notice.getPublisherId(), securityContextAccessor.currentUserId())) {
             throw new DataNotExistException("公告不存在或无权操作");
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendNotifications}）。
+     */
     private void sendNotifications(Notice notice) {
         var wrapper = new LambdaQueryWrapper<User>();
         if ("DEPARTMENT".equals(notice.getTargetType())) {
@@ -245,6 +257,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
                 .build());
     }
 
+    /**
+     * 处理内部业务逻辑（{@code activateDueNotices}）。
+     */
     private void activateDueNotices(List<Notice> notices) {
         var now = Instant.now();
         notices.stream()
@@ -259,6 +274,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
                 });
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Notice require(UUID id) {
         var notice = this.getById(id);
         if (notice == null) {
@@ -267,6 +285,9 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         return notice;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseTime}）。
+     */
     private Instant parseTime(String value) {
         if (!StringUtils.hasText(value)) {
             return Instant.now();
@@ -274,7 +295,7 @@ public class NoticeServiceImpl extends BaseServiceImpl<NoticeMapper, Notice> imp
         try {
             return timeMapper.toInstant(value);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("公告发布时间格式不正确");
+            throw new DataSaveException("公告发布时间格式不正确", exception);
         }
     }
 }

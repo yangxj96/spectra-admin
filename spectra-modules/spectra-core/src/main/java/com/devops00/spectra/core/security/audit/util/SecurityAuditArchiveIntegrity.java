@@ -18,6 +18,9 @@ public final class SecurityAuditArchiveIntegrity {
     private SecurityAuditArchiveIntegrity() {
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sha256}）。
+     */
     public static String sha256(byte[] content) {
         if (content == null) {
             throw new IllegalArgumentException("归档内容不能为空");
@@ -29,6 +32,9 @@ public final class SecurityAuditArchiveIntegrity {
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verify}）。
+     */
     public static void verify(byte[] content, String expectedSha256) {
         if (!MessageDigest.isEqual(sha256(content).getBytes(StandardCharsets.US_ASCII),
                 expectedSha256 == null

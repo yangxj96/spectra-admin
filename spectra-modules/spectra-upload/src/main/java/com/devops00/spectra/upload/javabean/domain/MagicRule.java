@@ -20,6 +20,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serial;
+import java.io.Serializable;
+
 /**
  * 文件魔数规则
  *
@@ -30,7 +33,10 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class MagicRule {
+public class MagicRule implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     /**
      * 魔数（十六进制字符串）

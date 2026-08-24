@@ -170,6 +170,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
                 .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()));
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toVO}）。
+     */
     private RoleVO toVO(SecurityRole role) {
         var vo = new RoleVO();
         vo.setId(role.getId());
@@ -180,10 +183,13 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         vo.setRemark(role.getRemark());
         vo.setAuthorityLevel(role.getAuthorityLevel());
         vo.setRoleKind(role.getRoleKind());
-        vo.setVersion(role.getVersion() == null ? 0L : role.getVersion());
+        vo.setVersion(role.getVersion() == null ? Long.valueOf(0L) : role.getVersion());
         return vo;
     }
 
+    /**
+     * 创建或构建目标数据（{@code generatedCode}）。
+     */
     private String generatedCode() {
         String code;
         do {
@@ -193,6 +199,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         return code;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureNameAvailable}）。
+     */
     private void ensureNameAvailable(String name, UUID excludedId) {
         var wrapper = new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getName, name);
         if (excludedId != null) {
@@ -203,6 +212,9 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         }
     }
 
+    /**
+     * 查询或获取目标数据（{@code codeExists}）。
+     */
     private boolean codeExists(String code, UUID excludedId) {
         var wrapper = new LambdaQueryWrapper<SecurityRole>().eq(SecurityRole::getCode, code);
         if (excludedId != null) {
@@ -211,10 +223,16 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         return count(wrapper) > 0;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private String normalize(String value) {
         return value == null ? null : value.trim();
     }
 
+    /**
+     * 查询或获取目标数据（{@code getRole}）。
+     */
     private SecurityRole getRole(UUID id) {
         var role = getBaseMapper().selectById(id);
         if (role == null) {
@@ -223,12 +241,18 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
         return role;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureNotSystemManaged}）。
+     */
     private void ensureNotSystemManaged(SecurityRole role) {
         if (Boolean.TRUE.equals(role.getSystemManaged()) || !"BUSINESS".equals(role.getRoleKind())) {
             throw new BuiltinDataException("内置角色不可操作");
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code ensureNoActiveAssignments}）。
+     */
     private void ensureNoActiveAssignments(UUID roleId, String operation) {
         if (roleAssignmentMapper.selectCount(new LambdaQueryWrapper<RoleAssignment>()
                 .eq(RoleAssignment::getRoleId, roleId)

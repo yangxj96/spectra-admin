@@ -35,7 +35,11 @@ import com.devops00.spectra.oa.contract.javabean.constant.ContractStatus;
 import com.devops00.spectra.oa.contract.javabean.entity.Contract;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractMilestone;
 import com.devops00.spectra.oa.contract.javabean.entity.ContractVersion;
-import com.devops00.spectra.oa.contract.javabean.from.*;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractMilestoneUpdateFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractPageFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractSaveFrom;
+import com.devops00.spectra.oa.contract.javabean.from.ContractVersionFrom;
 import com.devops00.spectra.oa.contract.javabean.vo.ContractMilestoneVO;
 import com.devops00.spectra.oa.contract.javabean.vo.ContractVO;
 import com.devops00.spectra.oa.contract.javabean.vo.ContractVersionVO;
@@ -418,6 +422,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         fileUploadFacade.download(requireVersion(id, versionId).getFileId());
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireVersion}）。
+     */
     private ContractVersion requireVersion(UUID id, UUID versionId) {
         var contract = requireAccessible(id);
         ContractVersion version = versionId == null
@@ -430,6 +437,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return version;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireMilestone}）。
+     */
     private ContractMilestone requireMilestone(UUID id, UUID milestoneId) {
         var milestone = milestoneMapper.selectOne(
                 new LambdaQueryWrapper<ContractMilestone>().eq(ContractMilestone::getId, milestoneId).eq(ContractMilestone::getContractId, id));
@@ -439,12 +449,18 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return milestone;
     }
 
+    /**
+     * 查询或获取目标数据（{@code currentVersion}）。
+     */
     private ContractVersion currentVersion(UUID id) {
         return versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getContractId, id)
                 .eq(ContractVersion::getCurrentVersion, true)
                 .last("limit 1"));
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code require}）。
+     */
     private Contract require(UUID id) {
         var entity = getById(id);
         if (entity == null) {
@@ -453,6 +469,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireAccessible}）。
+     */
     private Contract requireAccessible(UUID id) {
         var entity = require(id);
         var user = requireCurrentUser();
@@ -465,6 +484,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireOwner}）。
+     */
     private Contract requireOwner(UUID id) {
         var entity = require(id);
         var user = requireCurrentUser();
@@ -474,6 +496,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return entity;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireCurrentUser}）。
+     */
     private SecurityUser requireCurrentUser() {
         var user = securityContextAccessor.currentUser();
         if (user == null || user.getId() == null || user.getDepartmentId() == null) {
@@ -482,21 +507,33 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return user;
     }
 
+    /**
+     * 创建或构建目标数据（{@code generateContractNo}）。
+     */
     private String generateContractNo() {
         return "HT" + LocalDate.now(ZoneOffset.UTC).format(CONTRACT_NO_DATE)
                 + UUID.randomUUID().toString().replace("-", "").substring(0, 8).toUpperCase();
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateDates}）。
+     */
     private void validateDates(Instant startDate, Instant endDate) {
         if (startDate != null && endDate != null && endDate.isBefore(startDate)) {
             throw new DataSaveException("合同到期日期不能早于生效日期");
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeAmount}）。
+     */
     private BigDecimal normalizeAmount(BigDecimal amount) {
         return amount == null ? BigDecimal.ZERO.setScale(2) : amount.setScale(2, RoundingMode.HALF_UP);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeVisibility}）。
+     */
     private String normalizeVisibility(String value) {
         var normalized = normalize(value, "DEPARTMENT");
         if (!List.of("PUBLIC", "DEPARTMENT", "PRIVATE").contains(normalized)) {
@@ -505,10 +542,16 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         return normalized;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private String normalize(String value, String defaultValue) {
         return StringUtils.hasText(value) ? value.trim().toUpperCase() : defaultValue;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code trimToNull}）。
+     */
     private String trimToNull(String value) {
         return StringUtils.hasText(value) ? value.trim() : null;
     }

@@ -33,6 +33,10 @@ public class FileUploadException extends SpectraException {
         super(message);
     }
 
+    public FileUploadException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public FileUploadException(Throwable cause) {
         super(cause);
     }

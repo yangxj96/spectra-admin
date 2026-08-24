@@ -197,12 +197,18 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         initializationTokenManager.clear();
     }
 
+    /**
+     * 查询或获取目标数据（{@code findExistingUser}）。
+     */
     private User findExistingUser(String username) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
                 .eq(User::getEmail, username)
                 .last("LIMIT 1"));
     }
 
+    /**
+     * 查询或获取目标数据（{@code loadState}）。
+     */
     private SystemState loadState(boolean lock) {
         SystemState state = lock
                 ? stateMapper.selectForUpdateByStateKey(SystemStateKeys.SYSTEM)
@@ -214,11 +220,17 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         return state;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code lockInitialization}）。
+     */
     private void lockInitialization() {
         jdbcTemplate.query("SELECT pg_advisory_xact_lock(hashtext('" + ADVISORY_LOCK + "'))",
                 resultSet -> null);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireInitializationChallenge}）。
+     */
     private MfaLoginChallenge requireInitializationChallenge(String initializationId, boolean completed) {
         UUID challengeUuid;
         try {
@@ -239,6 +251,9 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         return challenge;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code requireChallengePort}）。
+     */
     private SecurityMfaChallengePort requireChallengePort() {
         SecurityMfaChallengePort port = challengeProvider.getIfAvailable();
         if (port == null) {
@@ -247,10 +262,16 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         return port;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private String normalize(String value) {
         return value == null ? "" : value.trim();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code resolveInitialSystemSettings}）。
+     */
     private InitialSystemSettings resolveInitialSystemSettings(SystemInitializationStartFrom from) {
         String systemName = normalize(from.getSystemName());
         if (systemName.isBlank()) {
@@ -275,7 +296,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         try {
             ZoneId.of(defaultTimezone);
         } catch (RuntimeException exception) {
-            throw new DataSaveException("默认时区无效");
+            throw new DataSaveException("默认时区无效", exception);
         }
         String securityProfile = normalize(from.getSecurityProfile());
         if (securityProfile.isBlank()) {
@@ -288,6 +309,9 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 defaultTimezone, securityProfile);
     }
 
+    /**
+     * 更新或推进目标状态（{@code saveInitialSystemSettings}）。
+     */
     private void saveInitialSystemSettings(InitialSystemSettings settings) {
         configuredService.upsert(SystemConfigKeys.SYSTEM_NAME, settings.systemName(), ConfiguredValueType.TEXT,
                 "系统名称");

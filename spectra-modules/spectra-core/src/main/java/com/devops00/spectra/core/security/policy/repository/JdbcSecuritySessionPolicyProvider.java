@@ -66,6 +66,9 @@ public class JdbcSecuritySessionPolicyProvider implements SecuritySessionPolicyP
         }
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toLong}）。
+     */
     private static Long toLong(Integer value) {
         return value == null ? null : value.longValue();
     }

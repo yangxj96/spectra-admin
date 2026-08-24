@@ -73,6 +73,9 @@ public class PasswordCredentialServiceImpl implements PasswordCredentialService 
         update(credential, passwordHash, mustChange, expiresAt);
     }
 
+    /**
+     * 更新或推进目标状态（{@code update}）。
+     */
     private void update(PasswordCredential credential, String passwordHash, boolean mustChange, Instant expiresAt) {
         credential.setPasswordHash(passwordHash);
         credential.setChangedAt(Instant.now());

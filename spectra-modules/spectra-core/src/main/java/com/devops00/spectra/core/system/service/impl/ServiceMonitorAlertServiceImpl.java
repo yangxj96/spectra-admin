@@ -68,6 +68,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     private final TimeMapper timeMapper;
     private Optional<NotificationService> notificationService = Optional.empty();
 
+    /**
+     * 更新或推进目标状态（{@code setNotificationService}）。
+     */
     @Autowired(required = false)
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = Optional.ofNullable(notificationService);
@@ -91,6 +94,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code evaluateRule}）。
+     */
     private void evaluateRule(ServiceMonitorAlertRule rule, ServiceMonitorSample sample) {
         var observation = observe(rule, sample);
         if (observation == null) {
@@ -115,6 +121,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code observe}）。
+     */
     private Observation observe(ServiceMonitorAlertRule rule, ServiceMonitorSample sample) {
         var metric = ServiceMonitorAlertMetric.fromCode(rule.getMetricCode());
         if (metric == null) {
@@ -151,6 +160,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 metric.getLabel() + (violated ? "异常" : "已恢复") + "：当前状态 " + current);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code dependencyStatus}）。
+     */
     private static String dependencyStatus(ServiceMonitorSample sample, ServiceMonitorAlertMetric metric) {
         return switch (metric) {
             case DATABASE_STATUS -> normalizeDependencyStatus(sample.getDatabaseStatus());
@@ -159,10 +171,16 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         };
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizeDependencyStatus}）。
+     */
     private static String normalizeDependencyStatus(String status) {
         return status == null || status.isBlank() ? ServiceMonitorDependencyStatus.UNKNOWN.name() : status;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code compare}）。
+     */
     private static boolean compare(double value, Double threshold, String operator) {
         if (threshold == null) {
             return false;
@@ -178,6 +196,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         };
     }
 
+    /**
+     * 处理内部业务逻辑（{@code compare}）。
+     */
     private static boolean compare(String value, String expected, String operator) {
         if (expected == null) {
             return false;
@@ -189,6 +210,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 : parsedOperator == ServiceMonitorAlertOperator.EQ && same;
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code parseOperator}）。
+     */
     private static ServiceMonitorAlertOperator parseOperator(String value, ServiceMonitorAlertOperator defaultValue) {
         if (value == null || value.isBlank()) {
             return defaultValue;
@@ -200,6 +224,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code metricUnit}）。
+     */
     private static String metricUnit(ServiceMonitorAlertMetric metric) {
         return switch (metric) {
             case CPU_USAGE, SYSTEM_MEMORY_USAGE, JVM_HEAP_USAGE, ERROR_RATE -> "%";
@@ -208,6 +235,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         };
     }
 
+    /**
+     * 查询或获取目标数据（{@code findActiveEvent}）。
+     */
     private ServiceMonitorAlertEvent findActiveEvent(UUID ruleId) {
         return eventMapper.selectOne(new LambdaQueryWrapper<ServiceMonitorAlertEvent>()
                 .eq(ServiceMonitorAlertEvent::getRuleId, ruleId)
@@ -217,6 +247,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .last("LIMIT 1"));
     }
 
+    /**
+     * 创建或构建目标数据（{@code createEvent}）。
+     */
     private ServiceMonitorAlertEvent createEvent(ServiceMonitorAlertRule rule, Observation observation) {
         var now = Instant.now();
         var event = new ServiceMonitorAlertEvent();
@@ -237,6 +270,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         return event;
     }
 
+    /**
+     * 更新或推进目标状态（{@code updateActiveEvent}）。
+     */
     private ServiceMonitorAlertEvent updateActiveEvent(ServiceMonitorAlertEvent event, Observation observation) {
         event.setCurrentValue(observation.currentValue());
         event.setMessage(observation.message());
@@ -246,6 +282,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         return event;
     }
 
+    /**
+     * 判断条件是否满足（{@code shouldNotify}）。
+     */
     private boolean shouldNotify(ServiceMonitorAlertEvent event, ServiceMonitorAlertRule rule) {
         var consecutiveFailures = Math.max(rule.getConsecutiveFailures() == null ? 1 : rule.getConsecutiveFailures(), 1);
         var occurrenceCount = event.getOccurrenceCount() == null ? 0 : event.getOccurrenceCount();
@@ -257,6 +296,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         return last == null || Duration.between(last, Instant.now()).getSeconds() >= cooldown;
     }
 
+    /**
+     * 执行内部处理逻辑（{@code notifyOperators}）。
+     */
     private void notifyOperators(ServiceMonitorAlertEvent event) {
         if (notificationService.isEmpty() || event.getId() == null) {
             return;
@@ -352,6 +394,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         }
     }
 
+    /**
+     * 处理内部业务逻辑（{@code recoverActiveEventWhenRuleDisabled}）。
+     */
     private void recoverActiveEventWhenRuleDisabled(UUID ruleId) {
         var event = findActiveEvent(ruleId);
         if (event == null) {
@@ -363,6 +408,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         eventMapper.updateById(event);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code validateRule}）。
+     */
     private static void validateRule(ServiceMonitorAlertRuleFrom from, String metricCode) {
         var metric = ServiceMonitorAlertMetric.fromCode(metricCode);
         if (metric == null)
@@ -424,6 +472,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toRuleVO}）。
+     */
     private ServiceMonitorAlertRuleVO toRuleVO(ServiceMonitorAlertRule rule) {
         var metric = ServiceMonitorAlertMetric.fromCode(rule.getMetricCode());
         return ServiceMonitorAlertRuleVO.builder()
@@ -445,6 +496,9 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .build();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code toEventVO}）。
+     */
     private ServiceMonitorAlertEventVO toEventVO(ServiceMonitorAlertEvent event) {
         return ServiceMonitorAlertEventVO.builder()
                 .id(event.getId())

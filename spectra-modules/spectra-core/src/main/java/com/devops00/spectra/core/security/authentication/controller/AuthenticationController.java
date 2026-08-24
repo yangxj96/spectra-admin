@@ -74,6 +74,9 @@ public class AuthenticationController {
         WebCookiePolicy.validate(securityProperties);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code login}）。
+     */
     @ULog(value = "'用户[' + #params.username + ']进行登陆'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
@@ -85,6 +88,9 @@ public class AuthenticationController {
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code verifyMfa}）。
+     */
     @ULog(value = "'完成 MFA 登录验证'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
@@ -96,6 +102,9 @@ public class AuthenticationController {
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code completeMfaEnrollment}）。
+     */
     @ULog(value = "'完成首次 MFA 登记登录'", type = SysLogType.SAFETY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
@@ -127,6 +136,9 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendSms}）。
+     */
     @ULog(value = "'发送短信验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/sms", version = "1.0.0")
@@ -135,6 +147,9 @@ public class AuthenticationController {
         verificationCodeService.sendSmsCode(params.getPhone());
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendEmail}）。
+     */
     @ULog(value = "'发送邮箱验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/email", version = "1.0.0")
@@ -143,6 +158,9 @@ public class AuthenticationController {
         verificationCodeService.sendEmailCode(params.getEmail());
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendBindingSms}）。
+     */
     @ULog(value = "'发送绑定手机号验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/bind/sms", version = "1.0.0")
@@ -151,6 +169,9 @@ public class AuthenticationController {
         verificationCodeService.sendBindingSmsCode(params.getPhone());
     }
 
+    /**
+     * 更新或推进目标状态（{@code sendBindingEmail}）。
+     */
     @ULog(value = "'发送绑定邮箱验证码'", type = SysLogType.SAFETY)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/bind/email", version = "1.0.0")

@@ -51,8 +51,14 @@ public abstract class EmailAuthenticationProvider implements BasicAuthentication
         return login(email, code);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code login}）。
+     */
     public abstract Authentication login(String email, String code) throws AuthenticationException;
 
+    /**
+     * 处理内部业务逻辑（{@code kaptchaValidate}）。
+     */
     public abstract void kaptchaValidate(String email, String kaptcha);
 
     @Override

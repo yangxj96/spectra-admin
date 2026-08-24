@@ -35,6 +35,9 @@ public class ResourceAuthorizationGuard {
         this.provider = provider;
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code assertAllowed}）。
+     */
     public void assertAllowed(ExecutionContext context, ScopeQuery query) {
         if (context == null || query == null) {
             throw new DataScopeViolationException("资源授权上下文不完整");
@@ -47,6 +50,9 @@ public class ResourceAuthorizationGuard {
         assertAllowed(new ScopedAuthorization(context.subjectId(), snapshot), context, query);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code assertBatchAllowed}）。
+     */
     public void assertBatchAllowed(ExecutionContext context, Collection<ScopeQuery> queries) {
         if (queries == null || queries.isEmpty()) {
             throw new DataScopeViolationException("批量资源集合不能为空");
@@ -56,6 +62,9 @@ public class ResourceAuthorizationGuard {
         }
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code assertExportAllowed}）。
+     */
     public void assertExportAllowed(ExecutionContext context, Collection<ScopeQuery> queries) {
         if (context == null || context.operation() != ResourceOperation.EXPORT) {
             throw new DataScopeViolationException("导出操作必须使用 EXPORT Permission");
@@ -63,6 +72,9 @@ public class ResourceAuthorizationGuard {
         assertBatchAllowed(context, queries);
     }
 
+    /**
+     * 校验并确保数据满足当前约束（{@code assertAllowed}）。
+     */
     public static void assertAllowed(ScopedAuthorization authorization, ExecutionContext context, ScopeQuery query) {
         if (!authorization.allows(context, query)) {
             throw new DataScopeViolationException("资源不在当前 Permission 的 Access Boundary 内");

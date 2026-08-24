@@ -67,53 +67,89 @@ public class NotificationModuleProperties {
     public NotificationModuleProperties() {
     }
 
+    /**
+     * 更新或推进目标状态（{@code setSystemConfigValueProvider}）。
+     */
     @Autowired(required = false)
     public void setSystemConfigValueProvider(SystemConfigValueProvider systemConfigValueProvider) {
         this.systemConfigValueProvider = systemConfigValueProvider;
     }
 
+    /**
+     * 处理内部业务逻辑（{@code enabled}）。
+     */
     public boolean enabled() {
         return systemValue("notification.enabled").map(Boolean::parseBoolean).orElse(enabled);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code addressEncryptionKey}）。
+     */
     public String addressEncryptionKey() {
         return systemValue("notification.address-encryption-key").orElse(normalize(addressEncryptionKey));
     }
 
+    /**
+     * 处理内部业务逻辑（{@code sensitivePayloadKey}）。
+     */
     public String sensitivePayloadKey() {
         return systemValue("notification.sensitive-payload-key").orElse(normalize(sensitivePayloadKey));
     }
 
+    /**
+     * 查询或获取目标数据（{@code allowedLinkPrefixes}）。
+     */
     public List<String> allowedLinkPrefixes() {
         return systemValue("notification.allowed-link-prefixes")
                 .map(value -> normalizePrefixes(Arrays.asList(value.split(","))))
                 .orElseGet(() -> normalizePrefixes(allowedLinkPrefixes));
     }
 
+    /**
+     * 更新或推进目标状态（{@code setEnabled}）。
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setAddressEncryptionKey}）。
+     */
     public void setAddressEncryptionKey(String addressEncryptionKey) {
         this.addressEncryptionKey = addressEncryptionKey;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setSensitivePayloadKey}）。
+     */
     public void setSensitivePayloadKey(String sensitivePayloadKey) {
         this.sensitivePayloadKey = sensitivePayloadKey;
     }
 
+    /**
+     * 更新或推进目标状态（{@code setAllowedLinkPrefixes}）。
+     */
     public void setAllowedLinkPrefixes(List<String> allowedLinkPrefixes) {
-        this.allowedLinkPrefixes = allowedLinkPrefixes;
+        this.allowedLinkPrefixes = normalizePrefixes(allowedLinkPrefixes);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code systemValue}）。
+     */
     private Optional<String> systemValue(String key) {
         return systemConfigValueProvider == null ? Optional.empty() : systemConfigValueProvider.find(key);
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalize}）。
+     */
     private static String normalize(String value) {
         return value == null ? "" : value.trim();
     }
 
+    /**
+     * 转换、解析或规范化数据（{@code normalizePrefixes}）。
+     */
     private static List<String> normalizePrefixes(List<String> values) {
         if (values == null || values.isEmpty()) {
             return DEFAULT_ALLOWED_LINK_PREFIXES;

@@ -25,6 +25,9 @@ public interface SecuritySessionRevoker {
 
     /** 撤销用户除指定 Access Token 外的其他会话。 */
     default void deleteByUserIdExceptToken(UUID userId, String accessToken) {
+        /**
+         * 更新或推进目标状态（{@code deleteByUserId}）。
+         */
         deleteByUserId(userId);
     }
 

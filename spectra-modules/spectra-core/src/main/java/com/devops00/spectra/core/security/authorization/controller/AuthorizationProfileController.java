@@ -52,6 +52,9 @@ public class AuthorizationProfileController {
 
     private final AuthorizationProfileService profileService;
 
+    /**
+     * 查询或获取目标数据（{@code all}）。
+     */
     @ULog("'查询授权方案列表'")
     @GetMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -59,6 +62,9 @@ public class AuthorizationProfileController {
         return profileService.all();
     }
 
+    /**
+     * 查询或获取目标数据（{@code detail}）。
+     */
     @ULog("'查询授权方案详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
@@ -66,6 +72,9 @@ public class AuthorizationProfileController {
         return profileService.detail(id);
     }
 
+    /**
+     * 创建或构建目标数据（{@code created}）。
+     */
     @ULog("'创建授权方案'")
     @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
@@ -73,6 +82,9 @@ public class AuthorizationProfileController {
         profileService.created(params);
     }
 
+    /**
+     * 更新或推进目标状态（{@code modify}）。
+     */
     @ULog("'修改授权方案'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
@@ -81,6 +93,9 @@ public class AuthorizationProfileController {
         profileService.modify(id, params);
     }
 
+    /**
+     * 处理内部业务逻辑（{@code enable}）。
+     */
     @ULog("'启用授权方案'")
     @PutMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
@@ -88,6 +103,9 @@ public class AuthorizationProfileController {
         profileService.enable(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code disable}）。
+     */
     @ULog("'停用授权方案'")
     @PutMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
@@ -95,6 +113,9 @@ public class AuthorizationProfileController {
         profileService.disable(id);
     }
 
+    /**
+     * 更新或推进目标状态（{@code deleteById}）。
+     */
     @ULog("'删除授权方案'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")

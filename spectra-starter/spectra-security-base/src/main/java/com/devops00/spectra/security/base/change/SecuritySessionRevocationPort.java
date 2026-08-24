@@ -40,6 +40,9 @@ public interface SecuritySessionRevocationPort {
      * 未提供专用实现时默认退化为撤销全部 Session。</p>
      */
     default void revokeUserSessionsExceptToken(UUID userId, String accessToken) {
+        /**
+         * 更新或推进目标状态（{@code revokeUserSessions}）。
+         */
         revokeUserSessions(userId);
     }
 }

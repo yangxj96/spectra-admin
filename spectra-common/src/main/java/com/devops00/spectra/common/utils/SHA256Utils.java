@@ -23,7 +23,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HexFormat;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -39,6 +38,8 @@ public final class SHA256Utils {
     private static final String SHA_256 = "SHA-256";
 
     private static final String HMAC_SHA_256 = "HmacSHA256";
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private SHA256Utils() {
     }
@@ -73,7 +74,7 @@ public final class SHA256Utils {
      */
     public static String generateNonce() {
         byte[] nonce = new byte[16];
-        new SecureRandom().nextBytes(nonce);
+        SECURE_RANDOM.nextBytes(nonce);
         return Base64.getEncoder().encodeToString(nonce);
     }
 }
