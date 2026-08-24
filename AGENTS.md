@@ -110,15 +110,18 @@ spectra-launch       → 应用入口，运行此模块
 - 统一格式配置：`config/eclipse-java-formatter.xml`
 - Java 缩进：4 个空格，不使用 Tab
 - Java 右边距：150 列
-- Maven 格式化：`.\mvnw.cmd spotless:apply`
-- Maven 校验：`.\mvnw.cmd verify`
+- Maven 格式化：模块完成时执行 `.\mvnw.cmd -pl spectra-core -am spotless:apply`，提交前执行全项目 `.\mvnw.cmd spotless:apply`
+- Maven 快速校验：按需执行 `.\mvnw.cmd -pl spectra-core -am compile` 或 `.\mvnw.cmd -pl spectra-core -am test`（将 `spectra-core` 替换为实际模块）
+- Maven 模块质量校验：`.\mvnw.cmd verify -pl spectra-core -am`（将 `spectra-core` 替换为实际模块）
+- Maven 全项目质量校验：`.\mvnw.cmd verify`（提交代码前执行）
 - Spotless 使用 Eclipse JDT Formatter，不依赖本机 IDEA 或其他 IDE 的可执行文件；IDEA 侧可导入同一份 Eclipse formatter XML 作为编辑器格式来源
 - 当前使用 `origin/master` 作为渐进校验基线；需要全量校验时执行 `.\mvnw.cmd spotless:check "-Dspotless.ratchetFrom=NONE"`。PowerShell 中必须给该系统属性加引号，避免 Maven 将其误解析为生命周期阶段
 
 ### 本地代码质量门禁
 
 - `Spotless` 只负责 Java 格式化和 import 整理；`Checkstyle` 负责命名、import 合法性和基础语义约定；`PMD` 负责源码级坏味道、复杂度和异常处理；`SpotBugs` 负责字节码 Bug 模式，FindSecBugs 作为其安全插件；`ArchUnit` 通过 JUnit 测试约束模块分层。
-- 修改 Java 后执行 `.\mvnw.cmd spotless:apply`，再执行 `.\mvnw.cmd verify`。`verify` 是统一门禁，必须同时通过 Spotless、Checkstyle、PMD、SpotBugs/FindSecBugs、ArchUnit 和 JUnit。
+- 开发阶段遵循“先实现、后整理”：不要求每次修改 Java 都执行完整 `verify`，优先按需运行目标模块的 `compile` 或 `test` 获取快速反馈。
+- 模块完成或提交代码前执行格式整理；模块完成时执行 `.\mvnw.cmd -pl spectra-core -am spotless:apply` 和 `.\mvnw.cmd verify -pl spectra-core -am`（将 `spectra-core` 替换为实际模块），提交前执行全项目 `.\mvnw.cmd spotless:apply` 和 `.\mvnw.cmd verify`。`verify` 是统一门禁，必须同时通过 Spotless、Checkstyle、PMD、SpotBugs/FindSecBugs、ArchUnit 和 JUnit。
 - 任一检查失败时，阅读完整错误信息，定位源码并修复根因后重跑；不得使用 `skip`、`exclude`、`failOnViolation=false` 或无理由的 suppression 绕过合理问题。仅生成代码或已确认的工具误报可以精确过滤，并在 `config/spotbugs/exclude.xml` 说明原因。
 - PMD 的复杂度阈值是现有历史编排代码的迁移基线（方法 30、类 200、NPath 10000），新增代码不得以此扩大复杂度，后续应逐步降低阈值。
 
