@@ -108,7 +108,7 @@ class SecurityFlywayPostgresIntegrationTest {
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery("SELECT COUNT(*) FROM spectra_security.sec_permission")) {
                 resultSet.next();
-                assertEquals(115, resultSet.getInt(1));
+                assertEquals(122, resultSet.getInt(1));
             }
             try (var statement = connection.createStatement();
                     var resultSet = statement.executeQuery(

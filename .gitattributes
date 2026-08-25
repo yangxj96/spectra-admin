@@ -86,4 +86,4 @@ bun.lockb binary
 *.dll   binary
 # Git LFS（大文件存储）
 *.dump filter=lfs diff=lfs merge=lfs -text
-spectra-config/src/main/resources/db/migration/V1__init_target_schema.sql filter=lfs diff=lfs merge=lfs -text
+spectra-config/src/main/resources/db/migration/V1__init_db.sql filter=lfs diff=lfs merge=lfs -text

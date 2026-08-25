@@ -176,13 +176,14 @@ class SecuritySchemaContractTest {
 
     @Test
     void assignmentBoundaryUniquenessMustIgnoreSoftDeletedHistory() throws IOException {
-        String migration = readMigration("V15__allow_replacing_assignment_boundaries.sql");
+        String migration = readV1();
 
-        assertTrue(migration.contains("DROP CONSTRAINT IF EXISTS uk_sec_assignment_permission_boundary_assignment_permission"));
-        assertTrue(migration.contains("DROP CONSTRAINT IF EXISTS uk_sec_assignment_grant_boundary_assignment_permission"));
-        assertTrue(migration.contains("ON spectra_security.sec_assignment_permission_boundary (assignment_id, permission_id)"));
-        assertTrue(migration.contains("ON spectra_security.sec_assignment_grant_boundary (assignment_id, permission_id)"));
-        assertEquals(2, migration.lines().filter(line -> line.trim().equals("WHERE deleted IS NULL;")).count());
+        assertTrue(migration.contains("CREATE UNIQUE INDEX uk_sec_assignment_permission_boundary_assignment_permission"));
+        assertTrue(migration.contains("CREATE UNIQUE INDEX uk_sec_assignment_grant_boundary_assignment_permission"));
+        assertTrue(migration.contains(
+                "ON spectra_security.sec_assignment_permission_boundary USING btree (assignment_id, permission_id) WHERE (deleted IS NULL);"));
+        assertTrue(migration
+                .contains("ON spectra_security.sec_assignment_grant_boundary USING btree (assignment_id, permission_id) WHERE (deleted IS NULL);"));
     }
 
     private String readSql() throws IOException {
@@ -200,7 +201,7 @@ class SecuritySchemaContractTest {
     }
 
     private String readV1() throws IOException {
-        return readMigration("V1__init_target_schema.sql");
+        return readMigration("V1__init_db.sql");
     }
 
     private String readCatalog() throws IOException {
