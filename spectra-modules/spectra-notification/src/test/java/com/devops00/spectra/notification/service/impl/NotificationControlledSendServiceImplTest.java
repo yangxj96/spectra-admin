@@ -26,7 +26,6 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
-import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.notification.javabean.entity.NotificationSendPreviewEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTemplateEntity;
@@ -43,12 +42,12 @@ import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.apache.ibatis.builder.MapperBuilderAssistant;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.ObjectTypeHandler;
+import org.mockito.ArgumentCaptor;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.PropertyNamingStrategies;
+import tools.jackson.databind.json.JsonMapper;
 
-import java.time.ZoneOffset;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,6 +71,8 @@ class NotificationControlledSendServiceImplTest {
 
     private static final UUID TEMPLATE_ID = UUID.randomUUID();
 
+    private static final UUID EMAIL_TEMPLATE_ID = UUID.randomUUID();
+
     @BeforeAll
     static void registerMybatisLambdaMetadata() {
         var configuration = new MybatisConfiguration();
@@ -93,8 +94,7 @@ class NotificationControlledSendServiceImplTest {
         var security = mock(SecurityContextAccessor.class);
         var template = template();
         var request = request();
-        var preview = new NotificationSendPreviewEntity();
-        preview.setId(UUID.randomUUID());
+        var previewCaptor = ArgumentCaptor.forClass(NotificationSendPreviewEntity.class);
         when(security.currentUserId()).thenReturn(OPERATOR_ID);
         when(templateMapper.selectById(TEMPLATE_ID)).thenReturn(template);
         when(audienceDirectory.resolve(any())).thenReturn(List.of(RECIPIENT_ID));
@@ -103,7 +103,7 @@ class NotificationControlledSendServiceImplTest {
         when(preferenceMapper.selectList(any())).thenReturn(List.of(preference()));
         when(gateway.availability(NotificationChannel.SMS))
                 .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
-        when(previewMapper.insert(any(NotificationSendPreviewEntity.class))).thenReturn(1);
+        when(previewMapper.insert(previewCaptor.capture())).thenReturn(1);
         when(previewMapper.update(any(), any())).thenReturn(1);
         when(previewMapper.updateById(any(NotificationSendPreviewEntity.class))).thenReturn(1);
         when(gateway.enqueue(any(), any())).thenReturn(new NotificationReceipt(UUID.randomUUID(), "ACCEPTED", 1, false));
@@ -112,15 +112,8 @@ class NotificationControlledSendServiceImplTest {
         var service = service(previewMapper, taskMapper, templateMapper, preferenceMapper, gateway,
                 audienceDirectory, recipientDirectory, security);
         var result = service.preview(request);
+        var preview = previewCaptor.getValue();
         when(previewMapper.selectById(result.previewId())).thenReturn(preview);
-        preview.setId(result.previewId());
-        preview.setOperatorUserId(OPERATOR_ID);
-        preview.setRequestHash(result.requestHash());
-        preview.setPreviewTokenHash(hash(result.previewToken()));
-        preview.setResolutionHash(hash(List.of(RECIPIENT_ID + ":SMS:null")));
-        preview.setRequestSnapshot(snapshot(request));
-        preview.setExpiresAt(result.expiresAt().toInstant(ZoneOffset.UTC));
-        preview.setStatus("PREVIEWED");
 
         var apply = new NotificationControlledSendApplyFrom();
         apply.setPreviewId(result.previewId());
@@ -135,6 +128,91 @@ class NotificationControlledSendServiceImplTest {
         verify(gateway, times(1)).enqueue(any(), any());
     }
 
+    @Test
+    void shouldAllowInAppWhenOptionalPreferenceIsMissing() {
+        var previewMapper = mock(NotificationSendPreviewMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var gateway = mock(NotificationGateway.class);
+        var audienceDirectory = mock(NotificationAudienceDirectory.class);
+        var recipientDirectory = mock(NotificationRecipientDirectory.class);
+        var security = mock(SecurityContextAccessor.class);
+        var template = template();
+        template.setChannel(NotificationChannel.IN_APP.name());
+        var request = request();
+        request.setChannels(List.of(NotificationChannel.IN_APP));
+        request.setTemplateVersionIds(Map.of(NotificationChannel.IN_APP, TEMPLATE_ID));
+        when(security.currentUserId()).thenReturn(OPERATOR_ID);
+        when(templateMapper.selectById(TEMPLATE_ID)).thenReturn(template);
+        when(audienceDirectory.resolve(any())).thenReturn(List.of(RECIPIENT_ID));
+        when(recipientDirectory.resolve(List.of(RECIPIENT_ID)))
+                .thenReturn(List.of(new NotificationRecipient(RECIPIENT_ID, null, null, true, true, "Asia/Shanghai")));
+        when(preferenceMapper.selectList(any())).thenReturn(List.of());
+        when(gateway.availability(NotificationChannel.IN_APP))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.IN_APP, true, "AVAILABLE"));
+        when(previewMapper.insert(any(NotificationSendPreviewEntity.class))).thenReturn(1);
+
+        var service = service(previewMapper, taskMapper, templateMapper, preferenceMapper, gateway,
+                audienceDirectory, recipientDirectory, security);
+        var result = service.preview(request);
+
+        assertEquals(1, result.eligibleTaskCount());
+        assertEquals(0, result.skippedTaskCount());
+        assertTrue(result.skippedCounts().isEmpty());
+    }
+
+    @Test
+    void shouldKeepSkippedReasonsSeparatedByChannel() {
+        var previewMapper = mock(NotificationSendPreviewMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var templateMapper = mock(NotificationTemplateMapper.class);
+        var preferenceMapper = mock(NotificationUserPreferenceMapper.class);
+        var gateway = mock(NotificationGateway.class);
+        var audienceDirectory = mock(NotificationAudienceDirectory.class);
+        var recipientDirectory = mock(NotificationRecipientDirectory.class);
+        var security = mock(SecurityContextAccessor.class);
+        var emailTemplate = template();
+        emailTemplate.setId(EMAIL_TEMPLATE_ID);
+        emailTemplate.setChannel(NotificationChannel.EMAIL.name());
+        var request = request();
+        request.setIdempotencyKey("controlled:multi-channel");
+        request.setChannels(List.of(NotificationChannel.SMS, NotificationChannel.EMAIL));
+        request.setTemplateVersionIds(Map.of(NotificationChannel.SMS, TEMPLATE_ID,
+                NotificationChannel.EMAIL, EMAIL_TEMPLATE_ID));
+        when(security.currentUserId()).thenReturn(OPERATOR_ID);
+        when(templateMapper.selectById(TEMPLATE_ID)).thenReturn(template());
+        when(templateMapper.selectById(EMAIL_TEMPLATE_ID)).thenReturn(emailTemplate);
+        when(audienceDirectory.resolve(any())).thenReturn(List.of(RECIPIENT_ID));
+        when(recipientDirectory.resolve(List.of(RECIPIENT_ID)))
+                .thenReturn(List.of(new NotificationRecipient(RECIPIENT_ID, "13800138000", "user@example.com", true, true,
+                        "Asia/Shanghai")));
+        when(preferenceMapper.selectList(any()))
+                .thenReturn(List.of(preference(NotificationChannel.SMS, false), preference(NotificationChannel.EMAIL, false)));
+        when(gateway.availability(NotificationChannel.SMS))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.SMS, true, "AVAILABLE"));
+        when(gateway.availability(NotificationChannel.EMAIL))
+                .thenReturn(new NotificationChannelAvailability(NotificationChannel.EMAIL, true, "AVAILABLE"));
+        when(previewMapper.insert(any(NotificationSendPreviewEntity.class))).thenReturn(1);
+
+        var service = service(previewMapper, taskMapper, templateMapper, preferenceMapper, gateway,
+                audienceDirectory, recipientDirectory, security);
+        var result = service.preview(request);
+
+        assertEquals(2, result.skippedTaskCount());
+        assertEquals(2, result.skippedDetails().size());
+        assertTrue(result.skippedDetails()
+                .stream()
+                .anyMatch(detail -> detail.channel() == NotificationChannel.SMS
+                        && "PREFERENCE_DISABLED_OR_QUIET".equals(detail.reason())
+                        && detail.count() == 1));
+        assertTrue(result.skippedDetails()
+                .stream()
+                .anyMatch(detail -> detail.channel() == NotificationChannel.EMAIL
+                        && "PREFERENCE_DISABLED_OR_QUIET".equals(detail.reason())
+                        && detail.count() == 1));
+    }
+
     private NotificationControlledSendServiceImpl service(NotificationSendPreviewMapper previewMapper,
                                                           NotificationTaskMapper taskMapper,
                                                           NotificationTemplateMapper templateMapper,
@@ -145,7 +223,9 @@ class NotificationControlledSendServiceImplTest {
                                                           SecurityContextAccessor security) {
         return new NotificationControlledSendServiceImpl(previewMapper, taskMapper, templateMapper, preferenceMapper,
                 gateway, audienceDirectory, recipientDirectory, new com.devops00.spectra.notification.strategy.NotificationPolicy(),
-                new NotificationTemplateRenderer(), security, new ObjectMapper(), NotificationTestTimeMapper.create());
+                new NotificationTemplateRenderer(), security,
+                JsonMapper.builder().propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE).build(),
+                NotificationTestTimeMapper.create());
     }
 
     private NotificationControlledSendFrom request() {
@@ -176,30 +256,17 @@ class NotificationControlledSendServiceImplTest {
     }
 
     private NotificationUserPreferenceEntity preference() {
+        return preference(NotificationChannel.SMS, true);
+    }
+
+    private NotificationUserPreferenceEntity preference(NotificationChannel channel, boolean enabled) {
         var preference = new NotificationUserPreferenceEntity();
         preference.setUserId(RECIPIENT_ID);
         preference.setPurpose(NotificationPurpose.SYSTEM_NOTICE.name());
-        preference.setChannel(NotificationChannel.SMS.name());
-        preference.setEnabled(true);
+        preference.setChannel(channel.name());
+        preference.setEnabled(enabled);
         preference.setDoNotDisturb(false);
         return preference;
     }
 
-    private Map<String, Object> snapshot(NotificationControlledSendFrom request) {
-        return new LinkedHashMap<>(Map.of(
-                "idempotencyKey", request.getIdempotencyKey(),
-                "purpose", request.getPurpose().name(),
-                "channels", List.of(NotificationChannel.SMS.name()),
-                "templateVersionIds", Map.of(NotificationChannel.SMS.name(), TEMPLATE_ID.toString()),
-                "audience", Map.of("userIds", List.of(RECIPIENT_ID.toString()), "departmentIds", List.of(), "roleIds", List.of()),
-                "parameters", request.getParameters()));
-    }
-
-    private String hash(String value) {
-        return SHA256Utils.hash(value);
-    }
-
-    private String hash(List<String> values) {
-        return hash(String.join("|", values));
-    }
 }

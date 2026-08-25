@@ -42,6 +42,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationControlledSen
 import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendApplyVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendPreviewVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendSampleVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendSkippedDetailVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendTemplateVO;
 import com.devops00.spectra.notification.mapper.NotificationSendPreviewMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
@@ -69,7 +70,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -139,7 +139,8 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         }
         return new NotificationControlledSendPreviewVO(entity.getId(), token, entity.getRequestHash(),
                 timeMapper.toLocalDateTime(entity.getExpiresAt()), evaluation.candidateUserCount(), evaluation.eligibleTaskCount(),
-                evaluation.skippedTaskCount(), evaluation.skippedCounts(), evaluation.channelAvailability(),
+                evaluation.skippedTaskCount(), evaluation.skippedCounts(), evaluation.skippedDetails(),
+                evaluation.channelAvailability(),
                 prepared.templates(), evaluation.samples());
     }
 
@@ -274,6 +275,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
             availability.put(channel, notificationGateway.availability(channel));
         }
         var skipped = new LinkedHashMap<String, Integer>();
+        var skippedByChannel = new LinkedHashMap<NotificationChannel, Map<String, Integer>>();
         var samples = new ArrayList<NotificationControlledSendSampleVO>();
         var eligible = 0;
         var fingerprints = new ArrayList<String>();
@@ -292,13 +294,27 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
                     }
                 } else {
                     skipped.merge(reason, 1, Integer::sum);
+                    skippedByChannel.computeIfAbsent(channel, ignored -> new LinkedHashMap<>())
+                            .merge(reason, 1, Integer::sum);
                 }
             }
         }
         var total = recipients.size() * request.getChannels().size();
         fingerprints.sort(String::compareTo);
         return new Evaluation(candidateUserIds, candidateUserIds.size(), eligible, total - eligible, skipped,
+                skippedDetails(skippedByChannel),
                 availability, samples, hash(fingerprints));
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code skippedDetails}）。
+     */
+    private List<NotificationControlledSendSkippedDetailVO> skippedDetails(
+                                                                           Map<NotificationChannel, Map<String, Integer>> skippedByChannel) {
+        var details = new ArrayList<NotificationControlledSendSkippedDetailVO>();
+        skippedByChannel.forEach((channel, reasons) -> reasons
+                .forEach((reason, count) -> details.add(new NotificationControlledSendSkippedDetailVO(channel, reason, count))));
+        return List.copyOf(details);
     }
 
     /**
@@ -316,13 +332,16 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
         if (channel != NotificationChannel.IN_APP && recipient.addressFor(channel) == null) {
             return "MISSING_CHANNEL_ADDRESS";
         }
-        if (!policy.mandatory(purpose)
-                && (preference == null
-                        || !Boolean.TRUE.equals(preference.getEnabled())
-                        || NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
-                                Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
-                                NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone())))) {
-            return "PREFERENCE_DISABLED_OR_QUIET";
+        if (!policy.mandatory(purpose)) {
+            if (preference == null) {
+                return channel == NotificationChannel.IN_APP ? null : "PREFERENCE_DISABLED_OR_QUIET";
+            }
+            if (!Boolean.TRUE.equals(preference.getEnabled())
+                    || NotificationDoNotDisturbPolicy.isQuiet(Boolean.TRUE.equals(preference.getDoNotDisturb()),
+                            Instant.now(), preference.getDoNotDisturbStart(), preference.getDoNotDisturbEnd(),
+                            NotificationDoNotDisturbPolicy.resolveZone(recipient.timezone()))) {
+                return "PREFERENCE_DISABLED_OR_QUIET";
+            }
         }
         return null;
     }
@@ -401,39 +420,13 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
      * 处理内部业务逻辑（{@code snapshot}）。
      */
     private Map<String, Object> snapshot(NotificationControlledSendFrom params) {
-        var snapshot = new LinkedHashMap<String, Object>();
-        snapshot.put("idempotencyKey", params.getIdempotencyKey());
-        snapshot.put("purpose", params.getPurpose().name());
-        snapshot.put("channels", params.getChannels().stream().map(Enum::name).toList());
-        snapshot.put("templateVersionIds", params.getTemplateVersionIds()
-                .entrySet()
-                .stream()
-                .collect(
-                        Collectors.toMap(entry -> entry.getKey().name(), entry -> entry.getValue().toString(),
-                                (left, right) -> right, LinkedHashMap::new)));
-        var audience = new LinkedHashMap<String, Object>();
-        audience.put("userIds", ids(params.getAudience().getUserIds()));
-        audience.put("departmentIds", ids(params.getAudience().getDepartmentIds()));
-        audience.put("roleIds", ids(params.getAudience().getRoleIds()));
-        snapshot.put("audience", audience);
-        snapshot.put("parameters", params.getParameters());
-        if (params.getBusinessType() != null) {
-            snapshot.put("businessType", params.getBusinessType());
+        try {
+            return objectMapper.readValue(
+                    objectMapper.writeValueAsString(params),
+                    objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class));
+        } catch (RuntimeException exception) {
+            throw new DataSaveException("生成通知发送 Preview 快照失败", exception);
         }
-        if (params.getBusinessId() != null) {
-            snapshot.put("businessId", params.getBusinessId());
-        }
-        if (params.getLink() != null) {
-            snapshot.put("link", params.getLink());
-        }
-        return snapshot;
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code ids}）。
-     */
-    private List<String> ids(List<UUID> values) {
-        return values == null ? List.of() : values.stream().filter(Objects::nonNull).map(UUID::toString).toList();
     }
 
     /**
@@ -504,6 +497,7 @@ public class NotificationControlledSendServiceImpl implements NotificationContro
 
     private record Evaluation(List<UUID> candidateUserIds, int candidateUserCount, int eligibleTaskCount,
                               int skippedTaskCount, Map<String, Integer> skippedCounts,
+                              List<NotificationControlledSendSkippedDetailVO> skippedDetails,
                               Map<NotificationChannel, NotificationChannelAvailability> channelAvailability,
                               List<NotificationControlledSendSampleVO> samples, String resolutionHash) {
     }

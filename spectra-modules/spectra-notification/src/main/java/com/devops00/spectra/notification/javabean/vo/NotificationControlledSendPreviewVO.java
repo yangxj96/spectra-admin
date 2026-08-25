@@ -33,20 +33,27 @@ import java.util.UUID;
 public record NotificationControlledSendPreviewVO(UUID previewId, String previewToken, String requestHash,
                                                   LocalDateTime expiresAt, int candidateUserCount, int eligibleTaskCount,
                                                   int skippedTaskCount, Map<String, Integer> skippedCounts,
+                                                  List<NotificationControlledSendSkippedDetailVO> skippedDetails,
                                                   Map<NotificationChannel, NotificationChannelAvailability> channelAvailability,
                                                   Map<NotificationChannel, NotificationControlledSendTemplateVO> templates,
                                                   List<NotificationControlledSendSampleVO> samples) {
 
     public NotificationControlledSendPreviewVO {
         skippedCounts = immutableMap(skippedCounts);
+        skippedDetails = immutableList(skippedDetails);
         channelAvailability = immutableMap(channelAvailability);
         templates = immutableMap(templates);
-        samples = samples == null ? List.of() : Collections.unmodifiableList(new ArrayList<>(samples));
+        samples = immutableList(samples);
     }
 
     @Override
     public Map<String, Integer> skippedCounts() {
         return immutableMap(skippedCounts);
+    }
+
+    @Override
+    public List<NotificationControlledSendSkippedDetailVO> skippedDetails() {
+        return immutableList(skippedDetails);
     }
 
     @Override
@@ -61,7 +68,7 @@ public record NotificationControlledSendPreviewVO(UUID previewId, String preview
 
     @Override
     public List<NotificationControlledSendSampleVO> samples() {
-        return Collections.unmodifiableList(new ArrayList<>(samples));
+        return immutableList(samples);
     }
 
     /**
@@ -71,5 +78,14 @@ public record NotificationControlledSendPreviewVO(UUID previewId, String preview
         return source == null || source.isEmpty()
                 ? Map.of()
                 : Collections.unmodifiableMap(new LinkedHashMap<>(source));
+    }
+
+    /**
+     * 转换、解析或规范化数据（{@code immutableList}）。
+     */
+    private static <T> List<T> immutableList(List<T> source) {
+        return source == null || source.isEmpty()
+                ? List.of()
+                : Collections.unmodifiableList(new ArrayList<>(source));
     }
 }
