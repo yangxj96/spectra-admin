@@ -23,6 +23,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationTemplatePageF
 import com.devops00.spectra.notification.javabean.from.NotificationTemplatePreviewFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplateSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplatePreviewVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateVO;
 
 import java.util.List;
@@ -43,6 +44,11 @@ public interface NotificationTemplateService {
     IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params);
 
     /**
+     * 查询或获取目标数据（{@code groupPage}）。
+     */
+    IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params);
+
+    /**
      * 查询或获取目标数据（{@code detail}）。
      */
     NotificationTemplateVO detail(UUID id);
@@ -51,11 +57,6 @@ public interface NotificationTemplateService {
      * 创建或构建目标数据（{@code create}）。
      */
     NotificationTemplateVO create(NotificationTemplateSaveFrom params);
-
-    /**
-     * 转换、解析或规范化数据（{@code copy}）。
-     */
-    NotificationTemplateVO copy(UUID id);
 
     /**
      * 更新或推进目标状态（{@code update}）。
@@ -73,6 +74,11 @@ public interface NotificationTemplateService {
     void disable(UUID id, NotificationTemplateActionFrom params);
 
     /**
+     * 更新或推进目标状态（{@code enable}）。
+     */
+    void enable(UUID id, NotificationTemplateActionFrom params);
+
+    /**
      * 更新或推进目标状态（{@code archive}）。
      */
     void archive(UUID id, NotificationTemplateActionFrom params);
@@ -81,11 +87,6 @@ public interface NotificationTemplateService {
      * 处理内部业务逻辑（{@code versions}）。
      */
     List<NotificationTemplateVO> versions(UUID id);
-
-    /**
-     * 更新或推进目标状态（{@code rollback}）。
-     */
-    NotificationTemplateVO rollback(UUID id);
 
     /**
      * 处理内部业务逻辑（{@code preview}）。

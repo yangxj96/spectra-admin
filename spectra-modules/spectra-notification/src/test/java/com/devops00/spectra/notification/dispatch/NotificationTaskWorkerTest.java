@@ -37,9 +37,11 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -88,6 +90,35 @@ class NotificationTaskWorkerTest {
         verify(deliveryMapper).insert(deliveryCaptor.capture());
         assertEquals("SENT", deliveryCaptor.getValue().getResultStatus());
         verify(sender).send(task);
+    }
+
+    @Test
+    void shouldKeepSuccessfulInAppSummary() {
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var sender = mock(NotificationSender.class);
+        var task = task("PENDING", Instant.now().minusSeconds(1), Instant.now().plusSeconds(60));
+        task.setChannel(NotificationChannel.IN_APP.name());
+        var completed = task("SENT", task.getScheduledAt(), task.getExpiresAt());
+        completed.setId(task.getId());
+        completed.setNotificationRequestId(task.getNotificationRequestId());
+        completed.setChannel(NotificationChannel.IN_APP.name());
+        when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
+        when(taskMapper.selectList(any(LambdaQueryWrapper.class))).thenReturn(List.of(completed));
+        when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+        when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
+        when(sender.channel()).thenReturn(NotificationChannel.IN_APP);
+        when(sender.send(task)).thenReturn(ChannelSendResult.sent("IN_APP", null, "站内信已写入收件箱"));
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+
+        assertEquals(1, worker.processPending(50));
+
+        var deliveryCaptor = org.mockito.ArgumentCaptor.forClass(NotificationDeliveryEntity.class);
+        verify(deliveryMapper).insert(deliveryCaptor.capture());
+        assertEquals("SENT", deliveryCaptor.getValue().getResultStatus());
+        assertEquals(Map.of("summary", "站内信已写入收件箱"), deliveryCaptor.getValue().getResponseSummary());
+        assertNull(deliveryCaptor.getValue().getErrorMessageSanitized());
     }
 
     @Test

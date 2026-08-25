@@ -18,7 +18,7 @@ package com.devops00.spectra.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * 通知投递趋势聚合行。
@@ -30,8 +30,8 @@ import java.time.LocalDateTime;
 @Data
 public class NotificationOverviewTrendVO {
 
-    /** 小时桶起始时间。 */
-    private LocalDateTime bucketAt;
+    /** PostgreSQL TIMESTAMPTZ 小时桶起始时间。 */
+    private Instant bucketAt;
     /** 投递尝试数。 */
     private long totalCount;
     /** 接受或发送成功数。 */

@@ -38,6 +38,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * PostgreSQL Outbox 任务 Worker；支持并发领取、租约恢复和指数退避。
@@ -62,6 +63,17 @@ public class NotificationTaskWorker {
      * Worker 锁定标识。
      */
     private static final String WORKER_ID = "notification-worker";
+
+    /**
+     * Provider 适配器允许写入投递摘要的固定编码；未知文本仍使用通用失败摘要，避免敏感内容落库。
+     */
+    private static final Set<String> SAFE_PROVIDER_SUMMARIES = Set.of(
+            "ACCEPTED", "CHANNEL_NOT_CONFIGURED", "MOCK_ACCEPTED", "PROVIDER_ACCEPTED",
+            "PROVIDER_CONFIGURATION_INVALID", "PROVIDER_FAILURE", "PROVIDER_HEALTH_CHECK_FAILED",
+            "PROVIDER_HTTP_REJECTED", "PROVIDER_NOT_CONFIGURED", "PROVIDER_NOT_REGISTERED",
+            "PROVIDER_RATE_LIMITED", "PROVIDER_REJECTED", "PROVIDER_REQUEST_INTERRUPTED",
+            "PROVIDER_REQUEST_UNAVAILABLE", "PROVIDER_SERVER_ERROR", "PROVIDER_UNKNOWN_RESULT",
+            "RECIPIENT_ADDRESS_UNAVAILABLE", "站内信已写入收件箱");
 
     /**
      * 通知任务 Mapper。
@@ -208,7 +220,7 @@ public class NotificationTaskWorker {
         delivery.setResultStatus(result.status().name());
         var safeSummary = sanitizeProviderSummary(result.summary());
         delivery.setErrorCode(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
-        delivery.setErrorMessageSanitized(safeSummary);
+        delivery.setErrorMessageSanitized(result.status() == ChannelSendStatus.SENT ? null : safeSummary);
         delivery.setResponseSummary(safeSummary == null ? Map.of() : Map.of("summary", safeSummary));
         if (deliveryMapper.insert(delivery) != 1) {
             throw new DataSaveException("记录通知投递结果失败");
@@ -249,7 +261,11 @@ public class NotificationTaskWorker {
                 .replaceAll("(?i)(code|captcha|token|secret|password)\\s*[:=]\\s*[^,; ]+", "$1=[REDACTED]")
                 .replaceAll("(?<!\\d)\\d{6}(?!\\d)", "[REDACTED]");
         safe = safe.length() > 200 ? safe.substring(0, 200) : safe;
-        return safe.toUpperCase(Locale.ROOT).contains("REDACTED") ? safe : "PROVIDER_FAILURE";
+        if (safe.toUpperCase(Locale.ROOT).contains("REDACTED")) {
+            return safe;
+        }
+        return SAFE_PROVIDER_SUMMARIES.contains(safe.toUpperCase(Locale.ROOT))
+                || SAFE_PROVIDER_SUMMARIES.contains(safe) ? safe : "PROVIDER_FAILURE";
     }
 
     /**

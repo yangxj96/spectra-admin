@@ -20,6 +20,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.RegionLevel;
 import com.devops00.spectra.core.system.javabean.entity.Region;
 import com.devops00.spectra.core.system.service.RegionService;
+import com.devops00.test.spectra.RegionImportTestApplication;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -53,7 +54,7 @@ import java.util.UUID;
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_REGION_IMPORT", matches = "true")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@SpringBootTest
+@SpringBootTest(classes = RegionImportTestApplication.class)
 public class RegionServiceTest {
 
     private static final int BATCH_SIZE = 500;
@@ -288,4 +289,5 @@ public class RegionServiceTest {
     private IllegalStateException invalidResource(String resourceName, int recordNumber, String reason) {
         return new IllegalStateException("区域资源 " + resourceName + " 第 " + recordNumber + " 条记录无效：" + reason);
     }
+
 }

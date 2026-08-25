@@ -8,12 +8,14 @@
 package com.devops00.spectra.core.security.initialization.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.devops00.spectra.core.security.authentication.service.MfaService;
+import com.devops00.spectra.common.constant.ConfiguredValueType;
+import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
-import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
@@ -35,8 +37,6 @@ import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
-import com.devops00.spectra.common.constant.ConfiguredValueType;
-import com.devops00.spectra.common.exception.DataSaveException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DuplicateKeyException;
@@ -49,7 +49,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.UUID;
 
-/** PostgreSQL + Redis 的系统首次初始化实现。 */
+/**
+ * PostgreSQL + Redis 的系统首次初始化实现。
+ */
 @Service
 @RequiredArgsConstructor
 public class SystemInitializationServiceImpl implements SystemInitializationService {
@@ -74,8 +76,11 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     @Override
     public SystemInitializationStatusVO status() {
         SystemState state = loadState(false);
-        return new SystemInitializationStatusVO(state.getState(), SystemStateKeys.INITIALIZED.equals(state.getState()),
-                !SystemStateKeys.INITIALIZED.equals(state.getState()));
+        return new SystemInitializationStatusVO(
+                state.getState(),
+                SystemStateKeys.INITIALIZED.equals(state.getState()),
+                !SystemStateKeys.INITIALIZED.equals(state.getState())
+        );
     }
 
     @Override
@@ -213,7 +218,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         SystemState state = lock
                 ? stateMapper.selectForUpdateByStateKey(SystemStateKeys.SYSTEM)
                 : stateMapper.selectOne(new LambdaQueryWrapper<SystemState>()
-                        .eq(SystemState::getStateKey, SystemStateKeys.SYSTEM));
+                .eq(SystemState::getStateKey, SystemStateKeys.SYSTEM));
         if (state == null) {
             throw new IllegalStateException("系统初始化状态不存在");
         }
@@ -224,7 +229,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
      * 处理内部业务逻辑（{@code lockInitialization}）。
      */
     private void lockInitialization() {
-        jdbcTemplate.query("SELECT pg_advisory_xact_lock(hashtext('" + ADVISORY_LOCK + "'))",
+        jdbcTemplate.query("SELECT PG_ADVISORY_XACT_LOCK(hashtext('" + ADVISORY_LOCK + "'))",
                 resultSet -> null);
     }
 

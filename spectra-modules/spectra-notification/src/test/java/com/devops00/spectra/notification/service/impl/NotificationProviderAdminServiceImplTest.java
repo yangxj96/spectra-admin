@@ -20,16 +20,20 @@ import com.devops00.spectra.common.config.SystemConfigValueProvider;
 import com.devops00.spectra.common.config.SystemConfigValueWriter;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.support.NotificationTestTimeMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
+import org.springframework.beans.factory.ObjectProvider;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
 import java.util.Base64;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,6 +55,7 @@ class NotificationProviderAdminServiceImplTest {
 
     private final Map<String, String> values = new HashMap<>();
     private NotificationProviderAdminServiceImpl service;
+    private ObjectProvider<NotificationProviderRuntime> runtimeProvider;
 
     @BeforeEach
     void setUp() {
@@ -74,8 +79,9 @@ class NotificationProviderAdminServiceImplTest {
         var key = Base64.getEncoder().encodeToString(new byte[32]);
         var protector = new NotificationPayloadProtector(
                 new NotificationModuleProperties(true, key, key, List.of()), new ObjectMapper());
+        runtimeProvider = mock();
         service = new NotificationProviderAdminServiceImpl(
-                provider, protector, new ObjectMapper(), NotificationTestTimeMapper.create());
+                provider, protector, new ObjectMapper(), NotificationTestTimeMapper.create(), runtimeProvider);
         service.setValueWriter(writer);
     }
 
@@ -160,6 +166,32 @@ class NotificationProviderAdminServiceImplTest {
         assertEquals("MOCK", configuration.providerType());
         assertTrue(configuration.enabled());
         assertEquals(NotificationChannel.SMS, configuration.channel());
+    }
+
+    @Test
+    void shouldExposeCachedRuntimeHealthAfterReloadingProviderConfiguration() {
+        var params = new NotificationProviderSaveFrom();
+        params.setProviderType("MOCK");
+        params.setEnabled(true);
+        service.modify(NotificationChannel.SMS, params);
+
+        var runtime = mock(NotificationProviderRuntime.class);
+        when(runtimeProvider.getIfAvailable()).thenReturn(runtime);
+        var checkedAt = Instant.parse("2026-08-25T14:00:00Z");
+        when(runtime.snapshot(NotificationChannel.SMS))
+                .thenReturn(NotificationProviderHealth.healthy("MOCK_PROVIDER_READY", checkedAt));
+        when(runtime.snapshot(NotificationChannel.EMAIL))
+                .thenReturn(NotificationProviderHealth.healthy("MOCK_PROVIDER_READY", checkedAt));
+
+        var result = service.list()
+                .stream()
+                .filter(provider -> provider.getChannel().equals(NotificationChannel.SMS.name()))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals("HEALTHY", result.getState());
+        assertEquals("MOCK_PROVIDER_READY", result.getReason());
+        assertNotNull(result.getCheckedAt());
     }
 
     @Test

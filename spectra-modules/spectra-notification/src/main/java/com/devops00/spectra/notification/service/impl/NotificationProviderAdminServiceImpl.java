@@ -25,12 +25,15 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfigDocument;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderConfiguration;
+import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealthState;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationProviderVO;
+import com.devops00.spectra.notification.provider.NotificationProviderRuntime;
 import com.devops00.spectra.notification.service.NotificationProviderAdminService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -117,6 +120,11 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
     private final TimeMapper timeMapper;
 
     /**
+     * Provider 运行时健康状态读取端口；使用延迟 Provider 避免配置服务与运行时协调器的初始化环依赖。
+     */
+    private final ObjectProvider<NotificationProviderRuntime> runtimeProvider;
+
+    /**
      * 公共运行时配置写入端口；精简测试上下文可以不提供。
      */
     private SystemConfigValueWriter valueWriter;
@@ -163,7 +171,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
         var secretConfigured = hasSecret(document, secretCiphertext);
         var secretUsable = secretConfigured && canDecrypt(secretCiphertext);
         var state = resolveState(document, secretUsable);
-        return NotificationProviderVO.builder()
+        var result = NotificationProviderVO.builder()
                 .channel(channel.name())
                 .providerType(document.providerType())
                 .state(state.name())
@@ -188,6 +196,7 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
                 .secretKeyId(document.secretKeyId())
                 .updatedAt(timeMapper.toLocalDateTime(document.updatedAt()))
                 .build();
+        return applyRuntimeHealth(channel, result);
     }
 
     /**
@@ -307,6 +316,24 @@ public class NotificationProviderAdminServiceImpl implements NotificationProvide
             throw new DataSaveException("Provider 配置序列化失败", exception);
         }
         return get(channel);
+    }
+
+    /**
+     * 将运行时最近一次健康检查结果合并到管理查询结果；未检查时保持 fail-closed 状态。
+     */
+    private NotificationProviderVO applyRuntimeHealth(NotificationChannel channel, NotificationProviderVO provider) {
+        if (channel == NotificationChannel.IN_APP) {
+            return provider;
+        }
+        var runtime = runtimeProvider.getIfAvailable();
+        if (runtime == null) {
+            return provider;
+        }
+        NotificationProviderHealth health = runtime.snapshot(channel);
+        provider.setState(health.state().name());
+        provider.setReason(health.reason());
+        provider.setCheckedAt(health.checkedAt() == null ? null : timeMapper.toLocalDateTime(health.checkedAt()));
+        return provider;
     }
 
     /**

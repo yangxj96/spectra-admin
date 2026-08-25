@@ -19,6 +19,7 @@ package com.devops00.spectra.notification.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.DataSaveException;
@@ -32,6 +33,8 @@ import com.devops00.spectra.notification.javabean.from.NotificationTemplateActio
 import com.devops00.spectra.notification.javabean.from.NotificationTemplatePageFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplatePreviewFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplateSaveFrom;
+import com.devops00.spectra.notification.javabean.vo.NotificationTemplateChannelGroupVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplatePreviewVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateVO;
 import com.devops00.spectra.notification.mapper.NotificationTemplateMapper;
@@ -44,7 +47,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -100,7 +106,53 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
                 throw new DataSaveException("模板状态不合法");
             }
         }
-        return converter.toPage(mapper.selectPage(page.toPage(), query));
+        var latestByTemplate = new LinkedHashMap<String, NotificationTemplateEntity>();
+        mapper.selectList(query).forEach(entity -> {
+            var key = templateKey(entity);
+            var current = latestByTemplate.get(key);
+            if (current == null || isPreferred(entity, current)) {
+                latestByTemplate.put(key, entity);
+            }
+        });
+        var latestTemplates = List.copyOf(latestByTemplate.values());
+        var pageSize = page.getPageSize();
+        var pageNum = page.getPageNum();
+        var offset = Math.max(0L, (pageNum - 1) * pageSize);
+        var fromIndex = Math.toIntExact(Math.min(offset, latestTemplates.size()));
+        var toIndex = Math.toIntExact(Math.min(offset + pageSize, latestTemplates.size()));
+        var result = new Page<NotificationTemplateEntity>(pageNum, pageSize, latestTemplates.size());
+        result.setRecords(latestTemplates.subList(fromIndex, toIndex));
+        return converter.toPage(result);
+    }
+
+    @Override
+    public IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params) {
+        var query = new LambdaQueryWrapper<NotificationTemplateEntity>()
+                .isNull(NotificationTemplateEntity::getDeleted)
+                .orderByDesc(NotificationTemplateEntity::getUpdatedAt)
+                .orderByDesc(NotificationTemplateEntity::getVersionNo);
+        if (params != null) {
+            query.like(StringUtils.hasText(params.getTemplateGroupCode()),
+                    NotificationTemplateEntity::getTemplateGroupCode, params.getTemplateGroupCode())
+                    .eq(StringUtils.hasText(params.getChannel()), NotificationTemplateEntity::getChannel, params.getChannel())
+                    .eq(StringUtils.hasText(params.getPurpose()), NotificationTemplateEntity::getPurpose, params.getPurpose())
+                    .eq(StringUtils.hasText(params.getState()), NotificationTemplateEntity::getState, params.getState());
+            validateState(params.getState());
+        }
+        var groups = new LinkedHashMap<String, NotificationTemplateGroupVO>();
+        mapper.selectList(query).forEach(entity -> appendGroupVersion(groups, entity));
+        var records = new ArrayList<>(groups.values());
+        records.sort(Comparator.comparing(NotificationTemplateGroupVO::getUpdatedAt,
+                Comparator.nullsLast(Comparator.naturalOrder())).reversed());
+
+        var pageSize = page.getPageSize() == null ? 15L : Math.max(1L, page.getPageSize());
+        var pageNum = page.getPageNum() == null ? 1L : Math.max(1L, page.getPageNum());
+        var offset = Math.max(0L, (pageNum - 1) * pageSize);
+        var fromIndex = Math.toIntExact(Math.min(offset, records.size()));
+        var toIndex = Math.toIntExact(Math.min(offset + pageSize, records.size()));
+        var result = new Page<NotificationTemplateGroupVO>(pageNum, pageSize, records.size());
+        result.setRecords(records.subList(fromIndex, toIndex));
+        return result;
     }
 
     @Override
@@ -116,27 +168,19 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         entity.setTemplateGroupCode(normalize(params.getTemplateGroupCode()));
         entity.setTemplateName(normalize(params.getTemplateName()));
         entity.setChannel(params.getChannel().name());
+        if (findDraft(entity.getTemplateGroupCode(), entity.getChannel()) != null) {
+            throw new DataSaveException("该模板渠道已有草稿，请继续编辑现有草稿");
+        }
         entity.setPurpose(purpose.name());
         entity.setVersionNo(nextVersionNo(entity.getTemplateGroupCode(), entity.getChannel()));
         entity.setState(DRAFT);
+        entity.setVersion(0L);
         copyContent(params, entity);
         if (mapper.insert(entity) != 1) {
             throw new DataSaveException("创建通知模板失败");
         }
         log.info("已创建通知模板草稿: templateId={}", entity.getId());
         return converter.toVO(entity);
-    }
-
-    @Override
-    @Transactional
-    public NotificationTemplateVO copy(UUID id) {
-        var source = getTemplate(id);
-        var draft = copyToDraft(source);
-        if (mapper.insert(draft) != 1) {
-            throw new DataSaveException("复制通知模板失败");
-        }
-        log.info("已复制通知模板草稿: sourceId={}, draftId={}", id, draft.getId());
-        return converter.toVO(draft);
     }
 
     @Override
@@ -170,9 +214,9 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
         mapper.update(null, new LambdaUpdateWrapper<NotificationTemplateEntity>()
                 .eq(NotificationTemplateEntity::getTemplateGroupCode, entity.getTemplateGroupCode())
                 .eq(NotificationTemplateEntity::getChannel, entity.getChannel())
-                .eq(NotificationTemplateEntity::getState, PUBLISHED)
+                .in(NotificationTemplateEntity::getState, List.of(PUBLISHED, DISABLED))
                 .isNull(NotificationTemplateEntity::getDeleted)
-                .set(NotificationTemplateEntity::getState, DISABLED)
+                .set(NotificationTemplateEntity::getState, ARCHIVED)
                 .set(NotificationTemplateEntity::getUpdatedAt, Instant.now()));
         entity.setState(PUBLISHED);
         entity.setVersionDigest(NotificationTemplateDigest.calculate(entity));
@@ -193,6 +237,19 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             throw new DataSaveException("停用通知模板失败");
         }
         log.info("已停用通知模板: templateId={}", id);
+    }
+
+    @Override
+    @Transactional
+    public void enable(UUID id, NotificationTemplateActionFrom params) {
+        var entity = getTemplate(id);
+        ensureState(entity, DISABLED, "只有已停用模板可以启用");
+        ensureVersion(entity, params.getVersion());
+        entity.setState(PUBLISHED);
+        if (mapper.updateById(entity) != 1) {
+            throw new DataSaveException("启用通知模板失败");
+        }
+        log.info("已启用通知模板: templateId={}", id);
     }
 
     @Override
@@ -222,41 +279,6 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
                 .stream()
                 .map(converter::toVO)
                 .toList();
-    }
-
-    @Override
-    @Transactional
-    public NotificationTemplateVO rollback(UUID id) {
-        var source = getTemplate(id);
-        if (DRAFT.equals(source.getState())) {
-            throw new DataSaveException("草稿模板不能回滚");
-        }
-        var draft = copyToDraft(source);
-        if (mapper.insert(draft) != 1) {
-            throw new DataSaveException("创建回滚草稿失败");
-        }
-        log.info("已从通知模板历史版本创建回滚草稿: sourceId={}, draftId={}", id, draft.getId());
-        return converter.toVO(draft);
-    }
-
-    /**
-     * 转换、解析或规范化数据（{@code copyToDraft}）。
-     */
-    private NotificationTemplateEntity copyToDraft(NotificationTemplateEntity source) {
-        var draft = new NotificationTemplateEntity();
-        draft.setTemplateGroupCode(source.getTemplateGroupCode());
-        draft.setTemplateName(source.getTemplateName());
-        draft.setChannel(source.getChannel());
-        draft.setPurpose(source.getPurpose());
-        draft.setVersionNo(nextVersionNo(source.getTemplateGroupCode(), source.getChannel()));
-        draft.setState(DRAFT);
-        draft.setTitleTemplate(source.getTitleTemplate());
-        draft.setContentTemplate(source.getContentTemplate());
-        draft.setHtmlTemplate(source.getHtmlTemplate());
-        draft.setParameterSchema(source.getParameterSchema());
-        draft.setProviderTemplateCode(source.getProviderTemplateCode());
-        draft.setVersionDigest(NotificationTemplateDigest.calculate(draft));
-        return draft;
     }
 
     @Override
@@ -388,6 +410,131 @@ public class NotificationTemplateServiceImpl implements NotificationTemplateServ
             throw new DataNotExistException("通知模板不存在");
         }
         return entity;
+    }
+
+    /**
+     * 生成模板组和渠道的稳定键。
+     */
+    private String templateKey(NotificationTemplateEntity entity) {
+        return entity.getTemplateGroupCode() + "\u0000" + entity.getChannel();
+    }
+
+    /**
+     * 按模板展示规则选择候选版本：已发布版本优先，同一状态下版本号高的优先。
+     */
+    private boolean isPreferred(NotificationTemplateEntity candidate, NotificationTemplateEntity current) {
+        var candidatePublished = PUBLISHED.equals(candidate.getState());
+        var currentPublished = PUBLISHED.equals(current.getState());
+        if (candidatePublished != currentPublished) {
+            return candidatePublished;
+        }
+        var candidateVersion = candidate.getVersionNo() == null ? 0 : candidate.getVersionNo();
+        var currentVersion = current.getVersionNo() == null ? 0 : current.getVersionNo();
+        if (candidateVersion != currentVersion) {
+            return candidateVersion > currentVersion;
+        }
+        return candidate.getUpdatedAt() != null
+                && (current.getUpdatedAt() == null || candidate.getUpdatedAt().isAfter(current.getUpdatedAt()));
+    }
+
+    /**
+     * 将一个渠道版本加入模板组管理视图。
+     */
+    private void appendGroupVersion(Map<String, NotificationTemplateGroupVO> groups,
+                                    NotificationTemplateEntity entity) {
+        var group = groups.computeIfAbsent(entity.getTemplateGroupCode(), key -> {
+            var value = new NotificationTemplateGroupVO();
+            value.setTemplateGroupCode(entity.getTemplateGroupCode());
+            value.setTemplateName(entity.getTemplateName());
+            value.setPurpose(entity.getPurpose());
+            value.setChannels(new ArrayList<>());
+            return value;
+        });
+        var entityUpdatedAt = timeMapper.toLocalDateTime(entity.getUpdatedAt());
+        if (group.getUpdatedAt() == null
+                || (entityUpdatedAt != null
+                        && entityUpdatedAt.isAfter(group.getUpdatedAt()))) {
+            group.setUpdatedAt(entityUpdatedAt);
+        }
+        var channel = group.getChannels()
+                .stream()
+                .filter(item -> Objects.equals(item.getChannel(), entity.getChannel()))
+                .findFirst()
+                .orElseGet(() -> {
+                    var value = new NotificationTemplateChannelGroupVO();
+                    value.setChannel(entity.getChannel());
+                    group.getChannels().add(value);
+                    return value;
+                });
+        var view = converter.toVO(entity);
+        if (DRAFT.equals(entity.getState())) {
+            if (channel.getDraft() == null || isNewer(entity, channel.getDraft())) {
+                channel.setDraft(view);
+            }
+        } else if (channel.getCurrent() == null || isPreferredCurrent(entity, channel.getCurrent())) {
+            channel.setCurrent(view);
+        }
+    }
+
+    /**
+     * 比较渠道草稿版本。
+     */
+    private boolean isNewer(NotificationTemplateEntity candidate, NotificationTemplateVO current) {
+        var candidateVersion = candidate.getVersionNo() == null ? 0 : candidate.getVersionNo();
+        var currentVersion = current.getVersionNo() == null ? 0 : current.getVersionNo();
+        if (candidateVersion != currentVersion) {
+            return candidateVersion > currentVersion;
+        }
+        var currentUpdatedAt = timeMapper.toInstant(current.getUpdatedAt());
+        return candidate.getUpdatedAt() != null
+                && (currentUpdatedAt == null || candidate.getUpdatedAt().isAfter(currentUpdatedAt));
+    }
+
+    /**
+     * 按发布优先级选择渠道当前版本。
+     */
+    private boolean isPreferredCurrent(NotificationTemplateEntity candidate, NotificationTemplateVO current) {
+        var candidateRank = currentRank(candidate.getState());
+        var currentRank = currentRank(current.getState());
+        if (candidateRank != currentRank) {
+            return candidateRank > currentRank;
+        }
+        return isNewer(candidate, current);
+    }
+
+    /**
+     * 返回渠道当前版本的发布优先级。
+     */
+    private int currentRank(String state) {
+        if (PUBLISHED.equals(state))
+            return 3;
+        if (DISABLED.equals(state))
+            return 2;
+        if (ARCHIVED.equals(state))
+            return 1;
+        return 0;
+    }
+
+    /**
+     * 查询指定模板渠道的唯一草稿。
+     */
+    private NotificationTemplateEntity findDraft(String groupCode, String channel) {
+        return mapper.selectOne(new LambdaQueryWrapper<NotificationTemplateEntity>()
+                .eq(NotificationTemplateEntity::getTemplateGroupCode, groupCode)
+                .eq(NotificationTemplateEntity::getChannel, channel)
+                .eq(NotificationTemplateEntity::getState, DRAFT)
+                .isNull(NotificationTemplateEntity::getDeleted)
+                .orderByDesc(NotificationTemplateEntity::getVersionNo)
+                .last("LIMIT 1"));
+    }
+
+    /**
+     * 校验模板列表状态。
+     */
+    private void validateState(String state) {
+        if (StringUtils.hasText(state) && !STATES.contains(state)) {
+            throw new DataSaveException("模板状态不合法");
+        }
     }
 
     /**

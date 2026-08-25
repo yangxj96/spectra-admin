@@ -126,4 +126,9 @@ public class NotificationProviderVO {
      * 配置更新时间。
      */
     private LocalDateTime updatedAt;
+
+    /**
+     * 最近一次健康检查时间；尚未检查时为空。
+     */
+    private LocalDateTime checkedAt;
 }

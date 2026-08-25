@@ -28,6 +28,8 @@ import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEnt
 import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewErrorVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationOverviewTrendVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationRequestAdminVO;
 import com.devops00.spectra.notification.mapper.NotificationDeliveryMapper;
 import com.devops00.spectra.notification.mapper.NotificationRequestMapper;
@@ -39,11 +41,18 @@ import org.apache.ibatis.type.ObjectTypeHandler;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -106,6 +115,34 @@ class NotificationAdminServiceImplTest {
         assertThrows(com.devops00.spectra.common.exception.DataSaveException.class,
                 () -> service.overview(new NotificationOverviewFrom(169)));
         verifyNoInteractions(requestMapper, taskMapper, deliveryMapper);
+    }
+
+    @Test
+    void shouldConvertPostgresInstantsBeforeReturningOverview() {
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var bucketAt = Instant.now().truncatedTo(ChronoUnit.HOURS);
+        var trendRow = new NotificationOverviewTrendVO();
+        trendRow.setBucketAt(bucketAt);
+        trendRow.setTotalCount(3L);
+        var errorRow = new NotificationOverviewErrorVO();
+        errorRow.setOccurredAt(bucketAt.plus(15, ChronoUnit.MINUTES));
+        when(deliveryMapper.selectOverviewTrend(any(), any())).thenReturn(List.of(trendRow));
+        when(deliveryMapper.selectRecentErrors(any(), any(), anyInt())).thenReturn(List.of(errorRow));
+        var service = new NotificationAdminServiceImpl(requestMapper, taskMapper, deliveryMapper,
+                mock(NotificationAdminConverter.class), mock(NotificationGateway.class), NotificationTestTimeMapper.create());
+
+        var overview = service.overview(new NotificationOverviewFrom(1));
+
+        assertEquals(LocalDateTime.ofInstant(bucketAt.plus(15, ChronoUnit.MINUTES), ZoneOffset.UTC),
+                overview.getRecentErrors().getFirst().getOccurredAt());
+        assertEquals(3L, overview.getTrend()
+                .stream()
+                .filter(item -> item.getBucketAt().equals(LocalDateTime.ofInstant(bucketAt, ZoneOffset.UTC)))
+                .findFirst()
+                .orElseThrow()
+                .getTotalCount());
     }
 
     @Test

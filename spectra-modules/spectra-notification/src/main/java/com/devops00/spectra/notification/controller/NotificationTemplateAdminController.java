@@ -25,6 +25,7 @@ import com.devops00.spectra.notification.javabean.from.NotificationTemplatePageF
 import com.devops00.spectra.notification.javabean.from.NotificationTemplatePreviewFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationTemplateSaveFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplatePreviewVO;
+import com.devops00.spectra.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateVO;
 import com.devops00.spectra.notification.service.NotificationTemplateService;
 import com.devops00.spectra.log.base.annotation.ULog;
@@ -69,6 +70,16 @@ public class NotificationTemplateAdminController {
     }
 
     /**
+     * 查询或获取目标数据（{@code groupPage}）。
+     */
+    @ULog("'查询通知模板组列表'")
+    @GetMapping(value = "/groups", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:template:read')")
+    public IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params) {
+        return service.groupPage(page, params);
+    }
+
+    /**
      * 查询或获取目标数据（{@code detail}）。
      */
     @ULog("'查询通知模板详情'")
@@ -86,16 +97,6 @@ public class NotificationTemplateAdminController {
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public NotificationTemplateVO create(@Validated(Verify.Insert.class) @RequestBody NotificationTemplateSaveFrom params) {
         return service.create(params);
-    }
-
-    /**
-     * 转换、解析或规范化数据（{@code copy}）。
-     */
-    @ULog("'复制通知模板草稿'")
-    @PostMapping(value = "/{id}/copy", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'notification:template:write')")
-    public NotificationTemplateVO copy(@PathVariable UUID id) {
-        return service.copy(id);
     }
 
     /**
@@ -133,6 +134,16 @@ public class NotificationTemplateAdminController {
     }
 
     /**
+     * 更新或推进目标状态（{@code enable}）。
+     */
+    @ULog("'启用通知模板'")
+    @PostMapping(value = "/{id}/enable", version = "1.0.0")
+    @PreAuthorize("hasPermission(null, 'notification:template:write')")
+    public void enable(@PathVariable UUID id, @Validated @RequestBody NotificationTemplateActionFrom params) {
+        service.enable(id, params);
+    }
+
+    /**
      * 更新或推进目标状态（{@code archive}）。
      */
     @ULog("'归档通知模板'")
@@ -150,16 +161,6 @@ public class NotificationTemplateAdminController {
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public List<NotificationTemplateVO> versions(@PathVariable UUID id) {
         return service.versions(id);
-    }
-
-    /**
-     * 更新或推进目标状态（{@code rollback}）。
-     */
-    @ULog("'回滚通知模板'")
-    @PostMapping(value = "/{id}/rollback", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'notification:template:publish')")
-    public NotificationTemplateVO rollback(@PathVariable UUID id) {
-        return service.rollback(id);
     }
 
     /**

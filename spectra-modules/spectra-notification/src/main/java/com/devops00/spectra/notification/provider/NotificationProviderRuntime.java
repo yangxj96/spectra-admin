@@ -99,12 +99,12 @@ public class NotificationProviderRuntime {
             return cached.health();
         }
         if (configuration.providerType() == null || configuration.providerType().isBlank()) {
-            return NotificationProviderHealth.notConfigured("PROVIDER_NOT_CONFIGURED", Instant.now());
+            return NotificationProviderHealth.notConfigured("PROVIDER_NOT_CONFIGURED", null);
         }
         if (!configuration.enabled()) {
-            return NotificationProviderHealth.disabled("DISABLED_BY_CONFIGURATION", Instant.now());
+            return NotificationProviderHealth.disabled("DISABLED_BY_CONFIGURATION", null);
         }
-        return NotificationProviderHealth.unhealthy("HEALTH_CHECK_REQUIRED", Instant.now());
+        return NotificationProviderHealth.unhealthy("HEALTH_CHECK_REQUIRED", null);
     }
 
     /**

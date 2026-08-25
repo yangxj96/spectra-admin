@@ -170,7 +170,7 @@ public class NotificationAdminServiceImpl implements NotificationAdminService {
                 ? List.<NotificationOverviewVO.ErrorSummary>of()
                 : recentErrorRows.stream()
                         .map(item -> NotificationOverviewVO.ErrorSummary.builder()
-                                .occurredAt(item.getOccurredAt())
+                                .occurredAt(timeMapper.toLocalDateTime(item.getOccurredAt()))
                                 .channel(item.getChannel())
                                 .status(item.getStatus())
                                 .errorCode(item.getErrorCode())

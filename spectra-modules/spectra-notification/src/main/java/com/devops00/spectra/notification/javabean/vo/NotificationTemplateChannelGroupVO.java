@@ -18,26 +18,28 @@ package com.devops00.spectra.notification.javabean.vo;
 
 import lombok.Data;
 
-import java.time.Instant;
-
 /**
- * 通知运行概览中的脱敏错误摘要。
+ * 通知模板组中的渠道版本视图。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/23
+ * @since 2026/8/25
  */
 @Data
-public class NotificationOverviewErrorVO {
+public class NotificationTemplateChannelGroupVO {
 
-    /** PostgreSQL TIMESTAMPTZ 错误发生时间。 */
-    private Instant occurredAt;
-    /** 通知渠道。 */
+    /**
+     * 渠道。
+     */
     private String channel;
-    /** 投递结果状态。 */
-    private String status;
-    /** 标准化错误码。 */
-    private String errorCode;
-    /** 脱敏错误信息。 */
-    private String message;
+
+    /**
+     * 当前发布版本；没有发布版本时为最高版本的历史记录。
+     */
+    private NotificationTemplateVO current;
+
+    /**
+     * 当前唯一草稿。
+     */
+    private NotificationTemplateVO draft;
 }
