@@ -298,17 +298,20 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
      * 转换、解析或规范化数据（{@code toGrantRequests}）。
      */
     private List<AuthorizationGrantRequest> toGrantRequests(SecurityRole role, List<AuthorizationBoundaryFrom> boundaries) {
-        if (boundaries == null || boundaries.isEmpty()) {
-            throw new DataException("授权 Boundary 不能为空");
-        }
-        var permissionRows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
-                .in(Permission::getCode, boundaries.stream().map(AuthorizationBoundaryFrom::getPermission).toList()));
-        var permissions = permissionRows.stream().collect(Collectors.toMap(Permission::getCode, value -> value));
         var rolePermissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
                 .eq(RolePermission::getRoleId, role.getId()))
                 .stream()
                 .map(RolePermission::getPermissionId)
                 .collect(Collectors.toSet());
+        if (boundaries == null || boundaries.isEmpty()) {
+            if (rolePermissionIds.isEmpty()) {
+                return List.of();
+            }
+            throw new DataException("角色「" + roleDisplayName(role) + "」至少需要一个权限访问范围");
+        }
+        var permissionRows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
+                .in(Permission::getCode, boundaries.stream().map(AuthorizationBoundaryFrom::getPermission).toList()));
+        var permissions = permissionRows.stream().collect(Collectors.toMap(Permission::getCode, value -> value));
         var grantableIds = roleGrantablePermissionMapper.selectList(new LambdaQueryWrapper<RoleGrantablePermission>()
                 .eq(RoleGrantablePermission::getRoleId, role.getId()))
                 .stream()
@@ -334,6 +337,10 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                     boundary.getGrant() == null ? null : toDomainScope(boundary.getGrant()), role.getAuthorityLevel()));
         }
         return List.copyOf(result);
+    }
+
+    private String roleDisplayName(SecurityRole role) {
+        return role.getName() == null || role.getName().isBlank() ? role.getCode() : role.getName().trim();
     }
 
     /**

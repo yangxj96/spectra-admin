@@ -10,6 +10,7 @@ package com.devops00.spectra.core.security.authorization.service.impl;
 import com.devops00.spectra.common.exception.BuiltinDataException;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
+import com.devops00.spectra.core.security.authorization.domain.RoleChangeImpact;
 import com.devops00.spectra.core.security.authorization.entity.Permission;
 import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePermission;
 import com.devops00.spectra.core.security.authorization.entity.RolePermission;
@@ -24,6 +25,7 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.RoleAuthoriz
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.RoleChangeImpactAnalyzer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
@@ -40,6 +42,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -48,6 +52,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -107,6 +114,9 @@ class RoleAuthorizationChangeServiceImplTest {
     @Mock
     private SecurityAuditWriter securityAuditWriter;
 
+    @Mock
+    private TimeMapper timeMapper;
+
     @InjectMocks
     private RoleAuthorizationChangeServiceImpl service;
 
@@ -163,6 +173,33 @@ class RoleAuthorizationChangeServiceImplTest {
         assertEquals(1, result.getAuthorityLevel());
         assertEquals(Set.of(), result.getPermissionCodes());
         assertEquals(Set.of(), result.getGrantablePermissionCodes());
+    }
+
+    @Test
+    void previewShouldAllowRoleWithoutPermissions() {
+        var roleId = UUID.randomUUID();
+        var operatorId = UUID.randomUUID();
+        var role = role(roleId, 1L);
+        when(securityContextAccessor.currentUserId()).thenReturn(operatorId);
+        when(roleMapper.selectById(roleId)).thenReturn(role);
+        when(rolePermissionMapper.selectList(any())).thenReturn(List.of());
+        when(roleGrantablePermissionMapper.selectList(any())).thenReturn(List.of());
+        when(roleAssignmentMapper.selectList(any())).thenReturn(List.of());
+        when(impactAnalyzer.analyze(any(), any(), eq(0), eq(0)))
+                .thenReturn(new RoleChangeImpact(Set.of(), Set.of(), Set.of(), Set.of(), false, false, 0, 0));
+        when(tokenService.issue(any())).thenReturn("preview-token");
+        when(timeMapper.toLocalDateTime(any(Instant.class))).thenReturn(LocalDateTime.of(2026, 8, 25, 12, 0));
+
+        var from = new RoleAuthorizationChangeFrom();
+        from.setExpectedVersion(1L);
+        from.setAuthorityLevel(1);
+        from.setPermissionCodes(Set.of());
+        from.setGrantablePermissionCodes(Set.of());
+
+        var result = service.preview(roleId, from);
+
+        assertEquals("preview-token", result.getPreviewToken());
+        verify(permissionMapper, never()).selectList(any());
     }
 
     @Test

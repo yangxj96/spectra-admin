@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.security.authorization.javabean.from;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
@@ -44,7 +43,7 @@ public class AuthorizationAssignmentChangeFrom {
     @PositiveOrZero(message = "目标用户安全版本不能为负数")
     private Long expectedVersion;
 
-    @NotEmpty(message = "Access Boundary 不能为空")
+    @NotNull(message = "Access Boundary 不能为空")
     @Valid
     private List<AuthorizationBoundaryFrom> boundaries;
 }

@@ -3,6 +3,7 @@ spectra:
   security:
     verification-code-hmac-key: ${SECURITY_VERIFICATION_CODE_HMAC_KEY:}
     verification-code-max-attempts: ${SECURITY_VERIFICATION_CODE_MAX_ATTEMPTS:5}
+    authorization-change-token-hmac-key: ${SPECTRA_SECURITY_AUTHORIZATION_CHANGE_TOKEN_HMAC_KEY:}
     refresh-cookie-name: ${SPECTRA_SECURITY_REFRESH_COOKIE_NAME:__Host-spectra-refresh}
     refresh-cookie-secure: ${SPECTRA_SECURITY_REFRESH_COOKIE_SECURE:true}
     allow-insecure-refresh-cookie: ${SPECTRA_SECURITY_ALLOW_INSECURE_REFRESH_COOKIE:false}

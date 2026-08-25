@@ -9,10 +9,12 @@ package com.devops00.spectra.core.security.authentication.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.core.security.authentication.javabean.from.MfaConfirmFrom;
+import com.devops00.spectra.core.security.authentication.javabean.from.MfaDisableFrom;
 import com.devops00.spectra.core.security.authentication.javabean.from.MfaRecoveryCodeFrom;
 import com.devops00.spectra.core.security.authentication.javabean.from.MfaSetupChallengeFrom;
 import com.devops00.spectra.core.security.authentication.javabean.from.MfaSetupConfirmFrom;
 import com.devops00.spectra.core.security.authentication.javabean.vo.MfaEnrollmentResult;
+import com.devops00.spectra.core.security.authentication.javabean.vo.MfaStatusVO;
 import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.util.AuthenticationContextUtils;
 import com.devops00.spectra.core.security.authentication.util.MfaChallengeUtils;
@@ -28,6 +30,7 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,10 +60,18 @@ public class MfaController {
     /**
      * 创建或构建目标数据（{@code beginTotpEnrollment}）。
      */
-    @PostMapping("/totp/enroll")
+    @ULog(value = "'开始 MFA 登记'", type = SysLogType.SAFETY)
+    @PostMapping(value = "/totp/enroll", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public MfaEnrollmentResult beginTotpEnrollment() {
         return mfaService.beginTotpEnrollment(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor));
+    }
+
+    /** 查询当前用户的 MFA 状态。 */
+    @GetMapping(value = "/status", version = "1.0.0")
+    @PreAuthorize("isAuthenticated()")
+    public MfaStatusVO status() {
+        return mfaService.status(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor));
     }
 
     /**
@@ -79,11 +90,21 @@ public class MfaController {
     /**
      * 处理内部业务逻辑（{@code confirmTotpEnrollment}）。
      */
-    @PostMapping("/totp/confirm")
+    @ULog(value = "'确认 MFA 登记'", type = SysLogType.SAFETY)
+    @PostMapping(value = "/totp/confirm", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<String> confirmTotpEnrollment(@Valid @RequestBody MfaConfirmFrom from) {
         return mfaService.confirmTotpEnrollment(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor),
                 from.getEnrollmentId(), from.getCode());
+    }
+
+    /** 停用当前用户的 TOTP MFA。 */
+    @ULog(value = "'停用 MFA'", type = SysLogType.SAFETY)
+    @PostMapping(value = "/totp/disable", version = "1.0.0")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("isAuthenticated()")
+    public void disableTotp(@Valid @RequestBody MfaDisableFrom from) {
+        mfaService.disableTotp(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor), from.getCode());
     }
 
     /**
@@ -106,7 +127,7 @@ public class MfaController {
     /**
      * 处理内部业务逻辑（{@code verifyRecoveryCode}）。
      */
-    @PostMapping("/recovery/verify")
+    @PostMapping(value = "/recovery/verify", version = "1.0.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
     public void verifyRecoveryCode(@Valid @RequestBody MfaRecoveryCodeFrom from) {
@@ -119,7 +140,7 @@ public class MfaController {
     /**
      * 处理内部业务逻辑（{@code rotateRecoveryCodes}）。
      */
-    @PostMapping("/recovery/rotate")
+    @PostMapping(value = "/recovery/rotate", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<String> rotateRecoveryCodes() {
         return mfaService.rotateRecoveryCodes(AuthenticationContextUtils.requireCurrentUserId(securityContextAccessor));

@@ -151,7 +151,7 @@ public class SecurityProperties {
     /** TOTP provisioning URI 的发行方名称。 */
     private String mfaTotpIssuer = "Spectra";
 
-    /** DEV_OPS 没有已验证 MFA 时禁止创建普通 Root Session。 */
+    /** DEV_OPS 尚未登记 MFA 时禁止创建普通 Root Session；显式停用后的登记保留撤销状态。 */
     private boolean mfaRequiredForDevOps = true;
 
     /** MFA 登录预认证挑战有效期（秒）。 */

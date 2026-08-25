@@ -27,6 +27,12 @@ public interface SecurityMfaVerifier {
     /** 判断用户是否已经激活 TOTP 因子。 */
     boolean hasActiveTotp(UUID userId);
 
+    /** 判断用户是否存在任意 TOTP 登记，包括已撤销的历史登记。 */
+    boolean hasAnyTotpEnrollment(UUID userId);
+
+    /** 判断用户是否存在未撤销的 TOTP 登记，包括 PENDING 和 ACTIVE 状态。 */
+    boolean hasNonRevokedTotpEnrollment(UUID userId);
+
     /** 校验 TOTP 验证码。 */
     boolean verifyTotp(UUID userId, String code);
 

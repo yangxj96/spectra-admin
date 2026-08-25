@@ -8,6 +8,7 @@
 package com.devops00.spectra.core.security.authentication.service;
 
 import com.devops00.spectra.core.security.authentication.javabean.vo.MfaEnrollmentResult;
+import com.devops00.spectra.core.security.authentication.javabean.vo.MfaStatusVO;
 import com.devops00.spectra.security.base.mfa.SecurityMfaVerifier;
 
 import java.util.List;
@@ -20,6 +21,17 @@ public interface MfaService extends SecurityMfaVerifier {
      * 创建或构建目标数据（{@code beginTotpEnrollment}）。
      */
     MfaEnrollmentResult beginTotpEnrollment(UUID userId);
+
+    /** 查询当前用户的 MFA 状态。 */
+    MfaStatusVO status(UUID userId);
+
+    /** 判断用户是否存在任意 TOTP 登记，包括已撤销的历史登记。 */
+    @Override
+    boolean hasAnyTotpEnrollment(UUID userId);
+
+    /** 判断用户是否存在未撤销的 TOTP 登记，包括 PENDING 和 ACTIVE 状态。 */
+    @Override
+    boolean hasNonRevokedTotpEnrollment(UUID userId);
 
     /**
      * 处理内部业务逻辑（{@code confirmTotpEnrollment}）。
@@ -40,4 +52,7 @@ public interface MfaService extends SecurityMfaVerifier {
 
     /** 原子作废旧 Recovery Code 并生成一组新码；明文只在本次响应中返回。 */
     List<String> rotateRecoveryCodes(UUID userId);
+
+    /** 校验当前 MFA 凭据并停用 TOTP。 */
+    void disableTotp(UUID userId, String code);
 }

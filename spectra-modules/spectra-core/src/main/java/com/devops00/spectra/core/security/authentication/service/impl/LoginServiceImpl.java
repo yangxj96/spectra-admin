@@ -99,7 +99,7 @@ public class LoginServiceImpl implements LoginService {
             if (requiresDevOpsMfa(user) && params.getType() != LoginType.PASSWORD) {
                 throw new LoginException("DEV_OPS 必须先完成账号密码验证");
             }
-            if (requiresDevOpsMfa(user)) {
+            if (requiresMfa(user) && !isMfaVerified(user)) {
                 return createMfaChallenge(user, clientType);
             }
             return issueAuthenticatedToken(user, clientType);
@@ -216,10 +216,28 @@ public class LoginServiceImpl implements LoginService {
      * 校验并确保数据满足当前约束（{@code requiresDevOpsMfa}）。
      */
     private boolean requiresDevOpsMfa(SecurityUser user) {
-        return securityProperties.isMfaRequiredForDevOps()
-                && user.getAuthorities()
+        if (!securityProperties.isMfaRequiredForDevOps()
+                || user.getAuthorities()
                         .stream()
-                        .anyMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()));
+                        .noneMatch(authority -> "ROLE_DEV_OPS".equals(authority.getAuthority()))) {
+            return false;
+        }
+        SecurityMfaVerifier verifier = requireMfaVerifier();
+        // 未登记或存在未完成绑定的 DEV_OPS 仍需首次绑定；用户明确停用后只保留 REVOKED 记录，不再强制重复绑定。
+        return verifier.hasActiveTotp(user.getId())
+                || !verifier.hasAnyTotpEnrollment(user.getId())
+                || verifier.hasNonRevokedTotpEnrollment(user.getId());
+    }
+
+    /** 判断用户是否需要进入 MFA 二阶段流程。 */
+    private boolean requiresMfa(SecurityUser user) {
+        return requiresDevOpsMfa(user) || requireMfaVerifier().hasActiveTotp(user.getId());
+    }
+
+    /** 判断当前主认证结果是否已经完成 MFA，例如直接使用 OTP 登录。 */
+    private boolean isMfaVerified(SecurityUser user) {
+        Map<String, Object> extraData = user.getExtraData();
+        return extraData != null && Boolean.TRUE.equals(extraData.get("mfaVerified"));
     }
 
     /**

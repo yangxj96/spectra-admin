@@ -18,7 +18,6 @@ package com.devops00.spectra.core.security.authorization.javabean.from;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
@@ -42,7 +41,7 @@ public class AuthorizationProfileAssignmentFrom {
     @PositiveOrZero(message = "授权方案 Role version 不能为负数")
     private Long roleVersion;
 
-    @NotEmpty(message = "授权方案至少需要一个 Permission Boundary")
+    @NotNull(message = "授权方案权限访问范围不能为空")
     @Valid
     private List<AuthorizationProfileBoundaryFrom> boundaries;
 }

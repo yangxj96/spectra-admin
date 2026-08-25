@@ -14,6 +14,7 @@ import com.devops00.spectra.core.security.authentication.javabean.enums.MfaEnrol
 import com.devops00.spectra.core.security.authentication.javabean.entity.RecoveryCode;
 import com.devops00.spectra.core.security.authentication.javabean.entity.TotpCredential;
 import com.devops00.spectra.core.security.authentication.javabean.vo.MfaEnrollmentResult;
+import com.devops00.spectra.core.security.authentication.javabean.vo.MfaStatusVO;
 import com.devops00.spectra.core.security.authentication.mapper.MfaEnrollmentMapper;
 import com.devops00.spectra.core.security.authentication.mapper.RecoveryCodeMapper;
 import com.devops00.spectra.core.security.authentication.mapper.TotpCredentialMapper;
@@ -78,6 +79,9 @@ public class MfaServiceImpl implements MfaService {
     @Override
     @Transactional
     public MfaEnrollmentResult beginTotpEnrollment(UUID userId) {
+        if (findActiveEnrollment(userId) != null) {
+            throw new IllegalStateException("当前用户已启用 MFA");
+        }
         MfaEnrollment enrollment = new MfaEnrollment();
         enrollment.setUserId(userId);
         enrollment.setFactorType(FACTOR_TOTP);
@@ -109,6 +113,12 @@ public class MfaServiceImpl implements MfaService {
         appendAudit("AUTH_CHALLENGE_CREATED", userId, Map.of("factorType", FACTOR_TOTP),
                 Map.of("state", PENDING), "TOTP 登记开始");
         return new MfaEnrollmentResult(enrollment.getId(), uri, secret);
+    }
+
+    @Override
+    public MfaStatusVO status(UUID userId) {
+        MfaEnrollment enrollment = findActiveEnrollment(userId);
+        return new MfaStatusVO(enrollment != null, enrollment == null ? null : enrollment.getFactorType());
     }
 
     /**
@@ -218,6 +228,26 @@ public class MfaServiceImpl implements MfaService {
         return List.copyOf(recoveryCodes);
     }
 
+    @Override
+    @Transactional
+    public void disableTotp(UUID userId, String code) {
+        MfaEnrollment enrollment = findActiveEnrollment(userId);
+        if (enrollment == null) {
+            throw new IllegalStateException("当前用户没有启用 MFA");
+        }
+        boolean verified = verifyTotp(userId, code) || consumeRecoveryCode(userId, code);
+        if (!verified) {
+            throw new IllegalArgumentException("MFA 验证码或恢复码错误");
+        }
+        enrollment.setState(MfaEnrollmentState.REVOKED.name());
+        enrollment.setRevokedAt(Instant.now(clock));
+        if (enrollmentMapper.updateById(enrollment) != 1) {
+            throw new IllegalStateException("停用 MFA 失败");
+        }
+        appendAudit("MFA_FACTOR_REVOKED", userId, Map.of("factorType", FACTOR_TOTP),
+                Map.of("factorType", FACTOR_TOTP, "state", MfaEnrollmentState.REVOKED.name()), "用户停用 MFA");
+    }
+
     /**
      * 创建或构建目标数据（{@code createRecoveryCodes}）。
      */
@@ -240,6 +270,21 @@ public class MfaServiceImpl implements MfaService {
     @Override
     public boolean hasActiveTotp(UUID userId) {
         return findActiveEnrollment(userId) != null;
+    }
+
+    @Override
+    public boolean hasAnyTotpEnrollment(UUID userId) {
+        return enrollmentMapper.selectCount(new LambdaQueryWrapper<MfaEnrollment>()
+                .eq(MfaEnrollment::getUserId, userId)
+                .eq(MfaEnrollment::getFactorType, FACTOR_TOTP)) > 0;
+    }
+
+    @Override
+    public boolean hasNonRevokedTotpEnrollment(UUID userId) {
+        return enrollmentMapper.selectCount(new LambdaQueryWrapper<MfaEnrollment>()
+                .eq(MfaEnrollment::getUserId, userId)
+                .eq(MfaEnrollment::getFactorType, FACTOR_TOTP)
+                .in(MfaEnrollment::getState, PENDING, ACTIVE)) > 0;
     }
 
     /**

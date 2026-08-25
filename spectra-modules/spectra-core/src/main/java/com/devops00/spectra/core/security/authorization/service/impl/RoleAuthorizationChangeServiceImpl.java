@@ -266,6 +266,9 @@ public class RoleAuthorizationChangeServiceImpl implements RoleAuthorizationChan
      * 校验并确保数据满足当前约束（{@code validatePermissionCodes}）。
      */
     private void validatePermissionCodes(Set<String> codes) {
+        if (codes.isEmpty()) {
+            return;
+        }
         var rows = permissionMapper.selectList(new LambdaQueryWrapper<Permission>().in(Permission::getCode, codes));
         var active = rows.stream()
                 .filter(permission -> SecurityAuthorizationState.ACTIVE.name().equals(permission.getState()))

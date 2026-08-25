@@ -19,5 +19,6 @@ package com.devops00.spectra.core.security.authentication.javabean.enums;
 /** MFA 登记状态。 */
 public enum MfaEnrollmentState {
     PENDING,
-    ACTIVE
+    ACTIVE,
+    REVOKED
 }

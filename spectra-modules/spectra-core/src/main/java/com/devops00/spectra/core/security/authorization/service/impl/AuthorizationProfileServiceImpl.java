@@ -264,9 +264,6 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
      * 校验并确保数据满足当前约束（{@code validateBoundaries}）。
      */
     private void validateBoundaries(SecurityRole role, List<AuthorizationProfileBoundaryFrom> boundaries) {
-        if (boundaries == null || boundaries.isEmpty()) {
-            throw new DataException("授权方案至少需要一个 Permission Boundary: " + role.getCode());
-        }
         var rolePermissionIds = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
                 .eq(RolePermission::getRoleId, role.getId()))
                 .stream()
@@ -277,6 +274,12 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 .stream()
                 .map(RoleGrantablePermission::getPermissionId)
                 .collect(Collectors.toSet());
+        if (boundaries == null || boundaries.isEmpty()) {
+            if (rolePermissionIds.isEmpty()) {
+                return;
+            }
+            throw new DataException("角色「" + roleDisplayName(role) + "」至少需要一个权限访问范围");
+        }
         var codes = boundaries.stream().map(item -> item.getPermission().trim()).toList();
         var permissions = permissionMapper.selectList(new LambdaQueryWrapper<Permission>()
                 .in(Permission::getCode, codes))
@@ -359,6 +362,13 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
                 .filter(code -> !code.isBlank())
                 .distinct()
                 .toList();
+    }
+
+    /**
+     * 获取角色展示名称（{@code roleDisplayName}）。
+     */
+    private String roleDisplayName(SecurityRole role) {
+        return role.getName() == null || role.getName().isBlank() ? role.getCode() : role.getName().trim();
     }
 
     /**
