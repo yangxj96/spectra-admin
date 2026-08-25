@@ -44,9 +44,9 @@ import java.util.UUID;
 public interface UserService extends BaseService<User> {
 
     /**
-     * 按用户邮箱查找身份资料，供通知和管理域使用；认证登录使用 identity hash，不直接信任该查询。
+     * 按登录用户名查找用户资料，供通知和管理域使用；认证登录使用 identity hash，不直接信任该查询。
      */
-    User getByEmail(String email);
+    User getByUsername(String username);
 
     /**
      * 分页查询用户列表

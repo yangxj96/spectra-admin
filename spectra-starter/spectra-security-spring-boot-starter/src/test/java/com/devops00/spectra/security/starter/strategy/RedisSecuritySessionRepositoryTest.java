@@ -85,7 +85,7 @@ class RedisSecuritySessionRepositoryTest {
 
         SecurityUser user = new SecurityUser();
         user.setId(userId);
-        user.setEmail("devops00.com");
+        user.setUsername("devops00.com");
         user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
         when(userLoader.load(userId)).thenReturn(user);
         SecuritySessionPolicyProvider policyProvider = mock();

@@ -191,7 +191,7 @@ public class LoginServiceImpl implements LoginService {
         return TokenVO.builder()
                 .loginType(LoginType.PASSWORD)
                 .id(user.getId())
-                .username(user.getEmail())
+                .username(user.getUsername())
                 .mfaRequired(true)
                 .mfaEnrollmentRequired(enrollmentRequired)
                 .mfaChallengeId(challenge.id())

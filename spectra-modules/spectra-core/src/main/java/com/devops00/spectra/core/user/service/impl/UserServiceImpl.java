@@ -28,6 +28,7 @@ import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.utils.StrUtils;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.security.authorization.domain.UserAuthorizationStatusCalculator;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
@@ -104,6 +105,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final AuthenticationIdentityService authenticationIdentityService;
 
+    private final UserContactService userContactService;
+
     private final PasswordCredentialService passwordCredentialService;
 
     private final NameFillExecutor fillExecutor;
@@ -123,11 +126,13 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final TimeMapper timeMapper;
 
     @Override
-    public User getByEmail(String email) {
-        if (StrUtils.isBlank(email)) {
+    public User getByUsername(String username) {
+        if (StrUtils.isBlank(username)) {
             return null;
         }
-        return this.getOne(new LambdaQueryWrapper<User>().eq(User::getEmail, email).last("LIMIT 1"));
+        return this.getOne(new LambdaQueryWrapper<User>()
+                .apply("lower(btrim(username)) = lower({0})", username.trim())
+                .last("LIMIT 1"));
     }
 
     @Override
@@ -136,12 +141,14 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (params.getStatus() != UserStatus.ACTIVE) {
             throw new DataException("新用户必须以 ACTIVE 状态创建");
         }
+        params.setUsername(params.getUsername().trim());
         var entity = userConverter.toEntity(params);
         if (!this.save(entity)) {
             throw new DataSaveException("保存用户信息异常");
         }
         // 目标认证模型将身份标识和密码凭证拆分保存；临时密码只保存其哈希。
-        authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getEmail());
+        authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getUsername());
+        syncProvisionedContacts(entity.getId(), params);
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
         return new UserCreatedVO(entity.getId(), entity.getRealName());
@@ -150,6 +157,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     @Override
     @Transactional
     public void modify(UserSaveFrom params) {
+        params.setUsername(params.getUsername().trim());
         var entity = this.getById(params.getId());
         if (null == entity) {
             throw new DataNotExistException("用户不存在");
@@ -158,7 +166,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
             throw new DataException("用户生命周期状态必须通过专用状态接口变更");
         }
         // 默认账号是否需要修改
-        boolean defaultAccountUpdateFlag = params.getEmail().equals(entity.getEmail());
+        boolean defaultAccountUpdateFlag = params.getUsername().equals(entity.getUsername());
         userConverter.updateUser(params, entity);
         if (this.baseMapper.updateById(entity) == 0) {
             throw new EntityUpdateException("更新用户发生错误");
@@ -166,7 +174,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
         // 默认密码身份处理
         if (!defaultAccountUpdateFlag) {
-            authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getEmail());
+            authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getUsername());
         }
 
     }
@@ -197,7 +205,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         // 条件构建
         var wrapper = new LambdaQueryWrapper<User>().like(StrUtils.isNotBlank(params.getRealName()), User::getRealName, params.getRealName())
                 .like(StrUtils.isNotBlank(params.getEmployeeNo()), User::getEmployeeNo, params.getEmployeeNo())
-                .like(StrUtils.isNotBlank(params.getEmail()), User::getEmail, params.getEmail())
+                .like(StrUtils.isNotBlank(params.getUsername()), User::getUsername, params.getUsername())
                 .in(params.getDepartmentId() != null, User::getDepartmentId, departmentService.getSelfAndDescendantIds(params.getDepartmentId()))
                 .eq(params.getStatus() != null, User::getStatus, params.getStatus());
 
@@ -404,6 +412,18 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
      */
     private List<RoleVO> targetRoles(UUID userId) {
         return targetRoles(authorizationAssignmentQueryService.findByUserId(userId));
+    }
+
+    /** 可信用户创建/导入流程可同时登记已验证联系方式。 */
+    private void syncProvisionedContacts(UUID userId, UserSaveFrom params) {
+        if (StrUtils.isNotBlank(params.getPhone())) {
+            userContactService.upsertVerified(userId, UserContactService.PHONE, params.getPhone());
+            authenticationIdentityService.createIdentity(userId, "SMS", params.getPhone());
+        }
+        if (StrUtils.isNotBlank(params.getEmail())) {
+            userContactService.upsertVerified(userId, UserContactService.EMAIL, params.getEmail());
+            authenticationIdentityService.createIdentity(userId, "EMAIL", params.getEmail());
+        }
     }
 
     /**

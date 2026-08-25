@@ -22,6 +22,8 @@ import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshotProvider;
 import com.devops00.spectra.security.base.authorization.ScopeMode;
@@ -45,6 +47,8 @@ import java.util.UUID;
 public class CoreNotificationRecipientDirectory implements NotificationRecipientDirectory {
 
     private final UserService userService;
+
+    private final UserContactService userContactService;
 
     private final AuthorizationSnapshotProvider authorizationSnapshotProvider;
 
@@ -72,7 +76,7 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         return loginNames.stream()
                 .filter(StringUtils::hasText)
                 .distinct()
-                .map(userService::getByEmail)
+                .map(userService::getByUsername)
                 .filter(Objects::nonNull)
                 .map(User::getId)
                 .filter(Objects::nonNull)
@@ -89,8 +93,17 @@ public class CoreNotificationRecipientDirectory implements NotificationRecipient
         }
         var user = userService.getById(userId);
         var active = user != null && UserStatus.ACTIVE.equals(user.getStatus());
-        var phone = user == null ? null : user.getPhone();
-        var email = user == null ? null : user.getEmail();
+        var contacts = user == null ? List.<UserContact>of() : userContactService.listActiveByUserId(userId);
+        var phone = contacts.stream()
+                .filter(contact -> UserContactService.PHONE.equals(contact.getContactType()))
+                .map(UserContact::getContactValue)
+                .findFirst()
+                .orElse(null);
+        var email = contacts.stream()
+                .filter(contact -> UserContactService.EMAIL.equals(contact.getContactType()))
+                .map(UserContact::getContactValue)
+                .findFirst()
+                .orElse(null);
         var verified = active && (StringUtils.hasText(phone) || StringUtils.hasText(email));
         return new NotificationRecipient(userId, phone, email, active, verified, user == null ? null : user.getTimezone());
     }

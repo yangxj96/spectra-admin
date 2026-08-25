@@ -129,7 +129,7 @@ public class MfaServiceImpl implements MfaService {
         if (user == null) {
             throw new IllegalStateException("MFA 登记用户不存在");
         }
-        String account = user.getEmail();
+        String account = user.getUsername();
         if (account == null || account.isBlank()) {
             throw new IllegalStateException("MFA 登记用户登录账号不存在");
         }

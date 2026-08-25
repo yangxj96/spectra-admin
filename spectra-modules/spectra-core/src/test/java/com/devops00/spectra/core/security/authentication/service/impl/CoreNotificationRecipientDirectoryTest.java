@@ -18,6 +18,8 @@ package com.devops00.spectra.core.security.authentication.service.impl;
 
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.core.system.service.DepartmentService;
+import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.service.UserService;
@@ -67,6 +69,8 @@ class CoreNotificationRecipientDirectoryTest {
 
     private SecurityContextAccessor security;
 
+    private UserContactService userContactService;
+
     @BeforeEach
     void setUp() {
         userService = mock(UserService.class);
@@ -76,11 +80,17 @@ class CoreNotificationRecipientDirectoryTest {
         var recipient = new User();
         recipient.setId(RECIPIENT_USER);
         recipient.setStatus(UserStatus.ACTIVE);
-        recipient.setEmail("recipient@example.com");
-        recipient.setPhone("13800138000");
         recipient.setDepartmentId(CURRENT_DEPARTMENT);
         when(userService.getById(RECIPIENT_USER)).thenReturn(recipient);
         when(security.currentUserId()).thenReturn(CURRENT_USER);
+        userContactService = mock(UserContactService.class);
+        var phone = new UserContact();
+        phone.setContactType(UserContactService.PHONE);
+        phone.setContactValue("13800138000");
+        var email = new UserContact();
+        email.setContactType(UserContactService.EMAIL);
+        email.setContactValue("recipient@example.com");
+        when(userContactService.listActiveByUserId(RECIPIENT_USER)).thenReturn(List.of(phone, email));
     }
 
     @Test
@@ -135,7 +145,8 @@ class CoreNotificationRecipientDirectoryTest {
     }
 
     private CoreNotificationRecipientDirectory directory() {
-        return new CoreNotificationRecipientDirectory(userService, authorizationSnapshotProvider, departmentService, security);
+        return new CoreNotificationRecipientDirectory(userService, userContactService, authorizationSnapshotProvider,
+                departmentService, security);
     }
 
     private void allowScope(AuthorizationScope scope) {

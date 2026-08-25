@@ -62,9 +62,9 @@ public class SecurityUser implements UserDetails {
     private String name;
 
     /**
-     * 邮箱
+     * 登录用户名
      */
-    private String email;
+    private String username;
 
     /**
      * 头像
@@ -142,14 +142,7 @@ public class SecurityUser implements UserDetails {
     @Override
     @NullMarked
     public String getUsername() {
-        return StrUtils.isNotBlank(this.getEmail()) ? this.getEmail() : "";
-    }
-
-    /**
-     * 更新或推进目标状态（{@code setUsername}）。
-     */
-    public void setUsername(String username) {
-        this.setEmail(username);
+        return StrUtils.isNotBlank(this.username) ? this.username : "";
     }
 
     /**

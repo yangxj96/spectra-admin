@@ -68,19 +68,18 @@ public class UserSaveFrom {
     @NotNull(message = "用户状态不能为空", groups = {Verify.Insert.class, Verify.Update.class})
     private UserStatus status;
 
-    /**
-     * 手机号码
-     */
-    @NotBlank(message = "手机号码不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    /** 登录用户名。 */
+    @NotBlank(message = "登录用户名不能为空", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 100, message = "登录用户名不能超过 100 个字符", groups = {Verify.Insert.class, Verify.Update.class})
+    private String username;
+
+    /** 新增用户时可由可信导入流程一并登记的手机号。 */
     @Size(max = 40, message = "手机号码不能超过 40 个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String phone;
 
-    /**
-     * 邮箱
-     */
+    /** 新增用户时可由可信导入流程一并登记的邮箱。 */
     @Email(message = "邮箱格式不正确", groups = {Verify.Insert.class, Verify.Update.class})
-    @NotBlank(message = "邮箱默认为登录账户，不能为空", groups = {Verify.Insert.class, Verify.Update.class})
-    @Size(max = 100, message = "邮箱不能超过 100 个字符", groups = {Verify.Insert.class, Verify.Update.class})
+    @Size(max = 255, message = "邮箱不能超过 255 个字符", groups = {Verify.Insert.class, Verify.Update.class})
     private String email;
 
     /**

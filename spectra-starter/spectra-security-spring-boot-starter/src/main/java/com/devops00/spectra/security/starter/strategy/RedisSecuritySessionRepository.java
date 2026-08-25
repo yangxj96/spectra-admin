@@ -174,7 +174,6 @@ public class RedisSecuritySessionRepository
         Map<String, Object> session = new LinkedHashMap<>();
         session.put("userId", userId);
         session.put("username", user.getUsername());
-        session.put("email", user.getEmail());
         session.put("clientType", clientType.getName());
         session.put("deviceId", resolveDeviceId());
         session.put("ip", ip);
@@ -747,7 +746,7 @@ public class RedisSecuritySessionRepository
         }
         return TokenVO.builder()
                 .id(user.getId())
-                .username(user.getEmail())
+                .username(user.getUsername())
                 .accessToken(token)
                 .refreshToken(refreshToken)
                 .permissions(permissions)

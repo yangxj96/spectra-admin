@@ -33,9 +33,13 @@ public class UserImportRowFrom {
     @Size(max = 64, message = "工号不能超过 64 个字符")
     private String employeeNo;
 
-    @NotBlank(message = "真实姓名不能为空")
-    @Size(max = 120, message = "真实姓名不能超过 120 个字符")
+    @NotBlank(message = "姓名不能为空")
+    @Size(max = 120, message = "姓名不能超过 120 个字符")
     private String realName;
+
+    @NotBlank(message = "登录用户名不能为空")
+    @Size(max = 100, message = "登录用户名不能超过 100 个字符")
+    private String username;
 
     @NotBlank(message = "手机号码不能为空")
     @Size(max = 40, message = "手机号码不能超过 40 个字符")

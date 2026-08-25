@@ -2673,7 +2673,7 @@ COMMENT ON COLUMN spectra_core.sys_user.departed_at IS '离职时间';
 -- Name: COLUMN sys_user.real_name; Type: COMMENT; Schema: spectra_core; Owner: -
 --
 
-COMMENT ON COLUMN spectra_core.sys_user.real_name IS '真实姓名';
+COMMENT ON COLUMN spectra_core.sys_user.real_name IS '姓名';
 
 
 --

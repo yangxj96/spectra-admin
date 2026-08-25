@@ -83,19 +83,12 @@ public class UserPageVO implements Serializable {
     private UserAuthorizationStatus authorizationStatus;
 
     /**
-     * 真实姓名
+     * 姓名
      */
     private String realName;
 
-    /**
-     * 手机号
-     */
-    private String phone;
-
-    /**
-     * 邮箱
-     */
-    private String email;
+    /** 登录用户名。 */
+    private String username;
 
     /**
      * 语言

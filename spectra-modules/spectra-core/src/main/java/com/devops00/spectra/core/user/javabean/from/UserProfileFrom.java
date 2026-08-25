@@ -19,7 +19,6 @@ package com.devops00.spectra.core.user.javabean.from;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -41,21 +40,6 @@ public class UserProfileFrom {
     @NotBlank(message = "姓名不能为空")
     @Size(max = 50, message = "姓名不能超过 50 个字符")
     private String realName;
-
-    /**
-     * 手机号
-     */
-    @NotBlank(message = "手机号码不能为空")
-    @Size(max = 40, message = "手机号码不能超过 40 个字符")
-    private String phone;
-
-    /**
-     * 邮箱
-     */
-    @NotBlank(message = "邮箱不能为空")
-    @Email(message = "邮箱格式不正确")
-    @Size(max = 100, message = "邮箱不能超过 100 个字符")
-    private String email;
 
     /**
      * 语言

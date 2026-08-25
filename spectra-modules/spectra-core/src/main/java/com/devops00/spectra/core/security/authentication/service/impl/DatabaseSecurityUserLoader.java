@@ -72,10 +72,10 @@ public class DatabaseSecurityUserLoader implements SecurityUserLoader {
     @Override
     public @Nullable SecurityUser load(UUID userId) {
         User user = userService.getById(userId);
-        if (user == null || user.getEmail() == null) {
+        if (user == null || user.getUsername() == null) {
             return null;
         }
-        AuthenticationIdentity identity = authenticationIdentityService.findPasswordIdentity(user.getEmail());
+        AuthenticationIdentity identity = authenticationIdentityService.findPasswordIdentity(user.getUsername());
         PasswordCredential credential = passwordCredentialService.getByUserId(userId);
         if (identity == null || credential == null) {
             return null;

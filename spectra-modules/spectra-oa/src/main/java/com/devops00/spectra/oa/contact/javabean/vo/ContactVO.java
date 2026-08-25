@@ -31,9 +31,12 @@ public class ContactVO {
     private String employeeNo;
 
     /**
-     * 真实姓名。
+     * 姓名。
      */
     private String realName;
+
+    /** 登录用户名。 */
+    private String username;
 
     /**
      * 头像。

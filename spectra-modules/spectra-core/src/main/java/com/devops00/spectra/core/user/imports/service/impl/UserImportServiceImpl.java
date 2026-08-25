@@ -22,6 +22,7 @@ import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.utils.SHA256Utils;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
+import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
@@ -119,6 +120,8 @@ public class UserImportServiceImpl implements UserImportService {
 
     private final UserMapper userMapper;
 
+    private final AuthenticationIdentityService authenticationIdentityService;
+
     private final DepartmentService departmentService;
 
     private final DictService dictService;
@@ -167,6 +170,7 @@ public class UserImportServiceImpl implements UserImportService {
             throw new DataException("创建用户导入任务失败");
         }
 
+        var usernames = new HashSet<String>();
         var emails = new HashSet<String>();
         var phones = new HashSet<String>();
         var validRows = 0;
@@ -183,7 +187,7 @@ public class UserImportServiceImpl implements UserImportService {
             row.setRowKey((index + 1) + ":" + normalized.source().getEmployeeNo());
             row.setRawData(normalized.rawData());
             row.setNormalizedData(normalized.normalizedData());
-            var errors = validate(normalized.source(), referenceData, params.isSkipExisting(), emails, phones);
+            var errors = validate(normalized.source(), referenceData, params.isSkipExisting(), usernames, emails, phones);
             if (errors.isEmpty()) {
                 row.setState(STATE_VALID);
                 validRows++;
@@ -408,10 +412,15 @@ public class UserImportServiceImpl implements UserImportService {
      * 校验并确保数据满足当前约束（{@code validate}）。
      */
     private List<String> validate(UserImportRowFrom source, ReferenceData referenceData, boolean skipExisting,
-                                  Set<String> emails, Set<String> phones) {
+                                  Set<String> usernames, Set<String> emails, Set<String> phones) {
         var errors = new ArrayList<String>();
         if (blank(source.getRealName())) {
-            errors.add("真实姓名不能为空");
+            errors.add("姓名不能为空");
+        }
+        if (blank(source.getUsername())) {
+            errors.add("登录用户名不能为空");
+        } else if (!usernames.add(source.getUsername().toLowerCase(Locale.ROOT))) {
+            errors.add("登录用户名在导入文件中重复");
         }
         if (blank(source.getPhone())) {
             errors.add("手机号码不能为空");
@@ -442,7 +451,7 @@ public class UserImportServiceImpl implements UserImportService {
         }
         var existing = findExisting(source);
         if (existing != null && !skipExisting) {
-            errors.add("邮箱或手机号码已存在");
+            errors.add("登录用户名、邮箱或手机号码已存在");
         }
         return errors;
     }
@@ -559,6 +568,7 @@ public class UserImportServiceImpl implements UserImportService {
         var result = new LinkedHashMap<String, Object>();
         result.put("employee_no", source.getEmployeeNo());
         result.put("real_name", source.getRealName());
+        result.put("username", source.getUsername());
         result.put("phone", source.getPhone());
         result.put("email", source.getEmail());
         result.put("department_code", source.getDepartmentCode());
@@ -575,6 +585,7 @@ public class UserImportServiceImpl implements UserImportService {
         var source = new UserImportRowFrom();
         source.setEmployeeNo(value(values, "employee_no"));
         source.setRealName(value(values, "real_name"));
+        source.setUsername(value(values, "username"));
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));
         source.setDepartmentCode(value(values, "department_code"));
@@ -640,11 +651,22 @@ public class UserImportServiceImpl implements UserImportService {
         if (byEmployeeNo != null) {
             return byEmployeeNo;
         }
-        var byEmail = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, source.getEmail()));
-        if (byEmail != null) {
-            return byEmail;
+        var byUsername = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .apply("lower(btrim(username)) = lower({0})", source.getUsername())
+                .last("LIMIT 1"));
+        if (byUsername != null) {
+            return byUsername;
         }
-        return userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, source.getPhone()));
+        var byEmail = source.getEmail() == null || source.getEmail().isBlank()
+                ? null
+                : authenticationIdentityService.findIdentity("EMAIL", source.getEmail());
+        if (byEmail != null) {
+            return userMapper.selectById(byEmail.getUserId());
+        }
+        var byPhone = source.getPhone() == null || source.getPhone().isBlank()
+                ? null
+                : authenticationIdentityService.findIdentity("SMS", source.getPhone());
+        return byPhone == null ? null : userMapper.selectById(byPhone.getUserId());
     }
 
     /**

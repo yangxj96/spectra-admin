@@ -19,6 +19,7 @@ package com.devops00.spectra.core.user.imports.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
@@ -62,6 +63,8 @@ public class UserImportRowProcessor {
 
     private final UserMapper userMapper;
 
+    private final AuthenticationIdentityService authenticationIdentityService;
+
     private final UserService userService;
 
     private final SecurityRoleMapper roleMapper;
@@ -98,6 +101,7 @@ public class UserImportRowProcessor {
         var user = new UserSaveFrom();
         user.setEmployeeNo(source.getEmployeeNo());
         user.setRealName(source.getRealName());
+        user.setUsername(source.getUsername());
         user.setPhone(source.getPhone());
         user.setEmail(source.getEmail());
         user.setLanguage(source.getLanguage());
@@ -184,11 +188,22 @@ public class UserImportRowProcessor {
         if (byEmployeeNo != null) {
             return byEmployeeNo;
         }
-        var byEmail = userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getEmail, source.getEmail()));
-        if (byEmail != null) {
-            return byEmail;
+        var byUsername = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .apply("lower(btrim(username)) = lower({0})", source.getUsername())
+                .last("LIMIT 1"));
+        if (byUsername != null) {
+            return byUsername;
         }
-        return userMapper.selectOne(new LambdaQueryWrapper<User>().eq(User::getPhone, source.getPhone()));
+        var byEmail = source.getEmail() == null || source.getEmail().isBlank()
+                ? null
+                : authenticationIdentityService.findIdentity("EMAIL", source.getEmail());
+        if (byEmail != null) {
+            return userMapper.selectById(byEmail.getUserId());
+        }
+        var byPhone = source.getPhone() == null || source.getPhone().isBlank()
+                ? null
+                : authenticationIdentityService.findIdentity("SMS", source.getPhone());
+        return byPhone == null ? null : userMapper.selectById(byPhone.getUserId());
     }
 
     /**
@@ -198,6 +213,7 @@ public class UserImportRowProcessor {
         var source = new UserImportRowFrom();
         source.setEmployeeNo(value(values, "employee_no"));
         source.setRealName(value(values, "real_name"));
+        source.setUsername(value(values, "username"));
         source.setPhone(value(values, "phone"));
         source.setEmail(value(values, "email"));
         source.setDepartmentCode(value(values, "department_code"));

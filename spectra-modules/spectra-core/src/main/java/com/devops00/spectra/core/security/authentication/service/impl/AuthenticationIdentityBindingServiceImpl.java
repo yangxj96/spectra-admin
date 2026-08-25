@@ -23,6 +23,7 @@ import com.devops00.spectra.core.security.authentication.javabean.entity.Authent
 import com.devops00.spectra.core.security.authentication.javabean.enums.AuthenticationIdentityState;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.security.base.constant.LoginType;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
@@ -54,6 +55,8 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
 
     private final AuthenticationIdentityService identityService;
 
+    private final UserContactService userContactService;
+
     @Override
     public List<AuthenticationIdentity> listByUserId(UUID userId) {
         return identityService.listByUserId(userId);
@@ -64,6 +67,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     public void bindPhone(UUID userId, String phone, String code) {
         consumeBindingCode(RedisCacheKey.BIND_PHONE_CODE, phone, code);
         identityService.createIdentity(userId, LoginType.SMS.name(), phone);
+        userContactService.upsertVerified(userId, UserContactService.PHONE, phone);
     }
 
     @Override
@@ -71,6 +75,7 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
     public void bindEmail(UUID userId, String email, String code) {
         consumeBindingCode(RedisCacheKey.BIND_EMAIL_CODE, email, code);
         identityService.createIdentity(userId, LoginType.EMAIL.name(), email);
+        userContactService.upsertVerified(userId, UserContactService.EMAIL, email);
     }
 
     @Override
@@ -88,6 +93,11 @@ public class AuthenticationIdentityBindingServiceImpl implements AuthenticationI
             throw new SpectraException("至少需要保留一个认证身份");
         }
         identityService.revokeByUserIdAndId(userId, identityId);
+        if (LoginType.SMS.name().equals(identity.getMethodCode())) {
+            userContactService.revokeByUserIdAndType(userId, UserContactService.PHONE);
+        } else if (LoginType.EMAIL.name().equals(identity.getMethodCode())) {
+            userContactService.revokeByUserIdAndType(userId, UserContactService.EMAIL);
+        }
     }
 
     /**

@@ -140,7 +140,7 @@ class UserImportServiceImplTest {
         task.setTotalRows(1);
         task.setErrorRows(1);
         task.setProfileVersionHash(SHA256Utils.hash("profile|MISSING"));
-        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001f13800138000"
+        task.setRequestHash(SHA256Utils.hash("file-hash\u001ffalse\u001e\u001fEMP-001\u001f张三\u001fzhangsan\u001f13800138000"
                 + "\u001fzhangsan@example.com\u001fdept\u001fzh-CN\u001fAsia/Shanghai\u001fprofile"));
         when(taskMapper.selectOne(any())).thenReturn(task);
         when(rowMapper.selectList(any())).thenReturn(List.of(row));
@@ -175,6 +175,7 @@ class UserImportServiceImplTest {
         var normalized = new LinkedHashMap<String, Object>();
         normalized.put("employee_no", "EMP-001");
         normalized.put("real_name", "张三");
+        normalized.put("username", "zhangsan");
         normalized.put("phone", "13800138000");
         normalized.put("email", "zhangsan@example.com");
         normalized.put("department_code", "dept");

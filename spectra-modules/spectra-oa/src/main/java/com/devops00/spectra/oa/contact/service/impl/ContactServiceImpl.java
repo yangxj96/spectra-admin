@@ -11,6 +11,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
+import com.devops00.spectra.core.security.authentication.javabean.entity.UserContact;
+import com.devops00.spectra.core.security.authentication.service.UserContactService;
 import com.devops00.spectra.core.system.javabean.entity.Department;
 import com.devops00.spectra.core.system.mapper.DepartmentMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -45,6 +47,7 @@ public class ContactServiceImpl implements ContactService {
     private final UserMapper userMapper;
     private final DepartmentMapper departmentMapper;
     private final ContactConverter contactConverter;
+    private final UserContactService userContactService;
 
     @Override
     public IPage<ContactVO> page(PageFrom page, String keyword) {
@@ -55,9 +58,7 @@ public class ContactServiceImpl implements ContactService {
                     .or()
                     .like(User::getRealName, value)
                     .or()
-                    .like(User::getPhone, value)
-                    .or()
-                    .like(User::getEmail, value));
+                    .like(User::getUsername, value));
         }
         wrapper.orderByAsc(User::getRealName).orderByAsc(User::getEmployeeNo);
         var users = userMapper.selectPage(page.toPage(), wrapper);
@@ -65,13 +66,26 @@ public class ContactServiceImpl implements ContactService {
         Map<UUID, Department> departments = departmentIds.isEmpty()
                 ? Collections.emptyMap()
                 : departmentMapper.selectByIds(departmentIds).stream().collect(Collectors.toMap(Department::getId, Function.identity()));
+        var contacts = userContactService.listActiveByUserIds(users.getRecords().stream().map(User::getId).toList());
         var result = new Page<ContactVO>(users.getCurrent(), users.getSize(), users.getTotal());
         result.setRecords(users.getRecords().stream().map(user -> {
             var vo = contactConverter.toVO(user);
+            vo.setUsername(user.getUsername());
+            var userContacts = contacts.getOrDefault(user.getId(), java.util.List.of());
+            vo.setPhone(contactValue(userContacts, UserContactService.PHONE));
+            vo.setEmail(contactValue(userContacts, UserContactService.EMAIL));
             var department = user.getDepartmentId() == null ? null : departments.get(user.getDepartmentId());
             vo.setDepartmentName(department == null ? null : StringUtils.hasText(department.getPath()) ? department.getPath() : department.getName());
             return vo;
         }).toList());
         return result;
+    }
+
+    private String contactValue(java.util.List<UserContact> contacts, String type) {
+        return contacts.stream()
+                .filter(contact -> type.equals(contact.getContactType()))
+                .map(UserContact::getContactValue)
+                .findFirst()
+                .orElse(null);
     }
 }

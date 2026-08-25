@@ -73,22 +73,14 @@ public class User extends BaseEntity {
     private Instant departedAt;
 
     /**
-     * 真实姓名
+     * 姓名
      */
     @TableField(value = "real_name")
     private String realName;
 
-    /**
-     * 手机号
-     */
-    @TableField(value = "phone")
-    private String phone;
-
-    /**
-     * 邮箱
-     */
-    @TableField(value = "email")
-    private String email;
+    /** 登录用户名；联系方式不再存储在用户主表。 */
+    @TableField(value = "username")
+    private String username;
 
     /**
      * 语言

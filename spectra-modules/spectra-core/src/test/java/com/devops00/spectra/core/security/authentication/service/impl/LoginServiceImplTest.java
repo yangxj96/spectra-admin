@@ -200,10 +200,10 @@ class LoginServiceImplTest {
         return mock(SecurityMfaChallengePort.class);
     }
 
-    private static SecurityUser user(UUID id, String email, String role) {
+    private static SecurityUser user(UUID id, String username, String role) {
         SecurityUser user = new SecurityUser();
         user.setId(id);
-        user.setEmail(email);
+        user.setUsername(username);
         user.setAuthorities(List.of(new SimpleGrantedAuthority(role)));
         return user;
     }

@@ -168,7 +168,7 @@ class AuthorizationProfileServiceImplTest {
     }
 
     private static AuthorizationProfileSaveFrom saveFrom(String roleCode, long roleVersion,
-                                                          List<AuthorizationProfileBoundaryFrom> boundaries) {
+                                                         List<AuthorizationProfileBoundaryFrom> boundaries) {
         var assignment = new AuthorizationProfileAssignmentFrom();
         assignment.setRoleCode(roleCode);
         assignment.setRoleVersion(roleVersion);

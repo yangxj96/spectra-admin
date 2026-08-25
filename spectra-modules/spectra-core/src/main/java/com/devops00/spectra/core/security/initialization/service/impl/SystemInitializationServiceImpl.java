@@ -79,8 +79,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         return new SystemInitializationStatusVO(
                 state.getState(),
                 SystemStateKeys.INITIALIZED.equals(state.getState()),
-                !SystemStateKeys.INITIALIZED.equals(state.getState())
-        );
+                !SystemStateKeys.INITIALIZED.equals(state.getState()));
     }
 
     @Override
@@ -103,7 +102,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         }
 
         User user = new User();
-        user.setEmail(username);
+        user.setUsername(username);
         user.setEmployeeNo("DEV_OPS");
         user.setStatus(UserStatus.LOCKED);
         user.setRealName(from.getRealName() == null || from.getRealName().isBlank()
@@ -207,7 +206,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
      */
     private User findExistingUser(String username) {
         return userMapper.selectOne(new LambdaQueryWrapper<User>()
-                .eq(User::getEmail, username)
+                .apply("lower(btrim(username)) = lower({0})", username.trim())
                 .last("LIMIT 1"));
     }
 
@@ -218,7 +217,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
         SystemState state = lock
                 ? stateMapper.selectForUpdateByStateKey(SystemStateKeys.SYSTEM)
                 : stateMapper.selectOne(new LambdaQueryWrapper<SystemState>()
-                .eq(SystemState::getStateKey, SystemStateKeys.SYSTEM));
+                        .eq(SystemState::getStateKey, SystemStateKeys.SYSTEM));
         if (state == null) {
             throw new IllegalStateException("系统初始化状态不存在");
         }

@@ -50,7 +50,7 @@ class UserControllerTest {
         from.setEmployeeNo("ADMIN");
         from.setRealName("系统管理员");
         from.setPhone("13800000000");
-        from.setEmail("admin@devops00.com");
+        from.setUsername("admin");
         from.setDepartmentId(UuidCreator.getTimeOrderedEpoch());
 
         var createdUser = userService.create(from);
