@@ -121,6 +121,28 @@ class UserOnboardingServiceImplTest {
     }
 
     @Test
+    void submitShouldAllowUserWithOnlySystemDefaultRole() {
+        var userId = UUID.randomUUID();
+        var userParams = new UserSaveFrom();
+        var authorization = new AuthorizationAssignmentsChangeFrom();
+        authorization.setAssignments(List.of());
+        authorization.setRemovedAssignments(List.of());
+        var request = new UserOnboardingFrom();
+        request.setUser(userParams);
+        request.setAuthorization(authorization);
+        when(userService.create(userParams)).thenReturn(new UserCreatedVO(userId, "基础用户"));
+        when(assignmentQueryService.findByUserId(userId)).thenReturn(List.of());
+
+        UserOnboardingVO result = service.submit(request);
+
+        assertEquals(userId, result.getId());
+        verify(userService).create(userParams);
+        verify(assignmentChangeService, never()).preview(any(), any());
+        verify(assignmentChangeService, never()).apply(any(), any());
+        verify(assignmentChangeService, never()).revoke(any(), any());
+    }
+
+    @Test
     void submitShouldReconcileExistingAssignmentsAndRevokeRemovedRole() {
         var userId = UUID.randomUUID();
         var keptAssignmentId = UUID.randomUUID();

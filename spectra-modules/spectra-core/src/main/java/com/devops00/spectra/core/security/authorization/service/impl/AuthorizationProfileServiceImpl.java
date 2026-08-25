@@ -256,6 +256,9 @@ public class AuthorizationProfileServiceImpl extends BaseServiceImpl<Authorizati
             if ("DEV_OPS".equals(role.getRoleKind())) {
                 throw new DataException("DEV_OPS Role 不能通过普通授权方案配置");
             }
+            if (Boolean.TRUE.equals(role.getSystemManaged())) {
+                throw new DataException("系统内置 Role 不能通过普通授权方案配置: " + roleCode);
+            }
             validateBoundaries(role, assignment.getBoundaries());
         }
     }

@@ -35,6 +35,7 @@ import com.devops00.spectra.core.security.authorization.constant.SecurityAuthori
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
+import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.system.service.DepartmentService;
 import com.devops00.spectra.core.user.javabean.converter.UserConverter;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
@@ -97,6 +98,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
 
     private final AuthorizationAssignmentQueryService authorizationAssignmentQueryService;
 
+    private final AuthorizationAssignmentChangeService authorizationAssignmentChangeService;
+
     private final RoleAssignmentMapper roleAssignmentMapper;
 
     private final DepartmentService departmentService;
@@ -150,6 +153,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         authenticationIdentityService.createPasswordIdentity(entity.getId(), entity.getUsername());
         syncProvisionedContacts(entity.getId(), params);
         passwordCredentialService.createOrReplace(entity.getId(), passwordEncoder.encode(generateTemporaryPassword()), true);
+        authorizationAssignmentChangeService.ensureDefaultUserRole(entity.getId());
         appendAudit("USER_CREATED", entity.getId(), Map.of(), Map.of("status", entity.getStatus().getCode()), null);
         return new UserCreatedVO(entity.getId(), entity.getRealName());
     }
@@ -176,6 +180,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
         if (!defaultAccountUpdateFlag) {
             authenticationIdentityService.updatePasswordIdentifier(entity.getId(), entity.getUsername());
         }
+        authorizationAssignmentChangeService.ensureDefaultUserRole(entity.getId());
 
     }
 

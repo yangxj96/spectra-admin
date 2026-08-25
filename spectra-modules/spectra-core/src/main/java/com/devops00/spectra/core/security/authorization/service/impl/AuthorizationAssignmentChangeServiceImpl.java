@@ -29,6 +29,7 @@ import com.devops00.spectra.core.security.authorization.entity.RoleGrantablePerm
 import com.devops00.spectra.core.security.authorization.entity.RolePermission;
 import com.devops00.spectra.core.security.authorization.entity.ScopeRule;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
+import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentApplyFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentChangeFrom;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationAssignmentRemovalFrom;
@@ -48,6 +49,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
 import com.devops00.spectra.core.user.mapper.UserMapper;
+import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -55,6 +57,7 @@ import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.authorization.AuthorizationGrantRequest;
 import com.devops00.spectra.security.base.authorization.AuthorizationScope;
 import com.devops00.spectra.security.base.authorization.AuthorizationSnapshot;
+import com.devops00.spectra.security.base.authorization.ScopeMode;
 import com.devops00.spectra.security.base.change.AuthorizationChangeToken;
 import com.devops00.spectra.security.base.change.AuthorizationChangeTokenService;
 import com.devops00.spectra.security.base.change.AuthorizationEpochGuard;
@@ -74,9 +77,11 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -183,7 +188,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
                 || from.getExpectedVersion() == null) {
             throw new DataException("角色授权移除参数不能为空");
         }
-        var target = userMapper.selectById(targetUserId);
+        var target = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getId, targetUserId)
+                .last("FOR UPDATE"));
         if (target == null) {
             throw new DataNotExistException("目标用户不存在");
         }
@@ -196,6 +203,10 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         }
         if (!SecurityAuthorizationState.ACTIVE.name().equals(assignment.getState())) {
             throw new DataException("待移除的角色授权已经不是生效状态");
+        }
+        var assignedRole = securityRoleMapper.selectById(assignment.getRoleId());
+        if (assignedRole != null && SecurityRoleCodes.DEFAULT_USER.equals(assignedRole.getCode())) {
+            throw new DataException("普通用户基础角色由系统自动维护，不能移除");
         }
         long assignmentVersion = assignment.getVersion() == null ? 0L : assignment.getVersion();
         if (assignmentVersion != from.getExpectedVersion()) {
@@ -236,6 +247,66 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         });
     }
 
+    @Override
+    @Transactional
+    public void ensureDefaultUserRole(UUID targetUserId) {
+        if (targetUserId == null) {
+            throw new DataException("目标用户不能为空");
+        }
+        var target = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getId, targetUserId)
+                .last("FOR UPDATE"));
+        if (target == null) {
+            throw new DataNotExistException("目标用户不存在");
+        }
+        var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
+                .eq(SecurityRole::getCode, SecurityRoleCodes.DEFAULT_USER)
+                .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()));
+        if (role == null) {
+            throw new DataNotExistException("系统普通用户基础角色不存在或已停用");
+        }
+        var existing = roleAssignmentMapper.selectOne(new LambdaQueryWrapper<RoleAssignment>()
+                .eq(RoleAssignment::getUserId, targetUserId)
+                .eq(RoleAssignment::getRoleId, role.getId())
+                .eq(RoleAssignment::getState, SecurityAuthorizationState.ACTIVE.name())
+                .last("LIMIT 1"));
+        if (existing != null) {
+            return;
+        }
+
+        var requests = rolePermissionMapper.selectList(new LambdaQueryWrapper<RolePermission>()
+                .eq(RolePermission::getRoleId, role.getId()))
+                .stream()
+                .map(RolePermission::getPermissionId)
+                .map(permissionMapper::selectById)
+                .filter(Objects::nonNull)
+                .map(permission -> {
+                    var allowedModes = permission.getAllowedScopeModes() == null
+                            ? List.<String>of()
+                            : Arrays.stream(permission.getAllowedScopeModes().split(","))
+                                    .map(String::trim)
+                                    .map(mode -> mode.toUpperCase(Locale.ROOT))
+                                    .toList();
+                    if (!allowedModes.contains(ScopeMode.SELF.name())) {
+                        throw new DataException("基础角色权限不支持 SELF 访问范围: " + permission.getCode());
+                    }
+                    return new AuthorizationGrantRequest(permission.getCode(),
+                            AuthorizationScope.of(ScopeMode.SELF), null,
+                            role.getAuthorityLevel());
+                })
+                .toList();
+        var targetSecurityVersion = target.getSecurityVersion() == null ? 0L : target.getSecurityVersion();
+        var prepared = new PreparedChange(securityContextAccessor.currentUserId(), role, null, null, requests, 0L,
+                targetSecurityVersion, "SYSTEM_DEFAULT_USER_ROLE");
+        var assignmentId = persist(prepared, targetUserId);
+        appendAudit("DEFAULT_USER_ROLE_ASSIGNED", prepared.operatorId(), targetUserId,
+                Map.of("assignmentId", assignmentId.toString()),
+                Map.of("roleCode", SecurityRoleCodes.DEFAULT_USER, "permissionCount", requests.size()),
+                "系统自动补齐普通用户基础角色");
+        epochGuard.advance(targetUserId, targetSecurityVersion);
+        sessionRevocationPort.revokeUserSessions(targetUserId);
+    }
+
     /**
      * 创建或构建目标数据（{@code prepare}）。
      */
@@ -265,6 +336,9 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         var requests = toGrantRequests(role, from.getBoundaries());
         var rootPolicy = rootAuthorizationPolicy.getIfAvailable();
         var root = rootPolicy != null && rootPolicy.isRoot(SecurityContextHolder.getContext().getAuthentication());
+        if (SecurityRoleCodes.DEFAULT_USER.equals(role.getCode())) {
+            throw new DataException("普通用户基础角色由系统自动维护，不能手工变更");
+        }
         AuthorizationSnapshot snapshot = snapshotLoader.load(operatorId);
         grantBoundaryService.evaluate(snapshot, operatorId, targetUserId, requests, root);
         var requestHash = requestHash(assignmentId, role.getId(), from.getExpectedVersion(), targetSecurityVersion,

@@ -18,6 +18,7 @@ package com.devops00.spectra.core.security.authorization.domain;
 
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
+import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 
 import java.time.LocalDateTime;
@@ -103,6 +104,9 @@ public final class UserAuthorizationStatusCalculator {
         }
         if (incompleteCount > 0) {
             return UserAuthorizationStatus.INCOMPLETE;
+        }
+        if (currentAssignments.stream().allMatch(assignment -> SecurityRoleCodes.DEFAULT_USER.equals(assignment.roleCode()))) {
+            return UserAuthorizationStatus.BASIC_ONLY;
         }
         return UserAuthorizationStatus.ACTIVE;
     }

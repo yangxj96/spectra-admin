@@ -17,7 +17,6 @@
 package com.devops00.spectra.core.security.authorization.javabean.from;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
@@ -33,9 +32,9 @@ import java.util.List;
 public class AuthorizationAssignmentsChangeFrom {
 
     /**
-     * 提交后保留或新增的角色授权，至少保留一个角色。
+     * 提交后保留或新增的业务角色授权。系统自动维护的 ROLE_USER 不在此字段中提交，
+     * 因此普通用户可以只保留系统基础角色并提交空列表。
      */
-    @NotEmpty(message = "至少保留一个角色授权")
     @Valid
     private List<AuthorizationAssignmentChangeFrom> assignments;
 

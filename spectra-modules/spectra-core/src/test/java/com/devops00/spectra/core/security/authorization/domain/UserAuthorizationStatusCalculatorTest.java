@@ -55,6 +55,14 @@ class UserAuthorizationStatusCalculatorTest {
     }
 
     @Test
+    void returnsBasicOnlyWhenOnlyDefaultUserRoleIsEffective() {
+        var assignment = assignment("ROLE_USER", "ACTIVE", "ACTIVE", 2L, 2, null, null);
+
+        assertThat(UserAuthorizationStatusCalculator.calculate(List.of(assignment), NOW))
+                .isEqualTo(UserAuthorizationStatus.BASIC_ONLY);
+    }
+
+    @Test
     void returnsActiveWhenEffectiveRootAssignmentHasNoPermissionBoundaries() {
         var assignment = assignment(RootAuthorizationPolicy.ROOT_ROLE, "ACTIVE", "ACTIVE", 7L, 0, null, null);
 

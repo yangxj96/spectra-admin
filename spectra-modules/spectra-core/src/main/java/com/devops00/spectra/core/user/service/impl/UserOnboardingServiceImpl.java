@@ -24,6 +24,7 @@ import com.devops00.spectra.core.security.authorization.javabean.vo.Authorizatio
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentQueryService;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
+import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.core.user.javabean.from.UserOnboardingFrom;
 import com.devops00.spectra.core.user.javabean.from.UserSaveFrom;
 import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
@@ -88,7 +89,10 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
                 : params.getRemovedAssignments()) {
             assignmentChangeService.revoke(userId, removal);
         }
-        for (var assignment : params.getAssignments()) {
+        var assignments = params.getAssignments() == null
+                ? List.<AuthorizationAssignmentChangeFrom>of()
+                : params.getAssignments();
+        for (var assignment : assignments) {
             applyAssignment(userId, assignment);
         }
     }
@@ -111,19 +115,23 @@ public class UserOnboardingServiceImpl implements UserOnboardingService {
      * 校验并确保数据满足当前约束（{@code validateAssignments}）。
      */
     private void validateAssignments(UUID userId, AuthorizationAssignmentsChangeFrom params) {
-        if (params == null || params.getAssignments() == null || params.getAssignments().isEmpty()) {
-            throw new com.devops00.spectra.common.exception.DataException("至少保留一个角色授权");
+        if (params == null) {
+            throw new com.devops00.spectra.common.exception.DataException("角色授权参数不能为空");
         }
         var activeAssignments = assignmentQueryService.findByUserId(userId)
                 .stream()
                 .filter(assignment -> SecurityAuthorizationState.ACTIVE.name().equals(assignment.state()))
+                .filter(assignment -> !SecurityRoleCodes.DEFAULT_USER.equals(assignment.roleCode()))
                 .toList();
         var activeAssignmentIds = activeAssignments.stream()
                 .map(assignment -> assignment.assignmentId())
                 .collect(Collectors.toSet());
         var requestedAssignmentIds = new HashSet<UUID>();
         var requestedRoleIds = new HashSet<UUID>();
-        for (var assignment : params.getAssignments()) {
+        var requestedAssignments = params.getAssignments() == null
+                ? List.<AuthorizationAssignmentChangeFrom>of()
+                : params.getAssignments();
+        for (var assignment : requestedAssignments) {
             if (assignment.getAssignmentId() != null && !requestedAssignmentIds.add(assignment.getAssignmentId())) {
                 throw new com.devops00.spectra.common.exception.DataException("同一角色授权不能重复提交");
             }

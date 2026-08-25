@@ -18,6 +18,7 @@ import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
+import com.devops00.spectra.core.security.authorization.constant.SecurityRoleCodes;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
 import com.devops00.spectra.core.user.javabean.from.RoleFrom;
@@ -166,7 +167,7 @@ public class RoleServiceImpl extends ServiceImpl<SecurityRoleMapper, SecurityRol
     @Override
     public SecurityRole getSystemDefaultUserRole() {
         return getBaseMapper().selectOne(new LambdaQueryWrapper<SecurityRole>()
-                .eq(SecurityRole::getCode, "ROLE_USER")
+                .eq(SecurityRole::getCode, SecurityRoleCodes.DEFAULT_USER)
                 .eq(SecurityRole::getState, SecurityAuthorizationState.ACTIVE.name()));
     }
 

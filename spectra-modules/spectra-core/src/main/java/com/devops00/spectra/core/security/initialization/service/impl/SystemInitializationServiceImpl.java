@@ -18,6 +18,7 @@ import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
 import com.devops00.spectra.core.security.authorization.entity.SecurityRole;
 import com.devops00.spectra.core.security.authorization.mapper.RoleAssignmentMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
 import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
@@ -64,6 +65,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private final ConfiguredService configuredService;
     private final SecurityRoleMapper securityRoleMapper;
     private final RoleAssignmentMapper roleAssignmentMapper;
+    private final AuthorizationAssignmentChangeService authorizationAssignmentChangeService;
     private final AuthenticationIdentityService authenticationIdentityService;
     private final PasswordCredentialService passwordCredentialService;
     private final MfaService mfaService;
@@ -187,6 +189,7 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
                 throw new IllegalStateException("创建 DEV_OPS 角色分配失败");
             }
         }
+        authorizationAssignmentChangeService.ensureDefaultUserRole(user.getId());
 
         state.setState(SystemStateKeys.INITIALIZED);
         state.setInitializedAt(Instant.now());

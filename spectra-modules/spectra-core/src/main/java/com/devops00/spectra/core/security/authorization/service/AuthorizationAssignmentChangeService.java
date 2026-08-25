@@ -49,4 +49,11 @@ public interface AuthorizationAssignmentChangeService {
      * @param from         撤销请求
      */
     void revoke(UUID targetUserId, AuthorizationAssignmentRemovalFrom from);
+
+    /**
+     * 确保目标用户拥有系统自动维护的普通用户基础角色。
+     *
+     * @param targetUserId 目标用户
+     */
+    void ensureDefaultUserRole(UUID targetUserId);
 }

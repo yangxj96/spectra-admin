@@ -14,29 +14,20 @@
  *  limitations under the License.
  */
 
-package com.devops00.spectra.core.security.authorization.domain;
+package com.devops00.spectra.core.security.authorization.constant;
 
 /**
- * 用户当前授权状态。
+ * 系统内置角色编码。
  *
  * @author yangxj96
  * @version 1.0
- * @since 2026/8/21
+ * @since 2026/8/26
  */
-public enum UserAuthorizationStatus {
+public final class SecurityRoleCodes {
 
-    /** 没有任何 RoleAssignment。 */
-    UNCONFIGURED,
+    /** 普通用户基础角色。 */
+    public static final String DEFAULT_USER = "ROLE_USER";
 
-    /** 仅拥有系统自动维护的普通用户基础角色。 */
-    BASIC_ONLY,
-
-    /** 存在有效 RoleAssignment，但缺少完整的 Permission Boundary。 */
-    INCOMPLETE,
-
-    /** 至少一个有效 RoleAssignment 已完整生效，且没有失效授权。 */
-    ACTIVE,
-
-    /** 当前仍有已过期、停用 Role 或部分失效的授权。 */
-    PARTIAL
+    private SecurityRoleCodes() {
+    }
 }
