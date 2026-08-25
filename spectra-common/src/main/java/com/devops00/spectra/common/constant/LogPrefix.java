@@ -39,8 +39,7 @@ public enum LogPrefix {
     PERSISTENCE("持久化"),
     REDIS("Redis"),
     CACHE("缓存"),
-    LOG("日志"),
-    AI("AI");
+    LOG("日志");
 
     private final String value;
 

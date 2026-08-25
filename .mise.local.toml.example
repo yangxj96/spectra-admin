@@ -58,13 +58,3 @@ S3_ACCESS_KEY = "local-placeholder"
 S3_SECRET_KEY = "local-placeholder"
 S3_BUCKET = "spectra-local"
 S3_REGION = "us-east-1"
-
-# AI：本机占位端点不会自动提供模型服务；调用 AI 功能前必须替换
-AI_KEY = "local-placeholder"
-AI_BASE_URL = "http://127.0.0.1:11434/v1"
-AI_MODEL = "local-placeholder"
-
-# RAG/Embedding：调用 RAG 前必须配置真实兼容端点和模型
-RAG_KEY = "local-placeholder"
-RAG_BASE_URL = "http://127.0.0.1:11434/v1"
-RAG_MODEL = "local-placeholder"

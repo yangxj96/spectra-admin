@@ -18,7 +18,6 @@
     <modules>
         <module>spectra-security-base</module>
         <module>spectra-security-spring-boot-starter</module>
-        <module>spectra-ai-base</module>
         <module>spectra-log-base</module>
         <module>spectra-log-spring-boot-starter</module>
     </modules>

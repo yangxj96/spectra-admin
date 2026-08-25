@@ -41,7 +41,7 @@ class SecuritySchemaContractTest {
         String schema = readSql();
         String migration = readV1();
 
-        for (String schemaName : List.of("spectra_core", "spectra_security", "spectra_oa", "spectra_ai",
+        for (String schemaName : List.of("spectra_core", "spectra_security", "spectra_oa",
                 "spectra_workflow", "spectra_notification")) {
             assertTrue(schema.contains("CREATE SCHEMA IF NOT EXISTS " + schemaName)
                     || migration.contains("CREATE SCHEMA " + schemaName + ";"), schemaName);
@@ -72,7 +72,6 @@ class SecuritySchemaContractTest {
         assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_archive_manifest"));
         assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
         assertTrue(schema.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
-        assertTrue(migration.contains("CREATE EXTENSION IF NOT EXISTS vector WITH SCHEMA spectra_ai"));
 
         for (String legacyObject : List.of(
                 "CREATE TABLE spectra_core.sys_account",
@@ -138,7 +137,7 @@ class SecuritySchemaContractTest {
                 .map(line -> line.substring("  - code: ".length()))
                 .toList();
 
-        assertEquals(115, codes.size());
+        assertEquals(111, codes.size());
         for (String code : codes) {
             assertTrue(migration.contains("'" + code + "'"), code);
         }

@@ -229,7 +229,7 @@ public class SystemGuideServiceImpl implements SystemGuideService {
         ensureAesKey(SystemConfigKeys.NOTIFICATION_ADDRESS_ENCRYPTION_KEY, "通知外部地址 AES-GCM 密钥");
         ensureAesKey(SystemConfigKeys.NOTIFICATION_SENSITIVE_PAYLOAD_KEY, "通知敏感载荷 AES-GCM 密钥");
         configuredService.upsert(SystemConfigKeys.NOTIFICATION_ALLOWED_LINK_PREFIXES,
-                "/login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/",
+                "/login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/",
                 ConfiguredValueType.TEXT, "消息中心允许的站内路由前缀");
     }
 

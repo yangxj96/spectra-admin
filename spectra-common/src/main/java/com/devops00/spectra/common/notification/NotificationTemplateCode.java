@@ -58,9 +58,6 @@ public final class NotificationTemplateCode {
     /** OA 合同履约节点提醒模板。 */
     public static final String OA_CONTRACT_MILESTONE_REMINDER = "oa.contract.milestone.reminder";
 
-    /** AI 知识库索引结果模板。 */
-    public static final String AI_RAG_INDEX = "ai.rag.index";
-
     /** 服务监控告警模板。 */
     public static final String SYSTEM_SERVICE_MONITOR_ALERT = "system.service-monitor-alert";
 

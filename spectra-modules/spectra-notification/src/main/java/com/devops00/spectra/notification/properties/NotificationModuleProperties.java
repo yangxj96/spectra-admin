@@ -39,8 +39,7 @@ import java.util.Optional;
 public class NotificationModuleProperties {
 
     private static final List<String> DEFAULT_ALLOWED_LINK_PREFIXES = List.of(
-            "/login", "/security/authentication/", "/oa/", "/workflow/", "/notification/", "/notification-center/", "/system/", "/file/",
-            "/ai/");
+            "/login", "/security/authentication/", "/oa/", "/workflow/", "/notification/", "/notification-center/", "/system/", "/file/");
 
     private boolean enabled = true;
 

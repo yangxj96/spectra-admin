@@ -103,13 +103,6 @@
             <artifactId>spectra-oa</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- AI -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-ai</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
 
 

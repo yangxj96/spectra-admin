@@ -14,7 +14,6 @@ WITH base_templates(template_group_code, purpose, title_template, content_templa
         ('oa.document.published', 'OA_NOTICE', '文档已发布：{{document_title}}', '{{summary}}', '{"properties":{"document_title":{"type":"string"},"summary":{"type":"string"}}}'::jsonb),
         ('oa.application.status', 'OA_NOTICE', '{{title}}', '{{content}}', '{"properties":{"title":{"type":"string"},"content":{"type":"string"}}}'::jsonb),
         ('oa.contract.milestone.reminder', 'OA_REMINDER', '合同履约节点即将到期', '合同「{{contract_title}}」的履约节点「{{milestone_name}}」将于 {{due_date}} 到期，请及时处理。', '{"properties":{"contract_title":{"type":"string"},"milestone_name":{"type":"string"},"due_date":{"type":"string"}}}'::jsonb),
-        ('ai.rag.index', 'SYSTEM_NOTICE', '知识库索引{{status}}', '文件「{{file_name}}」{{message}}', '{"properties":{"status":{"type":"string"},"file_name":{"type":"string"},"message":{"type":"string"}}}'::jsonb),
         ('system.service-monitor-alert', 'SYSTEM_NOTICE', '服务监控告警：{{rule_name}}', '{{message}}，请在服务监控中查看。', '{"properties":{"rule_name":{"type":"string"},"message":{"type":"string"}}}'::jsonb),
         ('system.notice', 'SYSTEM_NOTICE', '系统通知', '系统通知', '{"properties":{}}'::jsonb)
 ),

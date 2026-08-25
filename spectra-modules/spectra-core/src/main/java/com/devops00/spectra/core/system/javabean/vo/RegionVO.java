@@ -62,7 +62,7 @@ public class RegionVO implements Serializable {
     private String code;
 
     /**
-     * 区域路径，如 /110000/110100/110101
+     * 区域路径，如 11/1101/110101，不带前导斜杠
      */
     private String path;
 

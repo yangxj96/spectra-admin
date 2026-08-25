@@ -16,7 +16,6 @@ SET template_name = CASE template_group_code
                         WHEN 'oa.document.published' THEN '文档发布通知'
                         WHEN 'oa.application.status' THEN 'OA申请状态通知'
                         WHEN 'oa.contract.milestone.reminder' THEN '合同履约节点提醒'
-                        WHEN 'ai.rag.index' THEN '知识库索引通知'
                         WHEN 'system.service-monitor-alert' THEN '服务监控告警'
                         WHEN 'system.notice' THEN '系统通知'
                         ELSE template_group_code

@@ -42,19 +42,11 @@ spectra:
         archive-prefix: ${S3_SECURITY_AUDIT_ARCHIVE_PREFIX:security-audit/}
         region: ${S3_REGION}
       default-storage: s3
-  ai:
-    rag:
-      api-key: ${RAG_KEY}
-      base-url: ${RAG_BASE_URL}
-      model-name: ${RAG_MODEL}
-      embedding-batch-size: 20
-      max-segment-size: 300
-      max-overlap-size: 30
   notification:
     enabled: true
     address-encryption-key:
     sensitive-payload-key:
-    allowed-link-prefixes: /login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/,/ai/
+    allowed-link-prefixes: /login,/security/authentication/,/oa/,/workflow/,/notification/,/notification-center/,/system/,/file/
     worker:
       fixed-delay-ms: 5000
       processing-timeout-seconds: 300
@@ -182,20 +174,6 @@ flowable:
     enabled: false
   cmmn:
     enabled: false
-
-# ==================== LangChain4j / AI ====================
-langchain4j:
-  open-ai:
-    chat-model:
-      base-url: ${AI_BASE_URL}
-      api-key: ${AI_KEY}
-      model-name: ${AI_MODEL}
-      log-requests: true
-      log-responses: true
-    streaming-chat-model:
-      base-url: ${AI_BASE_URL}
-      api-key: ${AI_KEY}
-      model-name: ${AI_MODEL}
 
 # ==================== 日志配置 ====================
 logging:

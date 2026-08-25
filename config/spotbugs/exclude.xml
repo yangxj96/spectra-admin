@@ -18,10 +18,6 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.ai.base.ToolExecutor"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
         <Class name="com.devops00.spectra.log.base.aspect.ULogAspect"/>
         <Bug pattern="SPEL_INJECTION"/>
     </Match>
@@ -178,10 +174,5 @@
     <Match>
         <Class name="com.devops00.spectra.security.starter.advice.RestAuthenticationEntryPoint"/>
         <Bug pattern="XSS_SERVLET"/>
-    </Match>
-    <!-- JdbcTemplate and ObjectMapper are private Spring collaborators of the vector store. -->
-    <Match>
-        <Class name="com.devops00.spectra.ai.configuration.rag.store.PostgresEmbeddingStore"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
 </FindBugsFilter>

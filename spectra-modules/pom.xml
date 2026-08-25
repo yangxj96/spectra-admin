@@ -29,7 +29,6 @@
         <module>spectra-upload</module>
         <module>spectra-workflow</module>
         <module>spectra-oa</module>
-        <module>spectra-ai</module>
     </modules>
 
     <dependencies>
@@ -47,11 +46,6 @@
         <dependency>
             <groupId>com.devops00.spectra</groupId>
             <artifactId>spectra-security-base</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-ai-base</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
