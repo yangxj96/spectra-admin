@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerOperationHistoryMapper">
+    <resultMap id="BaseResultMap" type="com.devops00.spectra.core.scheduler.javabean.domain.SchedulerOperationHistoryRow">
+        <id column="id" property="id"/>
+        <result column="job_id" property="jobId"/>
+        <result column="execution_id" property="executionId"/>
+        <result column="operation_type" property="operationType"/>
+        <result column="status" property="status"/>
+        <result column="idempotency_key" property="idempotencyKey"/>
+        <result column="reason" property="reason"/>
+        <result column="requested_by" property="requestedBy"/>
+        <result column="requested_at" property="requestedAt"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="result_code" property="resultCode"/>
+        <result column="result_message" property="resultMessage"/>
+        <result column="source" property="source"/>
+    </resultMap>
+
+    <select id="selectPage" resultMap="BaseResultMap">
+        SELECT id,
+               job_id,
+               execution_id,
+               operation_type,
+               status,
+               idempotency_key,
+               reason,
+               requested_by,
+               requested_at,
+               finished_at,
+               result_code,
+               result_message,
+               'TASK' AS source
+        FROM spectra_core.scheduler_operation_audit
+        WHERE job_id = #{jobId}
+        UNION ALL
+        SELECT id,
+               job_id,
+               NULL::uuid AS execution_id,
+               command_type AS operation_type,
+               status,
+               idempotency_key,
+               reason,
+               requested_by,
+               requested_at,
+               finished_at,
+               result_code,
+               result_message,
+               'LOOP_COMMAND' AS source
+        FROM spectra_core.scheduler_control_command
+        WHERE job_id = #{jobId}
+        ORDER BY requested_at DESC, id DESC
+    </select>
+</mapper>

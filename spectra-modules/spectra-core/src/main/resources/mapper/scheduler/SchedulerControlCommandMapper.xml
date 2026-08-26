@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerControlCommandMapper">
+    <resultMap id="BaseResultMap" extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.scheduler.javabean.entity.SchedulerControlCommandEntity">
+        <result column="job_id" property="jobId"/>
+        <result column="target_runtime_id" property="targetRuntimeId"/>
+        <result column="target_session_key" property="targetSessionKey"/>
+        <result column="expected_runtime_version" property="expectedRuntimeVersion"/>
+        <result column="command_type" property="commandType"/>
+        <result column="status" property="status"/>
+        <result column="idempotency_key" property="idempotencyKey"/>
+        <result column="reason" property="reason"/>
+        <result column="requested_by" property="requestedBy"/>
+        <result column="requested_at" property="requestedAt"/>
+        <result column="deadline_at" property="deadlineAt"/>
+        <result column="applied_at" property="appliedAt"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="result_code" property="resultCode"/>
+        <result column="result_message" property="resultMessage"/>
+    </resultMap>
+
+    <select id="selectPendingCommands" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_control_command
+        WHERE status = 'REQUESTED'
+        ORDER BY requested_at, id
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectByIdempotencyKey" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_control_command
+        WHERE idempotency_key = #{idempotencyKey}
+        LIMIT 1
+    </select>
+
+    <insert id="insertIfAbsent">
+        INSERT INTO spectra_core.scheduler_control_command (
+            id, job_id, target_runtime_id, target_session_key, expected_runtime_version,
+            command_type, status, idempotency_key, reason, requested_by, requested_at,
+            deadline_at, created_by, created_at, updated_by, updated_at, deleted, version
+        ) VALUES (
+            #{command.id}, #{command.jobId}, #{command.targetRuntimeId}, #{command.targetSessionKey},
+            #{command.expectedRuntimeVersion}, #{command.commandType}, #{command.status},
+            #{command.idempotencyKey}, #{command.reason}, #{command.requestedBy}, #{command.requestedAt},
+            #{command.deadlineAt}, #{command.createdBy}, #{command.createdAt}, #{command.updatedBy},
+            #{command.updatedAt}, #{command.deleted}, #{command.version}
+        )
+        ON CONFLICT (idempotency_key) DO NOTHING
+    </insert>
+
+    <update id="claimCommand">
+        UPDATE spectra_core.scheduler_control_command
+        SET status = 'APPLYING',
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'REQUESTED'
+    </update>
+
+    <update id="markApplied">
+        UPDATE spectra_core.scheduler_control_command
+        SET status = 'APPLIED',
+            applied_at = #{appliedAt},
+            finished_at = #{appliedAt},
+            result_code = #{resultCode},
+            result_message = #{resultMessage},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'APPLYING'
+    </update>
+
+    <update id="markFinished">
+        UPDATE spectra_core.scheduler_control_command
+        SET status = #{status},
+            finished_at = #{finishedAt},
+            result_code = #{resultCode},
+            result_message = #{resultMessage},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'APPLYING'
+    </update>
+</mapper>

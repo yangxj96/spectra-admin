@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerExecutionMapper">
+    <resultMap id="BaseResultMap" extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.scheduler.javabean.entity.SchedulerExecutionEntity">
+        <result column="job_id" property="jobId"/>
+        <result column="fire_key" property="fireKey"/>
+        <result column="trigger_type" property="triggerType"/>
+        <result column="status" property="status"/>
+        <result column="job_revision" property="jobRevision"/>
+        <result column="handler_version" property="handlerVersion"/>
+        <result column="schedule_kind_snapshot" property="scheduleKindSnapshot"/>
+        <result column="schedule_expression_snapshot" property="scheduleExpressionSnapshot"/>
+        <result column="parameters_snapshot" property="parametersSnapshot"
+                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="effect_type" property="effectType"/>
+        <result column="scheduled_at" property="scheduledAt"/>
+        <result column="queued_at" property="queuedAt"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="finished_at" property="finishedAt"/>
+        <result column="next_retry_at" property="nextRetryAt"/>
+        <result column="deadline_at" property="deadlineAt"/>
+        <result column="attempt_no" property="attemptNo"/>
+        <result column="max_attempts" property="maxAttempts"/>
+        <result column="locked_by" property="lockedBy"/>
+        <result column="locked_at" property="lockedAt"/>
+        <result column="lease_expires_at" property="leaseExpiresAt"/>
+        <result column="last_heartbeat_at" property="lastHeartbeatAt"/>
+        <result column="last_error_code" property="lastErrorCode"/>
+        <result column="last_error_message" property="lastErrorMessage"/>
+        <result column="result_summary" property="resultSummary"
+                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="original_execution_id" property="originalExecutionId"/>
+        <result column="resolution_status" property="resolutionStatus"/>
+        <result column="resolution_reason" property="resolutionReason"/>
+        <result column="resolved_by" property="resolvedBy"/>
+        <result column="resolved_at" property="resolvedAt"/>
+    </resultMap>
+
+    <insert id="insertIfAbsent">
+        INSERT INTO spectra_core.scheduler_execution (
+            id, job_id, fire_key, trigger_type, status, job_revision, handler_version,
+            schedule_kind_snapshot, schedule_expression_snapshot, parameters_snapshot, effect_type,
+            scheduled_at, queued_at, started_at, finished_at, next_retry_at, deadline_at,
+            attempt_no, max_attempts, locked_by, locked_at, lease_expires_at, last_heartbeat_at,
+            last_error_code, last_error_message, result_summary, original_execution_id,
+            resolution_status, resolution_reason, resolved_by, resolved_at,
+            created_by, created_at, updated_by, updated_at, deleted, version
+        ) VALUES (
+            #{execution.id}, #{execution.jobId}, #{execution.fireKey}, #{execution.triggerType}, #{execution.status},
+            #{execution.jobRevision}, #{execution.handlerVersion}, #{execution.scheduleKindSnapshot},
+            #{execution.scheduleExpressionSnapshot},
+            #{execution.parametersSnapshot, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{execution.effectType}, #{execution.scheduledAt}, #{execution.queuedAt}, #{execution.startedAt},
+            #{execution.finishedAt}, #{execution.nextRetryAt}, #{execution.deadlineAt}, #{execution.attemptNo},
+            #{execution.maxAttempts}, #{execution.lockedBy}, #{execution.lockedAt}, #{execution.leaseExpiresAt},
+            #{execution.lastHeartbeatAt}, #{execution.lastErrorCode}, #{execution.lastErrorMessage},
+            #{execution.resultSummary, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{execution.originalExecutionId}, #{execution.resolutionStatus}, #{execution.resolutionReason},
+            #{execution.resolvedBy}, #{execution.resolvedAt}, #{execution.createdBy}, #{execution.createdAt},
+            #{execution.updatedBy}, #{execution.updatedAt}, #{execution.deleted}, #{execution.version}
+        )
+        ON CONFLICT (fire_key) DO NOTHING
+    </insert>
+
+    <select id="selectByFireKey" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_execution
+        WHERE fire_key = #{fireKey}
+    </select>
+
+    <select id="selectClaimable" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_execution
+        WHERE ((status = 'QUEUED' AND scheduled_at &lt;= #{now})
+            OR (status = 'RETRY_WAIT' AND next_retry_at IS NOT NULL AND next_retry_at &lt;= #{now}))
+        ORDER BY scheduled_at, id
+        LIMIT #{limit}
+    </select>
+
+    <update id="markExpiredAsUnknown">
+        UPDATE spectra_core.scheduler_execution
+        SET status = 'UNKNOWN',
+            last_error_code = #{errorCode},
+            last_error_message = #{errorMessage},
+            locked_by = NULL,
+            locked_at = NULL,
+            lease_expires_at = NULL,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE status = 'RUNNING'
+          AND lease_expires_at IS NOT NULL
+          AND lease_expires_at &lt; #{now}
+    </update>
+
+    <update id="requeueExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET status = 'QUEUED',
+            next_retry_at = NULL,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'RETRY_WAIT'
+          AND next_retry_at IS NOT NULL
+          AND next_retry_at &lt;= #{now}
+    </update>
+
+    <update id="finishExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET status = #{status},
+            attempt_no = CASE WHEN #{status} = 'RETRY_WAIT' THEN attempt_no + 1 ELSE attempt_no END,
+            last_error_code = #{errorCode},
+            last_error_message = #{errorMessage},
+            result_summary = #{resultSummary, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            next_retry_at = #{nextRetryAt},
+            finished_at = #{finishedAt},
+            locked_by = NULL,
+            locked_at = NULL,
+            lease_expires_at = NULL,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'RUNNING'
+          AND locked_by = #{instanceId}
+          AND lease_expires_at &gt;= COALESCE(#{finishedAt}, CURRENT_TIMESTAMP)
+    </update>
+
+    <update id="claimExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET status = 'RUNNING',
+            locked_by = #{instanceId},
+            locked_at = #{lockedAt},
+            lease_expires_at = #{leaseExpiresAt},
+            last_heartbeat_at = #{lockedAt},
+            started_at = COALESCE(started_at, #{lockedAt}),
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'QUEUED'
+    </update>
+
+    <update id="heartbeatExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET last_heartbeat_at = #{heartbeatAt},
+            lease_expires_at = #{leaseExpiresAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'RUNNING'
+          AND locked_by = #{instanceId}
+          AND lease_expires_at &gt;= #{heartbeatAt}
+    </update>
+
+    <update id="completeExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET status = #{status},
+            finished_at = #{finishedAt},
+            locked_by = NULL,
+            locked_at = NULL,
+            lease_expires_at = NULL,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'RUNNING'
+          AND locked_by = #{instanceId}
+          AND lease_expires_at &gt;= #{finishedAt}
+    </update>
+
+    <update id="cancelExecution">
+        UPDATE spectra_core.scheduler_execution
+        SET status = 'CANCELLED',
+            last_error_code = 'MANUALLY_CANCELLED',
+            last_error_message = #{reason},
+            finished_at = #{finishedAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status IN ('QUEUED', 'RETRY_WAIT')
+    </update>
+
+    <update id="resolveUnknown">
+        UPDATE spectra_core.scheduler_execution
+        SET resolution_status = #{resolutionStatus},
+            resolution_reason = #{reason},
+            resolved_by = #{resolvedBy},
+            resolved_at = #{resolvedAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status = 'UNKNOWN'
+          AND resolution_status = 'UNRESOLVED'
+    </update>
+</mapper>

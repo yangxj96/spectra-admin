@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerJobMapper">
+    <resultMap id="BaseResultMap" extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.scheduler.javabean.entity.SchedulerJobEntity">
+        <result column="job_key" property="jobKey"/>
+        <result column="name" property="name"/>
+        <result column="module" property="module"/>
+        <result column="description" property="description"/>
+        <result column="handler_key" property="handlerKey"/>
+        <result column="job_type" property="jobType"/>
+        <result column="run_scope" property="runScope"/>
+        <result column="definition_status" property="definitionStatus"/>
+        <result column="desired_state" property="desiredState"/>
+        <result column="schedule_kind" property="scheduleKind"/>
+        <result column="cron_expression" property="cronExpression"/>
+        <result column="fixed_delay_ms" property="fixedDelayMs"/>
+        <result column="initial_delay_ms" property="initialDelayMs"/>
+        <result column="next_fire_at" property="nextFireAt"/>
+        <result column="misfire_policy" property="misfirePolicy"/>
+        <result column="concurrency_policy" property="concurrencyPolicy"/>
+        <result column="execution_policy" property="executionPolicy"
+                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="parameters" property="parameters"
+                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="revision" property="revision"/>
+    </resultMap>
+
+    <select id="selectDueJobs" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_job
+        WHERE definition_status = 'REGISTERED'
+          AND job_type &lt;&gt; 'LOOP'
+          AND desired_state = 'ENABLED'
+          AND schedule_kind &lt;&gt; 'MANUAL'
+          AND next_fire_at IS NOT NULL
+          AND next_fire_at &lt;= #{now}
+        ORDER BY next_fire_at, id
+        LIMIT #{limit}
+        FOR UPDATE SKIP LOCKED
+    </select>
+
+    <update id="advanceNextFire">
+        UPDATE spectra_core.scheduler_job
+        SET next_fire_at = #{nextFireAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND definition_status = 'REGISTERED'
+    </update>
+
+    <select id="selectByIdForUpdate" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_job
+        WHERE id = #{id}
+        FOR UPDATE
+    </select>
+
+    <update id="updateDesiredState">
+        UPDATE spectra_core.scheduler_job
+        SET desired_state = #{desiredState},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND definition_status = 'REGISTERED'
+    </update>
+
+    <update id="updateDefinitionState">
+        UPDATE spectra_core.scheduler_job
+        SET definition_status = #{definitionStatus},
+            desired_state = #{desiredState},
+            next_fire_at = CASE WHEN #{definitionStatus} = 'REGISTERED'
+                                AND #{desiredState} = 'ENABLED' THEN next_fire_at ELSE NULL END,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+    </update>
+
+    <update id="updateDefinition">
+        UPDATE spectra_core.scheduler_job
+        SET name = #{job.name},
+            description = #{job.description},
+            schedule_kind = #{job.scheduleKind},
+            cron_expression = #{job.cronExpression},
+            fixed_delay_ms = #{job.fixedDelayMs},
+            initial_delay_ms = #{job.initialDelayMs},
+            next_fire_at = NULL,
+            misfire_policy = #{job.misfirePolicy},
+            concurrency_policy = #{job.concurrencyPolicy},
+            execution_policy = #{job.executionPolicy, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            parameters = #{job.parameters, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            revision = revision + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{job.id}
+          AND version = #{expectedVersion}
+          AND job_type = 'OPS'
+          AND definition_status = 'REGISTERED'
+    </update>
+</mapper>

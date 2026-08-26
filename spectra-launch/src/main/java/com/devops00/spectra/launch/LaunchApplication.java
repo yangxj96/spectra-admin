@@ -19,9 +19,6 @@ package com.devops00.spectra.launch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.annotation.EnableScheduling;
-
-import java.util.TimeZone;
 
 /**
  * 启动类
@@ -32,7 +29,6 @@ import java.util.TimeZone;
  */
 @Slf4j
 @SpringBootApplication
-@EnableScheduling
 public class LaunchApplication {
 
     private LaunchApplication() {
@@ -42,8 +38,6 @@ public class LaunchApplication {
      * 处理内部业务逻辑（{@code main}）。
      */
     static void main(String[] args) {
-        // 强制程序整体使用UTC时区.在展示的时候在格式化为对应时区
-        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(LaunchApplication.class, args);
     }
 }

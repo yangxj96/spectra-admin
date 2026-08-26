@@ -28,6 +28,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
+import com.devops00.spectra.core.scheduler.service.SchedulerTimeZoneResolver;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.oa.contract.javabean.converter.ContractConverter;
 import com.devops00.spectra.oa.contract.javabean.constant.ContractMilestoneStatus;
@@ -93,6 +94,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     private final ContractConverter contractConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final SchedulerTimeZoneResolver schedulerTimeZoneResolver;
 
     @Override
     public IPage<ContractVO> page(PageFrom page, ContractPageFrom params) {
@@ -372,7 +374,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
     @Override
     @Transactional
     public int sendDueMilestoneReminders() {
-        var deadline = timeMapper.toInstant(LocalDate.now(timeMapper.getUserZoneId()).plusDays(3));
+        var systemZone = schedulerTimeZoneResolver.resolve();
+        var deadline = LocalDate.now(systemZone).plusDays(3).atStartOfDay(systemZone).toInstant();
         var milestones = milestoneMapper.selectList(new LambdaQueryWrapper<ContractMilestone>().le(ContractMilestone::getDueDate, deadline)
                 .eq(ContractMilestone::getStatus, ContractMilestoneStatus.PENDING.getValue())
                 .isNull(ContractMilestone::getReminderSentAt));

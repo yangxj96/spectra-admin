@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework.configure.mvc.advice.exception;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.common.exception.SchedulerDatabaseUnavailableException;
 import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import jakarta.servlet.http.HttpServletResponse;
@@ -120,6 +121,15 @@ public class SqlExceptionAdvice {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         log.error("{}数据访问异常（兜底）: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
         return R.failure("系统内部错误,请联系管理员");
+    }
+
+    /** 调度内核数据库不可用时必须明确返回 503，不能被普通 SQL 兜底吞掉。 */
+    @ExceptionHandler(SchedulerDatabaseUnavailableException.class)
+    public R<Object> handleSchedulerDatabaseUnavailable(SchedulerDatabaseUnavailableException e,
+                                                        HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+        log.warn("{}调度 PostgreSQL 不可用，请求被拒绝: {}", LogPrefix.PERSISTENCE.p(), e.getMessage(), e);
+        return R.failure(HttpStatus.SERVICE_UNAVAILABLE, SchedulerDatabaseUnavailableException.CODE);
     }
 
     /**

@@ -19,7 +19,6 @@ package com.devops00.spectra.oa.contract.service.job;
 import com.devops00.spectra.oa.contract.service.ContractService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,11 +38,11 @@ public class ContractReminderJob {
     /**
      * 更新或推进目标状态（{@code sendDueMilestoneReminders}）。
      */
-    @Scheduled(cron = "0 0 1 * * *")
-    public void sendDueMilestoneReminders() {
+    public int sendDueMilestoneReminders() {
         var sent = contractService.sendDueMilestoneReminders();
         if (sent > 0) {
             log.info("合同履约节点提醒发送完成: count={}", sent);
         }
+        return sent;
     }
 }

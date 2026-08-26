@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerLoopRuntimeMapper">
+    <resultMap id="BaseResultMap" extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.scheduler.javabean.entity.SchedulerLoopRuntimeEntity">
+        <result column="job_id" property="jobId"/>
+        <result column="session_key" property="sessionKey"/>
+        <result column="instance_id" property="instanceId"/>
+        <result column="status" property="status"/>
+        <result column="started_at" property="startedAt"/>
+        <result column="stopped_at" property="stoppedAt"/>
+        <result column="last_heartbeat_at" property="lastHeartbeatAt"/>
+        <result column="lease_expires_at" property="leaseExpiresAt"/>
+        <result column="last_cycle_at" property="lastCycleAt"/>
+        <result column="last_progress_at" property="lastProgressAt"/>
+        <result column="drain_deadline_at" property="drainDeadlineAt"/>
+        <result column="total_cycles" property="totalCycles"/>
+        <result column="total_processed" property="totalProcessed"/>
+        <result column="total_failed" property="totalFailed"/>
+        <result column="consecutive_error_count" property="consecutiveErrorCount"/>
+        <result column="last_error_code" property="lastErrorCode"/>
+        <result column="last_error_message" property="lastErrorMessage"/>
+        <result column="state_reason" property="stateReason"/>
+    </resultMap>
+
+    <select id="selectByJobId" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_loop_runtime
+        WHERE job_id = #{jobId}
+        ORDER BY started_at DESC, id DESC
+    </select>
+
+    <update id="claimStartingRuntime">
+        UPDATE spectra_core.scheduler_loop_runtime
+        SET status = 'RUNNING',
+            last_heartbeat_at = #{heartbeatAt},
+            lease_expires_at = #{leaseExpiresAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND instance_id = #{instanceId}
+          AND status = 'STARTING'
+    </update>
+
+    <update id="heartbeatRuntime">
+        UPDATE spectra_core.scheduler_loop_runtime
+        SET last_heartbeat_at = #{heartbeatAt},
+            lease_expires_at = #{leaseExpiresAt},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND instance_id = #{instanceId}
+          AND status IN ('RUNNING', 'DEGRADED', 'DRAINING')
+          AND (lease_expires_at IS NULL OR lease_expires_at &gt;= #{heartbeatAt})
+    </update>
+
+    <update id="recordCycle">
+        UPDATE spectra_core.scheduler_loop_runtime
+        SET status = #{status},
+            last_cycle_at = #{cycleAt},
+            last_progress_at = COALESCE(#{progressAt}, last_progress_at),
+            total_cycles = total_cycles + 1,
+            total_processed = total_processed + #{processed},
+            total_failed = total_failed + #{failed},
+            consecutive_error_count = #{consecutiveErrorCount},
+            last_error_code = #{errorCode},
+            last_error_message = #{errorMessage},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND instance_id = #{instanceId}
+          AND status IN ('RUNNING', 'DEGRADED')
+          AND lease_expires_at IS NOT NULL
+          AND lease_expires_at &gt;= #{cycleAt}
+    </update>
+
+    <update id="transitionRuntime">
+        UPDATE spectra_core.scheduler_loop_runtime
+        SET status = #{status},
+            state_reason = #{reason},
+            drain_deadline_at = #{drainDeadlineAt},
+            stopped_at = #{stoppedAt},
+            lease_expires_at = CASE WHEN #{status} IN ('STOPPED', 'CRASHED', 'UNKNOWN')
+                                    THEN NULL ELSE lease_expires_at END,
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND instance_id = #{instanceId}
+          AND status IN ('STARTING', 'RUNNING', 'DEGRADED', 'DRAINING')
+    </update>
+
+    <update id="reclaimExpiredRuntime">
+        UPDATE spectra_core.scheduler_loop_runtime
+        SET status = #{status},
+            stopped_at = #{now},
+            lease_expires_at = NULL,
+            state_reason = #{reason},
+            updated_at = CURRENT_TIMESTAMP,
+            version = version + 1
+        WHERE id = #{id}
+          AND version = #{expectedVersion}
+          AND status IN ('STARTING', 'RUNNING', 'DEGRADED', 'DRAINING')
+          AND lease_expires_at IS NOT NULL
+          AND lease_expires_at &lt; #{now}
+    </update>
+</mapper>

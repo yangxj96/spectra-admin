@@ -34,12 +34,12 @@ import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.health.actuate.endpoint.CompositeHealthDescriptor;
 import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.core.env.Environment;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 
@@ -84,7 +84,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private final RedisConnectionFactory redisConnectionFactory;
     private final TimeMapper timeMapper;
     private final Environment environment;
-    private final HealthEndpoint healthEndpoint;
+    private final ObjectProvider<HealthEndpoint> healthEndpointProvider;
     private final ServiceMonitorSampleMapper sampleMapper;
     private final ServiceMonitorAlertService alertService;
     private final long collectionIntervalSeconds;
@@ -101,14 +101,14 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
 
     public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, DataSource dataSource,
                                      RedisConnectionFactory redisConnectionFactory, TimeMapper timeMapper, Environment environment,
-                                     HealthEndpoint healthEndpoint, ServiceMonitorSampleMapper sampleMapper,
+                                     ObjectProvider<HealthEndpoint> healthEndpointProvider, ServiceMonitorSampleMapper sampleMapper,
                                      ServiceMonitorAlertService alertService) {
         this.meterRegistry = meterRegistry;
         this.dataSource = dataSource;
         this.redisConnectionFactory = redisConnectionFactory;
         this.timeMapper = timeMapper;
         this.environment = environment;
-        this.healthEndpoint = healthEndpoint;
+        this.healthEndpointProvider = healthEndpointProvider;
         this.sampleMapper = sampleMapper;
         this.alertService = alertService;
         var intervalMillis = environment.getProperty("spectra.monitor.collection-interval-ms", Long.class, 10000L);
@@ -121,8 +121,20 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     /**
      * 按固定间隔采集一次监控快照，并保存单体应用本地历史趋势。
      */
-    @Scheduled(fixedDelayString = "${spectra.monitor.collection-interval-ms:10000}", initialDelay = 1000)
     public void collectSnapshot() {
+        try {
+            collectSnapshotInternal();
+        } catch (RuntimeException exception) {
+            log.warn("服务监控快照采集失败，保留上一份快照");
+        }
+    }
+
+    /** 统一调度 LOOP 使用的采集入口；失败向调度器暴露以进入错误聚合。 */
+    public void collectSnapshotForScheduler() {
+        collectSnapshotInternal();
+    }
+
+    private void collectSnapshotInternal() {
         try {
             var sample = collectSample();
             var persisted = persistSample(sample);
@@ -139,7 +151,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 }
             }
         } catch (RuntimeException exception) {
-            log.warn("服务监控快照采集失败，保留上一份快照");
+            throw exception;
         }
     }
 
@@ -230,7 +242,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private HealthSnapshot collectHealth() {
         var start = System.nanoTime();
         try {
-            var descriptor = healthEndpoint.health();
+            var descriptor = healthEndpointProvider.getObject().health();
             var components = new ArrayList<ServiceMonitorOverviewVO.HealthComponent>();
             var status = descriptor.getStatus();
             if (status == null) {

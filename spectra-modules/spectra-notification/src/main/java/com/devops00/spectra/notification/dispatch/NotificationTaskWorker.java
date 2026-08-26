@@ -30,9 +30,7 @@ import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -62,7 +60,7 @@ public class NotificationTaskWorker {
     /**
      * Worker 锁定标识。
      */
-    private static final String WORKER_ID = "notification-worker";
+    private static final String DEFAULT_WORKER_ID = "notification-worker";
 
     /**
      * Provider 适配器允许写入投递摘要的固定编码；未知文本仍使用通用失败摘要，避免敏感内容落库。
@@ -120,21 +118,24 @@ public class NotificationTaskWorker {
     /**
      * 周期领取到期任务；停用 Worker 不影响消息中心读取。
      */
-    @Scheduled(fixedDelayString = "${spectra.notification.worker.fixed-delay-ms:5000}")
-    public void scheduledProcess() {
-        processPending(50);
-    }
-
     /**
      * 供测试和运维手工触发的任务处理入口。
      */
-    @Transactional
     public int processPending(int limit) {
+        return processPending(limit, DEFAULT_WORKER_ID, true);
+    }
+
+    /**
+     * 由统一 LOOP 调度器调用；实例身份来自调度上下文，避免多实例共享锁持有者。
+     */
+    public int processPending(int limit, String workerId, boolean recoverLeases) {
         var safeLimit = Math.max(1, Math.min(limit, 100));
         var now = Instant.now();
-        recoverExpiredLeases(now);
+        if (recoverLeases) {
+            recoverExpiredLeases(now);
+        }
         var tasks = taskMapper.selectPendingTasks(now, safeLimit);
-        tasks.forEach(this::processOne);
+        tasks.forEach(task -> processOne(task, workerId));
         return tasks.size();
     }
 
@@ -157,7 +158,7 @@ public class NotificationTaskWorker {
     /**
      * 领取并处理单个通知任务。
      */
-    private void processOne(NotificationTaskEntity task) {
+    private void processOne(NotificationTaskEntity task, String workerId) {
         var now = Instant.now();
         if (isExpired(task, now)) {
             markExpired(task, now);
@@ -170,7 +171,7 @@ public class NotificationTaskWorker {
                         List.of(NotificationTaskStatus.PENDING.name(), NotificationTaskStatus.RETRYING.name()))
                 .le(NotificationTaskEntity::getScheduledAt, now)
                 .set(NotificationTaskEntity::getStatus, NotificationTaskStatus.PROCESSING.name())
-                .set(NotificationTaskEntity::getLockedBy, WORKER_ID)
+                .set(NotificationTaskEntity::getLockedBy, workerId)
                 .set(NotificationTaskEntity::getLockedAt, now));
         if (claimed != 1) {
             return;

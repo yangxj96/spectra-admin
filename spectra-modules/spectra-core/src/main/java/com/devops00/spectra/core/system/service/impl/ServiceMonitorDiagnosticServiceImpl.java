@@ -26,7 +26,6 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import javax.sql.DataSource;
 
@@ -448,7 +447,6 @@ public class ServiceMonitorDiagnosticServiceImpl implements ServiceMonitorDiagno
     /**
      * 执行内部处理逻辑（{@code cleanupExpiredTasks}）。
      */
-    @Scheduled(fixedDelayString = "${spectra.monitor.diagnostics.cleanup-interval-ms:3600000}", initialDelay = 60000)
     public void cleanupExpiredTasks() {
         var now = Instant.now();
         var tasks = taskMapper.selectList(new LambdaQueryWrapper<ServiceMonitorDiagnosticTask>()

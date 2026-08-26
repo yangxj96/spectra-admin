@@ -21,7 +21,6 @@ import com.devops00.spectra.notification.mapper.NotificationSendPreviewMapper;
 import com.devops00.spectra.notification.mapper.NotificationTaskMapper;
 import com.devops00.spectra.notification.properties.NotificationCleanupProperties;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,11 +55,6 @@ public class NotificationCleanupService {
     /**
      * 定时执行清理；关闭时保持完全无副作用。
      */
-    @Scheduled(fixedDelayString = "${spectra.notification.cleanup.fixed-delay-ms:3600000}")
-    public void scheduledCleanup() {
-        cleanupSensitivePayloads();
-    }
-
     /**
      * 批量清理请求和任务的敏感密文，并返回匿名计数。
      */

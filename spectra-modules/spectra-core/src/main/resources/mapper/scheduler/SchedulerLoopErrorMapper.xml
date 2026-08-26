@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.devops00.spectra.core.scheduler.mapper.SchedulerLoopErrorMapper">
+    <resultMap id="BaseResultMap" extends="com.devops00.spectra.common.base.BaseMapper.BaseAuditMap"
+               type="com.devops00.spectra.core.scheduler.javabean.entity.SchedulerLoopErrorEntity">
+        <result column="job_id" property="jobId"/>
+        <result column="instance_id" property="instanceId"/>
+        <result column="runtime_id" property="runtimeId"/>
+        <result column="error_fingerprint" property="errorFingerprint"/>
+        <result column="error_code" property="errorCode"/>
+        <result column="error_message" property="errorMessage"/>
+        <result column="status" property="status"/>
+        <result column="first_seen_at" property="firstSeenAt"/>
+        <result column="last_seen_at" property="lastSeenAt"/>
+        <result column="last_logged_at" property="lastLoggedAt"/>
+        <result column="occurrence_count" property="occurrenceCount"/>
+        <result column="suppressed_count" property="suppressedCount"/>
+        <result column="last_context" property="lastContext"
+                typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
+        <result column="resolved_by" property="resolvedBy"/>
+        <result column="resolved_at" property="resolvedAt"/>
+        <result column="resolution_reason" property="resolutionReason"/>
+    </resultMap>
+
+    <select id="selectOpenByFingerprint" resultMap="BaseResultMap">
+        SELECT *
+        FROM spectra_core.scheduler_loop_error
+        WHERE job_id = #{jobId}
+          AND instance_id = #{instanceId}
+          AND error_fingerprint = #{errorFingerprint}
+          AND status = 'OPEN'
+        LIMIT 1
+    </select>
+
+    <select id="upsertOccurrence" resultMap="BaseResultMap">
+        INSERT INTO spectra_core.scheduler_loop_error (
+            id, job_id, instance_id, runtime_id, error_fingerprint, error_code, error_message,
+            status, first_seen_at, last_seen_at, last_logged_at, occurrence_count, suppressed_count,
+            last_context, created_at, updated_at, version
+        ) VALUES (
+            #{error.id}, #{error.jobId}, #{error.instanceId}, #{error.runtimeId}, #{error.errorFingerprint},
+            #{error.errorCode}, #{error.errorMessage}, 'OPEN', #{error.firstSeenAt}, #{error.lastSeenAt},
+            #{error.lastLoggedAt}, 1, 0,
+            #{error.lastContext, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{error.createdAt}, #{error.updatedAt}, #{error.version}
+        )
+        ON CONFLICT (job_id, instance_id, error_fingerprint) DO UPDATE
+        SET runtime_id = EXCLUDED.runtime_id,
+            error_code = EXCLUDED.error_code,
+            error_message = EXCLUDED.error_message,
+            last_seen_at = EXCLUDED.last_seen_at,
+            last_logged_at = CASE
+                WHEN spectra_core.scheduler_loop_error.last_logged_at IS NULL
+                  OR spectra_core.scheduler_loop_error.last_logged_at
+                     &lt;= EXCLUDED.last_seen_at - (#{logIntervalMs} * INTERVAL '1 millisecond')
+                THEN EXCLUDED.last_logged_at
+                ELSE spectra_core.scheduler_loop_error.last_logged_at
+            END,
+            occurrence_count = spectra_core.scheduler_loop_error.occurrence_count + 1,
+            suppressed_count = CASE
+                WHEN spectra_core.scheduler_loop_error.last_logged_at IS NULL
+                  OR spectra_core.scheduler_loop_error.last_logged_at
+                     &lt;= EXCLUDED.last_seen_at - (#{logIntervalMs} * INTERVAL '1 millisecond')
+                THEN spectra_core.scheduler_loop_error.suppressed_count
+                ELSE spectra_core.scheduler_loop_error.suppressed_count + 1
+            END,
+            last_context = EXCLUDED.last_context,
+            updated_at = CURRENT_TIMESTAMP,
+            version = spectra_core.scheduler_loop_error.version + 1
+        RETURNING *
+    </select>
+</mapper>
