@@ -28,4 +28,8 @@ public class DataExistException extends DataException {
     public DataExistException() {
         super("数据已存在");
     }
+
+    public DataExistException(String message) {
+        super(message);
+    }
 }

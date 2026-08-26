@@ -17,6 +17,7 @@
 package com.devops00.spectra.framework;
 
 import com.devops00.spectra.common.exception.DataScopeViolationException;
+import com.devops00.spectra.common.exception.DataExistException;
 import com.devops00.spectra.common.response.R;
 import com.devops00.spectra.framework.configure.mvc.advice.exception.CommonExceptionAdvice;
 import jakarta.servlet.http.HttpServletResponse;
@@ -58,5 +59,18 @@ class CommonExceptionAdviceTest {
         assertEquals(HttpServletResponse.SC_FORBIDDEN, response.getStatus());
         assertEquals(HttpServletResponse.SC_FORBIDDEN, result.getCode());
         assertEquals("数据范围不足", result.getMsg());
+    }
+
+    @Test
+    void dataExistShouldPreserveActionableMessage() throws Exception {
+        var method = CommonExceptionAdvice.class.getMethod("dataExistException", Exception.class, HttpServletResponse.class);
+        var response = new MockHttpServletResponse();
+
+        var result = (R<?>) method.invoke(new CommonExceptionAdvice(),
+                new DataExistException("任务已归档，请重新注册"), response);
+
+        assertEquals(HttpServletResponse.SC_CONFLICT, response.getStatus());
+        assertEquals(HttpServletResponse.SC_CONFLICT, result.getCode());
+        assertEquals("任务已归档，请重新注册", result.getMsg());
     }
 }

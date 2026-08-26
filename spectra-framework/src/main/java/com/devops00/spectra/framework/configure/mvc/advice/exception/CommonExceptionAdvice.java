@@ -111,7 +111,7 @@ public class CommonExceptionAdvice {
     public R<Object> dataExistException(Exception e, HttpServletResponse response) {
         response.setStatus(HttpStatus.CONFLICT.value());
         log.error("{}数据已存在异常,{}", LogPrefix.WEB.p(), e.getMessage(), e);
-        return R.failure(HttpStatus.CONFLICT);
+        return R.failure(HttpStatus.CONFLICT, e.getMessage());
     }
 
     /**
