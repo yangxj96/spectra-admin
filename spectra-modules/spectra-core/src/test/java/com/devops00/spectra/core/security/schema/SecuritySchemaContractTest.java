@@ -38,12 +38,11 @@ class SecuritySchemaContractTest {
 
     @Test
     void shouldDeclareCurrentTargetSchemaAndRejectLegacySecurityObjects() throws IOException {
-        String schema = readSql();
         String migration = readV1();
 
         for (String schemaName : List.of("spectra_core", "spectra_security", "spectra_oa",
                 "spectra_workflow", "spectra_notification")) {
-            assertTrue(schema.contains("CREATE SCHEMA IF NOT EXISTS " + schemaName)
+            assertTrue(migration.contains("CREATE SCHEMA IF NOT EXISTS " + schemaName)
                     || migration.contains("CREATE SCHEMA " + schemaName + ";"), schemaName);
         }
         for (String table : List.of(
@@ -65,13 +64,12 @@ class SecuritySchemaContractTest {
                 "sec_recovery_code",
                 "sec_root_policy",
                 "sec_role_menu")) {
-            assertTrue(schema.contains("CREATE TABLE spectra_security." + table)
-                    || migration.contains("CREATE TABLE spectra_security." + table), table);
+            assertTrue(migration.contains("CREATE TABLE spectra_security." + table), table);
         }
-        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_event"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_audit_archive_manifest"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
-        assertTrue(schema.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_audit_event"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_audit_archive_manifest"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
+        assertTrue(migration.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
 
         for (String legacyObject : List.of(
                 "CREATE TABLE spectra_core.sys_account",
@@ -89,15 +87,15 @@ class SecuritySchemaContractTest {
 
     @Test
     void shouldKeepAuditBoundaryAndSecuritySeedsInTheCurrentBaseline() throws IOException {
-        String schema = readSql();
         String migration = readV1();
 
-        assertTrue(schema.contains("PARTITION BY RANGE (occurred_at)"));
-        assertTrue(schema.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
-        assertTrue(schema.contains("REVOKE UPDATE, DELETE ON spectra_security.sec_security_audit_event FROM PUBLIC"));
-        assertTrue(schema.contains("hot_retention_months >= 12"));
-        assertTrue(schema.contains("total_retention_years >= 5"));
-        assertTrue(schema.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
+        assertTrue(migration.contains("PARTITION BY RANGE (occurred_at)"));
+        assertTrue(migration.contains("CREATE TRIGGER trg_sec_security_audit_event_immutable"));
+        assertTrue(migration.contains("REVOKE UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER"));
+        assertTrue(migration.contains("ON spectra_security.sec_security_audit_event FROM spectra_runtime"));
+        assertTrue(migration.contains("hot_retention_months >= 12"));
+        assertTrue(migration.contains("total_retention_years >= 5"));
+        assertTrue(migration.contains("CREATE TABLE spectra_security.sec_security_change_outbox"));
         assertTrue(migration.contains("CREATE ROLE spectra_runtime"));
         assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_security.sec_security_audit_event TO spectra_runtime"));
         assertTrue(migration.contains("GRANT SELECT, INSERT ON spectra_security.sec_security_audit_event_default TO spectra_runtime"));
@@ -109,14 +107,13 @@ class SecuritySchemaContractTest {
 
     @Test
     void shouldKeepCurrentBaselineColumnsAndTechnicalConstraints() throws IOException {
-        String schema = readSql();
         String migration = readV1();
 
-        assertTrue(schema.contains("authority_level SMALLINT NOT NULL"));
-        assertTrue(schema.contains("CREATE UNIQUE INDEX uk_sec_assignment_permission_boundary_assignment_permission"));
-        assertTrue(schema.contains("CREATE UNIQUE INDEX uk_sec_assignment_grant_boundary_assignment_permission"));
-        assertTrue(schema.contains("WHERE deleted IS NULL"));
-        assertTrue(schema.contains("CONSTRAINT pk_sec_permission PRIMARY KEY"));
+        assertTrue(migration.contains("authority_level smallint"));
+        assertTrue(migration.contains("CREATE UNIQUE INDEX uk_sec_assignment_permission_boundary_assignment_permission"));
+        assertTrue(migration.contains("CREATE UNIQUE INDEX uk_sec_assignment_grant_boundary_assignment_permission"));
+        assertTrue(migration.contains("WHERE (deleted IS NULL)"));
+        assertTrue(migration.contains("CONSTRAINT pk_sec_permission PRIMARY KEY"));
         assertTrue(migration.contains("primary_department_id uuid"));
         assertTrue(migration.contains("security_version bigint"));
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_department_closure"));
@@ -144,9 +141,8 @@ class SecuritySchemaContractTest {
     }
 
     @Test
-    void resourceScopeIndexesMustRemainInTheBaselineAndOaDocumentation() throws IOException {
+    void resourceScopeIndexesMustRemainInTheFlywayBaseline() throws IOException {
         String migration = readV1();
-        String documented = readOaSql();
         List<String> indexes = List.of(
                 "idx_oa_asset_scope_department",
                 "idx_oa_calendar_scope_owner_department",
@@ -170,7 +166,6 @@ class SecuritySchemaContractTest {
                 "idx_oa_reimbursement_item_scope_department");
         for (String index : indexes) {
             assertTrue(migration.contains(index), index);
-            assertTrue(documented.contains(index), index);
         }
     }
 
@@ -186,49 +181,21 @@ class SecuritySchemaContractTest {
                 .contains("ON spectra_security.sec_assignment_grant_boundary USING btree (assignment_id, permission_id) WHERE (deleted IS NULL);"));
     }
 
-    private String readSql() throws IOException {
-        var candidates = List.of(
-                Path.of("docs", "sql", "spectra_security", "建表.sql"),
-                Path.of("..", "docs", "sql", "spectra_security", "建表.sql"),
-                Path.of("..", "..", "docs", "sql", "spectra_security", "建表.sql"),
-                Path.of("..", "..", "..", "docs", "sql", "spectra_security", "建表.sql"));
-        for (var candidate : candidates) {
-            if (Files.isRegularFile(candidate)) {
-                return Files.readString(candidate);
-            }
-        }
-        throw new IOException("找不到安全 schema SQL 文件");
-    }
-
     private String readV1() throws IOException {
         return readMigration("V1__init_db.sql");
     }
 
     private String readCatalog() throws IOException {
         var candidates = List.of(
-                Path.of("..", "..", "docs", "security", "permission-catalog.yaml"),
-                Path.of("..", "..", "..", "docs", "security", "permission-catalog.yaml"),
-                Path.of("..", "..", "..", "..", "docs", "security", "permission-catalog.yaml"));
+                Path.of("..", "..", "docs", "10-后端", "permission-catalog.yaml"),
+                Path.of("..", "..", "..", "docs", "10-后端", "permission-catalog.yaml"),
+                Path.of("..", "..", "..", "..", "docs", "10-后端", "permission-catalog.yaml"));
         for (var candidate : candidates) {
             if (Files.isRegularFile(candidate)) {
                 return Files.readString(candidate);
             }
         }
         throw new IOException("找不到 Permission Catalog");
-    }
-
-    private String readOaSql() throws IOException {
-        var candidates = List.of(
-                Path.of("docs", "sql", "spectra_oa", "建表.sql"),
-                Path.of("..", "docs", "sql", "spectra_oa", "建表.sql"),
-                Path.of("..", "..", "docs", "sql", "spectra_oa", "建表.sql"),
-                Path.of("..", "..", "..", "docs", "sql", "spectra_oa", "建表.sql"));
-        for (var candidate : candidates) {
-            if (Files.isRegularFile(candidate)) {
-                return Files.readString(candidate);
-            }
-        }
-        throw new IOException("找不到 OA schema SQL 文件");
     }
 
     private String readMigration(String fileName) throws IOException {

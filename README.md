@@ -83,7 +83,7 @@ java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
 | 基础设施 | `docs/10-后端/80-基础设施.md` |
 | API 总览 | `docs/10-后端/90-API总览.md` |
 | 数据模型 | `docs/30-数据模型/` |
-| 建表 SQL | `docs/sql/` |
+| 数据库迁移 | `spectra-config/src/main/resources/db/migration/` |
 | 环境与命令 | `docs/50-开发指南/` |
 
 在线文档：[https://www.devops00.com/spectra-admin/](https://www.devops00.com/spectra-admin/)
