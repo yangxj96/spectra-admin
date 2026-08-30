@@ -47,10 +47,10 @@ import com.devops00.spectra.oa.document.mapper.DocumentMapper;
 import com.devops00.spectra.oa.document.mapper.DocumentVersionMapper;
 import com.devops00.spectra.oa.document.service.DocumentService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.upload.javabean.entity.FileInfo;
-import com.devops00.spectra.upload.service.FileInfoService;
-import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
-import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+import com.devops00.spectra.upload.api.FileAssetPort;
+import com.devops00.spectra.upload.api.FileReferenceService;
+import com.devops00.spectra.oa.support.OaFileReferenceBinder;
+import com.devops00.spectra.oa.support.OaFileReferenceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -80,8 +80,9 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
 
     private final DocumentVersionMapper versionMapper;
     private final DocumentFolderMapper folderMapper;
-    private final FileInfoService fileInfoService;
-    private final FileUploadFacade fileUploadFacade;
+    private final FileAssetPort fileAssetPort;
+    private final FileReferenceService fileReferenceService;
+    private final OaFileReferenceBinder fileReferenceBinder;
     private final NotificationService notificationService;
     private final UserService userService;
     private final DocumentConverter documentConverter;
@@ -156,20 +157,17 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
     @Transactional
     public UUID addVersion(UUID id, DocumentVersionFrom from) {
         var document = requireOwner(id);
-        FileInfo file = fileInfoService.getById(from.getFileId());
-        if (file == null || !FileInfoStatus.ACTIVE.equals(file.getStatus())) {
-            throw new DataNotExistException("文件不存在或已失效");
-        }
+        var file = fileAssetPort.requireReadyForReference(from.getFileAssetId(), securityContextAccessor.currentUserId());
         var latest = versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
                 .orderByDesc(DocumentVersion::getVersionNo)
                 .last("limit 1"));
         var version = new DocumentVersion();
         version.setDocumentId(document.getId());
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
-        version.setFileId(file.getId());
-        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.getOriginalName());
-        version.setFileSize(from.getFileSize() == null ? file.getSize() : from.getFileSize());
-        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
+        version.setFileAssetId(file.fileAssetId());
+        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.originalName());
+        version.setFileSize(from.getFileSize() == null ? file.size() : from.getFileSize());
+        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.contentType());
         version.setVersionNote(from.getVersionNote());
         version.setCurrentVersion(true);
         versionMapper.update(null, new LambdaUpdateWrapper<DocumentVersion>().eq(DocumentVersion::getDocumentId, document.getId())
@@ -178,7 +176,8 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         if (versionMapper.insert(version) != 1) {
             throw new DataSaveException("保存文档版本失败");
         }
-        fileInfoService.incrRefCount(file.getId());
+        fileReferenceService.register(fileReferenceBinder.content(file.fileAssetId(), OaFileReferenceType.DOCUMENT_VERSION,
+                version.getId(), version.getFileName()));
         return version.getId();
     }
 
@@ -254,16 +253,6 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
             throw new DataSaveException("保存文档目录失败");
         }
         return entity.getId();
-    }
-
-    @Override
-    public void preview(UUID id, UUID versionId) {
-        fileUploadFacade.preview(requireVersion(id, versionId).getFileId());
-    }
-
-    @Override
-    public void download(UUID id, UUID versionId) {
-        fileUploadFacade.download(requireVersion(id, versionId).getFileId());
     }
 
     @Override

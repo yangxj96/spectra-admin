@@ -159,26 +159,6 @@ public class DocumentController {
     }
 
     /**
-     * 预览文档版本。
-     */
-    @ULog("'预览文档版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'oa:document:read')")
-    public void preview(@PathVariable UUID id, @PathVariable UUID versionId) {
-        bindService.preview(id, versionId);
-    }
-
-    /**
-     * 下载文档版本。
-     */
-    @ULog("'下载文档版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'oa:document:read')")
-    public void download(@PathVariable UUID id, @PathVariable UUID versionId) {
-        bindService.download(id, versionId);
-    }
-
-    /**
      * 恢复文档版本。
      */
     @ULog("'恢复文档版本'")

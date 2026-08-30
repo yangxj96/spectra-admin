@@ -41,10 +41,8 @@ public class ContractVersionVO {
      */
     private Integer versionNo;
 
-    /**
-     * 文件 ID。
-     */
-    private UUID fileId;
+    /** 文件资产 ID。 */
+    private UUID fileAssetId;
 
     /**
      * 文件名称。

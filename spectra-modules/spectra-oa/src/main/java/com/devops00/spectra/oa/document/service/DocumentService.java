@@ -90,16 +90,6 @@ public interface DocumentService extends BaseService<Document> {
     UUID createFolder(DocumentFolderSaveFrom from);
 
     /**
-     * 预览文档版本。
-     */
-    void preview(UUID id, UUID versionId);
-
-    /**
-     * 下载文档版本。
-     */
-    void download(UUID id, UUID versionId);
-
-    /**
      * 恢复文档当前版本。
      */
     void restoreVersion(UUID id, UUID versionId);

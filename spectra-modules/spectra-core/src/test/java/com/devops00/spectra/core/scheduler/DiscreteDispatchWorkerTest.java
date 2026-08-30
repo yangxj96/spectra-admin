@@ -22,10 +22,13 @@ import com.devops00.spectra.core.scheduler.worker.DiscreteDispatchWorker;
 import com.devops00.spectra.core.scheduler.worker.SchedulerInstanceIdentity;
 import org.junit.jupiter.api.Test;
 
+import java.util.concurrent.Executor;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 class DiscreteDispatchWorkerTest {
 
@@ -35,11 +38,46 @@ class DiscreteDispatchWorkerTest {
         var properties = new SchedulerProperties();
         properties.setDueBatchSize(7);
         var worker = new DiscreteDispatchWorker(
-                executionService, properties, new SchedulerInstanceIdentity("instance-a"));
+                executionService, properties, new SchedulerInstanceIdentity("instance-a"), Runnable::run);
 
         worker.runOnce();
 
         verify(executionService).dispatchDueJobs(any(), eq(7));
         verify(executionService).executeClaimable(any(), eq(7), eq("instance-a"));
+    }
+
+    @Test
+    void doesNotStartAnotherExecutionDrainWhileThePreviousDrainIsInFlight() {
+        var executionService = mock(SchedulerExecutionService.class);
+        var properties = new SchedulerProperties();
+        var executor = new HoldingExecutor();
+        var worker = new DiscreteDispatchWorker(
+                executionService, properties, new SchedulerInstanceIdentity("instance-a"), executor);
+
+        worker.runOnce();
+        worker.runOnce();
+
+        verify(executionService, never()).executeClaimable(any(), any(Integer.class), any());
+        executor.run();
+        verify(executionService).executeClaimable(any(), eq(properties.getDueBatchSize()), eq("instance-a"));
+    }
+
+    private static final class HoldingExecutor implements Executor {
+
+        private Runnable command;
+
+        @Override
+        public void execute(Runnable command) {
+            if (this.command != null) {
+                throw new IllegalStateException("test executor already has a command");
+            }
+            this.command = command;
+        }
+
+        private void run() {
+            Runnable current = command;
+            command = null;
+            current.run();
+        }
     }
 }

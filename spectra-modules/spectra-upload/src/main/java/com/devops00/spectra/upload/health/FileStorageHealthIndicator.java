@@ -16,16 +16,15 @@
 
 package com.devops00.spectra.upload.health;
 
-import com.devops00.spectra.upload.javabean.constant.UploadType;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
-import com.devops00.spectra.upload.properties.LocalProperties;
+import com.devops00.spectra.upload.storage.FileStorageProvider;
+import com.devops00.spectra.upload.storage.StorageHealth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.util.List;
 
 /**
  * 文件存储健康检查。
@@ -37,27 +36,17 @@ import java.nio.file.Path;
 public class FileStorageHealthIndicator implements HealthIndicator {
 
     private final FileUploadProperties uploadProperties;
-    private final LocalProperties localProperties;
+    private final List<FileStorageProvider> providers;
 
     @Override
     public Health health() {
-        if (uploadProperties.getDefaultStorage() != UploadType.LOCAL) {
-            return Health.unknown().build();
+        var provider = providers.stream().filter(value -> value.type() == uploadProperties.getDefaultStorage()).findFirst();
+        if (provider.isEmpty()) {
+            return Health.down().withDetail("provider", uploadProperties.getDefaultStorage()).build();
         }
-        try {
-            var uploadDirectory = Path.of(localProperties.getUploadDir());
-            var tempDirectory = Path.of(localProperties.getUploadTempDir());
-            var available = isWritableDirectory(uploadDirectory) && isWritableDirectory(tempDirectory);
-            return available ? Health.up().build() : Health.down().build();
-        } catch (RuntimeException exception) {
-            return Health.down().build();
-        }
-    }
-
-    /**
-     * 判断条件是否满足（{@code isWritableDirectory}）。
-     */
-    private static boolean isWritableDirectory(Path path) {
-        return Files.isDirectory(path) && Files.isWritable(path);
+        StorageHealth health = provider.get().health();
+        return health.available()
+                ? Health.up().withDetail("provider", provider.get().type()).build()
+                : Health.down().withDetail("provider", provider.get().type()).withDetail("detail", health.detail()).build();
     }
 }

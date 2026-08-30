@@ -42,11 +42,9 @@ public class DocumentVersion extends BaseEntity {
     @TableField("version_no")
     private Integer versionNo;
 
-    /**
-     * 文件 ID。
-     */
-    @TableField("file_id")
-    private UUID fileId;
+    /** 文件资产 ID。 */
+    @TableField("file_asset_id")
+    private UUID fileAssetId;
 
     /**
      * 文件名称。

@@ -76,14 +76,14 @@ public interface ReimbursementConverter {
     /**
      * 通用附件实体转报销附件视图对象。
      */
-    @Mapping(target = "previewUrl", source = "fileId", qualifiedByName = "toPreviewUrl")
+    @Mapping(target = "previewUrl", source = "fileAssetId", qualifiedByName = "toPreviewUrl")
     ReimbursementAttachmentVO toAttachmentVO(ApplicationAttachment source);
 
     /**
      * 将文件 ID 转换为文件预览地址。
      */
     @Named("toPreviewUrl")
-    default String toPreviewUrl(UUID fileId) {
-        return fileId == null ? null : "/api/file/upload/preview/" + fileId;
+    default String toPreviewUrl(UUID fileAssetId) {
+        return fileAssetId == null ? null : "/api/file/assets/" + fileAssetId + "/preview";
     }
 }

@@ -62,7 +62,7 @@ class SchedulerMigrationTest {
         DatabaseConfig database = migrate();
 
         try (Connection connection = database.open()) {
-            assertEquals(List.of("1", "2", "3", "4", "5", "6"), migrationVersions(connection));
+            assertEquals(List.of("1", "2", "3", "4", "5", "6", "7", "8", "9", "10"), migrationVersions(connection));
             for (String table : TABLES) {
                 assertTrue(tableExists(connection, table), "missing table: " + table);
                 for (String column : BASE_COLUMNS) {
@@ -79,11 +79,26 @@ class SchedulerMigrationTest {
                 }
             }
             assertEquals(List.of(
+                    "file.upload.cleanup",
                     "notification.cleanup-sensitive-payload",
                     "notification.task-worker",
                     "oa.contract.milestone-reminder",
                     "system.monitor.collect-snapshot",
                     "system.monitor.diagnostic-cleanup"), jobKeys);
+            try (var statement = connection.prepareStatement(
+                    "SELECT job_type, run_scope, schedule_kind, fixed_delay_ms, desired_state, "
+                            + "concurrency_policy FROM spectra_core.scheduler_job WHERE job_key = ?")) {
+                statement.setString(1, "file.upload.cleanup");
+                try (var resultSet = statement.executeQuery()) {
+                    assertTrue(resultSet.next());
+                    assertEquals("SYSTEM", resultSet.getString("job_type"));
+                    assertEquals("SINGLETON", resultSet.getString("run_scope"));
+                    assertEquals("FIXED_DELAY", resultSet.getString("schedule_kind"));
+                    assertEquals(300000L, resultSet.getLong("fixed_delay_ms"));
+                    assertEquals("ENABLED", resultSet.getString("desired_state"));
+                    assertEquals("FORBID", resultSet.getString("concurrency_policy"));
+                }
+            }
             assertEquals("timestamp with time zone", columnType(connection, "scheduler_job", "deleted"));
             assertEquals("jsonb", columnType(connection, "scheduler_job", "execution_policy"));
             assertTrue(indexExists(connection, "uk_scheduler_job_job_key"));

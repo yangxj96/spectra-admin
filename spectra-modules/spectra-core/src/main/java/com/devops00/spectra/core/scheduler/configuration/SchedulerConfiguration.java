@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Clock;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -40,5 +41,11 @@ public class SchedulerConfiguration {
     public ScheduledExecutorService schedulerTickExecutor() {
         return Executors.newSingleThreadScheduledExecutor(
                 Thread.ofVirtual().name("spectra-scheduler-tick-", 0).factory());
+    }
+
+    /** 创建与调度 tick 隔离的离散任务执行器。 */
+    @Bean(name = "schedulerExecutionExecutor", destroyMethod = "shutdownNow")
+    public ExecutorService schedulerExecutionExecutor() {
+        return Executors.newVirtualThreadPerTaskExecutor();
     }
 }

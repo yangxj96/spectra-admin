@@ -28,6 +28,7 @@ import com.devops00.spectra.core.scheduler.worker.SingletonLoopLeaseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.context.SmartLifecycle;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -195,6 +196,13 @@ public class SchedulerBootstrapService implements SmartLifecycle {
     /** 数据库健康检查失败时撤销调度就绪状态。 */
     public synchronized void markDatabaseUnavailable() {
         setNotReady("DATABASE_UNAVAILABLE");
+    }
+
+    /** 异步离散执行线程发现数据库故障时撤销调度就绪状态。 */
+    @EventListener
+    public void onDatabaseUnavailable(SchedulerDatabaseUnavailableEvent event) {
+        markDatabaseUnavailable();
+        log.error("调度执行线程访问数据库失败，撤销调度就绪状态", event.cause());
     }
 
     private synchronized void runTick() {

@@ -16,17 +16,11 @@
 
 package com.devops00.spectra.upload.properties;
 
-import com.devops00.spectra.upload.javabean.constant.UploadType;
-import com.devops00.spectra.upload.strategy.FileTypeValidationStrategy;
-import com.devops00.spectra.upload.strategy.impl.MagicNumberValidationStrategy;
-import com.devops00.spectra.upload.strategy.impl.MimeValidationStrategy;
-import com.devops00.spectra.upload.strategy.impl.TikaValidationStrategy;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import com.devops00.spectra.upload.javabean.constant.StorageProviderType;
+import java.time.Duration;
 
 /**
  * 文件上传参数
@@ -42,26 +36,36 @@ public class FileUploadProperties {
     /**
      * 文件上传默认实现
      */
-    private UploadType defaultStorage = UploadType.LOCAL;
+    private StorageProviderType defaultStorage = StorageProviderType.LOCAL;
 
     /**
      * 文件类型验证策略（扩展名校验已内置于 FileTypeValidator，无需配置）
      */
-    private List<Class<? extends FileTypeValidationStrategy>> strategies = new ArrayList<>(
-            Arrays.asList(TikaValidationStrategy.class, MimeValidationStrategy.class, MagicNumberValidationStrategy.class));
+    private Long maxFileSize = 1024L * 1024 * 1024;
 
     /**
      * 分片大小,默认5M 5242880L
      */
-    private Long chunkSize = 5242880L;
+    private Long chunkSize = 8L * 1024 * 1024;
 
-    /**
-     * 是否启用白名单模式（仅允许 allowedUpload=true 的类型）
-     */
-    private boolean whitelistEnabled = true;
+    private Long minChunkSize = 5L * 1024 * 1024;
 
-    /**
-     * 是否启用黑名单模式（拒绝 dangerous=true 的类型）
-     */
-    private boolean blacklistEnabled = true;
+    private Long maxChunkSize = 64L * 1024 * 1024;
+
+    private Integer maxParts = 10_000;
+
+    private Integer parallelism = 3;
+
+    private Integer maxConcurrentTasksPerUser = 3;
+
+    private Duration taskTtl = Duration.ofHours(24);
+
+    private Duration idleTimeout = Duration.ofHours(2);
+
+    private Duration recordRetention = Duration.ofDays(7);
+
+    private Duration orphanRetention = Duration.ofDays(7);
+
+    private Duration presignTtl = Duration.ofMinutes(15);
+
 }

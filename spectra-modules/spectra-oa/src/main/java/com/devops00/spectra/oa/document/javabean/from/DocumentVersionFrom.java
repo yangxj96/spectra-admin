@@ -23,11 +23,9 @@ import java.util.UUID;
 @Data
 public class DocumentVersionFrom {
 
-    /**
-     * 文件 ID。
-     */
+    /** 文件资产 ID。 */
     @NotNull(message = "文件不能为空")
-    private UUID fileId;
+    private UUID fileAssetId;
 
     /**
      * 文件名称。

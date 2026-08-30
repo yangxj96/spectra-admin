@@ -48,6 +48,10 @@ import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementItemMapper;
 import com.devops00.spectra.oa.reimbursement.mapper.ReimbursementMapper;
 import com.devops00.spectra.oa.reimbursement.service.ReimbursementService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import com.devops00.spectra.upload.api.FileReferenceService;
+import com.devops00.spectra.oa.support.OaFileReferenceBinder;
+import com.devops00.spectra.oa.support.OaFileReferenceType;
+import com.devops00.spectra.upload.api.FileAssetPort;
 import com.devops00.spectra.workflow.service.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -89,6 +93,9 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
     private final ReimbursementConverter reimbursementConverter;
     private final TimeMapper timeMapper;
     private final SecurityContextAccessor securityContextAccessor;
+    private final FileAssetPort fileAssetPort;
+    private final FileReferenceService fileReferenceService;
+    private final OaFileReferenceBinder fileReferenceBinder;
 
     @Override
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
@@ -336,18 +343,23 @@ public class ReimbursementServiceImpl extends BaseServiceImpl<ReimbursementMappe
      * 更新或推进目标状态（{@code replaceAttachments}）。
      */
     private void replaceAttachments(UUID applicationId, List<ReimbursementAttachmentFrom> attachments) {
+        attachmentMapper.selectList(new LambdaQueryWrapper<ApplicationAttachment>().eq(ApplicationAttachment::getApplicationId, applicationId))
+                .forEach(old -> fileReferenceService.removeByReference("OA_REIMBURSEMENT_ATTACHMENT", old.getId()));
         attachmentMapper.delete(new LambdaQueryWrapper<ApplicationAttachment>().eq(ApplicationAttachment::getApplicationId, applicationId));
         if (attachments == null || attachments.isEmpty()) {
             return;
         }
         var unique = new LinkedHashMap<UUID, ReimbursementAttachmentFrom>();
-        attachments.forEach(item -> unique.put(item.getFileId(), item));
+        attachments.forEach(item -> unique.put(item.getFileAssetId(), item));
         unique.values().forEach(item -> {
+            var file = fileAssetPort.requireReadyForReference(item.getFileAssetId(), securityContextAccessor.currentUserId());
             var attachment = reimbursementConverter.toAttachmentEntity(item);
             attachment.setApplicationId(applicationId);
             if (attachmentMapper.insert(attachment) != 1) {
                 throw new DataSaveException("保存报销凭证失败");
             }
+            fileReferenceService.register(fileReferenceBinder.content(file.fileAssetId(), OaFileReferenceType.REIMBURSEMENT_ATTACHMENT,
+                    attachment.getId(), attachment.getFileName()));
         });
     }
 

@@ -209,23 +209,4 @@ public class ContractController {
         return contractService.sendDueMilestoneReminders();
     }
 
-    /**
-     * 预览合同版本。
-     */
-    @ULog("'预览合同版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/preview", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'oa:contract:read')")
-    public void preview(@PathVariable UUID id, @PathVariable UUID versionId) {
-        contractService.preview(id, versionId);
-    }
-
-    /**
-     * 下载合同版本。
-     */
-    @ULog("'下载合同版本'")
-    @GetMapping(value = "/{id}/versions/{versionId}/download", version = "1.0.0")
-    @PreAuthorize("hasPermission(null, 'oa:contract:read')")
-    public void download(@PathVariable UUID id, @PathVariable UUID versionId) {
-        contractService.download(id, versionId);
-    }
 }

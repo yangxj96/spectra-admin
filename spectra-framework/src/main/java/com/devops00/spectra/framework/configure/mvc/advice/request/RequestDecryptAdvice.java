@@ -135,6 +135,10 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
     public HttpInputMessage beforeBodyRead(HttpInputMessage inputMessage, MethodParameter parameter, Type targetType,
                                            Class<? extends HttpMessageConverter<?>> converterType)
             throws IOException {
+        if (!isJsonContentType(inputMessage.getHeaders().getContentType())) {
+            // 二进制/表单请求不能被读取后再判断，否则会把大文件完整载入内存。
+            return inputMessage;
+        }
         byte[] bodyBytes = inputMessage.getBody().readAllBytes();
 
         // 优先检查 X-Encrypted 请求头
@@ -190,6 +194,12 @@ public class RequestDecryptAdvice implements RequestBodyAdvice {
      */
     private boolean isEncryptedBody(JsonNode node) {
         return node.has("data") && node.has("key") && node.has("iv");
+    }
+
+    private static boolean isJsonContentType(org.springframework.http.MediaType contentType) {
+        return contentType != null
+                && (org.springframework.http.MediaType.APPLICATION_JSON.includes(contentType)
+                        || contentType.getSubtype().endsWith("+json"));
     }
 
     /**

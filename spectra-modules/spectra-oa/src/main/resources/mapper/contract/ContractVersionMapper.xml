@@ -25,7 +25,7 @@
         <!--@Table spectra_oa.oa_contract_version-->
         <result column="contract_id"  property="contractId"/>
         <result column="version_no"   property="versionNo"/>
-        <result column="file_id"      property="fileId"/>
+        <result column="file_asset_id" property="fileAssetId"/>
         <result column="file_name"    property="fileName"/>
         <result column="file_size"    property="fileSize"/>
         <result column="content_type" property="contentType"/>
@@ -38,7 +38,7 @@
         <!--@mbg.generated-->
         contract_id,
         version_no,
-        file_id,
+        file_asset_id,
         file_name,
         file_size,
         content_type,

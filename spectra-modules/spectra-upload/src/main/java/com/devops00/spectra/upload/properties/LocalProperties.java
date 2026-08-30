@@ -33,10 +33,10 @@ public class LocalProperties {
     /**
      * 上传的文件夹位置
      */
-    private String uploadDir = "uploads";
+    private String storageRoot = "uploads";
 
     /**
      * 上传文件的时候临时文件路径
      */
-    private String uploadTempDir = "temp";
+    private String stagingRoot = "temp";
 }

@@ -26,9 +26,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpResponse;
@@ -72,6 +74,10 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
+        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
+
         var declaringClass = returnType.getContainingClass();
         // 判断是否是 BaseController 的子类 或者 属于 com.yangxj96.spectra.xxx.controller 包下
         return PATTERN.matcher(declaringClass.getPackageName()).matches();
@@ -82,7 +88,11 @@ public class ResponseModifyAdvice implements ResponseBodyAdvice<Object> {
                                   Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request, ServerHttpResponse response) {
 
         // 第一优先级：流式直接放行
-        if (MediaType.TEXT_EVENT_STREAM.includes(contentType) || body instanceof Flux || Flux.class.isAssignableFrom(returnType.getParameterType())) {
+        if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
+                || body instanceof Flux
+                || body instanceof Resource
+                || (body instanceof ResponseEntity<?> entity && entity.getBody() instanceof Resource)
+                || Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过流式响应包装"));
             return body;
         }

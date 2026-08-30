@@ -44,11 +44,9 @@ public class ApplicationAttachment extends BaseEntity {
     @TableField("application_id")
     private UUID applicationId;
 
-    /**
-     * 文件 ID。
-     */
-    @TableField("file_id")
-    private UUID fileId;
+    /** 文件资产 ID。 */
+    @TableField("file_asset_id")
+    private UUID fileAssetId;
 
     /**
      * 文件名称。

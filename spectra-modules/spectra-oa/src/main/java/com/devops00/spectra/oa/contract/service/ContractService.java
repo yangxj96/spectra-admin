@@ -116,13 +116,4 @@ public interface ContractService extends BaseService<Contract> {
      */
     int sendDueMilestoneReminders();
 
-    /**
-     * 预览合同版本。
-     */
-    void preview(UUID id, UUID versionId);
-
-    /**
-     * 下载合同版本。
-     */
-    void download(UUID id, UUID versionId);
 }

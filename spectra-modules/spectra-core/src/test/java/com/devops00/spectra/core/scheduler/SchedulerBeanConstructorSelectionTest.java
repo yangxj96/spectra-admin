@@ -38,7 +38,7 @@ class SchedulerBeanConstructorSelectionTest {
             SchedulerControlCommandService.class, 5,
             SingletonLoopLeaseService.class, 2,
             LoopController.class, 9,
-            DiscreteDispatchWorker.class, 3,
+            DiscreteDispatchWorker.class, 5,
             LoopErrorAggregator.class, 1);
 
     @Test

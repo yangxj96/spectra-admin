@@ -50,10 +50,10 @@ import com.devops00.spectra.oa.contract.mapper.ContractVersionMapper;
 import com.devops00.spectra.oa.contract.service.ContractService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
-import com.devops00.spectra.upload.javabean.entity.FileInfo;
-import com.devops00.spectra.upload.service.FileInfoService;
-import com.devops00.spectra.upload.javabean.constant.FileInfoStatus;
-import com.devops00.spectra.upload.service.impl.FileUploadFacade;
+import com.devops00.spectra.upload.api.FileAssetPort;
+import com.devops00.spectra.upload.api.FileReferenceService;
+import com.devops00.spectra.oa.support.OaFileReferenceBinder;
+import com.devops00.spectra.oa.support.OaFileReferenceType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -88,8 +88,9 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
 
     private final ContractVersionMapper versionMapper;
     private final ContractMilestoneMapper milestoneMapper;
-    private final FileInfoService fileInfoService;
-    private final FileUploadFacade fileUploadFacade;
+    private final FileAssetPort fileAssetPort;
+    private final FileReferenceService fileReferenceService;
+    private final OaFileReferenceBinder fileReferenceBinder;
     private final NotificationService notificationService;
     private final ContractConverter contractConverter;
     private final TimeMapper timeMapper;
@@ -213,20 +214,17 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (ContractStatus.ARCHIVED.getValue().equals(contract.getStatus())) {
             throw new DataSaveException("已归档合同不能新增版本");
         }
-        FileInfo file = fileInfoService.getById(from.getFileId());
-        if (file == null || !FileInfoStatus.ACTIVE.equals(file.getStatus())) {
-            throw new DataNotExistException("合同文件不存在或已失效");
-        }
+        var file = fileAssetPort.requireReadyForReference(from.getFileAssetId(), securityContextAccessor.currentUserId());
         var latest = versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getContractId, contract.getId())
                 .orderByDesc(ContractVersion::getVersionNo)
                 .last("limit 1"));
         var version = new ContractVersion();
         version.setContractId(contract.getId());
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
-        version.setFileId(file.getId());
-        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.getOriginalName());
-        version.setFileSize(from.getFileSize() == null ? file.getSize() : from.getFileSize());
-        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.getContentType());
+        version.setFileAssetId(file.fileAssetId());
+        version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.originalName());
+        version.setFileSize(from.getFileSize() == null ? file.size() : from.getFileSize());
+        version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.contentType());
         version.setVersionNote(trimToNull(from.getVersionNote()));
         version.setCurrentVersion(true);
         versionMapper.update(null, new LambdaUpdateWrapper<ContractVersion>().eq(ContractVersion::getContractId, contract.getId())
@@ -235,7 +233,8 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         if (versionMapper.insert(version) != 1) {
             throw new DataSaveException("保存合同版本失败");
         }
-        fileInfoService.incrRefCount(file.getId());
+        fileReferenceService.register(fileReferenceBinder.content(file.fileAssetId(), OaFileReferenceType.CONTRACT_VERSION,
+                version.getId(), version.getFileName()));
         return version.getId();
     }
 
@@ -413,16 +412,6 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             }
         }
         return sent;
-    }
-
-    @Override
-    public void preview(UUID id, UUID versionId) {
-        fileUploadFacade.preview(requireVersion(id, versionId).getFileId());
-    }
-
-    @Override
-    public void download(UUID id, UUID versionId) {
-        fileUploadFacade.download(requireVersion(id, versionId).getFileId());
     }
 
     /**

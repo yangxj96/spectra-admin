@@ -31,9 +31,11 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.ResourceHttpMessageConverter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -100,6 +102,10 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
             return false;
         }
 
+        if (Resource.class.isAssignableFrom(returnType.getParameterType())) {
+            return false;
+        }
+
         // 检查 @Encrypt 注解（方法级优先于类级）
         Method method = returnType.getMethod();
         if (method != null) {
@@ -136,7 +142,11 @@ public class ResponseEncryptAdvice implements ResponseBodyAdvice<Object> {
                                             Class<? extends HttpMessageConverter<?>> converterType, ServerHttpRequest request,
                                             ServerHttpResponse response) {
         // 第一：流式直接放行
-        if (MediaType.TEXT_EVENT_STREAM.includes(contentType) || body instanceof Flux || Flux.class.isAssignableFrom(returnType.getParameterType())) {
+        if (MediaType.TEXT_EVENT_STREAM.includes(contentType)
+                || body instanceof Flux
+                || body instanceof Resource
+                || (body instanceof ResponseEntity<?> entity && entity.getBody() instanceof Resource)
+                || Flux.class.isAssignableFrom(returnType.getParameterType())) {
             log.debug(LogPrefix.WEB.f("跳过流式响应包装"));
             return body;
         }

@@ -18,81 +18,53 @@ package com.devops00.spectra.upload.javabean.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.extension.handlers.Jackson3TypeHandler;
 import com.devops00.spectra.common.base.BaseEntity;
-import com.devops00.spectra.upload.javabean.domain.MagicRule;
-import lombok.Getter;
+import com.devops00.spectra.common.mybatis.PgJsonbNodeTypeHandler;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.List;
+import tools.jackson.databind.JsonNode;
 
-/**
- * 文件类型表
- *
- * @author yangxj96
- * @version 1.0
- * @since 2026/3/6 15:27
- */
+/** 文件类型策略实体。 */
 @Getter
 @Setter
 @ToString
 @EqualsAndHashCode(callSuper = true)
-@TableName(value = "file_type", schema = "spectra_upload", autoResultMap = true)
+@TableName(value = "file_type", schema = "spectra_core", autoResultMap = true)
 public class FileType extends BaseEntity {
 
-    /**
-     * 文件类型名称
-     */
-    @TableField("name")
-    private String name;
+    @TableField("code")
+    private String code;
 
-    /**
-     * 文件后缀（.jpg .png 等）
-     */
-    @TableField(value = "extension", typeHandler = Jackson3TypeHandler.class)
-    private List<String> extension;
+    @TableField("display_name")
+    private String displayName;
 
-    /**
-     * MIME 类型
-     */
-    @TableField(value = "mime", typeHandler = Jackson3TypeHandler.class)
-    private List<String> mime;
+    @TableField(value = "allowed_extensions", typeHandler = PgJsonbNodeTypeHandler.class)
+    private JsonNode allowedExtensions;
 
-    /**
-     * 文件魔数
-     */
-    @TableField(value = "magic_rules", typeHandler = Jackson3TypeHandler.class)
-    private List<MagicRule> magicRules;
+    @TableField(value = "allowed_content_types", typeHandler = PgJsonbNodeTypeHandler.class)
+    private JsonNode allowedContentTypes;
 
-    /**
-     * 最大文件大小（bytes）
-     */
+    @TableField(value = "magic_rules", typeHandler = PgJsonbNodeTypeHandler.class)
+    private JsonNode magicRules;
+
     @TableField("max_size")
     private Long maxSize;
 
-    /**
-     * 是否允许预览
-     */
-    @TableField("previewable")
-    private Boolean previewable;
+    @TableField("preview_enabled")
+    private Boolean previewEnabled;
 
-    /**
-     * 是否允许上传
-     */
-    @TableField("allowed_upload")
-    private Boolean allowedUpload;
+    @TableField("download_enabled")
+    private Boolean downloadEnabled;
 
-    /**
-     * 是否危险类型
-     */
+    @TableField("upload_enabled")
+    private Boolean uploadEnabled;
+
     @TableField("dangerous")
     private Boolean dangerous;
 
-    /**
-     * 备注
-     */
-    @TableField("remark")
-    private String remark;
+    @TableField("enabled")
+    private Boolean enabled;
 }
