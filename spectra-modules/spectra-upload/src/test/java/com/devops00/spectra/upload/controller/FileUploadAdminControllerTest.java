@@ -23,11 +23,14 @@ class FileUploadAdminControllerTest {
     @Test
     void adminEndpointsExposeDedicatedReadAndManagePermissions() throws Exception {
         assertThat(FileUploadAdminController.class.getMethod("page", PageFrom.class, FileUploadAdminPageRequest.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:read')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:read')");
         assertThat(FileUploadAdminController.class.getMethod("detail", UUID.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:read')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:read')");
         assertThat(FileUploadAdminController.class.getMethod("cancel", UUID.class, FileAdminOperationFrom.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
     }
 
     @Test

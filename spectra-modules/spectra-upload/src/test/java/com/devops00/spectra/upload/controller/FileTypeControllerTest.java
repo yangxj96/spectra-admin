@@ -22,17 +22,23 @@ class FileTypeControllerTest {
     @Test
     void readAndWriteEndpointsUseSeparatedPermissions() throws Exception {
         assertThat(FileTypeController.class.getMethod("page", PageFrom.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:read')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:read')");
         assertThat(FileTypeController.class.getMethod("get", UUID.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:read')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:read')");
         assertThat(FileTypeController.class.getMethod("create", FileTypePolicySaveFrom.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
         assertThat(FileTypeController.class.getMethod("modify", UUID.class, FileTypePolicySaveFrom.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
         assertThat(FileTypeController.class.getMethod("enable", UUID.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
         assertThat(FileTypeController.class.getMethod("disable", UUID.class)
-                .getAnnotation(PreAuthorize.class).value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
+                .getAnnotation(PreAuthorize.class)
+                .value()).isEqualTo("hasPermission(null, 'file:admin:manage')");
     }
 
     @Test
