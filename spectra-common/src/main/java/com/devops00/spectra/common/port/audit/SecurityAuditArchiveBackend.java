@@ -5,7 +5,7 @@
  *  you may not use this file except in compliance with the License.
  */
 
-package com.devops00.spectra.core.security.audit.domain;
+package com.devops00.spectra.common.port.audit;
 
 import java.time.Instant;
 
@@ -24,4 +24,10 @@ public interface SecurityAuditArchiveBackend {
 
     /** 按 manifest 中的 URI 读取归档对象，供恢复校验使用。 */
     byte[] read(String objectUri);
+
+    /** 检查 manifest 中的 URI 是否仍然存在于不可变存储。 */
+    boolean exists(String objectUri);
+
+    /** 读取对象并校验长度和 SHA-256，不满足预期时必须抛出异常。 */
+    void verify(String objectUri, String expectedSha256, long expectedLength);
 }

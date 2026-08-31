@@ -35,6 +35,7 @@ import com.devops00.spectra.security.base.change.SecuritySessionRevocationPort;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -113,6 +114,9 @@ class RoleAuthorizationChangeServiceImplTest {
 
     @Mock
     private SecurityAuditWriter securityAuditWriter;
+
+    @Mock
+    private SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     @Mock
     private TimeMapper timeMapper;

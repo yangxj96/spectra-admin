@@ -21,6 +21,7 @@ import com.devops00.spectra.core.security.authentication.javabean.entity.TotpCre
 import com.devops00.spectra.core.security.authentication.mapper.MfaEnrollmentMapper;
 import com.devops00.spectra.core.security.authentication.mapper.RecoveryCodeMapper;
 import com.devops00.spectra.core.security.authentication.mapper.TotpCredentialMapper;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -50,6 +51,7 @@ class MfaServiceImplTest {
         var userMapper = mock(UserMapper.class);
         var configuredService = mock(ConfiguredService.class);
         var securityAuditWriter = mock(SecurityAuditWriter.class);
+        var securityChangeOutboxProducer = mock(SecurityChangeOutboxProducer.class);
         var properties = new SecurityProperties();
         properties.setMfaEncryptionKey("01234567890123456789012345678901");
         properties.setMfaEncryptionKeyVersion("v1");
@@ -68,7 +70,7 @@ class MfaServiceImplTest {
         when(credentialMapper.insert(any(TotpCredential.class))).thenReturn(1);
 
         var service = new MfaServiceImpl(enrollmentMapper, credentialMapper, recoveryCodeMapper, userMapper,
-                configuredService, properties, securityAuditWriter);
+                configuredService, properties, securityAuditWriter, securityChangeOutboxProducer);
 
         String provisioningUri = service.beginTotpEnrollment(userId).provisioningUri();
         String decodedUri = URLDecoder.decode(provisioningUri, StandardCharsets.UTF_8);

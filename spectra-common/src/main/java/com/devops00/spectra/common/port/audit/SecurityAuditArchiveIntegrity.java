@@ -5,7 +5,7 @@
  *  you may not use this file except in compliance with the License.
  */
 
-package com.devops00.spectra.core.security.audit.util;
+package com.devops00.spectra.common.port.audit;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -18,9 +18,6 @@ public final class SecurityAuditArchiveIntegrity {
     private SecurityAuditArchiveIntegrity() {
     }
 
-    /**
-     * 处理内部业务逻辑（{@code sha256}）。
-     */
     public static String sha256(byte[] content) {
         if (content == null) {
             throw new IllegalArgumentException("归档内容不能为空");
@@ -32,16 +29,20 @@ public final class SecurityAuditArchiveIntegrity {
         }
     }
 
-    /**
-     * 处理内部业务逻辑（{@code verify}）。
-     */
     public static void verify(byte[] content, String expectedSha256) {
         if (!MessageDigest.isEqual(sha256(content).getBytes(StandardCharsets.US_ASCII),
                 expectedSha256 == null
                         ? new byte[0]
-                        : expectedSha256.toLowerCase(Locale.ROOT)
-                                .getBytes(StandardCharsets.US_ASCII))) {
+                        : expectedSha256.toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII))) {
             throw new IllegalStateException("安全审计归档完整性校验失败");
         }
+    }
+
+    /** 校验归档对象长度和摘要。 */
+    public static void verify(byte[] content, String expectedSha256, long expectedLength) {
+        if (expectedLength < 0 || content == null || content.length != expectedLength) {
+            throw new IllegalStateException("安全审计归档长度校验失败");
+        }
+        verify(content, expectedSha256);
     }
 }

@@ -16,9 +16,8 @@
 
 package com.devops00.spectra.core.security.audit.service;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -31,30 +30,26 @@ class SecurityAuditArchiveAuditTrailTest {
 
     @Test
     void archiveFailureIsRecordedAndUnknownOperationsAreRejected() {
-        var writer = new RecordingWriter();
-        var trail = new SecurityAuditArchiveAuditTrail(writer);
+        var auditService = new RecordingAuditService();
+        var trail = new SecurityAuditArchiveAuditTrail(auditService);
 
         trail.append("SECURITY_AUDIT_ARCHIVE_FAILED", null, "security_audit_2025_01", "checksum mismatch");
 
-        assertEquals("SECURITY_AUDIT_ARCHIVE_FAILED", writer.events.getFirst().eventType());
-        assertEquals(AuditResult.FAILED, writer.events.getFirst().result());
+        assertEquals("SECURITY_AUDIT_ARCHIVE_FAILED", auditService.records.getFirst().eventType());
+        assertEquals(AuditRecord.Result.FAILED, auditService.records.getFirst().result());
         trail.append("SECURITY_AUDIT_ARCHIVE_STARTED", null, "security_audit_2025_02", "copy started");
-        assertEquals(AuditResult.STARTED, writer.events.get(1).result());
+        assertEquals(AuditRecord.Result.STARTED, auditService.records.get(1).result());
         assertThrows(IllegalArgumentException.class,
                 () -> trail.append("SECURITY_AUDIT_ARCHIVE_DELETED", null, "security_audit_2025_01", "not allowed"));
     }
 
-    private static final class RecordingWriter implements SecurityAuditWriter {
+    private static final class RecordingAuditService implements AuditService {
 
-        private final List<SecurityAuditEvent> events = new ArrayList<>();
-
-        @Override
-        public void assertAvailable() {
-        }
+        private final List<AuditRecord> records = new ArrayList<>();
 
         @Override
-        public void append(SecurityAuditEvent event) {
-            events.add(event);
+        public void record(AuditRecord record) {
+            records.add(record);
         }
     }
 }

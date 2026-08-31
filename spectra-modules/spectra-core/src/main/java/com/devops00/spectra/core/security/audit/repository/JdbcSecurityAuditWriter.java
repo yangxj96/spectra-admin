@@ -16,10 +16,12 @@
 
 package com.devops00.spectra.core.security.audit.repository;
 
+import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditUnavailableException;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.ObjectMapper;
@@ -28,12 +30,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.sql.Types;
+import java.util.Map;
 import java.util.UUID;
 
 /**
  * PostgreSQL Security Audit 追加写入器。
  * <p>
  * 表和最小数据库权限由目标 Flyway schema 提供；没有表、连接或写权限时直接 fail-closed。
+ * 该写入器只负责同步写入不可变的安全审计事实表，不负责投递安全变更 outbox，
+ * 也不把安全事实降级为普通操作日志；需要外部动作的成功安全变更由 Core 业务事务显式调用
+ * {@code SecurityChangeOutboxProducer}，从而保证事实表与 outbox 同事务提交。
  *
  * @author yangxj96
  * @version 1.0
@@ -51,6 +57,7 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
 
     private final JdbcTemplate jdbcTemplate;
     private final ObjectMapper objectMapper;
+    private final ObjectProvider<AuditSanitizer> auditSanitizer;
 
     @Override
     public void assertAvailable() {
@@ -67,8 +74,8 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
             throw unavailable("Security Audit 事件不能为空", null);
         }
         try {
-            String before = objectMapper.writeValueAsString(event.before());
-            String after = objectMapper.writeValueAsString(event.after());
+            String before = objectMapper.writeValueAsString(sanitize(event.before()));
+            String after = objectMapper.writeValueAsString(sanitize(event.after()));
             jdbcTemplate.update(connection -> {
                 PreparedStatement statement = connection.prepareStatement(INSERT_SQL);
                 setUuid(statement, 1, event.eventId());
@@ -115,5 +122,14 @@ public class JdbcSecurityAuditWriter implements SecurityAuditWriter {
      */
     private static SecurityAuditUnavailableException unavailable(String message, Throwable cause) {
         return cause == null ? new SecurityAuditUnavailableException(message) : new SecurityAuditUnavailableException(message, cause);
+    }
+
+    /**
+     * 兼容直接使用旧安全写入端口的调用方，同时让进入数据库的快照统一经过 Core 约定的脱敏器。
+     * 没有 Starter 脱敏 Bean 的独立安全上下文沿用 {@link SecurityAuditEvent} 已完成的安全快照。
+     */
+    private Map<String, Object> sanitize(Map<String, Object> snapshot) {
+        var sanitizer = auditSanitizer.getIfAvailable();
+        return sanitizer == null ? snapshot : sanitizer.sanitize(snapshot);
     }
 }

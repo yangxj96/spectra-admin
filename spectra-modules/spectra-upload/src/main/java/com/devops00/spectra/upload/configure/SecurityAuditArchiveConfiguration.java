@@ -7,9 +7,9 @@
 
 package com.devops00.spectra.upload.configure;
 
-import com.devops00.spectra.core.security.audit.domain.SecurityAuditArchiveBackend;
-import com.devops00.spectra.core.security.audit.util.SecurityAuditArchiveIntegrity;
-import com.devops00.spectra.core.security.audit.domain.SecurityAuditArchiveReceipt;
+import com.devops00.spectra.common.port.audit.SecurityAuditArchiveBackend;
+import com.devops00.spectra.common.port.audit.SecurityAuditArchiveIntegrity;
+import com.devops00.spectra.common.port.audit.SecurityAuditArchiveReceipt;
 import com.devops00.spectra.upload.properties.S3Properties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,8 +18,10 @@ import org.springframework.context.annotation.Configuration;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ObjectLockMode;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.net.URI;
 import java.time.Instant;
@@ -71,19 +73,65 @@ public class SecurityAuditArchiveConfiguration {
             }
             String key = prefix() + objectKey;
             String digest = SecurityAuditArchiveIntegrity.sha256(content);
-            client.putObject(PutObjectRequest.builder()
-                    .bucket(properties.getArchiveBucket())
-                    .key(key)
-                    .contentType("application/octet-stream")
-                    .metadata(Map.of("sha256", digest, "retention-until", retainUntil.toString()))
-                    .objectLockMode(ObjectLockMode.COMPLIANCE)
-                    .objectLockRetainUntilDate(retainUntil)
-                    .build(), RequestBody.fromBytes(content));
+            try {
+                client.putObject(PutObjectRequest.builder()
+                        .bucket(properties.getArchiveBucket())
+                        .key(key)
+                        .ifNoneMatch("*")
+                        .contentType("application/octet-stream")
+                        .metadata(Map.of("sha256", digest, "retention-until", retainUntil.toString()))
+                        .objectLockMode(ObjectLockMode.COMPLIANCE)
+                        .objectLockRetainUntilDate(retainUntil)
+                        .build(), RequestBody.fromBytes(content));
+            } catch (S3Exception exception) {
+                if (exception.statusCode() != 412) {
+                    throw exception;
+                }
+                // 数据库确认失败后的重试可能命中已经写成功的 Object Lock 对象；
+                // 只有完全相同的不可变内容才视为幂等成功，冲突内容必须失败。
+                SecurityAuditArchiveIntegrity.verify(read(uri(key)), digest, content.length);
+            }
             return new SecurityAuditArchiveReceipt(uri(key), digest, content.length, retainUntil);
         }
 
         @Override
         public byte[] read(String objectUri) {
+            URI uri = requireArchiveUri(objectUri);
+            return client.getObjectAsBytes(GetObjectRequest.builder()
+                    .bucket(uri.getHost())
+                    .key(uri.getPath().substring(1))
+                    .build()).asByteArray();
+        }
+
+        @Override
+        public boolean exists(String objectUri) {
+            URI uri = requireArchiveUri(objectUri);
+            try {
+                client.headObject(HeadObjectRequest.builder()
+                        .bucket(uri.getHost())
+                        .key(uri.getPath().substring(1))
+                        .build());
+                return true;
+            } catch (RuntimeException exception) {
+                return false;
+            }
+        }
+
+        @Override
+        public void verify(String objectUri, String expectedSha256, long expectedLength) {
+            URI uri = requireArchiveUri(objectUri);
+            var metadata = client.headObject(HeadObjectRequest.builder()
+                    .bucket(uri.getHost())
+                    .key(uri.getPath().substring(1))
+                    .build());
+            if (metadata.contentLength() != expectedLength) {
+                throw new IllegalStateException("S3 归档对象长度校验失败");
+            }
+            SecurityAuditArchiveIntegrity.verify(read(objectUri), expectedSha256, expectedLength);
+        }
+
+        /** 校验并解析受配置 bucket 约束的对象 URI。 */
+        private URI requireArchiveUri(String objectUri) {
             URI uri = URI.create(objectUri);
             if (!"s3".equalsIgnoreCase(uri.getScheme())
                     || !properties.getArchiveBucket().equals(uri.getHost())
@@ -91,10 +139,7 @@ public class SecurityAuditArchiveConfiguration {
                     || uri.getPath().length() <= 1) {
                 throw new IllegalArgumentException("归档对象 URI 不属于配置的 S3 archive bucket");
             }
-            return client.getObjectAsBytes(GetObjectRequest.builder()
-                    .bucket(uri.getHost())
-                    .key(uri.getPath().substring(1))
-                    .build()).asByteArray();
+            return uri;
         }
 
         /**

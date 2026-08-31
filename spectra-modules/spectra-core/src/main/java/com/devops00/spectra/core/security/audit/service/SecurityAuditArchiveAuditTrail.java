@@ -16,9 +16,10 @@
 
 package com.devops00.spectra.core.security.audit.service;
 
-import com.devops00.spectra.security.base.audit.AuditResult;
-import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.common.audit.AuditCategory;
+import com.devops00.spectra.common.audit.AuditContext;
+import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.AuditService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +31,7 @@ import java.util.UUID;
  * 归档运维适配器的最高等级审计链。
  * <p>
  * 归档 backend 由部署侧选择（必须具备不可变对象/完整性校验能力）；该适配器只负责在
- * started/completed/failed/verified 四个边界写不可变 Security Audit。它不提供分区卸载、
+ * planned/started/completed/failed/verified/restored 边界写不可变 Security Audit。它不提供分区卸载、
  * 删除或修改 manifest 的应用权限，因此归档失败不会触发热数据提前移除。
  */
 @Component
@@ -38,12 +39,16 @@ import java.util.UUID;
 public class SecurityAuditArchiveAuditTrail {
 
     private static final Set<String> ARCHIVE_EVENTS = Set.of(
+            "SECURITY_AUDIT_ARCHIVE_PLANNED",
+            "SECURITY_AUDIT_ARCHIVE_RETRY_REQUESTED",
+            "SECURITY_AUDIT_ARCHIVE_RESTORE_REQUESTED",
             "SECURITY_AUDIT_ARCHIVE_STARTED",
             "SECURITY_AUDIT_ARCHIVE_COMPLETED",
             "SECURITY_AUDIT_ARCHIVE_FAILED",
-            "SECURITY_AUDIT_ARCHIVE_VERIFIED");
+            "SECURITY_AUDIT_ARCHIVE_VERIFIED",
+            "SECURITY_AUDIT_ARCHIVE_RESTORED");
 
-    private final SecurityAuditWriter securityAuditWriter;
+    private final AuditService auditService;
 
     /**
      * 更新或推进目标状态（{@code append}）。
@@ -52,22 +57,39 @@ public class SecurityAuditArchiveAuditTrail {
         if (!ARCHIVE_EVENTS.contains(eventType)) {
             throw new IllegalArgumentException("非法的审计归档事件类型");
         }
+        String safeDetail = safeDetail(detail);
         Map<String, Object> snapshot = Map.of(
                 "partitionName", partitionName == null ? "UNKNOWN" : partitionName,
-                "detail", detail == null ? "" : detail);
-        securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, "OPS", null, null,
-                Map.of(), snapshot, null, null, resultFor(eventType), null));
+                "detail", safeDetail);
+        auditService.record(new AuditRecord(UUID.randomUUID(), AuditCategory.SECURITY, eventType, null,
+                resultFor(eventType), null, new AuditContext(operatorId, null, null, "OPS", null, null),
+                Map.of(), snapshot, safeDetail));
     }
 
     /**
      * 处理内部业务逻辑（{@code resultFor}）。
      */
-    private static AuditResult resultFor(String eventType) {
+    private static AuditRecord.Result resultFor(String eventType) {
         return switch (eventType) {
-            case "SECURITY_AUDIT_ARCHIVE_STARTED" -> AuditResult.STARTED;
-            case "SECURITY_AUDIT_ARCHIVE_FAILED" -> AuditResult.FAILED;
-            case "SECURITY_AUDIT_ARCHIVE_COMPLETED", "SECURITY_AUDIT_ARCHIVE_VERIFIED" -> AuditResult.SUCCEEDED;
+            case "SECURITY_AUDIT_ARCHIVE_PLANNED",
+                    "SECURITY_AUDIT_ARCHIVE_RETRY_REQUESTED",
+                    "SECURITY_AUDIT_ARCHIVE_RESTORE_REQUESTED",
+                    "SECURITY_AUDIT_ARCHIVE_STARTED" ->
+                AuditRecord.Result.STARTED;
+            case "SECURITY_AUDIT_ARCHIVE_FAILED" -> AuditRecord.Result.FAILED;
+            case "SECURITY_AUDIT_ARCHIVE_COMPLETED",
+                    "SECURITY_AUDIT_ARCHIVE_VERIFIED",
+                    "SECURITY_AUDIT_ARCHIVE_RESTORED" ->
+                AuditRecord.Result.SUCCEEDED;
             default -> throw new IllegalArgumentException("非法的审计归档事件类型");
         };
+    }
+
+    private static String safeDetail(String detail) {
+        if (detail == null || detail.isBlank()) {
+            return "";
+        }
+        String normalized = detail.replaceAll("[\\r\\n\\t]+", " ").trim();
+        return normalized.length() <= 500 ? normalized : normalized.substring(0, 500);
     }
 }

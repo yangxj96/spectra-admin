@@ -20,6 +20,7 @@ import com.devops00.spectra.core.security.authentication.mapper.RecoveryCodeMapp
 import com.devops00.spectra.core.security.authentication.mapper.TotpCredentialMapper;
 import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.util.TotpSecretCipher;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.system.constant.SystemConfigKeys;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.entity.User;
@@ -60,13 +61,16 @@ public class MfaServiceImpl implements MfaService {
     private final ConfiguredService configuredService;
     private final SecurityProperties properties;
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
     private final Clock clock = Clock.systemUTC();
     private final SecureRandom random = new SecureRandom();
 
     public MfaServiceImpl(MfaEnrollmentMapper enrollmentMapper, TotpCredentialMapper credentialMapper,
                           RecoveryCodeMapper recoveryCodeMapper, UserMapper userMapper, ConfiguredService configuredService,
                           SecurityProperties properties,
-                          SecurityAuditWriter securityAuditWriter) {
+                          SecurityAuditWriter securityAuditWriter,
+                          SecurityChangeOutboxProducer securityChangeOutboxProducer) {
         this.enrollmentMapper = enrollmentMapper;
         this.credentialMapper = credentialMapper;
         this.recoveryCodeMapper = recoveryCodeMapper;
@@ -74,6 +78,7 @@ public class MfaServiceImpl implements MfaService {
         this.configuredService = configuredService;
         this.properties = properties;
         this.securityAuditWriter = securityAuditWriter;
+        this.securityChangeOutboxProducer = securityChangeOutboxProducer;
     }
 
     @Override
@@ -292,8 +297,10 @@ public class MfaServiceImpl implements MfaService {
      */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, targetId, targetId,
-                null, null, null, before, after, reason, null, auditResult(eventType), null));
+        var event = new SecurityAuditEvent(null, eventType, targetId, targetId,
+                null, null, null, before, after, reason, null, auditResult(eventType), null);
+        securityAuditWriter.append(event);
+        securityChangeOutboxProducer.publish(event);
     }
 
     /**

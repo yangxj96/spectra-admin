@@ -7,6 +7,7 @@
 
 package com.devops00.spectra.core.security.audit.util;
 
+import com.devops00.spectra.common.port.audit.SecurityAuditArchiveIntegrity;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;

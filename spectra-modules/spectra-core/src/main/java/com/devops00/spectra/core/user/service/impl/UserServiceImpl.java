@@ -51,6 +51,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserCreatedVO;
 import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.service.UserService;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.framework.assembler.NameFillExecutor;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
@@ -117,6 +118,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private final SecurityChangeExecutor securityChangeExecutor;
 
     private final SecurityAuditWriter securityAuditWriter;
+
+    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final SecurityContextAccessor securityContextAccessor;
 
@@ -390,8 +393,10 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
      */
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
-                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null));
+        var event = new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
+                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null);
+        securityAuditWriter.append(event);
+        securityChangeOutboxProducer.publish(event);
     }
 
     /**

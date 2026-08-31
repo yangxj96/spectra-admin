@@ -5,7 +5,7 @@
  *  you may not use this file except in compliance with the License.
  */
 
-package com.devops00.spectra.core.security.audit.domain;
+package com.devops00.spectra.common.port.audit;
 
 import java.time.Instant;
 

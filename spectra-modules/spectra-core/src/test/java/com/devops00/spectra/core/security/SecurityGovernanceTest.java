@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security;
 
 import com.devops00.spectra.core.security.change.service.impl.DefaultSecurityChangeExecutor;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.security.root.service.impl.JdbcLastEffectiveDevOpsGuard;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -35,6 +36,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * Phase 1 安全审计、事务门禁和最后 Root 保护测试。
@@ -45,7 +47,7 @@ class SecurityGovernanceTest {
     void highRiskMutationMustNotRunWhenAuditIsUnavailable() {
         var writer = new RecordingAuditWriter();
         writer.available = false;
-        var executor = new DefaultSecurityChangeExecutor(writer);
+        var executor = new DefaultSecurityChangeExecutor(writer, mock(SecurityChangeOutboxProducer.class));
         var executed = new AtomicBoolean();
 
         assertThrows(SecurityAuditUnavailableException.class,
@@ -61,7 +63,7 @@ class SecurityGovernanceTest {
     @Test
     void successfulMutationWritesStartedAndSucceededFacts() {
         var writer = new RecordingAuditWriter();
-        var executor = new DefaultSecurityChangeExecutor(writer);
+        var executor = new DefaultSecurityChangeExecutor(writer, mock(SecurityChangeOutboxProducer.class));
 
         assertEquals("ok", executor.execute(event(), () -> "ok"));
         assertEquals(List.of(AuditResult.STARTED, AuditResult.SUCCEEDED),

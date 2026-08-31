@@ -48,6 +48,7 @@ import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMappe
 import com.devops00.spectra.core.security.authorization.service.AuthorizationAssignmentChangeService;
 import com.devops00.spectra.core.security.authorization.service.GrantBoundaryService;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationSnapshotLoader;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.core.user.mapper.UserMapper;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
@@ -125,6 +126,7 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private final ObjectProvider<HighRiskApprovalGate> approvalGateProvider;
 
     private final SecurityAuditWriter securityAuditWriter;
+    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
 
     private final TimeMapper timeMapper;
 
@@ -553,8 +555,10 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
      */
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
-        securityAuditWriter.append(new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditResult.SUCCEEDED, null));
+        var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
+                before, after, reason, null, AuditResult.SUCCEEDED, null);
+        securityAuditWriter.append(event);
+        securityChangeOutboxProducer.publish(event);
     }
 
     /**

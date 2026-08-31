@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.security.audit.service;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
+import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.core.security.audit.javabean.from.SecurityAuditQueryFrom;
 import com.devops00.spectra.core.security.audit.javabean.vo.SecurityAuditPageVO;
@@ -27,7 +28,6 @@ import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.AuditVisibilityPolicy;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
-import com.devops00.spectra.security.base.audit.SecurityAuditSnapshotSanitizer;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -284,7 +284,7 @@ public class SecurityAuditQueryService {
             Map<?, ?> parsed = objectMapper.readValue(json, Map.class);
             var normalized = new LinkedHashMap<String, Object>();
             parsed.forEach((key, value) -> normalized.put(String.valueOf(key), value));
-            return SecurityAuditSnapshotSanitizer.sanitize(normalized);
+            return DefaultAuditSanitizer.INSTANCE.sanitize(normalized);
         } catch (Exception ignored) {
             return Map.of("_redacted", "invalid_snapshot");
         }

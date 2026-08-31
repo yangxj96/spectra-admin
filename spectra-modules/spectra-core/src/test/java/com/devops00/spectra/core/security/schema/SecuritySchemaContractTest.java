@@ -134,7 +134,7 @@ class SecuritySchemaContractTest {
                 .map(line -> line.substring("  - code: ".length()))
                 .toList();
 
-        assertEquals(111, codes.size());
+        assertEquals(112, codes.size());
         for (String code : codes) {
             assertTrue(migration.contains("'" + code + "'"), code);
         }
@@ -179,6 +179,23 @@ class SecuritySchemaContractTest {
                 "ON spectra_security.sec_assignment_permission_boundary USING btree (assignment_id, permission_id) WHERE (deleted IS NULL);"));
         assertTrue(migration
                 .contains("ON spectra_security.sec_assignment_grant_boundary USING btree (assignment_id, permission_id) WHERE (deleted IS NULL);"));
+    }
+
+    @Test
+    void securityOutboxMigrationMustDeclareLeaseIdempotencyAndArchiveFields() throws IOException {
+        String migration = readMigration("V13__secure_outbox_lease_and_indexes.sql");
+
+        for (String column : List.of("idempotency_key", "correlation_id", "state", "available_at",
+                "lease_owner", "lease_until")) {
+            assertTrue(migration.contains("ADD COLUMN " + column), column);
+        }
+        assertTrue(migration.contains("uk_sec_security_change_outbox_idempotency_key"));
+        assertTrue(migration.contains("idx_sec_security_change_outbox_pending"));
+        assertTrue(migration.contains("idx_sec_security_change_outbox_lease"));
+        assertTrue(migration.contains("content_length bigint"));
+        assertTrue(migration.contains("attempts integer"));
+        assertTrue(migration.contains("idx_sec_security_audit_archive_manifest_pending"));
+        assertTrue(migration.contains("idx_sec_security_audit_archive_manifest_lease"));
     }
 
     private String readV1() throws IOException {

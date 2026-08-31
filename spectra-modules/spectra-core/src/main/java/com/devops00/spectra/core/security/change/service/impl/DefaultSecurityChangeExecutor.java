@@ -19,6 +19,7 @@ package com.devops00.spectra.core.security.change.service.impl;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxProducer;
 import com.devops00.spectra.security.base.change.SecurityChangeExecutor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,8 @@ public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
 
     private final SecurityAuditWriter securityAuditWriter;
 
+    private final SecurityChangeOutboxProducer securityChangeOutboxProducer;
+
     @Override
     @Transactional
     public <T> T execute(SecurityAuditEvent event, Supplier<T> mutation) {
@@ -51,7 +54,9 @@ public class DefaultSecurityChangeExecutor implements SecurityChangeExecutor {
         securityAuditWriter.append(event.started());
         try {
             T result = mutation.get();
-            securityAuditWriter.append(event.withResult(AuditResult.SUCCEEDED));
+            var succeeded = event.withResult(AuditResult.SUCCEEDED);
+            securityAuditWriter.append(succeeded);
+            securityChangeOutboxProducer.publish(succeeded);
             return result;
         } catch (RuntimeException exception) {
             try {
