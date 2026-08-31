@@ -28,40 +28,40 @@ import com.devops00.spectra.common.constant.RedisKey;
 public enum SecurityRedisKey implements RedisKey {
 
     /** 会话详情（事实源）Hash，格式参数为 Access Token digest。 */
-    SESSION("sec:sess:%s"),
+    SESSION(SecurityRedisNamespace.PREFIX + "sess:%s"),
 
     /** 用户+端 → token（同端复用 & 按端踢出）。 */
-    USER_CLIENT("sec:uc:%s:%s"),
+    USER_CLIENT(SecurityRedisNamespace.PREFIX + "uc:%s:%s"),
 
     /** 用户所有 token 集合（全端踢出 & 在线查询）。 */
-    USER_TOKENS("sec:ut:%s"),
+    USER_TOKENS(SecurityRedisNamespace.PREFIX + "ut:%s"),
 
     /** 在线用户 ID 集合。 */
-    ONLINE_USERS("sec:online"),
+    ONLINE_USERS(SecurityRedisNamespace.PREFIX + "online"),
 
     /** Token Family 下的 Access digest 集合。 */
-    SESSION_FAMILY("sec:family:%s"),
+    SESSION_FAMILY(SecurityRedisNamespace.PREFIX + "family:%s"),
 
     /** Token Family 下的 Refresh digest 集合，用于整条会话链撤销时清理轮换残留。 */
-    REFRESH_FAMILY("sec:rt:family:%s"),
+    REFRESH_FAMILY(SecurityRedisNamespace.PREFIX + "rt:family:%s"),
 
     /** 登录失败计数（锁定账号）。 */
-    LOGIN_FAIL("sec:fail:%s"),
+    LOGIN_FAIL(SecurityRedisNamespace.PREFIX + "fail:%s"),
 
     /** 刷新 token → access token 映射。 */
-    REFRESH_TOKEN("sec:rt:%s"),
+    REFRESH_TOKEN(SecurityRedisNamespace.PREFIX + "rt:%s"),
 
     /** Refresh Token 重放后的用户级撤销栅栏。 */
-    REFRESH_REPLAY_FENCE("sec:replay:%s"),
+    REFRESH_REPLAY_FENCE(SecurityRedisNamespace.PREFIX + "replay:%s"),
 
     /** Refresh Token 一次性消费声明。 */
-    REFRESH_CLAIM("sec:rt:claim:%s"),
+    REFRESH_CLAIM(SecurityRedisNamespace.PREFIX + "rt:claim:%s"),
 
     /** MFA 登录预认证挑战；只保存短期非敏感的用户标识和挑战状态。 */
-    MFA_CHALLENGE("sec:mfa:challenge:%s"),
+    MFA_CHALLENGE(SecurityRedisNamespace.PREFIX + "mfa:challenge:%s"),
 
     /** 首次系统初始化令牌的 SHA-256 摘要；不保存令牌明文。 */
-    INITIALIZATION_TOKEN("sec:init:token");
+    INITIALIZATION_TOKEN(SecurityRedisNamespace.PREFIX + "init:token");
 
     private final String pattern;
 

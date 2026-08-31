@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.starter.strategy;
 
 import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
+import com.devops00.spectra.security.base.constant.SecurityRedisNamespace;
 import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -39,7 +40,7 @@ class SecurityRedisFailureIntegrationTest {
     @Test
     void shouldReadAndWriteThroughLiveRedis() {
         RedisProbe probe = RedisProbe.connect();
-        String key = "sec:test:redis-live:" + UUID.randomUUID();
+        String key = SecurityRedisNamespace.PREFIX + "test:redis-live:" + UUID.randomUUID();
         try {
             SecurityRedisExecutor.run("写入实时 Redis 测试值",
                     () -> probe.redis().opsForValue().set(key, "ok", Duration.ofMinutes(1)));
@@ -59,7 +60,7 @@ class SecurityRedisFailureIntegrationTest {
         RedisProbe probe = RedisProbe.connect();
         try {
             assertThatThrownBy(() -> SecurityRedisExecutor.require("读取故障 Redis 测试值",
-                    () -> probe.redis().opsForValue().get("sec:test:redis-failure")))
+                    () -> probe.redis().opsForValue().get(SecurityRedisNamespace.PREFIX + "test:redis-failure")))
                     .isInstanceOf(SecurityRedisUnavailableException.class);
         } finally {
             probe.close();

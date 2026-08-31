@@ -19,6 +19,10 @@ spectra:
     mfa-previous-encryption-key-version: ${SPECTRA_SECURITY_MFA_PREVIOUS_ENCRYPTION_KEY_VERSION:}
     mfa-challenge-expire: ${SPECTRA_SECURITY_MFA_CHALLENGE_EXPIRE:300}
     mfa-challenge-max-attempts: ${SPECTRA_SECURITY_MFA_CHALLENGE_MAX_ATTEMPTS:5}
+    redis:
+      namespace: "sec:"
+      fail-closed: true
+      worker-batch-size: ${SPECTRA_SECURITY_REDIS_WORKER_BATCH_SIZE:100}
     audit-archive-backend: ${SPECTRA_SECURITY_AUDIT_ARCHIVE_BACKEND:S3_OBJECT_LOCK}
   system:
     base-dir: files
@@ -138,15 +142,15 @@ spring:
   data:
     redis:
       url: redis://${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}/${REDIS_DB}
-      timeout: 10s
-      connect-timeout: 5s
+      timeout: ${SPECTRA_REDIS_COMMAND_TIMEOUT:10s}
+      connect-timeout: ${SPECTRA_REDIS_CONNECT_TIMEOUT:5s}
       lettuce:
         pool:
           enabled: true
-          max-idle: 10
-          min-idle: 2
-          max-active: 20
-          max-wait: 5000ms
+          max-idle: ${SPECTRA_REDIS_POOL_MAX_IDLE:10}
+          min-idle: ${SPECTRA_REDIS_POOL_MIN_IDLE:2}
+          max-active: ${SPECTRA_REDIS_POOL_MAX_ACTIVE:20}
+          max-wait: ${SPECTRA_REDIS_POOL_MAX_WAIT:5000ms}
         shutdown-timeout: 100ms
   security:
     user:
@@ -219,3 +223,5 @@ management:
   endpoint:
     health:
       show-details: when-authorized
+      status:
+        order: down,out-of-service,degraded,unknown,up

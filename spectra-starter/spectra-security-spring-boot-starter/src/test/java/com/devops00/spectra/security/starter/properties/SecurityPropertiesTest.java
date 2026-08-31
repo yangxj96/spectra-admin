@@ -17,9 +17,12 @@
 package com.devops00.spectra.security.starter.properties;
 
 import com.devops00.spectra.security.base.properties.SecurityProperties;
+import com.devops00.spectra.security.base.constant.SecurityRedisNamespace;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -40,6 +43,25 @@ class SecurityPropertiesTest {
         assertTrue(whitelists.contains("/security/mfa/setup/totp/confirm"));
         assertTrue(whitelists.contains("/notification/provider/callback/**"));
         assertFalse(whitelists.contains("/actuator/**"));
+        assertFalse(whitelists.contains("/actuator/metrics"));
         assertFalse(whitelists.contains("/file/preview/**"));
+    }
+
+    @Test
+    void shouldKeepSecurityRedisContractFailClosedAndNamespaced() {
+        var properties = new SecurityProperties();
+
+        assertEquals(SecurityRedisNamespace.PREFIX, properties.getRedis().getNamespace());
+        assertTrue(properties.getRedis().isFailClosed());
+        assertEquals(100, properties.getRedis().getWorkerBatchSize());
+        properties.validateRedisContract();
+    }
+
+    @Test
+    void shouldRejectRelaxedSecurityRedisContract() {
+        var properties = new SecurityProperties();
+        properties.getRedis().setFailClosed(false);
+
+        assertThrows(IllegalStateException.class, properties::validateRedisContract);
     }
 }

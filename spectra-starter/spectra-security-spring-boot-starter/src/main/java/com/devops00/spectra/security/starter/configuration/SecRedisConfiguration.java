@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.starter.configuration;
 
 import com.devops00.spectra.common.constant.LogPrefix;
+import com.devops00.spectra.security.base.properties.SecurityProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +46,10 @@ public class SecRedisConfiguration {
      * @return 自定义配置的[RedisTemplate]
      */
     @Bean("securityRedisTemplate")
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, @Qualifier("securityObjectMapper") ObjectMapper om) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory,
+                                                       @Qualifier("securityObjectMapper") ObjectMapper om,
+                                                       SecurityProperties securityProperties) {
+        securityProperties.validateRedisContract();
         log.debug(LogPrefix.SECURITY.f("开始配置Security使用的RedisTemplate"));
         var template = new RedisTemplate<String, Object>();
         template.setConnectionFactory(factory);

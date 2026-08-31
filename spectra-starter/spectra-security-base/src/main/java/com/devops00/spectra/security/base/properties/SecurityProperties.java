@@ -17,6 +17,7 @@
 package com.devops00.spectra.security.base.properties;
 
 import com.devops00.spectra.security.base.enums.SecMode;
+import com.devops00.spectra.security.base.constant.SecurityRedisNamespace;
 import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -192,4 +193,41 @@ public class SecurityProperties {
 
     /** 双提交 CSRF Header 名称。 */
     private String csrfHeaderName = "X-XSRF-TOKEN";
+
+    /** 安全 Redis 运行时契约。 */
+    private RedisContractProperties redis = new RedisContractProperties();
+
+    /**
+     * 安全 Redis 运行时契约配置。
+     *
+     * <p>连接/命令超时和连接池由 Spring Boot 的 {@code spring.data.redis} 管理；这里仅登记安全数据格式、
+     * fail-closed 不变量和后续可靠 worker 共用的批量边界。</p>
+     */
+    @Data
+    public static class RedisContractProperties {
+
+        /** 安全 Redis Key 固定命名空间。 */
+        private String namespace = SecurityRedisNamespace.PREFIX;
+
+        /** 安全 Redis 不可用时必须拒绝安全操作。 */
+        private boolean failClosed = true;
+
+        /** 可靠 worker 默认批量上限，避免后续 worker 无界读取。 */
+        private int workerBatchSize = 100;
+    }
+
+    /**
+     * 校验安全 Redis 契约；不允许通过配置关闭 fail-closed 或改变已发布 Key 命名空间。
+     */
+    public void validateRedisContract() {
+        if (!SecurityRedisNamespace.PREFIX.equals(redis.getNamespace())) {
+            throw new IllegalStateException("安全 Redis namespace 必须固定为 " + SecurityRedisNamespace.PREFIX);
+        }
+        if (!redis.isFailClosed()) {
+            throw new IllegalStateException("安全 Redis 必须启用 fail-closed");
+        }
+        if (redis.getWorkerBatchSize() < 1 || redis.getWorkerBatchSize() > 1000) {
+            throw new IllegalStateException("安全 Redis worker 批量大小必须在 1 到 1000 之间");
+        }
+    }
 }

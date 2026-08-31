@@ -10,16 +10,18 @@ package com.devops00.spectra.security.base.constant;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SecurityRedisKeyTest {
 
     @Test
     void shouldUseSecurityDigestNamespaceForSessionAndRefreshIndexes() {
-        assertTrue(SecurityRedisKey.SESSION.format("digest").startsWith("sec:"));
-        assertTrue(SecurityRedisKey.REFRESH_TOKEN.format("digest").startsWith("sec:"));
-        assertTrue(SecurityRedisKey.SESSION_FAMILY.format("family").startsWith("sec:"));
-        assertTrue(SecurityRedisKey.REFRESH_FAMILY.format("family").startsWith("sec:"));
+        assertEquals(SecurityRedisNamespace.PREFIX, "sec:");
+        assertTrue(SecurityRedisKey.SESSION.format("digest").startsWith(SecurityRedisNamespace.PREFIX));
+        assertTrue(SecurityRedisKey.REFRESH_TOKEN.format("digest").startsWith(SecurityRedisNamespace.PREFIX));
+        assertTrue(SecurityRedisKey.SESSION_FAMILY.format("family").startsWith(SecurityRedisNamespace.PREFIX));
+        assertTrue(SecurityRedisKey.REFRESH_FAMILY.format("family").startsWith(SecurityRedisNamespace.PREFIX));
         assertFalse(SecurityRedisKey.SESSION.format("plaintext-token").contains("auth:"));
     }
 }
