@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.oa.support;
 
-import com.devops00.spectra.upload.api.FileReferenceCommand;
+import com.devops00.spectra.common.port.file.FileReferenceCommand;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;

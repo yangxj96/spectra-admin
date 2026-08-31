@@ -19,7 +19,7 @@ package com.devops00.spectra.core.system.controller;
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.core.system.javabean.vo.SystemBootstrapVO;
 import com.devops00.spectra.core.system.service.SystemBootstrapService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,7 +41,7 @@ public class SystemBootstrapController {
      *
      * @return 启动配置
      */
-    @ULog("'获取系统启动配置'")
+    @Audit("'获取系统启动配置'")
     @Encrypt(response = false)
     @GetMapping(value = "/bootstrap", version = "1.0.0")
     @PreAuthorize("permitAll()")

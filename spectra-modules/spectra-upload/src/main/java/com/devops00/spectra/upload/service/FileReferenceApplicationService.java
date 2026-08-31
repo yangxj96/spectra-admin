@@ -5,13 +5,13 @@
  */
 package com.devops00.spectra.upload.service;
 
-import com.devops00.spectra.upload.api.FileReferenceCommand;
-import com.devops00.spectra.upload.api.FileReferenceKey;
-import com.devops00.spectra.upload.api.FileReferenceService;
-import com.devops00.spectra.upload.api.FileReferenceView;
+import com.devops00.spectra.common.port.file.FileReferenceCommand;
+import com.devops00.spectra.common.port.file.FileReferenceKey;
+import com.devops00.spectra.common.port.file.FileReferenceService;
+import com.devops00.spectra.common.port.file.FileReferenceView;
 import com.devops00.spectra.upload.javabean.entity.FileReference;
 import com.devops00.spectra.upload.mapper.FileReferenceMapper;
-import com.devops00.spectra.upload.api.FileReferencePermissionChecker;
+import com.devops00.spectra.common.port.file.FileReferencePermissionChecker;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

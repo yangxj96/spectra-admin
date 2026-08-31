@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.notification.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.notification.javabean.from.NotificationControlledSendApplyFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationControlledSendFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationControlledSendApplyVO;
@@ -43,7 +43,7 @@ public class NotificationControlledSendController {
     /**
      * 生成十分钟有效的一次性 Preview。
      */
-    @ULog("'预览受控通知发送'")
+    @Audit("'预览受控通知发送'")
     @PostMapping(value = "/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:send:preview')")
     public NotificationControlledSendPreviewVO preview(@Valid @RequestBody NotificationControlledSendFrom params) {
@@ -53,7 +53,7 @@ public class NotificationControlledSendController {
     /**
      * 原子消费 Preview 并通过 NotificationGateway 入队。
      */
-    @ULog("'应用受控通知发送'")
+    @Audit("'应用受控通知发送'")
     @PostMapping(value = "/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:send:apply')")
     public NotificationControlledSendApplyVO apply(@Valid @RequestBody NotificationControlledSendApplyFrom params) {

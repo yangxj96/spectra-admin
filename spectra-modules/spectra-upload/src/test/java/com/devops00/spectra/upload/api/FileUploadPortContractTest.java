@@ -16,6 +16,11 @@
 
 package com.devops00.spectra.upload.api;
 
+import com.devops00.spectra.common.port.file.FileAssetPort;
+import com.devops00.spectra.common.port.file.FileAssetSnapshot;
+import com.devops00.spectra.common.port.file.FileDownload;
+import com.devops00.spectra.common.port.file.FileReferenceCommand;
+import com.devops00.spectra.common.port.file.FileReferenceKey;
 import org.junit.jupiter.api.Test;
 
 import java.io.InputStream;

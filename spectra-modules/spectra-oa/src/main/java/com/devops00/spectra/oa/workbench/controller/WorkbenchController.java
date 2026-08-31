@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.workbench.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationCounter;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.application.javabean.constant.ApplicationStatus;
 import com.devops00.spectra.oa.application.service.ApplicationService;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
@@ -30,7 +30,7 @@ import com.devops00.spectra.oa.notice.javabean.constant.NoticeStatus;
 import com.devops00.spectra.oa.notice.service.NoticeService;
 import com.devops00.spectra.oa.workbench.javabean.vo.WorkbenchSummaryVO;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.workflow.service.TaskService;
+import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -65,7 +65,7 @@ public class WorkbenchController {
     /**
      * 查询 OA 工作台摘要。
      */
-    @ULog("'查询 OA 工作台摘要'")
+    @Audit("'查询 OA 工作台摘要'")
     @GetMapping(value = "/summary", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:workbench:read')")
     public WorkbenchSummaryVO summary() {

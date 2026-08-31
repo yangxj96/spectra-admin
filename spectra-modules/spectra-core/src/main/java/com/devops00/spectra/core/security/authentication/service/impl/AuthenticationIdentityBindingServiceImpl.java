@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.core.security.authentication.javabean.entity.AuthenticationIdentity;

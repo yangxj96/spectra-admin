@@ -20,7 +20,7 @@ import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.security.authorization.javabean.from.AuthorizationProfileSaveFrom;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationProfileVO;
 import com.devops00.spectra.core.security.authorization.service.AuthorizationProfileService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,7 +55,7 @@ public class AuthorizationProfileController {
     /**
      * 查询或获取目标数据（{@code all}）。
      */
-    @ULog("'查询授权方案列表'")
+    @Audit("'查询授权方案列表'")
     @GetMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public List<AuthorizationProfileVO> all() {
@@ -65,7 +65,7 @@ public class AuthorizationProfileController {
     /**
      * 查询或获取目标数据（{@code detail}）。
      */
-    @ULog("'查询授权方案详情'")
+    @Audit("'查询授权方案详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public AuthorizationProfileVO detail(@PathVariable UUID id) {
@@ -75,7 +75,7 @@ public class AuthorizationProfileController {
     /**
      * 创建或构建目标数据（{@code created}）。
      */
-    @ULog("'创建授权方案'")
+    @Audit("'创建授权方案'")
     @PostMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void created(@Validated(Verify.Insert.class) @RequestBody AuthorizationProfileSaveFrom params) {
@@ -85,7 +85,7 @@ public class AuthorizationProfileController {
     /**
      * 更新或推进目标状态（{@code modify}）。
      */
-    @ULog("'修改授权方案'")
+    @Audit("'修改授权方案'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void modify(@PathVariable UUID id,
@@ -96,7 +96,7 @@ public class AuthorizationProfileController {
     /**
      * 处理内部业务逻辑（{@code enable}）。
      */
-    @ULog("'启用授权方案'")
+    @Audit("'启用授权方案'")
     @PutMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void enable(@PathVariable UUID id) {
@@ -106,7 +106,7 @@ public class AuthorizationProfileController {
     /**
      * 更新或推进目标状态（{@code disable}）。
      */
-    @ULog("'停用授权方案'")
+    @Audit("'停用授权方案'")
     @PutMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void disable(@PathVariable UUID id) {
@@ -116,7 +116,7 @@ public class AuthorizationProfileController {
     /**
      * 更新或推进目标状态（{@code deleteById}）。
      */
-    @ULog("'删除授权方案'")
+    @Audit("'删除授权方案'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:grant')")
     public void deleteById(@PathVariable UUID id) {

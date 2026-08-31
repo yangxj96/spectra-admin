@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.workflow.service.impl;
 
-import com.devops00.spectra.workflow.service.ApprovalCallback;
-import com.devops00.spectra.workflow.service.WorkflowService;
+import com.devops00.spectra.workflow.api.ApprovalCallback;
+import com.devops00.spectra.workflow.api.WorkflowService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

@@ -19,6 +19,7 @@ package com.devops00.spectra.core.system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 操作日志mapper层
@@ -29,4 +30,12 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface OperationLogMapper extends BaseMapper<OperationLog> {
+
+    /**
+     * 按 outbox 事件幂等插入操作日志；重复消费返回 0，不抛出重复键异常。
+     *
+     * @param entity 操作日志
+     * @return 新增行数
+     */
+    int insertIfAbsent(@Param("entity") OperationLog entity);
 }

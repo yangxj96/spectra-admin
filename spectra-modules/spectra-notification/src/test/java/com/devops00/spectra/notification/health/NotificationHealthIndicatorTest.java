@@ -17,11 +17,11 @@
 package com.devops00.spectra.notification.health;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.notification.sender.NotificationSender;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.health.contributor.Status;
 
 import java.util.List;
 
@@ -40,7 +40,8 @@ class NotificationHealthIndicatorTest {
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
                 List.of(sender));
 
-        assertEquals(Status.DOWN, indicator.health().getStatus());
+        assertEquals(DependencyHealthStatus.DOWN, indicator.check().status());
+        assertEquals("IN_APP_UNAVAILABLE", indicator.check().errorCode());
     }
 
     @Test
@@ -49,7 +50,27 @@ class NotificationHealthIndicatorTest {
         var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
                 List.of(sender));
 
-        assertEquals(Status.UP, indicator.health().getStatus());
+        assertEquals(DependencyHealthStatus.UP, indicator.check().status());
+    }
+
+    @Test
+    void shouldReportUnknownWhenModuleIsDisabled() {
+        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(false, "", "", List.of()),
+                List.of());
+
+        assertEquals(DependencyHealthStatus.UNKNOWN, indicator.check().status());
+        assertEquals("MODULE_DISABLED", indicator.check().errorCode());
+    }
+
+    @Test
+    void shouldReportDegradedWhenOptionalChannelIsUnavailable() {
+        var inApp = sender(NotificationChannel.IN_APP, true);
+        var email = sender(NotificationChannel.EMAIL, false);
+        var indicator = new NotificationHealthIndicator(new NotificationModuleProperties(true, "", "", List.of()),
+                List.of(inApp, email));
+
+        assertEquals(DependencyHealthStatus.DEGRADED, indicator.check().status());
+        assertEquals("OPTIONAL_CHANNEL_UNAVAILABLE", indicator.check().errorCode());
     }
 
     private NotificationSender sender(NotificationChannel channel, boolean available) {

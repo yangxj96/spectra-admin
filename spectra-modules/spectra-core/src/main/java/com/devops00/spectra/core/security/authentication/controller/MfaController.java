@@ -18,8 +18,8 @@ import com.devops00.spectra.core.security.authentication.javabean.vo.MfaStatusVO
 import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.util.AuthenticationContextUtils;
 import com.devops00.spectra.core.security.authentication.util.MfaChallengeUtils;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
 import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
@@ -60,7 +60,7 @@ public class MfaController {
     /**
      * 创建或构建目标数据（{@code beginTotpEnrollment}）。
      */
-    @ULog(value = "'开始 MFA 登记'", type = SysLogType.SAFETY)
+    @Audit(value = "'开始 MFA 登记'", category = AuditCategory.SECURITY)
     @PostMapping(value = "/totp/enroll", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public MfaEnrollmentResult beginTotpEnrollment() {
@@ -77,7 +77,7 @@ public class MfaController {
     /**
      * 创建或构建目标数据（{@code beginSetupTotpEnrollment}）。
      */
-    @ULog(value = "'开始首次 MFA 登记'", type = SysLogType.SAFETY)
+    @Audit(value = "'开始首次 MFA 登记'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/setup/totp/enroll", version = "1.0.0")
     @PreAuthorize("permitAll()")
@@ -90,7 +90,7 @@ public class MfaController {
     /**
      * 处理内部业务逻辑（{@code confirmTotpEnrollment}）。
      */
-    @ULog(value = "'确认 MFA 登记'", type = SysLogType.SAFETY)
+    @Audit(value = "'确认 MFA 登记'", category = AuditCategory.SECURITY)
     @PostMapping(value = "/totp/confirm", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<String> confirmTotpEnrollment(@Valid @RequestBody MfaConfirmFrom from) {
@@ -99,7 +99,7 @@ public class MfaController {
     }
 
     /** 停用当前用户的 TOTP MFA。 */
-    @ULog(value = "'停用 MFA'", type = SysLogType.SAFETY)
+    @Audit(value = "'停用 MFA'", category = AuditCategory.SECURITY)
     @PostMapping(value = "/totp/disable", version = "1.0.0")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("isAuthenticated()")
@@ -110,7 +110,7 @@ public class MfaController {
     /**
      * 处理内部业务逻辑（{@code confirmSetupTotpEnrollment}）。
      */
-    @ULog(value = "'确认首次 MFA 登记'", type = SysLogType.SAFETY)
+    @Audit(value = "'确认首次 MFA 登记'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/setup/totp/confirm", version = "1.0.0")
     @PreAuthorize("permitAll()")

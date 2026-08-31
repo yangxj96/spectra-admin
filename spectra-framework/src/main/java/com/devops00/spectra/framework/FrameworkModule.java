@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.framework;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -25,7 +26,8 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0
  * @since 2026/3/8 23:30
  */
-@ComponentScan("com.devops00.spectra.framework")
+@AutoConfiguration
+@ComponentScan(basePackageClasses = FrameworkModule.class)
 public class FrameworkModule {
 
 }

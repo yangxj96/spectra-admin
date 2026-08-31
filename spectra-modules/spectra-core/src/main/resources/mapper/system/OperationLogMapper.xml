@@ -32,6 +32,8 @@
         <result column="args"      property="args" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
         <result column="result"    property="result" typeHandler="com.devops00.spectra.common.mybatis.PgJsonbTypeHandler"/>
         <result column="time_cost" property="timeCost"/>
+        <result column="outbox_event_id" property="outboxEventId"
+                typeHandler="com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler"/>
     </resultMap>
     <!-- @formatter:on -->
 
@@ -46,6 +48,26 @@
         args,
         result,
         time_cost,
+        outbox_event_id,
         <include refid="com.devops00.spectra.common.base.BaseMapper.BaseAuditColumns"/>
     </sql>
+
+    <insert id="insertIfAbsent" parameterType="com.devops00.spectra.core.system.javabean.entity.OperationLog">
+        INSERT INTO spectra_core.sys_log (
+            id, type, explain, status, ip, method, url, args, result, time_cost, outbox_event_id,
+            created_by, created_at, updated_by, updated_at, deleted, version
+        ) VALUES (
+            #{entity.id, typeHandler=com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler},
+            #{entity.type}, #{entity.explain}, #{entity.status}, #{entity.ip}, #{entity.method}, #{entity.url},
+            #{entity.args, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{entity.result, typeHandler=com.devops00.spectra.common.mybatis.PgJsonbTypeHandler},
+            #{entity.timeCost},
+            #{entity.outboxEventId, typeHandler=com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler},
+            #{entity.createdBy, typeHandler=com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler},
+            #{entity.createdAt},
+            #{entity.updatedBy, typeHandler=com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler},
+            #{entity.updatedAt}, #{entity.deleted}, #{entity.version}
+        )
+        ON CONFLICT (outbox_event_id) DO NOTHING
+    </insert>
 </mapper>

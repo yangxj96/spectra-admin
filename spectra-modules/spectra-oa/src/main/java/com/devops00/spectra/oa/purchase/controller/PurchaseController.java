@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.purchase.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.purchase.javabean.from.PurchaseExecuteFrom;
 import com.devops00.spectra.oa.purchase.javabean.from.PurchasePageFrom;
 import com.devops00.spectra.oa.purchase.javabean.from.PurchaseReceiptFrom;
@@ -59,7 +59,7 @@ public class PurchaseController {
     /**
      * 创建采购申请草稿。
      */
-    @ULog("'创建采购申请草稿'")
+    @Audit("'创建采购申请草稿'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody PurchaseSaveFrom from) {
@@ -69,7 +69,7 @@ public class PurchaseController {
     /**
      * 修改采购申请草稿。
      */
-    @ULog("'修改采购申请草稿'")
+    @Audit("'修改采购申请草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody PurchaseSaveFrom from) {
@@ -79,7 +79,7 @@ public class PurchaseController {
     /**
      * 分页查询采购申请。
      */
-    @ULog("'分页查询采购申请'")
+    @Audit("'分页查询采购申请'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public IPage<PurchaseVO> page(PageFrom page, PurchasePageFrom params) {
@@ -89,7 +89,7 @@ public class PurchaseController {
     /**
      * 查询采购申请详情。
      */
-    @ULog("'查询采购申请详情'")
+    @Audit("'查询采购申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public PurchaseVO get(@PathVariable UUID id) {
@@ -99,7 +99,7 @@ public class PurchaseController {
     /**
      * 提交采购申请审批。
      */
-    @ULog("'提交采购申请审批'")
+    @Audit("'提交采购申请审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void submit(@PathVariable UUID id, @RequestBody(required = false) PurchaseSubmitFrom from) {
@@ -109,7 +109,7 @@ public class PurchaseController {
     /**
      * 撤回采购申请。
      */
-    @ULog("'撤回采购申请'")
+    @Audit("'撤回采购申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void withdraw(@PathVariable UUID id) {
@@ -119,7 +119,7 @@ public class PurchaseController {
     /**
      * 取消采购申请。
      */
-    @ULog("'取消采购申请'")
+    @Audit("'取消采购申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void cancel(@PathVariable UUID id) {
@@ -129,7 +129,7 @@ public class PurchaseController {
     /**
      * 登记采购执行。
      */
-    @ULog("'登记采购执行'")
+    @Audit("'登记采购执行'")
     @PostMapping(value = "/{id}/execute", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:execute')")
     public void execute(@PathVariable UUID id, @RequestBody PurchaseExecuteFrom from) {
@@ -139,7 +139,7 @@ public class PurchaseController {
     /**
      * 登记采购收货。
      */
-    @ULog("'登记采购收货'")
+    @Audit("'登记采购收货'")
     @PostMapping(value = "/{id}/receipts", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:receive')")
     public void receive(@PathVariable UUID id, @Validated(Verify.Insert.class) @RequestBody PurchaseReceiptFrom from) {

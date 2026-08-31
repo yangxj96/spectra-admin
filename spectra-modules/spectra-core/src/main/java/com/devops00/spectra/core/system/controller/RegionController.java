@@ -25,7 +25,7 @@ import com.devops00.spectra.core.system.javabean.from.RegionPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.RegionPathVO;
 import com.devops00.spectra.core.system.javabean.vo.RegionVO;
 import com.devops00.spectra.core.system.service.RegionService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -65,7 +65,7 @@ public class RegionController {
      * @param from 查询参数
      * @return 根据条件获取的下级的列表
      */
-    @ULog("'获取行政区划懒加载树'")
+    @Audit("'获取行政区划懒加载树'")
     @GetMapping(value = "/lazy", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:read')")
     public List<RegionVO> lazyTree(RegionLazyFrom from) {
@@ -75,7 +75,7 @@ public class RegionController {
     /**
      * 查询或获取目标数据（{@code page}）。
      */
-    @ULog("'分页查询行政区划'")
+    @Audit("'分页查询行政区划'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:read')")
     public IPage<RegionVO> page(PageFrom page, RegionPageFrom params) {
@@ -85,7 +85,7 @@ public class RegionController {
     /**
      * 查询或获取目标数据（{@code getPath}）。
      */
-    @ULog("'获取行政区划路径'")
+    @Audit("'获取行政区划路径'")
     @GetMapping(value = "/path/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:read')")
     public RegionPathVO getPath(@PathVariable UUID id) {
@@ -98,7 +98,7 @@ public class RegionController {
      * @param params 行政区划信息
      * @return 新增后的行政区划信息
      */
-    @ULog("'新增行政区划'")
+    @Audit("'新增行政区划'")
     @PostMapping(value = "/created", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:create')")
     public RegionVO created(@Validated(Verify.Insert.class) @RequestBody RegionFrom params) {
@@ -111,7 +111,7 @@ public class RegionController {
      * @param params 行政区划信息
      * @return 修改后的行政区划信息
      */
-    @ULog("'修改行政区划'")
+    @Audit("'修改行政区划'")
     @PutMapping(value = "/modify", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:update')")
     public RegionVO modify(@Validated(Verify.Update.class) @RequestBody RegionFrom params) {
@@ -123,7 +123,7 @@ public class RegionController {
      *
      * @param id 行政区划ID
      */
-    @ULog("'删除行政区划'")
+    @Audit("'删除行政区划'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'region:disable')")
     public void deleteById(@PathVariable UUID id) {

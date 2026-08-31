@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.reimbursement.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPageFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementPaymentFrom;
 import com.devops00.spectra.oa.reimbursement.javabean.from.ReimbursementSaveFrom;
@@ -58,7 +58,7 @@ public class ReimbursementController {
     /**
      * 创建报销草稿。
      */
-    @ULog("'创建报销草稿'")
+    @Audit("'创建报销草稿'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody ReimbursementSaveFrom from) {
@@ -68,7 +68,7 @@ public class ReimbursementController {
     /**
      * 修改报销草稿。
      */
-    @ULog("'修改报销草稿'")
+    @Audit("'修改报销草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody ReimbursementSaveFrom from) {
@@ -78,7 +78,7 @@ public class ReimbursementController {
     /**
      * 分页查询报销单。
      */
-    @ULog("'分页查询报销单'")
+    @Audit("'分页查询报销单'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:read')")
     public IPage<ReimbursementVO> page(PageFrom page, ReimbursementPageFrom params) {
@@ -88,7 +88,7 @@ public class ReimbursementController {
     /**
      * 查询报销详情。
      */
-    @ULog("'查询报销详情'")
+    @Audit("'查询报销详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:read')")
     public ReimbursementVO get(@PathVariable UUID id) {
@@ -98,7 +98,7 @@ public class ReimbursementController {
     /**
      * 提交报销审批。
      */
-    @ULog("'提交报销审批'")
+    @Audit("'提交报销审批'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:update')")
     public void submit(@PathVariable UUID id, @RequestBody(required = false) ReimbursementSubmitFrom from) {
@@ -108,7 +108,7 @@ public class ReimbursementController {
     /**
      * 撤回报销申请。
      */
-    @ULog("'撤回报销申请'")
+    @Audit("'撤回报销申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:update')")
     public void withdraw(@PathVariable UUID id) {
@@ -118,7 +118,7 @@ public class ReimbursementController {
     /**
      * 取消报销申请。
      */
-    @ULog("'取消报销申请'")
+    @Audit("'取消报销申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:update')")
     public void cancel(@PathVariable UUID id) {
@@ -128,7 +128,7 @@ public class ReimbursementController {
     /**
      * 登记报销付款。
      */
-    @ULog("'登记报销付款'")
+    @Audit("'登记报销付款'")
     @PostMapping(value = "/{id}/payment", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:reimbursement:pay')")
     public void payment(@PathVariable UUID id, @RequestBody(required = false) ReimbursementPaymentFrom from) {

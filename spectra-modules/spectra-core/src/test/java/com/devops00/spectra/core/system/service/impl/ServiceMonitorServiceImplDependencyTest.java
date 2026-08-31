@@ -17,11 +17,8 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import com.devops00.spectra.core.system.health.CoreHealthAggregator;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,27 +27,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ServiceMonitorServiceImplDependencyTest {
 
     @Test
-    void healthEndpointIsResolvedLazilyToAvoidSchedulerHealthCycle() {
+    void monitorUsesCoreHealthAggregatorInsteadOfActuatorEndpoint() {
         var constructor = Arrays.stream(ServiceMonitorServiceImpl.class.getDeclaredConstructors())
-                .filter(item -> item.getParameterCount() == 8)
+                .filter(item -> item.getParameterCount() == 6)
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(Arrays.stream(constructor.getParameterTypes()).anyMatch(HealthEndpoint.class::equals))
-                .as("ServiceMonitorServiceImpl 不得在构造阶段创建 HealthEndpoint")
-                .isFalse();
-        assertThat(Arrays.stream(constructor.getGenericParameterTypes())
-                .anyMatch(ServiceMonitorServiceImplDependencyTest::isHealthEndpointProvider))
-                .as("ServiceMonitorServiceImpl 应通过 ObjectProvider 延迟获取 HealthEndpoint")
+        assertThat(Arrays.stream(constructor.getParameterTypes())
+                .anyMatch(CoreHealthAggregator.class::equals))
+                .as("ServiceMonitorServiceImpl 应接收 CoreHealthAggregator")
                 .isTrue();
-    }
-
-    private static boolean isHealthEndpointProvider(Type type) {
-        if (!(type instanceof ParameterizedType parameterizedType)
-                || parameterizedType.getRawType() != ObjectProvider.class) {
-            return false;
-        }
-        var arguments = parameterizedType.getActualTypeArguments();
-        return arguments.length == 1 && arguments[0] == HealthEndpoint.class;
+        assertThat(Arrays.stream(constructor.getParameterTypes())
+                .anyMatch(type -> type.getTypeName().contains("HealthContributor")))
+                .as("ServiceMonitorServiceImpl 不应直接接收 contributor")
+                .isFalse();
     }
 }

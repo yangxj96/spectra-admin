@@ -17,6 +17,8 @@
 package com.devops00.spectra.upload;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -26,7 +28,9 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0
  * @since 2026/3/8 23:41
  */
-@ComponentScan("com.devops00.spectra.upload")
+@AutoConfiguration
+@ConditionalOnProperty(prefix = "spectra.modules.upload", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ComponentScan(basePackageClasses = UploadModule.class)
 @MapperScan("com.devops00.spectra.upload.mapper")
 public class UploadModule {
 }

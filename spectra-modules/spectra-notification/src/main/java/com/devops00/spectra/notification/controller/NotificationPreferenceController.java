@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.notification.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.notification.javabean.entity.NotificationUserPreferenceEntity;
 import com.devops00.spectra.notification.service.NotificationPreferenceService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -53,7 +53,7 @@ public class NotificationPreferenceController {
     /**
      * 查询当前用户用途×渠道偏好。
      */
-    @ULog("'查询通知偏好'")
+    @Audit("'查询通知偏好'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<NotificationUserPreferenceEntity> list() {
@@ -63,7 +63,7 @@ public class NotificationPreferenceController {
     /**
      * 保存当前用户可选通知偏好。
      */
-    @ULog("'更新通知偏好'")
+    @Audit("'更新通知偏好'")
     @PutMapping(version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public void save(@RequestParam String purpose, @RequestParam String channel, @RequestParam boolean enabled,

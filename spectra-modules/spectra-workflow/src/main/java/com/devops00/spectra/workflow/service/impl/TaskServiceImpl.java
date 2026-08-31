@@ -27,8 +27,8 @@ import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
 import com.devops00.spectra.workflow.javabean.vo.TaskVO;
-import com.devops00.spectra.workflow.service.ApprovalCallback;
-import com.devops00.spectra.workflow.service.WorkflowService;
+import com.devops00.spectra.workflow.api.ApprovalCallback;
+import com.devops00.spectra.workflow.api.WorkflowService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.flowable.engine.HistoryService;
@@ -54,7 +54,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImpl implements com.devops00.spectra.workflow.service.TaskService {
+public class TaskServiceImpl implements com.devops00.spectra.workflow.api.TaskService {
 
     private final TaskService flowableTaskService;
 

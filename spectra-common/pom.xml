@@ -38,18 +38,11 @@
     </properties>
 
     <dependencies>
-        <!-- === 内部模块 === -->
-        <!-- 统一配置文件 -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-config</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === Spring Boot === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.validation</groupId>
@@ -65,15 +58,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-        <!-- UUIDv7生成器 -->
-        <dependency>
-            <groupId>com.github.f4b6a3</groupId>
-            <artifactId>uuid-creator</artifactId>
+            <scope>provided</scope>
         </dependency>
         <!-- lombok -->
         <dependency>
@@ -93,11 +78,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
-        </dependency>
-        <!-- js sql parser -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-jsqlparser</artifactId>
+            <scope>provided</scope>
         </dependency>
 
     </dependencies>

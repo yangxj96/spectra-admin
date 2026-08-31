@@ -22,7 +22,7 @@ import com.devops00.spectra.core.system.javabean.from.ConfiguredFrom;
 import com.devops00.spectra.core.system.javabean.from.ConfiguredPageFrom;
 import com.devops00.spectra.core.system.javabean.vo.ConfiguredVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -57,7 +57,7 @@ public class ConfiguredController {
      *
      * @param params 修改参数入参实体
      */
-    @ULog("'修改系统配置'")
+    @Audit("'修改系统配置'")
     @PutMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:config:update')")
     public void modify(@Validated @RequestBody ConfiguredFrom params) {
@@ -67,7 +67,7 @@ public class ConfiguredController {
     /**
      * 查询或获取目标数据（{@code page}）。
      */
-    @ULog("'分页查询系统配置'")
+    @Audit("'分页查询系统配置'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:config:read')")
     public IPage<ConfiguredVO> page(PageFrom page, ConfiguredPageFrom params) {

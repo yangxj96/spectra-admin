@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.devops00.spectra.common.base.BaseEntity;
 import com.devops00.spectra.common.mybatis.PgJsonbTypeHandler;
-import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.core.system.javabean.enums.SysLogType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -99,4 +99,10 @@ public class OperationLog extends BaseEntity {
      */
     @TableField(value = "time_cost")
     private Long timeCost;
+
+    /**
+     * 来源操作日志 outbox 事件 ID，用于消费幂等和链路追溯。
+     */
+    @TableField(value = "outbox_event_id")
+    private java.util.UUID outboxEventId;
 }

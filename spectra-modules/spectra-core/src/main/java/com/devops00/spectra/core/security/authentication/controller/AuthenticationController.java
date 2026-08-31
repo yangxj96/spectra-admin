@@ -21,9 +21,9 @@ import com.devops00.spectra.core.security.authentication.javabean.from.MfaComple
 import com.devops00.spectra.core.security.authentication.javabean.from.MfaVerifyFrom;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
 import com.devops00.spectra.core.security.authentication.service.VerificationCodeService;
-import com.devops00.spectra.core.security.authentication.util.AuthenticationWebUtils;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.framework.configure.mvc.security.AuthenticationWebUtils;
+import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.security.base.constant.ClientType;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.from.EmailCodeFrom;
@@ -77,7 +77,7 @@ public class AuthenticationController {
     /**
      * 处理内部业务逻辑（{@code login}）。
      */
-    @ULog(value = "'用户[' + #params.username + ']进行登陆'", type = SysLogType.SAFETY)
+    @Audit(value = "'用户[' + #params.username + ']进行登陆'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/login", version = "1.0.0")
@@ -91,7 +91,7 @@ public class AuthenticationController {
     /**
      * 处理内部业务逻辑（{@code verifyMfa}）。
      */
-    @ULog(value = "'完成 MFA 登录验证'", type = SysLogType.SAFETY)
+    @Audit(value = "'完成 MFA 登录验证'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/mfa/verify", version = "1.0.0")
@@ -105,7 +105,7 @@ public class AuthenticationController {
     /**
      * 处理内部业务逻辑（{@code completeMfaEnrollment}）。
      */
-    @ULog(value = "'完成首次 MFA 登记登录'", type = SysLogType.SAFETY)
+    @Audit(value = "'完成首次 MFA 登记登录'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/mfa/complete", version = "1.0.0")
@@ -116,7 +116,7 @@ public class AuthenticationController {
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 
-    @ULog(value = "'用户登出系统'", type = SysLogType.SAFETY)
+    @Audit(value = "'用户登出系统'", category = AuditCategory.SECURITY)
     @PostMapping(value = "/logout", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("permitAll()")
@@ -139,7 +139,7 @@ public class AuthenticationController {
     /**
      * 更新或推进目标状态（{@code sendSms}）。
      */
-    @ULog(value = "'发送短信验证码'", type = SysLogType.SAFETY)
+    @Audit(value = "'发送短信验证码'", category = AuditCategory.SECURITY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/sms", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
@@ -150,7 +150,7 @@ public class AuthenticationController {
     /**
      * 更新或推进目标状态（{@code sendEmail}）。
      */
-    @ULog(value = "'发送邮箱验证码'", type = SysLogType.SAFETY)
+    @Audit(value = "'发送邮箱验证码'", category = AuditCategory.SECURITY)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/email", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
@@ -161,7 +161,7 @@ public class AuthenticationController {
     /**
      * 更新或推进目标状态（{@code sendBindingSms}）。
      */
-    @ULog(value = "'发送绑定手机号验证码'", type = SysLogType.SAFETY)
+    @Audit(value = "'发送绑定手机号验证码'", category = AuditCategory.SECURITY)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/bind/sms", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
@@ -172,7 +172,7 @@ public class AuthenticationController {
     /**
      * 更新或推进目标状态（{@code sendBindingEmail}）。
      */
-    @ULog(value = "'发送绑定邮箱验证码'", type = SysLogType.SAFETY)
+    @Audit(value = "'发送绑定邮箱验证码'", category = AuditCategory.SECURITY)
     @PreAuthorize("isAuthenticated()")
     @PostMapping(value = "/bind/email", version = "1.0.0")
     @ResponseStatus(HttpStatus.OK)
@@ -180,7 +180,7 @@ public class AuthenticationController {
         verificationCodeService.sendBindingEmailCode(params.getEmail());
     }
 
-    @ULog(value = "'刷新token'", type = SysLogType.SAFETY)
+    @Audit(value = "'刷新token'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @PostMapping(value = "/refresh", version = "1.0.0")

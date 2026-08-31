@@ -28,7 +28,7 @@ import com.devops00.spectra.notification.javabean.vo.NotificationTemplatePreview
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateGroupVO;
 import com.devops00.spectra.notification.javabean.vo.NotificationTemplateVO;
 import com.devops00.spectra.notification.service.NotificationTemplateService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,7 +62,7 @@ public class NotificationTemplateAdminController {
     /**
      * 查询或获取目标数据（{@code page}）。
      */
-    @ULog("'查询通知模板列表'")
+    @Audit("'查询通知模板列表'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public IPage<NotificationTemplateVO> page(PageFrom page, NotificationTemplatePageFrom params) {
@@ -72,7 +72,7 @@ public class NotificationTemplateAdminController {
     /**
      * 查询或获取目标数据（{@code groupPage}）。
      */
-    @ULog("'查询通知模板组列表'")
+    @Audit("'查询通知模板组列表'")
     @GetMapping(value = "/groups", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public IPage<NotificationTemplateGroupVO> groupPage(PageFrom page, NotificationTemplatePageFrom params) {
@@ -82,7 +82,7 @@ public class NotificationTemplateAdminController {
     /**
      * 查询或获取目标数据（{@code detail}）。
      */
-    @ULog("'查询通知模板详情'")
+    @Audit("'查询通知模板详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public NotificationTemplateVO detail(@PathVariable UUID id) {
@@ -92,7 +92,7 @@ public class NotificationTemplateAdminController {
     /**
      * 创建或构建目标数据（{@code create}）。
      */
-    @ULog("'创建通知模板草稿'")
+    @Audit("'创建通知模板草稿'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public NotificationTemplateVO create(@Validated(Verify.Insert.class) @RequestBody NotificationTemplateSaveFrom params) {
@@ -102,7 +102,7 @@ public class NotificationTemplateAdminController {
     /**
      * 更新或推进目标状态（{@code update}）。
      */
-    @ULog("'修改通知模板草稿'")
+    @Audit("'修改通知模板草稿'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public NotificationTemplateVO update(@PathVariable UUID id,
@@ -116,7 +116,7 @@ public class NotificationTemplateAdminController {
     /**
      * 更新或推进目标状态（{@code publish}）。
      */
-    @ULog("'发布通知模板'")
+    @Audit("'发布通知模板'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:publish')")
     public void publish(@PathVariable UUID id, @Validated @RequestBody NotificationTemplateActionFrom params) {
@@ -126,7 +126,7 @@ public class NotificationTemplateAdminController {
     /**
      * 更新或推进目标状态（{@code disable}）。
      */
-    @ULog("'停用通知模板'")
+    @Audit("'停用通知模板'")
     @PostMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public void disable(@PathVariable UUID id, @Validated @RequestBody NotificationTemplateActionFrom params) {
@@ -136,7 +136,7 @@ public class NotificationTemplateAdminController {
     /**
      * 更新或推进目标状态（{@code enable}）。
      */
-    @ULog("'启用通知模板'")
+    @Audit("'启用通知模板'")
     @PostMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public void enable(@PathVariable UUID id, @Validated @RequestBody NotificationTemplateActionFrom params) {
@@ -146,7 +146,7 @@ public class NotificationTemplateAdminController {
     /**
      * 更新或推进目标状态（{@code archive}）。
      */
-    @ULog("'归档通知模板'")
+    @Audit("'归档通知模板'")
     @PostMapping(value = "/{id}/archive", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:write')")
     public void archive(@PathVariable UUID id, @Validated @RequestBody NotificationTemplateActionFrom params) {
@@ -156,7 +156,7 @@ public class NotificationTemplateAdminController {
     /**
      * 处理内部业务逻辑（{@code versions}）。
      */
-    @ULog("'查询通知模板版本历史'")
+    @Audit("'查询通知模板版本历史'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public List<NotificationTemplateVO> versions(@PathVariable UUID id) {
@@ -166,7 +166,7 @@ public class NotificationTemplateAdminController {
     /**
      * 处理内部业务逻辑（{@code preview}）。
      */
-    @ULog("'预览通知模板'")
+    @Audit("'预览通知模板'")
     @PostMapping(value = "/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:template:read')")
     public NotificationTemplatePreviewVO preview(@Validated @RequestBody NotificationTemplatePreviewFrom params) {

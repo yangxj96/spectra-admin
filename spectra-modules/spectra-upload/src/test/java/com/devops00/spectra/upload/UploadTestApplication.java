@@ -16,7 +16,6 @@
 
 package com.devops00.spectra.upload;
 
-import com.devops00.spectra.core.CoreModule;
 import com.devops00.spectra.common.notification.NotificationAudienceDirectory;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
@@ -39,7 +38,7 @@ import java.util.UUID;
  * @version 1.0
  * @since 2026/3/8 01:16
  */
-@SpringBootApplication(exclude = CoreModule.class)
+@SpringBootApplication
 @ComponentScan("com.devops00.spectra.upload")
 public class UploadTestApplication {
 

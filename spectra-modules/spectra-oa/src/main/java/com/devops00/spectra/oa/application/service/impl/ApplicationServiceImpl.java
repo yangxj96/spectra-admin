@@ -35,7 +35,7 @@ import com.devops00.spectra.oa.application.mapper.ApplicationMapper;
 import com.devops00.spectra.oa.application.mapper.ApplicationTypeMapper;
 import com.devops00.spectra.oa.application.service.ApplicationService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.workflow.service.TaskService;
+import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

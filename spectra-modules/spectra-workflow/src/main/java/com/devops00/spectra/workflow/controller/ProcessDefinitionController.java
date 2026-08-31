@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.workflow.javabean.from.DeployProcessFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionResourceVO;
 import com.devops00.spectra.workflow.javabean.vo.ProcessDefinitionVO;
@@ -56,7 +56,7 @@ public class ProcessDefinitionController {
     /**
      * 获取所有的流程定义
      */
-    @ULog("'查询流程定义列表'")
+    @Audit("'查询流程定义列表'")
     @GetMapping(value = "", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public List<ProcessDefinitionVO> definitions() {
@@ -66,7 +66,7 @@ public class ProcessDefinitionController {
     /**
      * 获取流程定义详情
      */
-    @ULog("'查询流程定义详情'")
+    @Audit("'查询流程定义详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public ProcessDefinitionVO definitionDetail(@PathVariable String id) {
@@ -76,7 +76,7 @@ public class ProcessDefinitionController {
     /**
      * 获取流程定义图
      */
-    @ULog("'获取流程定义图'")
+    @Audit("'获取流程定义图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0", produces = MediaType.IMAGE_PNG_VALUE)
     @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public byte[] getDiagram(@PathVariable String id) {
@@ -86,7 +86,7 @@ public class ProcessDefinitionController {
     /**
      * 挂起流程定义
      */
-    @ULog("'挂起流程定义'")
+    @Audit("'挂起流程定义'")
     @PostMapping(value = "/{id}/suspend", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:update')")
     public void suspend(@PathVariable String id) {
@@ -96,7 +96,7 @@ public class ProcessDefinitionController {
     /**
      * 激活流程定义
      */
-    @ULog("'激活流程定义'")
+    @Audit("'激活流程定义'")
     @PostMapping(value = "/{id}/activate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:update')")
     public void activate(@PathVariable String id) {
@@ -106,7 +106,7 @@ public class ProcessDefinitionController {
     /**
      * 获取流程定义的 BPMN XML 源码
      */
-    @ULog("'获取流程定义BPMN资源'")
+    @Audit("'获取流程定义BPMN资源'")
     @GetMapping(value = "/{id}/resource", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:read')")
     public ProcessDefinitionResourceVO getResource(@PathVariable String id) {
@@ -117,7 +117,7 @@ public class ProcessDefinitionController {
      * 部署流程定义（新增或更新版本）
      */
     @XssCleanIgnore
-    @ULog("'部署流程定义'")
+    @Audit("'部署流程定义'")
     @PostMapping(value = "/deploy", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:process:create')")
     public ProcessDefinitionVO deploy(@RequestBody @Valid DeployProcessFrom from) {

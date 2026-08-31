@@ -46,6 +46,11 @@
             <artifactId>archunit-junit5</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- 目标数据库 schema 由 Flyway V1 起完整管理；不使用 baseline-on-migrate 兼容旧库。 -->
         <dependency>
@@ -55,6 +60,12 @@
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
+        </dependency>
+        <!-- 配置资源属于启动装配边界，不通过 common 传递。 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-config</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <!-- === 项目模块-基础功能 === -->
@@ -84,12 +95,6 @@
             <artifactId>spectra-security-spring-boot-starter</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-log-spring-boot-starter</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === 项目模块-功能模块 === -->
         <!-- 基础模块 -->
         <dependency>

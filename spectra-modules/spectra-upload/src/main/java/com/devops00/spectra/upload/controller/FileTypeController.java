@@ -7,7 +7,7 @@ package com.devops00.spectra.upload.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.upload.javabean.from.FileTypePolicySaveFrom;
 import com.devops00.spectra.upload.javabean.vo.FileTypePolicyVO;
 import com.devops00.spectra.upload.service.FileTypeManagementService;
@@ -52,28 +52,28 @@ public class FileTypeController {
         return managementService.get(id);
     }
 
-    @ULog("'创建文件类型策略'")
+    @Audit("'创建文件类型策略'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO create(@Valid @RequestBody FileTypePolicySaveFrom from) {
         return managementService.create(from);
     }
 
-    @ULog("'修改文件类型策略'")
+    @Audit("'修改文件类型策略'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO modify(@PathVariable UUID id, @Valid @RequestBody FileTypePolicySaveFrom from) {
         return managementService.modify(id, from);
     }
 
-    @ULog("'启用文件类型策略'")
+    @Audit("'启用文件类型策略'")
     @PostMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO enable(@PathVariable UUID id) {
         return managementService.enable(id);
     }
 
-    @ULog("'停用文件类型策略'")
+    @Audit("'停用文件类型策略'")
     @PostMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public FileTypePolicyVO disable(@PathVariable UUID id) {

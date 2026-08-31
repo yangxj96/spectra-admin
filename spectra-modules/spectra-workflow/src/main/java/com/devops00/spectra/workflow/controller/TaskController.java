@@ -17,13 +17,13 @@
 package com.devops00.spectra.workflow.controller;
 
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.workflow.javabean.from.TaskCompleteFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskDelegateFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskPageFrom;
 import com.devops00.spectra.workflow.javabean.from.TaskTransferFrom;
-import com.devops00.spectra.workflow.service.TaskService;
+import com.devops00.spectra.workflow.api.TaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +59,7 @@ public class TaskController {
      * @param params 查询参数
      * @return 待办任务列表
      */
-    @ULog("'查询待办任务'")
+    @Audit("'查询待办任务'")
     @GetMapping(value = "/todo", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object todo(PageFrom page, TaskPageFrom params) {
@@ -74,7 +74,7 @@ public class TaskController {
      * @param params 查询参数
      * @return 已办任务列表
      */
-    @ULog("'查询已办任务'")
+    @Audit("'查询已办任务'")
     @GetMapping(value = "/done", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:read')")
     public Object done(PageFrom page, TaskPageFrom params) {
@@ -88,7 +88,7 @@ public class TaskController {
      * @param id   任务ID
      * @param from 完成参数
      */
-    @ULog("'完成任务'")
+    @Audit("'完成任务'")
     @PostMapping(value = "/{id}/complete", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void complete(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
@@ -101,7 +101,7 @@ public class TaskController {
      * @param id   任务ID
      * @param from 完成参数
      */
-    @ULog("'驳回任务'")
+    @Audit("'驳回任务'")
     @PostMapping(value = "/{id}/reject", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void reject(@PathVariable String id, @Validated @RequestBody TaskCompleteFrom from) {
@@ -114,7 +114,7 @@ public class TaskController {
      * @param id   任务ID
      * @param from 转办参数
      */
-    @ULog("'转办任务'")
+    @Audit("'转办任务'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void transfer(@PathVariable String id, @Validated @RequestBody TaskTransferFrom from) {
@@ -127,7 +127,7 @@ public class TaskController {
      * @param id   任务ID
      * @param from 委派参数
      */
-    @ULog("'委派任务'")
+    @Audit("'委派任务'")
     @PostMapping(value = "/{id}/delegate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:task:update')")
     public void delegate(@PathVariable String id, @Validated @RequestBody TaskDelegateFrom from) {

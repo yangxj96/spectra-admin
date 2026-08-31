@@ -15,8 +15,8 @@ import com.devops00.spectra.core.security.initialization.javabean.vo.SystemIniti
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStartVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.common.audit.AuditCategory;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -51,7 +51,7 @@ public class SystemInitializationController {
     /**
      * 创建或构建目标数据（{@code start}）。
      */
-    @ULog(value = "'开始系统初始化'", type = SysLogType.SAFETY)
+    @Audit(value = "'开始系统初始化'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/start", version = "1.0.0")
     @PreAuthorize("permitAll()")
@@ -64,7 +64,7 @@ public class SystemInitializationController {
     /**
      * 处理内部业务逻辑（{@code confirmMfa}）。
      */
-    @ULog(value = "'确认系统初始化 MFA'", type = SysLogType.SAFETY)
+    @Audit(value = "'确认系统初始化 MFA'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/mfa/confirm", version = "1.0.0")
     @PreAuthorize("permitAll()")
@@ -76,7 +76,7 @@ public class SystemInitializationController {
     /**
      * 处理内部业务逻辑（{@code complete}）。
      */
-    @ULog(value = "'完成系统初始化'", type = SysLogType.SAFETY)
+    @Audit(value = "'完成系统初始化'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/complete", version = "1.0.0")
     @PreAuthorize("permitAll()")

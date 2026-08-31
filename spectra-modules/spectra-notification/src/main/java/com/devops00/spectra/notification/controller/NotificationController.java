@@ -19,7 +19,7 @@ package com.devops00.spectra.notification.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.exception.DataNotExistException;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.notification.javabean.from.NotificationBatchDeleteFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationQueryFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationInboxVO;
@@ -63,7 +63,7 @@ public class NotificationController {
     /**
      * 查询当前用户消息列表。
      */
-    @ULog("'查询消息列表'")
+    @Audit("'查询消息列表'")
     @GetMapping(value = "/list", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public IPage<NotificationInboxVO> list(PageFrom page, NotificationQueryFrom params) {
@@ -73,7 +73,7 @@ public class NotificationController {
     /**
      * 查询当前用户消息详情。
      */
-    @ULog("'查询消息详情'")
+    @Audit("'查询消息详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public NotificationInboxVO detail(@PathVariable UUID id) {
@@ -83,7 +83,7 @@ public class NotificationController {
     /**
      * 查询当前用户未读数量。
      */
-    @ULog("'获取未读消息数'")
+    @Audit("'获取未读消息数'")
     @GetMapping(value = "/unread-count", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:read')")
     public long unreadCount() {
@@ -93,7 +93,7 @@ public class NotificationController {
     /**
      * 标记单条消息已读。
      */
-    @ULog("'标记消息已读'")
+    @Audit("'标记消息已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAsRead(@PathVariable UUID id) {
@@ -103,7 +103,7 @@ public class NotificationController {
     /**
      * 标记当前用户全部消息已读。
      */
-    @ULog("'全部标记已读'")
+    @Audit("'全部标记已读'")
     @PutMapping(value = "/read-all", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:update')")
     public void markAllAsRead() {
@@ -113,7 +113,7 @@ public class NotificationController {
     /**
      * 删除当前用户的一条消息。
      */
-    @ULog("'删除消息'")
+    @Audit("'删除消息'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void deleteById(@PathVariable UUID id) {
@@ -123,7 +123,7 @@ public class NotificationController {
     /**
      * 仅删除当前用户拥有的消息，混合用户 ID 不会影响其他收件人。
      */
-    @ULog("'批量删除消息'")
+    @Audit("'批量删除消息'")
     @PostMapping(value = "/batch-delete", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'notification:delete')")
     public void batchDelete(@Valid @RequestBody NotificationBatchDeleteFrom from) {

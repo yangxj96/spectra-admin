@@ -32,7 +32,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.authorization.service.OrganizationChangeService;
 import com.devops00.spectra.core.security.authorization.service.RoleAuthorizationChangeService;
 import com.devops00.spectra.core.security.authorization.javabean.vo.AuthorizationAssignmentView;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,7 +71,7 @@ public class AuthorizationController {
     /**
      * 查询或获取目标数据（{@code organizationVersion}）。
      */
-    @ULog("'查询组织结构安全版本'")
+    @Audit("'查询组织结构安全版本'")
     @GetMapping(value = "/departments/organization-version", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:read')")
     public long organizationVersion() {
@@ -81,7 +81,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code departmentCreatePreview}）。
      */
-    @ULog("'预览新增部门影响'")
+    @Audit("'预览新增部门影响'")
     @PostMapping(value = "/departments/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
     public OrganizationChangePreviewVO departmentCreatePreview(
@@ -93,7 +93,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code departmentCreateApply}）。
      */
-    @ULog("'提交新增部门变更'")
+    @Audit("'提交新增部门变更'")
     @PostMapping(value = "/departments/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:create')")
     public void departmentCreateApply(@Validated @RequestBody OrganizationCreateApplyFrom from) {
@@ -104,7 +104,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code roleState}）。
      */
-    @ULog("'查询 Role 授权能力'")
+    @Audit("'查询 Role 授权能力'")
     @GetMapping(value = "/roles/{roleId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
     public RoleAuthorizationStateVO roleState(@PathVariable UUID roleId) {
@@ -114,7 +114,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code departmentPreview}）。
      */
-    @ULog("'预览部门编辑与移动影响'")
+    @Audit("'预览部门编辑与移动影响'")
     @PostMapping(value = "/departments/{departmentId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public OrganizationChangePreviewVO departmentPreview(@PathVariable UUID departmentId,
@@ -126,7 +126,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code departmentApply}）。
      */
-    @ULog("'提交部门编辑与移动变更'")
+    @Audit("'提交部门编辑与移动变更'")
     @PostMapping(value = "/departments/{departmentId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'department:update')")
     public void departmentApply(@PathVariable UUID departmentId,
@@ -138,7 +138,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code rolePreview}）。
      */
-    @ULog("'预览 Role 授权能力变更'")
+    @Audit("'预览 Role 授权能力变更'")
     @PostMapping(value = "/roles/{roleId}/impact-preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public RoleAuthorizationChangePreviewVO rolePreview(@PathVariable UUID roleId,
@@ -150,7 +150,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code roleApply}）。
      */
-    @ULog("'提交 Role 授权能力变更'")
+    @Audit("'提交 Role 授权能力变更'")
     @PostMapping(value = "/roles/{roleId}/impact-apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:grant')")
     public void roleApply(@PathVariable UUID roleId,
@@ -162,7 +162,7 @@ public class AuthorizationController {
     /**
      * 查询或获取目标数据（{@code assignments}）。
      */
-    @ULog("'查询用户授权实例'")
+    @Audit("'查询用户授权实例'")
     @GetMapping(value = "/users/{userId}/assignments", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:read')")
     public List<AuthorizationAssignmentView> assignments(@PathVariable UUID userId) {
@@ -172,7 +172,7 @@ public class AuthorizationController {
     /**
      * 处理内部业务逻辑（{@code preview}）。
      */
-    @ULog("'预览用户授权实例变更'")
+    @Audit("'预览用户授权实例变更'")
     @PostMapping(value = "/users/{userId}/assignments/preview", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")
     public AuthorizationChangePreviewVO preview(@PathVariable UUID userId,
@@ -184,7 +184,7 @@ public class AuthorizationController {
     /**
      * 更新或推进目标状态（{@code apply}）。
      */
-    @ULog("'提交用户授权实例变更'")
+    @Audit("'提交用户授权实例变更'")
     @PostMapping(value = "/users/{userId}/assignments/apply", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'role:assign')")
     public void apply(@PathVariable UUID userId,

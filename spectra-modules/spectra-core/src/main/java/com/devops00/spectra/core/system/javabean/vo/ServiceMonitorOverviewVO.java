@@ -192,7 +192,7 @@ public class ServiceMonitorOverviewVO {
         /** 依赖名称。 */
         private String name;
 
-        /** 依赖状态：UP 或 DOWN。 */
+        /** 依赖状态：UP、DEGRADED、DOWN 或 UNKNOWN。 */
         private String status;
 
         /** 检查耗时，单位为毫秒。 */
@@ -214,7 +214,7 @@ public class ServiceMonitorOverviewVO {
         /** 组件名称。 */
         private String name;
 
-        /** 组件状态：UP、DOWN、OUT_OF_SERVICE 或 UNKNOWN。 */
+        /** 组件状态：UP、DEGRADED、DOWN 或 UNKNOWN。 */
         private String status;
 
         /** 脱敏后的状态说明。 */

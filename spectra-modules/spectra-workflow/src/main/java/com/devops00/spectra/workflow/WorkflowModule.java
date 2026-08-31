@@ -17,6 +17,8 @@
 package com.devops00.spectra.workflow;
 
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -32,7 +34,9 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0
  * @since 2025/11/11
  */
-@ComponentScan("com.devops00.spectra.workflow")
+@AutoConfiguration
+@ConditionalOnProperty(prefix = "spectra.modules.workflow", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ComponentScan(basePackageClasses = WorkflowModule.class)
 @MapperScan("com.devops00.spectra.workflow.**.mapper")
 public class WorkflowModule {
 }

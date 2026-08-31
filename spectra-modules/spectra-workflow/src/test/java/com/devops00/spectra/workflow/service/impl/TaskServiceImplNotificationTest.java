@@ -24,7 +24,7 @@ import com.devops00.spectra.common.notification.NotificationSendRequest;
 import com.devops00.spectra.common.notification.NotificationService;
 import com.devops00.spectra.common.notification.NotificationTemplateCode;
 import com.devops00.spectra.workflow.javabean.converter.TaskConverter;
-import com.devops00.spectra.workflow.service.WorkflowService;
+import com.devops00.spectra.workflow.api.WorkflowService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;

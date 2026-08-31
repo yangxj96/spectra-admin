@@ -49,11 +49,29 @@
         </dependency>
 
         <!-- === Spring Boot === -->
+        <!-- SecurityProperties 使用 Spring Boot 配置属性注解。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
         <!-- 基础security -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
         </dependency>
+        <!-- TokenVO 使用 Jackson 3 的 UUID 序列化注解。 -->
+        <dependency>
+            <groupId>tools.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- === 数据库 === -->
+        <!-- LoginType 实现 MyBatis-Plus 枚举接口。 -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-annotation</artifactId>
+        </dependency>
+
         <!-- 验证码一次性消费需要 Redis 原子脚本 -->
         <dependency>
             <groupId>org.springframework.data</groupId>

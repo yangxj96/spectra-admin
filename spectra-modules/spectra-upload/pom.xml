@@ -39,13 +39,6 @@
     </properties>
 
     <dependencies>
-        <!-- === 项目模块 === -->
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-core</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === 功能模块 === -->
         <!-- S3协议连接rustfs -->
         <dependency>

@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.contact.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.contact.javabean.from.ContactPageFrom;
 import com.devops00.spectra.oa.contact.javabean.vo.ContactVO;
 import com.devops00.spectra.oa.contact.service.ContactService;
@@ -47,7 +47,7 @@ public class ContactController {
     /**
      * 分页查询通讯录。
      */
-    @ULog("'分页查通讯录'")
+    @Audit("'分页查通讯录'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:contact:read')")
     public IPage<ContactVO> page(PageFrom page, ContactPageFrom params) {

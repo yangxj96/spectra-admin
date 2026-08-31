@@ -17,7 +17,7 @@
 package com.devops00.spectra.notification.controller;
 
 import com.devops00.spectra.common.notification.NotificationChannel;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.notification.javabean.domain.NotificationProviderHealth;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderSaveFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationProviderTestFrom;
@@ -71,7 +71,7 @@ public class NotificationProviderAdminController {
     /**
      * 查询所有通知渠道 Provider 配置。
      */
-    @ULog("'查询通知 Provider 配置'")
+    @Audit("'查询通知 Provider 配置'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:provider:read')")
     public List<NotificationProviderVO> list() {
@@ -81,7 +81,7 @@ public class NotificationProviderAdminController {
     /**
      * 查询指定渠道 Provider 配置。
      */
-    @ULog("'查询通知 Provider 详情'")
+    @Audit("'查询通知 Provider 详情'")
     @GetMapping(value = "/{channel}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:provider:read')")
     public NotificationProviderVO get(@PathVariable NotificationChannel channel) {
@@ -91,7 +91,7 @@ public class NotificationProviderAdminController {
     /**
      * 保存指定渠道 Provider 配置。
      */
-    @ULog("'保存通知 Provider 配置'")
+    @Audit("'保存通知 Provider 配置'")
     @PutMapping(value = "/{channel}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
     public NotificationProviderVO modify(@PathVariable NotificationChannel channel,
@@ -102,7 +102,7 @@ public class NotificationProviderAdminController {
     /**
      * 执行指定渠道健康检查；不返回任何供应商原始响应。
      */
-    @ULog("'检查通知 Provider 健康状态'")
+    @Audit("'检查通知 Provider 健康状态'")
     @PostMapping(value = "/{channel}/health", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
     public NotificationProviderHealth health(@PathVariable NotificationChannel channel) {
@@ -112,7 +112,7 @@ public class NotificationProviderAdminController {
     /**
      * 向明确指定的测试地址发送一次测试消息；不写入业务 Request/Task/Delivery。
      */
-    @ULog("'测试通知 Provider 发送'")
+    @Audit("'测试通知 Provider 发送'")
     @PostMapping(value = "/{channel}/test", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:provider:configure')")
     public NotificationProviderTestVO test(@PathVariable NotificationChannel channel,

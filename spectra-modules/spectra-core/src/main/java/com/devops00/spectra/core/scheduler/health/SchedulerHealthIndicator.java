@@ -16,45 +16,72 @@
 
 package com.devops00.spectra.core.scheduler.health;
 
+import com.devops00.spectra.common.health.DependencyHealthContributor;
+import com.devops00.spectra.common.health.DependencyHealthResult;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.core.scheduler.mapper.SchedulerJobMapper;
-import com.devops00.spectra.core.scheduler.service.ScheduledJobRegistry;
 import com.devops00.spectra.core.scheduler.service.SchedulerBootstrapService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.health.contributor.Health;
-import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.time.Instant;
 
 /** 调度器数据库、注册表和启动门禁健康检查。 */
 @Component("scheduler")
 @RequiredArgsConstructor
-public class SchedulerHealthIndicator implements HealthIndicator {
+public class SchedulerHealthIndicator implements DependencyHealthContributor {
+
+    private static final Duration TIMEOUT = Duration.ofSeconds(3);
 
     private final SchedulerBootstrapService bootstrapService;
     private final SchedulerJobMapper jobMapper;
-    private final ScheduledJobRegistry registry;
 
     @Override
-    public Health health() {
-        bootstrapService.retryStartIfNeeded();
-        long jobCount;
+    public String contributorName() {
+        return "scheduler";
+    }
+
+    @Override
+    public String moduleName() {
+        return "core";
+    }
+
+    @Override
+    public String dependencyType() {
+        return "SCHEDULER";
+    }
+
+    @Override
+    public Duration timeout() {
+        return TIMEOUT;
+    }
+
+    @Override
+    public DependencyHealthResult check() {
+        var start = System.nanoTime();
+        var checkedAt = Instant.now();
         try {
-            jobCount = jobMapper.selectCount(null);
+            bootstrapService.retryStartIfNeeded();
+            jobMapper.selectCount(null);
         } catch (RuntimeException exception) {
             bootstrapService.markDatabaseUnavailable();
-            return Health.down()
-                    .withDetail("reason", "DATABASE_UNAVAILABLE")
-                    .withDetail("state", bootstrapService.getState())
-                    .build();
+            return result(DependencyHealthStatus.DOWN, start, checkedAt,
+                    "DATABASE_UNAVAILABLE", "调度器数据库不可用");
         }
-        var builder = bootstrapService.isReady() ? Health.up() : Health.down();
-        return builder
-                .withDetail("state", bootstrapService.getState())
-                .withDetail("ready", bootstrapService.isReady())
-                .withDetail("running", bootstrapService.isRunning())
-                .withDetail("jobCount", jobCount)
-                .withDetail("registeredHandlerCount", registry.descriptors().size())
-                .withDetail("failureCode", bootstrapService.getFailureCode())
-                .withDetail("systemTimezone", bootstrapService.getSystemZone().getId())
-                .build();
+        if (!bootstrapService.isReady()) {
+            var state = bootstrapService.getState();
+            var disabled = "DISABLED".equalsIgnoreCase(state);
+            return result(disabled ? DependencyHealthStatus.UNKNOWN : DependencyHealthStatus.DOWN,
+                    start, checkedAt, disabled ? "SCHEDULER_DISABLED" : "SCHEDULER_NOT_READY",
+                    disabled ? "调度器未启用" : "调度器未就绪");
+        }
+        return result(DependencyHealthStatus.UP, start, checkedAt, null, "调度器检查正常");
+    }
+
+    private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,
+                                          String errorCode, String safeSummary) {
+        return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,
+                Duration.ofNanos(System.nanoTime() - start), checkedAt, errorCode, safeSummary);
     }
 }

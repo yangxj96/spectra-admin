@@ -16,7 +16,9 @@
 
 package com.devops00.spectra.core;
 
+import com.devops00.spectra.framework.FrameworkModule;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 /**
@@ -26,7 +28,8 @@ import org.springframework.context.annotation.ComponentScan;
  * @version 1.0
  * @since 2026/3/8 23:30
  */
-@ComponentScan("com.devops00.spectra.core")
+@AutoConfiguration(after = FrameworkModule.class)
+@ComponentScan(basePackageClasses = CoreModule.class)
 @MapperScan("com.devops00.spectra.core.**.mapper")
 public class CoreModule {
 

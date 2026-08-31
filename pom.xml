@@ -34,6 +34,7 @@
         <spotless.ratchetFrom>origin/master</spotless.ratchetFrom>
         <maven.compiler.plugin.version>3.15.0</maven.compiler.plugin.version>
         <maven.jar.plugin.version>3.5.1</maven.jar.plugin.version>
+        <maven.enforcer.plugin.version>3.6.3</maven.enforcer.plugin.version>
         <spring-boot.maven.plugin.version>4.1.0</spring-boot.maven.plugin.version>
         <flatten.maven.plugin.version>1.8.0</flatten.maven.plugin.version>
         <checkstyle.maven.plugin.version>3.6.0</checkstyle.maven.plugin.version>
@@ -173,6 +174,39 @@
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>${maven.enforcer.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>ban-microservice-components</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <bannedDependencies>
+                                    <searchTransitive>true</searchTransitive>
+                                    <message>单体多模块架构禁止引入 Nacos、服务发现、远程配置中心或 Zookeeper 客户端。</message>
+                                    <excludes>
+                                        <exclude>com.alibaba.cloud:*</exclude>
+                                        <exclude>com.alibaba.nacos:*</exclude>
+                                        <exclude>org.springframework.cloud:*</exclude>
+                                        <exclude>com.netflix.eureka:*</exclude>
+                                        <exclude>com.netflix.discovery:*</exclude>
+                                        <exclude>com.ecwid.consul:*</exclude>
+                                        <exclude>org.apache.curator:*</exclude>
+                                        <exclude>org.apache.zookeeper:zookeeper</exclude>
+                                    </excludes>
+                                </bannedDependencies>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>

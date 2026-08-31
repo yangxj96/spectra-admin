@@ -18,7 +18,7 @@ package com.devops00.spectra.oa.leave.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveCreateFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeavePageFrom;
 import com.devops00.spectra.oa.leave.javabean.from.LeaveSubmitFrom;
@@ -56,7 +56,7 @@ public class LeaveController {
     /**
      * 创建请假申请。
      */
-    @ULog("'创建请假申请'")
+    @Audit("'创建请假申请'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:create')")
     public UUID create(@Validated @RequestBody LeaveCreateFrom from) {
@@ -66,7 +66,7 @@ public class LeaveController {
     /**
      * 修改请假申请。
      */
-    @ULog("'修改请假申请'")
+    @Audit("'修改请假申请'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void update(@PathVariable UUID id, @Validated @RequestBody LeaveCreateFrom from) {
@@ -76,7 +76,7 @@ public class LeaveController {
     /**
      * 分页查询请假申请。
      */
-    @ULog("'分页查询请假申请'")
+    @Audit("'分页查询请假申请'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:read')")
     public IPage<LeaveVO> page(PageFrom page, LeavePageFrom params) {
@@ -86,7 +86,7 @@ public class LeaveController {
     /**
      * 查询请假申请详情。
      */
-    @ULog("'查询请假申请详情'")
+    @Audit("'查询请假申请详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:read')")
     public LeaveVO get(@PathVariable UUID id) {
@@ -96,7 +96,7 @@ public class LeaveController {
     /**
      * 提交请假申请。
      */
-    @ULog("'提交请假申请'")
+    @Audit("'提交请假申请'")
     @PostMapping(value = "/{id}/submit", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void submit(@PathVariable UUID id, @RequestBody(required = false) LeaveSubmitFrom from) {
@@ -106,7 +106,7 @@ public class LeaveController {
     /**
      * 撤回请假申请。
      */
-    @ULog("'撤回请假申请'")
+    @Audit("'撤回请假申请'")
     @PostMapping(value = "/{id}/withdraw", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void withdraw(@PathVariable UUID id) {
@@ -116,7 +116,7 @@ public class LeaveController {
     /**
      * 取消请假申请。
      */
-    @ULog("'取消请假申请'")
+    @Audit("'取消请假申请'")
     @PostMapping(value = "/{id}/cancel", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:leave:update')")
     public void cancel(@PathVariable UUID id) {

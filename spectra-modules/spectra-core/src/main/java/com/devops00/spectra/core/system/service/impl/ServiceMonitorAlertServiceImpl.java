@@ -24,7 +24,7 @@ import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertMetric
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertEventState;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertOperator;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorAlertSeverity;
-import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDependencyStatus;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.core.system.javabean.from.ServiceMonitorAlertRuleFrom;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorAlertEventVO;
 import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorAlertRuleVO;
@@ -106,9 +106,10 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
         if (observation.violated()) {
             var event = active == null ? createEvent(rule, observation) : updateActiveEvent(active, observation);
             if (shouldNotify(event, rule)) {
-                notifyOperators(event);
-                event.setLastNotifiedAt(Instant.now());
-                eventMapper.updateById(event);
+                if (notifyOperators(event)) {
+                    event.setLastNotifiedAt(Instant.now());
+                    eventMapper.updateById(event);
+                }
             }
             return;
         }
@@ -175,7 +176,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
      * 转换、解析或规范化数据（{@code normalizeDependencyStatus}）。
      */
     private static String normalizeDependencyStatus(String status) {
-        return status == null || status.isBlank() ? ServiceMonitorDependencyStatus.UNKNOWN.name() : status;
+        return status == null || status.isBlank() ? DependencyHealthStatus.UNKNOWN.name() : status;
     }
 
     /**
@@ -299,16 +300,21 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
     /**
      * 执行内部处理逻辑（{@code notifyOperators}）。
      */
-    private void notifyOperators(ServiceMonitorAlertEvent event) {
-        if (notificationService.isEmpty() || event.getId() == null) {
-            return;
+    private boolean notifyOperators(ServiceMonitorAlertEvent event) {
+        if (event.getId() == null) {
+            log.warn("服务监控告警通知不可用：告警事件尚未生成 ID");
+            return false;
+        }
+        if (notificationService.isEmpty()) {
+            log.warn("服务监控告警通知不可用：通知模块未启用，eventId={}", event.getId());
+            return false;
         }
         var role = securityRoleMapper.selectOne(new LambdaQueryWrapper<SecurityRole>()
                 .eq(SecurityRole::getCode, ROLE_DEV_OPS)
                 .eq(SecurityRole::getState, ACTIVE)
                 .isNull(SecurityRole::getDeleted));
         if (role == null) {
-            return;
+            return false;
         }
         var now = Instant.now();
         var assignments = roleAssignmentMapper.selectList(new LambdaQueryWrapper<RoleAssignment>()
@@ -323,7 +329,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                         .gt(RoleAssignment::getValidUntil, now)));
         var userIds = assignments.stream().map(RoleAssignment::getUserId).distinct().toList();
         if (userIds.isEmpty()) {
-            return;
+            return false;
         }
         var recipients = userMapper.selectList(new LambdaQueryWrapper<User>()
                 .select(User::getId)
@@ -334,7 +340,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                 .map(User::getId)
                 .toList();
         if (recipients.isEmpty()) {
-            return;
+            return false;
         }
         notificationService.get()
                 .send(NotificationSendRequest.inApp(
@@ -345,6 +351,7 @@ public class ServiceMonitorAlertServiceImpl implements ServiceMonitorAlertServic
                         .businessReference("SERVICE_MONITOR_ALERT", event.getId().toString())
                         .sourceModule("spectra-core")
                         .build());
+        return true;
     }
 
     @Override

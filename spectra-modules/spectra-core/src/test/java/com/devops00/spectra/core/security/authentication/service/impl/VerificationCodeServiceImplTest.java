@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.common.notification.NotificationSendRequest;
@@ -138,5 +138,20 @@ class VerificationCodeServiceImplTest {
 
         verifyNoInteractions(redisTemplate);
         verifyNoInteractions(notificationService);
+    }
+
+    @Test
+    void shouldExplainWhenNotificationModuleIsNotAssembled() {
+        var redisTemplate = mock(RedisTemplate.class);
+        var valueOperations = mock(ValueOperations.class);
+        when(redisTemplate.opsForValue()).thenReturn(valueOperations);
+        when(valueOperations.setIfAbsent(any(), any(), anyLong(), any(TimeUnit.class))).thenReturn(true);
+        var properties = new SecurityProperties();
+        properties.setVerificationCodeHmacKey("test-verification-hmac-key");
+        var service = new VerificationCodeServiceImpl(null, redisTemplate, properties);
+
+        var exception = assertThrows(RuntimeException.class, () -> service.sendSmsCode("13800138000"));
+
+        assertTrue(exception.getMessage().contains("通知模块未启用"));
     }
 }

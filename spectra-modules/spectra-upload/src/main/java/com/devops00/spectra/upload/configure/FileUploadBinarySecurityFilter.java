@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.upload.configure;
 
-import com.devops00.spectra.core.security.authentication.util.AuthenticationWebUtils;
+import com.devops00.spectra.framework.configure.mvc.security.AuthenticationWebUtils;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -39,13 +39,23 @@
     </properties>
 
     <dependencies>
-        <!-- 告警事件通过统一通知网关发送站内消息。 -->
+        <!-- Core 的平台基础依赖显式声明；可选业务模块不得通过父 POM 形成反向依赖。 -->
         <dependency>
             <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-notification</artifactId>
+            <artifactId>spectra-common</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-framework</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-security-base</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 通知通过 common.notification 的纯 Java port 调用，Core 不依赖通知实现。 -->
         <!-- === 工具 === -->
         <!-- ip 转区域 -->
         <dependency>

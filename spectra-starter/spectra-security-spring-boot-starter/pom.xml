@@ -56,12 +56,6 @@
             <artifactId>spectra-framework</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.devops00.spectra</groupId>
-            <artifactId>spectra-log-base</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
         <!-- === Spring Boot === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

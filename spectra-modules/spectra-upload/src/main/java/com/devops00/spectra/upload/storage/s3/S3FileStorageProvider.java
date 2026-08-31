@@ -179,9 +179,9 @@ public class S3FileStorageProvider implements FileStorageProvider {
     public StorageHealth health() {
         try {
             client.headBucket(HeadBucketRequest.builder().bucket(properties.getBucket()).build());
-            return new StorageHealth(true, "s3 bucket reachable");
+            return StorageHealth.available("S3_BUCKET_REACHABLE");
         } catch (RuntimeException e) {
-            return new StorageHealth(false, e.getMessage());
+            return StorageHealth.unavailable("S3_BUCKET_UNAVAILABLE");
         }
     }
 

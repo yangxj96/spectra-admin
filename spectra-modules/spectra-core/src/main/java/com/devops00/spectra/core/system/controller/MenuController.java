@@ -20,7 +20,7 @@ import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.core.system.javabean.from.MenuSaveFrom;
 import com.devops00.spectra.core.system.javabean.vo.MenuTreeVO;
 import com.devops00.spectra.core.system.service.MenuService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.Nullable;
@@ -62,7 +62,7 @@ public class MenuController {
      *
      * @param params 菜单信息
      */
-    @ULog("'新增菜单'")
+    @Audit("'新增菜单'")
     @PostMapping(value = "/created", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MenuSaveFrom params) {
@@ -72,7 +72,7 @@ public class MenuController {
     /**
      * 更新或推进目标状态（{@code deleteById}）。
      */
-    @ULog("'删除菜单'")
+    @Audit("'删除菜单'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:disable')")
     public void deleteById(@PathVariable UUID id) {
@@ -84,7 +84,7 @@ public class MenuController {
      *
      * @param params 菜单信息
      */
-    @ULog("'修改菜单'")
+    @Audit("'修改菜单'")
     @PutMapping(value = "/modify", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:update')")
     public void modify(@Validated(Verify.Update.class) @RequestBody MenuSaveFrom params) {
@@ -96,7 +96,7 @@ public class MenuController {
      *
      * @return 构建的树形菜单
      */
-    @ULog(value = "'获取树形菜单'")
+    @Audit(value = "'获取树形菜单'")
     @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'menu:read')")
     public @Nullable List<MenuTreeVO> tree() {
@@ -109,7 +109,7 @@ public class MenuController {
      * @param user 当前登录用户
      * @return 当前用户授权菜单树
      */
-    @ULog(value = "'获取当前用户菜单'")
+    @Audit(value = "'获取当前用户菜单'")
     @GetMapping(value = "/current", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public List<MenuTreeVO> current(@AuthenticationPrincipal SecurityUser user) {

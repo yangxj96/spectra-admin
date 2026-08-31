@@ -6,8 +6,8 @@
 package com.devops00.spectra.upload.controller;
 
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.upload.api.FileAccessContext;
-import com.devops00.spectra.upload.api.FileDownload;
+import com.devops00.spectra.common.port.file.FileAccessContext;
+import com.devops00.spectra.common.port.file.FileDownload;
 import com.devops00.spectra.upload.service.FileAssetApplicationService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

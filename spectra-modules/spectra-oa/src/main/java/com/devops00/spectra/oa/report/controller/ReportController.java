@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.oa.report.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.report.javabean.from.DepartmentStatsFrom;
 import com.devops00.spectra.oa.report.javabean.vo.DepartmentStatsVO;
 import com.devops00.spectra.oa.report.service.DepartmentStatsService;
@@ -52,7 +52,7 @@ public class ReportController {
     /**
      * 查询部门维度统计。
      */
-    @ULog("'查询部门维度统计'")
+    @Audit("'查询部门维度统计'")
     @GetMapping(value = "/department", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public List<DepartmentStatsVO> department(DepartmentStatsFrom from) {
@@ -62,7 +62,7 @@ public class ReportController {
     /**
      * 导出部门维度统计。
      */
-    @ULog("'导出部门维度统计'")
+    @Audit("'导出部门维度统计'")
     @GetMapping(value = "/department/export", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:report:read')")
     public ResponseEntity<byte[]> exportDepartment(DepartmentStatsFrom from) {

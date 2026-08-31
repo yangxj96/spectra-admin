@@ -46,7 +46,7 @@ import com.devops00.spectra.oa.leave.mapper.LeaveBalanceMapper;
 import com.devops00.spectra.oa.leave.mapper.LeaveTypeMapper;
 import com.devops00.spectra.oa.leave.service.LeaveService;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
-import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -21,7 +21,7 @@ import com.devops00.spectra.core.security.policy.javabean.from.SecuritySessionPo
 import com.devops00.spectra.core.security.policy.javabean.vo.SecurityPasswordPolicyVO;
 import com.devops00.spectra.core.security.policy.javabean.vo.SecuritySessionPolicyVO;
 import com.devops00.spectra.core.security.policy.service.SecurityPolicyService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -49,7 +49,7 @@ public class SecurityPolicyController {
     /**
      * 查询或获取目标数据（{@code sessionPolicies}）。
      */
-    @ULog("'查询会话策略'")
+    @Audit("'查询会话策略'")
     @GetMapping(value = "/session", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
     public List<SecuritySessionPolicyVO> sessionPolicies() {
@@ -59,7 +59,7 @@ public class SecurityPolicyController {
     /**
      * 更新或推进目标状态（{@code modifySessionPolicy}）。
      */
-    @ULog("'修改会话策略'")
+    @Audit("'修改会话策略'")
     @PutMapping(value = "/session/{clientId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:session-policy:update')")
     public SecuritySessionPolicyVO modifySessionPolicy(@PathVariable UUID clientId,
@@ -70,7 +70,7 @@ public class SecurityPolicyController {
     /**
      * 查询或获取目标数据（{@code passwordPolicy}）。
      */
-    @ULog("'查询密码策略'")
+    @Audit("'查询密码策略'")
     @GetMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
     public SecurityPasswordPolicyVO passwordPolicy() {
@@ -80,7 +80,7 @@ public class SecurityPolicyController {
     /**
      * 更新或推进目标状态（{@code modifyPasswordPolicy}）。
      */
-    @ULog("'修改密码策略'")
+    @Audit("'修改密码策略'")
     @PutMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:password-policy:update')")
     public SecurityPasswordPolicyVO modifyPasswordPolicy(@Validated @RequestBody SecurityPasswordPolicyFrom from) {

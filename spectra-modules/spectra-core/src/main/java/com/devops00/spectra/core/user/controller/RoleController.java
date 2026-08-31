@@ -27,7 +27,7 @@ import com.devops00.spectra.core.user.javabean.vo.RoleVO;
 import com.devops00.spectra.core.user.service.RelRoleMenuService;
 import com.devops00.spectra.core.user.service.RoleEditorService;
 import com.devops00.spectra.core.user.service.RoleService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -63,7 +63,7 @@ public class RoleController {
 
     private final RelRoleMenuService relRoleMenuService;
 
-    @ULog("'提交角色编辑'")
+    @Audit("'提交角色编辑'")
     @PostMapping(value = "/editor", version = "1.0.0")
     @PreAuthorize("((#p0.id == null and hasPermission(null, 'role:create')) "
             + "or (#p0.id != null and hasPermission(null, 'role:update'))) "
@@ -78,7 +78,7 @@ public class RoleController {
     /**
      * 处理内部业务逻辑（{@code enable}）。
      */
-    @ULog("'启用角色'")
+    @Audit("'启用角色'")
     @PutMapping(value = "/{id}/enable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:disable')")
     public void enable(@PathVariable UUID id) {
@@ -88,7 +88,7 @@ public class RoleController {
     /**
      * 更新或推进目标状态（{@code disable}）。
      */
-    @ULog("'禁用角色'")
+    @Audit("'禁用角色'")
     @PutMapping(value = "/{id}/disable", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:disable')")
     public void disable(@PathVariable UUID id) {
@@ -98,7 +98,7 @@ public class RoleController {
     /**
      * 更新或推进目标状态（{@code deleteById}）。
      */
-    @ULog("'删除角色'")
+    @Audit("'删除角色'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:delete')")
     public void deleteById(@PathVariable UUID id) {
@@ -107,7 +107,7 @@ public class RoleController {
 
     /* 查询部分 */
 
-    @ULog("'分页查询角色列表'")
+    @Audit("'分页查询角色列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public IPage<RoleVO> page(PageFrom page, RolePageFrom params) {
@@ -117,7 +117,7 @@ public class RoleController {
     /**
      * 查询或获取目标数据（{@code list}）。
      */
-    @ULog("'查询角色列表'")
+    @Audit("'查询角色列表'")
     @GetMapping(value = "/list", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public List<RoleVO> list() {
@@ -127,7 +127,7 @@ public class RoleController {
     /**
      * 查询或获取目标数据（{@code detail}）。
      */
-    @ULog("'查询角色详情'")
+    @Audit("'查询角色详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public RoleVO detail(@PathVariable UUID id) {
@@ -136,7 +136,7 @@ public class RoleController {
 
     /* 关联处理部分 */
 
-    @ULog("'获取角色关联的菜单列表'")
+    @Audit("'获取角色关联的菜单列表'")
     @GetMapping(value = "/{roleId}/menu", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'role:read')")
     public List<MenuVO> getRoleRelMenuByRoleId(@PathVariable UUID roleId) {

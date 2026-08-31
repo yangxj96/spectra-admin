@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.provider;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.KaptchaNotMatchException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;

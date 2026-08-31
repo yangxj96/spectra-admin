@@ -16,11 +16,11 @@
 
 package com.devops00.spectra.workflow.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.workflow.javabean.from.ProcessInstanceStartFrom;
 import com.devops00.spectra.workflow.javabean.from.ProcessInstanceTerminateFrom;
 import com.devops00.spectra.workflow.javabean.vo.ProcessInstanceVO;
-import com.devops00.spectra.workflow.service.ProcessInstanceService;
+import com.devops00.spectra.workflow.api.ProcessInstanceService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -56,7 +56,7 @@ public class ProcessInstanceController {
      * @param from 启动参数
      * @return 流程实例ID
      */
-    @ULog("'启动流程'")
+    @Audit("'启动流程'")
     @PostMapping(value = "/start", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:instance:create')")
     public String start(@Validated @RequestBody ProcessInstanceStartFrom from) {
@@ -69,7 +69,7 @@ public class ProcessInstanceController {
      * @param id 流程实例ID
      * @return 流程实例信息
      */
-    @ULog("'查询流程实例状态'")
+    @Audit("'查询流程实例状态'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public ProcessInstanceVO getStatus(@PathVariable String id) {
@@ -82,7 +82,7 @@ public class ProcessInstanceController {
      * @param id 流程实例ID
      * @return 流程变量
      */
-    @ULog("'查询流程变量'")
+    @Audit("'查询流程变量'")
     @GetMapping(value = "/{id}/variables", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public Map<String, Object> getVariables(@PathVariable String id) {
@@ -95,7 +95,7 @@ public class ProcessInstanceController {
      * @param id   流程实例ID
      * @param from 终止参数
      */
-    @ULog("'终止流程'")
+    @Audit("'终止流程'")
     @PostMapping(value = "/{id}/terminate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'workflow:instance:update')")
     public void terminate(@PathVariable String id, @RequestBody ProcessInstanceTerminateFrom from) {
@@ -108,7 +108,7 @@ public class ProcessInstanceController {
      * @param id 流程实例ID
      * @return 流程图图片（PNG格式）
      */
-    @ULog("'获取流程实例图'")
+    @Audit("'获取流程实例图'")
     @GetMapping(value = "/{id}/diagram", version = "1.0.0", produces = MediaType.IMAGE_PNG_VALUE)
     @PreAuthorize("hasPermission(null, 'workflow:instance:read')")
     public byte[] getDiagram(@PathVariable String id) {

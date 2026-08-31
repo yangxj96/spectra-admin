@@ -16,43 +16,89 @@
 
 package com.devops00.spectra.notification.health;
 
+import com.devops00.spectra.common.health.DependencyHealthContributor;
+import com.devops00.spectra.common.health.DependencyHealthResult;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import com.devops00.spectra.notification.sender.NotificationSender;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.health.contributor.Health;
-import org.springframework.boot.health.contributor.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.util.EnumMap;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 /**
- * 通知模块健康检查；站内信不可用时整体标记为 DOWN。
+ * 通知模块健康 contributor；站内信是必需通道，外部通道按可选能力计算 DEGRADED。
  */
 @Component("notification")
+@ConditionalOnProperty(prefix = "spectra.modules.notification", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
-public class NotificationHealthIndicator implements HealthIndicator {
+public class NotificationHealthIndicator implements DependencyHealthContributor {
+
+    private static final Duration TIMEOUT = Duration.ofSeconds(3);
 
     private final NotificationModuleProperties properties;
 
     private final List<NotificationSender> senders;
 
     @Override
-    public Health health() {
+    public String contributorName() {
+        return "notification";
+    }
+
+    @Override
+    public String moduleName() {
+        return "notification";
+    }
+
+    @Override
+    public String dependencyType() {
+        return "NOTIFICATION";
+    }
+
+    @Override
+    public Duration timeout() {
+        return TIMEOUT;
+    }
+
+    @Override
+    public DependencyHealthResult check() {
+        var start = System.nanoTime();
+        var checkedAt = Instant.now();
         if (!properties.enabled()) {
-            return Health.down().withDetail("reason", "MODULE_DISABLED").build();
+            return result(DependencyHealthStatus.UNKNOWN, start, checkedAt, "MODULE_DISABLED", "通知模块未启用");
         }
-        var channels = new EnumMap<NotificationChannel, String>(NotificationChannel.class);
-        for (var channel : NotificationChannel.values()) {
-            var sender = senders.stream().filter(item -> item.channel() == channel).findFirst();
-            channels.put(channel, sender.map(item -> item.available() ? "AVAILABLE" : item.unavailableReason())
-                    .orElse("CHANNEL_NOT_REGISTERED"));
+        if (!senderAvailable(NotificationChannel.IN_APP)) {
+            return result(DependencyHealthStatus.DOWN, start, checkedAt, "IN_APP_UNAVAILABLE", "站内信通道不可用");
         }
-        var inApp = channels.get(NotificationChannel.IN_APP);
-        var builder = "AVAILABLE".equals(inApp)
-                ? Health.up()
-                : Health.down().withDetail("reason", "IN_APP_UNAVAILABLE");
-        return builder.withDetail("enabled", true).withDetail("channels", channels).build();
+        var optionalChannelUnavailable = java.util.Arrays.stream(NotificationChannel.values())
+                .filter(channel -> channel != NotificationChannel.IN_APP)
+                .anyMatch(channel -> sender(channel).map(sender -> !sender.available()).orElse(false));
+        if (optionalChannelUnavailable) {
+            return result(DependencyHealthStatus.DEGRADED, start, checkedAt,
+                    "OPTIONAL_CHANNEL_UNAVAILABLE", "站内信正常，部分可选通知通道不可用");
+        }
+        return result(DependencyHealthStatus.UP, start, checkedAt, null, "通知通道检查正常");
+    }
+
+    private boolean senderAvailable(NotificationChannel channel) {
+        return sender(channel)
+                .map(NotificationSender::available)
+                .orElse(false);
+    }
+
+    private java.util.Optional<NotificationSender> sender(NotificationChannel channel) {
+        return senders.stream()
+                .filter(item -> item.channel() == channel)
+                .findFirst();
+    }
+
+    private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,
+                                          String errorCode, String safeSummary) {
+        return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,
+                Duration.ofNanos(System.nanoTime() - start), checkedAt, errorCode, safeSummary);
     }
 }

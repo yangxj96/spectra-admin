@@ -18,7 +18,7 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.log.base.aspect.ULogAspect"/>
+        <Class name="com.devops00.spectra.core.audit.AuditAspect"/>
         <Bug pattern="SPEL_INJECTION"/>
     </Match>
     <Match>
@@ -106,7 +106,7 @@
         <Class name="com.devops00.spectra.core.system.service.impl.ServiceMonitorServiceImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
-    <!-- FindSecBugs treats the request records referenced by trusted @ULog metadata as log input;
+    <!-- FindSecBugs treats the request records referenced by trusted @Audit metadata as log input;
          AuthorizationController logs only UUIDs and fixed fields, so these four findings are taint false positives. -->
     <Match>
         <Class name="com.devops00.spectra.core.security.authorization.controller.AuthorizationController"/>
@@ -129,10 +129,6 @@
     <Match>
         <Class name="com.devops00.spectra.core.common.runner.FolderCheckRunner"/>
         <Bug pattern="PATH_TRAVERSAL_IN"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.common.listener.ulog.ULogListener"/>
-        <Bug pattern="BEAN_PROPERTY_INJECTION"/>
     </Match>
     <!-- Spring collaborators are intentionally retained by the local storage service. -->
     <Match>

@@ -48,12 +48,12 @@ class NotificationSqlContractTest {
 
     @Test
     void shouldKeepSchemaTablesIndexesAndColumnComments() throws IOException {
-        var schema = readSql("建表.sql");
+        var schema = readSql();
 
-        assertTrue(schema.contains("CREATE SCHEMA IF NOT EXISTS spectra_notification"));
-        assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_request"));
-        assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_task"));
-        assertTrue(schema.contains("CREATE TABLE IF NOT EXISTS spectra_notification.ntf_delivery"));
+        assertTrue(schema.contains("CREATE SCHEMA spectra_notification"));
+        assertTrue(schema.contains("CREATE TABLE spectra_notification.ntf_request"));
+        assertTrue(schema.contains("CREATE TABLE spectra_notification.ntf_task"));
+        assertTrue(schema.contains("CREATE TABLE spectra_notification.ntf_delivery"));
         assertTrue(schema.contains("UK_NTF_REQUEST_IDEMPOTENCY"));
         assertTrue(schema.contains("UK_NTF_TASK_RECIPIENT_CHANNEL"));
         assertTrue(schema.contains("created_by"));
@@ -106,15 +106,16 @@ class NotificationSqlContractTest {
         assertEquals(originalSql, boundSql.getSql(), "数据权限拦截器不得重新序列化 PostgreSQL 锁定查询");
     }
 
-    private String readSql(String name) throws IOException {
+    private String readSql() throws IOException {
+        var name = "V1__init_db.sql";
         var candidates = List.of(
-                Path.of("docs", "sql", "spectra_notification", name),
-                Path.of("..", "docs", "sql", "spectra_notification", name),
-                Path.of("..", "..", "docs", "sql", "spectra_notification", name),
-                Path.of("..", "..", "..", "docs", "sql", "spectra_notification", name));
+                Path.of("spectra-config", "src", "main", "resources", "db", "migration", name),
+                Path.of("..", "..", "spectra-config", "src", "main", "resources", "db", "migration", name),
+                Path.of("..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration", name),
+                Path.of("..", "..", "..", "..", "spectra-config", "src", "main", "resources", "db", "migration", name));
         for (var candidate : candidates) {
             if (Files.isRegularFile(candidate)) {
-                return Files.readString(candidate);
+                return Files.readString(candidate, StandardCharsets.UTF_8);
             }
         }
         throw new IOException("找不到通知 SQL 文件: " + name);
@@ -130,16 +131,29 @@ class NotificationSqlContractTest {
     }
 
     private Set<String> tableColumns(String schema) {
-        var tablePattern = Pattern.compile(
-                "CREATE TABLE IF NOT EXISTS spectra_notification\\.(\\w+) \\((.*?)\\R\\);", Pattern.DOTALL);
-        var columnPattern = Pattern.compile("^ {4}([a-z][a-z0-9_]*)\\s+[A-Z]", Pattern.MULTILINE);
         var columns = new HashSet<String>();
-        var tables = tablePattern.matcher(schema);
-        while (tables.find()) {
-            var tableName = tables.group(1);
-            var tableColumns = columnPattern.matcher(tables.group(2));
-            while (tableColumns.find()) {
-                columns.add(tableName + "." + tableColumns.group(1));
+        String tableName = null;
+        for (var line : schema.lines().toList()) {
+            var trimmedLine = line.trim();
+            var tablePrefix = "CREATE TABLE spectra_notification.";
+            var tableIfNotExistsPrefix = "CREATE TABLE IF NOT EXISTS spectra_notification.";
+            if (trimmedLine.startsWith(tablePrefix) || trimmedLine.startsWith(tableIfNotExistsPrefix)) {
+                var prefix = trimmedLine.startsWith(tablePrefix) ? tablePrefix : tableIfNotExistsPrefix;
+                var nameStart = prefix.length();
+                var nameEnd = trimmedLine.indexOf(' ', nameStart);
+                tableName = trimmedLine.substring(nameStart, nameEnd);
+                continue;
+            }
+            if (tableName == null) {
+                continue;
+            }
+            if (line.trim().equals(");")) {
+                tableName = null;
+                continue;
+            }
+            if (line.length() >= 5 && line.startsWith("    ") && Character.isLowerCase(line.charAt(4))) {
+                var nameEnd = line.indexOf(' ', 4);
+                columns.add(tableName + "." + line.substring(4, nameEnd));
             }
         }
         return columns;

@@ -18,7 +18,6 @@ package com.devops00.test.spectra;
 
 import com.devops00.spectra.core.CoreModule;
 import com.devops00.spectra.core.system.service.impl.RegionServiceImpl;
-import com.devops00.spectra.notification.NotificationModule;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import org.mybatis.spring.annotation.MapperScan;
@@ -32,7 +31,7 @@ import java.util.UUID;
 
 /** 行政区划导入专用测试上下文，避免加载无关业务和其他集成测试配置。 */
 @SpringBootConfiguration
-@EnableAutoConfiguration(exclude = {CoreModule.class, NotificationModule.class})
+@EnableAutoConfiguration(exclude = CoreModule.class)
 @ComponentScan("com.devops00.spectra.core.system.javabean.converter")
 @MapperScan("com.devops00.spectra.core.system.mapper")
 @Import(RegionServiceImpl.class)

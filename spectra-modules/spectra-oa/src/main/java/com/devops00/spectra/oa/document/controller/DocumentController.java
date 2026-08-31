@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.document.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.document.javabean.from.DocumentFolderSaveFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentPageFrom;
 import com.devops00.spectra.oa.document.javabean.from.DocumentSaveFrom;
@@ -61,7 +61,7 @@ public class DocumentController {
     /**
      * 分页查询文档。
      */
-    @ULog("'分页查询文档'")
+    @Audit("'分页查询文档'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:read')")
     public IPage<DocumentVO> page(PageFrom page, DocumentPageFrom params) {
@@ -71,7 +71,7 @@ public class DocumentController {
     /**
      * 查询文档详情。
      */
-    @ULog("'查询文档详情'")
+    @Audit("'查询文档详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:read')")
     public DocumentVO get(@PathVariable UUID id) {
@@ -81,7 +81,7 @@ public class DocumentController {
     /**
      * 创建文档。
      */
-    @ULog("'创建文档'")
+    @Audit("'创建文档'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody DocumentSaveFrom from) {
@@ -91,7 +91,7 @@ public class DocumentController {
     /**
      * 修改文档。
      */
-    @ULog("'修改文档'")
+    @Audit("'修改文档'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody DocumentSaveFrom from) {
@@ -101,7 +101,7 @@ public class DocumentController {
     /**
      * 新增文档版本。
      */
-    @ULog("'新增文档版本'")
+    @Audit("'新增文档版本'")
     @PostMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:update')")
     public UUID addVersion(@PathVariable UUID id, @Validated @RequestBody DocumentVersionFrom from) {
@@ -111,7 +111,7 @@ public class DocumentController {
     /**
      * 查询文档版本。
      */
-    @ULog("'查询文档版本'")
+    @Audit("'查询文档版本'")
     @GetMapping(value = "/{id}/versions", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:read')")
     public List<DocumentVersionVO> versions(@PathVariable UUID id) {
@@ -121,7 +121,7 @@ public class DocumentController {
     /**
      * 发布文档。
      */
-    @ULog("'发布文档'")
+    @Audit("'发布文档'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:update')")
     public void publish(@PathVariable UUID id) {
@@ -131,7 +131,7 @@ public class DocumentController {
     /**
      * 归档文档。
      */
-    @ULog("'归档文档'")
+    @Audit("'归档文档'")
     @PostMapping(value = "/{id}/archive", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:update')")
     public void archive(@PathVariable UUID id) {
@@ -141,7 +141,7 @@ public class DocumentController {
     /**
      * 查询文档目录。
      */
-    @ULog("'查询文档目录'")
+    @Audit("'查询文档目录'")
     @GetMapping(value = "/folders", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:read')")
     public List<DocumentFolderVO> folders() {
@@ -151,7 +151,7 @@ public class DocumentController {
     /**
      * 创建文档目录。
      */
-    @ULog("'创建文档目录'")
+    @Audit("'创建文档目录'")
     @PostMapping(value = "/folders", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:create')")
     public UUID createFolder(@Validated(Verify.Insert.class) @RequestBody DocumentFolderSaveFrom from) {
@@ -161,7 +161,7 @@ public class DocumentController {
     /**
      * 恢复文档版本。
      */
-    @ULog("'恢复文档版本'")
+    @Audit("'恢复文档版本'")
     @PutMapping(value = "/{id}/versions/{versionId}/current", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:document:update')")
     public void restoreVersion(@PathVariable UUID id, @PathVariable UUID versionId) {

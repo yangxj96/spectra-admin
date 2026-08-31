@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.security.base.audit;
 
+import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -72,8 +73,8 @@ public record SecurityAuditEvent(UUID eventId,
         if (result == null) {
             throw new IllegalArgumentException("安全审计事件结果不能为空");
         }
-        before = immutableCopy(SecurityAuditSnapshotSanitizer.sanitize(before));
-        after = immutableCopy(SecurityAuditSnapshotSanitizer.sanitize(after));
+        before = immutableCopy(DefaultAuditSanitizer.INSTANCE.sanitize(before));
+        after = immutableCopy(DefaultAuditSanitizer.INSTANCE.sanitize(after));
     }
 
     @Override

@@ -25,7 +25,7 @@ import com.devops00.spectra.core.system.javabean.vo.CryptoConfigVO;
 import com.devops00.spectra.core.system.javabean.vo.CryptoKeyPairVO;
 import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.framework.configure.mvc.crypto.CryptoKeyManager;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -62,7 +62,7 @@ public class CryptoController {
     /**
      * 获取加解密配置（前端初始化调用）
      */
-    @ULog("'获取加解密配置'")
+    @Audit("'获取加解密配置'")
     @Encrypt(response = false)
     @PreAuthorize("permitAll()")
     @GetMapping(value = "/config", version = "1.0.0")
@@ -75,7 +75,7 @@ public class CryptoController {
      *
      * <p>客户端私钥用于浏览器端解密响应和签名请求，是加密通信初始化数据，不属于密钥管理操作。</p>
      */
-    @ULog("'获取客户端私钥'")
+    @Audit("'获取客户端私钥'")
     @Encrypt(response = false)
     @GetMapping(value = "/keypair/client-private", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
@@ -86,7 +86,7 @@ public class CryptoController {
     /**
      * 生成新的 RSA 密钥对
      */
-    @ULog("'生成RSA密钥对'")
+    @Audit("'生成RSA密钥对'")
     @PostMapping(value = "/keypair/generate", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public CryptoKeyPairVO generateKeyPair() {
@@ -119,7 +119,7 @@ public class CryptoController {
     /**
      * 手动重新加载密钥
      */
-    @ULog("'重新加载加解密密钥'")
+    @Audit("'重新加载加解密密钥'")
     @PostMapping(value = "/keypair/refresh", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'security:crypto:manage')")
     public void refreshKeys() {

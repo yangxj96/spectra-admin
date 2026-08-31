@@ -52,6 +52,29 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- 承载 common 中仍保持原包名的技术适配类型；不向 common 反向注入业务。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-jsqlparser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <!-- UUIDv7 生成器由 framework 的 MyBatis 元对象处理器使用。 -->
+        <dependency>
+            <groupId>com.github.f4b6a3</groupId>
+            <artifactId>uuid-creator</artifactId>
+        </dependency>
+
         <!-- === Spring Boot === -->
         <!-- AOP -->
         <dependency>
@@ -77,6 +100,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator-autoconfigure</artifactId>
             <scope>compile</scope>
+        </dependency>
+        <!-- 统一健康快照的 Actuator 适配器直接使用 Health API。 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-health</artifactId>
         </dependency>
         <!-- 自动配置包 -->
         <dependency>

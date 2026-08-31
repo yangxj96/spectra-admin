@@ -24,16 +24,15 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Security Audit 敏感快照回归测试。
  */
-class SecurityAuditSnapshotSanitizerTest {
+class SecurityAuditEventSanitizationTest {
 
     @Test
-    void shouldRemoveSensitiveKeysRecursivelyBeforePersistence() {
+    void shouldRedactSensitiveKeysRecursivelyBeforePersistence() {
         var event = new SecurityAuditEvent(null, "PASSWORD_CHANGED", null, null, "WEB", null, null,
                 Map.of("username", "alice", "password", "must-not-persist",
                         "nested", Map.of("refresh_token", "must-not-persist"),
@@ -41,10 +40,10 @@ class SecurityAuditSnapshotSanitizerTest {
                 Map.of(), "test", null, AuditResult.STARTED, "corr");
 
         assertEquals("alice", event.before().get("username"));
-        assertFalse(event.before().containsKey("password"));
-        assertFalse(((Map<?, ?>) event.before().get("nested")).containsKey("refresh_token"));
+        assertEquals("***", event.before().get("password"));
+        assertEquals("***", ((Map<?, ?>) event.before().get("nested")).get("refresh_token"));
         assertEquals("safe", ((Map<?, ?>) ((List<?>) event.before().get("items")).getFirst()).get("name"));
-        assertFalse(((Map<?, ?>) ((List<?>) event.before().get("items")).getFirst()).containsKey("clientSecret"));
+        assertEquals("***", ((Map<?, ?>) ((List<?>) event.before().get("items")).getFirst()).get("clientSecret"));
     }
 
     @Test

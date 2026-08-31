@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.common.service.impl;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.ReadPropertiesException;
 import com.devops00.spectra.core.common.service.KaptchaService;
 import com.devops00.spectra.framework.configure.kaptcha.properties.KaptchaProperties;

@@ -19,9 +19,10 @@ package com.devops00.spectra.notification;
 import com.devops00.spectra.notification.properties.NotificationCleanupProperties;
 import com.devops00.spectra.notification.properties.NotificationModuleProperties;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * 统一通知模块入口
@@ -30,8 +31,9 @@ import org.springframework.context.annotation.Configuration;
  * @version 1.0
  * @since 2026/8/11
  */
-@Configuration
-@ComponentScan("com.devops00.spectra.notification")
+@AutoConfiguration
+@ConditionalOnProperty(prefix = "spectra.modules.notification", name = "enabled", havingValue = "true", matchIfMissing = true)
+@ComponentScan(basePackageClasses = NotificationModule.class)
 @MapperScan("com.devops00.spectra.notification.mapper")
 @EnableConfigurationProperties({NotificationModuleProperties.class, NotificationCleanupProperties.class})
 public class NotificationModule {

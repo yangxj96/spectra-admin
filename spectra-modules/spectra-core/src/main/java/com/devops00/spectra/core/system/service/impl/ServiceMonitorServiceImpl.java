@@ -17,9 +17,11 @@
 package com.devops00.spectra.core.system.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.devops00.spectra.common.health.DependencyHealthResult;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.common.exception.DataException;
+import com.devops00.spectra.core.system.health.CoreHealthAggregator;
 import com.devops00.spectra.core.system.javabean.entity.ServiceMonitorSample;
-import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorDependencyStatus;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorFreshness;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorHistoryRange;
 import com.devops00.spectra.core.system.javabean.enums.ServiceMonitorHealthStatus;
@@ -34,21 +36,13 @@ import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.health.actuate.endpoint.CompositeHealthDescriptor;
-import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
 import org.springframework.core.env.Environment;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.stereotype.Service;
-import javax.sql.DataSource;
 
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.net.InetAddress;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -80,11 +74,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private static final int DEFAULT_HISTORY_RETENTION_DAYS = 7;
 
     private final MeterRegistry meterRegistry;
-    private final DataSource dataSource;
-    private final RedisConnectionFactory redisConnectionFactory;
     private final TimeMapper timeMapper;
     private final Environment environment;
-    private final ObjectProvider<HealthEndpoint> healthEndpointProvider;
+    private final CoreHealthAggregator healthAggregator;
     private final ServiceMonitorSampleMapper sampleMapper;
     private final ServiceMonitorAlertService alertService;
     private final long collectionIntervalSeconds;
@@ -99,16 +91,14 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private long previousRequestNanos = -1L;
     private volatile Instant lastHistoryCleanupAt;
 
-    public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, DataSource dataSource,
-                                     RedisConnectionFactory redisConnectionFactory, TimeMapper timeMapper, Environment environment,
-                                     ObjectProvider<HealthEndpoint> healthEndpointProvider, ServiceMonitorSampleMapper sampleMapper,
+    public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, TimeMapper timeMapper, Environment environment,
+                                     CoreHealthAggregator healthAggregator,
+                                     ServiceMonitorSampleMapper sampleMapper,
                                      ServiceMonitorAlertService alertService) {
         this.meterRegistry = meterRegistry;
-        this.dataSource = dataSource;
-        this.redisConnectionFactory = redisConnectionFactory;
         this.timeMapper = timeMapper;
         this.environment = environment;
-        this.healthEndpointProvider = healthEndpointProvider;
+        this.healthAggregator = healthAggregator;
         this.sampleMapper = sampleMapper;
         this.alertService = alertService;
         var intervalMillis = environment.getProperty("spectra.monitor.collection-interval-ms", Long.class, 10000L);
@@ -211,8 +201,8 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         var nonHeapUsage = memoryBean.getNonHeapMemoryUsage();
         var threadBean = ManagementFactory.getThreadMXBean();
         var requestMetrics = collectRequestMetrics();
-        var dependencies = List.of(checkDatabase(), checkRedis());
         var health = collectHealth();
+        var dependencies = toDependencies(health.results());
         var status = resolveStatus(cpuUsage, systemMemoryUsage, heapUsage.usage(), requestMetrics, dependencies,
                 health.status());
         var runtime = ManagementFactory.getRuntimeMXBean();
@@ -221,17 +211,17 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
                 .filter(item -> "PostgreSQL".equals(item.getName()))
                 .map(ServiceMonitorOverviewVO.Dependency::getStatus)
                 .findFirst()
-                .orElse(ServiceMonitorDependencyStatus.UNKNOWN.name());
+                .orElse(DependencyHealthStatus.UNKNOWN.name());
         var redisStatus = dependencies.stream()
                 .filter(item -> "Redis".equals(item.getName()))
                 .map(ServiceMonitorOverviewVO.Dependency::getStatus)
                 .findFirst()
-                .orElse(ServiceMonitorDependencyStatus.UNKNOWN.name());
+                .orElse(DependencyHealthStatus.UNKNOWN.name());
         return new Sample(now, cpuUsage, logicalCores, systemMemoryUsage, totalMemory, usedMemory, availableMemory,
                 heapUsage.used(), heapUsage.max(), heapUsage.usage(), nonHeapUsage.getUsed(), threadBean.getThreadCount(),
                 threadBean.getPeakThreadCount(), collectGcCount(), requestMetrics.qps(), requestMetrics.errorRate(),
                 requestMetrics.p95ResponseMs(), requestMetrics.available(), dependencies, health.components(),
-                health.status(), health.latencyMs(), status,
+                health.status().name(), health.latencyMs(), status,
                 databaseStatus, redisStatus,
                 runtime.getUptime() / 1000L);
     }
@@ -240,55 +230,55 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
      * 处理内部业务逻辑（{@code collectHealth}）。
      */
     private HealthSnapshot collectHealth() {
-        var start = System.nanoTime();
-        try {
-            var descriptor = healthEndpointProvider.getObject().health();
-            var components = new ArrayList<ServiceMonitorOverviewVO.HealthComponent>();
-            var status = descriptor.getStatus();
-            if (status == null) {
-                return new HealthSnapshot("UNKNOWN", List.of(healthComponent("application", "UNKNOWN")), elapsedMillis(start));
-            }
-            if (descriptor instanceof CompositeHealthDescriptor composite) {
-                var compositeComponents = composite.getComponents();
-                if (compositeComponents != null && !compositeComponents.isEmpty()) {
-                    compositeComponents
-                            .forEach((name, component) -> components.add(healthComponent(name,
-                                    component.getStatus() == null ? "UNKNOWN" : component.getStatus().getCode())));
-                } else {
-                    components.add(healthComponent("application", status.getCode()));
-                }
-            } else {
-                components.add(healthComponent("application", status.getCode()));
-            }
-            return new HealthSnapshot(status.getCode(), List.copyOf(components), elapsedMillis(start));
-        } catch (RuntimeException exception) {
-            return new HealthSnapshot("UNKNOWN", List.of(healthComponent("application", "UNKNOWN")),
-                    elapsedMillis(start));
-        }
+        var snapshot = healthAggregator.snapshot();
+        var components = snapshot.results().isEmpty()
+                ? List.of(healthComponent("application", DependencyHealthStatus.UNKNOWN, "没有已注册的健康 contributor"))
+                : snapshot.results().stream().map(this::healthComponent).toList();
+        return new HealthSnapshot(snapshot.status(), components, snapshot.results(), snapshot.latency().toMillis());
     }
 
     /**
      * 处理内部业务逻辑（{@code healthComponent}）。
      */
-    private static ServiceMonitorOverviewVO.HealthComponent healthComponent(String name, String status) {
-        var normalizedStatus = status == null || status.isBlank() ? "UNKNOWN" : status;
+    private ServiceMonitorOverviewVO.HealthComponent healthComponent(DependencyHealthResult result) {
+        return healthComponent(result.contributorName(), result.status(), result.safeSummary());
+    }
+
+    private ServiceMonitorOverviewVO.HealthComponent healthComponent(String name, DependencyHealthStatus status,
+                                                                     String message) {
         return ServiceMonitorOverviewVO.HealthComponent.builder()
                 .name(name)
-                .status(normalizedStatus)
-                .message(healthMessage(normalizedStatus))
+                .status(status.name())
+                .message(message == null || message.isBlank() ? healthMessage(status) : message)
                 .build();
     }
 
     /**
      * 处理内部业务逻辑（{@code healthMessage}）。
      */
-    private static String healthMessage(String status) {
+    private static String healthMessage(DependencyHealthStatus status) {
         return switch (status) {
-            case "UP" -> "检查正常";
-            case "DOWN" -> "检查未通过";
-            case "OUT_OF_SERVICE" -> "服务不可用";
-            default -> "检查状态未知";
+            case UP -> "检查正常";
+            case DEGRADED -> "检查部分可用";
+            case DOWN -> "检查未通过";
+            case UNKNOWN -> "检查状态未知";
         };
+    }
+
+    private static List<ServiceMonitorOverviewVO.Dependency> toDependencies(List<DependencyHealthResult> results) {
+        return results.stream()
+                .filter(result -> "DATABASE".equals(result.dependencyType())
+                        || "REDIS".equals(result.dependencyType())
+                        || "OBJECT_STORAGE".equals(result.dependencyType()))
+                .map(result -> ServiceMonitorOverviewVO.Dependency.builder()
+                        .name(result.contributorName())
+                        .status(result.status().name())
+                        .latencyMs(result.latency().toMillis())
+                        .message(result.safeSummary() == null
+                                ? healthMessage(result.status())
+                                : result.safeSummary())
+                        .build())
+                .toList();
     }
 
     /**
@@ -331,64 +321,25 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     }
 
     /**
-     * 校验并确保数据满足当前约束（{@code checkDatabase}）。
-     */
-    private ServiceMonitorOverviewVO.Dependency checkDatabase() {
-        var start = System.nanoTime();
-        try (Connection connection = dataSource.getConnection()) {
-            var available = connection.isValid(2);
-            return dependency("PostgreSQL", available, start, available ? "连接正常" : "数据库连接不可用");
-        } catch (SQLException | RuntimeException exception) {
-            return dependency("PostgreSQL", false, start, "数据库连接不可用");
-        }
-    }
-
-    /**
-     * 校验并确保数据满足当前约束（{@code checkRedis}）。
-     */
-    private ServiceMonitorOverviewVO.Dependency checkRedis() {
-        var start = System.nanoTime();
-        try (RedisConnection connection = redisConnectionFactory.getConnection()) {
-            var available = "PONG".equalsIgnoreCase(connection.ping());
-            return dependency("Redis", available, start, available ? "连接正常" : "Redis 连接不可用");
-        } catch (RuntimeException exception) {
-            return dependency("Redis", false, start, "Redis 连接不可用");
-        }
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code dependency}）。
-     */
-    private static ServiceMonitorOverviewVO.Dependency dependency(String name, boolean available, long start,
-                                                                  String message) {
-        return ServiceMonitorOverviewVO.Dependency.builder()
-                .name(name)
-                .status((available ? ServiceMonitorDependencyStatus.UP : ServiceMonitorDependencyStatus.DOWN).name())
-                .latencyMs(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start))
-                .message(message)
-                .build();
-    }
-
-    /**
      * 转换、解析或规范化数据（{@code resolveStatus}）。
      */
     private static ServiceMonitorHealthStatus resolveStatus(double cpuUsage, double systemMemoryUsage, double jvmHeapUsage,
                                                             RequestMetrics requestMetrics,
                                                             List<ServiceMonitorOverviewVO.Dependency> dependencies,
-                                                            String healthStatus) {
+                                                            DependencyHealthStatus healthStatus) {
         var downCount = dependencies.stream()
-                .filter(item -> ServiceMonitorDependencyStatus.DOWN.name().equals(item.getStatus()))
+                .filter(item -> DependencyHealthStatus.DOWN.name().equals(item.getStatus()))
                 .count();
-        if (downCount == dependencies.size()) {
+        if (!dependencies.isEmpty() && downCount == dependencies.size()) {
             return ServiceMonitorHealthStatus.DOWN;
         }
         if (downCount > 0L) {
             return ServiceMonitorHealthStatus.DEGRADED;
         }
-        if ("DOWN".equals(healthStatus) || "OUT_OF_SERVICE".equals(healthStatus)) {
+        if (healthStatus == DependencyHealthStatus.DOWN || healthStatus == DependencyHealthStatus.DEGRADED) {
             return ServiceMonitorHealthStatus.DEGRADED;
         }
-        if ("UNKNOWN".equals(healthStatus)) {
+        if (healthStatus == DependencyHealthStatus.UNKNOWN) {
             return ServiceMonitorHealthStatus.WARNING;
         }
         if (cpuUsage >= WARNING_CPU_USAGE
@@ -701,8 +652,9 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
         }
     }
 
-    private record HealthSnapshot(String status, List<ServiceMonitorOverviewVO.HealthComponent> components,
-                                  long latencyMs) {
+    private record HealthSnapshot(DependencyHealthStatus status,
+                                  List<ServiceMonitorOverviewVO.HealthComponent> components,
+                                  List<DependencyHealthResult> results, long latencyMs) {
     }
 
     private record Freshness(ServiceMonitorFreshness status, long ageSeconds) {

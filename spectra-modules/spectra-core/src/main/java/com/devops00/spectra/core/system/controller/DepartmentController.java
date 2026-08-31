@@ -18,7 +18,7 @@ package com.devops00.spectra.core.system.controller;
 
 import com.devops00.spectra.core.system.javabean.vo.DepartmentTreeVo;
 import com.devops00.spectra.core.system.service.DepartmentService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +49,7 @@ public class DepartmentController {
      *
      * @return 组织机构树形结构数组
      */
-    @ULog("'获取组织机构树形列表'")
+    @Audit("'获取组织机构树形列表'")
     @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'department:read')")
     public @Nullable List<DepartmentTreeVo> tree() throws IllegalAccessException {

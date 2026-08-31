@@ -3,7 +3,7 @@ package com.devops00.spectra.oa.supply.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.supply.javabean.from.SupplyOperationFrom;
 import com.devops00.spectra.oa.supply.javabean.from.SupplyPageFrom;
 import com.devops00.spectra.oa.supply.javabean.from.SupplySaveFrom;
@@ -39,7 +39,7 @@ public class SupplyController {
     /**
      * 创建办公用品。
      */
-    @ULog("'创建办公用品'")
+    @Audit("'创建办公用品'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody SupplySaveFrom from) {
@@ -49,7 +49,7 @@ public class SupplyController {
     /**
      * 修改办公用品。
      */
-    @ULog("'修改办公用品'")
+    @Audit("'修改办公用品'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody SupplySaveFrom from) {
@@ -59,7 +59,7 @@ public class SupplyController {
     /**
      * 分页查询办公用品库存。
      */
-    @ULog("'分页查询办公用品库存'")
+    @Audit("'分页查询办公用品库存'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public IPage<SupplyItemVO> page(PageFrom page, SupplyPageFrom params) {
@@ -69,7 +69,7 @@ public class SupplyController {
     /**
      * 查询办公用品详情。
      */
-    @ULog("'查询办公用品详情'")
+    @Audit("'查询办公用品详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public SupplyItemVO get(@PathVariable UUID id) {
@@ -79,7 +79,7 @@ public class SupplyController {
     /**
      * 查询低库存办公用品。
      */
-    @ULog("'查询低库存办公用品'")
+    @Audit("'查询低库存办公用品'")
     @GetMapping(value = "/low-stock", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:read')")
     public List<SupplyItemVO> lowStock() {
@@ -89,7 +89,7 @@ public class SupplyController {
     /**
      * 办公用品入库。
      */
-    @ULog("'办公用品入库'")
+    @Audit("'办公用品入库'")
     @PostMapping(value = "/{id}/inbound", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void inbound(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
@@ -99,7 +99,7 @@ public class SupplyController {
     /**
      * 办公用品领用。
      */
-    @ULog("'办公用品领用'")
+    @Audit("'办公用品领用'")
     @PostMapping(value = "/{id}/issue", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void issue(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
@@ -109,7 +109,7 @@ public class SupplyController {
     /**
      * 办公用品退库。
      */
-    @ULog("'办公用品退库'")
+    @Audit("'办公用品退库'")
     @PostMapping(value = "/{id}/return", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void returnStock(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {
@@ -119,7 +119,7 @@ public class SupplyController {
     /**
      * 办公用品盘点调整。
      */
-    @ULog("'办公用品盘点调整'")
+    @Audit("'办公用品盘点调整'")
     @PostMapping(value = "/{id}/adjust", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:purchase:update')")
     public void adjust(@PathVariable UUID id, @Validated @RequestBody SupplyOperationFrom from) {

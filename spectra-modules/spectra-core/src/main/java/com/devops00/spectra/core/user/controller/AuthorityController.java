@@ -18,7 +18,7 @@ package com.devops00.spectra.core.user.controller;
 
 import com.devops00.spectra.core.security.authorization.service.PermissionCatalogService;
 import com.devops00.spectra.core.user.javabean.vo.AuthorityTreeVO;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,7 +46,7 @@ public class AuthorityController {
     /**
      * 处理内部业务逻辑（{@code tree}）。
      */
-    @ULog("'获取 Permission Catalog 树列表'")
+    @Audit("'获取 Permission Catalog 树列表'")
     @GetMapping(value = "/tree", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'permission:read')")
     public List<AuthorityTreeVO> tree() {

@@ -16,14 +16,18 @@
 
 package com.devops00.spectra.upload.health;
 
+import com.devops00.spectra.common.health.DependencyHealthContributor;
+import com.devops00.spectra.common.health.DependencyHealthResult;
+import com.devops00.spectra.common.health.DependencyHealthStatus;
 import com.devops00.spectra.upload.properties.FileUploadProperties;
 import com.devops00.spectra.upload.storage.FileStorageProvider;
 import com.devops00.spectra.upload.storage.StorageHealth;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.health.contributor.Health;
-import org.springframework.boot.health.contributor.HealthIndicator;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -32,21 +36,58 @@ import java.util.List;
  * <p>本地存储检查上传目录和临时目录是否可写；其他存储类型由对应 Provider 自身负责连通性检查。</p>
  */
 @Component("fileStorage")
+@ConditionalOnProperty(prefix = "spectra.modules.upload", name = "enabled", havingValue = "true", matchIfMissing = true)
 @RequiredArgsConstructor
-public class FileStorageHealthIndicator implements HealthIndicator {
+public class FileStorageHealthIndicator implements DependencyHealthContributor {
+
+    private static final Duration TIMEOUT = Duration.ofSeconds(5);
 
     private final FileUploadProperties uploadProperties;
     private final List<FileStorageProvider> providers;
 
     @Override
-    public Health health() {
+    public String contributorName() {
+        return "file-storage";
+    }
+
+    @Override
+    public String moduleName() {
+        return "upload";
+    }
+
+    @Override
+    public String dependencyType() {
+        return "OBJECT_STORAGE";
+    }
+
+    @Override
+    public Duration timeout() {
+        return TIMEOUT;
+    }
+
+    @Override
+    public DependencyHealthResult check() {
+        var start = System.nanoTime();
+        var checkedAt = Instant.now();
         var provider = providers.stream().filter(value -> value.type() == uploadProperties.getDefaultStorage()).findFirst();
         if (provider.isEmpty()) {
-            return Health.down().withDetail("provider", uploadProperties.getDefaultStorage()).build();
+            return result(DependencyHealthStatus.DOWN, start, checkedAt,
+                    "STORAGE_PROVIDER_NOT_REGISTERED", "默认对象存储 Provider 未注册");
         }
-        StorageHealth health = provider.get().health();
-        return health.available()
-                ? Health.up().withDetail("provider", provider.get().type()).build()
-                : Health.down().withDetail("provider", provider.get().type()).withDetail("detail", health.detail()).build();
+        try {
+            StorageHealth health = provider.get().health();
+            var status = DependencyHealthStatus.fromAvailability(health.available());
+            return result(status, start, checkedAt, health.errorCode(),
+                    health.available() ? "OBJECT_STORAGE_REACHABLE" : "OBJECT_STORAGE_UNAVAILABLE");
+        } catch (RuntimeException exception) {
+            return result(DependencyHealthStatus.DOWN, start, checkedAt,
+                    "STORAGE_CHECK_FAILED", "对象存储检查失败");
+        }
+    }
+
+    private DependencyHealthResult result(DependencyHealthStatus status, long start, Instant checkedAt,
+                                          String errorCode, String safeSummary) {
+        return new DependencyHealthResult(contributorName(), moduleName(), dependencyType(), status,
+                Duration.ofNanos(System.nanoTime() - start), checkedAt, errorCode, safeSummary);
     }
 }

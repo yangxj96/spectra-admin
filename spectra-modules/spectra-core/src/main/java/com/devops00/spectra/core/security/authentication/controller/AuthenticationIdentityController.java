@@ -21,7 +21,7 @@ import com.devops00.spectra.core.security.authentication.javabean.from.BindPhone
 import com.devops00.spectra.core.security.authentication.javabean.vo.AuthenticationIdentityVO;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityBindingService;
 import com.devops00.spectra.framework.configure.mapstruct.TimeMapper;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +54,7 @@ public class AuthenticationIdentityController {
     /**
      * 查询或获取目标数据（{@code list}）。
      */
-    @ULog("'获取认证身份列表'")
+    @Audit("'获取认证身份列表'")
     @GetMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:read')")
     public List<AuthenticationIdentityVO> list() {
@@ -74,7 +74,7 @@ public class AuthenticationIdentityController {
     /**
      * 更新或推进目标状态（{@code bindPhone}）。
      */
-    @ULog("'绑定手机号认证身份'")
+    @Audit("'绑定手机号认证身份'")
     @PostMapping(value = "/phone", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindPhone(@Validated @RequestBody BindPhoneFrom params) {
@@ -84,7 +84,7 @@ public class AuthenticationIdentityController {
     /**
      * 更新或推进目标状态（{@code bindEmail}）。
      */
-    @ULog("'绑定邮箱认证身份'")
+    @Audit("'绑定邮箱认证身份'")
     @PostMapping(value = "/email", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void bindEmail(@Validated @RequestBody BindEmailFrom params) {
@@ -94,7 +94,7 @@ public class AuthenticationIdentityController {
     /**
      * 更新或推进目标状态（{@code unbind}）。
      */
-    @ULog("'撤销认证身份'")
+    @Audit("'撤销认证身份'")
     @DeleteMapping(value = "/{identityId}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'account:update')")
     public void unbind(@PathVariable UUID identityId) {

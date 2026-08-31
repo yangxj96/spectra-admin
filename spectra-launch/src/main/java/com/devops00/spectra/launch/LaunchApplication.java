@@ -19,6 +19,8 @@ package com.devops00.spectra.launch;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
+import com.devops00.spectra.launch.configuration.ModuleAssemblyConfiguration;
 
 /**
  * 启动类
@@ -29,6 +31,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @Slf4j
 @SpringBootApplication
+@Import(ModuleAssemblyConfiguration.class)
 public class LaunchApplication {
 
     private LaunchApplication() {

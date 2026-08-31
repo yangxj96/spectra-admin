@@ -176,9 +176,12 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         try {
             Files.createDirectories(storageRoot);
             Files.createDirectories(stagingRoot);
-            return new StorageHealth(Files.isDirectory(storageRoot) && Files.isDirectory(stagingRoot), "local filesystem");
+            var available = Files.isDirectory(storageRoot) && Files.isDirectory(stagingRoot);
+            return available
+                    ? StorageHealth.available("LOCAL_STORAGE_REACHABLE")
+                    : StorageHealth.unavailable("LOCAL_STORAGE_UNAVAILABLE");
         } catch (IOException e) {
-            return new StorageHealth(false, e.getMessage());
+            return StorageHealth.unavailable("LOCAL_STORAGE_UNAVAILABLE");
         }
     }
 

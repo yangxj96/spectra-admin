@@ -20,7 +20,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationChannelAvailability;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.notification.javabean.from.NotificationAdminQueryFrom;
 import com.devops00.spectra.notification.javabean.from.NotificationOverviewFrom;
 import com.devops00.spectra.notification.javabean.vo.NotificationDeliveryAdminVO;
@@ -61,7 +61,7 @@ public class NotificationAdminController {
     /**
      * 查询通知运行概览；统计窗口最多允许七天，避免管理查询扫描无限历史数据。
      */
-    @ULog("'查询通知运行概览'")
+    @Audit("'查询通知运行概览'")
     @GetMapping(value = "/overview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationOverviewVO overview(NotificationOverviewFrom from) {
@@ -71,7 +71,7 @@ public class NotificationAdminController {
     /**
      * 查询逻辑通知请求详情摘要。
      */
-    @ULog("'查询通知请求详情'")
+    @Audit("'查询通知请求详情'")
     @GetMapping(value = "/requests/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationRequestAdminVO getRequest(@PathVariable UUID id) {
@@ -81,7 +81,7 @@ public class NotificationAdminController {
     /**
      * 查询通知投递任务详情摘要。
      */
-    @ULog("'查询通知任务详情'")
+    @Audit("'查询通知任务详情'")
     @GetMapping(value = "/tasks/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationTaskAdminVO getTask(@PathVariable UUID id) {
@@ -91,7 +91,7 @@ public class NotificationAdminController {
     /**
      * 查询通知投递记录详情摘要。
      */
-    @ULog("'查询通知投递详情'")
+    @Audit("'查询通知投递详情'")
     @GetMapping(value = "/deliveries/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationDeliveryAdminVO getDelivery(@PathVariable UUID id) {
@@ -101,7 +101,7 @@ public class NotificationAdminController {
     /**
      * 查询渠道健康状态；仅返回是否可用及脱敏原因。
      */
-    @ULog("'查询通知渠道状态'")
+    @Audit("'查询通知渠道状态'")
     @GetMapping(value = "/channels/{channel}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public NotificationChannelAvailability availability(@PathVariable NotificationChannel channel) {
@@ -111,7 +111,7 @@ public class NotificationAdminController {
     /**
      * 查询逻辑通知请求。
      */
-    @ULog("'查询通知请求'")
+    @Audit("'查询通知请求'")
     @GetMapping(value = "/requests", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationRequestAdminVO> pageRequests(PageFrom page, NotificationAdminQueryFrom params) {
@@ -121,7 +121,7 @@ public class NotificationAdminController {
     /**
      * 查询通知投递任务。
      */
-    @ULog("'查询通知任务'")
+    @Audit("'查询通知任务'")
     @GetMapping(value = "/tasks", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationTaskAdminVO> pageTasks(PageFrom page, NotificationAdminQueryFrom params) {
@@ -131,7 +131,7 @@ public class NotificationAdminController {
     /**
      * 查询通知投递记录。
      */
-    @ULog("'查询通知投递记录'")
+    @Audit("'查询通知投递记录'")
     @GetMapping(value = "/deliveries", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:read')")
     public IPage<NotificationDeliveryAdminVO> pageDeliveries(PageFrom page, NotificationAdminQueryFrom params) {
@@ -141,7 +141,7 @@ public class NotificationAdminController {
     /**
      * 重新排队失败通知任务。
      */
-    @ULog("'重试通知任务'")
+    @Audit("'重试通知任务'")
     @PostMapping(value = "/tasks/{id}/retry", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:retry')")
     public void retry(@PathVariable UUID id) {
@@ -151,7 +151,7 @@ public class NotificationAdminController {
     /**
      * 取消尚未完成的通知任务。
      */
-    @ULog("'取消通知任务'")
+    @Audit("'取消通知任务'")
     @DeleteMapping(value = "/tasks/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'notification:admin:cancel')")
     public void cancel(@PathVariable UUID id) {

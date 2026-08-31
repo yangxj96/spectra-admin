@@ -30,7 +30,7 @@ import com.devops00.spectra.core.system.javabean.vo.ServiceMonitorRuntimeDiagnos
 import com.devops00.spectra.core.system.service.ServiceMonitorAlertService;
 import com.devops00.spectra.core.system.service.ServiceMonitorDiagnosticService;
 import com.devops00.spectra.core.system.service.ServiceMonitorService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.FileSystemResource;
@@ -76,7 +76,7 @@ public class ServiceMonitorController {
      *
      * @return 服务监控总览
      */
-    @ULog("'获取服务监控总览'")
+    @Audit("'获取服务监控总览'")
     @GetMapping(value = "/overview", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public ServiceMonitorOverviewVO getOverview() {
@@ -89,7 +89,7 @@ public class ServiceMonitorController {
      * @param from 查询条件
      * @return 历史趋势
      */
-    @ULog("'查询服务监控历史'")
+    @Audit("'查询服务监控历史'")
     @GetMapping(value = "/history", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:read')")
     public ServiceMonitorHistoryVO getHistory(ServiceMonitorHistoryFrom from) {
@@ -99,7 +99,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code getAlertSummary}）。
      */
-    @ULog("'查询服务监控告警摘要'")
+    @Audit("'查询服务监控告警摘要'")
     @GetMapping(value = "/alerts/summary", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
     public ServiceMonitorAlertSummaryVO getAlertSummary() {
@@ -109,7 +109,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code listAlertRules}）。
      */
-    @ULog("'查询服务监控告警规则'")
+    @Audit("'查询服务监控告警规则'")
     @GetMapping(value = "/alerts/rules", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
     public List<ServiceMonitorAlertRuleVO> listAlertRules() {
@@ -119,7 +119,7 @@ public class ServiceMonitorController {
     /**
      * 更新或推进目标状态（{@code modifyAlertRule}）。
      */
-    @ULog("'修改服务监控告警规则'")
+    @Audit("'修改服务监控告警规则'")
     @PutMapping(value = "/alerts/rules/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:configure')")
     public void modifyAlertRule(@PathVariable UUID id, @Validated @RequestBody ServiceMonitorAlertRuleFrom from) {
@@ -129,7 +129,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code listAlertEvents}）。
      */
-    @ULog("'查询服务监控告警事件'")
+    @Audit("'查询服务监控告警事件'")
     @GetMapping(value = "/alerts/events", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:alert')")
     public List<ServiceMonitorAlertEventVO> listAlertEvents(
@@ -140,7 +140,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code getRuntimeDiagnostic}）。
      */
-    @ULog("'查询服务运行时诊断'")
+    @Audit("'查询服务运行时诊断'")
     @GetMapping(value = "/diagnostics/runtime", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public ServiceMonitorRuntimeDiagnosticVO getRuntimeDiagnostic() {
@@ -150,7 +150,7 @@ public class ServiceMonitorController {
     /**
      * 创建或构建目标数据（{@code createDiagnosticTask}）。
      */
-    @ULog("'创建服务监控诊断任务'")
+    @Audit("'创建服务监控诊断任务'")
     @PostMapping(value = "/diagnostics/tasks", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public ServiceMonitorDiagnosticTaskVO createDiagnosticTask(
@@ -161,7 +161,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code listDiagnosticTasks}）。
      */
-    @ULog("'查询服务监控诊断任务'")
+    @Audit("'查询服务监控诊断任务'")
     @GetMapping(value = "/diagnostics/tasks", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public List<ServiceMonitorDiagnosticTaskVO> listDiagnosticTasks() {
@@ -171,7 +171,7 @@ public class ServiceMonitorController {
     /**
      * 查询或获取目标数据（{@code getDiagnosticTask}）。
      */
-    @ULog("'查询服务监控诊断任务状态'")
+    @Audit("'查询服务监控诊断任务状态'")
     @GetMapping(value = "/diagnostics/tasks/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public ServiceMonitorDiagnosticTaskVO getDiagnosticTask(@PathVariable UUID id) {
@@ -182,7 +182,7 @@ public class ServiceMonitorController {
      * 处理内部业务逻辑（{@code downloadDiagnosticTask}）。
      */
     @Encrypt(response = false)
-    @ULog("'下载服务监控诊断文件'")
+    @Audit("'下载服务监控诊断文件'")
     @GetMapping(value = "/diagnostics/tasks/{id}/download", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'system:monitor:diagnose')")
     public ResponseEntity<Resource> downloadDiagnosticTask(@PathVariable UUID id) {

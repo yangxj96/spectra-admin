@@ -5,7 +5,7 @@
  */
 package com.devops00.spectra.upload.controller;
 
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.upload.javabean.from.ConfirmPartRequest;
 import com.devops00.spectra.upload.javabean.from.CreateUploadRequest;
 import com.devops00.spectra.upload.javabean.from.PartTargetRequest;
@@ -40,7 +40,7 @@ public class FileUploadController {
 
     private final UploadApplicationService uploadService;
 
-    @ULog("'创建或恢复文件上传任务'")
+    @Audit("'创建或恢复文件上传任务'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:create')")
     public UploadSessionVO create(@Valid @RequestBody CreateUploadRequest request) {

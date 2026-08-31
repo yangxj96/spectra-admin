@@ -3,7 +3,7 @@ package com.devops00.spectra.oa.asset.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.asset.javabean.from.AssetCategorySaveFrom;
 import com.devops00.spectra.oa.asset.javabean.from.AssetOperationFrom;
 import com.devops00.spectra.oa.asset.javabean.from.AssetPageFrom;
@@ -43,7 +43,7 @@ public class AssetController {
     /**
      * 创建资产。
      */
-    @ULog("'创建资产'")
+    @Audit("'创建资产'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:create')")
     public UUID create(@Validated(Verify.Insert.class) @RequestBody AssetSaveFrom from) {
@@ -53,7 +53,7 @@ public class AssetController {
     /**
      * 修改资产。
      */
-    @ULog("'修改资产'")
+    @Audit("'修改资产'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody AssetSaveFrom from) {
@@ -63,7 +63,7 @@ public class AssetController {
     /**
      * 分页查询资产台账。
      */
-    @ULog("'分页查询资产台账'")
+    @Audit("'分页查询资产台账'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:read')")
     public IPage<AssetVO> page(PageFrom page, AssetPageFrom params) {
@@ -73,7 +73,7 @@ public class AssetController {
     /**
      * 查询资产详情。
      */
-    @ULog("'查询资产详情'")
+    @Audit("'查询资产详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:read')")
     public AssetVO get(@PathVariable UUID id) {
@@ -83,7 +83,7 @@ public class AssetController {
     /**
      * 查询资产分类。
      */
-    @ULog("'查询资产分类'")
+    @Audit("'查询资产分类'")
     @GetMapping(value = "/categories", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:read')")
     public List<AssetCategoryVO> categories() {
@@ -93,7 +93,7 @@ public class AssetController {
     /**
      * 创建资产分类。
      */
-    @ULog("'创建资产分类'")
+    @Audit("'创建资产分类'")
     @PostMapping(value = "/categories", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:create')")
     public UUID createCategory(@Validated(Verify.Insert.class) @RequestBody AssetCategorySaveFrom from) {
@@ -103,7 +103,7 @@ public class AssetController {
     /**
      * 修改资产分类。
      */
-    @ULog("'修改资产分类'")
+    @Audit("'修改资产分类'")
     @PutMapping(value = "/categories/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void updateCategory(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody AssetCategorySaveFrom from) {
@@ -113,7 +113,7 @@ public class AssetController {
     /**
      * 领用资产。
      */
-    @ULog("'资产领用'")
+    @Audit("'资产领用'")
     @PostMapping(value = "/{id}/assign", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void assign(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
@@ -123,7 +123,7 @@ public class AssetController {
     /**
      * 归还资产。
      */
-    @ULog("'资产归还'")
+    @Audit("'资产归还'")
     @PostMapping(value = "/{id}/return", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void returnAsset(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
@@ -133,7 +133,7 @@ public class AssetController {
     /**
      * 调拨资产。
      */
-    @ULog("'资产调拨'")
+    @Audit("'资产调拨'")
     @PostMapping(value = "/{id}/transfer", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void transfer(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
@@ -143,7 +143,7 @@ public class AssetController {
     /**
      * 登记资产维修。
      */
-    @ULog("'资产维修'")
+    @Audit("'资产维修'")
     @PostMapping(value = "/{id}/maintenance", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void maintenance(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
@@ -153,7 +153,7 @@ public class AssetController {
     /**
      * 报废资产。
      */
-    @ULog("'资产报废'")
+    @Audit("'资产报废'")
     @PostMapping(value = "/{id}/scrap", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:update')")
     public void scrap(@PathVariable UUID id, @RequestBody(required = false) AssetOperationFrom from) {
@@ -163,7 +163,7 @@ public class AssetController {
     /**
      * 根据采购收货生成资产草稿。
      */
-    @ULog("'采购收货生成资产草稿'")
+    @Audit("'采购收货生成资产草稿'")
     @PostMapping(value = "/from-purchase", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:asset:create')")
     public List<AssetVO> createFromPurchase(@Validated(Verify.Insert.class) @RequestBody AssetPurchaseDraftFrom from) {

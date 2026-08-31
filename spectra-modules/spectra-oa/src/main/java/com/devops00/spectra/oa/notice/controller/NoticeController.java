@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.notice.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.notice.javabean.from.NoticeCreateFrom;
 import com.devops00.spectra.oa.notice.javabean.from.NoticePageFrom;
 import com.devops00.spectra.oa.notice.javabean.vo.NoticeVO;
@@ -56,7 +56,7 @@ public class NoticeController {
     /**
      * 查询公告列表。
      */
-    @ULog("'查询公告列表'")
+    @Audit("'查询公告列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:read')")
     public IPage<NoticeVO> page(PageFrom page, NoticePageFrom params) {
@@ -66,7 +66,7 @@ public class NoticeController {
     /**
      * 获取公告详情。
      */
-    @ULog("'获取公告详情'")
+    @Audit("'获取公告详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:read')")
     public NoticeVO get(@PathVariable UUID id) {
@@ -76,7 +76,7 @@ public class NoticeController {
     /**
      * 创建公告草稿。
      */
-    @ULog("'创建公告草稿'")
+    @Audit("'创建公告草稿'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:create')")
     public NoticeVO create(@Validated(Verify.Insert.class) @RequestBody NoticeCreateFrom from) {
@@ -86,7 +86,7 @@ public class NoticeController {
     /**
      * 发布公告。
      */
-    @ULog("'发布公告'")
+    @Audit("'发布公告'")
     @PostMapping(value = "/{id}/publish", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void publish(@PathVariable UUID id) {
@@ -96,7 +96,7 @@ public class NoticeController {
     /**
      * 撤回公告。
      */
-    @ULog("'撤回公告'")
+    @Audit("'撤回公告'")
     @PostMapping(value = "/{id}/revoke", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void revoke(@PathVariable UUID id) {
@@ -106,7 +106,7 @@ public class NoticeController {
     /**
      * 标记公告已读。
      */
-    @ULog("'标记公告已读'")
+    @Audit("'标记公告已读'")
     @PutMapping(value = "/{id}/read", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:notice:update')")
     public void markRead(@PathVariable UUID id) {

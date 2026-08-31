@@ -7,7 +7,7 @@ package com.devops00.spectra.upload.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.upload.javabean.entity.FileUploadSession;
 import com.devops00.spectra.upload.javabean.from.FileAdminOperationFrom;
 import com.devops00.spectra.upload.javabean.from.FileUploadAdminPageRequest;
@@ -54,7 +54,7 @@ public class FileUploadAdminController {
         return adminService.detail(uploadId);
     }
 
-    @ULog("'管理员取消文件上传任务'")
+    @Audit("'管理员取消文件上传任务'")
     @PostMapping(value = "/{uploadId}/admin-cancel", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'file:admin:manage')")
     public void cancel(@PathVariable UUID uploadId, @Valid @RequestBody FileAdminOperationFrom operation) {

@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.calendar.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarPageFrom;
 import com.devops00.spectra.oa.calendar.javabean.from.CalendarSaveFrom;
 import com.devops00.spectra.oa.calendar.javabean.vo.CalendarVO;
@@ -57,7 +57,7 @@ public class CalendarController {
     /**
      * 查询日程列表。
      */
-    @ULog("'查询日程列表'")
+    @Audit("'查询日程列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:calendar:read')")
     public IPage<CalendarVO> page(PageFrom page, CalendarPageFrom params) {
@@ -67,7 +67,7 @@ public class CalendarController {
     /**
      * 获取日程详情。
      */
-    @ULog("'获取日程详情'")
+    @Audit("'获取日程详情'")
     @GetMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:calendar:read')")
     public CalendarVO get(@PathVariable UUID id) {
@@ -77,7 +77,7 @@ public class CalendarController {
     /**
      * 创建日程。
      */
-    @ULog("'创建日程'")
+    @Audit("'创建日程'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:calendar:create')")
     public CalendarVO create(@Validated(Verify.Insert.class) @RequestBody CalendarSaveFrom from) {
@@ -87,7 +87,7 @@ public class CalendarController {
     /**
      * 更新日程。
      */
-    @ULog("'更新日程'")
+    @Audit("'更新日程'")
     @PutMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:calendar:update')")
     public CalendarVO update(@PathVariable UUID id, @Validated(Verify.Update.class) @RequestBody CalendarSaveFrom from) {
@@ -97,7 +97,7 @@ public class CalendarController {
     /**
      * 删除日程。
      */
-    @ULog("'删除日程'")
+    @Audit("'删除日程'")
     @DeleteMapping(value = "/{id}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:calendar:delete')")
     public void delete(@PathVariable UUID id) {

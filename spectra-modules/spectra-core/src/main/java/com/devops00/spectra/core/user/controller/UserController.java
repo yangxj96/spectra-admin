@@ -30,7 +30,7 @@ import com.devops00.spectra.core.user.javabean.vo.UserPasswordResetVO;
 import com.devops00.spectra.core.user.javabean.vo.UserOnboardingVO;
 import com.devops00.spectra.core.user.service.UserService;
 import com.devops00.spectra.core.user.service.UserOnboardingService;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import jakarta.servlet.http.HttpServletResponse;
@@ -77,7 +77,7 @@ public class UserController {
     /**
      * 处理内部业务逻辑（{@code onboarding}）。
      */
-    @ULog("'提交新增用户及角色授权'")
+    @Audit("'提交新增用户及角色授权'")
     @PostMapping(value = "/onboarding", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:create') and hasPermission(null, 'role:assign')")
     public UserOnboardingVO onboarding(@Validated(Verify.Insert.class) @RequestBody UserOnboardingFrom params) {
@@ -87,7 +87,7 @@ public class UserController {
     /**
      * 更新或推进目标状态（{@code modifyOnboarding}）。
      */
-    @ULog("'提交用户信息及角色授权变更'")
+    @Audit("'提交用户信息及角色授权变更'")
     @PutMapping(value = "/onboarding", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:update') and hasPermission(null, 'role:assign')")
     public UserOnboardingVO modifyOnboarding(@Validated(Verify.Update.class) @RequestBody UserOnboardingFrom params) {
@@ -97,7 +97,7 @@ public class UserController {
     /**
      * 处理内部业务逻辑（{@code passwordResetById}）。
      */
-    @ULog("'重置用户密码'")
+    @Audit("'重置用户密码'")
     @PutMapping(value = "/password/reset/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:reset-password')")
     public UserPasswordResetVO passwordResetById(@PathVariable UUID uid, HttpServletResponse response) {
@@ -106,42 +106,42 @@ public class UserController {
         return bindService.passwordResetById(uid);
     }
 
-    @ULog("'锁定用户'")
+    @Audit("'锁定用户'")
     @PutMapping(value = "/lock/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
     public void lock(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
         bindService.changeStatus(uid, UserStatus.LOCKED, reason);
     }
 
-    @ULog("'解锁用户'")
+    @Audit("'解锁用户'")
     @PutMapping(value = "/unlock/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")
     public void unlock(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
         bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
-    @ULog("'禁用用户'")
+    @Audit("'禁用用户'")
     @PutMapping(value = "/disable/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
     public void disable(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
         bindService.changeStatus(uid, UserStatus.DISABLED, reason);
     }
 
-    @ULog("'启用用户'")
+    @Audit("'启用用户'")
     @PutMapping(value = "/enable/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")
     public void enable(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
         bindService.changeStatus(uid, UserStatus.ACTIVE, reason);
     }
 
-    @ULog("'用户离职'")
+    @Audit("'用户离职'")
     @PutMapping(value = "/depart/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:disable')")
     public void depart(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
         bindService.changeStatus(uid, UserStatus.DEPARTED, reason);
     }
 
-    @ULog("'用户重新入职'")
+    @Audit("'用户重新入职'")
     @PutMapping(value = "/reinstate/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null ,'user:unlock')")
     public void reinstate(@PathVariable UUID uid, @RequestParam(required = false) String reason) {
@@ -151,7 +151,7 @@ public class UserController {
     /**
      * 查询或获取目标数据（{@code page}）。
      */
-    @ULog("'分页查询用户列表'")
+    @Audit("'分页查询用户列表'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
     public IPage<UserPageVO> page(PageFrom page, UserPageFrom params) throws IllegalAccessException {
@@ -161,7 +161,7 @@ public class UserController {
     /**
      * 查询或获取目标数据（{@code detail}）。
      */
-    @ULog("'根据ID获取用户详情'")
+    @Audit("'根据ID获取用户详情'")
     @GetMapping(value = "/{uid}", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'user:read')")
     public UserPageVO detail(@PathVariable UUID uid) throws IllegalAccessException {
@@ -171,7 +171,7 @@ public class UserController {
     /**
      * 处理内部业务逻辑（{@code online}）。
      */
-    @ULog("'获取在线用户'")
+    @Audit("'获取在线用户'")
     @GetMapping(value = "/online", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'session:read')")
     public List<UserOnlineVO> online(PageFrom page) {
@@ -181,7 +181,7 @@ public class UserController {
     /**
      * 查询或获取目标数据（{@code getProfile}）。
      */
-    @ULog("'获取当前用户详情'")
+    @Audit("'获取当前用户详情'")
     @GetMapping(value = "/profile", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public UserProfileVO getProfile() {
@@ -192,7 +192,7 @@ public class UserController {
     /**
      * 更新或推进目标状态（{@code updateProfile}）。
      */
-    @ULog("'更新当前用户信息'")
+    @Audit("'更新当前用户信息'")
     @PutMapping(value = "/profile", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public void updateProfile(@Validated @RequestBody UserProfileFrom params) {
@@ -203,7 +203,7 @@ public class UserController {
     /**
      * 处理内部业务逻辑（{@code changePassword}）。
      */
-    @ULog("'修改密码'")
+    @Audit("'修改密码'")
     @PutMapping(value = "/password", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
     public void changePassword(@Validated @RequestBody ChangePasswordFrom params) {

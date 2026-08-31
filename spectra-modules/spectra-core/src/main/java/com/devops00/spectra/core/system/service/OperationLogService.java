@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.system.service;
 
+import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.base.BaseService;
 import com.devops00.spectra.core.system.javabean.entity.OperationLog;
 
@@ -27,4 +28,23 @@ import com.devops00.spectra.core.system.javabean.entity.OperationLog;
  * @since 2025/6/14 00:00
  */
 public interface OperationLogService extends BaseService<OperationLog> {
+
+    /**
+     * 接收 Core 统一操作审计记录。
+     *
+     * <p>实现负责把记录转换为当前操作日志 outbox 所需的待投递对象；调用方不直接依赖
+     * {@code sys_log} 表或 Mapper。</p>
+     *
+     * @param record 统一操作审计记录
+     */
+    void record(AuditRecord record);
+
+    /**
+     * 将已从 outbox 读取的操作审计事件幂等落入 {@code sys_log}。
+     *
+     * <p>该方法只由 Core outbox worker 调用，不是新的 HTTP API。</p>
+     *
+     * @param record 已持久化的操作审计事件
+     */
+    void persist(AuditRecord record);
 }

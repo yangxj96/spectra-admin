@@ -16,8 +16,8 @@
 
 package com.devops00.spectra.oa.purchase.service;
 
-import com.devops00.spectra.workflow.service.ApprovalCallback;
-import com.devops00.spectra.workflow.service.WorkflowService;
+import com.devops00.spectra.workflow.api.ApprovalCallback;
+import com.devops00.spectra.workflow.api.WorkflowService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

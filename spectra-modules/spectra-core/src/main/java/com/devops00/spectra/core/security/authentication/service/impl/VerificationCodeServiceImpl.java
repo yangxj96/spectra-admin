@@ -16,7 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
-import com.devops00.spectra.common.constant.RedisCacheKey;
+import com.devops00.spectra.core.common.constant.RedisCacheKey;
 import com.devops00.spectra.common.exception.SpectraException;
 import com.devops00.spectra.common.notification.NotificationChannel;
 import com.devops00.spectra.common.notification.NotificationDirectAddress;
@@ -32,6 +32,7 @@ import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
 import com.devops00.spectra.security.base.util.VerificationCodeDigest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -55,7 +56,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
     private final RedisTemplate<String, Object> redisTemplate;
     private final SecurityProperties securityProperties;
 
-    public VerificationCodeServiceImpl(NotificationService notificationService,
+    public VerificationCodeServiceImpl(@Nullable NotificationService notificationService,
                                        @Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redisTemplate,
                                        SecurityProperties securityProperties) {
         this.notificationService = notificationService;
@@ -94,6 +95,7 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
                           NotificationPurpose purpose, String templateCode) {
         var redisKey = redisPrefix + address;
         requireHmacKey();
+        var notificationService = requireNotificationService();
         var code = generateCode();
         try {
             var requestWindow = Instant.now().getEpochSecond()
@@ -156,5 +158,17 @@ public class VerificationCodeServiceImpl implements VerificationCodeService {
                 || securityProperties.getVerificationCodeHmacKey().isBlank()) {
             throw new SpectraException("验证码安全密钥未配置");
         }
+    }
+
+    /**
+     * 获取通知适配器；通知模块未装配时给出明确的能力缺失信息。
+     *
+     * @return 通知服务
+     */
+    private NotificationService requireNotificationService() {
+        if (notificationService == null) {
+            throw new SpectraException("通知模块未启用，无法发送验证码");
+        }
+        return notificationService;
     }
 }

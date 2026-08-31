@@ -19,7 +19,7 @@ package com.devops00.spectra.oa.meeting.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.Verify;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
-import com.devops00.spectra.log.base.annotation.ULog;
+import com.devops00.spectra.common.audit.Audit;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingCreateFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingPageFrom;
 import com.devops00.spectra.oa.meeting.javabean.from.MeetingRecordFrom;
@@ -57,7 +57,7 @@ public class MeetingController {
     /**
      * 创建一个会议
      */
-    @ULog("'创建会议'")
+    @Audit("'创建会议'")
     @PostMapping(version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:create')")
     public void created(@Validated(Verify.Insert.class) @RequestBody MeetingCreateFrom from) {
@@ -67,7 +67,7 @@ public class MeetingController {
     /**
      * 分页查询会议
      */
-    @ULog("'分页查询会议'")
+    @Audit("'分页查询会议'")
     @GetMapping(value = "/page", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:read')")
     public IPage<MeetingVO> page(PageFrom page, MeetingPageFrom params) {
@@ -77,7 +77,7 @@ public class MeetingController {
     /**
      * 响应会议邀请。
      */
-    @ULog("'响应会议邀请'")
+    @Audit("'响应会议邀请'")
     @PostMapping(value = "/{id}/response", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void respond(@PathVariable UUID id, @Validated @RequestBody MeetingResponseFrom from) {
@@ -87,7 +87,7 @@ public class MeetingController {
     /**
      * 会议签到。
      */
-    @ULog("'会议签到'")
+    @Audit("'会议签到'")
     @PostMapping(value = "/{id}/check-in", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void checkIn(@PathVariable UUID id) {
@@ -97,7 +97,7 @@ public class MeetingController {
     /**
      * 保存会议纪要。
      */
-    @ULog("'保存会议纪要'")
+    @Audit("'保存会议纪要'")
     @PostMapping(value = "/{id}/record", version = "1.0.0")
     @PreAuthorize("hasPermission(null, 'oa:meeting:update')")
     public void saveRecord(@PathVariable UUID id, @Validated @RequestBody MeetingRecordFrom from) {

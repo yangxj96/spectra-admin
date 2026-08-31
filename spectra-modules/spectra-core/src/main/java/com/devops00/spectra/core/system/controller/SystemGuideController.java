@@ -20,8 +20,8 @@ import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemGuideCompleteFrom;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemGuideStatusVO;
 import com.devops00.spectra.core.security.initialization.service.SystemGuideService;
-import com.devops00.spectra.log.base.annotation.ULog;
-import com.devops00.spectra.log.base.enums.SysLogType;
+import com.devops00.spectra.common.audit.Audit;
+import com.devops00.spectra.common.audit.AuditCategory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +47,7 @@ public class SystemGuideController {
      *
      * @return 引导状态
      */
-    @ULog("'查询系统设置引导状态'")
+    @Audit("'查询系统设置引导状态'")
     @Encrypt(response = false)
     @GetMapping(value = "/status", version = "1.0.0")
     @PreAuthorize("isAuthenticated()")
@@ -61,7 +61,7 @@ public class SystemGuideController {
      *
      * @param from 引导配置
      */
-    @ULog(value = "'完成系统设置引导'", type = SysLogType.SAFETY)
+    @Audit(value = "'完成系统设置引导'", category = AuditCategory.SECURITY)
     @Encrypt(response = false)
     @PostMapping(value = "/complete", version = "1.0.0")
     @PreAuthorize("hasRole('ROLE_DEV_OPS')")
