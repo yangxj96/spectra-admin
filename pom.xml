@@ -26,7 +26,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <!-- 项目版本 -->
-        <revision>0.0.18</revision>
+        <revision>0.0.1-SNAPSHOT</revision>
 
         <!-- 代码格式化与校验 -->
         <spotless.version>3.9.0</spotless.version>
