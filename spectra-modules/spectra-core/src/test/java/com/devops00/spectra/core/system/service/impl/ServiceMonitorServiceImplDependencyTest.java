@@ -18,6 +18,7 @@ package com.devops00.spectra.core.system.service.impl;
 
 import org.junit.jupiter.api.Test;
 import com.devops00.spectra.core.system.health.CoreHealthAggregator;
+import org.springframework.context.annotation.Lazy;
 
 import java.util.Arrays;
 
@@ -33,10 +34,16 @@ class ServiceMonitorServiceImplDependencyTest {
                 .findFirst()
                 .orElseThrow();
 
-        assertThat(Arrays.stream(constructor.getParameterTypes())
-                .anyMatch(CoreHealthAggregator.class::equals))
+        var healthParameter = Arrays.stream(constructor.getParameters())
+                .filter(item -> CoreHealthAggregator.class.equals(item.getType()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(healthParameter)
                 .as("ServiceMonitorServiceImpl 应接收 CoreHealthAggregator")
-                .isTrue();
+                .satisfies(parameter -> assertThat(parameter.isAnnotationPresent(Lazy.class))
+                        .as("CoreHealthAggregator 必须惰性注入以打断启动期健康/调度循环依赖")
+                        .isTrue());
         assertThat(Arrays.stream(constructor.getParameterTypes())
                 .anyMatch(type -> type.getTypeName().contains("HealthContributor")))
                 .as("ServiceMonitorServiceImpl 不应直接接收 contributor")

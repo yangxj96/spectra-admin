@@ -37,6 +37,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.lang.management.GarbageCollectorMXBean;
@@ -92,7 +93,7 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     private volatile Instant lastHistoryCleanupAt;
 
     public ServiceMonitorServiceImpl(MeterRegistry meterRegistry, TimeMapper timeMapper, Environment environment,
-                                     CoreHealthAggregator healthAggregator,
+                                     @Lazy CoreHealthAggregator healthAggregator,
                                      ServiceMonitorSampleMapper sampleMapper,
                                      ServiceMonitorAlertService alertService) {
         this.meterRegistry = meterRegistry;
