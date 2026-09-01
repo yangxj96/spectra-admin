@@ -22,6 +22,7 @@ import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.constant.LogPrefix;
 import com.devops00.spectra.common.utils.IpUtils;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
@@ -62,8 +63,6 @@ import java.util.Map;
 @Aspect
 public class AuditAspect {
 
-    private static final String REQUEST_ID_HEADER = "X-Request-ID";
-    private static final String CORRELATION_ID_HEADER = "X-Correlation-ID";
     private static final String CLIENT_TYPE_HEADER = "X-Client-Type";
 
     private final SecurityContextAccessor securityContextAccessor;
@@ -98,32 +97,36 @@ public class AuditAspect {
         Method method = resolveMethod(point);
         AuditDescriptor descriptor = resolveDescriptor(method, point);
         long startedAt = System.nanoTime();
-        try {
-            return transactionOperations.execute(status -> {
-                Object result = null;
-                Throwable failure = null;
-                try {
-                    result = point.proceed();
-                    return result;
-                } catch (Throwable ex) {
-                    failure = ex;
-                    throw new AuditedInvocationException(ex);
-                } finally {
-                    if (descriptor != null) {
-                        try {
-                            submit(point, method, descriptor, result, failure, startedAt);
-                        } catch (AuditService.AuditRecordingException auditFailure) {
-                            if (failure != null) {
-                                failure.addSuppressed(auditFailure);
-                            } else {
-                                throw auditFailure;
+        var current = resolveCorrelationContext();
+        try (var ignored = RequestCorrelationContext.openWithMdc(
+                current)) {
+            try {
+                return transactionOperations.execute(status -> {
+                    Object result = null;
+                    Throwable failure = null;
+                    try {
+                        result = point.proceed();
+                        return result;
+                    } catch (Throwable ex) {
+                        failure = ex;
+                        throw new AuditedInvocationException(ex);
+                    } finally {
+                        if (descriptor != null) {
+                            try {
+                                submit(point, method, descriptor, result, failure, startedAt);
+                            } catch (AuditService.AuditRecordingException auditFailure) {
+                                if (failure != null) {
+                                    failure.addSuppressed(auditFailure);
+                                } else {
+                                    throw auditFailure;
+                                }
                             }
                         }
                     }
-                }
-            });
-        } catch (AuditedInvocationException ex) {
-            throw ex.original;
+                });
+            } catch (AuditedInvocationException ex) {
+                throw ex.original;
+            }
         }
     }
 
@@ -242,20 +245,36 @@ public class AuditAspect {
 
     private RequestMetadata requestMetadata() {
         if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes)) {
-            return RequestMetadata.empty();
+            var trace = RequestCorrelationContext.current();
+            return RequestMetadata.empty(trace.requestId(), trace.correlationId());
         }
         HttpServletRequest request = attributes.getRequest();
         HttpServletResponse response = attributes.getResponse();
+        var trace = RequestCorrelationContext.current();
         return new RequestMetadata(
                 true,
                 request.getMethod(),
                 request.getRequestURI(),
-                header(request, REQUEST_ID_HEADER),
-                header(request, CORRELATION_ID_HEADER),
+                trace.requestId(),
+                trace.correlationId(),
                 header(request, CLIENT_TYPE_HEADER),
                 IpUtils.getClientIP(request),
                 header(request, "User-Agent"),
                 response == null ? 0 : (short) response.getStatus());
+    }
+
+    private RequestCorrelationContext.Context resolveCorrelationContext() {
+        var current = RequestCorrelationContext.current();
+        if (!current.isEmpty()) {
+            return current;
+        }
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes) {
+            var request = attributes.getRequest();
+            return RequestCorrelationContext.forHttp(
+                    request.getHeader(RequestCorrelationContext.REQUEST_ID_HEADER),
+                    request.getHeader(RequestCorrelationContext.CORRELATION_ID_HEADER));
+        }
+        return RequestCorrelationContext.forTask(null);
     }
 
     private String header(HttpServletRequest request, String name) {
@@ -286,8 +305,9 @@ public class AuditAspect {
                                    String userAgent,
                                    short status) {
 
-        private static RequestMetadata empty() {
-            return new RequestMetadata(false, null, null, null, null, null, null, null, (short) 0);
+        private static RequestMetadata empty(String requestId, String correlationId) {
+            return new RequestMetadata(false, null, null, requestId, correlationId,
+                    null, null, null, (short) 0);
         }
     }
 

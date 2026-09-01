@@ -11,7 +11,10 @@ import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
@@ -84,6 +87,38 @@ class AuditAspectContractTest {
         when(point.proceed()).thenReturn("ok");
 
         assertThrows(AuditService.AuditRecordingException.class, () -> aspect.handleAround(point));
+    }
+
+    @Test
+    void shouldUseSanitizedRequestContextInsteadOfRawHeaders() throws Throwable {
+        AtomicReference<AuditRecord> recorded = new AtomicReference<>();
+        AuditAspect aspect = new AuditAspect(mock(SecurityContextAccessor.class), recorded::set,
+                snapshot -> Map.of("sanitized", true), transactionOperations());
+        Method method = Fixture.class.getDeclaredMethod("explicitOperationAudit");
+        ProceedingJoinPoint point = mock(ProceedingJoinPoint.class);
+        MethodSignature signature = mock(MethodSignature.class);
+        when(signature.getMethod()).thenReturn(method);
+        when(signature.getParameterNames()).thenReturn(new String[0]);
+        when(point.getSignature()).thenReturn(signature);
+        when(point.getArgs()).thenReturn(new Object[0]);
+        when(point.proceed()).thenReturn("ok");
+
+        var request = new MockHttpServletRequest("GET", "/api/test");
+        request.addHeader(RequestCorrelationContext.REQUEST_ID_HEADER, "invalid request id");
+        request.addHeader(RequestCorrelationContext.CORRELATION_ID_HEADER, "correlation-456");
+        var response = new MockHttpServletResponse();
+        var attributes = new org.springframework.web.context.request.ServletRequestAttributes(request, response);
+        org.springframework.web.context.request.RequestContextHolder.setRequestAttributes(attributes);
+        try {
+            aspect.handleAround(point);
+        } finally {
+            org.springframework.web.context.request.RequestContextHolder.resetRequestAttributes();
+            RequestCorrelationContext.clear();
+        }
+
+        var context = recorded.get().context();
+        assertTrue(!"invalid request id".equals(context.requestId()));
+        assertEquals("correlation-456", context.correlationId());
     }
 
     private static TransactionOperations transactionOperations() {

@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
@@ -317,6 +318,7 @@ public class LoginServiceImpl implements LoginService {
         }
         AuditResult result = eventType.endsWith("_FAILED") ? AuditResult.FAILED : AuditResult.SUCCEEDED;
         securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null,
-                clientType.name(), null, null, Map.of(), Map.of(), reason, null, result, null));
+                clientType.name(), null, null, Map.of(), Map.of(), reason, null, result,
+                RequestCorrelationContext.current().correlationId()));
     }
 }

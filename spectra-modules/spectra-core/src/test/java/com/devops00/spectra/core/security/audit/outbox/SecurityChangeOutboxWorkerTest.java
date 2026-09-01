@@ -6,6 +6,7 @@
 
 package com.devops00.spectra.core.security.audit.outbox;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.security.base.audit.AuditResult;
 import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
@@ -52,6 +53,11 @@ class SecurityChangeOutboxWorkerTest {
         var repository = mock(SecurityChangeOutboxRepository.class);
         var handler = mock(SecurityChangeOutboxHandler.class);
         when(handler.supports("USER_STATUS_CHANGED")).thenReturn(true);
+        doAnswer(invocation -> {
+            assertEquals("corr-123", RequestCorrelationContext.current().correlationId());
+            assertEquals(null, RequestCorrelationContext.current().requestId());
+            return null;
+        }).when(handler).handle(any(), any());
         var auditEvent = event();
         var outboxEvent = outboxEvent(auditEvent, 1);
         when(repository.claimBatch("worker-a", NOW, NOW.plusSeconds(30), 100, 10)).thenReturn(List.of(outboxEvent));

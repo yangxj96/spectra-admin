@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.policy.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.exception.DataException;
 import com.devops00.spectra.common.exception.DataNotExistException;
 import com.devops00.spectra.common.exception.EntityUpdateException;
@@ -264,7 +265,8 @@ public class JdbcSecurityPolicyService implements SecurityPolicyService {
     private SecurityAuditEvent auditEvent(String type, UUID targetId, Map<String, Object> before,
                                           Map<String, Object> after) {
         return new SecurityAuditEvent(null, type, securityContextAccessor.currentUserId(), targetId, null, null, null,
-                before, after, "安全策略配置变更", null, AuditResult.STARTED, null);
+                before, after, "安全策略配置变更", null, AuditResult.STARTED,
+                RequestCorrelationContext.current().correlationId());
     }
 
     /**

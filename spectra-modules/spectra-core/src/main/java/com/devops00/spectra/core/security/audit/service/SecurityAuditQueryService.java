@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.audit.service;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.common.audit.DefaultAuditSanitizer;
 import com.devops00.spectra.common.exception.DataNotExistException;
@@ -342,7 +343,8 @@ public class SecurityAuditQueryService {
         metrics.recordQuery(operation, AuditResult.SUCCEEDED.name());
         var operatorId = visibilityPolicy.viewerId(viewer);
         securityAuditWriter.append(new SecurityAuditEvent(UUID.randomUUID(), eventType, operatorId, null, null, null, null,
-                Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED, null));
+                Map.of("operation", operation), Map.of(), null, null, AuditResult.SUCCEEDED,
+                RequestCorrelationContext.current().correlationId()));
     }
 
     private record QueryPlan(String whereSql, List<Object> arguments) {

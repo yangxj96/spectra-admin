@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.common.exception.DataException;
@@ -171,7 +172,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         var event = new SecurityAuditEvent(UUID.randomUUID(), "AUTHORIZATION_IMPACT_APPLIED", operatorId, targetUserId,
                 null, null, null, Map.of("assignmentId", String.valueOf(assignmentId)),
                 Map.of("roleId", prepared.role().getId().toString(), "permissionCount", prepared.requests().size()),
-                "通过 Grant Boundary Preview/Apply 提交", null, AuditResult.STARTED, null);
+                "通过 Grant Boundary Preview/Apply 提交", null, AuditResult.STARTED,
+                RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             UUID persistedAssignmentId = persist(prepared, targetUserId);
             recordAssignmentEvents(prepared, targetUserId, persistedAssignmentId);
@@ -227,7 +229,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
         var event = new SecurityAuditEvent(UUID.randomUUID(), "ROLE_ASSIGNMENT_REVOKE_APPLIED", operatorId,
                 targetUserId, null, null, null,
                 Map.of("assignmentId", assignment.getId().toString(), "roleId", assignment.getRoleId().toString()),
-                Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权", null, AuditResult.STARTED, null);
+                Map.of("state", SecurityAuthorizationState.REVOKED.name()), "移除用户角色授权", null,
+                AuditResult.STARTED, RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             var update = new LambdaUpdateWrapper<RoleAssignment>()
                     .eq(RoleAssignment::getId, assignment.getId())
@@ -556,7 +559,8 @@ public class AuthorizationAssignmentChangeServiceImpl implements AuthorizationAs
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditResult.SUCCEEDED, null);
+                before, after, reason, null, AuditResult.SUCCEEDED,
+                RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);
         securityChangeOutboxProducer.publish(event);
     }

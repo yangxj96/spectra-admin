@@ -213,13 +213,15 @@ logging:
     root: info
     other: error
     spectra: debug
+  pattern:
+    console: '%d{yyyy-MM-dd''T''HH:mm:ss.SSSXXX} %-5level [%X{requestId:-}/%X{correlationId:-}] %logger{36} - %msg%n%wEx'
 
 # ==================== 健康检查 ====================
 management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
+        include: health, info, metrics, prometheus
   endpoint:
     health:
       show-details: when-authorized

@@ -17,6 +17,7 @@
 package com.devops00.spectra.notification.dispatch;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendStatus;
@@ -159,6 +160,13 @@ public class NotificationTaskWorker {
      * 领取并处理单个通知任务。
      */
     private void processOne(NotificationTaskEntity task, String workerId) {
+        try (var ignored = RequestCorrelationContext.openTask(
+                task.getId() == null ? null : task.getId().toString())) {
+            processOneWithContext(task, workerId);
+        }
+    }
+
+    private void processOneWithContext(NotificationTaskEntity task, String workerId) {
         var now = Instant.now();
         if (isExpired(task, now)) {
             markExpired(task, now);

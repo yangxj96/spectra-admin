@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.security.authorization.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
@@ -201,7 +202,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
                 null, null, null, Map.of("organizationVersion", prepared.impact().beforeVersion()),
                 Map.of("organizationVersion", prepared.impact().afterVersion(), "operation",
                         prepared.changeType().name()),
-                "通过组织变更 Preview/Apply 提交", null, AuditResult.STARTED, null);
+                "通过组织变更 Preview/Apply 提交", null, AuditResult.STARTED,
+                RequestCorrelationContext.current().correlationId());
         securityChangeExecutor.execute(event, () -> {
             UUID persistedDepartmentId = persist(prepared);
             String eventType = prepared.changeType() == ChangeType.CREATE
@@ -409,7 +411,8 @@ public class OrganizationChangeServiceImpl implements OrganizationChangeService 
     private void appendAudit(String eventType, UUID operatorId, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         var event = new SecurityAuditEvent(null, eventType, operatorId, targetId, null, null, null,
-                before, after, reason, null, AuditResult.SUCCEEDED, null);
+                before, after, reason, null, AuditResult.SUCCEEDED,
+                RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);
         securityChangeOutboxProducer.publish(event);
     }

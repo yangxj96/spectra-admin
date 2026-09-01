@@ -27,6 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -47,6 +49,7 @@ import java.util.concurrent.ConcurrentMap;
  */
 @Slf4j
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 10)
 public class RequestGetParamsFilter extends OncePerRequestFilter {
 
     @Override

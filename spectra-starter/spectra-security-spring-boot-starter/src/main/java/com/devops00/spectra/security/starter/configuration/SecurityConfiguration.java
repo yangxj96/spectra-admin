@@ -23,14 +23,20 @@ import com.devops00.spectra.security.base.properties.SecurityProperties;
 import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.starter.eval.SpectraPermissionEvaluator;
 import com.devops00.spectra.security.starter.filter.TokenAuthenticationFilter;
+import com.devops00.spectra.security.starter.ratelimit.RedisRateLimiter;
+import com.devops00.spectra.security.starter.ratelimit.RequestRateLimitFilter;
 import jakarta.servlet.DispatcherType;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
@@ -48,6 +54,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -105,6 +112,17 @@ public class SecurityConfiguration {
     }
 
     /**
+     * Redis API 限流器。
+     *
+     * @param redis 安全 Redis Template
+     * @return Redis 限流器
+     */
+    @Bean
+    public RedisRateLimiter redisRateLimiter(@Qualifier("securityRedisTemplate") RedisTemplate<String, Object> redis) {
+        return new RedisRateLimiter(redis);
+    }
+
+    /**
      * Spring Security核心过滤器
      *
      * @param http {@code HttpSecurity}
@@ -113,8 +131,15 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager,
                                                    SecurityContextAccessor securityContextAccessor,
-                                                   SecurityUserLookupPort securityUserLookupPort) {
+                                                   SecurityUserLookupPort securityUserLookupPort,
+                                                   RedisRateLimiter redisRateLimiter,
+                                                   @Qualifier("securityObjectMapper") ObjectMapper objectMapper,
+                                                   ObjectProvider<MeterRegistry> meterRegistryProvider) {
         log.debug(LogPrefix.SECURITY.f("配置核心过滤器"));
+
+        MeterRegistry meterRegistry = meterRegistryProvider.getIfAvailable(SimpleMeterRegistry::new);
+        var requestRateLimitFilter = new RequestRateLimitFilter(redisRateLimiter, securityContextAccessor,
+                objectMapper, meterRegistry);
 
         // 白名单
         var whitelistPaths = properties.getWhitelists().toArray(new String[0]);
@@ -136,6 +161,7 @@ public class SecurityConfiguration {
                 // 注册过滤器
                 .addFilterBefore(new TokenAuthenticationFilter(securityContextAccessor, securityUserLookupPort),
                         UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(requestRateLimitFilter, TokenAuthenticationFilter.class)
                 // 允许同源iframe
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 权限匹配

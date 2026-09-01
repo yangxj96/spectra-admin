@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.user.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.BaseServiceImpl;
@@ -350,7 +351,7 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
                 reason,
                 null,
                 AuditResult.STARTED,
-                null);
+                RequestCorrelationContext.current().correlationId());
 
         securityChangeExecutor.execute(event, () -> {
             current.setStatus(target);
@@ -394,7 +395,8 @@ public class UserServiceImpl extends BaseServiceImpl<UserMapper, User> implement
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         var event = new SecurityAuditEvent(null, eventType, currentOperatorId(), targetId,
-                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED, null);
+                null, null, null, before, after, reason, null, AuditResult.SUCCEEDED,
+                RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);
         securityChangeOutboxProducer.publish(event);
     }

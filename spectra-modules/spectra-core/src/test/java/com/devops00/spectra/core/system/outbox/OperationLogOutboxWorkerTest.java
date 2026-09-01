@@ -10,6 +10,7 @@ import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditService;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.system.service.OperationLogService;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.AfterEach;
@@ -57,6 +58,11 @@ class OperationLogOutboxWorkerTest {
         var transactionTemplate = transactionTemplate();
         var record = record(EVENT_ID);
         var event = event(record, 1);
+        doAnswer(invocation -> {
+            assertEquals("correlation-456", RequestCorrelationContext.current().correlationId());
+            assertEquals("request-123", RequestCorrelationContext.current().requestId());
+            return null;
+        }).when(operationLogService).persist(any(AuditRecord.class));
         when(repository.claimBatch("worker-a", NOW, NOW.plusSeconds(30), 100, 10)).thenReturn(List.of(event));
         when(repository.markProcessed(EVENT_ID, "worker-a", NOW)).thenReturn(1);
         when(repository.pendingCount()).thenReturn(0L);

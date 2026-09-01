@@ -44,6 +44,7 @@ class SecurityPropertiesTest {
         assertTrue(whitelists.contains("/notification/provider/callback/**"));
         assertFalse(whitelists.contains("/actuator/**"));
         assertFalse(whitelists.contains("/actuator/metrics"));
+        assertFalse(whitelists.contains("/actuator/prometheus"));
         assertFalse(whitelists.contains("/file/preview/**"));
     }
 

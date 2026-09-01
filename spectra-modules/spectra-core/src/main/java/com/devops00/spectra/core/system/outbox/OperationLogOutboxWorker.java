@@ -15,6 +15,7 @@ import com.devops00.spectra.common.scheduler.ScheduledLoopHandler;
 import com.devops00.spectra.common.scheduler.ScheduledRunScope;
 import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
 import com.devops00.spectra.common.audit.AuditRecord;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.system.service.OperationLogService;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -185,22 +186,32 @@ public class OperationLogOutboxWorker implements ScheduledLoopHandler {
     }
 
     private void processOne(OperationLogOutboxRepository.OperationLogOutboxEvent event, String owner) {
-        AuditRecord record;
-        try {
-            record = objectMapper.readValue(event.payload(), AuditRecord.class);
-        } catch (RuntimeException exception) {
-            throw new OutboxPayloadException("普通操作日志 outbox payload 无法解析", exception);
-        }
-        if (!event.eventId().equals(record.eventId())) {
-            throw new OutboxPayloadException("普通操作日志 outbox event_id 与 payload 不一致");
-        }
-        transactionTemplate.executeWithoutResult(status -> {
-            operationLogService.persist(record);
-            if (repository.markProcessed(event.eventId(), owner, clock.instant()) != 1) {
-                throw new DataAccessException("普通操作日志 outbox 租约已失效，未确认成功") {
-                };
+        try (var ignored = RequestCorrelationContext.openTask(event.eventId().toString())) {
+            AuditRecord record;
+            try {
+                record = objectMapper.readValue(event.payload(), AuditRecord.class);
+            } catch (RuntimeException exception) {
+                throw new OutboxPayloadException("普通操作日志 outbox payload 无法解析", exception);
             }
-        });
+            if (!event.eventId().equals(record.eventId())) {
+                throw new OutboxPayloadException("普通操作日志 outbox event_id 与 payload 不一致");
+            }
+            var correlationId = record.context().correlationId() == null
+                    ? record.context().requestId()
+                    : record.context().correlationId();
+            var recordContext = record.context().requestId() == null && correlationId == null
+                    ? RequestCorrelationContext.forTask(event.eventId().toString())
+                    : new RequestCorrelationContext.Context(record.context().requestId(), correlationId);
+            try (var ignoredRecordContext = RequestCorrelationContext.openWithMdc(recordContext)) {
+                transactionTemplate.executeWithoutResult(status -> {
+                    operationLogService.persist(record);
+                    if (repository.markProcessed(event.eventId(), owner, clock.instant()) != 1) {
+                        throw new DataAccessException("普通操作日志 outbox 租约已失效，未确认成功") {
+                        };
+                    }
+                });
+            }
+        }
     }
 
     /**

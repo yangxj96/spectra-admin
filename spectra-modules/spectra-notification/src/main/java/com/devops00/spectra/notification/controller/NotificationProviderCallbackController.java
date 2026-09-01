@@ -47,7 +47,7 @@ public class NotificationProviderCallbackController {
     /**
      * 接收一个渠道的外部 Provider 回执。
      */
-    @PostMapping("/{channel}")
+    @PostMapping(value = "/{channel}", version = "1.0.0")
     public NotificationProviderCallbackVO callback(@PathVariable NotificationChannel channel,
                                                    @RequestHeader(name = "X-Notification-Signature", required = false) String signature,
                                                    @RequestBody String body) {

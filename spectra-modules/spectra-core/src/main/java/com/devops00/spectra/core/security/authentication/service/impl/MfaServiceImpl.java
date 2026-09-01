@@ -7,6 +7,7 @@
 
 package com.devops00.spectra.core.security.authentication.service.impl;
 
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.devops00.spectra.core.security.authentication.javabean.entity.MfaEnrollment;
@@ -298,7 +299,8 @@ public class MfaServiceImpl implements MfaService {
     private void appendAudit(String eventType, UUID targetId, Map<String, Object> before,
                              Map<String, Object> after, String reason) {
         var event = new SecurityAuditEvent(null, eventType, targetId, targetId,
-                null, null, null, before, after, reason, null, auditResult(eventType), null);
+                null, null, null, before, after, reason, null, auditResult(eventType),
+                RequestCorrelationContext.current().correlationId());
         securityAuditWriter.append(event);
         securityChangeOutboxProducer.publish(event);
     }
