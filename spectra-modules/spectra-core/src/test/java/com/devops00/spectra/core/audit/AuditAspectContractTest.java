@@ -12,6 +12,10 @@ import com.devops00.spectra.common.audit.AuditRecord;
 import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
+import com.devops00.spectra.core.security.authorization.controller.AuthorizationController;
+import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
+import com.devops00.spectra.core.security.initialization.controller.SystemInitializationController;
+import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -118,6 +122,32 @@ class AuditAspectContractTest {
         var context = recorded.get().context();
         assertTrue(!"invalid request id".equals(context.requestId()));
         assertEquals("correlation-456", context.correlationId());
+    }
+
+    @Test
+    void initializationMfaAuditMustUsePersistableEventType() throws NoSuchMethodException {
+        Method method = SystemInitializationController.class.getDeclaredMethod(
+                "confirmMfa", SystemInitializationMfaConfirmFrom.class);
+        Audit audit = method.getAnnotation(Audit.class);
+
+        assertEquals("SYSTEM_INITIALIZATION_MFA_CONFIRMED", audit.eventType());
+        assertTrue(audit.eventType().length() <= 100);
+    }
+
+    @Test
+    void generatedAuditEventTypeMustFitPersistenceLimit() throws Exception {
+        Method auditedMethod = AuthorizationController.class.getDeclaredMethod(
+                "departmentCreatePreview", OrganizationChangeFrom.class);
+        Method resolver = AuditAspect.class.getDeclaredMethod(
+                "resolveDescriptor", Method.class, ProceedingJoinPoint.class);
+        assertTrue(resolver.trySetAccessible());
+
+        Object descriptor = resolver.invoke(new AuditAspect(null, null, null, null), auditedMethod, null);
+        Method eventType = descriptor.getClass().getDeclaredMethod("eventType");
+        assertTrue(eventType.trySetAccessible());
+
+        assertEquals("AuthorizationController#departmentCreatePreview", eventType.invoke(descriptor));
+        assertTrue(((String) eventType.invoke(descriptor)).length() <= 100);
     }
 
     private static TransactionOperations transactionOperations() {

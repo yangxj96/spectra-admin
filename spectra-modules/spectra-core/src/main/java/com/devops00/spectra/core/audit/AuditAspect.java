@@ -65,6 +65,8 @@ public class AuditAspect {
 
     private static final String CLIENT_TYPE_HEADER = "X-Client-Type";
 
+    private static final int EVENT_TYPE_MAX_LENGTH = 100;
+
     private final SecurityContextAccessor securityContextAccessor;
 
     private final AuditService auditService;
@@ -146,12 +148,24 @@ public class AuditAspect {
         Audit audit = method.getAnnotation(Audit.class);
         if (audit != null) {
             String eventType = audit.eventType().isBlank()
-                    ? method.getDeclaringClass().getName() + "#" + method.getName()
+                    ? generatedEventType(method)
                     : audit.eventType();
             return new AuditDescriptor(audit.category(), eventType, parseDescription(audit.value(), method, point));
         }
 
         return null;
+    }
+
+    /**
+     * 生成默认事件类型，并兼容安全审计表的 100 字符长度约束。
+     *
+     * <p>完整类名便于定位，但深层包名可能超过持久化字段长度；超限时使用类简单名仍保持稳定的类名和方法名组合。</p>
+     */
+    private static String generatedEventType(Method method) {
+        String qualifiedName = method.getDeclaringClass().getName() + "#" + method.getName();
+        return qualifiedName.length() <= EVENT_TYPE_MAX_LENGTH
+                ? qualifiedName
+                : method.getDeclaringClass().getSimpleName() + "#" + method.getName();
     }
 
     private String parseDescription(String expression, Method method, ProceedingJoinPoint point) {

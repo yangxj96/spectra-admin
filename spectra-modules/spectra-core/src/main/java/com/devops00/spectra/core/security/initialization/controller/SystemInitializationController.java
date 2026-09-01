@@ -64,7 +64,7 @@ public class SystemInitializationController {
     /**
      * 处理内部业务逻辑（{@code confirmMfa}）。
      */
-    @Audit(value = "'确认系统初始化 MFA'", category = AuditCategory.SECURITY)
+    @Audit(value = "'确认系统初始化 MFA'", category = AuditCategory.SECURITY, eventType = "SYSTEM_INITIALIZATION_MFA_CONFIRMED")
     @Encrypt(response = false)
     @PostMapping(value = "/mfa/confirm", version = "1.0.0")
     @PreAuthorize("permitAll()")
