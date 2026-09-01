@@ -2,7 +2,7 @@
 
 ## 运行时与安全
 
-- 使用 Java 25 和本项目的 `mvnw.cmd`；不要依赖全局 Maven。
+- 使用 mise 管理的 Java 25 和本项目的 `./mvnw`；不要依赖全局 Maven。
 - `.mise.local.toml` 只保存本机配置和凭据，不读取后输出，不复制到代码、文档或日志。
 - PostgreSQL、Redis、S3 等外部依赖按当前任务需要验证，不因普通检查自动启动服务。
 - 安全 Redis 是安全事实源；连接、命令或脚本状态无法确认时必须 fail-closed，不得降级为“Token/Challenge 不存在”。

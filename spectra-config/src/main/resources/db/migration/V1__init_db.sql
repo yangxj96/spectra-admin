@@ -6,7 +6,7 @@
 -- indexes, functions, triggers, runtime role boundary and ordinary seeds.
 -- The spectra_core.sys_region table and its comments are retained, while the
 -- large region row dataset is intentionally excluded and imported separately
--- from the JSON seed pack with scripts/import-regions.ps1.
+-- from the JSON seed pack with scripts/import-regions.sh.
 -- No runtime users, departments, credentials, MFA records, assignments, or
 -- security change outbox data are included in this clean baseline.
 

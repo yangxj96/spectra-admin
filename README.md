@@ -29,41 +29,40 @@
 
 复制 `.mise.local.toml.example` 为 `.mise.local.toml`。模板默认使用 HTTPS 4004，首次启动前需要准备 `files/ssl/keystore.p12` 并填写对应密码；数据库和 Redis 必须改成真实可连接的本机值，S3 的占位地址只保证配置完整，使用文件存储功能前必须接入真实 Provider。该本机文件可能包含凭据，不得提交。
 
-```powershell
-Copy-Item .mise.local.toml.example .mise.local.toml
+```bash
+cp .mise.local.toml.example .mise.local.toml
 ```
 
 数据库初始化、前端联调和 HTTPS 可选配置见根工作区 `docs/50-开发指南/10-环境搭建.md`。
 
 ## 构建与校验
 
-以下命令从 `spectra-admin/` 执行；Unix 环境将 `mvnw.cmd` 换为 `./mvnw`。
+以下命令从 `spectra-admin/` 执行；当前 Ubuntu/WSL 统一使用项目自带的 `./mvnw`。
 
-```powershell
+```bash
 # 渐进格式检查/格式化
-.\mvnw.cmd spotless:check
-.\mvnw.cmd spotless:apply
+./mvnw spotless:check
+./mvnw spotless:apply
 
-# 全量格式检查；PowerShell 中系统属性需要加引号
-.\mvnw.cmd spotless:check "-Dspotless.ratchetFrom=NONE"
+# 全量格式检查
+./mvnw spotless:check '-Dspotless.ratchetFrom=NONE'
 
 # 测试与完整打包
-.\mvnw.cmd test
-.\mvnw.cmd clean package -DskipTests
+./mvnw test
+./mvnw clean package -DskipTests
 ```
 
 ## 启动
 
 先完成 Maven 打包，再运行 `spectra-launch` 生成的 Spring Boot 可执行 JAR：
 
-```powershell
-$jar = Get-ChildItem .\spectra-launch\target\spectra-launch-*.jar -File |
-    Where-Object { $_.Name -notlike '*.jar.original' } |
-    Select-Object -First 1
-
-java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED `
-    -Dspring.profiles.active=dev `
-    -jar $jar.FullName
+```bash
+jar=$(find spectra-launch/target -maxdepth 1 -type f \
+    -name 'spectra-launch-*.jar' ! -name '*.jar.original' -print -quit)
+test -n "$jar"
+mise exec -- java --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED \
+    -Dspring.profiles.active=dev \
+    -jar "$jar"
 ```
 
 默认开发端口为 `4004`，API 上下文为 `/api`。示例配置首次启动地址是 `https://127.0.0.1:4004/api`；模板默认启用 HTTPS，启动前需准备 `files/ssl/keystore.p12` 并填写 `SSL_PASSWORD`。启动前需确保 PostgreSQL、Redis 和 `.mise.local.toml` 中的环境变量可用。
