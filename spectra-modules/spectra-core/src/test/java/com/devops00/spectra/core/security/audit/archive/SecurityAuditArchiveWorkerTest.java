@@ -89,6 +89,39 @@ class SecurityAuditArchiveWorkerTest {
     }
 
     @Test
+    void keepsManifestRetryableWhenObjectStorageUploadFails() {
+        var repository = mock(SecurityAuditArchiveManifestRepository.class);
+        var dataRepository = mock(SecurityAuditArchiveDataRepository.class);
+        var backend = mock(SecurityAuditArchiveBackend.class);
+        var auditTrail = mock(SecurityAuditArchiveAuditTrail.class);
+        var manifest = manifest("PLANNED", null, null, null, null);
+        when(backend.id()).thenReturn("S3_OBJECT_LOCK");
+        when(repository.claimBatch("worker-a", NOW, NOW.plusSeconds(60), 20, 10)).thenReturn(List.of(manifest));
+        when(repository.archiveBackend()).thenReturn("S3_OBJECT_LOCK");
+        when(repository.totalRetentionYears()).thenReturn(5);
+        when(dataRepository.snapshot(PARTITION, RANGE_START, RANGE_END))
+                .thenReturn(new SecurityAuditArchiveDataRepository.ArchiveSnapshot(CONTENT, 1L));
+        doThrow(new IllegalStateException("object storage unavailable")).when(backend)
+                .put(anyString(), any(byte[].class), any(Instant.class));
+        when(repository.markFailed(eq(MANIFEST_ID), eq("worker-a"), eq(OPERATOR_ID), eq(NOW),
+                any(Instant.class), eq("IllegalStateException: object storage unavailable"))).thenReturn(1);
+        when(repository.pendingCount()).thenReturn(1L);
+        when(repository.oldestPendingAt()).thenReturn(NOW);
+
+        var worker = worker(repository, dataRepository, provider(backend), auditTrail, "worker-a");
+
+        assertEquals(new SecurityAuditArchiveWorker.BatchResult(1, 0, 1, 1), worker.processBatch());
+        verify(repository).markFailed(eq(MANIFEST_ID), eq("worker-a"), eq(OPERATOR_ID), eq(NOW),
+                any(Instant.class), eq("IllegalStateException: object storage unavailable"));
+        verify(repository, org.mockito.Mockito.never()).markArchived(any(), any(), anyString(), anyString(),
+                anyLong(), anyLong(), any(), any(), any());
+        verify(auditTrail).append("SECURITY_AUDIT_ARCHIVE_STARTED", OPERATOR_ID, PARTITION,
+                "manifestId=" + MANIFEST_ID);
+        verify(auditTrail).append("SECURITY_AUDIT_ARCHIVE_FAILED", OPERATOR_ID, PARTITION,
+                "manifestId=" + MANIFEST_ID + ";error=IllegalStateException: object storage unavailable");
+    }
+
+    @Test
     void verifiesObjectSourceRangeAndRowCountBeforeVerifiedState() {
         var repository = mock(SecurityAuditArchiveManifestRepository.class);
         var dataRepository = mock(SecurityAuditArchiveDataRepository.class);

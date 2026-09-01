@@ -43,6 +43,12 @@
         <spotbugs.maven.plugin.version>4.10.3.0</spotbugs.maven.plugin.version>
         <findsecbugs.version>1.14.0</findsecbugs.version>
         <archunit.version>1.4.1</archunit.version>
+        <testcontainers.version>2.0.5</testcontainers.version>
+        <testcontainers-redis.version>2.2.4</testcontainers-redis.version>
+
+        <!-- 测试分类：默认只运行快速测试，外部依赖测试必须显式启用 integration profile。 -->
+        <spectra.test.groups.include></spectra.test.groups.include>
+        <spectra.test.groups.exclude>integration,manual-integration</spectra.test.groups.exclude>
 
         <!-- 数据库 -->
         <mybatis-plus.version>3.5.15</mybatis-plus.version>
@@ -148,6 +154,22 @@
                 <artifactId>archunit-junit5</artifactId>
                 <version>${archunit.version}</version>
             </dependency>
+            <!-- Spring Boot 4.1.0 对齐的可重复外部依赖测试版本；仅由叶子模块以 test scope 使用。 -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-postgresql</artifactId>
+                <version>${testcontainers.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.redis</groupId>
+                <artifactId>testcontainers-redis</artifactId>
+                <version>${testcontainers-redis.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -173,6 +195,14 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <groups>${spectra.test.groups.include}</groups>
+                    <excludedGroups>${spectra.test.groups.exclude}</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
@@ -349,5 +379,34 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>integration</id>
+            <activation>
+                <property>
+                    <name>groups</name>
+                    <value>integration</value>
+                </property>
+            </activation>
+            <properties>
+                <spectra.test.groups.include>integration</spectra.test.groups.include>
+                <spectra.test.groups.exclude></spectra.test.groups.exclude>
+            </properties>
+        </profile>
+        <profile>
+            <id>manual-integration</id>
+            <activation>
+                <property>
+                    <name>groups</name>
+                    <value>manual-integration</value>
+                </property>
+            </activation>
+            <properties>
+                <spectra.test.groups.include>manual-integration</spectra.test.groups.include>
+                <spectra.test.groups.exclude></spectra.test.groups.exclude>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

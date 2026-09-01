@@ -27,6 +27,7 @@ import com.devops00.spectra.core.security.authorization.mapper.RoleGrantablePerm
 import com.devops00.spectra.core.security.authorization.mapper.RolePermissionMapper;
 import com.devops00.spectra.core.security.authorization.mapper.ScopeRuleMapper;
 import com.devops00.spectra.core.security.authorization.mapper.SecurityRoleMapper;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mybatis.spring.annotation.MapperScan;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /** 真实 PostgreSQL 不可用时，授权快照加载必须失败，不得降级为空权限。 */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_POSTGRES_FAILURE_TEST", matches = "true")
+@Tag("manual-integration")
 @SpringBootTest(classes = SecurityAuthorizationPostgresFailureIntegrationTest.TestApplication.class, properties = {
         "spring.autoconfigure.exclude="
                 + "com.devops00.spectra.core.CoreModule,"

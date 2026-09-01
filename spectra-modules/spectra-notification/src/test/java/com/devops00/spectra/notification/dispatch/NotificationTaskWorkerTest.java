@@ -21,6 +21,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 import com.devops00.spectra.common.notification.NotificationChannel;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.notification.javabean.domain.ChannelSendResult;
 import com.devops00.spectra.notification.javabean.entity.NotificationDeliveryEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
@@ -224,6 +225,28 @@ class NotificationTaskWorkerTest {
         verify(sender, never()).send(any(NotificationTaskEntity.class));
         verify(deliveryMapper, never()).insert(any(NotificationDeliveryEntity.class));
         verify(taskMapper, times(2)).update(isNull(), any(LambdaUpdateWrapper.class));
+    }
+
+    @Test
+    void shouldOpenTaskLevelCorrelationContextWhileSending() {
+        var taskMapper = mock(NotificationTaskMapper.class);
+        var deliveryMapper = mock(NotificationDeliveryMapper.class);
+        var requestMapper = mock(NotificationRequestMapper.class);
+        var sender = mock(NotificationSender.class);
+        var task = task("PENDING", Instant.now().minusSeconds(1), Instant.now().plusSeconds(60));
+        when(taskMapper.selectPendingTasks(any(Instant.class), anyInt())).thenReturn(List.of(task));
+        when(taskMapper.update(isNull(), any(LambdaUpdateWrapper.class))).thenReturn(1);
+        when(deliveryMapper.insert(any(NotificationDeliveryEntity.class))).thenReturn(1);
+        when(sender.channel()).thenReturn(NotificationChannel.SMS);
+        when(sender.send(task)).thenAnswer(invocation -> {
+            assertEquals(task.getId().toString(), RequestCorrelationContext.current().correlationId());
+            assertNull(RequestCorrelationContext.current().requestId());
+            return ChannelSendResult.sent("SMS", null, "ACCEPTED");
+        });
+        var worker = worker(taskMapper, deliveryMapper, requestMapper, List.of(sender));
+
+        assertEquals(1, worker.processPending(50));
+        assertTrue(RequestCorrelationContext.current().isEmpty());
     }
 
     private NotificationTaskWorker worker(NotificationTaskMapper taskMapper,

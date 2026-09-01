@@ -16,8 +16,13 @@
 
 package com.devops00.spectra.notification.schema;
 
+import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -46,14 +51,33 @@ import static org.junit.jupiter.api.Assertions.fail;
 /**
  * 在真实 PostgreSQL 上验证通知表的事务、唯一约束和 Worker 领取语义。
  *
- * <p>测试只在显式设置 {@code SPECTRA_NOTIFICATION_POSTGRES_TEST=true} 时启用，连接信息从
- * {@code DB_URL}、{@code DB_USERNAME} 和 {@code DB_PASSWORD} 读取。每个测试使用随机测试数据并在结束时清理，
+ * <p>该测试只在 Maven 的 {@code integration} profile 中执行，使用 Testcontainers 创建可丢弃的
+ * PostgreSQL 数据库并从当前 Flyway migration 完整初始化 schema。每个测试使用随机测试数据并在结束时清理，
  * 不依赖本机已有业务数据。</p>
  */
-@EnabledIfEnvironmentVariable(named = "SPECTRA_NOTIFICATION_POSTGRES_TEST", matches = "true")
+@Tag("integration")
+@Testcontainers
 class NotificationPostgresIntegrationTest {
 
     private static final String SCHEMA = "spectra_notification";
+
+    @Container
+    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18-alpine")
+            .withDatabaseName("spectra_notification")
+            .withUsername("postgres")
+            .withPassword("integration");
+
+    @BeforeAll
+    static void migrateSchema() {
+        Flyway.configure()
+                .dataSource(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword())
+                .locations("classpath:db/migration")
+                .baselineOnMigrate(false)
+                .validateOnMigrate(true)
+                .cleanDisabled(true)
+                .load()
+                .migrate();
+    }
 
     @Test
     void shouldRollbackRequestAndTaskTogether() throws Exception {
@@ -365,8 +389,7 @@ class NotificationPostgresIntegrationTest {
 
     private Connection openConnection() throws Exception {
         Class.forName("org.postgresql.Driver");
-        return DriverManager.getConnection(requiredEnvironment("DB_URL"), requiredEnvironment("DB_USERNAME"),
-                requiredEnvironment("DB_PASSWORD"));
+        return DriverManager.getConnection(POSTGRES.getJdbcUrl(), POSTGRES.getUsername(), POSTGRES.getPassword());
     }
 
     private void executeSensitivePayloadCleanup(Connection connection, Instant now, Instant cutoff, int limit)
@@ -413,14 +436,6 @@ class NotificationPostgresIntegrationTest {
             taskCleanup.setInt(3, limit);
             taskCleanup.executeUpdate();
         }
-    }
-
-    private String requiredEnvironment(String name) {
-        var value = System.getenv(name);
-        if (value == null || value.isBlank()) {
-            throw new IllegalStateException("缺少真实 PostgreSQL 集成测试环境变量: " + name);
-        }
-        return value;
     }
 
     private void insertRequest(Connection connection, UUID requestId, String idempotencyKey)

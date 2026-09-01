@@ -24,6 +24,7 @@ import com.devops00.test.spectra.RegionImportTestApplication;
 import jakarta.annotation.Resource;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
@@ -53,6 +54,7 @@ import java.util.UUID;
  * @since 2026/1/30 14:01
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_REGION_IMPORT", matches = "true")
+@Tag("manual-integration")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @SpringBootTest(classes = RegionImportTestApplication.class)
 public class RegionServiceTest {

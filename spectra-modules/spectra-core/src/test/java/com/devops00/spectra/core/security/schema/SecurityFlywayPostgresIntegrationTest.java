@@ -18,8 +18,11 @@ package com.devops00.spectra.core.security.schema;
 
 import org.flywaydb.core.Flyway;
 import org.flywaydb.core.api.FlywayException;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -33,24 +36,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * 真实 PostgreSQL 上的目标 schema/Flyway 门禁。
  * <p>
- * 该测试默认禁用，不会连接或修改开发机数据库。只有显式设置
- * {@code SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST=true} 后才会执行；连接信息
- * 通过专用测试环境变量提供，并且必须使用可丢弃的隔离数据库。当前 V1 基线会创建数据库角色，
- * 测试只验证当前单一 V1 基线，不会创建额外数据库角色。
+ * 该测试只在 Maven 的 {@code integration} profile 中执行，使用 Testcontainers 创建
+ * 两个可丢弃的 PostgreSQL 数据库。当前 V1 基线会创建数据库角色，容器账号使用测试专用超级用户。
  */
-@EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST", matches = "true")
+@Tag("integration")
+@Testcontainers
 class SecurityFlywayPostgresIntegrationTest {
 
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
 
+    @Container
+    static final PostgreSQLContainer<?> EMPTY_DATABASE = new PostgreSQLContainer<>("postgres:18-alpine")
+            .withDatabaseName("spectra_security_empty")
+            .withUsername("postgres")
+            .withPassword("integration");
+
+    @Container
+    static final PostgreSQLContainer<?> NON_EMPTY_DATABASE = new PostgreSQLContainer<>("postgres:18-alpine")
+            .withDatabaseName("spectra_security_nonempty")
+            .withUsername("postgres")
+            .withPassword("integration");
+
     @Test
     void shouldMigrateEmptyTargetDatabaseFromV1() throws SQLException {
-        DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_DB_");
+        DatabaseConfig database = DatabaseConfig.from(EMPTY_DATABASE);
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
                 .locations(MIGRATION_LOCATION)
@@ -132,7 +145,7 @@ class SecurityFlywayPostgresIntegrationTest {
 
     @Test
     void shouldRejectNonEmptyDatabaseWithoutBaseline() throws SQLException {
-        DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_FLYWAY_NONEMPTY_DB_");
+        DatabaseConfig database = DatabaseConfig.from(NON_EMPTY_DATABASE);
         String marker = "security_flyway_marker_" + UUID.randomUUID().toString().replace("-", "");
 
         try (Connection connection = database.open(); Statement statement = connection.createStatement()) {
@@ -236,12 +249,8 @@ class SecurityFlywayPostgresIntegrationTest {
 
     private record DatabaseConfig(String url, String username, String password) {
 
-        private static DatabaseConfig from(String prefix) {
-            String url = environment(prefix + "URL");
-            String username = environment(prefix + "USERNAME");
-            String password = environment(prefix + "PASSWORD");
-            assumeTrue(!url.isBlank() && !username.isBlank(), "未提供专用 PostgreSQL 集成测试连接信息");
-            return new DatabaseConfig(url, username, password);
+        private static DatabaseConfig from(PostgreSQLContainer<?> container) {
+            return new DatabaseConfig(container.getJdbcUrl(), container.getUsername(), container.getPassword());
         }
 
         private Connection open() throws SQLException {
@@ -249,7 +258,4 @@ class SecurityFlywayPostgresIntegrationTest {
         }
     }
 
-    private static String environment(String name) {
-        return System.getenv().getOrDefault(name, "").trim();
-    }
 }

@@ -6,31 +6,43 @@
 
 package com.devops00.spectra.core.security.schema;
 
+import com.devops00.spectra.core.security.audit.outbox.SecurityChangeOutboxRepository;
 import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 /**
  * 安全变更 outbox 的真实 PostgreSQL 契约测试。
  *
- * <p>默认关闭，不连接本机开发数据库，也不使用 Docker。只有显式设置
- * {@code SPECTRA_SECURITY_OUTBOX_POSTGRES_TEST=true} 并提供专用、可丢弃的隔离数据库连接时才执行。
- * 测试只验证 Flyway 迁移、事务回滚和幂等唯一约束；生产数据不得作为测试库。</p>
+ * <p>该测试只在 Maven 的 {@code integration} profile 中执行，使用 Testcontainers 创建可丢弃的
+ * PostgreSQL 数据库。测试只验证 Flyway 迁移、事务回滚和幂等唯一约束；生产数据不得作为测试库。</p>
  */
-@EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_OUTBOX_POSTGRES_TEST", matches = "true")
+@Tag("integration")
+@Testcontainers
 class OutboxPostgresIntegrationTest {
 
     private static final String MIGRATION_LOCATION = "classpath:db/migration";
     private static final String OUTBOX_TABLE = "spectra_security.sec_security_change_outbox";
+
+    @Container
+    static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18-alpine")
+            .withDatabaseName("spectra_security_outbox")
+            .withUsername("postgres")
+            .withPassword("integration");
 
     @Test
     void migrationMustExposeLeaseAndIdempotencyContract() throws SQLException {
@@ -75,8 +87,41 @@ class OutboxPostgresIntegrationTest {
         }
     }
 
+    @Test
+    void replacementWorkerCanTakeOverExpiredLeaseAndFenceCrashedOwner() throws SQLException {
+        DatabaseConfig database = migrate();
+        SecurityChangeOutboxRepository repository = repository(database);
+        UUID eventId = UUID.randomUUID();
+        String idempotencyKey = "lease-recovery-" + UUID.randomUUID();
+        Instant now = Instant.now();
+        try {
+            assertEquals(1, repository.enqueue(eventId, idempotencyKey, "USER_CREATED", "USER", null,
+                    "{\"event\":\"lease-recovery\"}", "correlation-lease", now, null));
+
+            var firstClaim = repository.claimBatch("worker-a", now, now.plusSeconds(30), 10, 10);
+            assertEquals(1, firstClaim.size());
+            assertEquals(eventId, firstClaim.getFirst().eventId());
+            assertEquals(1, firstClaim.getFirst().attempts());
+
+            Instant afterRestart = now.plusSeconds(31);
+            var replacementClaim = repository.claimBatch("worker-b", afterRestart, afterRestart.plusSeconds(30), 10, 10);
+            assertEquals(1, replacementClaim.size());
+            assertEquals(eventId, replacementClaim.getFirst().eventId());
+            assertEquals(2, replacementClaim.getFirst().attempts());
+            assertEquals(0, repository.markProcessed(eventId, "worker-a", afterRestart));
+            assertEquals(1, repository.markProcessed(eventId, "worker-b", afterRestart));
+        } finally {
+            try (var connection = database.open();
+                    var statement = connection.prepareStatement(
+                            "DELETE FROM " + OUTBOX_TABLE + " WHERE id = ?")) {
+                statement.setObject(1, eventId);
+                statement.executeUpdate();
+            }
+        }
+    }
+
     private static DatabaseConfig migrate() {
-        DatabaseConfig database = DatabaseConfig.from("SPECTRA_SECURITY_OUTBOX_DB_");
+        DatabaseConfig database = DatabaseConfig.from(POSTGRES);
         Flyway.configure()
                 .dataSource(database.url(), database.username(), database.password())
                 .locations(MIGRATION_LOCATION)
@@ -86,6 +131,11 @@ class OutboxPostgresIntegrationTest {
                 .load()
                 .migrate();
         return database;
+    }
+
+    private static SecurityChangeOutboxRepository repository(DatabaseConfig database) {
+        var dataSource = new DriverManagerDataSource(database.url(), database.username(), database.password());
+        return new SecurityChangeOutboxRepository(new JdbcTemplate(dataSource));
     }
 
     private static int insert(Connection connection, UUID eventId, String idempotencyKey, String payload)
@@ -157,12 +207,8 @@ class OutboxPostgresIntegrationTest {
 
     private record DatabaseConfig(String url, String username, String password) {
 
-        private static DatabaseConfig from(String prefix) {
-            String url = environment(prefix + "URL");
-            String username = environment(prefix + "USERNAME");
-            String password = environment(prefix + "PASSWORD");
-            assumeTrue(!url.isBlank() && !username.isBlank(), "未提供专用 PostgreSQL 集成测试连接信息");
-            return new DatabaseConfig(url, username, password);
+        private static DatabaseConfig from(PostgreSQLContainer<?> container) {
+            return new DatabaseConfig(container.getJdbcUrl(), container.getUsername(), container.getPassword());
         }
 
         private Connection open() throws SQLException {
@@ -170,7 +216,4 @@ class OutboxPostgresIntegrationTest {
         }
     }
 
-    private static String environment(String name) {
-        return System.getenv().getOrDefault(name, "").trim();
-    }
 }

@@ -22,6 +22,7 @@ import com.devops00.spectra.security.base.audit.SecurityAuditEvent;
 import com.devops00.spectra.security.base.audit.SecurityAuditWriter;
 import com.devops00.spectra.security.base.root.RootGovernanceException;
 import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,6 +50,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * 该测试默认禁用，只接受专用、可丢弃的 Flyway 测试数据库连接。
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_FLYWAY_POSTGRES_TEST", matches = "true")
+@Tag("manual-integration")
 class SecurityRootConcurrencyPostgresIntegrationTest {
 
     private static final String MIGRATION_LOCATION = "classpath:db/migration";

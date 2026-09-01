@@ -17,6 +17,7 @@
 package com.devops00.spectra.core.scheduler;
 
 import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
@@ -39,6 +40,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * {@code SPECTRA_SCHEDULER_FLYWAY_POSTGRES_TEST=true} 后才会执行。
  */
 @EnabledIfEnvironmentVariable(named = "SPECTRA_SCHEDULER_FLYWAY_POSTGRES_TEST", matches = "true")
+@Tag("manual-integration")
 class SchedulerMigrationTest {
 
     private static final String MIGRATION_LOCATION = "classpath:db/migration";

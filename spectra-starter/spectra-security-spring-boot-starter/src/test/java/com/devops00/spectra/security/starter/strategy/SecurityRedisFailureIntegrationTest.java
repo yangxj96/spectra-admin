@@ -19,27 +19,34 @@ package com.devops00.spectra.security.starter.strategy;
 import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import com.devops00.spectra.security.base.constant.SecurityRedisNamespace;
 import com.devops00.spectra.security.base.util.SecurityRedisExecutor;
+import com.redis.testcontainers.RedisContainer;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
-import org.springframework.data.redis.connection.RedisPassword;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.net.ServerSocket;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /** 真实 Redis 上验证安全 Redis 正常读写与故障拒绝。 */
-@EnabledIfEnvironmentVariable(named = "SPECTRA_SECURITY_REDIS_LIVE_TEST", matches = "true")
+@Tag("integration")
+@Testcontainers
 class SecurityRedisFailureIntegrationTest {
+
+    @Container
+    static final RedisContainer REDIS = new RedisContainer("redis:7.4.7");
 
     @Test
     void shouldReadAndWriteThroughLiveRedis() {
-        RedisProbe probe = RedisProbe.connect();
+        RedisProbe probe = RedisProbe.connect(REDIS);
         String key = SecurityRedisNamespace.PREFIX + "test:redis-live:" + UUID.randomUUID();
         try {
             SecurityRedisExecutor.run("写入实时 Redis 测试值",
@@ -56,8 +63,12 @@ class SecurityRedisFailureIntegrationTest {
     }
 
     @Test
-    void shouldFailClosedWhenRedisIsUnavailable() {
-        RedisProbe probe = RedisProbe.connect();
+    void shouldFailClosedWhenRedisEndpointIsUnavailable() throws Exception {
+        int unusedPort;
+        try (var socket = new ServerSocket(0)) {
+            unusedPort = socket.getLocalPort();
+        }
+        RedisProbe probe = RedisProbe.connect(REDIS.getHost(), unusedPort);
         try {
             assertThatThrownBy(() -> SecurityRedisExecutor.require("读取故障 Redis 测试值",
                     () -> probe.redis().opsForValue().get(SecurityRedisNamespace.PREFIX + "test:redis-failure")))
@@ -69,15 +80,13 @@ class SecurityRedisFailureIntegrationTest {
 
     private record RedisProbe(RedisTemplate<String, String> redis, LettuceConnectionFactory connectionFactory) {
 
-        private static RedisProbe connect() {
-            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(
-                    environment("REDIS_HOST", "127.0.0.1"), integerEnvironment("REDIS_PORT", 6379));
-            configuration.setDatabase(integerEnvironment("REDIS_DB", 0));
-            String password = environment("REDIS_PASSWORD", "");
-            if (!password.isBlank()) {
-                configuration.setPassword(RedisPassword.of(password));
-            }
+        private static RedisProbe connect(RedisContainer container) {
+            return connect(container.getHost(), container.getFirstMappedPort());
+        }
 
+        private static RedisProbe connect(String host, int port) {
+            RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration(host, port);
+            configuration.setDatabase(0);
             LettuceConnectionFactory connectionFactory = new LettuceConnectionFactory(configuration);
             connectionFactory.afterPropertiesSet();
             RedisTemplate<String, String> redis = new RedisTemplate<>();
@@ -94,13 +103,5 @@ class SecurityRedisFailureIntegrationTest {
         private void close() {
             connectionFactory.destroy();
         }
-    }
-
-    private static String environment(String name, String defaultValue) {
-        return System.getenv().getOrDefault(name, defaultValue).trim();
-    }
-
-    private static int integerEnvironment(String name, int defaultValue) {
-        return Integer.parseInt(environment(name, Integer.toString(defaultValue)));
     }
 }

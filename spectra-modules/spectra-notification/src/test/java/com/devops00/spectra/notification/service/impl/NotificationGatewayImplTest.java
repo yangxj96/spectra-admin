@@ -18,6 +18,7 @@ package com.devops00.spectra.notification.service.impl;
 
 import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
+import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.common.mybatis.handler.UUIDTypeHandler;
 import com.devops00.spectra.common.notification.NotificationChannel;
@@ -25,6 +26,7 @@ import com.devops00.spectra.common.notification.NotificationPurpose;
 import com.devops00.spectra.common.notification.NotificationRecipient;
 import com.devops00.spectra.common.notification.NotificationRecipientDirectory;
 import com.devops00.spectra.common.notification.NotificationRequest;
+import com.devops00.spectra.common.notification.NotificationReceipt;
 import com.devops00.spectra.notification.configuration.NotificationPayloadProtector;
 import com.devops00.spectra.notification.javabean.entity.NotificationRequestEntity;
 import com.devops00.spectra.notification.javabean.entity.NotificationTaskEntity;
@@ -98,13 +100,20 @@ class NotificationGatewayImplTest {
         var gateway = new NotificationGatewayImpl(requestMapper, taskMapper, templateMapper, preferenceMapper,
                 new NotificationTemplateRenderer(), new NotificationPolicy(), new NotificationModuleProperties(true, "", "", List.of()),
                 directory, protector, List.of());
-        var receipt = gateway
-                .enqueue(NotificationRequest.inApp("test:expand", NotificationPurpose.SYSTEM_NOTICE,
-                        List.of(first, second), "test", "标题", "正文", "TEST", "1", "TEST", null));
+        NotificationReceipt receipt;
+        try (var ignored = RequestCorrelationContext.openWithMdc(
+                RequestCorrelationContext.forHttp("request-123", "correlation-456"))) {
+            receipt = gateway
+                    .enqueue(NotificationRequest.inApp("test:expand", NotificationPurpose.SYSTEM_NOTICE,
+                            List.of(first, second), "test", "标题", "正文", "TEST", "1", "TEST", null));
+        }
 
         assertEquals(2, receipt.taskCount());
         assertTrue(!receipt.idempotentReplay());
         verify(taskMapper, times(2)).insert(any(NotificationTaskEntity.class));
+        var requestCaptor = ArgumentCaptor.forClass(NotificationRequestEntity.class);
+        verify(requestMapper).insert(requestCaptor.capture());
+        assertEquals("correlation-456", requestCaptor.getValue().getTraceId());
     }
 
     @Test
