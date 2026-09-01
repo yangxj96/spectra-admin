@@ -92,6 +92,7 @@ public class AuditAspect {
      * @return 业务方法返回值
      * @throws Throwable 业务方法原始异常
      */
+    @SuppressWarnings("PMD.PreserveStackTrace")
     @Around("@annotation(com.devops00.spectra.common.audit.Audit)")
     public Object handleAround(ProceedingJoinPoint point) throws Throwable {
         Method method = resolveMethod(point);
@@ -125,7 +126,7 @@ public class AuditAspect {
                     }
                 });
             } catch (AuditedInvocationException ex) {
-                throw ex.original;
+                throw ex.getCause();
             }
         }
     }

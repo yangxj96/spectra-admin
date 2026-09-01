@@ -9,4 +9,8 @@ import java.time.Instant;
 import java.util.Map;
 
 public record PartTarget(String method, String url, Map<String, String> headers, Instant expiresAt, int attempt) {
+
+    public PartTarget {
+        headers = Map.copyOf(headers);
+    }
 }

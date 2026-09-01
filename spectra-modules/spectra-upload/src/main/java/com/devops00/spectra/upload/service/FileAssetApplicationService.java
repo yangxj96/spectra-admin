@@ -172,9 +172,9 @@ public class FileAssetApplicationService implements FileAssetPort {
         boolean admin = authentication != null
                 && authentication.getAuthorities()
                         .stream()
-                        .anyMatch(authority -> authority.getAuthority().equals("file:admin:read")
-                                || authority.getAuthority().equals("file:admin:*")
-                                || authority.getAuthority().equals("*"));
+                        .anyMatch(authority -> "file:admin:read".equals(authority.getAuthority())
+                                || "file:admin:*".equals(authority.getAuthority())
+                                || "*".equals(authority.getAuthority()));
         return currentUserId != null && context != null && currentUserId.equals(context.userId()) && admin;
     }
 

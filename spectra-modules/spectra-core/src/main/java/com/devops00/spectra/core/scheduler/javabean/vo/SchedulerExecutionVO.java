@@ -23,4 +23,9 @@ public record SchedulerExecutionVO(UUID id, UUID jobId, String fireKey, Schedule
                                    String lastErrorCode, String lastErrorMessage, Map<String, Object> resultSummary,
                                    UUID originalExecutionId, SchedulerResolutionStatus resolutionStatus,
                                    String resolutionReason, UUID resolvedBy, Instant resolvedAt, Long version) {
+
+    public SchedulerExecutionVO {
+        parametersSnapshot = parametersSnapshot == null ? Map.of() : Map.copyOf(parametersSnapshot);
+        resultSummary = resultSummary == null ? Map.of() : Map.copyOf(resultSummary);
+    }
 }

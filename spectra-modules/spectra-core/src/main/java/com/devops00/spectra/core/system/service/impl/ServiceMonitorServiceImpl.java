@@ -619,13 +619,6 @@ public class ServiceMonitorServiceImpl implements ServiceMonitorService {
     }
 
     /**
-     * 处理内部业务逻辑（{@code elapsedMillis}）。
-     */
-    private static long elapsedMillis(long start) {
-        return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-    }
-
-    /**
      * 处理内部业务逻辑（{@code downsample}）。
      */
     private static <T> List<T> downsample(List<T> values, int maxPoints) {

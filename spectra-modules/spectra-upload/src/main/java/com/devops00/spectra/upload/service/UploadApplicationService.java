@@ -43,8 +43,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.HexFormat;
 import java.util.List;
@@ -66,6 +68,7 @@ public class UploadApplicationService {
     private final ObjectProvider<UploadApplicationService> serviceProvider;
     private final FileUploadConverter fileUploadConverter;
 
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     public UploadApplicationService(FileUploadProperties properties,
                                     S3Properties s3Properties,
                                     FileTypeMapper fileTypeMapper,
@@ -349,7 +352,7 @@ public class UploadApplicationService {
                 assetId = asset.getId();
             }
             sessionMapper.markReady(uploadId, assetId, Instant.now());
-        } catch (Exception e) {
+        } catch (IOException | NoSuchAlgorithmException | RuntimeException e) {
             try {
                 provider.abortMultipart(multipart);
             } catch (RuntimeException ignored) {

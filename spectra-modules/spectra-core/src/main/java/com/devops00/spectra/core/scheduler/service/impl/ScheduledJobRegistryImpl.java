@@ -35,7 +35,7 @@ import java.util.Optional;
 
 /** 默认调度处理器注册表。 */
 @Component
-public class ScheduledJobRegistryImpl implements ScheduledJobRegistry {
+public final class ScheduledJobRegistryImpl implements ScheduledJobRegistry {
 
     private final Map<String, ScheduledJobDescriptor> descriptors;
     private final Map<String, ScheduledJobHandler> jobHandlers;

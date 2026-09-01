@@ -108,7 +108,12 @@ public class LocalFileStorageProvider implements FileStorageProvider {
         Path destination = StoragePaths.resolve(storageRoot, multipart.key());
         Path temporary = destination.resolveSibling(destination.getFileName() + ".tmp");
         try {
-            Files.createDirectories(destination.getParent());
+            Path destinationParent = destination.getParent();
+            if (destinationParent == null) {
+                throw storageFailure("unable to resolve local upload destination",
+                        new IOException("destination parent is missing"));
+            }
+            Files.createDirectories(destinationParent);
             try (OutputStream output = Files.newOutputStream(temporary)) {
                 for (StoredPart part : parts.stream().sorted(java.util.Comparator.comparingInt(StoredPart::partNumber)).toList()) {
                     try (InputStream input = Files.newInputStream(sourceDirectory.resolve(partName(part.partNumber())))) {

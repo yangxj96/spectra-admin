@@ -15,4 +15,8 @@ public record SchedulerLoopErrorVO(UUID id, UUID jobId, String instanceId, UUID 
                                    Instant lastLoggedAt, Long occurrenceCount, Long suppressedCount,
                                    Map<String, Object> lastContext, UUID resolvedBy, Instant resolvedAt,
                                    String resolutionReason, Long version) {
+
+    public SchedulerLoopErrorVO {
+        lastContext = lastContext == null ? Map.of() : Map.copyOf(lastContext);
+    }
 }

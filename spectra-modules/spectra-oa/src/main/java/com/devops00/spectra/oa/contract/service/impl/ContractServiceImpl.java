@@ -223,7 +223,7 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
         version.setFileAssetId(file.fileAssetId());
         version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.originalName());
-        version.setFileSize(from.getFileSize() == null ? file.size() : from.getFileSize());
+        version.setFileSize(Objects.requireNonNullElse(from.getFileSize(), file.size()));
         version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.contentType());
         version.setVersionNote(trimToNull(from.getVersionNote()));
         version.setCurrentVersion(true);
@@ -412,21 +412,6 @@ public class ContractServiceImpl extends BaseServiceImpl<ContractMapper, Contrac
             }
         }
         return sent;
-    }
-
-    /**
-     * 校验并确保数据满足当前约束（{@code requireVersion}）。
-     */
-    private ContractVersion requireVersion(UUID id, UUID versionId) {
-        var contract = requireAccessible(id);
-        ContractVersion version = versionId == null
-                ? currentVersion(contract.getId())
-                : versionMapper.selectOne(new LambdaQueryWrapper<ContractVersion>().eq(ContractVersion::getId, versionId)
-                        .eq(ContractVersion::getContractId, contract.getId()));
-        if (version == null) {
-            throw new DataNotExistException("合同版本不存在");
-        }
-        return version;
     }
 
     /**

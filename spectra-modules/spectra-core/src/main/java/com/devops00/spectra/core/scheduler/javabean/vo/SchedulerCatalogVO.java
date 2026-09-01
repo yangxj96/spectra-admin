@@ -22,4 +22,10 @@ public record SchedulerCatalogVO(String jobKey,
                                  Map<String, Object> parameterSchema,
                                  List<String> supportedActions,
                                  Map<String, Object> executionPolicy) {
+
+    public SchedulerCatalogVO {
+        parameterSchema = parameterSchema == null ? Map.of() : Map.copyOf(parameterSchema);
+        supportedActions = supportedActions == null ? List.of() : List.copyOf(supportedActions);
+        executionPolicy = executionPolicy == null ? Map.of() : Map.copyOf(executionPolicy);
+    }
 }

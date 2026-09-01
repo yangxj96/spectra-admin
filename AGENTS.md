@@ -8,6 +8,12 @@
 - 安全 Redis 是安全事实源；连接、命令或脚本状态无法确认时必须 fail-closed，不得降级为“Token/Challenge 不存在”。
 - 启动时使用 UTC；API 契约版本为 `1.0.0`。
 
+## 本地开发启动流程
+
+- 启动后端前先在 `spectra-admin/` 根目录执行 `mise exec -- ./mvnw install -DskipTests`，确保依赖和可执行包已安装。
+- 启动后端统一使用 `mise exec -- ./mvnw -f spectra-launch/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev`，通过 mise 加载 `.mise.local.toml` 环境；不得读取或输出该文件中的凭据。
+- `spring-boot:run` 的工作目录由 `spectra-launch/pom.xml` 指向 `spectra-admin/` 根目录，以便正确解析 `files/` 下的本地开发资源。
+
 ## 实现约束
 
 - 修改或审查 Java 代码时使用 `$spectra-admin-spec`。

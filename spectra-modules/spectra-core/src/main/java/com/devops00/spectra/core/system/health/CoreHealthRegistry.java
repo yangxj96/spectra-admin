@@ -31,7 +31,7 @@ import java.util.Map;
  * 在启动阶段完成校验，避免同名 contributor 被后装配的 Bean 静默覆盖。</p>
  */
 @Component
-public class CoreHealthRegistry {
+public final class CoreHealthRegistry {
 
     private final List<DependencyHealthContributor> contributors;
     private final Map<String, ContributorMetadata> metadata;
@@ -56,10 +56,10 @@ public class CoreHealthRegistry {
             }
             metadata.put(name, new ContributorMetadata(name, module, dependencyType, timeout));
         }
-        this.contributors = names.values()
+        this.contributors = List.copyOf(names.values()
                 .stream()
                 .sorted(java.util.Comparator.comparing(DependencyHealthContributor::contributorName))
-                .toList();
+                .toList());
         this.metadata = Map.copyOf(metadata);
     }
 

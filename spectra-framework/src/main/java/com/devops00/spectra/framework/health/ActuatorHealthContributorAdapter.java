@@ -17,7 +17,6 @@
 package com.devops00.spectra.framework.health;
 
 import com.devops00.spectra.common.health.DependencyHealthResult;
-import com.devops00.spectra.common.health.DependencyHealthSnapshot;
 import com.devops00.spectra.common.health.DependencyHealthSnapshotProvider;
 import com.devops00.spectra.common.health.DependencyHealthStatus;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;

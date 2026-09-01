@@ -22,7 +22,6 @@ import com.devops00.spectra.common.scheduler.ScheduledJobHandler;
 import com.devops00.spectra.common.scheduler.ScheduledJobType;
 import com.devops00.spectra.common.scheduler.ScheduledRunScope;
 import com.devops00.spectra.common.scheduler.ScheduledScheduleKind;
-import com.devops00.spectra.common.scheduler.ScheduledTriggerType;
 import com.devops00.spectra.core.scheduler.service.impl.ScheduledJobRegistryImpl;
 import org.junit.jupiter.api.Test;
 

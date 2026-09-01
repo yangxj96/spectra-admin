@@ -31,6 +31,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -287,7 +289,7 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
                 manifestRepository.totalRetentionYears());
         String objectKey = manifest.partitionName() + "/" + manifest.manifestId() + ".jsonl";
         SecurityAuditArchiveReceipt receipt = backend.put(objectKey, content, retainUntil);
-        if (!digest.equals(receipt.contentSha256()) || content.length != receipt.contentLength()) {
+        if (!sameDigest(digest, receipt.contentSha256()) || content.length != receipt.contentLength()) {
             throw new IllegalStateException("归档 backend 返回的完整性回执不匹配");
         }
         transactionTemplate.executeWithoutResult(status -> {
@@ -326,7 +328,7 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
         var source = dataRepository.snapshot(manifest.partitionName(), manifest.rangeStart(), manifest.rangeEnd());
         String sourceDigest = SecurityAuditArchiveIntegrity.sha256(source.content());
         if (source.rowCount() != manifest.rowCount()
-                || !sourceDigest.equals(manifest.contentSha256())
+                || !sameDigest(sourceDigest, manifest.contentSha256())
                 || (manifest.contentLength() != null && source.content().length != manifest.contentLength())) {
             throw new IllegalStateException("安全审计归档源范围、行数或摘要校验失败");
         }
@@ -408,6 +410,12 @@ public class SecurityAuditArchiveWorker implements ScheduledLoopHandler {
         long base = 1L << exponent;
         long jitter = ThreadLocalRandom.current().nextLong(0, Math.max(1L, base / 4));
         return Math.min(MAX_BACKOFF_SECONDS, base + jitter);
+    }
+
+    private static boolean sameDigest(String expected, String actual) {
+        return actual != null
+                && MessageDigest.isEqual(expected.getBytes(StandardCharsets.US_ASCII),
+                        actual.getBytes(StandardCharsets.US_ASCII));
     }
 
     private static String errorMessage(Throwable exception) {

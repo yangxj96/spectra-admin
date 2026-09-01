@@ -15,7 +15,6 @@ import com.devops00.spectra.core.scheduler.javabean.vo.SchedulerLoopErrorVO;
 import com.devops00.spectra.core.scheduler.javabean.vo.SchedulerLoopRuntimeVO;
 import com.devops00.spectra.core.scheduler.javabean.vo.SchedulerOperationVO;
 
-import java.util.List;
 import java.util.Map;
 
 /** 调度管理实体和视图转换器。 */

@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.devops00.spectra.common.base.javabean.from.PageFrom;
 import com.devops00.spectra.upload.javabean.from.FileReferenceRequest;
 import com.devops00.spectra.upload.javabean.from.FileReferencePageRequest;
-import com.devops00.spectra.upload.javabean.entity.FileReference;
 import com.devops00.spectra.upload.javabean.vo.FileReferenceAdminVO;
 import com.devops00.spectra.common.port.file.FileReferenceView;
 import com.devops00.spectra.upload.service.FileReferenceAdminService;

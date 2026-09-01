@@ -22,4 +22,9 @@ public record SchedulerJobVO(UUID id, String jobKey, String name, String module,
                              Long initialDelayMs, Instant nextFireAt, SchedulerMisfirePolicy misfirePolicy,
                              SchedulerConcurrencyPolicy concurrencyPolicy, Map<String, Object> executionPolicy,
                              Map<String, Object> parameters, Long revision, Long version) {
+
+    public SchedulerJobVO {
+        executionPolicy = executionPolicy == null ? Map.of() : Map.copyOf(executionPolicy);
+        parameters = parameters == null ? Map.of() : Map.copyOf(parameters);
+    }
 }

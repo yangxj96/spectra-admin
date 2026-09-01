@@ -170,6 +170,8 @@
                     <jvmArguments>
                         --add-modules ALL-SYSTEM --enable-native-access=ALL-UNNAMED
                     </jvmArguments>
+                    <!-- 配置和 files/ 目录位于 spectra-admin 根目录，避免 spring-boot:run 以本模块为工作目录。 -->
+                    <workingDirectory>${project.basedir}/..</workingDirectory>
                 </configuration>
             </plugin>
         </plugins>

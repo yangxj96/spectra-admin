@@ -19,6 +19,7 @@ package com.devops00.spectra.core.scheduler.worker;
 import com.devops00.spectra.core.scheduler.configuration.SchedulerProperties;
 import com.devops00.spectra.core.scheduler.service.SchedulerDatabaseUnavailableEvent;
 import com.devops00.spectra.core.scheduler.service.SchedulerExecutionService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -30,6 +31,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** 单次调度 tick 的离散任务派发器。 */
+@Slf4j
 @Component
 public class DiscreteDispatchWorker {
 
@@ -102,6 +104,7 @@ public class DiscreteDispatchWorker {
                     eventPublisher.publishEvent(new SchedulerDatabaseUnavailableEvent(exception));
                 } catch (RuntimeException exception) {
                     // 处理器异常由 SchedulerExecutionService 转换为 UNKNOWN；这里不伪造成功结果。
+                    log.warn("调度执行批次失败，等待执行服务回写状态", exception);
                 } finally {
                     executionDrainInFlight.set(false);
                 }

@@ -22,7 +22,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.UUID;
-import java.time.Duration;
 
 /** 高频循环错误聚合 Mapper。 */
 @Mapper

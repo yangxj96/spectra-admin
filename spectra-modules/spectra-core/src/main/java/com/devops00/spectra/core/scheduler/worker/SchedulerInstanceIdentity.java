@@ -22,7 +22,7 @@ import java.util.UUID;
 
 /** 单体应用进程级实例身份；不使用主机名或可变网络地址。 */
 @Component
-public class SchedulerInstanceIdentity {
+public final class SchedulerInstanceIdentity {
 
     private final String value;
 

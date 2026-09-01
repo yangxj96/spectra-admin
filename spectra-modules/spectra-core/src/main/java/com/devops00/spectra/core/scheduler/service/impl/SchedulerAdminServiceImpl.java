@@ -67,6 +67,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -485,7 +486,7 @@ public class SchedulerAdminServiceImpl implements SchedulerAdminService {
         job.setScheduleKind(from.getScheduleKind());
         job.setCronExpression(cleanText(from.getCronExpression()));
         job.setFixedDelayMs(from.getFixedDelayMs());
-        job.setInitialDelayMs(from.getInitialDelayMs() == null ? 0L : from.getInitialDelayMs());
+        job.setInitialDelayMs(Objects.requireNonNullElse(from.getInitialDelayMs(), 0L));
         job.setNextFireAt(null);
         job.setMisfirePolicy(from.getMisfirePolicy());
         job.setConcurrencyPolicy(from.getConcurrencyPolicy());

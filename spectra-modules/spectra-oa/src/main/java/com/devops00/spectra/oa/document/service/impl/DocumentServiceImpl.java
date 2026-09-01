@@ -166,7 +166,7 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         version.setVersionNo(latest == null ? 1 : latest.getVersionNo() + 1);
         version.setFileAssetId(file.fileAssetId());
         version.setFileName(StringUtils.hasText(from.getFileName()) ? from.getFileName() : file.originalName());
-        version.setFileSize(from.getFileSize() == null ? file.size() : from.getFileSize());
+        version.setFileSize(Objects.requireNonNullElse(from.getFileSize(), file.size()));
         version.setContentType(StringUtils.hasText(from.getContentType()) ? from.getContentType() : file.contentType());
         version.setVersionNote(from.getVersionNote());
         version.setCurrentVersion(true);
@@ -271,21 +271,6 @@ public class DocumentServiceImpl extends BaseServiceImpl<DocumentMapper, Documen
         if (versionMapper.updateById(version) != 1) {
             throw new DataSaveException("恢复文档版本失败");
         }
-    }
-
-    /**
-     * 校验并确保数据满足当前约束（{@code requireVersion}）。
-     */
-    private DocumentVersion requireVersion(UUID id, UUID versionId) {
-        var document = requireAccessible(id);
-        DocumentVersion version = versionId == null
-                ? currentVersion(document.getId())
-                : versionMapper.selectOne(new LambdaQueryWrapper<DocumentVersion>().eq(DocumentVersion::getId, versionId)
-                        .eq(DocumentVersion::getDocumentId, document.getId()));
-        if (version == null) {
-            throw new DataNotExistException("文档版本不存在");
-        }
-        return version;
     }
 
     /**

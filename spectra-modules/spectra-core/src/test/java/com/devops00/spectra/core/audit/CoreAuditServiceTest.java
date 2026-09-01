@@ -19,7 +19,6 @@ package com.devops00.spectra.core.audit;
 import com.devops00.spectra.common.audit.AuditCategory;
 import com.devops00.spectra.common.audit.AuditContext;
 import com.devops00.spectra.common.audit.AuditRecord;
-import com.devops00.spectra.common.audit.AuditSanitizer;
 import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.core.system.service.OperationLogService;
 import com.devops00.spectra.security.base.audit.AuditResult;

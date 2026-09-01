@@ -49,6 +49,7 @@ public interface SchedulerLoopRuntimeMapper extends BaseMapper<SchedulerLoopRunt
                          @Param("leaseExpiresAt") Instant leaseExpiresAt);
 
     /** 以会话版本回写周期计数和运行状态。 */
+    @SuppressWarnings("PMD.ExcessiveParameterList")
     int recordCycle(
                     @Param("id") UUID id,
                     @Param("expectedVersion") long expectedVersion,
