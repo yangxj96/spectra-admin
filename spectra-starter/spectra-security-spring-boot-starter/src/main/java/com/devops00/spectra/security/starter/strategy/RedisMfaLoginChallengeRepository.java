@@ -142,9 +142,10 @@ public final class RedisMfaLoginChallengeRepository implements SecurityMfaChalle
     @Override
     public boolean recordFailure(String challengeId) {
         return SecurityRedisExecutor.execute("记录 MFA Challenge 失败次数", () -> {
+            // Lua 的 tonumber 参数必须保持数值类型，避免 JSON 字符串序列化后的引号。
             Long result = SecurityRedisExecutor.require("记录 MFA Challenge 失败次数",
                     () -> redis.execute(RECORD_FAILURE_SCRIPT, Collections.singletonList(key(challengeId)),
-                            Integer.toString(Math.max(1, properties.getMfaChallengeMaxAttempts()))));
+                            Math.max(1, properties.getMfaChallengeMaxAttempts())));
             return result > 0;
         });
     }

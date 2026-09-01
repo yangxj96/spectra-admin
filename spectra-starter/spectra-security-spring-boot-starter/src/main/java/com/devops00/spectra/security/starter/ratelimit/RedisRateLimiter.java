@@ -106,7 +106,8 @@ public final class RedisRateLimiter {
     }
 
     private static IncrementResult executeRedisScript(RedisTemplate<String, Object> redis, String key, long ttlMillis) {
-        List<?> response = redis.execute(INCREMENT_SCRIPT, List.of(key), Long.toString(ttlMillis));
+        // Lua 的 PEXPIRE 参数必须是裸数字；String 会被 JSON 序列化为带引号的参数。
+        List<?> response = redis.execute(INCREMENT_SCRIPT, List.of(key), ttlMillis);
         if (response == null || response.size() < 2) {
             throw new SecurityRedisUnavailableException("安全 Redis 限流脚本未返回完整结果", null);
         }

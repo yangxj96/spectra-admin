@@ -19,6 +19,8 @@ package com.devops00.spectra.security.starter.ratelimit;
 import com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -129,6 +131,28 @@ class RedisRateLimiterTest {
 
         assertThatThrownBy(() -> limiter.tryAcquire(policy, new RateLimitPolicy.Subject("192.0.2.10", null)))
                 .isInstanceOf(SecurityRedisUnavailableException.class);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldPassWindowTtlAsNumericScriptArgument() {
+        var policy = new RateLimitPolicy("test", java.time.Duration.ofMinutes(1), 1,
+                RateLimitPolicy.SubjectDimension.IP,
+                List.of(new RateLimitPolicy.Endpoint("POST", "/test")));
+        var arguments = new AtomicReference<Object[]>();
+        RedisTemplate<String, Object> redis = new RedisTemplate<>() {
+            @Override
+            public <T> T execute(RedisScript<T> script, List<String> keys, Object... args) {
+                arguments.set(args);
+                return (T) List.of(1L, 60_000L);
+            }
+        };
+
+        var decision = new RedisRateLimiter(redis).tryAcquire(policy,
+                new RateLimitPolicy.Subject("192.0.2.10", null));
+
+        assertThat(decision.allowed()).isTrue();
+        assertThat(arguments.get()).containsExactly(60_000L);
     }
 
     @Test

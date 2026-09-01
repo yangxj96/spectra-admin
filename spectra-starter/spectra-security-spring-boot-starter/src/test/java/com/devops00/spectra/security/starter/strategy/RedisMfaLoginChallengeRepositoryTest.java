@@ -29,6 +29,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -43,6 +44,28 @@ import static org.mockito.Mockito.when;
 
 /** Redis MFA 预认证挑战存储测试。 */
 class RedisMfaLoginChallengeRepositoryTest {
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void shouldPassFailureLimitAsNumericScriptArgument() {
+        var arguments = new AtomicReference<Object[]>();
+        RedisTemplate<String, Object> redis = new RedisTemplate<>() {
+            @Override
+            public <T> T execute(RedisScript<T> script, List<String> keys, Object... args) {
+                arguments.set(args);
+                return (T) Long.valueOf(1L);
+            }
+        };
+        SecurityProperties properties = new SecurityProperties();
+        properties.setMfaChallengeMaxAttempts(2);
+
+        var repository = new RedisMfaLoginChallengeRepository(redis, properties);
+
+        repository.recordFailure(UUID.randomUUID().toString());
+        assertEquals(1, arguments.get().length);
+        assertTrue(arguments.get()[0] instanceof Number);
+        assertEquals(2, ((Number) arguments.get()[0]).intValue());
+    }
 
     @Test
     void shouldCreateShortLivedChallengeWithNonSensitiveState() {
@@ -98,7 +121,7 @@ class RedisMfaLoginChallengeRepositoryTest {
         String challengeId = UUID.randomUUID().toString();
         String key = SecurityRedisKey.MFA_CHALLENGE.format(challengeId);
         List<String> keys = List.of(key);
-        when(redis.execute(any(RedisScript.class), eq(keys), eq("2")))
+        when(redis.execute(any(RedisScript.class), eq(keys), eq(2)))
                 .thenReturn(1L)
                 .thenReturn(0L);
 
@@ -113,7 +136,7 @@ class RedisMfaLoginChallengeRepositoryTest {
         RedisTemplate<String, Object> redis = mock();
         String challengeId = UUID.randomUUID().toString();
         List<String> keys = List.of(SecurityRedisKey.MFA_CHALLENGE.format(challengeId));
-        when(redis.execute(any(RedisScript.class), eq(keys), eq("5"))).thenReturn(null);
+        when(redis.execute(any(RedisScript.class), eq(keys), eq(5))).thenReturn(null);
 
         var repository = new RedisMfaLoginChallengeRepository(redis, new SecurityProperties());
 
