@@ -39,6 +39,14 @@
     </properties>
 
     <dependencies>
+        <!-- 测试上下文复用集中管理的 application-dev.yml，不进入核心模块运行时依赖。 -->
+        <dependency>
+            <groupId>com.devops00.spectra</groupId>
+            <artifactId>spectra-config</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <!-- === 工具 === -->
         <!-- ip 转区域 -->
         <dependency>
