@@ -33,7 +33,7 @@
         LIMIT 1
     </select>
 
-    <select id="upsertOccurrence" resultMap="BaseResultMap">
+    <select id="upsertOccurrence" resultMap="BaseResultMap" affectData="true">
         INSERT INTO spectra_core.scheduler_loop_error (
             id, job_id, instance_id, runtime_id, error_fingerprint, error_code, error_message,
             status, first_seen_at, last_seen_at, last_logged_at, occurrence_count, suppressed_count,

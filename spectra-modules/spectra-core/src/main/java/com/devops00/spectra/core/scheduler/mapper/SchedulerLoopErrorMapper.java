@@ -16,6 +16,7 @@
 
 package com.devops00.spectra.core.scheduler.mapper;
 
+import com.baomidou.mybatisplus.annotation.InterceptorIgnore;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.devops00.spectra.core.scheduler.javabean.entity.SchedulerLoopErrorEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -34,6 +35,7 @@ public interface SchedulerLoopErrorMapper extends BaseMapper<SchedulerLoopErrorE
                                                      @Param("errorFingerprint") String errorFingerprint);
 
     /** 原子写入或更新错误聚合，并返回更新后的聚合记录。 */
+    @InterceptorIgnore(dataPermission = "true")
     SchedulerLoopErrorEntity upsertOccurrence(
                                               @Param("error") SchedulerLoopErrorEntity error,
                                               @Param("logIntervalMs") long logIntervalMs);
