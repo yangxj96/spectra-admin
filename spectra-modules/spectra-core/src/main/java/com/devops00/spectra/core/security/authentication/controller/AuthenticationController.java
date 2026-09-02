@@ -17,8 +17,6 @@
 package com.devops00.spectra.core.security.authentication.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
-import com.devops00.spectra.core.security.authentication.javabean.from.MfaCompleteFrom;
-import com.devops00.spectra.core.security.authentication.javabean.from.MfaVerifyFrom;
 import com.devops00.spectra.core.security.authentication.service.LoginService;
 import com.devops00.spectra.core.security.authentication.service.VerificationCodeService;
 import com.devops00.spectra.framework.configure.mvc.security.AuthenticationWebUtils;
@@ -48,7 +46,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * 认证 HTTP 适配器。
  *
- * <p>登录、MFA、会话撤销和刷新编排由 LoginService 负责；本控制器只处理 HTTP 参数、
+ * <p>登录、会话撤销和刷新编排由 LoginService 负责；本控制器只处理 HTTP 参数、
  * Web Cookie 和 CSRF。</p>
  *
  * @author yangxj96
@@ -85,34 +83,6 @@ public class AuthenticationController {
                          HttpServletResponse response) {
         ClientType clientType = AuthenticationWebUtils.clientType(request);
         TokenVO token = loginService.login(params, clientType);
-        return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code verifyMfa}）。
-     */
-    @Audit(value = "'完成 MFA 登录验证'", category = AuditCategory.SECURITY)
-    @Encrypt(response = false)
-    @PreAuthorize("permitAll()")
-    @PostMapping(value = "/mfa/verify", version = "1.0.0")
-    public TokenVO verifyMfa(@Valid @RequestBody MfaVerifyFrom params, HttpServletRequest request,
-                             HttpServletResponse response) {
-        ClientType clientType = AuthenticationWebUtils.clientType(request);
-        TokenVO token = loginService.verifyMfa(params.getChallengeId(), params.getCode(), clientType);
-        return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code completeMfaEnrollment}）。
-     */
-    @Audit(value = "'完成首次 MFA 登记登录'", category = AuditCategory.SECURITY)
-    @Encrypt(response = false)
-    @PreAuthorize("permitAll()")
-    @PostMapping(value = "/mfa/complete", version = "1.0.0")
-    public TokenVO completeMfaEnrollment(@Valid @RequestBody MfaCompleteFrom params,
-                                         HttpServletRequest request, HttpServletResponse response) {
-        ClientType clientType = AuthenticationWebUtils.clientType(request);
-        TokenVO token = loginService.completeMfaEnrollment(params.getChallengeId(), clientType);
         return AuthenticationWebUtils.writeWebToken(response, token, securityProperties, clientType);
     }
 

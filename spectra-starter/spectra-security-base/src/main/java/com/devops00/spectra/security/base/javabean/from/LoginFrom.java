@@ -63,13 +63,4 @@ public class LoginFrom {
      */
     private String emailCode;
 
-    /**
-     * OTP 验证码。
-     */
-    private String principal;
-
-    /**
-     * 一次性密码。
-     */
-    private String otp;
 }

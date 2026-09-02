@@ -9,9 +9,7 @@ package com.devops00.spectra.core.security.initialization.controller;
 
 import com.devops00.spectra.common.annotation.Encrypt;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
-import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationStartFrom;
-import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationMfaConfirmVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStartVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 import com.devops00.spectra.core.security.initialization.service.SystemInitializationService;
@@ -59,18 +57,6 @@ public class SystemInitializationController {
                                              @Valid @RequestBody SystemInitializationStartFrom from,
                                              @RequestHeader(value = INITIALIZATION_TOKEN_HEADER, required = false) String token) {
         return initializationService.start(from, token);
-    }
-
-    /**
-     * 处理内部业务逻辑（{@code confirmMfa}）。
-     */
-    @Audit(value = "'确认系统初始化 MFA'", category = AuditCategory.SECURITY, eventType = "SYSTEM_INITIALIZATION_MFA_CONFIRMED")
-    @Encrypt(response = false)
-    @PostMapping(value = "/mfa/confirm", version = "1.0.0")
-    @PreAuthorize("permitAll()")
-    public SystemInitializationMfaConfirmVO confirmMfa(
-                                                       @Valid @RequestBody SystemInitializationMfaConfirmFrom from) {
-        return initializationService.confirmMfa(from);
     }
 
     /**

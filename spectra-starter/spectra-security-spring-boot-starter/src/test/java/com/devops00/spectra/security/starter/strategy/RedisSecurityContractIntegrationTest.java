@@ -24,7 +24,6 @@ import com.devops00.spectra.security.base.util.VerificationCodeRedisStore;
 import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataAccessResourceFailureException;
-import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.data.redis.core.ValueOperations;
@@ -76,18 +75,6 @@ class RedisSecurityContractIntegrationTest {
     }
 
     @Test
-    void shouldConsumeMfaChallengeOnlyOnce() {
-        RedisTemplate<String, Object> redis = mock();
-        when(redis.execute(any(RedisScript.class), eq(List.of(SecurityRedisKey.MFA_CHALLENGE.format("challenge")))))
-                .thenReturn(1L)
-                .thenReturn(0L);
-        var repository = new RedisMfaLoginChallengeRepository(redis, new SecurityProperties());
-
-        assertTrue(repository.consume("challenge"));
-        assertFalse(repository.consume("challenge"));
-    }
-
-    @Test
     void shouldRejectConsumedOrExpiredVerificationCode() {
         RedisTemplate<String, Object> redis = mock();
         String key = "security:verification:login:sms:expired";
@@ -117,20 +104,6 @@ class RedisSecurityContractIntegrationTest {
 
         assertThrows(com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException.class,
                 () -> RefreshTokenRotationStore.claim(redis, "sec:rt:missing", "sec:rt:claim:missing", 300));
-    }
-
-    @Test
-    void shouldFailClosedForMfaWhenRedisCommandFails() {
-        RedisTemplate<String, Object> redis = mock();
-        HashOperations<String, Object, Object> hashes = mock();
-        when(redis.opsForHash()).thenReturn(hashes);
-        when(hashes.entries(any(String.class)))
-                .thenThrow(new DataAccessResourceFailureException("redis unavailable"));
-
-        var repository = new RedisMfaLoginChallengeRepository(redis, new SecurityProperties());
-
-        assertThrows(com.devops00.spectra.security.base.exception.SecurityRedisUnavailableException.class,
-                () -> repository.find("challenge"));
     }
 
     @Test

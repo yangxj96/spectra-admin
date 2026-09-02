@@ -27,7 +27,7 @@ public class SecurityChangeOutboxProducer {
     private final ObjectMapper objectMapper;
 
     /**
-     * 只为成功的安全配置变更产生外部动作事件；登录、MFA 校验和审计查询仍只写安全事实表。
+     * 只为成功的安全配置变更产生外部动作事件；登录和审计查询仍只写安全事实表。
      * 调用方必须在安全变更数据库事务内调用本方法。
      */
     public void publish(SecurityAuditEvent event) {
@@ -46,7 +46,6 @@ public class SecurityChangeOutboxProducer {
         }
     }
 
-    /** 供直接处理 MFA 变更的服务复用同一事件过滤规则。 */
     public static boolean isDispatchable(String eventType) {
         if (eventType == null || eventType.isBlank()) {
             return false;
@@ -55,8 +54,6 @@ public class SecurityChangeOutboxProducer {
                 || eventType.startsWith("ROLE_")
                 || eventType.startsWith("AUTHORIZATION_")
                 || eventType.startsWith("ORGANIZATION_")
-                || eventType.startsWith("MFA_FACTOR_")
-                || eventType.equals("MFA_RECOVERY_CODES_ROTATED")
                 || eventType.equals("SESSION_POLICY_CHANGED")
                 || eventType.equals("PASSWORD_POLICY_CHANGED");
     }
@@ -70,9 +67,6 @@ public class SecurityChangeOutboxProducer {
         }
         if (eventType.startsWith("ORGANIZATION_")) {
             return "ORGANIZATION";
-        }
-        if (eventType.startsWith("MFA_")) {
-            return "MFA_POLICY";
         }
         return "SECURITY_POLICY";
     }

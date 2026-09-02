@@ -8,9 +8,7 @@
 package com.devops00.spectra.core.security.initialization.service;
 
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
-import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationStartFrom;
-import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationMfaConfirmVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStartVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 
@@ -26,11 +24,6 @@ public interface SystemInitializationService {
      * 创建或构建目标数据（{@code start}）。
      */
     SystemInitializationStartVO start(SystemInitializationStartFrom from, String initializationToken);
-
-    /**
-     * 处理内部业务逻辑（{@code confirmMfa}）。
-     */
-    SystemInitializationMfaConfirmVO confirmMfa(SystemInitializationMfaConfirmFrom from);
 
     /**
      * 处理内部业务逻辑（{@code complete}）。

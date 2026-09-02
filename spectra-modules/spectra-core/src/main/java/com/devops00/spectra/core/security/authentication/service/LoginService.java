@@ -29,14 +29,8 @@ import com.devops00.spectra.security.base.javabean.vo.TokenVO;
  */
 public interface LoginService {
 
-    /** 执行账号主认证，必要时返回 MFA 预认证挑战。 */
+    /** 执行账号主认证并签发正式会话。 */
     TokenVO login(LoginFrom params, ClientType clientType);
-
-    /** 校验已完成主认证的 MFA 挑战并签发会话。 */
-    TokenVO verifyMfa(String challengeId, String code, ClientType clientType);
-
-    /** 首次完成 MFA 登记后消费挑战并签发会话。 */
-    TokenVO completeMfaEnrollment(String challengeId, ClientType clientType);
 
     /** 撤销当前会话和刷新会话。 */
     void logout(String token, String refreshToken, ClientType clientType);

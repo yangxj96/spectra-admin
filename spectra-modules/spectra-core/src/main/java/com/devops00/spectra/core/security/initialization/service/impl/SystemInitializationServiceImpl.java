@@ -11,7 +11,6 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.devops00.spectra.common.constant.ConfiguredValueType;
 import com.devops00.spectra.common.exception.DataSaveException;
 import com.devops00.spectra.core.security.authentication.service.AuthenticationIdentityService;
-import com.devops00.spectra.core.security.authentication.service.MfaService;
 import com.devops00.spectra.core.security.authentication.service.PasswordCredentialService;
 import com.devops00.spectra.core.security.authorization.constant.SecurityAuthorizationState;
 import com.devops00.spectra.core.security.authorization.entity.RoleAssignment;
@@ -22,9 +21,7 @@ import com.devops00.spectra.core.security.authorization.service.AuthorizationAss
 import com.devops00.spectra.core.security.initialization.constant.SystemStateKeys;
 import com.devops00.spectra.core.security.initialization.javabean.entity.SystemState;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationCompleteFrom;
-import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
 import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationStartFrom;
-import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationMfaConfirmVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStartVO;
 import com.devops00.spectra.core.security.initialization.javabean.vo.SystemInitializationStatusVO;
 import com.devops00.spectra.core.security.initialization.mapper.SystemStateMapper;
@@ -34,12 +31,8 @@ import com.devops00.spectra.core.system.service.ConfiguredService;
 import com.devops00.spectra.core.user.javabean.constant.UserStatus;
 import com.devops00.spectra.core.user.javabean.entity.User;
 import com.devops00.spectra.core.user.mapper.UserMapper;
-import com.devops00.spectra.security.base.constant.ClientType;
-import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort;
-import com.devops00.spectra.security.base.mfa.SecurityMfaChallengePort.MfaLoginChallenge;
 import com.devops00.spectra.security.base.policy.SecurityPasswordPolicyProvider;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -68,12 +61,10 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     private final AuthorizationAssignmentChangeService authorizationAssignmentChangeService;
     private final AuthenticationIdentityService authenticationIdentityService;
     private final PasswordCredentialService passwordCredentialService;
-    private final MfaService mfaService;
     private final SystemInitializationTokenManager initializationTokenManager;
     private final SecurityPasswordPolicyProvider passwordPolicyProvider;
     private final PasswordEncoder passwordEncoder;
     private final JdbcTemplate jdbcTemplate;
-    private final ObjectProvider<SecurityMfaChallengePort> challengeProvider;
 
     @Override
     public SystemInitializationStatusVO status() {
@@ -119,46 +110,31 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
 
         authenticationIdentityService.createPasswordIdentity(user.getId(), username);
         passwordCredentialService.createOrReplace(user.getId(), passwordEncoder.encode(from.getPassword()), false);
-        var enrollment = mfaService.beginTotpEnrollment(user.getId());
-        MfaLoginChallenge challenge = requireChallengePort().create(
-                user.getId(), username, ClientType.WEB, true);
-        UUID initializationId = UUID.fromString(challenge.id());
+        UUID initializationId = UUID.randomUUID();
 
         state.setState(SystemStateKeys.INITIALIZING);
         state.setInitializationId(initializationId);
         if (stateMapper.updateById(state) != 1) {
             throw new IllegalStateException("保存初始化状态失败");
         }
-        return new SystemInitializationStartVO(initializationId, enrollment.enrollmentId(),
-                enrollment.provisioningUri(), enrollment.secret(), challenge.expiresAt());
-    }
-
-    @Override
-    @Transactional
-    public SystemInitializationMfaConfirmVO confirmMfa(SystemInitializationMfaConfirmFrom from) {
-        MfaLoginChallenge challenge = requireInitializationChallenge(from.getInitializationId(), false);
-        if (!challenge.enrollmentRequired() || challenge.enrollmentCompleted()) {
-            throw new IllegalStateException("初始化 MFA 挑战状态无效");
-        }
-        var recoveryCodes = mfaService.confirmTotpEnrollment(challenge.userId(), from.getEnrollmentId(), from.getCode());
-        if (!requireChallengePort().markEnrollmentCompleted(challenge.id())) {
-            throw new IllegalStateException("初始化 MFA 挑战状态更新失败");
-        }
-        return new SystemInitializationMfaConfirmVO(recoveryCodes);
+        return new SystemInitializationStartVO(initializationId);
     }
 
     @Override
     @Transactional
     public void complete(SystemInitializationCompleteFrom from) {
-        MfaLoginChallenge challenge = requireInitializationChallenge(from.getInitializationId(), true);
         lockInitialization();
         SystemState state = loadState(true);
+        UUID initializationId = parseInitializationId(from.getInitializationId());
         if (!SystemStateKeys.INITIALIZING.equals(state.getState())
-                || !challenge.id().equals(String.valueOf(state.getInitializationId()))) {
+                || !initializationId.equals(state.getInitializationId())) {
             throw new IllegalStateException("初始化状态已变化，请重新开始初始化");
         }
 
-        User user = userMapper.selectById(challenge.userId());
+        User user = userMapper.selectOne(new LambdaQueryWrapper<User>()
+                .eq(User::getEmployeeNo, "DEV_OPS")
+                .eq(User::getStatus, UserStatus.LOCKED)
+                .last("LIMIT 1"));
         if (user == null || !UserStatus.LOCKED.equals(user.getStatus())) {
             throw new IllegalStateException("初始化用户状态无效");
         }
@@ -198,9 +174,6 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
             throw new IllegalStateException("完成系统初始化失败");
         }
 
-        if (!requireChallengePort().consume(challenge.id())) {
-            throw new IllegalStateException("初始化 MFA 挑战已失效");
-        }
         initializationTokenManager.clear();
     }
 
@@ -236,37 +209,14 @@ public class SystemInitializationServiceImpl implements SystemInitializationServ
     }
 
     /**
-     * 校验并确保数据满足当前约束（{@code requireInitializationChallenge}）。
+     * 解析初始化流程的一次性标识。
      */
-    private MfaLoginChallenge requireInitializationChallenge(String initializationId, boolean completed) {
-        UUID challengeUuid;
+    private UUID parseInitializationId(String initializationId) {
         try {
-            challengeUuid = UUID.fromString(initializationId);
+            return UUID.fromString(initializationId);
         } catch (IllegalArgumentException exception) {
-            throw new IllegalArgumentException("初始化挑战无效", exception);
+            throw new IllegalArgumentException("初始化标识无效", exception);
         }
-        SystemState state = loadState(false);
-        if (!SystemStateKeys.INITIALIZING.equals(state.getState()) || !challengeUuid.equals(state.getInitializationId())) {
-            throw new IllegalStateException("初始化状态不存在或已完成");
-        }
-        MfaLoginChallenge challenge = requireChallengePort().find(initializationId);
-        if (challenge == null
-                || challenge.clientType() != ClientType.WEB
-                || challenge.enrollmentCompleted() != completed) {
-            throw new IllegalStateException("初始化 MFA 挑战不存在或已过期");
-        }
-        return challenge;
-    }
-
-    /**
-     * 校验并确保数据满足当前约束（{@code requireChallengePort}）。
-     */
-    private SecurityMfaChallengePort requireChallengePort() {
-        SecurityMfaChallengePort port = challengeProvider.getIfAvailable();
-        if (port == null) {
-            throw new IllegalStateException("Redis MFA 挑战存储未配置");
-        }
-        return port;
     }
 
     /**

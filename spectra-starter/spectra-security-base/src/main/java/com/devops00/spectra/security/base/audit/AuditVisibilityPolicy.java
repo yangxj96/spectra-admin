@@ -89,7 +89,6 @@ public interface AuditVisibilityPolicy {
                 || normalized.contains("BREAK_GLASS")
                 || normalized.contains("SECURITY")
                 || normalized.contains("SESSION")
-                || normalized.contains("MFA")
                 || normalized.contains("PASSWORD")
                 || normalized.contains("AUDIT");
     }

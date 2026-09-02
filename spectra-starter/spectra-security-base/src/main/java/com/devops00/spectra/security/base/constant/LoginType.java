@@ -39,10 +39,6 @@ public enum LoginType implements IEnum<Integer> {
      */
     SMS(2, "sms"),
     /**
-     * 扫码
-     */
-    OTP(3, "OTP"),
-    /**
      * 邮件验证码登录
      */
     EMAIL(4, "email"),

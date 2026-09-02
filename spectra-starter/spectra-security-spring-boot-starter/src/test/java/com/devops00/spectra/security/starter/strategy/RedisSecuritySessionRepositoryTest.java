@@ -17,7 +17,6 @@
 package com.devops00.spectra.security.starter.strategy;
 
 import com.devops00.spectra.security.base.constant.SecurityRedisKey;
-import com.devops00.spectra.security.base.holder.SecurityUserLoader;
 import com.devops00.spectra.security.base.javabean.entity.SecurityUser;
 import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
@@ -25,6 +24,7 @@ import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.TokenDigestService;
 import com.devops00.spectra.security.starter.converter.UserOnlineConverter;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.SetOperations;
@@ -37,9 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -54,47 +52,37 @@ import static org.mockito.Mockito.when;
 class RedisSecuritySessionRepositoryTest {
 
     @Test
-    void shouldPreserveMfaAssuranceWhenRefreshingDevOpsSession() {
-        String refreshToken = "refresh-token";
-        String refreshDigest = TokenDigestService.digest(refreshToken);
-        String accessDigest = "access-digest";
-        String familyId = "family-id";
+    void shouldNotPersistAuthenticationAssuranceWhenCreatingSession() {
         UUID userId = UUID.fromString("00000000-0000-0000-0000-000000000001");
-        String refreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
-        String sessionKey = SecurityRedisKey.SESSION.format(accessDigest);
+        String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
 
         RedisTemplate<String, Object> redis = mock();
         HashOperations<String, Object, Object> hashes = mock();
         SetOperations<String, Object> sets = mock();
         ValueOperations<String, Object> values = mock();
-        SecurityUserLoader userLoader = mock();
         when(redis.opsForHash()).thenReturn(hashes);
         when(redis.opsForSet()).thenReturn(sets);
         when(redis.opsForValue()).thenReturn(values);
-        when(hashes.entries(eq(refreshKey))).thenReturn(Map.of(
-                "accessToken", accessDigest,
-                "userId", userId.toString(),
-                "clientType", "web",
-                "familyId", familyId,
-                "aal", "AAL2"));
-        // Access Session 已过期时仍必须依据 Refresh Hash 保留的 AAL2 刷新成功。
-        when(hashes.entries(eq(sessionKey))).thenReturn(Map.of());
-        when(sets.members(anyString())).thenReturn(Set.of());
+        when(sets.members(eq(userTokensKey))).thenReturn(Set.of());
         when(redis.hasKey(anyString())).thenReturn(false);
-        when(redis.execute(any(), anyList(), any())).thenReturn(1L);
 
         SecurityUser user = new SecurityUser();
         user.setId(userId);
         user.setUsername("devops00.com");
         user.setAuthorities(List.of(new SimpleGrantedAuthority("ROLE_DEV_OPS")));
-        when(userLoader.load(userId)).thenReturn(user);
         SecuritySessionPolicyProvider policyProvider = mock();
         when(policyProvider.find("web")).thenReturn(SessionPolicy.defaults(900, 86400));
 
         var repository = new RedisSecuritySessionRepository(mock(ObjectMapper.class), redis,
-                new SecurityProperties(), mock(UserOnlineConverter.class), policyProvider, userLoader);
+                new SecurityProperties(), mock(UserOnlineConverter.class), policyProvider, null);
 
-        assertDoesNotThrow(() -> repository.refreshByRefreshToken(refreshToken));
+        repository.createToken(user, com.devops00.spectra.security.base.constant.ClientType.WEB);
+
+        ArgumentCaptor<Map> sessionCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(hashes, org.mockito.Mockito.atLeast(2)).putAll(anyString(), sessionCaptor.capture());
+        for (Map<?, ?> hash : sessionCaptor.getAllValues()) {
+            org.junit.jupiter.api.Assertions.assertFalse(hash.containsKey("aal"));
+        }
     }
 
     @Test

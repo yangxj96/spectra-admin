@@ -68,10 +68,6 @@
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
-        <Class name="com.devops00.spectra.core.security.authentication.controller.MfaController"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
         <Class name="com.devops00.spectra.core.security.authentication.provider.LoginEmailProvider"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
@@ -81,10 +77,6 @@
     </Match>
     <Match>
         <Class name="com.devops00.spectra.core.security.authentication.service.impl.LoginServiceImpl"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.core.security.authentication.service.impl.MfaServiceImpl"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>
@@ -191,10 +183,6 @@
     </Match>
     <Match>
         <Class name="com.devops00.spectra.security.starter.ratelimit.RequestRateLimitFilter"/>
-        <Bug pattern="EI_EXPOSE_REP2"/>
-    </Match>
-    <Match>
-        <Class name="com.devops00.spectra.security.starter.strategy.RedisMfaLoginChallengeRepository"/>
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
     <Match>

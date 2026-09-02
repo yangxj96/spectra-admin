@@ -13,12 +13,6 @@ spectra:
     refresh-cookie-domain: ${SPECTRA_SECURITY_REFRESH_COOKIE_DOMAIN:}
     csrf-cookie-name: ${SPECTRA_SECURITY_CSRF_COOKIE_NAME:XSRF-TOKEN}
     csrf-header-name: ${SPECTRA_SECURITY_CSRF_HEADER_NAME:X-XSRF-TOKEN}
-    mfa-encryption-key: ${SPECTRA_SECURITY_MFA_ENCRYPTION_KEY:}
-    mfa-encryption-key-version: ${SPECTRA_SECURITY_MFA_ENCRYPTION_KEY_VERSION:v1}
-    mfa-previous-encryption-key: ${SPECTRA_SECURITY_MFA_PREVIOUS_ENCRYPTION_KEY:}
-    mfa-previous-encryption-key-version: ${SPECTRA_SECURITY_MFA_PREVIOUS_ENCRYPTION_KEY_VERSION:}
-    mfa-challenge-expire: ${SPECTRA_SECURITY_MFA_CHALLENGE_EXPIRE:300}
-    mfa-challenge-max-attempts: ${SPECTRA_SECURITY_MFA_CHALLENGE_MAX_ATTEMPTS:5}
     redis:
       namespace: "sec:"
       fail-closed: true

@@ -57,9 +57,6 @@ public enum SecurityRedisKey implements RedisKey {
     /** Refresh Token 一次性消费声明。 */
     REFRESH_CLAIM(SecurityRedisNamespace.PREFIX + "rt:claim:%s"),
 
-    /** MFA 登录预认证挑战；只保存短期非敏感的用户标识和挑战状态。 */
-    MFA_CHALLENGE(SecurityRedisNamespace.PREFIX + "mfa:challenge:%s"),
-
     /** 首次系统初始化令牌的 SHA-256 摘要；不保存令牌明文。 */
     INITIALIZATION_TOKEN(SecurityRedisNamespace.PREFIX + "init:token");
 

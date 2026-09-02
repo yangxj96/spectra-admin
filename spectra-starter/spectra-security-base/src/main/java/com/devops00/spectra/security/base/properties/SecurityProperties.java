@@ -45,15 +45,9 @@ public class SecurityProperties {
             "/common/kaptcha",
             // 用户登陆
             "/security/authentication/login",
-            // MFA 二阶段登录与首次 TOTP 登记
-            "/security/authentication/mfa/verify",
-            "/security/authentication/mfa/complete",
-            "/security/mfa/setup/totp/enroll",
-            "/security/mfa/setup/totp/confirm",
-            // 首次系统初始化；接口内部仍要求一次性初始化令牌或 Redis Challenge
+            // 首次系统初始化；接口内部要求一次性初始化令牌和初始化 ID
             "/system/initialization/status",
             "/system/initialization/start",
-            "/system/initialization/mfa/confirm",
             "/system/initialization/complete",
             // 刷新token
             "/security/authentication/refresh",
@@ -136,30 +130,6 @@ public class SecurityProperties {
 
     /** v2 用户最大活动会话数。 */
     private int maxSessions = 5;
-
-    /** TOTP 密钥加密密钥；必须由环境变量或密钥管理系统提供。 */
-    private String mfaEncryptionKey = "";
-
-    /** TOTP 密钥加密版本，用于轮换和回迁。 */
-    private String mfaEncryptionKeyVersion = "v1";
-
-    /** TOTP 密钥轮换期间允许解密旧设备密钥的上一版本；只用于迁移，不用于新加密。 */
-    private String mfaPreviousEncryptionKey = "";
-
-    /** 上一 TOTP 密钥的版本号；必须和上一密钥同时配置。 */
-    private String mfaPreviousEncryptionKeyVersion = "";
-
-    /** TOTP provisioning URI 的发行方名称。 */
-    private String mfaTotpIssuer = "Spectra";
-
-    /** DEV_OPS 尚未登记 MFA 时禁止创建普通 Root Session；显式停用后的登记保留撤销状态。 */
-    private boolean mfaRequiredForDevOps = true;
-
-    /** MFA 登录预认证挑战有效期（秒）。 */
-    private long mfaChallengeExpire = 300L;
-
-    /** 单个 MFA 登录预认证挑战允许的最大失败次数。 */
-    private int mfaChallengeMaxAttempts = 5;
 
     /** Web Refresh Token 的 Host-only Cookie 名称。 */
     private String refreshCookieName = "__Host-spectra-refresh";

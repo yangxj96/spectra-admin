@@ -34,7 +34,6 @@ import com.devops00.spectra.security.base.javabean.vo.UserOnlineVO;
 import com.devops00.spectra.security.base.policy.SecuritySessionPolicyProvider;
 import com.devops00.spectra.security.base.policy.SecurityPolicyUnavailableException;
 import com.devops00.spectra.security.base.properties.SecurityProperties;
-import com.devops00.spectra.security.base.root.RootAuthorizationPolicy;
 import com.devops00.spectra.security.base.session.SessionConcurrencyMode;
 import com.devops00.spectra.security.base.session.SessionPolicy;
 import com.devops00.spectra.security.base.util.RefreshTokenRotationStore;
@@ -89,12 +88,6 @@ public class RedisSecuritySessionRepository
 
     private static final String HEADER_DEVICE_ID = "X-Device-Id";
 
-    private static final String SESSION_ASSURANCE_FIELD = "aal";
-
-    private static final String ASSURANCE_LEVEL_ONE = "AAL1";
-
-    private static final String ASSURANCE_LEVEL_TWO = "AAL2";
-
     private final ObjectMapper om;
     private final RedisTemplate<String, Object> redis;
     private final SecurityProperties properties;
@@ -132,16 +125,6 @@ public class RedisSecuritySessionRepository
      * 创建或构建目标数据（{@code createToken}）。
      */
     private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId) {
-        return createToken(user, clientType, familyId, isMfaVerified(user));
-    }
-
-    /**
-     * 创建或构建目标数据（{@code createToken}）。
-     */
-    private TokenVO createToken(SecurityUser user, ClientType clientType, String familyId, boolean mfaVerified) {
-        if (properties.isMfaRequiredForDevOps() && isRoot(user) && !mfaVerified) {
-            throw new IllegalStateException("DEV_OPS 必须先完成 MFA 验证");
-        }
         String userId = user.getId().toString();
         String ucKey = SecurityRedisKey.USER_CLIENT.format(userId, clientType.getName());
 
@@ -180,7 +163,6 @@ public class RedisSecuritySessionRepository
         session.put("loginTime", now);
         session.put("lastActiveTime", now);
         session.put("familyId", familyId);
-        session.put(SESSION_ASSURANCE_FIELD, mfaVerified ? ASSURANCE_LEVEL_TWO : ASSURANCE_LEVEL_ONE);
 
         String sessionKey = SecurityRedisKey.SESSION.format(tokenDigest);
         String userTokensKey = SecurityRedisKey.USER_TOKENS.format(userId);
@@ -194,13 +176,12 @@ public class RedisSecuritySessionRepository
         redis.opsForValue().set(rtKey, refreshDigest, refreshTtl);
         redis.opsForSet().add(SecurityRedisKey.SESSION_FAMILY.format(familyId), tokenDigest);
         redis.expire(SecurityRedisKey.SESSION_FAMILY.format(familyId), refreshTtl);
-        // Refresh Hash 保存刷新轮换所需的不可变会话声明；AAL 必须随 Refresh Token 轮换，不能依赖已过期的 Access Session。
+        // Refresh Hash 保存刷新轮换所需的不可变会话声明。
         Map<String, Object> rtData = new LinkedHashMap<>();
         rtData.put("accessToken", tokenDigest);
         rtData.put("userId", userId);
         rtData.put("clientType", clientType.getName());
         rtData.put("familyId", familyId);
-        rtData.put(SESSION_ASSURANCE_FIELD, mfaVerified ? ASSURANCE_LEVEL_TWO : ASSURANCE_LEVEL_ONE);
         String rtRefreshKey = SecurityRedisKey.REFRESH_TOKEN.format(refreshDigest);
         redis.opsForHash().putAll(rtRefreshKey, rtData);
         redis.expire(rtRefreshKey, refreshTtl);
@@ -261,7 +242,6 @@ public class RedisSecuritySessionRepository
                 () -> redis.opsForHash().entries(sessionKey));
         String clientType = Objects.toString(session.get("clientType"),
                 Objects.toString(rtData.get("clientType"), ClientType.WEB.getName()));
-        boolean mfaVerified = refreshAssurance(rtData);
         Duration refreshTtl = Duration.ofSeconds(sessionPolicy(clientType).refreshTtlSeconds());
         String replayFenceKey = SecurityRedisKey.REFRESH_REPLAY_FENCE.format(familyId);
         if (redisHasKey(replayFenceKey)) {
@@ -284,7 +264,7 @@ public class RedisSecuritySessionRepository
             if (redisHasKey(replayFenceKey)) {
                 throw new IllegalArgumentException("刷新token所属会话已因重放风险撤销");
             }
-            return createToken(currentUser, ClientType.fromName(clientType), familyId, mfaVerified);
+            return createToken(currentUser, ClientType.fromName(clientType), familyId);
         } catch (RuntimeException exception) {
             revokeFamilyForRefreshReplay(familyId);
             throw exception;
@@ -689,47 +669,12 @@ public class RedisSecuritySessionRepository
     }
 
     /**
-     * 判断条件是否满足（{@code isMfaVerified}）。
-     */
-    private boolean isMfaVerified(SecurityUser user) {
-        Map<String, Object> extraData = user.getExtraData();
-        return extraData != null && Boolean.TRUE.equals(extraData.get("mfaVerified"));
-    }
-
-    /**
      * 处理内部业务逻辑（{@code secureEquals}）。
      */
     private static boolean secureEquals(String expected, Object actual) {
         return actual != null
                 && MessageDigest.isEqual(expected.getBytes(StandardCharsets.UTF_8),
                         actual.toString().getBytes(StandardCharsets.UTF_8));
-    }
-
-    /**
-     * Refresh Token 的认证等级是创建会话时固化的安全声明。
-     * <p>
-     * Access Session 只有短 TTL，刷新时不能以它是否仍存在作为 MFA 是否完成的依据；
-     * 同时拒绝缺失或未知等级，避免不完整的旧格式刷新数据被降级解释为 AAL1。
-     */
-    private boolean refreshAssurance(Map<Object, Object> refreshData) {
-        String assurance = Objects.toString(refreshData.get(SESSION_ASSURANCE_FIELD), null);
-        if (ASSURANCE_LEVEL_ONE.equals(assurance)) {
-            return false;
-        }
-        if (ASSURANCE_LEVEL_TWO.equals(assurance)) {
-            return true;
-        }
-        throw new IllegalArgumentException("刷新token认证等级异常，请重新登录");
-    }
-
-    /**
-     * 判断条件是否满足（{@code isRoot}）。
-     */
-    private boolean isRoot(SecurityUser user) {
-        return user.getAuthorities()
-                .stream()
-                .anyMatch(authority -> RootAuthorizationPolicy.ROOT_ROLE
-                        .equals(authority.getAuthority()));
     }
 
     /**

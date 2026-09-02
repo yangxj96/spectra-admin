@@ -133,7 +133,7 @@ public class SqlExceptionAdvice {
     }
 
     /**
-     * 安全 Redis 不可用时必须停止 Token、Session、MFA 和防重放相关请求，不能返回普通 500 或继续降级。
+     * 安全 Redis 不可用时必须停止 Token、Session、验证码和防重放相关请求，不能返回普通 500 或继续降级。
      */
     @ExceptionHandler(SecurityRedisUnavailableException.class)
     public R<Object> handleSecurityRedisUnavailable(SecurityRedisUnavailableException e, HttpServletResponse response) {

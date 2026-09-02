@@ -56,9 +56,7 @@ public final class DefaultAuditSanitizer implements AuditSanitizer {
             "verificationcode",
             "verifycode",
             "smscode",
-            "emailcode",
-            "otp",
-            "totp");
+            "emailcode");
 
     private static final Pattern URL_SECRET = Pattern.compile(
             "(?i)([?&](?:x-amz-signature|x-amz-credential|signature|token|access_token|refresh_token|api_key|apikey|secret)=)[^&#\\s]*");

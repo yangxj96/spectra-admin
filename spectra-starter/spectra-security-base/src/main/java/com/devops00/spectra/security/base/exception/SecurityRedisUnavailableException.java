@@ -21,7 +21,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 /**
  * 安全 Redis 依赖不可用异常。
  *
- * <p>安全 Redis 是 Token、Session、MFA Challenge、验证码和防重放状态的事实源。
+ * <p>安全 Redis 是 Token、Session、验证码和防重放状态的事实源。
  * 发生连接、超时或命令执行失败时，调用方不得把故障解释为“数据不存在”并继续处理请求。</p>
  *
  * @author yangxj96

@@ -14,8 +14,6 @@ import com.devops00.spectra.common.audit.AuditService;
 import com.devops00.spectra.common.audit.RequestCorrelationContext;
 import com.devops00.spectra.core.security.authorization.controller.AuthorizationController;
 import com.devops00.spectra.core.security.authorization.javabean.from.OrganizationChangeFrom;
-import com.devops00.spectra.core.security.initialization.controller.SystemInitializationController;
-import com.devops00.spectra.core.security.initialization.javabean.from.SystemInitializationMfaConfirmFrom;
 import com.devops00.spectra.security.base.holder.SecurityContextAccessor;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -122,16 +120,6 @@ class AuditAspectContractTest {
         var context = recorded.get().context();
         assertTrue(!"invalid request id".equals(context.requestId()));
         assertEquals("correlation-456", context.correlationId());
-    }
-
-    @Test
-    void initializationMfaAuditMustUsePersistableEventType() throws NoSuchMethodException {
-        Method method = SystemInitializationController.class.getDeclaredMethod(
-                "confirmMfa", SystemInitializationMfaConfirmFrom.class);
-        Audit audit = method.getAnnotation(Audit.class);
-
-        assertEquals("SYSTEM_INITIALIZATION_MFA_CONFIRMED", audit.eventType());
-        assertTrue(audit.eventType().length() <= 100);
     }
 
     @Test

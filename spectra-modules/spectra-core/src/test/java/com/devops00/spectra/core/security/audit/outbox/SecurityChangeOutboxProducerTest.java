@@ -19,7 +19,6 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -60,7 +59,7 @@ class SecurityChangeOutboxProducerTest {
         producer.publish(event("SECURITY_AUDIT_VIEWED", AuditResult.SUCCEEDED));
 
         verify(repository, never()).enqueue(any(), any(), any(), any(), any(), any(), any(), any(), any());
-        assertTrue(SecurityChangeOutboxProducer.isDispatchable("MFA_FACTOR_ENROLLED"));
+        assertFalse(SecurityChangeOutboxProducer.isDispatchable("MFA_FACTOR_ENROLLED"));
         assertFalse(SecurityChangeOutboxProducer.isDispatchable("AUTH_LOGIN_SUCCEEDED"));
     }
 

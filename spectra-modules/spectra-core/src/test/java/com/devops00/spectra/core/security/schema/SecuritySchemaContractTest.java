@@ -59,9 +59,6 @@ class SecuritySchemaContractTest {
                 "sec_authentication_method",
                 "sec_session_policy",
                 "sec_password_policy",
-                "sec_mfa_enrollment",
-                "sec_totp_credential",
-                "sec_recovery_code",
                 "sec_root_policy",
                 "sec_role_menu")) {
             assertTrue(migration.contains("CREATE TABLE spectra_security." + table), table);
@@ -121,8 +118,11 @@ class SecuritySchemaContractTest {
         assertTrue(migration.contains("CREATE TABLE spectra_core.sys_system_state"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.sec_assignment_permission_boundary"));
         assertTrue(migration.contains("CREATE TABLE spectra_security.sec_assignment_grant_boundary"));
-        assertTrue(migration.contains("encrypted_secret bytea"));
-        assertTrue(migration.contains("code_hash character varying(255)"));
+        assertFalse(migration.contains("CREATE TABLE spectra_security.sec_mfa_enrollment"));
+        assertFalse(migration.contains("CREATE TABLE spectra_security.sec_totp_credential"));
+        assertFalse(migration.contains("CREATE TABLE spectra_security.sec_recovery_code"));
+        assertFalse(migration.contains("encrypted_secret bytea"));
+        assertFalse(migration.contains("code_hash character varying(255)"));
     }
 
     @Test

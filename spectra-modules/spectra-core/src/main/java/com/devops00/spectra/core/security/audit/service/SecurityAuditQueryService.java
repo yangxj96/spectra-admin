@@ -212,7 +212,7 @@ public class SecurityAuditQueryService {
         if (!visibilityPolicy.canViewHighRisk(viewer)) {
             conditions.add("NOT (UPPER(event_type) LIKE '%ROOT%' OR UPPER(event_type) LIKE '%BREAK_GLASS%' "
                     + "OR UPPER(event_type) LIKE '%SECURITY%' OR UPPER(event_type) LIKE '%SESSION%' "
-                    + "OR UPPER(event_type) LIKE '%MFA%' OR UPPER(event_type) LIKE '%PASSWORD%' "
+                    + "OR UPPER(event_type) LIKE '%PASSWORD%' "
                     + "OR UPPER(event_type) LIKE '%AUDIT%')");
             if (!visibilityPolicy.canViewAllNonHighRisk(viewer)) {
                 UUID viewerId = visibilityPolicy.viewerId(viewer);

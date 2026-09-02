@@ -80,18 +80,6 @@ public class TokenVO implements Serializable {
      */
     private List<String> permissions;
 
-    /** 是否需要在创建正式会话前完成 MFA。 */
-    private boolean mfaRequired;
-
-    /** 是否需要先完成首次 TOTP 登记。 */
-    private boolean mfaEnrollmentRequired;
-
     /** 是否需要先修改临时密码。 */
     private boolean passwordChangeRequired;
-
-    /** MFA 预认证挑战 ID；仅短期有效，不是 Access Token。 */
-    private String mfaChallengeId;
-
-    /** MFA 预认证挑战过期时间（毫秒时间戳）。 */
-    private Long mfaChallengeExpiresAt;
 }
