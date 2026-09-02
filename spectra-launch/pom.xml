@@ -151,12 +151,15 @@
                 <version>${spring-boot.maven.plugin.version}</version>
                 <executions>
                     <execution>
+                        <id>repackage</id>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
+                    <!-- 只有启动模块执行 spring-boot:run -->
+                    <skip>false</skip>
                     <!-- 启动类 -->
                     <mainClass>com.devops00.spectra.launch.LaunchApplication</mainClass>
                     <!-- 排除lombok -->

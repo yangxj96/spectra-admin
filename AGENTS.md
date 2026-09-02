@@ -10,9 +10,38 @@
 
 ## 本地开发启动流程
 
-- 启动后端前先在 `spectra-admin/` 根目录执行 `mise exec -- ./mvnw install -DskipTests`，确保依赖和可执行包已安装。
-- 启动后端统一使用 `mise exec -- ./mvnw -f spectra-launch/pom.xml spring-boot:run -Dspring-boot.run.profiles=dev`，通过 mise 加载 `.mise.local.toml` 环境；不得读取或输出该文件中的凭据。
+- 命令均在本目录（`spectra-admin/`）根目录执行；`-pl spectra-launch -am` 使用 Maven reactor 内的模块输出，不需要为日常启动预先 `install`。
+- 启动后端统一使用：
+
+  ```bash
+  mise exec -- ./mvnw -pl spectra-launch -am spring-boot:run \
+      -Dspring-boot.run.profiles=dev \
+      -Dmaven.test.skip=true
+  ```
+
+  `-Dmaven.test.skip=true` 会跳过测试资源处理、测试编译和测试执行；通过 mise 加载 `.mise.local.toml` 环境，但不得读取或输出该文件中的凭据。
+- 执行单元测试使用：
+
+  ```bash
+  mise exec -- ./mvnw -pl spectra-launch -am test
+  ```
+
+  单元测试命令不得携带 `-Dmaven.test.skip=true`。如果 Java 25 下 Mockito inline 报 Byte Buddy self-attach 错误，先确认本机 JDK 的动态 agent 权限，再按本机 Maven 仓库中实际的 Byte Buddy agent 路径临时传入 `-DargLine=-javaagent:<path>`；不要把本机绝对路径写入仓库。
+- 阶段性完成后执行质量门禁：
+
+  ```bash
+  mise exec -- ./mvnw -pl spectra-launch -am verify \
+      -Dmaven.test.skip=true
+  ```
+
+  该命令执行编译、打包、Spotless、Checkstyle、PMD、SpotBugs 和 Enforcer，但不执行单元测试；Spotless 的 `check` 只验证格式，不自动修改文件。
+- `spring-boot:run` 不进入 `verify` 阶段，因此日常启动不会执行 Spotless、Checkstyle、PMD 和 SpotBugs；Enforcer 位于 `validate` 阶段，仍然执行。
 - `spring-boot:run` 的工作目录由 `spectra-launch/pom.xml` 指向 `spectra-admin/` 根目录，以便正确解析 `files/` 下的本地开发资源。
+
+## 本地 Flyway 状态
+
+- 当前数据库结构来源是 `spectra-config/src/main/resources/db/migration/` 的 V1 基线及后续递增 migration；不得通过打开 `baseline-on-migrate`、`repair`、删除 `flyway_schema_history` 记录或忽略缺失 migration 来掩盖版本漂移。
+- 如果开发库提示数据库版本高于仓库最新 migration，先确认 `DB_URL` 指向可丢弃的开发库；当前仓库基线重整后，执行过旧 V1～V34 或其他历史链的开发库应重建，再由当前 migration 链初始化。需要保留数据的环境必须先设计并审查一次性结构/数据迁移。
 
 ## 实现约束
 
